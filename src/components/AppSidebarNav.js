@@ -4,20 +4,29 @@ import PropTypes from 'prop-types'
 
 import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
+import CIcon from '@coreui/icons-react'
 
-import { CBadge, CNavLink, CSidebarNav } from '@coreui/react'
+import { CBadge, CNavLink, CNavGroup, CNavItem, CSidebarNav } from '@coreui/react'
+import * as iconSet from '@coreui/icons'
 
 export const AppSidebarNav = ({ items }) => {
+  const componentMap = {
+    CNavItem: CNavItem,
+    CNavGroup: CNavGroup,
+    CNavLink: CNavLink,
+  }
   const navLink = (name, icon, badge, indent = false) => {
     return (
       <>
-        {icon
-          ? icon
-          : indent && (
-              <span className="nav-icon">
-                <span className="nav-icon-bullet"></span>
-              </span>
-            )}
+        {icon && iconSet[icon] ? (
+          <CIcon icon={iconSet[icon]} customClassName="nav-icon" />
+        ) : (
+          indent && (
+            <span className="nav-icon">
+              <span className="nav-icon-bullet"></span>
+            </span>
+          )
+        )}
         {name && name}
         {badge && (
           <CBadge color={badge.color} className="ms-auto" size="sm">
@@ -30,7 +39,7 @@ export const AppSidebarNav = ({ items }) => {
 
   const navItem = (item, index, indent = false) => {
     const { component, name, badge, icon, ...rest } = item
-    const Component = component
+    const Component = componentMap[component]
     return (
       <Component as="div" key={index}>
         {rest.to || rest.href ? (
@@ -50,7 +59,7 @@ export const AppSidebarNav = ({ items }) => {
 
   const navGroup = (item, index) => {
     const { component, name, icon, items, to, ...rest } = item
-    const Component = component
+    const Component = componentMap[component]
     return (
       <Component compact as="div" key={index} toggler={navLink(name, icon)} {...rest}>
         {items?.map((item, index) =>
@@ -63,7 +72,9 @@ export const AppSidebarNav = ({ items }) => {
   return (
     <CSidebarNav as={SimpleBar}>
       {items &&
-        items.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}
+        items.map((item, index) =>
+          item.items.length > 0 ? navGroup(item, index) : navItem(item, index),
+        )}
     </CSidebarNav>
   )
 }

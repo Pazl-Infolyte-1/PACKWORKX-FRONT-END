@@ -1,8 +1,9 @@
+
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import eslintPluginReact from 'eslint-plugin-react'
 import eslintPluginReactHooks from 'eslint-plugin-react-hooks'
 import globals from 'globals'
-
+ 
 export default [
   { ignores: ['eslint.config.mjs'] },
   {
@@ -32,8 +33,11 @@ export default [
       },
     },
     rules: {
-      ...eslintPluginReactHooks.configs.recommended.rules,
+      ...eslintPluginReactHooks.configs.recommended.rules,'prettier/prettier': ['error', { endOfLine: 'auto' }]
     },
   },
   eslintPluginPrettierRecommended,
 ]
+ 
+ 
+ 

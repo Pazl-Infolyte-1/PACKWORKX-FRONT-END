@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
@@ -16,13 +16,30 @@ import { AppSidebarNav } from './AppSidebarNav'
 import { logo } from 'src/assets/brand/logo'
 import { sygnet } from 'src/assets/brand/sygnet'
 
-// sidebar nav config
-import navigation from '../_nav'
-
 const AppSidebar = () => {
   const dispatch = useDispatch()
+  const [navigation, setNavigation] = useState([])
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('https://mocki.io/v1/48b130d9-74b7-4ea6-8b03-c30794d35c24')
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`)
+        }
+
+        const data = await response.json()
+        setNavigation(data)
+      } catch (error) {
+        console.error('Fetch error:', error)
+      }
+    }
+
+    fetchData()
+  }, []) // ✅ Runs only on initial render
 
   return (
     <CSidebar
@@ -35,7 +52,7 @@ const AppSidebar = () => {
         dispatch({ type: 'set', sidebarShow: visible })
       }}
     >
-      <CSidebarHeader className="border-bottom">
+      <CSidebarHeader className="border-bottom d-flex align-items-center justify-content-between p-3">
         <CSidebarBrand to="/">
           <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} />
           <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />
@@ -46,7 +63,9 @@ const AppSidebar = () => {
           onClick={() => dispatch({ type: 'set', sidebarShow: false })}
         />
       </CSidebarHeader>
+
       <AppSidebarNav items={navigation} />
+
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler
           onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}

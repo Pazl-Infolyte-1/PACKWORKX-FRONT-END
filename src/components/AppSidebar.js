@@ -39,7 +39,7 @@ const AppSidebar = () => {
     }
 
     fetchData()
-  }, []) // ✅ Runs only on initial render
+  }, [])
 
   return (
     <CSidebar

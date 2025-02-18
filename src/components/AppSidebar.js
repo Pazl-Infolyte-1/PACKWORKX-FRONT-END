@@ -25,7 +25,7 @@ const AppSidebar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://mocki.io/v1/48b130d9-74b7-4ea6-8b03-c30794d35c24')
+        const response = await fetch('https://mocki.io/v1/06462cba-3291-4ee4-b45f-bac79856b843')
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`)

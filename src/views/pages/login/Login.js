@@ -51,11 +51,13 @@ const Login = () => {
       if (response.status === true && response.data) {
         // Save token or user data in localStorage or context if needed
         localStorage.setItem('token', response.data.token)
+        console.log('Token stored:', localStorage.getItem('token'))
+
         // Dispatch the login success action
         dispatch({
           type: 'LOGIN_SUCCESS',
           payload: {
-            user: response.data.user || { username: formData.username }, // Adjust based on your API response
+            user: response.data.user || { username: formData.username },
             token: response.data.token,
           },
         })

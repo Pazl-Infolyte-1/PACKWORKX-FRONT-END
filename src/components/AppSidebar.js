@@ -15,6 +15,7 @@ import { AppSidebarNav } from './AppSidebarNav'
 
 import { logo } from 'src/assets/brand/logo'
 import { sygnet } from 'src/assets/brand/sygnet'
+import apiMethods from '../api/config'
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
@@ -25,16 +26,20 @@ const AppSidebar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://mocki.io/v1/48b130d9-74b7-4ea6-8b03-c30794d35c24')
+        const response = await apiMethods.getSideBarMenu()
+        console.log('API Response:', response)
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`)
+        // Assuming apiMethods.getSideBarMenu() returns a promise that resolves to the data directly
+        // If it returns a fetch response, you'll need to use response.json()
+        if (response && response.data) {
+          setNavigation(response.data)
+        } else {
+          throw new Error('Invalid response format')
         }
-
-        const data = await response.json()
-        setNavigation(data)
       } catch (error) {
         console.error('Fetch error:', error)
+        // You might want to set some error state here
+        setNavigation([]) // Set empty navigation on error
       }
     }
 

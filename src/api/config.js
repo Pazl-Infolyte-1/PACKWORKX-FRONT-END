@@ -16,12 +16,15 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
+    console.log('Interceptor token:', token)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+      console.log('Authorization header set:', config.headers.Authorization)
     }
     return config
   },
   (error) => {
+    console.error('Request interceptor error:', error)
     return Promise.reject(error)
   },
 )
@@ -53,6 +56,12 @@ const endpoints = {
     logout: {
       url: '/auth/logout',
       method: 'POST',
+    },
+  },
+  menu: {
+    sideBarMenu: {
+      url: '/rbac',
+      method: 'GET',
     },
   },
   customers: {
@@ -124,6 +133,18 @@ export const apiMethods = {
     }
   },
 
+  // side bar menu
+  getSideBarMenu: async (params) => {
+    try {
+      const token = localStorage.getItem('token')
+      console.log('object', token)
+      const { url, method } = endpoints.menu.sideBarMenu
+      const response = await apiClient[method.toLowerCase()](url, { params })
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
   // Customer methods
   getCustomers: async (params) => {
     try {

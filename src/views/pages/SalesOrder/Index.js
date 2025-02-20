@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Form from '../../common/Form'
+import Forms from '../../common/Forms'
 import Table from '../../common/Table'
 import { CButton } from '@coreui/react'
 import FilterComponent from '../../common/FilterComponent'
@@ -61,7 +62,8 @@ function Index() {
         </div>
       </div>
       <FilterComponent />
-      <Form visible={visible} setVisible={setVisible} formFields={formFields} />
+      {/* <Form visible={visible} setVisible={setVisible} formFields={formFields} /> */}
+      <Forms visible={visible} setVisible={setVisible} />
       <Table data={salesData} />
     </>
   )

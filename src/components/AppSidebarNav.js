@@ -8,8 +8,15 @@ import CIcon from '@coreui/icons-react'
 
 import { CBadge, CNavLink, CNavGroup, CNavItem, CSidebarNav, CNavTitle } from '@coreui/react'
 import * as iconSet from '@coreui/icons'
+import routeMappings from '../../src/routes'
 
 export const AppSidebarNav = ({ items }) => {
+  const getPathFromKey = (key) => {
+    console.log('Key', key)
+    const route = routeMappings.find((r) => r.key === key)
+    return route ? route.path : '#'
+  }
+  console.log('items for menu', items)
   const navLink = (title, icon, badge, indent = false) => {
     return (
       <>
@@ -33,39 +40,44 @@ export const AppSidebarNav = ({ items }) => {
   }
 
   const navItem = (item, index, indent = false) => {
-    const { component, title, badge, icon, ...rest } = item
+    console.log('item navItem', item)
+    const { subModuleName, badge, subModuleIconName, subModuleKey, ...rest } = item
     const Component = CNavItem
+    const path = getPathFromKey(subModuleKey)
     return (
       <Component as="div" key={index}>
-        <CNavLink
-          {...(rest.to && { as: NavLink })}
-          {...(rest.href && { target: '_blank', rel: 'noopener noreferrer' })}
-          {...rest}
-        >
-          {navLink(title, icon, badge, indent)}
+        <CNavLink as={NavLink} to={path} {...rest}>
+          {navLink(subModuleName, subModuleIconName, badge, indent)}
         </CNavLink>
       </Component>
     )
   }
 
   const navGroup = (item, index) => {
-    const { title, icon, items, submenus, to, ...rest } = item
-    const Component = submenus && submenus.length > 0 ? CNavGroup : CNavItem
+    console.log('item navGroup', item)
+    const { moduleName, moduleIconName, subModules, moduleKey, ...rest } = item
+    const Component = subModules && subModules.length > 0 ? CNavGroup : CNavItem
     return (
-      <Component compact as="div" key={index} toggler={navLink(title, icon)} {...rest}>
-        {submenus?.map((item, index) => navItem(item, index, true))}
+      <Component
+        compact
+        as="div"
+        key={index}
+        toggler={navLink(moduleName, moduleIconName)}
+        {...rest}
+      >
+        {subModules?.map((item, index) => navItem(item, index, true))}
       </Component>
     )
   }
 
   return (
     <CSidebarNav as={SimpleBar}>
-      {items.menuGroups &&
-        items.menuGroups.map((item, index) => (
+      {items &&
+        items.map((item, index) => (
           <React.Fragment key={index}>
-            <CNavTitle className="nav-title">{item.title}</CNavTitle>
-            {item.menus.map((i, indexing) =>
-              i.submenus.length > 0 ? navGroup(i, indexing) : navItem(i, indexing),
+            <CNavTitle className="nav-title">{item.groupName}</CNavTitle>
+            {item.modules.map((i, indexing) =>
+              i.subModules.length > 0 ? navGroup(i, indexing) : navItem(i, indexing),
             )}
           </React.Fragment>
         ))}

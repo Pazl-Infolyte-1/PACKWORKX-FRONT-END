@@ -16,6 +16,7 @@ import Dropdown from 'react-bootstrap/Dropdown'
 import { FaAngleDown, FaAngleUp, FaEllipsisV, FaRedoAlt, FaEye } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
 import { cilBriefcase, cilMinus, cilClipboard, cilCut, cilOptions, cilReload } from '@coreui/icons'
+import { useNavigate } from 'react-router-dom'
 
 const ItemType = 'WORK_ORDER'
 
@@ -36,7 +37,7 @@ const CustomToggle = React.forwardRef(({ onClick }, ref) => (
   </span>
 ))
 
-function WorkOrderCard({ order, index, visibleIndex, setVisibleIndex }) {
+function WorkOrderCard({ order, index, visibleIndex, setVisibleIndex, removeWOFromPlan }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
     item: { order, index },
@@ -72,8 +73,38 @@ function WorkOrderCard({ order, index, visibleIndex, setVisibleIndex }) {
           <Dropdown>
             <Dropdown.Toggle as={CustomToggle} />
             <Dropdown.Menu>
-              <Dropdown.Item onClick={() => handleEdit(item)}>Edit</Dropdown.Item>
-              <Dropdown.Item onClick={() => handleDelete(item)}>Delete</Dropdown.Item>
+              <Dropdown.Item onClick={() => console.log('View Work Order', order)}>
+                <CIcon
+                  icon={cilBriefcase}
+                  className="me-2"
+                  style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                />
+                View Work Order
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => console.log('View Sales Order', order)}>
+                <CIcon
+                  icon={cilClipboard}
+                  className="me-2"
+                  style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                />
+                View Sales Order
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => removeWOFromPlan(order)}>
+                <CIcon
+                  icon={cilMinus}
+                  className="me-2"
+                  style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                />
+                Remove from Plan
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => console.log('Split Work Order', order)}>
+                <CIcon
+                  icon={cilCut}
+                  className="me-2"
+                  style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                />
+                Split Work Order
+              </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -115,6 +146,7 @@ function GroupOrderDropZone({
   groupVisibleIndex,
   setGroupVisibleIndex,
   removeWorkOrderFromGroup,
+  removeWorkOrderFromPlan,
 }) {
   const [, drop] = useDrop(() => ({
     accept: ItemType,
@@ -208,6 +240,14 @@ function GroupOrderDropZone({
                         View Sales Order
                       </Dropdown.Item>
                       <Dropdown.Item onClick={() => removeWorkOrderFromGroup(item, groupIndex)}>
+                        <CIcon
+                          icon={cilMinus}
+                          className="me-2"
+                          style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                        />
+                        Remove from Group
+                      </Dropdown.Item>
+                      <Dropdown.Item onClick={() => removeWorkOrderFromPlan(item, groupIndex)}>
                         <CIcon
                           icon={cilMinus}
                           className="me-2"
@@ -450,6 +490,14 @@ const Index = () => {
 
   const [groupOrders, setGroupOrders] = useState([])
   const [activeTab, setActiveTab] = useState('group')
+  const tabs = ['group', 'sfg', 'rm', 'returnables']
+
+  const handleNextStep = () => {
+    const currentIndex = tabs.indexOf(activeTab)
+    if (currentIndex < tabs.length - 1) {
+      setActiveTab(tabs[currentIndex + 1])
+    }
+  }
 
   const removeWorkOrderFromGroup = (order, groupIndex) => {
     console.log('Removing order from group', order, groupIndex)
@@ -466,6 +514,23 @@ const Index = () => {
       updatedOrders.sort((a, b) => a.id - b.id)
       return updatedOrders
     })
+  }
+
+  const removeWorkOrderFromPlan = (order, groupIndex) => {
+    console.log('Removing order from group', order, groupIndex)
+
+    setGroupOrders((prevGroups) =>
+      prevGroups.map((group, index) =>
+        index === groupIndex
+          ? { ...group, items: group.items.filter((item) => item.id !== order.id) }
+          : group,
+      ),
+    )
+  }
+
+  const removeWOFromPlan = (order) => {
+    console.log('Removing order from plan', order)
+    setWorkOrders((prevOrders) => prevOrders.filter((item) => item.id !== order.id))
   }
 
   const handleAutoSync = () => {
@@ -496,16 +561,6 @@ const Index = () => {
         return prevGroups
       }
 
-      // const isOrderInAnyGroup = prevGroups.some((group) =>
-      //   group.items.some((item) => item.id === order.id),
-      // )
-
-      // if (isOrderInAnyGroup) {
-      //   alert(
-      //     `Work Order ${order.order_id} is already assigned to a group and cannot be added again.`,
-      //   )
-      //   return prevGroups
-      // }
       setWorkOrders((prevOrders) => prevOrders.filter((item) => item.id !== order.id))
 
       return prevGroups.map((group, index) =>
@@ -533,150 +588,111 @@ const Index = () => {
           >
             + Add Group
           </CButton>
-          <CButton color="danger" className="text-white">
+          <CButton color="danger" className="text-white" onClick={handleNextStep}>
             Next Step
           </CButton>
         </div>
       </div>
 
-      <CRow>
-        <CCol xs={12}>
-          <CNav variant="tabs">
-            <CNavItem>
+      <CCol xs={12}>
+        <CNav variant="tabs">
+          {tabs.map((tab) => (
+            <CNavItem key={tab}>
               <CNavLink
-                href="#"
-                active={activeTab === 'group'}
-                onClick={() => setActiveTab('group')}
+                active={activeTab === tab}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setActiveTab(tab)
+                }}
                 style={{
-                  padding: '8px 8px',
-                  border: '0',
-                  boxSizing: 'border-box',
-                  borderRadius: '4px',
-                  boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
-                  backgroundColor: activeTab === 'group' ? '#8761e5' : 'transparent',
-                  color: activeTab === 'group' ? '#ffffff' : '#8761e5',
-                  fontSize: '15px',
-                  fontFamily: 'Roboto',
-                  fontWeight: '500',
-                  lineHeight: '20px',
-                  outline: 'none',
+                  backgroundColor: activeTab === tab ? '#8761e5' : 'transparent',
+                  color: activeTab === tab ? '#ffffff' : '#8761e5',
                 }}
               >
-                Group
+                {tab.charAt(0).toUpperCase() + tab.slice(1).replace(/_/g, ' ')}
               </CNavLink>
             </CNavItem>
-
-            <CNavItem>
-              <CNavLink
-                href="#"
-                active={activeTab === 'sfg'}
-                onClick={() => setActiveTab('sfg')}
-                style={{
-                  backgroundColor: activeTab === 'sfg' ? '#8761e5' : 'transparent',
-                  color: activeTab === 'sfg' ? '#ffffff' : '#8761e5',
-                }}
-              >
-                Allocate SFG
-              </CNavLink>
-            </CNavItem>
-
-            <CNavItem>
-              <CNavLink
-                href="#"
-                active={activeTab === 'rm'}
-                onClick={() => setActiveTab('rm')}
-                style={{
-                  backgroundColor: activeTab === 'rm' ? '#8761e5' : 'transparent',
-                  color: activeTab === 'rm' ? '#ffffff' : '#8761e5',
-                }}
-              >
-                Allocate RM
-              </CNavLink>
-            </CNavItem>
-
-            <CNavItem>
-              <CNavLink
-                href="#"
-                active={activeTab === 'returnables'}
-                onClick={() => setActiveTab('returnables')}
-                style={{
-                  backgroundColor: activeTab === 'returnables' ? '#8761e5' : 'transparent',
-                  color: activeTab === 'returnables' ? '#ffffff' : '#8761e5',
-                }}
-              >
-                Returnables
-              </CNavLink>
-            </CNavItem>
-          </CNav>
-        </CCol>
-      </CRow>
+          ))}
+        </CNav>
+      </CCol>
 
       <CRow>
-        <CCol xs={5} className="mt-4">
-          <CRow>
-            <CCol xs={12}>
-              <CCard
-                className="text-black bold"
-                style={{
-                  cursor: 'pointer',
-                  height: '56px',
-                  padding: '0px 8px',
-                  border: '0',
-                  boxSizing: 'border-box',
-                  borderRadius: '4px',
-                  boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
-                  backgroundColor: '#c7c7f1',
-                  color: '#000000',
-                  fontSize: '22px',
-                  fontFamily: 'Roboto',
-                  fontWeight: '500',
-                  lineHeight: '31px',
-                  outline: 'none',
-                }}
-              >
-                <CCardBody>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <CCardText className="mx-auto text-bold">Work Orders</CCardText>
-                    <CIcon
-                      icon={cilReload}
-                      onClick={handleAutoSync}
-                      className="me-2 hover-pointer"
-                      style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
+        <CCol xs={12} className="mt-4">
+          {activeTab === 'group' && (
+            <div>
+              <CCol xs={5} className="mt-4">
+                <CRow>
+                  <CCol xs={12}>
+                    <CCard
+                      className="text-black bold"
+                      style={{
+                        cursor: 'pointer',
+                        height: '56px',
+                        padding: '0px 8px',
+                        border: '0',
+                        boxSizing: 'border-box',
+                        borderRadius: '4px',
+                        boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
+                        backgroundColor: '#c7c7f1',
+                        color: '#000000',
+                        fontSize: '22px',
+                        fontFamily: 'Roboto',
+                        fontWeight: '500',
+                        lineHeight: '31px',
+                        outline: 'none',
+                      }}
+                    >
+                      <CCardBody>
+                        <div className="d-flex justify-content-between align-items-center">
+                          <CCardText className="mx-auto text-bold">Work Orders</CCardText>
+                          <CIcon
+                            icon={cilReload}
+                            onClick={handleAutoSync}
+                            className="me-2 hover-pointer"
+                            style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
+                          />
+                        </div>
+                      </CCardBody>
+                    </CCard>
+                  </CCol>
+                </CRow>
+                <CRow className="mt-3">
+                  <CCol xs={12}>
+                    {workOrders.map((order) => (
+                      <WorkOrderCard
+                        key={order.id}
+                        order={order}
+                        index={order.id}
+                        visibleIndex={visibleIndex}
+                        setVisibleIndex={setVisibleIndex}
+                        removeWOFromPlan={removeWOFromPlan}
+                      />
+                    ))}
+                  </CCol>
+                </CRow>
+              </CCol>
+
+              <CCol xs={7} className="mt-1">
+                <CRow className="mt-2 px-3 py-3">
+                  {groupOrders.map((groupOrder, groupIndex) => (
+                    <GroupOrderDropZone
+                      key={groupIndex}
+                      groupOrder={groupOrder}
+                      groupIndex={groupIndex}
+                      addWorkOrderToGroup={addWorkOrderToGroup}
+                      groupVisibleIndex={groupVisibleIndex}
+                      setGroupVisibleIndex={setGroupVisibleIndex}
+                      removeWorkOrderFromGroup={removeWorkOrderFromGroup}
+                      removeWorkOrderFromPlan={removeWorkOrderFromPlan}
                     />
-                  </div>
-                </CCardBody>
-              </CCard>
-            </CCol>
-          </CRow>
-          <CRow className="mt-3">
-            <CCol xs={12}>
-              {workOrders.map((order) => (
-                <WorkOrderCard
-                  key={order.id}
-                  order={order}
-                  index={order.id}
-                  visibleIndex={visibleIndex}
-                  setVisibleIndex={setVisibleIndex}
-                />
-              ))}
-            </CCol>
-          </CRow>
-        </CCol>
-
-        <CCol xs={7} className="mt-1">
-          <CRow className="mt-2 px-3 py-3">
-            {groupOrders.map((groupOrder, groupIndex) => (
-              <GroupOrderDropZone
-                key={groupIndex}
-                groupOrder={groupOrder}
-                groupIndex={groupIndex}
-                addWorkOrderToGroup={addWorkOrderToGroup}
-                groupVisibleIndex={groupVisibleIndex}
-                setGroupVisibleIndex={setGroupVisibleIndex}
-                removeWorkOrderFromGroup={removeWorkOrderFromGroup}
-              />
-            ))}
-          </CRow>
+                  ))}
+                </CRow>
+              </CCol>
+            </div>
+          )}
+          {activeTab === 'sfg' && <div>Allocate SFG Content</div>}
+          {activeTab === 'rm' && <div>Allocate RM Content</div>}
+          {activeTab === 'returnables' && <div>Returnables Content</div>}
         </CCol>
       </CRow>
     </div>

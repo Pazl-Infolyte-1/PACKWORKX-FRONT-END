@@ -1,96 +1,75 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import {
-  CButton,
-  CModal,
-  CModalBody,
-  CModalFooter,
-  CModalHeader,
-  CModalTitle,
-  CFormInput,
-  CFormLabel,
-  CFormSelect,
-  CFormCheck,
-  CRow,
-  CCol,
-  CFormTextarea,
-} from '@coreui/react'
+import { CButton, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/react'
 
 const Forms = ({ visible, setVisible }) => {
-  const initialValues = {}
-
   const [SKUformData, setSKUformData] = useState({ sections: [] })
-  const [visibleSections, setVisibleSections] = useState({
-    corrugated_sheet: false,
-    corrugated_box: false,
-    die_cut_box: false,
-    sku_management: false,
-    custom_items: false,
-  })
+  const [visibleSections, setVisibleSections] = useState({})
+  const [skuTypeSelected, setSkuTypeSelected] = useState(false)
+  const [formValues, setFormValues] = useState({})
 
+  // Fetching form data
   useEffect(() => {
-    axios
-      .get('https://mocki.io/v1/d28c5219-9f41-4ef2-b642-0d53cab4d893')
-      .then((resp) => {
-        console.log('Response:', resp.data)
-        setSKUformData(resp.data || { sections: [] })
-      })
-      .catch((err) => console.error('Error fetching data:', err.response || err))
-  }, [])
+    const fetchFormData = async () => {
+      try {
+        const response = await axios.get('https://mocki.io/v1/d28c5219-9f41-4ef2-b642-0d53cab4d893')
+        console.log('Response:', response.data)
 
-  if (SKUformData?.sections?.length > 0) {
-    SKUformData.sections.forEach((section) => {
-      if (section.inputs) {
-        section.inputs.forEach((input) => {
-          if (input.defaultValue !== undefined) {
-            initialValues[input.id] =
-              input.type === 'checkbox' ? [input.defaultValue] : input.defaultValue
+        if (!response.data || !response.data.sections) {
+          setSKUformData({ sections: [] })
+          return
+        }
+
+        setSKUformData(response.data)
+
+        const initialVisibility = {}
+        response.data.sections.forEach((section) => {
+          initialVisibility[section.groupId] = false
+        })
+
+        setVisibleSections(initialVisibility)
+
+        // Initialize form values after fetching data
+        const newFormValues = {}
+        response.data.sections.forEach((section) => {
+          if (section.inputs) {
+            section.inputs.forEach((input) => {
+              if (input.defaultValue !== undefined) {
+                newFormValues[input.id] =
+                  input.type === 'checkbox' ? [input.defaultValue] : input.defaultValue
+              }
+            })
           }
         })
+
+        setFormValues(newFormValues)
+      } catch (error) {
+        console.error('Error fetching data:', error.response || error)
       }
-    })
-  }
+    }
 
-  const [formValues, setFormValues] = useState(initialValues)
+    fetchFormData()
+  }, [])
 
+  // Handling input changes
   const handleChange = (e, id, isMultiSelect = false, isCheckbox = false, isToggle = false) => {
-    // console.log(e.target.value);
-    if (Number(e.target.value) === 1) {
-      document.getElementById('corrugated_sheet').style.display = 'block'
-      document.getElementById('corrugated_box').style.display = 'none'
-      document.getElementById('die_cut_box').style.display = 'none'
-      document.getElementById('sku_management').style.display = 'none'
-      document.getElementById('custom_items').style.display = 'none'
-    } else if (Number(e.target.value) === 2) {
-      document.getElementById('corrugated_sheet').style.display = 'none'
-      document.getElementById('corrugated_box').style.display = 'block'
-      document.getElementById('die_cut_box').style.display = 'none'
-      document.getElementById('sku_management').style.display = 'none'
-      document.getElementById('custom_items').style.display = 'none'
-    } else if (Number(e.target.value) === 3) {
-      document.getElementById('corrugated_sheet').style.display = 'none'
-      document.getElementById('corrugated_box').style.display = 'none'
-      document.getElementById('die_cut_box').style.display = 'block'
-      document.getElementById('sku_management').style.display = 'none'
-      document.getElementById('custom_items').style.display = 'none'
-    } else if (Number(e.target.value) === 4) {
-      document.getElementById('corrugated_sheet').style.display = 'none'
-      document.getElementById('corrugated_box').style.display = 'none'
-      document.getElementById('die_cut_box').style.display = 'none'
-      document.getElementById('custom_items').style.display = 'block'
-      document.getElementById('sku_management').style.display = 'block'
-    } else if (Number(e.target.value) === 5) {
-      document.getElementById('corrugated_sheet').style.display = 'none'
-      document.getElementById('corrugated_box').style.display = 'none'
-      document.getElementById('die_cut_box').style.display = 'none'
-      document.getElementById('sku_management').style.display = 'none'
-      document.getElementById('custom_items').style.display = 'none'
-    } else {
-      document.getElementById('corrugated_sheet').style.display = 'none'
-      document.getElementById('corrugated_box').style.display = 'none'
-      document.getElementById('die_cut_box').style.display = 'none'
-      document.getElementById('sku_management').style.display = 'none'
-      document.getElementById('custom_items').style.display = 'none'
+    const value = e.target.value
+
+    console.log('id', id)
+
+    if (id === 'sku_name') {
+      console.log('Selected SKU Type:', value)
+      setSkuTypeSelected(true)
+
+      const newVisibility = {
+        corrugated_sheet: value === '1',
+        corrugated_box: value === '2',
+        die_cut_box: value === '3',
+        sku_management: value === '4',
+        custom_items: value === '5',
+      }
+
+      setVisibleSections(newVisibility)
     }
 
     if (isToggle) {
@@ -110,229 +89,125 @@ const Forms = ({ visible, setVisible }) => {
     }
   }
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Form Data Submitted:', formValues)
   }
 
   return (
-    <>
-      <CModal
-        alignment="center"
-        scrollable
-        size="xl"
-        visible={visible}
-        onClose={() => setVisible(false)}
-        aria-labelledby="VerticallyCenteredScrollableExample2"
-      >
-        <CModalHeader>
-          <CModalTitle id="VerticallyCenteredScrollableExample2">
-            {SKUformData.pageTitle}
-          </CModalTitle>
-        </CModalHeader>
-        <CModalBody>
-          <form className="container" onSubmit={handleSubmit}>
-            {SKUformData.sections.map((section, sectionIndex) => {
-              const { groupName, count, inputs, groupId, groupShow } = section
-              const chunkedInputs = []
+    <CModal
+      alignment="center"
+      scrollable
+      size="xl"
+      visible={visible}
+      onClose={() => setVisible(false)}
+      aria-labelledby="VerticallyCenteredScrollableExample2"
+    >
+      <CModalHeader>
+        <CModalTitle id="VerticallyCenteredScrollableExample2">{SKUformData.pageTitle}</CModalTitle>
+      </CModalHeader>
+      <CModalBody>
+        <form className="container" onSubmit={handleSubmit}>
+          {SKUformData.sections.map((section, sectionIndex) => {
+            const { groupName, count, inputs, groupId } = section
 
-              for (let i = 0; i < inputs.length; i += count) {
-                chunkedInputs.push(inputs.slice(i, i + count))
-              }
+            if (!inputs || inputs.length === 0) {
+              return null
+            }
 
-              return (
-                <div
-                  key={sectionIndex}
-                  className={`section ${groupShow ? 'visible' : 'hidden'}`}
-                  id={groupId}
-                >
-                  <h2 className="group-title">{groupName}</h2>
+            // Only hide sections related to SKU type selection if they exist in `visibleSections`
+            const shouldBeHidden =
+              Object.keys(visibleSections).length > 0 &&
+              groupId in visibleSections &&
+              !visibleSections[groupId]
 
-                  {chunkedInputs.map((row, rowIndex) => (
-                    <div key={rowIndex} className="row">
-                      {row.map((input, colIndex) => {
-                        const inputId =
-                          input.id ||
-                          `${input.label.replace(/\s+/g, '_').toLowerCase()}_${sectionIndex}_${colIndex}`
-                        const isDisabled = input.readOnly || false
+            return (
+              <div
+                key={sectionIndex}
+                className={`section ${shouldBeHidden ? 'hidden' : ''}`}
+                id={groupId}
+              >
+                <h2 className="group-title">{groupName}</h2>
 
-                        return (
-                          <div
-                            key={colIndex}
-                            className={`input-group ${input.layout === 'horizontal' ? 'horizontal' : 'vertical'}`}
-                          >
-                            {input.type !== 'submit' && input.type !== 'reset' && (
-                              <label htmlFor={inputId}>
-                                {input.label}{' '}
-                                {input.required && <span className="required-asterisk">*</span>}
-                              </label>
-                            )}
+                {inputs.map((input, index) => {
+                  const inputId = input.id || `input_${sectionIndex}_${index}`
+                  const isDisabled = input.readOnly || false
 
-                            {[
-                              'text',
-                              'email',
-                              'password',
-                              'tel',
-                              'number',
-                              'date',
-                              'time',
-                              'datetime-local',
-                              'month',
-                              'week',
-                              'color',
-                              'range',
-                              'search',
-                              'url',
-                            ].includes(input.type) ? (
-                              <input
-                                id={inputId}
-                                type={input.type}
-                                placeholder={input.placeholder}
-                                defaultValue={input.defaultValue || ''}
-                                className="input-box"
-                                required={input.required || false}
-                                readOnly={input.readOnly || false}
-                                disabled={isDisabled}
-                                onChange={(e) => handleChange(e, inputId)}
-                              />
-                            ) : input.type === 'file' ? (
-                              <input
-                                id={inputId}
-                                type="file"
-                                className="input-box"
-                                required={input.required || false}
-                                disabled={isDisabled}
-                                onChange={(e) => handleChange(e, inputId)}
-                              />
-                            ) : input.type === 'image' ? (
-                              <input
-                                id={inputId}
-                                type="image"
-                                src={input.src}
-                                alt={input.label}
-                                className="image-input"
-                              />
-                            ) : input.type === 'radio' ? (
-                              <div
-                                className={`radio-group ${input.layout === 'horizontal' ? 'horizontal' : 'vertical'}`}
-                              >
-                                {input.options.map((option, index) => (
-                                  <label key={index} className="radio-label">
-                                    <input
-                                      type="radio"
-                                      name={inputId}
-                                      value={option.label || option} // Adjusted for option.label
-                                      defaultChecked={
-                                        input.defaultValue === (option.label || option)
-                                      }
-                                      required={input.required || false}
-                                      disabled={isDisabled}
-                                      onChange={(e) => handleChange(e, inputId)}
-                                    />
-                                    {option.label || option} {/* Adjusted for option.label */}
-                                  </label>
-                                ))}
-                              </div>
-                            ) : input.type === 'checkbox' ? (
-                              <div
-                                className={`checkbox-group ${input.layout === 'horizontal' ? 'horizontal' : 'vertical'}`}
-                              >
-                                {input.options.map((option, index) => (
-                                  <label key={index} className="checkbox-label">
-                                    <input
-                                      type="checkbox"
-                                      value={option.label || option} // Adjusted for option.label
-                                      defaultChecked={input.defaultValue?.includes(
-                                        option.label || option,
-                                      )}
-                                      required={input.required || false}
-                                      disabled={isDisabled}
-                                      onChange={(e) => handleChange(e, inputId, false, true)}
-                                    />
-                                    {option.label || option} {/* Adjusted for option.label */}
-                                  </label>
-                                ))}
-                              </div>
-                            ) : input.type === 'select' ? (
-                              <select
-                                id={inputId}
-                                className="input-box"
-                                required={input.required || false}
-                                disabled={isDisabled}
-                                defaultValue={input.defaultValue || ''}
-                                onChange={(e) => handleChange(e, inputId)}
-                              >
-                                <option value="">Select {input.label}</option>
-                                {input.options.map((option, index) => (
-                                  <option key={index} value={option.id || option}>
-                                    {' '}
-                                    {/* Adjusted for option.label */}
-                                    {option.label || option} {/* Adjusted for option.label */}
-                                  </option>
-                                ))}
-                              </select>
-                            ) : input.type === 'multi-select' ? (
-                              <select
-                                id={inputId}
-                                multiple
-                                className="input-box"
-                                required={input.required || false}
-                                disabled={isDisabled}
-                                defaultValue={input.defaultValue || []}
-                                onChange={(e) => handleChange(e, inputId, true)}
-                              >
-                                {input.options.map((option, index) => (
-                                  <option key={index} value={option.label || option}>
-                                    {' '}
-                                    {/* Adjusted for option.label */}
-                                    {option.label || option} {/* Adjusted for option.label */}
-                                  </option>
-                                ))}
-                              </select>
-                            ) : input.type === 'toggle' ? (
-                              <label className="switch">
-                                <input
-                                  type="checkbox"
-                                  id={inputId}
-                                  defaultChecked={input.defaultValue}
-                                  onChange={(e) => handleChange(e, inputId, false, false, true)}
-                                />
-                                <span className="slider"></span>
-                              </label>
-                            ) : input.type === 'submit' ? (
-                              <button type="submit" className="button-input" disabled={isDisabled}>
-                                {input.label || 'Submit'}
-                              </button>
-                            ) : input.type === 'reset' ? (
-                              <button
-                                type="reset"
-                                className="button-input"
-                                disabled={isDisabled}
-                                onClick={() => setFormValues(initialValues)}
-                              >
-                                {input.label || 'Reset'}
-                              </button>
-                            ) : null}
-                          </div>
-                        )
-                      })}
+                  return (
+                    <div key={index} className="input-group">
+                      {input.type !== 'submit' && input.type !== 'reset' && (
+                        <label htmlFor={inputId}>
+                          {input.label}{' '}
+                          {input.required && <span className="required-asterisk">*</span>}
+                        </label>
+                      )}
+
+                      {input.type === 'text' ||
+                      input.type === 'number' ||
+                      input.type === 'email' ||
+                      input.type === 'password' ? (
+                        <input
+                          id={inputId}
+                          type={input.type}
+                          placeholder={input.placeholder}
+                          defaultValue={input.defaultValue || ''}
+                          required={input.required || false}
+                          readOnly={isDisabled}
+                          disabled={isDisabled}
+                          onChange={(e) => handleChange(e, inputId)}
+                        />
+                      ) : input.type === 'checkbox' ? (
+                        <input
+                          type="checkbox"
+                          id={inputId}
+                          checked={formValues[inputId] || false}
+                          disabled={isDisabled}
+                          onChange={(e) => handleChange(e, inputId, false, true)}
+                        />
+                      ) : input.type === 'select' ? (
+                        <select
+                          id={inputId}
+                          required={input.required || false}
+                          disabled={isDisabled}
+                          defaultValue={input.defaultValue || ''}
+                          onChange={(e) => handleChange(e, inputId)}
+                        >
+                          <option value="">Select {input.label}</option>
+                          {input.options.map((option, idx) => (
+                            <option key={idx} value={option.id || option}>
+                              {option.label || option}
+                            </option>
+                          ))}
+                        </select>
+                      ) : input.type === 'toggle' ? (
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            id={inputId}
+                            defaultChecked={input.defaultValue}
+                            onChange={(e) => handleChange(e, inputId, false, false, true)}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      ) : null}
                     </div>
-                  ))}
-                </div>
-              )
-            })}
-          </form>
-        </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setVisible(false)}>
-            Close
-          </CButton>
-          <CButton color="primary" onClick={handleSubmit}>
-            Save changes
-          </CButton>
-        </CModalFooter>
-      </CModal>
-    </>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </form>
+      </CModalBody>
+      <CModalFooter>
+        <CButton color="secondary" onClick={() => setVisible(false)}>
+          Close
+        </CButton>
+        <CButton color="primary" onClick={handleSubmit}>
+          Save changes
+        </CButton>
+      </CModalFooter>
+    </CModal>
   )
 }
 

@@ -16,7 +16,6 @@ export const AppSidebarNav = ({ items }) => {
     const route = routeMappings.find((r) => r.key === key)
     return route ? route.path : '#'
   }
-  console.log('items for menu', items)
   const navLink = (title, icon, badge, indent = false) => {
     return (
       <>
@@ -56,7 +55,7 @@ export const AppSidebarNav = ({ items }) => {
   const navGroup = (item, index) => {
     console.log('item navGroup', item)
     const { moduleName, moduleIconName, subModules, moduleKey, ...rest } = item
-    const Component = subModules && subModules.length > 0 ? CNavGroup : CNavItem
+    const Component = CNavGroup
     return (
       <Component
         compact
@@ -65,7 +64,7 @@ export const AppSidebarNav = ({ items }) => {
         toggler={navLink(moduleName, moduleIconName)}
         {...rest}
       >
-        {subModules?.map((item, index) => navItem(item, index, true))}
+        {subModules?.map((nitem, i) => navItem(nitem, i, true))}
       </Component>
     )
   }

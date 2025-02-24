@@ -2,54 +2,20 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { CButton, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/react'
 
-const Forms = ({ visible, setVisible }) => {
-  const [SKUformData, setSKUformData] = useState({ sections: [] })
+const Forms = ({ visible, setVisible, formFields }) => {
   const [visibleSections, setVisibleSections] = useState({})
   const [skuTypeSelected, setSkuTypeSelected] = useState(false)
   const [formValues, setFormValues] = useState({})
 
-  // Fetching form data
   useEffect(() => {
-    const fetchFormData = async () => {
-      try {
-        const response = await axios.get('https://mocki.io/v1/d28c5219-9f41-4ef2-b642-0d53cab4d893')
-        console.log('Response:', response.data)
-
-        if (!response.data || !response.data.sections) {
-          setSKUformData({ sections: [] })
-          return
-        }
-
-        setSKUformData(response.data)
-
-        const initialVisibility = {}
-        response.data.sections.forEach((section) => {
-          initialVisibility[section.groupId] = false
-        })
-
-        setVisibleSections(initialVisibility)
-
-        // Initialize form values after fetching data
-        const newFormValues = {}
-        response.data.sections.forEach((section) => {
-          if (section.inputs) {
-            section.inputs.forEach((input) => {
-              if (input.defaultValue !== undefined) {
-                newFormValues[input.id] =
-                  input.type === 'checkbox' ? [input.defaultValue] : input.defaultValue
-              }
-            })
-          }
-        })
-
-        setFormValues(newFormValues)
-      } catch (error) {
-        console.error('Error fetching data:', error.response || error)
-      }
-    }
-
-    fetchFormData()
-  }, [])
+    const initialValues = {}
+    formFields.sections?.forEach((section) => {
+      section.inputs?.forEach((input) => {
+        initialValues[input.id] = input.defaultValue || ''
+      })
+    })
+    setFormValues(initialValues)
+  }, [formFields])
 
   // Handling input changes
   const handleChange = (e, id, isMultiSelect = false, isCheckbox = false, isToggle = false) => {
@@ -105,11 +71,11 @@ const Forms = ({ visible, setVisible }) => {
       aria-labelledby="VerticallyCenteredScrollableExample2"
     >
       <CModalHeader>
-        <CModalTitle id="VerticallyCenteredScrollableExample2">{SKUformData.pageTitle}</CModalTitle>
+        <CModalTitle id="VerticallyCenteredScrollableExample2">{formFields.pageTitle}</CModalTitle>
       </CModalHeader>
       <CModalBody>
         <form className="container" onSubmit={handleSubmit}>
-          {SKUformData.sections.map((section, sectionIndex) => {
+          {(formFields.sections || []).map((section, sectionIndex) => {
             const { groupName, count, inputs, groupId } = section
 
             if (!inputs || inputs.length === 0) {

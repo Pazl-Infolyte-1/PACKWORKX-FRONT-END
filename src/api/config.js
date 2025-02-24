@@ -64,6 +64,12 @@ const endpoints = {
       method: 'GET',
     },
   },
+  form: {
+    formfeilds: {
+      url: (id) => `/form-fields/${id}`,
+      method: 'GET',
+    },
+  },
   customers: {
     list: {
       url: '/customers',
@@ -189,6 +195,16 @@ export const apiMethods = {
   deleteCustomer: async (id) => {
     try {
       const { url, method } = endpoints.customers.delete
+      const response = await apiClient[method.toLowerCase()](url(id))
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  getFormFields: async (id) => {
+    try {
+      const { url, method } = endpoints.form.formfeilds
       const response = await apiClient[method.toLowerCase()](url(id))
       return response.data
     } catch (error) {

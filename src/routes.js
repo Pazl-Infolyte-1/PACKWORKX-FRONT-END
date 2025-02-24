@@ -1,23 +1,4 @@
 import React from 'react'
-import Index from './views/pages/SalesOrder/Index'
-import SKU from './views/pages/SKU/Index'
-import Clients from './views/pages/Clients/Index'
-import Jobs from './views/pages/Jobs/Index'
-import WorkOrders from './views/pages/WorkOrders/Index'
-import Routes from './views/pages/Routes/index'
-import MachinesTypes from './views/pages/Machines/MachineTypes'
-import IndividualMachines from './views/pages/Machines/IndividualMachine'
-import IndividualSKUTypes from './views/pages/SKU/IndividualSKUTypes'
-import SKUTypes from './views/pages/SKU/SKUTypes'
-import Employee from './views/pages/Employees/Employee'
-import EmployeeAttendancce from './views/pages/Employees/EmployeeAttendance'
-import IndividualEmployee from './views/pages/Employees/IndividualEmployee'
-import FinishedGoodAllocation from './views/pages/Jobs/FinishedGoodsAllocation'
-import ProductionPlanning from './views/pages/Jobs/ProductionPlanning'
-import RMAllocation from './views/pages/Jobs/RMAllocation'
-import SemiFinishedGoodsAllocation from './views/pages/Jobs/SemiFinishedGoodsAllocation'
-import InventoryDashboard from './views/pages/SKU/InventoryDashboard'
-import MachineMasterDashboard from './views/pages/Machines/MachineMasterDashboard'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const routes = [

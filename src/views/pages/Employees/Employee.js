@@ -7,12 +7,12 @@ import FilterComponent from '../../common/FilterComponent'
 const Employee = () => {
   const employee_data = [
     {
-      headers: ['Employee ID', 'Name', 'Role', 'Department'],
+      headers: ['Employee ID', 'Name', 'Role', 'Department', 'Work Schedule'],
       values: [
-        [1, 'John Doe', 'Manager', 'Sales'],
-        [2, 'Jane Smith', 'Developer', 'Engineering'],
-        [3, 'Emily Johnson', 'Designer', 'Marketing'],
-        [4, 'Michael Brown', 'Developer', 'Engineering'],
+        [1, 'John Doe', 'Manager', 'Sales', '9:00 AM - 5:00 PM'],
+        [2, 'Jane Smith', 'Developer', 'Engineering', '9:00 AM - 5:00 PM'],
+        [3, 'Emily Johnson', 'Designer', 'Marketing', '9:00 AM - 5:00 PM'],
+        [4, 'Michael Brown', 'Developer', 'Engineering', '9:00 AM - 5:00 PM'],
       ],
     },
   ]

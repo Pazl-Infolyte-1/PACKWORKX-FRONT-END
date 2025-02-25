@@ -69,6 +69,10 @@ const endpoints = {
       url: (id) => `/form-fields/${id}`,
       method: 'GET',
     },
+    dynamicFormFields: {
+      url: (id) => `/form-fields/${id}/add?=`,
+      method: 'GET',
+    },
   },
   customers: {
     list: {
@@ -205,6 +209,15 @@ export const apiMethods = {
   getFormFields: async (id) => {
     try {
       const { url, method } = endpoints.form.formfeilds
+      const response = await apiClient[method.toLowerCase()](url(id))
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+  getDynamicFormFields: async (id) => {
+    try {
+      const { url, method } = endpoints.form.dynamicFormFields
       const response = await apiClient[method.toLowerCase()](url(id))
       return response.data
     } catch (error) {

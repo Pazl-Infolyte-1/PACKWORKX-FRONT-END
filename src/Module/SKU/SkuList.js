@@ -7,7 +7,7 @@ import {
   MdMoreVert,
 } from 'react-icons/md'
 
-function Index() {
+function SkuList() {
   const [skuType, setSkuType] = useState('')
   const [client, setClient] = useState('')
   const [searchSKU, setSearchSKU] = useState('')
@@ -295,4 +295,4 @@ function Index() {
   )
 }
 
-export default Index
+export default SkuList

@@ -11,11 +11,53 @@ import * as iconSet from '@coreui/icons'
 import routeMappings from '../../src/routes'
 
 export const AppSidebarNav = ({ items }) => {
+  // Static menu items to be added before API items
+  const staticMenuItems = [
+    {
+      groupName: 'Static Menu',
+      modules: [
+        {
+          moduleName: 'Dashboard',
+          moduleIconName: 'cilSpeedometer',
+          moduleKey: 'dashboard',
+          subModules: [
+            {
+              subModuleName: 'Packages',
+              subModuleIconName: 'cilChartPie',
+              subModuleKey: 5001,
+            },
+            {
+              subModuleName: 'Companies',
+              subModuleIconName: 'cilNotes',
+              subModuleKey: 5002,
+            },
+            {
+              subModuleName: 'Billings',
+              subModuleIconName: 'cilNotes',
+              subModuleKey: 5003,
+            },
+          ],
+        },
+        {
+          moduleName: 'User Management',
+          moduleIconName: 'cilUser',
+          moduleKey: 'users',
+          subModules: [], // Empty array for a module with no submodules
+        },
+      ],
+    },
+  ]
+
+  // Combine static and API menu items
+  const combinedItems = [...staticMenuItems, ...items]
+
   const getPathFromKey = (key) => {
-    console.log('Key', key)
-    const route = routeMappings.find((r) => r.key === key)
+    // Handle string and number keys differently
+    const keyStr = typeof key === 'number' ? key.toString() : key
+    const route = routeMappings.find((r) => r.key === keyStr || r.key === key)
     return route ? route.path : '#'
   }
+
   const navLink = (title, icon, badge, indent = false) => {
     return (
       <>
@@ -39,45 +81,49 @@ export const AppSidebarNav = ({ items }) => {
   }
 
   const navItem = (item, index, indent = false) => {
-    console.log('item navItem', item)
-    const { subModuleName, badge, subModuleIconName, subModuleKey, ...rest } = item
+    // Handle both the static menu structure and the API response structure
+    const title = item.subModuleName || item.moduleName
+    const icon = item.subModuleIconName || item.moduleIconName
+    const key = item.subModuleKey || item.moduleKey
+    const badge = item.badge || null
+
     const Component = CNavItem
-    const path = getPathFromKey(subModuleKey)
+    const path = getPathFromKey(key)
+
     return (
       <Component as="div" key={index}>
-        <CNavLink as={NavLink} to={path} {...rest}>
-          {navLink(subModuleName, subModuleIconName, badge, indent)}
+        <CNavLink as={NavLink} to={path}>
+          {navLink(title, icon, badge, indent)}
         </CNavLink>
       </Component>
     )
   }
 
   const navGroup = (item, index) => {
-    console.log('item navGroup', item)
-    const { moduleName, moduleIconName, subModules, moduleKey, ...rest } = item
+    const { moduleName, moduleIconName, subModules, moduleKey } = item
     const Component = CNavGroup
+
     return (
-      <Component
-        compact
-        as="div"
-        key={index}
-        toggler={navLink(moduleName, moduleIconName)}
-        {...rest}
-      >
-        {subModules?.map((nitem, i) => navItem(nitem, i, true))}
+      <Component compact as="div" key={index} toggler={navLink(moduleName, moduleIconName)}>
+        {subModules && subModules.length > 0
+          ? subModules.map((subItem, i) => navItem(subItem, i, true))
+          : null}
       </Component>
     )
   }
 
   return (
     <CSidebarNav as={SimpleBar}>
-      {items &&
-        items.map((item, index) => (
+      {combinedItems &&
+        combinedItems.map((item, index) => (
           <React.Fragment key={index}>
             <CNavTitle className="nav-title">{item.groupName}</CNavTitle>
-            {item.modules.map((i, indexing) =>
-              i.subModules.length > 0 ? navGroup(i, indexing) : navItem(i, indexing),
-            )}
+            {item.modules &&
+              item.modules.map((moduleItem, moduleIndex) =>
+                moduleItem.subModules && moduleItem.subModules.length > 0
+                  ? navGroup(moduleItem, moduleIndex)
+                  : navItem(moduleItem, moduleIndex),
+              )}
           </React.Fragment>
         ))}
     </CSidebarNav>
@@ -85,5 +131,5 @@ export const AppSidebarNav = ({ items }) => {
 }
 
 AppSidebarNav.propTypes = {
-  items: PropTypes.object.isRequired,
+  items: PropTypes.array.isRequired,
 }

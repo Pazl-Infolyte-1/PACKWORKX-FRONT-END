@@ -103,6 +103,7 @@ const Index = () => {
                 style={{
                   backgroundColor: activeTab === tab ? '#8761e5' : 'transparent',
                   color: activeTab === tab ? '#ffffff' : '#8761e5',
+                  cursor: 'pointer',
                 }}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1).replace(/_/g, ' ')}

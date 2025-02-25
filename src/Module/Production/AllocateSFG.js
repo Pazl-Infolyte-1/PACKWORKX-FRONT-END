@@ -5,13 +5,9 @@ import {
   CCard,
   CCardBody,
   CCardText,
-  CNav,
-  CNavItem,
-  CNavLink,
   CButton,
   CCollapse,
   CFormSelect,
-  CCardHeader,
   CTable,
   CTableHeaderCell,
   CTableHead,
@@ -19,12 +15,232 @@ import {
   CTableRow,
   CTableDataCell,
 } from '@coreui/react'
-import Dropdown from 'react-bootstrap/Dropdown'
-import { FaAngleDown, FaAngleUp, FaEllipsisV, FaRedoAlt, FaEye } from 'react-icons/fa'
+import { FaAngleDown, FaAngleUp } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
-import { cilBriefcase, cilMinus, cilClipboard, cilCut, cilOptions, cilReload } from '@coreui/icons'
+import { cilOptions } from '@coreui/icons'
+import { useDrag, useDrop } from 'react-dnd'
 
-const AllocateSFG = ({ workOrders, groupOrders }) => {
+const ItemType = 'WORK_ORDER'
+
+function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
+  const [, drag] = useDrag(() => ({
+    type: ItemType,
+    item: { sfg },
+  }))
+  const toggleCollapse = (id) => {
+    setOpenSFG((prevId) => (prevId === id ? null : id)) // Toggle behavior
+  }
+  return (
+    <CCard className="mt-3" ref={drag} key={sfg.id}>
+      <CCardBody>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <span onClick={() => toggleCollapse(sfg.id)}>
+            {sfg.id} {openSFG === sfg.id ? <FaAngleUp /> : <FaAngleDown />}
+          </span>
+          <span
+            style={{
+              fontSize: '16px',
+              lineHeight: '21px',
+            }}
+          >
+            <CIcon
+              icon={cilOptions}
+              className="me-2 hover-pointer"
+              style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
+            />
+          </span>
+        </div>
+
+        <CCollapse visible={openSFG === sfg.id}>
+          <CRow className="align-items-center mt-3 mb-2">
+            <CCol md="3">
+              <span>{sfg.description}</span>
+            </CCol>
+            <CCol md="3">
+              <span>{sfg.size}</span>
+            </CCol>
+            <CCol md="3">
+              <span>Available Qty : {sfg.available_qty}</span>
+            </CCol>
+            <CCol md="3">
+              <span>Blocked Qty : {sfg.blocked_qty}</span>
+            </CCol>
+          </CRow>
+          <hr />
+          <CRow className="mt-3">
+            <CCol xs={9}>
+              <CTable>
+                <CTableHead>
+                  <CTableRow>
+                    <CTableHeaderCell></CTableHeaderCell>
+                    <CTableHeaderCell>GSM</CTableHeaderCell>
+                    <CTableHeaderCell>BF</CTableHeaderCell>
+                    <CTableHeaderCell>Print</CTableHeaderCell>
+                    <CTableHeaderCell>L x W</CTableHeaderCell>
+                    <CTableHeaderCell>Flute</CTableHeaderCell>
+                    <CTableHeaderCell>Color</CTableHeaderCell>
+                  </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                  {sfg.table_data.map((s, index) => (
+                    <CTableRow key={index}>
+                      <CTableDataCell>{s.name}</CTableDataCell>
+                      <CTableDataCell>{s.gsm}</CTableDataCell>
+                      <CTableDataCell>{s.bf}</CTableDataCell>
+                      <CTableDataCell>{s.print}</CTableDataCell>
+                      <CTableDataCell>{s.l_w}</CTableDataCell>
+                      <CTableDataCell>{s.flute}</CTableDataCell>
+                      <CTableDataCell>{s.color}</CTableDataCell>
+                    </CTableRow>
+                  ))}
+                </CTableBody>
+              </CTable>
+            </CCol>
+            <CCol xs={3}>
+              {sfg.work_orders.map((wo, index) => (
+                <CCard
+                  key={index}
+                  style={{
+                    height: '63px',
+                    backgroundColor: '#ffffff',
+                    borderRadius: '10px',
+                    boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.16)',
+                    marginTop: '10px',
+                    padding: '2px',
+                  }}
+                >
+                  <CRow>
+                    <CCol xs={6}>
+                      <span>{wo.wo_id}</span>
+                    </CCol>
+                    <CCol xs={6}>
+                      <span>Q -</span>
+                      <div>{wo.quantity}</div>
+                    </CCol>
+                  </CRow>
+                </CCard>
+              ))}
+            </CCol>
+          </CRow>
+        </CCollapse>
+      </CCardBody>
+    </CCard>
+  )
+}
+
+function GroupDropZone({
+  i,
+  itemIndex,
+  groupIndex,
+  addQuantity,
+  visibleItemIndex,
+  setVisibleItemIndex,
+}) {
+  const [, drop] = useDrop(() => ({
+    accept: ItemType,
+    drop: (item) => addQuantity(i, groupIndex, item), // Handle drop
+  }))
+
+  const toggleItemCollapse = (index) => {
+    setVisibleItemIndex(visibleItemIndex === index ? null : index)
+  }
+
+  return (
+    <CCard
+      key={itemIndex}
+      ref={drop}
+      className="mb-2"
+      style={{
+        marginTop: '10px',
+        backgroundColor: '#f5f4f7',
+        borderRadius: '10px',
+      }}
+    >
+      <CCardBody>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <span onClick={() => toggleItemCollapse(itemIndex)}>
+            {i.order_id} {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />}
+          </span>
+          <span
+            style={{
+              fontSize: '16px',
+              lineHeight: '21px',
+            }}
+          >
+            {i.finished_goods} / {i.quantity}
+          </span>
+        </div>
+
+        <CCollapse visible={visibleItemIndex === itemIndex}>
+          <div
+            style={{
+              marginTop: '10px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: '8px',
+            }}
+          >
+            <span>{i.sku_name}</span>
+            <span>{i.dimension}</span>
+            <span>{i.layers} PLY</span>
+            <span>{i.print}</span>
+
+            <span>Quantity :{i.quantity}</span>
+            <span>{i.route}</span>
+          </div>
+          {i.layer_group.map((lg) => (
+            <CCard
+              style={{
+                padding: '10px',
+                marginTop: '10px',
+                backgroundColor: '#f5f4f7',
+                borderRadius: '10px',
+              }}
+            >
+              {lg.layer_name}
+              <br />
+              <div
+                style={{
+                  marginTop: '10px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  gap: '8px',
+                }}
+              >
+                <span>Board Size (L x W) : {lg.dimensions}</span>
+                <span>{lg.color}</span>
+                <span>{lg.gsm} GSM</span>
+                <span>{lg.bf} BF</span>
+              </div>
+            </CCard>
+          ))}
+        </CCollapse>
+      </CCardBody>
+    </CCard>
+  )
+}
+
+const AllocateSFG = ({
+  workOrders,
+  setWorkOrders,
+  groupOrders,
+  setGroupOrders,
+  autoSyncOrders,
+}) => {
   const [visibleGroupIndex, setVisibleGroupIndex] = useState(null)
   const [visibleItemIndex, setVisibleItemIndex] = useState(null)
   const [advanced, setAdvanced] = useState(false)
@@ -132,17 +348,42 @@ const AllocateSFG = ({ workOrders, groupOrders }) => {
 
   const [openSFG, setOpenSFG] = useState(null)
 
-  const toggleCollapse = (id) => {
-    setOpenSFG((prevId) => (prevId === id ? null : id)) // Toggle behavior
+  const addQuantity = (i, groupIndex, item) => {
+    console.log('Work Order:', i)
+    console.log('Group Index:', groupIndex)
+    console.log('Item:', item)
+    console.log('Work Orders:', workOrders)
+
+    setGroupOrders((prevOrders) =>
+      prevOrders.map((order) => {
+        if (order.order_id === i.wo_id) {
+          console.log('Inside the if condition')
+          console.log('Order:', order)
+
+          const updatedItems = order.items.map((orderItem) =>
+            orderItem.id === i.id
+              ? {
+                  ...orderItem,
+                  finished_goods: orderItem.finished_goods + item.sfg['available_qty'],
+                }
+              : orderItem,
+          )
+
+          return {
+            ...order,
+            items: updatedItems,
+          }
+        }
+        return order
+      }),
+    )
+    setSfgData((prevSfgData) => prevSfgData.filter((sfg) => sfg.id !== item.sfg['id']))
   }
 
   const toggleGroupCollapse = (index) => {
     setVisibleGroupIndex(visibleGroupIndex === index ? null : index)
   }
 
-  const toggleItemCollapse = (index) => {
-    setVisibleItemIndex(visibleItemIndex === index ? null : index)
-  }
   return (
     <>
       <CCol xs={5} className="mt-4">
@@ -205,84 +446,15 @@ const AllocateSFG = ({ workOrders, groupOrders }) => {
 
                   <CCollapse visible={visibleGroupIndex === groupIndex}>
                     {group.items.map((i, itemIndex) => (
-                      <CCard
+                      <GroupDropZone
                         key={itemIndex}
-                        className="mb-2"
-                        style={{
-                          marginTop: '10px',
-                          backgroundColor: '#f5f4f7',
-                          borderRadius: '10px',
-                        }}
-                      >
-                        <CCardBody>
-                          <div
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            <span onClick={() => toggleItemCollapse(itemIndex)}>
-                              {i.order_id}{' '}
-                              {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />}
-                            </span>
-                            <span
-                              style={{
-                                fontSize: '16px',
-                                lineHeight: '21px',
-                              }}
-                            >
-                              {i.finished_goods} / {i.quantity}
-                            </span>
-                          </div>
-
-                          <CCollapse visible={visibleItemIndex === itemIndex}>
-                            <div
-                              style={{
-                                marginTop: '10px',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                gap: '8px',
-                              }}
-                            >
-                              <span>{i.sku_name}</span>
-                              <span>{i.dimension}</span>
-                              <span>{i.layers} PLY</span>
-                              <span>{i.print}</span>
-
-                              <span>Quantity :{i.quantity}</span>
-                              <span>{i.route}</span>
-                            </div>
-                            {i.layer_group.map((lg) => (
-                              <CCard
-                                style={{
-                                  padding: '10px',
-                                  marginTop: '10px',
-                                  backgroundColor: '#f5f4f7',
-                                  borderRadius: '10px',
-                                }}
-                              >
-                                {lg.layer_name}
-                                <br />
-                                <div
-                                  style={{
-                                    marginTop: '10px',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    gap: '8px',
-                                  }}
-                                >
-                                  <span>Board Size (L x W) : {lg.dimensions}</span>
-                                  <span>{lg.color}</span>
-                                  <span>{lg.gsm} GSM</span>
-                                  <span>{lg.bf} BF</span>
-                                </div>
-                              </CCard>
-                            ))}
-                          </CCollapse>
-                        </CCardBody>
-                      </CCard>
+                        i={i}
+                        itemIndex={itemIndex}
+                        groupIndex={groupIndex}
+                        addQuantity={addQuantity}
+                        visibleItemIndex={visibleItemIndex}
+                        setVisibleItemIndex={setVisibleItemIndex}
+                      />
                     ))}
                   </CCollapse>
                 </CCardBody>
@@ -351,17 +523,16 @@ const AllocateSFG = ({ workOrders, groupOrders }) => {
                     <option>A</option>
                   </CFormSelect>
                 </CCol>
-
-                <CCol md="2" className="d-flex justify-content-end">
-                  <CButton
-                    color="light"
-                    onClick={() => setAdvanced(!advanced)}
-                    className="d-flex align-items-center"
-                  >
-                    Advanced {advanced ? <FaAngleUp /> : <FaAngleDown />}
-                  </CButton>
-                </CCol>
               </CRow>
+              <div className="mt-3 d-flex justify-content-end">
+                <CButton
+                  color="light"
+                  onClick={() => setAdvanced(!advanced)}
+                  className="d-flex align-items-center"
+                >
+                  Advanced {advanced ? <FaAngleUp /> : <FaAngleDown />}
+                </CButton>
+              </div>
 
               {advanced && (
                 <CRow className="mt-3">
@@ -383,113 +554,13 @@ const AllocateSFG = ({ workOrders, groupOrders }) => {
               <div
                 style={{
                   height: '6px',
-                  marginTop: '10px',
+                  marginTop: '20px',
                   backgroundColor: '#e5e7eb',
                   borderRadius: '2px',
                 }}
               ></div>
               {sfgData.map((sfg) => (
-                <CCard className="mt-3" key={sfg.id}>
-                  <CCardBody>
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <span onClick={() => toggleCollapse(sfg.id)}>
-                        {sfg.id} {openSFG === sfg.id ? <FaAngleUp /> : <FaAngleDown />}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: '16px',
-                          lineHeight: '21px',
-                        }}
-                      >
-                        <CIcon
-                          icon={cilOptions}
-                          className="me-2 hover-pointer"
-                          style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
-                        />
-                      </span>
-                    </div>
-
-                    <CCollapse visible={openSFG === sfg.id}>
-                      <CRow className="align-items-center mt-3 mb-2">
-                        <CCol md="3">
-                          <span>{sfg.description}</span>
-                        </CCol>
-                        <CCol md="3">
-                          <span>{sfg.size}</span>
-                        </CCol>
-                        <CCol md="3">
-                          <span>Available Qty : {sfg.available_qty}</span>
-                        </CCol>
-                        <CCol md="3">
-                          <span>Blocked Qty : {sfg.blocked_qty}</span>
-                        </CCol>
-                      </CRow>
-                      <hr />
-                      <CRow className="mt-3">
-                        <CCol xs={9}>
-                          <CTable>
-                            <CTableHead>
-                              <CTableRow>
-                                <CTableHeaderCell scope="col"></CTableHeaderCell>
-                                <CTableHeaderCell scope="col">GSM</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">BF</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Print</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">L x W</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Flute</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Color</CTableHeaderCell>
-                              </CTableRow>
-                            </CTableHead>
-                            <CTableBody>
-                              {sfg.table_data.map((s, index) => (
-                                <CTableRow key={index}>
-                                  <CTableDataCell>{s.name}</CTableDataCell>
-                                  <CTableDataCell>{s.gsm}</CTableDataCell>
-                                  <CTableDataCell>{s.bf}</CTableDataCell>
-                                  <CTableDataCell>{s.print}</CTableDataCell>
-                                  <CTableDataCell>{s.l_w}</CTableDataCell>
-                                  <CTableDataCell>{s.flute}</CTableDataCell>
-                                  <CTableDataCell>{s.color}</CTableDataCell>
-                                </CTableRow>
-                              ))}
-                            </CTableBody>
-                          </CTable>
-                        </CCol>
-                        <CCol xs={3}>
-                          {sfg.work_orders.map((wo, index) => (
-                            <CCard
-                              key={index}
-                              style={{
-                                height: '63px',
-                                backgroundColor: '#ffffff',
-                                borderRadius: '10px',
-                                boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.16)',
-                                marginTop: '10px',
-                                padding: '2px',
-                              }}
-                            >
-                              <CRow>
-                                <CCol xs={6}>
-                                  <span>{wo.wo_id}</span>
-                                </CCol>
-                                <CCol xs={6}>
-                                  <span>Q -</span>
-                                  <div>{wo.quantity}</div>
-                                </CCol>
-                              </CRow>
-                            </CCard>
-                          ))}
-                        </CCol>
-                      </CRow>
-                    </CCollapse>
-                  </CCardBody>
-                </CCard>
+                <SFGDragableCard sfg={sfg} openSFG={openSFG} setOpenSFG={setOpenSFG} />
               ))}
             </CCardBody>
           </CCard>

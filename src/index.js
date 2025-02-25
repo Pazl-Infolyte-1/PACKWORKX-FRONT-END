@@ -4,6 +4,7 @@ import { Provider } from 'react-redux'
 import 'core-js'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import './index.css';
 
 import App from './App'
 import store from './store'

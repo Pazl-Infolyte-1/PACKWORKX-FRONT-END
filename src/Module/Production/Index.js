@@ -123,9 +123,33 @@ const Index = () => {
             autoSyncOrders={autoSyncOrders}
           />
         )}
-        {activeTab === 'sfg' && <AllocateSFG workOrders={workOrders} groupOrders={groupOrders} />}
-        {activeTab === 'rm' && <AllocateRM />}
-        {activeTab === 'returnables' && <ReturnablesContent />}
+        {activeTab === 'sfg' && (
+          <AllocateSFG
+            workOrders={workOrders}
+            groupOrders={groupOrders}
+            setGroupOrders={setGroupOrders}
+            setWorkOrders={setWorkOrders}
+            autoSyncOrders={autoSyncOrders}
+          />
+        )}
+        {activeTab === 'rm' && (
+          <AllocateRM
+            workOrders={workOrders}
+            groupOrders={groupOrders}
+            setGroupOrders={setGroupOrders}
+            setWorkOrders={setWorkOrders}
+            autoSyncOrders={autoSyncOrders}
+          />
+        )}
+        {activeTab === 'returnables' && (
+          <ReturnablesContent
+            workOrders={workOrders}
+            groupOrders={groupOrders}
+            setGroupOrders={setGroupOrders}
+            setWorkOrders={setWorkOrders}
+            autoSyncOrders={autoSyncOrders}
+          />
+        )}
       </CRow>
     </div>
   )

@@ -19,6 +19,7 @@ import { FaAngleDown, FaAngleUp } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
 import { cilOptions } from '@coreui/icons'
 import { useDrag, useDrop } from 'react-dnd'
+import './styles.css'
 
 const ItemType = 'WORK_ORDER'
 
@@ -41,13 +42,23 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
             cursor: 'pointer',
           }}
         >
-          <span onClick={() => toggleCollapse(sfg.id)}>
+          <span
+            onClick={() => toggleCollapse(sfg.id)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px', // Creates space between the text and icon
+              whiteSpace: 'nowrap', // Prevents text from wrapping
+            }}
+          >
             {sfg.id} {openSFG === sfg.id ? <FaAngleUp /> : <FaAngleDown />}
           </span>
           <span
             style={{
               fontSize: '16px',
               lineHeight: '21px',
+              display: 'flex', // Ensures CIcon stays aligned properly
+              alignItems: 'center',
             }}
           >
             <CIcon
@@ -58,12 +69,12 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
           </span>
         </div>
 
-        <CCollapse visible={openSFG === sfg.id}>
+        <CCollapse className="custom-collapse" visible={openSFG === sfg.id}>
           <CRow className="align-items-center mt-3 mb-2">
-            <CCol md="1">
+            <CCol md="2">
               <span>{sfg.gsm} GSM</span>
             </CCol>
-            <CCol md="1">
+            <CCol md="2">
               <span>{sfg.bf} BF</span>
             </CCol>
             <CCol md="2">
@@ -145,22 +156,38 @@ function GroupDropZone({
             justifyContent: 'space-between',
             alignItems: 'center',
             cursor: 'pointer',
+            width: '100%', // Ensures proper space allocation
           }}
         >
-          <span onClick={() => toggleItemCollapse(itemIndex)}>
-            {i.order_id} {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />}
-          </span>
+          {/* Keep order_id and icon in the same row */}
           <span
+            onClick={() => toggleItemCollapse(itemIndex)}
             style={{
-              fontSize: '16px',
-              lineHeight: '21px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px', // Adds space between text and icon
+              whiteSpace: 'nowrap', // Prevents text wrapping
             }}
           >
-            {i.finished_goods} / {i.quantity}
+            {i.order_id ? i.order_id : i.layer_name}{' '}
+            {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />}
+          </span>
+
+          {/* Ensure finished_goods / quantity stay aligned */}
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: '16px',
+              lineHeight: '21px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {i.quantity ? `${i.finished_goods} / ${i.quantity}` : ''}
           </span>
         </div>
 
-        <CCollapse visible={visibleItemIndex === itemIndex}>
+        <CCollapse className="custom-collapse" visible={visibleItemIndex === itemIndex}>
           <div
             style={{
               marginTop: '10px',
@@ -169,40 +196,54 @@ function GroupDropZone({
               gap: '8px',
             }}
           >
-            <span>{i.sku_name}</span>
-            <span>{i.dimension}</span>
-            <span>{i.layers} PLY</span>
-            <span>{i.print}</span>
+            {i.sku_name ? (
+              <>
+                <span>{i.sku_name}</span>
+                <span>{i.dimension}</span>
+                <span>{i.layers} PLY</span>
+                <span>{i.print}</span>
 
-            <span>Quantity :{i.quantity}</span>
-            <span>{i.route}</span>
+                <span>Quantity :{i.quantity}</span>
+                <span>{i.route}</span>
+              </>
+            ) : (
+              <>
+                <span>GSM - {i.gsm}</span>
+                <span>BF - {i.bf}</span>
+                <span>{i.dimensions} PLY</span>
+                <span>{i.color}</span>
+              </>
+            )}
           </div>
-          {i.layer_group.map((lg) => (
-            <CCard
-              style={{
-                padding: '10px',
-                marginTop: '10px',
-                backgroundColor: '#f5f4f7',
-                borderRadius: '10px',
-              }}
-            >
-              {lg.layer_name}
-              <br />
-              <div
-                style={{
-                  marginTop: '10px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  gap: '8px',
-                }}
-              >
-                <span>Board Size (L x W) : {lg.dimensions}</span>
-                <span>{lg.color}</span>
-                <span>{lg.gsm} GSM</span>
-                <span>{lg.bf} BF</span>
-              </div>
-            </CCard>
-          ))}
+          {i.layer_group
+            ? i.layer_group.map((lg) => (
+                <CCard
+                  key={lg.layer_name} // Added a unique key
+                  style={{
+                    padding: '10px',
+                    marginTop: '10px',
+                    backgroundColor: '#f5f4f7',
+                    borderRadius: '10px',
+                  }}
+                >
+                  {lg.layer_name}
+                  <br />
+                  <div
+                    style={{
+                      marginTop: '10px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: '8px',
+                    }}
+                  >
+                    <span>Board Size (L x W) : {lg.dimensions}</span>
+                    <span>{lg.color}</span>
+                    <span>{lg.gsm} GSM</span>
+                    <span>{lg.bf} BF</span>
+                  </div>
+                </CCard>
+              ))
+            : null}
         </CCollapse>
       </CCardBody>
     </CCard>
@@ -347,17 +388,41 @@ const AllocateRM = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, au
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       cursor: 'pointer',
+                      width: '100%', // Ensures elements use available space
                     }}
                   >
-                    <span onClick={() => toggleGroupCollapse(groupIndex)}>
+                    {/* Ensures group.name and the icon stay on the same line */}
+                    <span
+                      onClick={() => toggleGroupCollapse(groupIndex)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px', // Adds space between text and icon
+                        whiteSpace: 'nowrap', // Prevents text wrapping
+                      }}
+                    >
                       {group.name}{' '}
                       {visibleGroupIndex === groupIndex ? <FaAngleUp /> : <FaAngleDown />}
                     </span>
-                    {group.items.reduce((sum, g) => sum + g.finished_goods, 0)} /
-                    {group.items.reduce((sum, g) => sum + g.quantity, 0)}
+
+                    {/* Ensures numbers stay aligned */}
+                    <span
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {group.items.reduce(
+                        (sum, g) => (g.finished_goods ? sum + g.finished_goods : sum + 0),
+                        0,
+                      )}{' '}
+                      /
+                      {group.items.reduce((sum, g) => (g.quantity ? sum + g.quantity : sum + 0), 0)}
+                    </span>
                   </div>
 
-                  <CCollapse visible={visibleGroupIndex === groupIndex}>
+                  <CCollapse className="custom-collapse" visible={visibleGroupIndex === groupIndex}>
                     {group.items.map((i, itemIndex) => (
                       <GroupDropZone
                         key={itemIndex}

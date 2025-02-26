@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CRow,
   CCol,
@@ -16,6 +16,7 @@ import Dropdown from 'react-bootstrap/Dropdown'
 import { FaAngleDown, FaAngleUp, FaEllipsisV, FaRedoAlt, FaEye } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
 import { cilBriefcase, cilMinus, cilClipboard, cilCut, cilOptions, cilReload } from '@coreui/icons'
+import './styles.css'
 
 const ItemType = 'WORK_ORDER'
 
@@ -35,6 +36,40 @@ const CustomToggle = React.forwardRef(({ onClick }, ref) => (
     />
   </span>
 ))
+
+function LayerDragble({ lg }) {
+  const [, drag] = useDrag(() => ({
+    type: ItemType,
+    item: { lg },
+  }))
+  return (
+    <CCard
+      ref={drag}
+      style={{
+        padding: '10px',
+        marginTop: '10px',
+        backgroundColor: '#f5f4f7',
+        borderRadius: '10px',
+      }}
+    >
+      {lg.layer_name}
+      <br />
+      <div
+        style={{
+          marginTop: '10px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: '8px',
+        }}
+      >
+        <span>Board Size (L x W) : {lg.dimensions}</span>
+        <span>{lg.color}</span>
+        <span>{lg.gsm} GSM</span>
+        <span>{lg.bf} BF</span>
+      </div>
+    </CCard>
+  )
+}
 
 function WorkOrderCard({ order, index, visibleIndex, setVisibleIndex, removeWOFromPlan }) {
   const [, drag] = useDrag(() => ({
@@ -64,7 +99,15 @@ function WorkOrderCard({ order, index, visibleIndex, setVisibleIndex, removeWOFr
             cursor: 'pointer',
           }}
         >
-          <span onClick={toggleCollapse}>
+          <span
+            onClick={toggleCollapse}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {order.order_id} {visibleIndex === index ? <FaAngleUp /> : <FaAngleDown />}
           </span>
           <Dropdown>
@@ -106,19 +149,28 @@ function WorkOrderCard({ order, index, visibleIndex, setVisibleIndex, removeWOFr
           </Dropdown>
         </div>
 
-        <CCollapse visible={visibleIndex === index}>
+        <CCollapse className="custom-collapse" visible={visibleIndex === index}>
           <hr />
-          <div>
-            SKU Name - {order.sku_name} <br />
-            Layers - {order.layers} <br />
-            Print - {order.print} <br />
-            Dimensions - {order.dimension} <br />
-            Planned Start - {order.planned_start} <br />
-            Planned End - {order.planned_end} <br />
-            Quantity - {order.quantity} <br />
-            Route - {order.route}
-          </div>
 
+          <div
+            style={{
+              marginTop: '10px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: '8px',
+            }}
+          >
+            <span>{order.sku_name}</span>
+            <span>{order.dimension}</span>
+            <span>{order.layers} PLY</span>
+            <span>{order.print}</span>
+
+            <span>Quantity :{order.quantity}</span>
+            <span>{order.route}</span>
+          </div>
+          {order.layer_group.map((lg) => (
+            <LayerDragble key={lg.id} lg={lg} />
+          ))}
           <div
             style={{
               display: 'flex',
@@ -147,7 +199,7 @@ function GroupOrderDropZone({
 }) {
   const [, drop] = useDrop(() => ({
     accept: ItemType,
-    drop: (item) => addWorkOrderToGroup(item.order, groupIndex),
+    drop: (item) => addWorkOrderToGroup(item, groupIndex),
   }))
 
   const toggleCollapse = (itemIndex) => {
@@ -201,20 +253,36 @@ function GroupOrderDropZone({
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     cursor: 'pointer',
+                    width: '100%',
                   }}
                 >
-                  <span onClick={() => toggleCollapse(itemIndex)}>
-                    {item.order_id}
-                    {groupVisibleIndex === uniqueIndex ? <FaAngleUp /> : <FaAngleDown />}
-                  </span>
                   <span
+                    onClick={() => toggleCollapse(itemIndex)}
                     style={{
-                      fontSize: '16px',
-                      lineHeight: '21px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      whiteSpace: 'nowrap',
                     }}
                   >
-                    {item.finished_goods} / {item.quantity}
+                    {item.order_id ? item.order_id : `${item.layer_name}, ${item.wo}`}
+
+                    {groupVisibleIndex === uniqueIndex ? <FaAngleUp /> : <FaAngleDown />}
                   </span>
+
+                  <span
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      fontSize: '16px',
+                      lineHeight: '21px',
+                      gap: '4px',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {item.quantity ? `${item.finished_goods} / ${item.quantity}` : ''}
+                  </span>
+
                   <Dropdown>
                     <Dropdown.Toggle as={CustomToggle} />
                     <Dropdown.Menu>
@@ -261,63 +329,78 @@ function GroupOrderDropZone({
                     </Dropdown.Menu>
                   </Dropdown>
                 </div>
-                <CCollapse visible={groupVisibleIndex === uniqueIndex}>
+
+                <CCollapse className="custom-collapse" visible={groupVisibleIndex === uniqueIndex}>
                   <div className="mt-1">
-                    SKU Name - {item.sku_name} <br />
-                    Layers - {item.layers} <br />
-                    Print - {item.print} <br />
-                    Dimensions - {item.dimension} <br />
-                    Planned Start - {item.planned_start} <br />
-                    Planned End - {item.planned_end} <br />
-                    Quantity - {item.quantity} <br />
-                    Route - {item.route}
-                    <div className="d-flex align-items-center">
-                      <label>Finished Goods - </label>
-                      <input
-                        style={{
-                          width: '74px',
-                          height: '20px',
-                          padding: '0px 8px',
-                          border: '0.8px solid #7f7f7f',
-                          boxSizing: 'border-box',
-                          borderRadius: '6px',
-                          backgroundColor: '#ffffff',
-                          color: '#94a3b8',
-                          fontSize: '14px',
-                          fontFamily: 'Roboto',
-                          lineHeight: '21.600000381469727px',
-                          outline: 'none',
-                          justifyContent: 'end',
-                        }}
-                        type="number"
-                        defaultValue={item.finished_goods}
-                        onChange={(e) => {
-                          const newValue = e.target.value
-                          setGroupOrders((prevGroups) =>
-                            prevGroups.map((group, index) => {
-                              if (index === groupIndex) {
-                                return {
-                                  ...group,
-                                  items: group.items.map((order) =>
-                                    order.id === item.id
-                                      ? { ...order, finished_goods: newValue }
-                                      : order,
-                                  ),
-                                }
-                              }
-                              return group
-                            }),
-                          )
-                          setWorkOrders((prevOrders) =>
-                            prevOrders.map((order) =>
-                              order.id === item.id ? { ...order, finished_goods: newValue } : order,
-                            ),
-                          )
-                        }}
-                      />
-                    </div>
-                    <span>Available - {item.quantity}</span>
+                    {item.sku_name ? (
+                      <>
+                        SKU Name - {item.sku_name} <br />
+                        Layers - {item.layers} <br />
+                        Print - {item.print} <br />
+                        Dimensions - {item.dimension} <br />
+                        Planned Start - {item.planned_start} <br />
+                        Planned End - {item.planned_end} <br />
+                        Quantity - {item.quantity} <br />
+                        Route - {item.route}
+                        <div className="d-flex align-items-center">
+                          <label>Finished Goods - </label>
+                          <input
+                            style={{
+                              width: '74px',
+                              height: '20px',
+                              padding: '0px 8px',
+                              border: '0.8px solid #7f7f7f',
+                              boxSizing: 'border-box',
+                              borderRadius: '6px',
+                              backgroundColor: '#ffffff',
+                              color: '#94a3b8',
+                              fontSize: '14px',
+                              fontFamily: 'Roboto',
+                              lineHeight: '21.6px',
+                              outline: 'none',
+                              justifyContent: 'end',
+                            }}
+                            type="number"
+                            defaultValue={item.finished_goods}
+                            onChange={(e) => {
+                              const newValue = e.target.value
+                              setGroupOrders((prevGroups) =>
+                                prevGroups.map((group, index) => {
+                                  if (index === groupIndex) {
+                                    return {
+                                      ...group,
+                                      items: group.items.map((order) =>
+                                        order.id === item.id
+                                          ? { ...order, finished_goods: newValue }
+                                          : order,
+                                      ),
+                                    }
+                                  }
+                                  return group
+                                }),
+                              )
+                              setWorkOrders((prevOrders) =>
+                                prevOrders.map((order) =>
+                                  order.id === item.id
+                                    ? { ...order, finished_goods: newValue }
+                                    : order,
+                                ),
+                              )
+                            }}
+                          />
+                        </div>
+                        <span>Available - {item.quantity}</span> <br />
+                      </>
+                    ) : (
+                      <>
+                        GSM - {item.gsm} <br />
+                        BF - {item.bf} <br />
+                        Dimensions - {item.dimensions} <br />
+                        Color - {item.color} <br />
+                      </>
+                    )}
                   </div>
+
                   <div
                     style={{
                       display: 'flex',
@@ -340,7 +423,10 @@ function GroupOrderDropZone({
 }
 
 const Group = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyncOrders }) => {
-  const [dropdownOpen, setDropdownOpen] = useState(false)
+  useEffect(() => {
+    console.log('group Orders', groupOrders)
+  }, [groupOrders])
+
   const [visibleIndex, setVisibleIndex] = useState(null)
   const [groupVisibleIndex, setGroupVisibleIndex] = useState(null)
   const removeWorkOrderFromGroup = (order, groupIndex) => {
@@ -399,7 +485,6 @@ const Group = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyn
 
   const addWorkOrderToGroup = (order, groupIndex) => {
     console.log('Adding order to group', order)
-    console.log('Adding order to index', groupIndex)
 
     setGroupOrders((prevGroups) => {
       if (prevGroups[groupIndex]?.name === 'Auto Sync') {
@@ -407,10 +492,21 @@ const Group = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyn
         return prevGroups
       }
 
-      setWorkOrders((prevOrders) => prevOrders.filter((item) => item.id !== order.id))
+      if (order.order) {
+        setWorkOrders((prevOrders) => prevOrders.filter((item) => item.id !== order.order.id))
+      } else if (order.lg) {
+        setWorkOrders((prevOrders) =>
+          prevOrders.map((wo) => ({
+            ...wo,
+            layer_group: wo.layer_group.filter((layer) => layer.id !== order.lg.id),
+          })),
+        )
+      }
 
       return prevGroups.map((group, index) =>
-        index === groupIndex ? { ...group, items: [...group.items, order] } : group,
+        index === groupIndex
+          ? { ...group, items: [...group.items, order.order ? order.order : order.lg] }
+          : group,
       )
     })
   }
@@ -441,12 +537,12 @@ const Group = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyn
             >
               <CCardBody>
                 <div className="d-flex justify-content-between align-items-center">
-                  <CCardText className="mx-auto text-bold">Work Orders</CCardText>
+                  <CCardText className="mx-auto text-bold mb-0">Work Orders</CCardText>
                   <CIcon
                     icon={cilReload}
                     onClick={handleAutoSync}
                     className="me-2 hover-pointer"
-                    style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
+                    style={{ fontSize: '1.4rem', fontWeight: 'bold', verticalAlign: 'middle' }}
                   />
                 </div>
               </CCardBody>

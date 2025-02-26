@@ -17,6 +17,7 @@ function SkuList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [dynamicFields, setDynamicFields] = useState('')
   const formRefs = useRef({})
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -117,7 +118,7 @@ function SkuList() {
                   </button>
                 ))}
                 <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
-                  <div className="text-2xl font-semibold text-center py-4">
+                  <div className="flex justify-start text-2xl font-semibold py-4">
                     {dynamicFields?.data?.pageTitle}
                   </div>
 
@@ -130,14 +131,30 @@ function SkuList() {
                         </h2>
 
                         {/* Render Fields */}
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-3 gap-1">
                           {section?.inputs?.map((inputField) => (
                             <div key={inputField?.id} className="p-4 rounded-lg">
                               <label className="text-black text-lg font-medium block mb-1">
                                 {inputField?.label}
                                 {inputField?.required && <span className="text-red-500">*</span>}
                               </label>
-
+                              {inputField.type === 'select' && (
+                                <select
+                                  ref={(el) => (formRefs.current[inputField.id] = el)}
+                                  defaultValue={inputField?.defaultValue || ''}
+                                  required={inputField?.required}
+                                  className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
+                                >
+                                  <option value="" disabled>
+                                    {inputField?.placeholder || 'Select an option'}
+                                  </option>
+                                  {inputField?.options?.map((option) => (
+                                    <option key={option?.id} value={option?.id}>
+                                      {option?.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
                               {inputField?.type === 'text' && (
                                 <input
                                   ref={(el) => (formRefs.current[inputField.id] = el)}
@@ -191,24 +208,6 @@ function SkuList() {
                                 />
                               )}
 
-                              {inputField.type === 'select' && (
-                                <select
-                                  ref={(el) => (formRefs.current[inputField.id] = el)}
-                                  defaultValue={inputField?.defaultValue || ''}
-                                  required={inputField?.required}
-                                  className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
-                                >
-                                  <option value="" disabled>
-                                    {inputField?.placeholder || 'Select an option'}
-                                  </option>
-                                  {inputField?.options?.map((option) => (
-                                    <option key={option?.id} value={option?.id}>
-                                      {option?.label}
-                                    </option>
-                                  ))}
-                                </select>
-                              )}
-
                               {inputField?.type === 'radio' && (
                                 <div className="mt-1 flex space-x-4">
                                   {inputField?.options?.map((option) => (
@@ -250,7 +249,7 @@ function SkuList() {
                                   placeholder={inputField?.placeholder || ''}
                                   defaultValue={inputField?.defaultValue || ''}
                                   required={inputField?.required}
-                                  className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
+                                  className="w-full h-14 px-2 py-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
                                 />
                               )}
                             </div>

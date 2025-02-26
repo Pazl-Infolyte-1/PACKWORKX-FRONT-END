@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import autoprefixer from 'autoprefixer'
-import tailwind from 'tailwindcss'
+import tailwind from "tailwindcss"
 export default defineConfig(() => {
   return {
     base: './',
@@ -13,7 +13,7 @@ export default defineConfig(() => {
       postcss: {
         plugins: [
           autoprefixer({}), // add options if needed
-          tailwind(),
+          tailwind()
         ],
       },
       preprocessorOptions: {

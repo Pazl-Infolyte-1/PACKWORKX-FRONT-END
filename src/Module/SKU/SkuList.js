@@ -17,7 +17,7 @@ function SkuList() {
 	const [searchSKU,setSearchSKU] = useState('')
 	const [isDrawerOpen,setDrawerOpen] = useState(false);
 	const [dynamicFields,setDynamicFields] = useState("")
-	const formRefs = useRef({});
+	
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
@@ -32,40 +32,53 @@ function SkuList() {
 		fetchData()
 	},[])
 
-	const handleSubmit = () => {
-		const formId = dynamicFields?.data?.formId;
-		const fields = [];
-
+	const handleSubmit = (event) => {
+		event.preventDefault(); // Prevent form submission
+	
+		const formData = {};
+	
 		dynamicFields?.data?.sections.forEach((section) => {
-			section?.inputs.forEach((inputField) => {
-				const ref = formRefs.current[inputField.id];
-
-				if (ref) {
-					let value;
-
-					if (inputField.type === "radio") {
-						const selectedRadio = document.querySelector(
-							`input[name="${inputField.name}"]:checked`
-						);
-						value = selectedRadio ? selectedRadio.value : "";
-					} else if (inputField.type === "select") {
-						value = parseInt(ref.value,10);
-					} else if (inputField.type === "file") {
-						value = ref.files.length > 0 ? ref.files[0].name : ""; // Get file name
-					} else {
-						value = ref.value;
+			section?.inputs?.forEach((inputField) => {
+				let value = inputField?.defaultValue || ""; // Start with default value
+	
+				if (inputField?.type === "file") {
+					// Get the selected file name(s) or keep the default value
+					const fileInput = document.getElementById(inputField.id);
+					if (fileInput?.files?.length) {
+						value = fileInput.files[0].name; // Update if user selects a file
 					}
-
-					fields.push({
-						field_id: inputField.fieldId,
-						value,
-					});
+				} else if (inputField?.type === "radio") {
+					// Get selected radio button value
+					const selectedOption = document.querySelector(`input[name="${inputField.name}"]:checked`);
+					if (selectedOption) {
+						value = selectedOption.value; // Update if user changes selection
+					}
+				} else if (inputField?.type === "checkbox") {
+					// Get checkbox value (true/false)
+					const checkboxInput = document.getElementById(`checkbox-${inputField.id}`);
+					value = checkboxInput?.checked;
+				} else if (inputField?.type === "select") {
+					// Get selected value for dropdown
+					const selectElement = document.querySelector(`[name="${inputField.name}"]`);
+					if (selectElement) {
+						value = selectElement.value; // Update if user selects a different option
+					}
+				} else {
+					// Get values for text, email, number, etc.
+					const inputElement = document.querySelector(`[name="${inputField.name}"]`);
+					if (inputElement) {
+						value = inputElement.value; // Update if user changes the input
+					}
 				}
+	
+				formData[inputField.name] = value;
 			});
 		});
-
-		console.log(JSON.stringify({ form_id: formId,fields }));
+	
+		console.log("Final Form Data:", formData);
 	};
+	
+	
 	return (
 		<div>
 			<div>
@@ -113,7 +126,7 @@ function SkuList() {
 									</button>
 								))}
 								<Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
-									<div className="text-2xl font-semibold text-center py-4">
+									<div className="flex justify-start text-2xl font-semibold py-4">
 										{dynamicFields?.data?.pageTitle}
 									</div>
 
@@ -126,69 +139,14 @@ function SkuList() {
 												</h2>
 
 												{/* Render Fields */}
-												<div className="grid grid-cols-3 gap-4">
+												<div className="grid grid-cols-3 gap-1">
 													{section?.inputs?.map((inputField) => (
 														<div key={inputField?.id} className="p-4 rounded-lg">
 															<label className="text-black text-lg font-medium block mb-1">
 																{inputField?.label}{inputField?.required && <span className="text-red-500">*</span>}
 															</label>
-
-															{inputField?.type === "text" && (
-																<input
-																	ref={(el) => (formRefs.current[inputField.id] = el)}
-																	type="text"
-																	placeholder={inputField?.placeholder || ""}
-																	defaultValue={inputField?.defaultValue || ""}
-																	required={inputField?.required}
-																	className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
-																/>
-															)}
-															{inputField?.type === "url" && (
-																<input
-																	ref={(el) => (formRefs.current[inputField.id] = el)}
-																	type="text"
-																	placeholder={inputField?.placeholder || ""}
-																	defaultValue={inputField?.defaultValue || ""}
-																	required={inputField?.required}
-																	className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
-																/>
-															)}
-															{inputField?.type === "email" && (
-																<input
-																	ref={(el) => (formRefs.current[inputField.id] = el)}
-																	type="email"
-																	placeholder={inputField?.placeholder || ""}
-																	defaultValue={inputField?.defaultValue || ""}
-																	required={inputField?.required}
-																	className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
-																/>
-															)}
-
-															{inputField?.type === "number" && (
-																<input
-																	ref={(el) => (formRefs.current[inputField.id] = el)}
-																	type="number"
-																	placeholder={inputField?.placeholder || ""}
-																	defaultValue={inputField?.defaultValue || ""}
-																	required={inputField?.required}
-																	className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
-																/>
-															)}
-
-															{inputField?.type === "tel" && (
-																<input
-																	ref={(el) => (formRefs.current[inputField.id] = el)}
-																	type="number"
-																	placeholder={inputField?.placeholder || ""}
-																	defaultValue={inputField?.defaultValue || ""}
-																	required={inputField?.required}
-																	className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
-																/>
-															)}
-
 															{inputField.type === "select" && (
 																<select
-																	ref={(el) => (formRefs.current[inputField.id] = el)}
 																	defaultValue={inputField?.defaultValue || ""}
 																	required={inputField?.required}
 																	className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
@@ -203,13 +161,61 @@ function SkuList() {
 																	))}
 																</select>
 															)}
+															{inputField?.type === "text" && (
+																<input
+																	type="text"
+																	placeholder={inputField?.placeholder || ""}
+																	defaultValue={inputField?.defaultValue || ""}
+																	required={inputField?.required}
+																	className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
+																/>
+															)}
+															{inputField?.type === "url" && (
+																<input
+																	type="text"
+																	placeholder={inputField?.placeholder || ""}
+																	defaultValue={inputField?.defaultValue || ""}
+																	required={inputField?.required}
+																	className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
+																/>
+															)}
+															{inputField?.type === "email" && (
+																<input
+																	type="email"
+																	placeholder={inputField?.placeholder || ""}
+																	defaultValue={inputField?.defaultValue || ""}
+																	required={inputField?.required}
+																	className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
+																/>
+															)}
+
+															{inputField?.type === "number" && (
+																<input
+																	type="number"
+																	placeholder={inputField?.placeholder || ""}
+																	defaultValue={inputField?.defaultValue || ""}
+																	required={inputField?.required}
+																	className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
+																/>
+															)}
+
+															{inputField?.type === "tel" && (
+																<input
+																	type="number"
+																	placeholder={inputField?.placeholder || ""}
+																	defaultValue={inputField?.defaultValue || ""}
+																	required={inputField?.required}
+																	className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
+																/>
+															)}
+
+														
 
 															{inputField?.type === "radio" && (
 																<div className="mt-1 flex space-x-4">
 																	{inputField?.options?.map((option) => (
 																		<label key={option?.id} className="inline-flex items-center">
 																			<input
-																				ref={(el) => (formRefs.current[inputField.id] = el)}
 																				type="radio"
 																				name={inputField?.name}
 																				value={option?.id}
@@ -237,12 +243,11 @@ function SkuList() {
 															)}
 															{inputField?.type === "file" && (
 																<input
-																	ref={(el) => (formRefs.current[inputField.id] = el)}
 																	type="file"
 																	placeholder={inputField?.placeholder || ""}
 																	defaultValue={inputField?.defaultValue || ""}
 																	required={inputField?.required}
-																	className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
+																	className="w-full h-14 px-2 py-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none"
 																/>
 															)}
 														</div>

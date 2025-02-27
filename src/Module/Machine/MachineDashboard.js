@@ -6,7 +6,7 @@ import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableData
 import {  FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa'
 import Drawer from '../../components/Drawer/Drawer';
 import { useState } from "react";
-import { FaFileUpload } from "react-icons/fa";
+import { RiUploadCloudLine } from "react-icons/ri";
 
 
 
@@ -14,8 +14,8 @@ export default function MachineMaster() {
   const [isdrawopen,setdrawopen]=useState(false)
   return (
     <div>
-      <div style={{ padding: '10px', width: '100%', height: '100vh', border:'1px soild black',backgroundColor:'#ffff' }}>
-        <div style={{display:'flex',justifyContent:'space-between', marginBottom:'10px'}}>
+      <div style={{ padding: '20px', width: '100%', height: '100vh', border:'1px soild black',backgroundColor:'#ffff' }}>
+        <div style={{display:'flex',justifyContent:'space-between', marginBottom:'30px'}}>
         <h3 style={{  color: '#030303',fontSize:'20px' }}>Machine Master Dashboard</h3>
         <button style={{color:'#ffff',backgroundColor:'#8167e5',borderRadius:'5px', padding:'5px'}} onClick={()=>setdrawopen(true)}>+ Add Machine</button>
         </div>
@@ -34,27 +34,27 @@ export default function MachineMaster() {
               height: '100px', width: '280px', backgroundColor: item.bgColor, borderRadius: '10px', padding: '5px', display: 'flex',
               boxShadow: '0px 2px 10px rgba(3,3,3,0.1)'
             }}>
-              <div style={{ width:"100%",}}>
+              <div style={{ width:"100%",padding:'10px'}}>
                 <h2 style={{ fontSize: '16px', fontWeight: 'bold', color: item.color,textAlign:'left' }}>{item.label}</h2>
                 <p style={{ textAlign:'left', color: item.color,fontSize:'20px',fontWeight:'bold',marginLeft:'10px' }}>{item.count}</p>
               </div>
-              <div style={{ width:"20%"}}>
+              <div style={{ width:"20%",padding:'10px'}}>
                 <p style={{ fontSize: "40px", color: item.iconColor }}>{item.icon}</p>
               </div>
             </div>
           ))}
         </div>
 
-        <div style={{ backgroundColor: '#ffffff', borderRadius: '10px', boxShadow: '0px 2px 10px rgba(3,3,3,0.1)', padding: '10px' }}>
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '10px', padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ marginLeft: '10px',fontSize:'20px' }}>Raw Material</h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <input type="text" placeholder="Search by Name, ID, Status" style={{ width: '230px', padding: '8px', border: '1px solid #ccc', borderRadius: '12px' }} />
-              <input type="date" style={{ padding: '8px', borderRadius: '12px', border: '1px solid #ccc' }} />
-              <button style={{ padding: '8px', borderRadius: '6px', backgroundColor: '#8167e5', color: '#ffffff', outline: 'none', border: 'none' }}>Filter</button>
+              <input type="text" placeholder="Search by Name, ID, Status" style={{ width: '230px', padding: '4px', border: '1px solid #ccc', borderRadius: '12px' }} />
+              <input type="date" style={{ padding: '4px', borderRadius: '12px', border: '1px solid #ccc' }} />
+              <button style={{ padding: '4px',width:'50px', borderRadius: '6px', backgroundColor: '#8167e5', color: '#ffffff', outline: 'none', border: 'none' }}>Filter</button>
             </div>
           </div>
-          <CTable hover responsive>
+          <CTable hover responsive style={{marginTop:'20px'}}>
             <CTableHead>
               <CTableRow style={{ backgroundColor: '#e5e7eb' }}>
                 {['ID', 'Name', 'Type', 'Process Count', 'Status', 'Last Maintenance', 'Next Maintenance', 'Speed', 'Capacity', 'Action'].map((header, i) => (
@@ -69,8 +69,12 @@ export default function MachineMaster() {
                 id: '002', name: 'Machine B', type: 'Type 2', count: 10, status: 'Maintenance', last: '01/05/2023', next: '01/07/2023', speed: 500, capacity: '2000 L', color: '#81182c'
               }, {
                 id: '003', name: 'Machine C', type: 'Type 3', count: 5, status: 'UnderMaintenance', last: '01/05/2023', next: '01/07/2023', speed: 500, capacity: '2000 L', color: '#ff3b30'
-              }, {
-                id: '004', name: 'Machine D', type: 'Type 4', count: 5, status: 'Disable', last: '01/05/2023', next: '01/07/2023', speed: 500, capacity: '2000 L', color: '#ff3b30'
+              },{
+                 id: '004', name: 'Machine D', type: 'Type 4', count: 8, status: 'Disable', last: '01/05/2023', next: '01/07/2023', speed: 500, capacity: '2000 L', color: '#ff3b30'
+              },{
+                 id: '005', name: 'Machine E', type: 'Type 5', count: 25, status: 'Active', last: '01/05/2023', next: '01/07/2023', speed: 500, capacity: '2000 L', color: '#ff3b30'
+              },{
+                 id: '006', name: 'Machine F', type: 'Type 6', count: 10, status: 'Disable', last: '01/05/2023', next: '01/07/2023', speed: 500, capacity: '2000 L', color: '#ff3b30'
               }].map((machine, i) => (
                 <CTableRow key={i}>
                   <CTableDataCell>{machine.id}</CTableDataCell>
@@ -90,14 +94,14 @@ export default function MachineMaster() {
           
         </div>
         
-       <div style={{  display:"flex",justifyContent:"flex-end" ,alignItems:"center" ,marginTop:'30px',gap:'10px' }}>
-                 <FaAngleDoubleLeft style={{ fontSize: '24px', cursor: 'pointer' }} />
+       <div style={{  display:"flex",justifyContent:"flex-end" ,alignItems:"center" ,gap:'5px' }}>
+                 <FaAngleDoubleLeft style={{ fontSize: '15px', cursor: 'pointer' }} />
                  {[1, 2, 3, 4].map((num) => (
                    <button
                      key={num}
                      style={{
-                       width: '40px',
-                       height: '40px',
+                       width: '35px',
+                       height: '35px',
                        borderRadius: '50%',
                        backgroundColor: num === 4 ? '#c1c0e0' : '#e5e7eb',
                        border: 'none',
@@ -107,7 +111,7 @@ export default function MachineMaster() {
                      {num}
                    </button>
                  ))}
-                 <FaAngleDoubleRight style={{ fontSize: '24px', cursor: 'pointer' }} />
+                 <FaAngleDoubleRight style={{ fontSize: '15px', cursor: 'pointer' }} />
                </div>
                <Drawer isOpen={isdrawopen} onClose={() => setdrawopen(false)}>
 
@@ -150,9 +154,9 @@ export default function MachineMaster() {
     <button style={{ color: 'white', backgroundColor: '#ff2d55',width:'150px',borderRadius:'5px',padding:'5px',boxShadow: '0px 0px 10px rgba(3,3,3,0.1)' }}>Delete Machine</button>
 </div>
 
-<div style={{ display: "flex", justifyContent: "space-between", background: "#f5f5f5", padding: "5px", borderRadius: "10px",width:'100%',height:'200px' }}>
+<div style={{ display: "flex", justifyContent: "space-between", background: "#f5f5f5", padding: "20px", borderRadius: "10px",width:'100%',height:'200px' }}>
     <div style={{ width: '50%', display: "flex", flexDirection: "column" }}>
-        <h3>Machine Process Integration</h3>
+        <h3 style={{fontSize:'20px',marginBottom:'10px'}}>Machine Process Integration</h3>
         <h6>Add Machine to a Process</h6>
 
         <select style={{ width: "100%", padding: "10px", margin: "5px 0",borderRadius: "5px", border: "1px solid #ccc" }}>
@@ -164,13 +168,13 @@ export default function MachineMaster() {
         </select>
     </div>
 
-    <div style={{ backgroundColor: '#fff', marginTop: '60px', padding: '10px 100px 10px 100px', borderRadius: '5px', boxShadow: '0px 0px 5px rgba(0,0,0,0.1)',width:'45%',height:'120px'  }}>
+    <div style={{ backgroundColor: '#fff', marginTop: '60px', padding: '10px 100px 10px 100px', borderRadius: '5px', boxShadow: '0px 0px 5px rgba(0,0,0,0.1)',width:'45%',height:'100px'  }}>
          <div style={{justifyItems:'center'}}>
-              <FaFileUpload style={{height:'40px',width:'40px'}}/>
-        <p style={{marginBottom:'0px'}}>Select your file or drag and drop</p>
-        <button style={{ backgroundColor: '#8167e5', color: 'white', padding: '5px ',width:'70px', border: 'none', borderRadius: '3px' }}>
-            Browse
-        </button>
+              <RiUploadCloudLine style={{height:'30px',width:'30px',marginTop:'5px'}}/>
+              <h6 style={{}}>Upload a File</h6>
+        <p >Select your file or drag and drop</p>
+        
+         
         </div>
     </div>
    </div>

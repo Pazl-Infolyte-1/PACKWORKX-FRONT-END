@@ -9,6 +9,9 @@ const MachineDashboard = React.lazy(() => import('./Module/Machine/MachineDashbo
 const InventoryHandling = React.lazy(() => import('./Module/Inventory/InventoryHandling.js'))
 const Production = React.lazy(() => import('./Module/Production/Index.js'))
 const Packages = React.lazy(() => import('./Module/Admin/Packages.js'))
+const Billing = React.lazy(() => import('./Module/Admin/Billing.js'))
+const Companies = React.lazy(() => import('./Module/Admin/Companies.js'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: '' },
@@ -20,6 +23,10 @@ const routes = [
   { path: '/inventoryhandling', name: 'Inventory Handling', element: InventoryHandling, key: 28 },
   { path: '/production', name: 'Production', element: Production, key: 26 },
   { path: '/packages', name: 'Packages', element: Packages, key: 5001 },
+  { path: '/billing', name: 'Billing', element: Billing, key: 5003 },
+  { path: '/companies', name: 'Companies', element: Companies, key: 5002 },
+
+
 ]
 
 export default routes

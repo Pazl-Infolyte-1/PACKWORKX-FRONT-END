@@ -19,6 +19,7 @@ import { FaAngleDown, FaAngleUp } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
 import { cilOptions } from '@coreui/icons'
 import { useDrag, useDrop } from 'react-dnd'
+import './styles.css'
 
 const ItemType = 'WORK_ORDER'
 
@@ -39,15 +40,27 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
             justifyContent: 'space-between',
             alignItems: 'center',
             cursor: 'pointer',
+            width: '100%', // Ensures elements use available space
           }}
         >
-          <span onClick={() => toggleCollapse(sfg.id)}>
+          {/* Ensures sfg.id and the icon stay on the same line */}
+          <span
+            onClick={() => toggleCollapse(sfg.id)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px', // Adds space between text and icon
+              whiteSpace: 'nowrap', // Prevents text wrapping
+            }}
+          >
             {sfg.id} {openSFG === sfg.id ? <FaAngleUp /> : <FaAngleDown />}
           </span>
+
+          {/* Ensures the CIcon stays aligned */}
           <span
             style={{
-              fontSize: '16px',
-              lineHeight: '21px',
+              display: 'flex',
+              alignItems: 'center',
             }}
           >
             <CIcon
@@ -58,7 +71,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
           </span>
         </div>
 
-        <CCollapse visible={openSFG === sfg.id}>
+        <CCollapse className="custom-collapse" visible={openSFG === sfg.id}>
           <CRow className="align-items-center mt-3 mb-2">
             <CCol md="3">
               <span>{sfg.description}</span>
@@ -170,22 +183,35 @@ function GroupDropZone({
             justifyContent: 'space-between',
             alignItems: 'center',
             cursor: 'pointer',
+            width: '100%', // Ensures elements use available space
           }}
         >
-          <span onClick={() => toggleItemCollapse(itemIndex)}>
+          {/* Ensures order_id and the icon stay on the same line */}
+          <span
+            onClick={() => toggleItemCollapse(itemIndex)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px', // Adds space between text and icon
+              whiteSpace: 'nowrap', // Prevents text wrapping
+            }}
+          >
             {i.order_id} {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />}
           </span>
+
+          {/* Ensures the finished_goods / quantity stays aligned */}
           <span
             style={{
-              fontSize: '16px',
-              lineHeight: '21px',
+              display: 'flex',
+              alignItems: 'center',
+              whiteSpace: 'nowrap',
             }}
           >
             {i.finished_goods} / {i.quantity}
           </span>
         </div>
 
-        <CCollapse visible={visibleItemIndex === itemIndex}>
+        <CCollapse className="custom-collapse" visible={visibleItemIndex === itemIndex}>
           <div
             style={{
               marginTop: '10px',
@@ -434,17 +460,37 @@ const AllocateSFG = ({
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       cursor: 'pointer',
+                      width: '100%', // Ensures full width usage
                     }}
                   >
-                    <span onClick={() => toggleGroupCollapse(groupIndex)}>
+                    {/* Keeps group.name and icon on the same line */}
+                    <span
+                      onClick={() => toggleGroupCollapse(groupIndex)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px', // Adds spacing between text and icon
+                        whiteSpace: 'nowrap', // Prevents unintended wrapping
+                      }}
+                    >
                       {group.name}{' '}
                       {visibleGroupIndex === groupIndex ? <FaAngleUp /> : <FaAngleDown />}
                     </span>
-                    {group.items.reduce((sum, g) => sum + g.finished_goods, 0)} /
-                    {group.items.reduce((sum, g) => sum + g.quantity, 0)}
+
+                    {/* Ensures the numbers stay aligned properly */}
+                    <span
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {group.items.reduce((sum, g) => sum + g.finished_goods, 0)} /{' '}
+                      {group.items.reduce((sum, g) => sum + g.quantity, 0)}
+                    </span>
                   </div>
 
-                  <CCollapse visible={visibleGroupIndex === groupIndex}>
+                  <CCollapse className="custom-collapse" visible={visibleGroupIndex === groupIndex}>
                     {group.items.map((i, itemIndex) => (
                       <GroupDropZone
                         key={itemIndex}

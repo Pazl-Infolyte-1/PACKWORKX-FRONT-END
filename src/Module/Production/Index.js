@@ -30,7 +30,7 @@ const Index = () => {
   useEffect(() => {
     async function getWorkOrders() {
       try {
-        const response = await axios.get('https://mocki.io/v1/ba2ffb2a-adbd-4ea7-a08f-84d1f99c8e36')
+        const response = await axios.get('https://mocki.io/v1/c070abb2-c022-41a6-853d-84f1288963d8')
         console.log(response.data)
         setWorkOrders(response.data.orders)
       } catch (error) {
@@ -52,8 +52,8 @@ const Index = () => {
   }, [])
 
   const [groupOrders, setGroupOrders] = useState([])
-  const [activeTab, setActiveTab] = useState('group')
-  const tabs = ['group', 'sfg', 'rm', 'returnables']
+  const [activeTab, setActiveTab] = useState('Group Layers')
+  const tabs = ['Group Layers', 'Allocate SFG', 'Allocate RM', 'Returnables']
 
   const handleNextStep = () => {
     const currentIndex = tabs.indexOf(activeTab)
@@ -75,7 +75,7 @@ const Index = () => {
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h3>Order Grouping</h3>
         <div className="ms-auto d-flex">
-          {activeTab === 'group' && (
+          {activeTab === 'Group Layers' && (
             <CButton
               color="white border-black hover-text-white background-black"
               className="text-black me-2"
@@ -106,7 +106,7 @@ const Index = () => {
                   cursor: 'pointer',
                 }}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1).replace(/_/g, ' ')}
+                {tab}
               </CNavLink>
             </CNavItem>
           ))}
@@ -114,7 +114,7 @@ const Index = () => {
       </CCol>
 
       <CRow>
-        {activeTab === 'group' && (
+        {activeTab === 'Group Layers' && (
           <Group
             workOrders={workOrders}
             groupOrders={groupOrders}
@@ -123,7 +123,7 @@ const Index = () => {
             autoSyncOrders={autoSyncOrders}
           />
         )}
-        {activeTab === 'sfg' && (
+        {activeTab === 'Allocate SFG' && (
           <AllocateSFG
             workOrders={workOrders}
             groupOrders={groupOrders}
@@ -132,7 +132,7 @@ const Index = () => {
             autoSyncOrders={autoSyncOrders}
           />
         )}
-        {activeTab === 'rm' && (
+        {activeTab === 'Allocate RM' && (
           <AllocateRM
             workOrders={workOrders}
             groupOrders={groupOrders}
@@ -141,7 +141,7 @@ const Index = () => {
             autoSyncOrders={autoSyncOrders}
           />
         )}
-        {activeTab === 'returnables' && (
+        {activeTab === 'Returnables' && (
           <ReturnablesContent
             workOrders={workOrders}
             groupOrders={groupOrders}

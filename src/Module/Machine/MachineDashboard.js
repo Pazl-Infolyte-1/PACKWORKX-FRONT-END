@@ -15,9 +15,9 @@ export default function MachineMaster() {
   return (
     <div>
       <div style={{ padding: '10px', width: '100%', height: '100vh', border:'1px soild black',backgroundColor:'#ffff' }}>
-        <div style={{display:'flex',justifyContent:'space-between',marginBottom:'5px'}}>
-        <h3 style={{ marginBottom: '10px', color: '#030303',fontSize:'20px' }}>Machine Master Dashboard</h3>
-        <button style={{color:'red'}} onClick={()=>setdrawopen(true)}>+ Add Machine</button>
+        <div style={{display:'flex',justifyContent:'space-between', marginBottom:'10px'}}>
+        <h3 style={{  color: '#030303',fontSize:'20px' }}>Machine Master Dashboard</h3>
+        <button style={{color:'#ffff',backgroundColor:'#8167e5',borderRadius:'5px', padding:'5px'}} onClick={()=>setdrawopen(true)}>+ Add Machine</button>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '3px', marginBottom: '20px', width: "100%" }}>
           {[{
@@ -129,7 +129,10 @@ export default function MachineMaster() {
         <div style={{width:'30%'}}>
           <h5>Attributes & Parameters</h5>
           <input style={{width: "100%",padding: "10px",margin: "5px 0",borderRadius: "5px",border: "1px solid #ccc",}} type="text" placeholder="Reel Capacity" />
+          <div style={{display:'flex',gap:'10px'}}>
           <input style={{width: "100%",padding: "10px",margin: "5px 0",borderRadius: "5px",border: "1px solid #ccc",}} type="text" placeholder="Custom Tag"  />
+          <input style={{width: "100%",padding: "10px",margin: "5px 0",borderRadius: "5px",border: "1px solid #ccc",}} type="text" placeholder="Value"  />
+          </div>
           <input style={{width: "100%",padding: "10px",margin: "5px 0",borderRadius: "5px",border: "1px solid #ccc",}} type="text" placeholder="Speed Parameters"  />
           <input style={{width: "100%",padding: "10px",margin: "5px 0",borderRadius: "5px",border: "1px solid #ccc",}} type="text" placeholder="Other Parameters"  />
         </div>
@@ -141,13 +144,13 @@ export default function MachineMaster() {
         </div>
      </div>
     
-     <div style={{ display: 'flex', float: 'right', marginTop: '10px', gap: '20px', padding:'15px', borderRadius: '10px' }}>
-    <button>Cancel</button>
-    <button style={{ color: "black", backgroundColor: '#8167e5', width:'60px',borderRadius:'5px' }}>Save</button>
-    <button style={{ color: 'white', backgroundColor: '#ff2d55',width:'150px',borderRadius:'5px' }}>Delete Machine</button>
+     <div style={{ display: 'flex', float: 'right', marginTop: '10px', gap: '20px', padding:'20px', borderRadius: '10px' }}>
+    <button style={{ color: "black", backgroundColor: '#ffff', width:'80px',borderRadius:'5px',padding:'5px', boxShadow: '0px 0px 10px rgba(3,3,3,0.1)' }}>Cancel</button>
+    <button style={{ color: "white", backgroundColor: '#8167e5', width:'80px',borderRadius:'5px',padding:'5px',boxShadow: '0px 0px 10px rgba(3,3,3,0.1)' }}>Save</button>
+    <button style={{ color: 'white', backgroundColor: '#ff2d55',width:'150px',borderRadius:'5px',padding:'5px',boxShadow: '0px 0px 10px rgba(3,3,3,0.1)' }}>Delete Machine</button>
 </div>
 
-<div style={{ display: "flex", justifyContent: "space-between", background: "#f5f5f5", padding: "5px", borderRadius: "10px",width:'100%' }}>
+<div style={{ display: "flex", justifyContent: "space-between", background: "#f5f5f5", padding: "5px", borderRadius: "10px",width:'100%',height:'200px' }}>
     <div style={{ width: '50%', display: "flex", flexDirection: "column" }}>
         <h3>Machine Process Integration</h3>
         <h6>Add Machine to a Process</h6>
@@ -161,21 +164,20 @@ export default function MachineMaster() {
         </select>
     </div>
 
-    <div style={{ backgroundColor: '#fff', marginTop: '60px', padding: '10px 100px 10px 100px', borderRadius: '5px', boxShadow: '0px 0px 5px rgba(0,0,0,0.1)',width:'45%'  }}>
-              <FaFileUpload style={{height:'40px',width:'40px',marginLeft:'100px'}}/>
-        <p>Select your file or drag and drop</p>
-        <button style={{ backgroundColor: '#8167e5', color: 'white', padding: '0px 5px ', border: 'none', borderRadius: '3px', marginLeft:'100px' }}>
+    <div style={{ backgroundColor: '#fff', marginTop: '60px', padding: '10px 100px 10px 100px', borderRadius: '5px', boxShadow: '0px 0px 5px rgba(0,0,0,0.1)',width:'45%',height:'120px'  }}>
+         <div style={{justifyItems:'center'}}>
+              <FaFileUpload style={{height:'40px',width:'40px'}}/>
+        <p style={{marginBottom:'0px'}}>Select your file or drag and drop</p>
+        <button style={{ backgroundColor: '#8167e5', color: 'white', padding: '5px ',width:'70px', border: 'none', borderRadius: '3px' }}>
             Browse
         </button>
+        </div>
     </div>
-</div>
-
-
-       
- </Drawer>
+   </div>
+  </Drawer>
        
  
-      </div>
+  </div>
       
     </div>
 

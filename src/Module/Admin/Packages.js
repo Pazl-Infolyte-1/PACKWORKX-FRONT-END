@@ -47,20 +47,25 @@ function Packages() {
   const totalPages = Math.ceil(tableData.length / rowsPerPage)
 
   return (
-    <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column' , paddingInline: '20px'}}>
+    <div
+      style={{
+        height: '100vh',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        paddingInline: '20px',
+      }}
+    >
       {/* Header */}
-      <div style={{ width: '100%', height: '40px',  }}>
+      <div style={{ width: '100%', height: '40px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          
-            <h4>Packages</h4>
-          
+          <h4>Packages</h4>
         </div>
       </div>
 
       {/* Search Bar & Add Button */}
       <div
         style={{
-          
           marginTop: '5px',
           height: '80px',
           display: 'flex',
@@ -228,7 +233,7 @@ function Packages() {
                   <CFormInput label="Max Employee" placeholder="Enter Max Employee" />
                 </CCol>
 
-                <div style={{ paddingTop: '35px' }}>
+                <div style={{ paddingTop: '37px' }}>
                   <CCol md={6} style={{ width: '250px' }}>
                     <CFormInput label="Max Storage Size" placeholder="Enter Max Storage Size" />
                   </CCol>

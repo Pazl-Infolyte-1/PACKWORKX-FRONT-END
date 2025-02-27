@@ -104,18 +104,20 @@ function ListOfSalesOrder() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            border: '2px solid black',
+            
             padding: '10px',
           }}
         >
           <div
             style={{
               display: 'flex',
+              justifyContent:"space-between",
               alignItems: 'center',
               height: '40px',
               width: '300px',
               gap: '7px',
-              border: '2px solid black',
+             backgroundColor:"white",
+             borderRadius:"6px",
               padding: '5px',
             }}
           >
@@ -123,11 +125,16 @@ function ListOfSalesOrder() {
             <input
               type="text"
               placeholder="Start Typing To Search"
-              style={{ width: '100%' }}
+              style={{ width: '100%',outline:"none", backgroundColor:"transparent" }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            
           </div>
+          <div  className=' bg-white h-10 w-20 flex items-center justify-center rounded-md'>
+          <button>Filter</button>
+          </div>
+          
         </div>
 
         {/* Table */}
@@ -254,7 +261,10 @@ function ListOfSalesOrder() {
                   </CRow>
                 </CForm>
 
-                <h3 className="text-lg font-semibold mt-6 mb-4">SKU Details</h3>
+                <div className='flex items-center justify-between  mt-6 mb-4'>
+                <h3 className="text-lg font-semibold ">SKU</h3>
+                  <CButton color="success">+Add SKU</CButton>
+                </div>
                 <div className='flex justify-between items-center gap-5'>
                 <CRow className="mb-3  flex justify-between items-center w-full">
                   <CCol md={3}>
@@ -314,7 +324,7 @@ function ListOfSalesOrder() {
                   </div>
                 </div>
 
-                <CRow className="flex justify-between mt-4 border-b-2 border-">
+                <CRow className="flex justify-between mt-4 border-b-2 border-black pb-3">
                   <CCol md={6}>
                     <CButton color="secondary">Previous Invoiced Rates</CButton>
                   </CCol>
@@ -327,12 +337,9 @@ function ListOfSalesOrder() {
 
 
 
-                <div className='flex items-center justify-between'>
-                <h3 className="text-lg font-semibold mb-4">Work Order Details</h3>
-                <div className="flex justify-end mt-4">
+                <div className='flex items-center justify-between  mt-6 '>
+                <h3 className="text-lg font-semibold ">Work Order Details</h3>
                   <CButton color="success">Work Order</CButton>
-                </div>
-
                 </div>
 
                 

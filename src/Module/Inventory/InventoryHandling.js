@@ -1,181 +1,112 @@
-import React from 'react'
-import './Style.css'
+import React from "react";
+import { FaSearch, FaCircle, FaFillDrip, FaThumbtack, FaStar, FaShieldAlt, FaUsers } from "react-icons/fa";
+import { BiDollarCircle } from "react-icons/bi";
+import { CgWorkAlt } from "react-icons/cg";
+import {  FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa'
 
-import { IoSearch } from 'react-icons/io5'
-import { FaBell } from 'react-icons/fa'
-import { FaWarehouse } from 'react-icons/fa'
-import { FaThumbtack } from 'react-icons/fa'
-import { FaFillDrip } from 'react-icons/fa'
-import { FaCircle } from 'react-icons/fa'
-import { BiDollarCircle } from 'react-icons/bi'
-import { CiStar } from 'react-icons/ci'
-import { MdWorkOutline } from 'react-icons/md'
-import { MdOutlineGppGood } from 'react-icons/md'
-import { MdGroups2 } from 'react-icons/md'
+const InventoryDashboard = () => {
+    return (
+        
+        <div style={{ backgroundColor: "#f7f7f7", margin: 0, }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", }}>
+                <StockCard title="Reels" quantity="1200" status="Enough Stock" backgroundColor="#d4edda" color="#155724" buttonColor="#286e34" icon={<BiDollarCircle />} />
+                <StockCard title="Corrugation Glue" quantity="300" status="Low Stock" backgroundColor="#fff3cd " color="#856404" buttonColor="#856404" icon={<FaStar />} />
+                <StockCard title="Pasting Glue" quantity="50" status="Out of Stock" backgroundColor="#f8d7da " color="#721c24" buttonColor="#721c24" icon={<CgWorkAlt />} />
+                <StockCard title="Finished Goods" quantity="600" backgroundColor="#e5e5e5" color="#858585" buttonColor="#858585" icon={<FaShieldAlt />} />
+                <StockCard title="Semi Finished Goods" quantity="450" backgroundColor="#c7c7f1" color="#2f667f" buttonColor="#2f667f" icon={<FaUsers />} />
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", backgroundColor: "white", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
+                    <h5 style={{ color: '#21338e' }}>Total Stock Value</h5>
+                    <h3 style={{ fontSize: "28px", fontWeight: "700", color: "#21338e" }}>$50,000</h3>
+                </div>
+            </div>
+            <MaterialSection />
+        </div>
+    );
+};
 
-const Demo = () => {
-  return (
-    <div className="dashboard-container">
-      <div className="stock-overview">
-        <div className="stock-card-green">
-          <div className="title-green">
-            <h3>Reels</h3>
-            <p>Total Quantity: 1200</p>
-            <p>Status: Enough Stock</p>
-            <button className="green-button">View Details</button>
-          </div>
-          <div className="image-green">
-            <BiDollarCircle
-              style={{ height: '60px', width: '60px', marginTop: '10px', color: 'white' }}
-            />
-          </div>
+const StockCard = ({ title, quantity, status, color, buttonColor, icon, backgroundColor }) => (
+    <div style={{ boxSizing: "border-box", display: "flex", justifyContent: "space-between", padding: "10px 30px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", color, backgroundColor,minHeight:'140.2px' }}>
+        <div>
+            <h6>{title}</h6>
+            <p style={{ marginBottom: '0' }}>Total Quantity: {quantity}</p>
+            {status && <p style={{ marginBottom: '0' }}>Status: {status}</p>}
+            <button style={{ fontSize: "14px", color: "white", padding: "2px 10px", borderRadius: "4px", backgroundColor: buttonColor, border: "none", cursor: "pointer", marginTop: '20px', bottom: '0' }}>view info</button>
         </div>
-        <div className="stock-card-yellow">
-          <div className="title-yellow">
-            <h3>Glues</h3>
-            <p>Total Quantity:300</p>
-            <p>Status: low Stock</p>
-            <button className="yellow-button">View Details</button>
-          </div>
-          <div className="image-yellow">
-            <CiStar style={{ height: '60px', width: '60px', marginTop: '10px', color: 'white' }} />
-          </div>
-        </div>
-        <div className="stock-card-red">
-          <div className="title-red">
-            <h3>Pins</h3>
-            <p>Total Quantity:50</p>
-            <p>Status:Out of Stock</p>
-            <button className="red-button">View Details</button>
-          </div>
-          <div className="image-red">
-            <MdWorkOutline
-              style={{ height: '60px', width: '60px', marginTop: '10px', color: 'white' }}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="summary-box">
-        <div className="stock-card-black">
-          <div className="title-black">
-            <h3>Finished Goods</h3>
-            <p>Total Quantity: 600</p>
+        <div>
+            <span style={{ color:buttonColor, borderRadius: '5px', fontSize: "30px", backgroundColor: buttonColor }}>{icon}</span>
 
-            <button className="black-button">View Details</button>
-          </div>
-          <div className="image-black">
-            <MdOutlineGppGood
-              style={{ height: '60px', width: '60px', marginTop: '10px', color: 'white' }}
-            />
-          </div>
         </div>
-        <div className="stock-card-blue">
-          <div className="title-blue">
-            <h3>Semi Finished Goods</h3>
-            <p>Total Quantity:450</p>
-
-            <button className="blue-button">View Details</button>
-          </div>
-          <div className="image-blue">
-            <MdGroups2
-              style={{ height: '60px', width: '60px', marginTop: '10px', color: 'white' }}
-            />
-          </div>
-        </div>
-
-        <div className="stock-value">
-          <h3>Total Stock Value </h3>
-          <h1>$50,000</h1>
-        </div>
-      </div>
-      <section className="materials-section">
-        <h4>Raw Materials Types</h4>
-        <div className="input">
-          <div
-            style={{
-              border: 'none',
-              marginBottom: '3px',
-              position: ' relative',
-              display: 'flex',
-              borderRadius: '8px',
-              height: '30',
-              width: '200',
-              boxShadow: '0px 2px 3px rgba(0,0,0)',
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Search SKU by name or ID"
-              className="search-input"
-              style={{
-                outline: 'none',
-                border: '0',
-                height: '40',
-                width: '200',
-                marginBottom: '3px',
-              }}
-            />
-            <IoSearch style={{ height: 25, width: 25, marginRight: 10, marginTop: '8' }} />
-          </div>
-          <div
-            style={{
-              boxshadow: ' 0px 2px 8px rgba(0,0,0,0)',
-              backgroundcolor: '#8167e5',
-              outline: 'none',
-              height: '40',
-              width: '100',
-              color: '#ffffff',
-              display: 'flex',
-              marginRight: '10px',
-            }}
-          >
-            <button>Filter</button>
-            <button className="saved-button">Saved Filter</button>
-            <button className="bulk-button">Bulk upload</button>
-          </div>
-        </div>
-        <table>
-          <tbody>
-            <tr>
-              <td>
-                <FaCircle style={{ height: '20', width: '20', color: '#6ac8d8' }} /> Reel - Standard
-              </td>
-              <td>Type:Standard</td>
-              <td>Available:180</td>
-              <td>Reorder Level:500</td>
-              <td>Last Updated:2023-10-01</td>
-            </tr>
-            <tr>
-              <td>
-                <FaFillDrip style={{ height: '20', width: '20', color: '#ea64d3' }} /> Glue -
-                Pasting
-              </td>
-              <td>Type:Normal</td>
-              <td>Available:200</td>
-              <td>Reorder Level:100</td>
-              <td>Last Updated:2023-10-01</td>
-            </tr>
-            <tr>
-              <td>
-                <FaThumbtack style={{ height: '20', width: '20', color: '#21338e' }} /> Pin - Small
-              </td>
-              <td>Type:Medium</td>
-              <td>Available:25</td>
-              <td>Reorder Level:200</td>
-              <td>Last Updated:2023-10-01</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <div className="pagination">
-        <button>1</button>
-        <button>2</button>
-        <button>3</button>
-        <button>4 </button>
-      </div>
     </div>
-  )
-}
+);
 
-export default Demo
+const ButtonCommon = ({children}) => (
+    <span style={{color: "white",padding: "4px 6px",borderRadius: "4px",margin: "0 4px",border: "none",boxShadow: '0px 1px 4px rgba(0,0,0,0.1)',
+        outline: 'none',
+        background: '#8167e5', 
+        cursor: 'pointer' 
+    }}>
+        {children}
+    </span>
+);
+
+const MaterialSection = () => (
+    <section style={{ backgroundColor: "white", padding: "16px", marginTop: "10px", borderRadius: "8px", boxShadow: "0 1px 4px rgba(0,0,0,0.1)" }}>
+        <h6>Raw Materials Types</h6>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", }}>
+            <div style={{ position: "relative", display: "flex", alignItems: "center", boxShadow: '0px 1px 4px rgba(0,0,0,0.1)' }}>
+                <input type="text" placeholder="Search SKU by name or ID" style={{ border: "1px solid #d1d5db", padding: "3px", borderRadius: "6px", width: "280px" }} />
+                <FaSearch style={{ position: "absolute", right: "12px", color: "#6b7280" }} />
+            </div>
+            <div>
+                <ButtonCommon>Filter</ButtonCommon>
+                <ButtonCommon>Saved Filter</ButtonCommon>
+                <ButtonCommon>Bulk Upload</ButtonCommon>
+            </div>
+        </div>
+        <MaterialTable />
+        <div style={{  display:"flex",justifyContent:"flex-end" ,alignItems:"center" ,marginTop:'30px',gap:'10px' }}>
+                 <FaAngleDoubleLeft style={{ fontSize: '24px', cursor: 'pointer' }} />
+                 {[1, 2, 3, 4].map((num) => (
+                   <button
+                     key={num}
+                     style={{
+                       width: '40px',
+                       height: '40px',
+                       borderRadius: '50%',
+                       backgroundColor: num === 4 ? '#c1c0e0' : '#e5e7eb',
+                       border: 'none',
+                       cursor: 'pointer',
+                     }}
+                   >
+                     {num}
+                   </button>
+                 ))}
+                 <FaAngleDoubleRight style={{ fontSize: '24px', cursor: 'pointer' }} />
+               </div>
+    </section>
+    
+);
+
+const MaterialTable = () => (
+    <table style={{ width: "100%", marginTop: "16px", borderCollapse: "collapse", boxShadow: "0 1px 4px rgba(0,0,0,0)" }}>
+        <tbody>
+            <MaterialRow icon={<FaCircle style={{ color: "#3b82f6" }} />} name="Reel - Standard" type="Standard" available="180" reorder="500" updated="2023-10-01" />
+            <MaterialRow icon={<FaFillDrip style={{ color: "#ec4899" }} />} name="Glue - Pasting" type="Normal" available="200" reorder="100" updated="2023-10-01" />
+            <MaterialRow icon={<FaThumbtack style={{ color: "#6366f1" }} />} name="Pin - Small" type="Medium" available="25" reorder="200" updated="2023-10-01" />
+        </tbody>
+    </table>
+);
+
+const MaterialRow = ({ icon, name, type, available, reorder, updated }) => (
+    <tr style={{ borderBottom: "1px solid #d1d5db", textAlign: "left" }}>
+        <td style={{ padding: "8px 16px", display: "flex", alignItems: "center", gap: "8px" }}>{icon} <span>{name}</span></td>
+        <td style={{ padding: "8px 16px" }}>Type: {type}</td>
+        <td style={{ padding: "8px 16px" }}>Available: {available}</td>
+        <td style={{ padding: "8px 16px" }}>Reorder Level: {reorder}</td>
+        <td style={{ padding: "8px 16px" }}>Last Updated: {updated}</td>
+    </tr>
+);
+
+ 
+
+export default InventoryDashboard;

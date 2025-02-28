@@ -198,7 +198,7 @@ export default function MachineMaster() {
           <div className="overflow-x-auto  overflow-y-auto h-[300px] custom-scrollbar ">
             <CTable striped hover className="mt-3 border border-gray-200 pb-3 ">
               {/* Table Header */}
-              <CTableHead className="bg-gray-100 sticky top-0 z-10">
+              <CTableHead className="bg-gray-100 sticky top-0 ">
                 <CTableRow>
                   {headers.map((header, index) => (
                     <CTableHeaderCell

@@ -10,6 +10,23 @@ import Drawer from '../../components/Drawer/Drawer';
 import apiMethods from '../../api/config';
 import { useRef } from "react";
 
+import {
+	CTable,
+	CTableHead,
+	CTableRow,
+	CTableHeaderCell,
+	CTableBody,
+	CTableDataCell,
+	CRow,
+	CCol,
+	CFormInput,
+	CFormSelect,
+	CButton,
+	CFormCheck,
+  } from '@coreui/react'
+import axios from 'axios';
+import CommonPagination from '../../components/New/Pagination';
+
 "use client";
 function SkuList() {
 	const [skuType,setSkuType] = useState('')
@@ -18,6 +35,7 @@ function SkuList() {
 	const [isDrawerOpen,setDrawerOpen] = useState(false);
 	const [dynamicFields,setDynamicFields] = useState("")
 	const formRefs = useRef({});
+	const [data, setData] = useState([])
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -32,6 +50,38 @@ function SkuList() {
 
 		fetchData()
 	},[])
+
+
+	useEffect(() => {
+		async function fetchData() {
+		  try {
+			const response = await axios.get('https://mocki.io/v1/a229e5e3-10b1-4522-ba26-314bda2ff239')
+	 
+			setData(response.data)
+		  } catch (error) {
+			console.error('Error fetching data:', error)
+		  }
+		}
+		fetchData()
+	  }, [])
+
+
+	  const tableData = data?.values && Array.isArray(data.values) ? data.values : []
+	  const headers = data?.headers && Array.isArray(data.headers) ? data.headers : []
+
+	  const [currentPage, setCurrentPage] = useState(1)
+  const rowsPerPage = 4
+ 
+  const indexOfLastRow = currentPage * rowsPerPage
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage
+  const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
+  const totalPages = Math.ceil(tableData.length / rowsPerPage)
+
+
+
+
+
+
 
 	const handleSubmit = () => {
 		const formId = dynamicFields?.data?.formId;
@@ -443,109 +493,56 @@ function SkuList() {
 							</div>
 						</div>
 
-						{/* Table */}
-						<div style={{ marginTop: '20px' }}>
-							<table
-								style={{
-									width: '100%',
-									borderCollapse: 'collapse',
-									boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-								}}
-							>
-								<thead style={{ backgroundColor: '#21338e',color: 'white',height: '64px' }}>
-									<tr>
-										{[
-											'SKU Name',
-											'Created Date',
-											'Modified Date',
-											'SKU Type',
-											'Client',
-											'Dimensions',
-											'Deckle',
-											'Actions',
-										].map((heading,index) => (
-											<th key={index} style={{ padding: '12px',fontSize: '18px',fontWeight: '600' }}>
-												{heading}
-											</th>
-										))}
-									</tr>
-								</thead>
-								<tbody style={{ backgroundColor: 'white',color: '#424242' }}>
-									<tr style={{ textAlign: 'center' }}>
-										{['Box','2022-01-01','2022-01-01','Box','Client 1','10x10x10','20'].map(
-											(data,index) => (
-												<td key={index} style={{ padding: '12px',fontSize: '18px' }}>
-													{data}
-												</td>
-											),
-										)}
-										<td>
-											<button
-												style={{
-													padding: '6px',
-													border: 'none',
-													background: 'transparent',
-													cursor: 'pointer',
-												}}
-											>
-												<MdMoreVert style={{ fontSize: '20px' }} />
-											</button>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
 
-						{/* Pagination */}
-						<div
-							style={{
-								display: 'flex',
-								justifyContent: 'space-between',
-								alignItems: 'center',
-								marginTop: '20px',
-							}}
-						>
-							<h3 style={{ color: 'gray',fontSize: '18px' }}>Items per page: 10</h3>
-							<div style={{ display: 'flex',gap: '24px',alignItems: 'center' }}>
-								<FaAngleDoubleLeft style={{ fontSize: '24px',cursor: 'pointer' }} />
-								{[1,2,3,4].map((num) => (
-									<button
-										key={num}
-										style={{
-											width: '40px',
-											height: '40px',
-											borderRadius: '50%',
-											backgroundColor: num === 4 ? '#c1c0e0' : '#e5e7eb',
-											border: 'none',
-											cursor: 'pointer',
-										}}
-									>
-										{num}
-									</button>
-								))}
-								<FaAngleDoubleRight style={{ fontSize: '24px',cursor: 'pointer' }} />
-							</div>
-						</div>
+						<CTable striped hover className="mt-3 border border-gray-200 ">
+          <CTableHead className="bg-gray-100">
+            <CTableRow>
+              {headers.map((header, index) => (
+                <CTableHeaderCell key={index} className="py-3 px-4 text-gray-600 font-medium">
+                  {header}
+                </CTableHeaderCell>
+              ))}
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {currentRows.length > 0 ? (
+              currentRows.map((row, rowIndex) => (
+                <CTableRow key={rowIndex} className="border-b ">
+                  {row.map((cell, cellIndex) => (
+                    <CTableDataCell key={cellIndex} className="py-3 px-4 text-gray-700">
+                      {cell}
+                    </CTableDataCell>
+                  ))}
+                </CTableRow>
+              ))
+            ) : (
+              <CTableRow>
+                <CTableDataCell colSpan={headers.length} className="text-center py-3">
+                  No data available
+                </CTableDataCell>
+              </CTableRow>
+            )}
+          </CTableBody>
+        </CTable>
+ 
+        <div className="flex justify-end items-center gap-4 mt-4">
+          <CommonPagination count={5} page={1} onChange={''} />
+        </div>
+      
+ 
+
+
+						
+
+						
+						
+
+						
 					</div>
-					)
-					{
-						[1,2,3,4].map((num) => (
-							<button
-								key={num}
-								style={{
-									width: '40px',
-									height: '40px',
-									borderRadius: '50%',
-									backgroundColor: num === 4 ? '#c1c0e0' : '#e5e7eb',
-									border: 'none',
-									cursor: 'pointer',
-								}}
-							>
-								{num}
-							</button>
-						))
-					}
-					<FaAngleDoubleRight style={{ fontSize: '24px',cursor: 'pointer' }} />
+					
+					
+				
+		
 				</div >
 			</div >
 		</div >

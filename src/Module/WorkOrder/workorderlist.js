@@ -19,25 +19,42 @@ import {
 import CIcon from "@coreui/icons-react";
 import { cilSearch, cilFilter } from "@coreui/icons";
 import {  FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa'
+import CommonPagination from '../../components/New/Pagination';
+import { useEffect,useState } from 'react'
+import axios from 'axios'
+
 
 const WorkOrders = () => {
-  const WorkOrder = [
-    {
-      number: "WO-1001",salesOrder: "G3P0057",client: "Sterling Labs",date: "18/02/2025",etd: "25/02/2025",route: "Corr - Box",sku: "60 ml",
-      qty: 5100,stage: "Prod Planning",status: "Pending",
-    },
-    {
-      number: "WO-1002",salesOrder: "G3P0057",client: "Sterling Labs",date: "18/02/2025",etd: "25/02/2025",route: "Corr - Box",sku: "60 ml",
-      qty: 10300,stage: "Pending",status: "Pending",
-    },
-    {
-      number: "WO-1003",salesOrder: "G3P0057",client: "Sterling Labs",date: "18/02/2025",etd: "25/02/2025",route: "Corr - Box",sku: "60 ml",
-      qty: 5200,stage: "Pending",status: "Pending",
-    },
-  ]
+  const [data, setData] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const rowsPerPage = 4
+ 
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get('https://mocki.io/v1/41daccf7-65a8-4414-bb04-de0fc4272d78')
+ 
+        setData(response.data)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    fetchData()
+  }, [])
+ 
+  const tableData = data?.values && Array.isArray(data.values) ? data.values : []
+  const headers = data?.headers && Array.isArray(data.headers) ? data.headers : []
+
+
+  const indexOfLastRow = currentPage * rowsPerPage
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage
+  const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
+  const totalPages = Math.ceil(tableData.length / rowsPerPage)
+
 
   return (
-    <div  style={{width:'100%',height:'100vh',margin:'0px'}}>
+    <div  style={{width:'100%'}}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
         <h5>Work Orders</h5>
         <div style={{ display: "flex", gap: "10px", marginLeft: "40px", height: "40px" }}>
@@ -53,100 +70,43 @@ const WorkOrders = () => {
           </CButton>
         </div>
       </div>
-      <div className="table-container" style={{marginTop:"35px"}} >
-      <CTable >
-        <CTableHead >
-          <CTableRow>
-            <CTableHeaderCell>Number</CTableHeaderCell>
-            <CTableHeaderCell>Sales Order</CTableHeaderCell>
-            <CTableHeaderCell>Client</CTableHeaderCell>
-            <CTableHeaderCell>Created Date</CTableHeaderCell>
-            <CTableHeaderCell>ETD</CTableHeaderCell>
-            <CTableHeaderCell>Route(s)</CTableHeaderCell>
-            <CTableHeaderCell>SKU Name</CTableHeaderCell>
-            <CTableHeaderCell>Qty</CTableHeaderCell>
-            <CTableHeaderCell>
-              <CDropdown>
-                <CDropdownToggle color="#7d7d7d">Stage</CDropdownToggle>
-                <CDropdownMenu>
-                  <CDropdownItem>Prod Planning</CDropdownItem>
-                  <CDropdownItem>Pending</CDropdownItem>
-                </CDropdownMenu>
-              </CDropdown>
-            </CTableHeaderCell>
-            <CTableHeaderCell>
-              <CDropdown>
-                <CDropdownToggle color="#7d7d7d">Status</CDropdownToggle>
-                <CDropdownMenu>
-                  <CDropdownItem>Pending</CDropdownItem>
-                  <CDropdownItem>Completed</CDropdownItem>
-                </CDropdownMenu>
-              </CDropdown>
-            </CTableHeaderCell>
-          </CTableRow>
-        </CTableHead>
-        <CTableBody>
-          {WorkOrder.map((order, index) => (
-            <CTableRow key={index}>
-              <CTableDataCell><a href="#">{order.number}</a></CTableDataCell>
-              <CTableDataCell><a href="#">{order.salesOrder}</a></CTableDataCell>
-              <CTableDataCell>{order.client}</CTableDataCell>
-              <CTableDataCell>{order.date}</CTableDataCell>
-              <CTableDataCell>{order.etd}</CTableDataCell>
-              <CTableDataCell>{order.route}</CTableDataCell>
-              <CTableDataCell>{order.sku}</CTableDataCell>
-              <CTableDataCell>{order.qty}</CTableDataCell>
-              <CTableDataCell>
-                <CButton
-                  style={{
-                    height:"35px",
-                    width:"130px",
-                    marginRight: "5px",
-                    color: order.stage === "Prod Planning" ? "#fff" : "#fff",
-                    backgroundColor: order.stage === "Prod Planning" ? "#ffd000" : "#7d7d7d",
-                  }}
-                >
-                  {order.stage}
-                </CButton>
-              </CTableDataCell>
-
-              <CTableDataCell>
-                <CButton
-                  style={{
-                    height:"35px",
-                    width:"130px",
-                    marginRight: "5px",
-                    color: "#fff",
-                    backgroundColor: "#6c757d",
-                  }}
-                >
-                  {order.status}
-                </CButton>
-              </CTableDataCell>
+      <div className="border h-[80%]">
+      <div className=" overflow-x-auto overflow-y-auto  whitespace-nowrap mt-9 h-50 p-2 ">
+      <CTable striped hover className="mt-3 border border-gray-200  ">
+          <CTableHead className="bg-gray-100 sticky top-0  z-10">
+            <CTableRow>
+              {headers.map((header, index) => (
+                <CTableHeaderCell key={index} className="py-3 px-4 text-gray-600 font-medium">
+                  {header}
+                </CTableHeaderCell>
+              ))}
             </CTableRow>
-          ))}
-        </CTableBody>
-      </CTable>
-      </div>
-      <div style={{  display:"flex",justifyContent:"flex-end" ,alignItems:"center" ,marginTop:'30px',gap:'5px' }}>
-                 <FaAngleDoubleLeft style={{ fontSize: '15px', cursor: 'pointer' }} />
-                 {[1, 2, 3, 4].map((num) => (
-                   <button
-                     key={num}
-                     style={{
-                       width: '35px',
-                       height: '35px',
-                       borderRadius: '50%',
-                       backgroundColor: num === 4 ? '#c1c0e0' : '#e5e7eb',
-                       border: 'none',
-                       cursor: 'pointer',
-                     }}
-                   >
-                     {num}
-                   </button>
-                 ))}
-                 <FaAngleDoubleRight style={{ fontSize: '15px', cursor: 'pointer' }} />
-               </div>
+          </CTableHead>
+          <CTableBody>
+            {currentRows.length > 0 ? (
+              currentRows.map((row, rowIndex) => (
+                <CTableRow key={rowIndex} className="border-b ">
+                  {row.map((cell, cellIndex) => (
+                    <CTableDataCell key={cellIndex} className="py-3 px-4 text-gray-700">
+                      {cell}
+                    </CTableDataCell>
+                  ))}
+                </CTableRow>
+              ))
+            ) : (
+              <CTableRow>
+                <CTableDataCell colSpan={headers.length} className="text-center py-3">
+                  No data available
+                </CTableDataCell>
+              </CTableRow>
+            )}
+          </CTableBody>
+        </CTable>
+        </div>
+      <div className="flex justify-end items-center gap-4 mt-4">
+          <CommonPagination count={5} page={1} onChange={''} />
+        </div>
+        </div>
     </div>
   );
 };

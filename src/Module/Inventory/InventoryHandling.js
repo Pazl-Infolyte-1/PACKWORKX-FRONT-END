@@ -8,7 +8,7 @@ const InventoryDashboard = () => {
     return (
         
         <div style={{ backgroundColor: "#f7f7f7", margin: 0, }}>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "30px", }}>
                 <StockCard title="Reels" quantity="1200" status="Enough Stock" backgroundColor="#d4edda" color="#155724" buttonColor="#286e34" icon={<BiDollarCircle />} />
                 <StockCard title="Corrugation Glue" quantity="300" status="Low Stock" backgroundColor="#fff3cd " color="#856404" buttonColor="#856404" icon={<FaStar />} />
                 <StockCard title="Pasting Glue" quantity="50" status="Out of Stock" backgroundColor="#f8d7da " color="#721c24" buttonColor="#721c24" icon={<CgWorkAlt />} />
@@ -53,8 +53,8 @@ const MaterialSection = () => (
     <section style={{ backgroundColor: "white", padding: "16px", marginTop: "10px", borderRadius: "8px", boxShadow: "0 1px 4px rgba(0,0,0,0.1)" }}>
         <h6>Raw Materials Types</h6>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", }}>
-            <div style={{ position: "relative", display: "flex", alignItems: "center", boxShadow: '0px 1px 4px rgba(0,0,0,0.1)' }}>
-                <input type="text" placeholder="Search SKU by name or ID" style={{ border: "1px solid #d1d5db", padding: "3px", borderRadius: "6px", width: "280px" }} />
+            <div style={{ position: "relative", display: "flex", alignItems: "center", boxShadow: '0px 1px 4px rgba(0,0,0,0.1)',marginTop:"10px" }}>
+                <input type="text" placeholder="Search SKU by name or ID" style={{ border: "1px solid #d1d5db", padding: "3px", borderRadius: "6px", width: "280px"}} />
                 <FaSearch style={{ position: "absolute", right: "12px", color: "#6b7280" }} />
             </div>
             <div>
@@ -64,14 +64,14 @@ const MaterialSection = () => (
             </div>
         </div>
         <MaterialTable />
-        <div style={{  display:"flex",justifyContent:"flex-end" ,alignItems:"center" ,marginTop:'30px',gap:'10px' }}>
-                 <FaAngleDoubleLeft style={{ fontSize: '24px', cursor: 'pointer' }} />
+        <div style={{  display:"flex",justifyContent:"flex-end" ,alignItems:"center" ,marginTop:'30px',gap:'5px' }}>
+                 <FaAngleDoubleLeft style={{ fontSize: '15px', cursor: 'pointer' }} />
                  {[1, 2, 3, 4].map((num) => (
                    <button
                      key={num}
                      style={{
-                       width: '40px',
-                       height: '40px',
+                       width: '35px',
+                       height: '35px',
                        borderRadius: '50%',
                        backgroundColor: num === 4 ? '#c1c0e0' : '#e5e7eb',
                        border: 'none',
@@ -81,7 +81,7 @@ const MaterialSection = () => (
                      {num}
                    </button>
                  ))}
-                 <FaAngleDoubleRight style={{ fontSize: '24px', cursor: 'pointer' }} />
+                 <FaAngleDoubleRight style={{ fontSize: '15px', cursor: 'pointer' }} />
                </div>
     </section>
     

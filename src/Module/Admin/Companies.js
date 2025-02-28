@@ -33,6 +33,7 @@ import { FiSearch, FiFilter } from "react-icons/fi";
 import Drawer from '../../components/Drawer/Drawer';
 
 
+
 const companies = [
   { id: 6, name: "Hettinger Group", package: "Default (monthly)", registerDate: "5 months ago", employees: "12/20", clients: 11, totalUsers: 23, status: "Active", icon: <FaBuilding color="#dc3545" size={18} /> },
   { id: 5, name: "Monahan-Toy", package: "Default (monthly)", registerDate: "1 month ago", employees: "12/20", clients: 11, totalUsers: 23, status: "Active", icon: <FaCubes color="#ffc107" size={18} /> },
@@ -49,8 +50,10 @@ const CompanyManagement = () => {
       <CCard>
 
         <>
+
           {/* Top Controls */}
-          <CCardHeader style={{ padding: "15px", background: "#f8f9fa" }}>
+          
+          <CCardHeader style={{ padding: "15px", background: "#f8f9fa",position:"sticky",top:"0",zIndex:"1" }}>
             <CRow className="w-100 align-items-center">
               <CCol md={6} className="d-flex gap-2">
                 <CFormInput placeholder="Start Date To End Date" style={{ maxWidth: "220px" }} />
@@ -119,7 +122,11 @@ const CompanyManagement = () => {
                 ))}
               </CTableBody>
             </CTable>
+            
+            
           </CCardBody>
+          
+          
         </>
 
           
@@ -191,6 +198,7 @@ const CompanyManagement = () => {
            </CCol>
          </CRow>
        </CCardBody>
+       
             
 
             {/* Account Details Section */}
@@ -218,6 +226,7 @@ const CompanyManagement = () => {
             </div>
           </div>
         </Drawer>
+        
         
 
 

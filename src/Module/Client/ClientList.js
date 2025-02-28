@@ -6,7 +6,6 @@ import Cell from '../../assets/images/mob.png'
 import Facebook from '../../assets/images/fb.png'
 import apiMethods from '../../api/config'
 import { IoSearch } from 'react-icons/io5'
-import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa'
 import axios from 'axios'
 
 import {
@@ -199,78 +198,6 @@ function ClientList() {
           <CommonPagination count={5} page={1} onChange={''} />
         </div>
       </div>
-      {/* Pagination Controls */}
-
-      {/* <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          marginTop: '30px',
-          gap: '10px',
-        }}
-      >
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className={`px-3 py-1 rounded-md border ${
-            currentPage === 1
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-[#5f59c6] text-white hover:bg-[#5e57d7]'
-          }`}
-          style={{
-            width: '35px',
-            height: '35px',
-            borderRadius: '50%',
-            border: 'none',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <FaAngleDoubleLeft style={{ fontSize: '15px' }} />
-        </button>
-        {[...Array(totalPages)].map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentPage(index + 1)}
-            className={`px-3 py-1 rounded-md border ${
-              currentPage === index + 1 ? 'bg-[#5f59c6] text-white' : 'bg-gray-200'
-            }`}
-            style={{
-              width: '35px',
-              height: '35px',
-              borderRadius: '50%',
-              border: 'none',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            {index + 1}
-          </button>
-        ))}
-        <button
-          onClick={() => setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))}
-          disabled={currentPage === totalPages}
-          className={`px-3 py-1 rounded-md border ${
-            currentPage === totalPages
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-[#5f59c6] text-white hover:bg-[#5e57d7]'
-          }`}
-          style={{
-            width: '35px',
-            height: '35px',
-            borderRadius: '50%',
-            border: 'none',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <FaAngleDoubleRight className="h-6 w-6 border" />
-        </button>
-      </div> */}
       <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
         <div className="grid grid-cols-2 gap-2">
           {/* Left Column */}

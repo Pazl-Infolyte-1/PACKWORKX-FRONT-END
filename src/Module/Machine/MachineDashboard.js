@@ -15,6 +15,7 @@ import {
   CTableBody,
   CTableDataCell,
 } from '@coreui/react'
+import CommonPagination from '../../components/New/Pagination'
 
 export default function MachineMaster() {
   const [isdrawopen, setdrawopen] = useState(false)
@@ -194,84 +195,50 @@ export default function MachineMaster() {
         </div>
 
         <div className="overflow-x-auto border border-gray-200 px-3 mt-3 rounded-md w-[100%]">
-  <div className="overflow-y-auto h-[300px]">
-    <CTable striped hover className="mt-3 border border-gray-200 pb-3">
-      {/* Table Header */}
-      <CTableHead className="bg-gray-100 sticky top-0 z-10">
-        <CTableRow>
-          {headers.map((header, index) => (
-            <CTableHeaderCell 
-              key={index} 
-              className="py-3 px-6 text-gray-600 font-medium whitespace-nowrap min-w-[150px]"
-            >
-              {header}
-            </CTableHeaderCell>
-          ))}
-        </CTableRow>
-      </CTableHead>
+          <div className="overflow-y-auto h-[300px]">
+            <CTable striped hover className="mt-3 border border-gray-200 pb-3">
+              {/* Table Header */}
+              <CTableHead className="bg-gray-100 sticky top-0 z-10">
+                <CTableRow>
+                  {headers.map((header, index) => (
+                    <CTableHeaderCell
+                      key={index}
+                      className="py-3 px-6 text-gray-600 font-medium whitespace-nowrap min-w-[150px]"
+                    >
+                      {header}
+                    </CTableHeaderCell>
+                  ))}
+                </CTableRow>
+              </CTableHead>
 
-      {/* Table Body */}
-      <CTableBody>
-        {currentRows.length > 0 ? (
-          currentRows.map((row, rowIndex) => (
-            <CTableRow key={rowIndex} className="border-b">
-              {row.map((cell, cellIndex) => (
-                <CTableDataCell 
-                  key={cellIndex} 
-                  className="py-3 px-6 text-gray-700 break-words min-w-[150px]"
-                >
-                  {cell}
-                </CTableDataCell>
-              ))}
-            </CTableRow>
-          ))
-        ) : (
-          <CTableRow>
-            <CTableDataCell colSpan={headers.length} className="text-center py-3">
-              No data available
-            </CTableDataCell>
-          </CTableRow>
-        )}
-      </CTableBody>
-    </CTable>
-  </div>
-</div>
-
-
-        <div className="flex justify-end items-center mt-3  space-x-2">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className={`px-3 py-1 rounded-md border ${
-              currentPage === 1
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-[#5f59c6] text-white hover:bg-[#5e57d7]'
-            }`}
-          >
-            Prev
-          </button>
-          {[...Array(totalPages)].map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentPage(index + 1)}
-              className={`px-3 py-1 rounded-md border ${
-                currentPage === index + 1 ? 'bg-[#5f59c6] text-white' : 'bg-gray-200'
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))}
-            disabled={currentPage === totalPages}
-            className={`px-3 py-1 rounded-md border ${
-              currentPage === totalPages
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-[#5f59c6] text-white hover:bg-[#5e57d7]'
-            }`}
-          >
-            Next
-          </button>
+              {/* Table Body */}
+              <CTableBody>
+                {currentRows.length > 0 ? (
+                  currentRows.map((row, rowIndex) => (
+                    <CTableRow key={rowIndex} className="border-b">
+                      {row.map((cell, cellIndex) => (
+                        <CTableDataCell
+                          key={cellIndex}
+                          className="py-3 px-6 text-gray-700 break-words min-w-[150px]"
+                        >
+                          {cell}
+                        </CTableDataCell>
+                      ))}
+                    </CTableRow>
+                  ))
+                ) : (
+                  <CTableRow>
+                    <CTableDataCell colSpan={headers.length} className="text-center py-3">
+                      No data available
+                    </CTableDataCell>
+                  </CTableRow>
+                )}
+              </CTableBody>
+            </CTable>
+          </div>
+          <div className="flex justify-end items-center mt-1">
+            <CommonPagination count={7} page={1} />
+          </div>
         </div>
       </div>
 

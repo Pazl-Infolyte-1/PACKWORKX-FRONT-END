@@ -194,9 +194,9 @@ export default function MachineMaster() {
           </div>
         </div>
 
-        <div className="overflow-x-auto border border-gray-200 px-3 mt-3 rounded-md w-[100%]">
-          <div className="overflow-y-auto h-[300px]">
-            <CTable striped hover className="mt-3 border border-gray-200 pb-3">
+        <div className="border border-gray-200 px-3 mt-3 rounded-md w-[100%] ">
+          <div className="overflow-x-auto  overflow-y-auto h-[300px] custom-scrollbar ">
+            <CTable striped hover className="mt-3 border border-gray-200 pb-3 ">
               {/* Table Header */}
               <CTableHead className="bg-gray-100 sticky top-0 z-10">
                 <CTableRow>

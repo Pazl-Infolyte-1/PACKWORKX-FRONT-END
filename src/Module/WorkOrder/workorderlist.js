@@ -53,8 +53,9 @@ const WorkOrders = () => {
           </CButton>
         </div>
       </div>
-      <CTable>
-        <CTableHead>
+      <div className="table-container" style={{marginTop:"35px"}} >
+      <CTable >
+        <CTableHead >
           <CTableRow>
             <CTableHeaderCell>Number</CTableHeaderCell>
             <CTableHeaderCell>Sales Order</CTableHeaderCell>
@@ -126,14 +127,15 @@ const WorkOrders = () => {
           ))}
         </CTableBody>
       </CTable>
-      <div style={{  display:"flex",justifyContent:"flex-end" ,alignItems:"center" ,marginTop:'30px',gap:'10px' }}>
-                 <FaAngleDoubleLeft style={{ fontSize: '24px', cursor: 'pointer' }} />
+      </div>
+      <div style={{  display:"flex",justifyContent:"flex-end" ,alignItems:"center" ,marginTop:'30px',gap:'5px' }}>
+                 <FaAngleDoubleLeft style={{ fontSize: '15px', cursor: 'pointer' }} />
                  {[1, 2, 3, 4].map((num) => (
                    <button
                      key={num}
                      style={{
-                       width: '40px',
-                       height: '40px',
+                       width: '35px',
+                       height: '35px',
                        borderRadius: '50%',
                        backgroundColor: num === 4 ? '#c1c0e0' : '#e5e7eb',
                        border: 'none',
@@ -143,7 +145,7 @@ const WorkOrders = () => {
                      {num}
                    </button>
                  ))}
-                 <FaAngleDoubleRight style={{ fontSize: '24px', cursor: 'pointer' }} />
+                 <FaAngleDoubleRight style={{ fontSize: '15px', cursor: 'pointer' }} />
                </div>
     </div>
   );

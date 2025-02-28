@@ -10,13 +10,33 @@ import {
   CNavLink,
   CButton,
   CCollapse,
+  CModal,
+  CModalBody,
+  CModalFooter,
+  CTable,
+  CTableHeaderCell,
+  CTableDataCell,
+  CTableRow,
+  CTableHead,
+  CTableBody,
 } from '@coreui/react'
 import { useDrag, useDrop } from 'react-dnd'
 import Dropdown from 'react-bootstrap/Dropdown'
 import { FaAngleDown, FaAngleUp, FaEllipsisV, FaRedoAlt, FaEye } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
-import { cilBriefcase, cilMinus, cilClipboard, cilCut, cilOptions, cilReload } from '@coreui/icons'
+import {
+  cilBriefcase,
+  cilMinus,
+  cilClipboard,
+  cilCut,
+  cilOptions,
+  cilReload,
+  cilTrash,
+  cilQrCode,
+  cilLink,
+} from '@coreui/icons'
 import './styles.css'
+import ProgressBar from './ProgressBar'
 
 const ItemType = 'WORK_ORDER'
 
@@ -71,7 +91,16 @@ function LayerDragble({ lg }) {
   )
 }
 
-function WorkOrderCard({ order, index, visibleIndex, setVisibleIndex, removeWOFromPlan }) {
+function WorkOrderCard({
+  order,
+  index,
+  visibleIndex,
+  setVisibleIndex,
+  removeWOFromPlan,
+  setModalWorkOrder,
+  modalWorkOrder,
+  setVisible,
+}) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
     item: { order, index },
@@ -131,7 +160,7 @@ function WorkOrderCard({ order, index, visibleIndex, setVisibleIndex, removeWOFr
               </Dropdown.Item>
               <Dropdown.Item onClick={() => removeWOFromPlan(order)}>
                 <CIcon
-                  icon={cilMinus}
+                  icon={cilTrash}
                   className="me-2"
                   style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
                 />
@@ -180,7 +209,13 @@ function WorkOrderCard({ order, index, visibleIndex, setVisibleIndex, removeWOFr
               marginRight: '10px',
             }}
           >
-            <FaEye style={{ cursor: 'pointer' }} />
+            <FaEye
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                setModalWorkOrder(order)
+                setVisible(true)
+              }}
+            />
           </div>
         </CCollapse>
       </CCardBody>
@@ -196,6 +231,9 @@ function GroupOrderDropZone({
   setGroupVisibleIndex,
   removeWorkOrderFromGroup,
   removeWorkOrderFromPlan,
+  setModalWorkOrder,
+  modalWorkOrder,
+  setVisible,
 }) {
   const [, drop] = useDrop(() => ({
     accept: ItemType,
@@ -304,7 +342,7 @@ function GroupOrderDropZone({
                       </Dropdown.Item>
                       <Dropdown.Item onClick={() => removeWorkOrderFromGroup(item, groupIndex)}>
                         <CIcon
-                          icon={cilMinus}
+                          icon={cilTrash}
                           className="me-2"
                           style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
                         />
@@ -410,7 +448,13 @@ function GroupOrderDropZone({
                       marginRight: '10px',
                     }}
                   >
-                    <FaEye style={{ cursor: 'pointer' }} />
+                    <FaEye
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => {
+                        setModalWorkOrder(item)
+                        setVisible(true)
+                      }}
+                    />
                   </div>
                 </CCollapse>
               </CCardBody>
@@ -429,6 +473,8 @@ const Group = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyn
 
   const [visibleIndex, setVisibleIndex] = useState(null)
   const [groupVisibleIndex, setGroupVisibleIndex] = useState(null)
+  const [modalWorkOrder, setModalWorkOrder] = useState(null)
+  const [visible, setVisible] = useState(false)
   const removeWorkOrderFromGroup = (order, groupIndex) => {
     console.log('Removing order from group', order, groupIndex)
 
@@ -560,6 +606,9 @@ const Group = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyn
                   visibleIndex={visibleIndex}
                   setVisibleIndex={setVisibleIndex}
                   removeWOFromPlan={removeWOFromPlan}
+                  setModalWorkOrder={setModalWorkOrder}
+                  modalWorkOrder={modalWorkOrder}
+                  setVisible={setVisible}
                 />
               ))}
           </CCol>
@@ -579,10 +628,175 @@ const Group = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyn
                 setGroupVisibleIndex={setGroupVisibleIndex}
                 removeWorkOrderFromGroup={removeWorkOrderFromGroup}
                 removeWorkOrderFromPlan={removeWorkOrderFromPlan}
+                setModalWorkOrder={setModalWorkOrder}
+                modalWorkOrder={modalWorkOrder}
+                setVisible={setVisible}
               />
             ))}
         </CRow>
       </CCol>
+
+      <CModal
+        alignment="center"
+        scrollable
+        size="xl"
+        visible={visible}
+        onClose={() => setVisible(false)}
+        aria-labelledby="VerticallyCenteredScrollableExample2"
+      >
+        <CModalBody className="d-block">
+          <div className="mt-3">
+            {modalWorkOrder && (
+              <>
+                <span className="mt-5 fw-bold flex items-center gap-2">
+                  {modalWorkOrder.order_id}{' '}
+                  <div style={{ width: '45px', height: '40px' }}>
+                    <ProgressBar
+                      value={Math.min(
+                        Math.max(
+                          parseFloat(
+                            (
+                              (modalWorkOrder.finished_goods / modalWorkOrder.quantity) *
+                              100
+                            ).toFixed(1),
+                          ),
+                          0,
+                        ),
+                        100,
+                      )}
+                    />
+                  </div>
+                  <span className="ml-20 fw-light">
+                    Planned
+                    <span className="font-medium text-green-700">
+                      {' '}
+                      {modalWorkOrder.finished_goods}{' '}
+                    </span>
+                    out of
+                    <span className="font-medium text-blue-700">
+                      {' '}
+                      {modalWorkOrder.quantity}
+                    </span>{' '}
+                    Quantity.
+                  </span>
+                </span>
+
+                <CRow className="mt-3">
+                  <CCol xs={4} md={4} lg={4}>
+                    <CRow>
+                      <CCol xs={6} md={6}>
+                        <div className="mt-3 text-bold">
+                          SKU Name <br />
+                          Print <br />
+                          Route <br />
+                          Planned Start
+                        </div>
+                      </CCol>
+                      <CCol xs={6} md={6}>
+                        <div className="mt-3">
+                          {modalWorkOrder.sku_name} <br />
+                          {modalWorkOrder.print} <br />
+                          {modalWorkOrder.route} <br />
+                          {modalWorkOrder.planned_start}
+                        </div>
+                      </CCol>
+                    </CRow>
+                  </CCol>
+                  <CCol xs={4} md={4} lg={4}>
+                    <CRow>
+                      <CCol xs={6} md={6}>
+                        <div className="mt-3 text-bold">
+                          Layers <br />
+                          Dimensions <br />
+                          Qty <br />
+                          Planned End
+                        </div>
+                      </CCol>
+                      <CCol xs={6} md={6}>
+                        <div className="mt-3">
+                          {modalWorkOrder.layers} <br />
+                          {modalWorkOrder.dimension} <br />
+                          {modalWorkOrder.quantity} <br />
+                          {modalWorkOrder.planned_end}
+                        </div>
+                      </CCol>
+                    </CRow>
+                  </CCol>
+                  <CCol xs={4} md={4} lg={4} className="relative">
+                    <CRow>
+                      <CIcon
+                        icon={cilQrCode}
+                        className="absolute right-0"
+                        style={{
+                          marginRight: '20px',
+                          marginTop: '-90px',
+                          height: '110px',
+                          width: '150px',
+                        }}
+                      />
+                    </CRow>
+
+                    <CRow className="mt-5">
+                      <div>ETD (Estimated Delivery Date) : 12/12/2025</div>
+                      <div className="flex items-center gap-1">
+                        <span>Linked to Sales</span>
+                        <CIcon
+                          icon={cilLink}
+                          className="me-1 cursor-pointer"
+                          style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
+                        />
+                        <span>S0 - 001</span>
+                      </div>
+                      <div>Client MERK</div>
+                    </CRow>
+                  </CCol>
+                </CRow>
+                <hr />
+                <CTable striped hover>
+                  <CTableHead>
+                    <CTableHeaderCell></CTableHeaderCell>
+                    <CTableHeaderCell>GSM</CTableHeaderCell>
+                    <CTableHeaderCell>Board Size</CTableHeaderCell>
+                    <CTableHeaderCell>BF</CTableHeaderCell>
+                    <CTableHeaderCell>Color</CTableHeaderCell>
+                    <CTableHeaderCell>Print</CTableHeaderCell>
+                    <CTableHeaderCell>Allocation Details</CTableHeaderCell>
+                    <CTableHeaderCell>Flute Ratio</CTableHeaderCell>
+                    <CTableHeaderCell>Allocated Material</CTableHeaderCell>
+                  </CTableHead>
+                  <CTableBody>
+                    {modalWorkOrder.layer_group &&
+                      modalWorkOrder.layer_group.map((lg) => (
+                        <CTableRow key={lg.id}>
+                          {' '}
+                          <CTableDataCell>{lg.layer_name}</CTableDataCell>
+                          <CTableDataCell>{lg.gsm}</CTableDataCell>
+                          <CTableDataCell>{lg.dimensions}</CTableDataCell>
+                          <CTableDataCell>{lg.bf}</CTableDataCell>
+                          <CTableDataCell>{lg.colors}</CTableDataCell>
+                          <CTableDataCell>{modalWorkOrder.print}</CTableDataCell>
+                          <CTableDataCell>FG</CTableDataCell>
+                          <CTableDataCell>NA</CTableDataCell>
+                          <CTableDataCell>
+                            <div style={{ width: '45px', height: '40px' }}>
+                              <ProgressBar value={80} />
+                            </div>
+                          </CTableDataCell>
+                        </CTableRow>
+                      ))}
+                  </CTableBody>
+                </CTable>
+              </>
+            )}
+          </div>
+        </CModalBody>
+
+        {/* <CModalFooter>
+          <CButton color="secondary" onClick={() => setVisible(false)}>
+            Close
+          </CButton>
+        </CModalFooter> */}
+      </CModal>
     </>
   )
 }

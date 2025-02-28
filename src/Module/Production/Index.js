@@ -77,8 +77,7 @@ const Index = () => {
         <div className="ms-auto d-flex">
           {activeTab === 'Group Layers' && (
             <CButton
-              color="white border-black hover-text-white background-black"
-              className="text-black me-2"
+              className="text-black border border-black bg-white hover:bg-black hover:text-white me-2 cursor-pointer"
               onClick={handleAddGroup}
             >
               + Add Group

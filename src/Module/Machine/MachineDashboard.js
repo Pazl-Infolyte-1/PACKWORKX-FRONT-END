@@ -2,428 +2,512 @@ import { MdPrecisionManufacturing } from 'react-icons/md'
 import { MdEmojiObjects } from 'react-icons/md'
 import { MdEngineering } from 'react-icons/md'
 import { MdDoDisturbOn } from 'react-icons/md'
+import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa'
+import Drawer from '../../components/Drawer/Drawer'
+import { useState, useEffect } from 'react'
+import { RiUploadCloudLine } from 'react-icons/ri'
+import axios from 'axios'
+import {
+  CTable,
+  CTableHead,
+  CTableRow,
+  CTableHeaderCell,
+  CTableBody,
+  CTableDataCell,
+} from '@coreui/react'
+import CommonPagination from '../../components/New/Pagination'
 
-function MachineDashboard() {
+export default function MachineMaster() {
+  const [isdrawopen, setdrawopen] = useState(false)
+  const [data, setData] = useState([])
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get('https://mocki.io/v1/d116fece-51e7-4563-be37-d3dc674cf740')
+
+        setData(response.data)
+        console.log(response.data)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const tableData = data?.values && Array.isArray(data.values) ? data.values : []
+  const headers = data?.headers && Array.isArray(data.headers) ? data.headers : []
+  const [currentPage, setCurrentPage] = useState(1)
+  const rowsPerPage = 4
+  const indexOfLastRow = currentPage * rowsPerPage
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage
+  const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
+  const totalPages = Math.ceil(tableData.length / rowsPerPage)
+
   return (
-    <div>
-      <div style={{ fontFamily: 'Mulish', padding: '20px', Width: '100%', margin: 'auto' }}>
-        {/* Dashboard Heading */}
-        <h1 style={{ marginBottom: '20px', color: '#030303' }}>Machine Master Dashboard</h1>
+    <div
+      style={{
+        padding: '20px',
+        width: '100%',
+        height: '90vh',
+        border: '1px soild black',
+        backgroundColor: '#ffff',
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px' }}>
+        <h3 style={{ color: '#030303', fontSize: '20px' }}>Machine Master Dashboard</h3>
+        <button
+          style={{
+            color: '#ffff',
+            backgroundColor: '#8167e5',
+            borderRadius: '5px',
+            padding: '5px',
+          }}
+          onClick={() => setdrawopen(true)}
+        >
+          + Add Machine
+        </button>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: '3px',
+          marginBottom: '20px',
+          width: '100%',
+        }}
+      >
+        {[
+          {
+            label: 'Total Machine',
+            count: 150,
+            color: '#4a03fa',
+            bgColor: '#c7c7f1',
+            icon: <MdPrecisionManufacturing />,
+            iconColor: '#4a03fa',
+          },
+          {
+            label: 'Active',
+            count: 120,
+            color: '#155724',
+            bgColor: '#c3f2cb',
+            icon: <MdEmojiObjects />,
+            iconColor: '#155724',
+          },
+          {
+            label: 'Under Maintenance',
+            count: 20,
+            color: '#0000ff',
+            bgColor: '#aad3ff',
+            icon: <MdEngineering />,
+            iconColor: '#0000ff',
+          },
+          {
+            label: 'Disabled',
+            count: 10,
+            color: '#ff2d55',
+            bgColor: '#ffb9c6',
+            icon: <MdDoDisturbOn />,
+            iconColor: '#ff2d55',
+          },
+        ].map((item, index) => (
+          <div
+            key={index}
+            style={{
+              height: '100px',
+              width: '280px',
+              backgroundColor: item.bgColor,
+              borderRadius: '10px',
+              padding: '5px',
+              display: 'flex',
+              boxShadow: '0px 2px 10px rgba(3,3,3,0.1)',
+            }}
+          >
+            <div style={{ width: '100%', padding: '10px' }}>
+              <h2
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  color: item.color,
+                  textAlign: 'left',
+                }}
+              >
+                {item.label}
+              </h2>
+              <p
+                style={{
+                  textAlign: 'left',
+                  color: item.color,
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  marginLeft: '10px',
+                }}
+              >
+                {item.count}
+              </p>
+            </div>
+            <div style={{ width: '20%', padding: '10px' }}>
+              <p style={{ fontSize: '40px', color: item.iconColor }}>{item.icon}</p>
+            </div>
+          </div>
+        ))}
+      </div>
 
-        {/* Status Boxes in Row */}
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '10px',
+          padding: '20px',
+          border: '1px  solid #e5e7eb',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 style={{ marginLeft: '10px', fontSize: '20px' }}>Raw Material</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <input
+              type="text"
+              placeholder="Search by Name, ID, Status"
+              style={{
+                width: '230px',
+                padding: '4px',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+              }}
+            />
+            <input
+              type="date"
+              style={{ padding: '4px', borderRadius: '6px', border: '1px solid #ccc' }}
+            />
+            <button
+              style={{
+                padding: '4px',
+                width: '50px',
+                borderRadius: '6px',
+                backgroundColor: '#8167e5',
+                color: '#ffffff',
+                outline: 'none',
+                border: 'none',
+              }}
+            >
+              Filter
+            </button>
+          </div>
+        </div>
+
+        <div className="border border-gray-200 px-3 mt-3 rounded-md w-[100%] ">
+          <div className="overflow-x-auto  overflow-y-auto h-[300px] custom-scrollbar ">
+            <CTable striped hover className="mt-3 border border-gray-200 pb-3 ">
+              {/* Table Header */}
+              <CTableHead className="bg-gray-100 sticky top-0 ">
+                <CTableRow>
+                  {headers.map((header, index) => (
+                    <CTableHeaderCell
+                      key={index}
+                      className="py-3 px-6 text-gray-600 font-medium whitespace-nowrap min-w-[150px]"
+                    >
+                      {header}
+                    </CTableHeaderCell>
+                  ))}
+                </CTableRow>
+              </CTableHead>
+
+              {/* Table Body */}
+              <CTableBody>
+                {currentRows.length > 0 ? (
+                  currentRows.map((row, rowIndex) => (
+                    <CTableRow key={rowIndex} className="border-b">
+                      {row.map((cell, cellIndex) => (
+                        <CTableDataCell
+                          key={cellIndex}
+                          className="py-3 px-6 text-gray-700 break-words min-w-[150px]"
+                        >
+                          {cell}
+                        </CTableDataCell>
+                      ))}
+                    </CTableRow>
+                  ))
+                ) : (
+                  <CTableRow>
+                    <CTableDataCell colSpan={headers.length} className="text-center py-3">
+                      No data available
+                    </CTableDataCell>
+                  </CTableRow>
+                )}
+              </CTableBody>
+            </CTable>
+          </div>
+          <div className="flex justify-end items-center mt-1">
+            <CommonPagination count={7} page={1} />
+          </div>
+        </div>
+      </div>
+
+      <Drawer isOpen={isdrawopen} onClose={() => setdrawopen(false)}>
+        <div> Add/Edit Machine</div>
+
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            gap: '10px',
-            marginBottom: '20px',
-          }}
-        >
-          <div
-            style={{
-              height: '130px',
-              width: '350px',
-              backgroundColor: '#c7c7f1',
-              borderRadius: '5px',
-              padding: '5px',
-              display: 'flex',
-              borderRadius: '10px',
-              boxShadow: '0px 2px 10px rgba(241, 236, 236, 0.1)',
-              opacity: 0.6,
-            }}
-          >
-            <div>
-              <h3 style={{ marginLeft: '10px', color: '#4a03fa' }}>Total Machine</h3>
-
-              <h1 style={{ marginLeft: '100px', color: '#4a03fa' }}>150</h1>
-            </div>
-            <div>
-              <MdPrecisionManufacturing
-                style={{
-                  height: '50px',
-                  width: '50px',
-                  marginLeft: '100px',
-                  marginTop: '30px',
-                  color: '#4a03fa',
-                }}
-              />
-            </div>
-          </div>
-          <div
-            style={{
-              height: '130px',
-              width: '350px',
-              backgroundColor: '#c3f2cb',
-              borderRadius: '5px',
-              padding: '5px',
-              display: 'flex',
-              borderRadius: '10px',
-              boxShadow: '0px 2px 10px rgba(3,3,3,0.1)',
-              opacity: 0.6,
-            }}
-          >
-            <div>
-              <h3 style={{ marginLeft: '80px', color: '#155724' }}>Active</h3>
-
-              <h1 style={{ marginLeft: '100px', color: '#155724' }}>120</h1>
-            </div>
-            <div>
-              <MdEmojiObjects
-                style={{
-                  height: '50px',
-                  width: '50px',
-                  marginLeft: '100px',
-                  marginTop: '30px',
-                  color: '#155724',
-                }}
-              />
-            </div>
-          </div>
-          <div
-            style={{
-              height: '130px',
-              width: '350px',
-              backgroundColor: '#aad3ff',
-              borderRadius: '5px',
-              padding: '5px',
-              display: 'flex',
-              borderRadius: '10px',
-              boxShadow: '0px 2px 10px rgba(3,3,3,0.1)',
-              opacity: 0.6,
-            }}
-          >
-            <div>
-              <h3 style={{ marginLeft: '10px', color: '#0000ff' }}>Under Maintenance</h3>
-
-              <h1 style={{ marginLeft: '100px', color: '#0000ff' }}>20</h1>
-            </div>
-            <div>
-              <MdEngineering
-                style={{
-                  height: '50px',
-                  width: '50px',
-                  marginLeft: '100px',
-                  marginTop: '30px',
-                  color: '#0000ff',
-                }}
-              />
-            </div>
-          </div>
-          <div
-            style={{
-              height: '130px',
-              width: '350px',
-              backgroundColor: '#ffb9c6',
-              borderRadius: '5px',
-              padding: '5px',
-              display: 'flex',
-              borderRadius: '10px',
-              boxShadow: '0px 2px 10px rgba(3,3,3,0.1)',
-              opacity: 0.6,
-            }}
-          >
-            <div>
-              <h3 style={{ marginLeft: '80px', textAlign: 'center', color: '#ff2d55' }}>
-                Disabled
-              </h3>
-
-              <h1 style={{ marginLeft: '100px', color: '#ff2d55' }}>10</h1>
-            </div>
-            <div>
-              <MdDoDisturbOn
-                style={{
-                  height: '50px',
-                  width: '50px',
-                  marginLeft: '80px',
-                  marginTop: '30px',
-                  color: '#ff2d55',
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Machine Table */}
-        <div
-          style={{
-            backgroundColor: '#ffffff',
+            background: '#f5f5f5',
+            padding: '20px',
             borderRadius: '10px',
-            boxShadow: '0px 2px 10px rgba(3,3,3,0.1)',
-            padding: '10px',
+            marginTop: '15px',
           }}
         >
-          <div style={{ borderRadius: '5px', backgroundColor: '#fff' }}>
-            <div style={{ display: 'flex' }}>
-              <h3 style={{ marginLeft: '10px' }}>Machine Table</h3>
-              {/* Search and Filter Section */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  flexWrap: 'wrap',
-                  marginLeft: '55%',
-                }}
-              >
-                <input
-                  type="text"
-                  placeholder="Search by Name, ID, Status, Process"
-                  style={{
-                    width: '230px',
-                    padding: '8px',
-                    border: '1px solid #ccc',
-                    borderRadius: '12px',
-                    boxShadow: '0px 2px 8px rgba(0,0,0,0.16)',
-                    backgroundColor: 'rgba(0,0,0,0)',
-                    color: '#7f7f7f',
-                  }}
-                />
-                <input
-                  type="date"
-                  style={{
-                    padding: '0px 8px',
-                    border: '0',
-                    boxSizing: 'border-box',
-                    borderRadius: '12px',
-                    boxShadow: '0px 2px 8px rgba(0,0,0,0.16)',
-                    backgroundColor: '#ffffff',
-                    color: '#023f81',
-                    fontSize: '18px',
-                    fontFamily: 'Mulish',
-                    lineHeight: '30px',
-                    textAlign: 'center',
-                    outline: 'none',
-                  }}
-                />
-
-                <button
-                  style={{
-                    padding: '0px 8px',
-                    borderRadius: '6px',
-                    backgroundColor: '#8167e5',
-                    color: '#ffffff',
-                    fontSize: '18px',
-                    fontFamily: 'Poppins',
-                    fontWeight: '500',
-                    lineHeight: '30px',
-                    cursor: 'pointer',
-                    width: '100px',
-                    outline: 'none',
-                    border: '0',
-                  }}
-                >
-                  Filter
-                </button>
-              </div>
-            </div>
+          {/* Basic Section */}
+          <div style={{ width: '30%', display: 'flex', flexDirection: 'column' }}>
+            <h5>Basic</h5>
+            <input
+              style={{
+                width: '100%',
+                padding: '10px',
+                margin: '5px 0',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+              }}
+              type="text"
+              placeholder="Machine Name"
+            />
+            <select
+              style={{
+                width: '100%',
+                padding: '10px',
+                margin: '5px 0',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+              }}
+            >
+              <option>Type 1</option>
+            </select>
+            <select
+              style={{
+                width: '100%',
+                padding: '10px',
+                margin: '5px 0',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+              }}
+            >
+              <option>Process X</option>
+            </select>
+            <input
+              style={{
+                width: '100%',
+                padding: '10px',
+                margin: '5px 0',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+              }}
+              type="text"
+              placeholder="Capacity"
+            />
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', margintop: '10px' }}>
-            <thead>
-              <tr style={{ backgroundColor: '#e5e7eb', border: '1px solid #000', opacity: 0.6 }}>
-                <th style={{ padding: '10px', border: '1px solid #fff', textAlign: 'left' }}>ID</th>
-                <th style={{ padding: '10px', border: '1px solid #fff', textAlign: 'left' }}>
-                  Name
-                </th>
-                <th style={{ padding: '10px', border: '1px solid #fff', textAlign: 'left' }}>
-                  Type
-                </th>
-                <th style={{ padding: '10px', border: '1px solid #fff', textAlign: 'left' }}>
-                  Process Count
-                </th>
-                <th style={{ padding: '10px', border: '1px solid #fff', textAlign: 'left' }}>
-                  Status
-                </th>
-                <th style={{ padding: '10px', border: '1px solid #fff', textAlign: 'left' }}>
-                  Last Maintenance
-                </th>
-                <th style={{ padding: '10px', border: '1px solid #fff', textAlign: 'left' }}>
-                  Next Maintenance
-                </th>
-                <th style={{ padding: '10px', border: '1px solid #fff', textAlign: 'left' }}>
-                  Speed
-                </th>
-                <th style={{ padding: '10px', border: '1px solid #fff', textAlign: 'left' }}>
-                  Capacity
-                </th>
-                <th style={{ padding: '10px', border: '1px solid #fff', textAlign: 'left' }}>
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{ border: '1px solid #fff' }}>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>001</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>Machine A</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>Type 1</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>3</td>
-                <td style={{ padding: '10px', border: '1px solid #fff', color: '#0275ff' }}>
-                  Active
-                </td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>01/01/2023</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>01/07/2023</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>500</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>2000 L</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>...</td>
-              </tr>
-              <tr style={{ border: '1px solid #fff' }}>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  002
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  Machine 2
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  Type 2
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  10
-                </td>
-                <td
-                  style={{
-                    padding: '10px',
-                    border: '1px solid #fff',
-                    backgroundColor: '#f2f2f2',
-                    color: '#81182c',
-                  }}
-                >
-                  Maintenance
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  01/05/2023
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  01/07/2023
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  500
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  2000 L
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  ...
-                </td>
-              </tr>
-              <tr style={{ border: '1px solid #fff' }}>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>003</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>Machine c</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>Type 3</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>5</td>
-                <td style={{ padding: '10px', border: '1px solid #fff', color: '#ff3b30' }}>
-                  Disable
-                </td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>01/01/2023</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>01/07/2023</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>500</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>2000 L</td>
-                <td style={{ padding: '10px', border: '1px solid #fff' }}>...</td>
-              </tr>
-              <tr style={{ border: '1px solid #fff' }}>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  004
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  Machine d
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  Type 4
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  5
-                </td>
-                <td
-                  style={{
-                    padding: '10px',
-                    border: '1px solid #fff',
-                    backgroundColor: '#f2f2f2',
-                    color: '#ff3b30',
-                  }}
-                >
-                  Under Maintenance
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  01/03/2023
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  01/07/2023
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  500
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  2000 L
-                </td>
-                <td
-                  style={{ padding: '10px', border: '1px solid #fff', backgroundColor: '#f2f2f2' }}
-                >
-                  ...
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div style={{ width: '30%' }}>
+            <h5>Attributes & Parameters</h5>
+            <input
+              style={{
+                width: '100%',
+                padding: '10px',
+                margin: '5px 0',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+              }}
+              type="text"
+              placeholder="Reel Capacity"
+            />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <input
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  margin: '5px 0',
+                  borderRadius: '5px',
+                  border: '1px solid #ccc',
+                }}
+                type="text"
+                placeholder="Custom Tag"
+              />
+              <input
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  margin: '5px 0',
+                  borderRadius: '5px',
+                  border: '1px solid #ccc',
+                }}
+                type="text"
+                placeholder="Value"
+              />
+            </div>
+            <input
+              style={{
+                width: '100%',
+                padding: '10px',
+                margin: '5px 0',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+              }}
+              type="text"
+              placeholder="Speed Parameters"
+            />
+            <input
+              style={{
+                width: '100%',
+                padding: '10px',
+                margin: '5px 0',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+              }}
+              type="text"
+              placeholder="Other Parameters"
+            />
+          </div>
+          <div style={{ width: '30%' }}>
+            <h5>Maintenance & Status</h5>
+            <input
+              style={{
+                width: '100%',
+                padding: '10px',
+                margin: '5px 0',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+              }}
+              type="text"
+              placeholder="Description of Maintenance"
+            />
+            <input
+              style={{
+                width: '100%',
+                padding: '10px',
+                margin: '5px 0',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+              }}
+              type="text"
+              placeholder="Last Date Of Maintenance"
+            />
+            <input
+              style={{
+                width: '100%',
+                padding: '10px',
+                margin: '5px 0',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+              }}
+              type="text"
+              placeholder="Next  Date Of Maintenance"
+            />
+          </div>
         </div>
 
-        {/* Pagination */}
         <div
           style={{
             display: 'flex',
-            justifyContent: 'right',
+            float: 'right',
             marginTop: '10px',
-            gap: '5px',
-            marginRight: '20px',
+            gap: '20px',
+            padding: '20px',
+            borderRadius: '10px',
           }}
         >
-          {[1, 2, 3, 4].map((page) => (
-            <button
-              key={page}
+          <button
+            style={{
+              color: 'black',
+              backgroundColor: '#ffff',
+              width: '80px',
+              borderRadius: '5px',
+              padding: '5px',
+              boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            style={{
+              color: 'white',
+              backgroundColor: '#8167e5',
+              width: '80px',
+              borderRadius: '5px',
+              padding: '5px',
+              boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
+            }}
+          >
+            Save
+          </button>
+          <button
+            style={{
+              color: 'white',
+              backgroundColor: '#ff2d55',
+              width: '150px',
+              borderRadius: '5px',
+              padding: '5px',
+              boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
+            }}
+          >
+            Delete Machine
+          </button>
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            background: '#f5f5f5',
+            padding: '20px',
+            borderRadius: '10px',
+            width: '100%',
+            height: '200px',
+          }}
+        >
+          <div style={{ width: '50%', display: 'flex', flexDirection: 'column' }}>
+            <h3 style={{ fontSize: '20px', marginBottom: '10px' }}>Machine Process Integration</h3>
+            <h6>Add Machine to a Process</h6>
+
+            <select
               style={{
-                backgroundColor: "#e5e7eb'",
+                width: '100%',
+                padding: '10px',
+                margin: '5px 0',
+                borderRadius: '5px',
                 border: '1px solid #ccc',
-                padding: '5px 10px',
-                cursor: 'pointer',
-                borderRadius: '3px',
               }}
             >
-              {page}
-            </button>
-          ))}
+              <option>Process A</option>
+            </select>
+
+            <select
+              style={{
+                width: '100%',
+                padding: '10px',
+                margin: '5px 0',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+              }}
+            >
+              <option>Machine A</option>
+            </select>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: '#fff',
+              marginTop: '60px',
+              padding: '10px 100px 10px 100px',
+              borderRadius: '5px',
+              boxShadow: '0px 0px 5px rgba(0,0,0,0.1)',
+              width: '45%',
+              height: '100px',
+            }}
+          >
+            <div style={{ justifyItems: 'center' }}>
+              <RiUploadCloudLine style={{ height: '30px', width: '30px', marginTop: '5px' }} />
+              <h6 style={{}}>Upload a File</h6>
+              <p>Select your file or drag and drop</p>
+            </div>
+          </div>
         </div>
-      </div>
+      </Drawer>
     </div>
   )
 }
-export default MachineDashboard

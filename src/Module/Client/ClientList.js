@@ -6,7 +6,6 @@ import Cell from '../../assets/images/mob.png'
 import Facebook from '../../assets/images/fb.png'
 import apiMethods from '../../api/config'
 import { IoSearch } from 'react-icons/io5'
-import {  FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa'
 import axios from 'axios'
 
 import {
@@ -23,6 +22,7 @@ import {
   CButton,
   CFormCheck,
 } from '@coreui/react'
+import CommonPagination from '../../components/New/Pagination'
 
 function ClientList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -100,79 +100,69 @@ function ClientList() {
           <h4>Clients and Vendors</h4>
         </div>
       </div>
-
       {/* Search Bar & Add Button */}
-      <div
-        style={{
-          marginTop: '9px',
-          height: '80px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
+      <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
         <div
           style={{
             display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center',
-            height: '40px',
-            width: '300px',
-            gap: '2px',
           }}
         >
           <div
             style={{
-              backgroundColor: 'white',
-              height: '100%',
-              width: '40px',
               display: 'flex',
-              justifyContent: 'center',
               alignItems: 'center',
+              height: '35px',
+              width: '300px',
+              gap: '2px',
             }}
           >
-            <IoSearch />
+            <div
+              style={{
+                backgroundColor: 'white',
+                height: '100%',
+                width: '40px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: '6px 0 0 6px',
+              }}
+            >
+              <IoSearch />
+            </div>
+            <input
+              type="text"
+              placeholder="Search"
+              style={{
+                outline: 'none',
+                height: '100%',
+                width: '100%',
+                borderRadius: '0 6px 6px 0',
+                paddingLeft: '8px',
+              }}
+            />
           </div>
-          <input
-            type="text"
-            placeholder="Start Typing To Search"
-            style={{
-              outline: 'none',
-              border: '0.8px solid #e8e5ea',
-              height: '100%',
-              width: '100%',
-              borderRadius: '6px',
-            }}
-          />
+          <div className="flex justify-center items-center gap-2">
+            <button className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto">
+              Import
+            </button>
+
+            <button className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto">
+              Download
+            </button>
+
+            <button
+              className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto"
+              onClick={() => {
+                setDrawerOpen(true)
+              }}
+            >
+              Add Client
+            </button>
+          </div>
         </div>
-        <div className='flex justify-center items-center gap-2' >
 
-        <button
-          className="h-10 flex items-center font-bold bg-[#5f59c6] text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto"
-        >
-          Import
-        </button>
-
-        <button
-          className="h-10 flex items-center font-bold bg-[#5f59c6] text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto"
-          
-        >
-          Download
-        </button>
-
-        <button
-          className="h-10 flex items-center font-bold bg-[#5f59c6] text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto"
-          onClick={() => {
-            setDrawerOpen(true)
-          }}
-        >
-          Add Client
-        </button>
-       
-
-        </div>
-      </div>
-
-      <div className="overflow-x-auto border border-gray-200 px-3 rounded-md">
         <CTable striped hover className="mt-3 border border-gray-200">
           <CTableHead className="bg-gray-100">
             <CTableRow>
@@ -203,85 +193,11 @@ function ClientList() {
             )}
           </CTableBody>
         </CTable>
+
+        <div className="flex justify-end items-center gap-4 mt-4">
+          <CommonPagination count={5} page={1} onChange={''} />
+        </div>
       </div>
-
-      {/* Pagination Controls */}
-      <div style={{  display:"flex",justifyContent:"flex-end" ,alignItems:"center" ,marginTop:'30px',gap:'10px' }}>
-      
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className={`px-3 py-1 rounded-md border ${
-            currentPage === 1
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-[#5f59c6] text-white hover:bg-[#5e57d7]'
-          }`}
-          
-          style={{
-            width: '35px',
-            height: '35px',
-            borderRadius: '50%',
-            border: 'none',
-            display:"flex",
-            justifyContent:"center",
-            alignItems:"center"
-            
-          }}
-
-        >
-          <FaAngleDoubleLeft style={{ fontSize: '15px' }} />
-        </button>
-        {[...Array(totalPages)].map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentPage(index + 1)}
-            className={`px-3 py-1 rounded-md border ${
-              currentPage === index + 1 ? 'bg-[#5f59c6] text-white' : 'bg-gray-200'
-            }`}
-
-            style={{
-              width: '35px',
-              height: '35px',
-              borderRadius: '50%',
-              border: 'none',
-              display:"flex",
-              justifyContent:"center",
-              alignItems:"center"
-            }}
-          >
-            {index + 1}
-
-            
-
-
-
-
-
-          </button>
-        ))}
-        <button
-          onClick={() => setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))}
-          disabled={currentPage === totalPages}
-          className={`px-3 py-1 rounded-md border ${
-            currentPage === totalPages
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-[#5f59c6] text-white hover:bg-[#5e57d7]'
-          }`}
-
-          style={{
-            width: '35px',
-            height: '35px',
-            borderRadius: '50%',
-            border: 'none',
-            display:"flex",
-            justifyContent:"center",
-            alignItems:"center"
-          }}
-        >
-          <FaAngleDoubleRight className="h-6 w-6 border" />
-        </button>
-      </div>
-
       <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
         <div className="grid grid-cols-2 gap-2">
           {/* Left Column */}

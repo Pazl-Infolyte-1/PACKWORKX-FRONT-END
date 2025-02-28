@@ -22,8 +22,12 @@ import {
   CFormSelect,
   CRow,
   CCol,
+  CBadge,
 } from '@coreui/react'
 import { MdDeleteOutline } from 'react-icons/md'
+import CommonPagination from '../../components/New/Pagination'
+import CIcon from '@coreui/icons-react'
+import { cilOptions } from '@coreui/icons'
 
 function ListOfSalesOrder() {
   const [data, setData] = useState([])
@@ -37,7 +41,7 @@ function ListOfSalesOrder() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get('https://mocki.io/v1/e81a757f-f425-4bf4-8e0c-b78ced3d6e54')
+        const response = await axios.get('https://mocki.io/v1/62ca4ded-8529-455e-94d8-3106bd7f4fc7')
         setData(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -64,11 +68,10 @@ function ListOfSalesOrder() {
     <div>
       <div
         style={{
-          height: '100vh',
+          height: '100%',
           width: '100%',
           display: 'flex',
           flexDirection: 'column',
-          paddingInline: '20px',
         }}
       >
         {/* Header */}
@@ -81,43 +84,31 @@ function ListOfSalesOrder() {
             }}
           >
             <h4>Sales Order</h4>
-            <button
-              style={{
-                backgroundColor: '#ed4040',
-                borderRadius: '6px',
-                height: '40px',
-                width: '140px',
-                color: 'white',
-              }}
-              onClick={() => setDrawerOpen(true)}
-            >
-              Add Sales Order
-            </button>
           </div>
         </div>
 
         {/* Search Bar */}
-        <div
+        {/* <div
           style={{
             marginTop: '5px',
             height: '80px',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            
+
             padding: '10px',
           }}
         >
           <div
             style={{
               display: 'flex',
-              justifyContent:"space-between",
+              justifyContent: 'space-between',
               alignItems: 'center',
               height: '40px',
               width: '300px',
               gap: '7px',
-             backgroundColor:"white",
-             borderRadius:"6px",
+              backgroundColor: 'white',
+              borderRadius: '6px',
               padding: '5px',
             }}
           >
@@ -125,20 +116,75 @@ function ListOfSalesOrder() {
             <input
               type="text"
               placeholder="Start Typing To Search"
-              style={{ width: '100%',outline:"none", backgroundColor:"transparent" }}
+              style={{ width: '100%', outline: 'none', backgroundColor: 'transparent' }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            
           </div>
-          <div  className=' bg-white h-10 w-20 flex items-center justify-center rounded-md'>
-          <button>Filter</button>
+          <div className=" bg-white h-10 w-20 flex items-center justify-center rounded-md">
+            <button>Filter</button>
           </div>
-          
-        </div>
+        </div> */}
 
         {/* Table */}
-        <div className="overflow-x-auto">
+
+        <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                height: '35px',
+                width: '300px',
+                gap: '2px',
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: 'white',
+                  height: '100%',
+                  width: '40px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: '6px 0 0 6px',
+                }}
+              >
+                <IoSearch />
+              </div>
+              <input
+                type="text"
+                placeholder="Search"
+                style={{
+                  outline: 'none',
+                  height: '100%',
+                  width: '100%',
+                  borderRadius: '0 6px 6px 0',
+                  paddingLeft: '8px',
+                }}
+              />
+            </div>
+            <div className="flex justify-center items-center gap-2">
+              <button
+                style={{
+                  backgroundColor: '#ed4040',
+                  borderRadius: '6px',
+                  height: '40px',
+                  width: '140px',
+                  color: 'white',
+                }}
+                onClick={() => setDrawerOpen(true)}
+              >
+                Add Sales Order
+              </button>
+            </div>
+          </div>
           <CTable striped hover className="mt-3 border border-gray-200">
             <CTableHead className="bg-gray-100">
               <CTableRow>
@@ -155,9 +201,35 @@ function ListOfSalesOrder() {
                   <CTableRow key={rowIndex} className="border-b">
                     {row.map((cell, cellIndex) => (
                       <CTableDataCell key={cellIndex} className="py-3 px-4 text-gray-700">
-                        {cell}
+                        {cellIndex === 0 || cellIndex === 4 ? (
+                          <div className="text-blue-700 underline">{cell}</div>
+                        ) : cellIndex === 6 ? (
+                          <CBadge
+                            color={
+                              cell === 'Pending'
+                                ? 'warning'
+                                : cell === 'Approved'
+                                  ? 'success'
+                                  : 'danger'
+                            }
+                          >
+                            {cell}
+                          </CBadge>
+                        ) : (
+                          cell
+                        )}
                       </CTableDataCell>
                     ))}
+
+                    <CTableDataCell>
+                      <CButton color="light">
+                        <CIcon
+                          icon={cilOptions}
+                          className="me-2"
+                          style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
+                        />
+                      </CButton>
+                    </CTableDataCell>
                   </CTableRow>
                 ))
               ) : (
@@ -169,38 +241,10 @@ function ListOfSalesOrder() {
               )}
             </CTableBody>
           </CTable>
-        </div>
 
-        {/* Pagination Controls */}
-        <div className="flex justify-end items-center mt-4 space-x-2">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className={`px-3 py-1 rounded-md border ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#5f59c6] text-white hover:bg-[#5e57d7]'}`}
-          >
-            Prev
-          </button>
-
-          {/* Dynamically show only relevant page numbers */}
-          {Array.from({ length: totalPages }, (_, index) => index + 1)
-            .slice(Math.max(currentPage - 3, 0), Math.min(currentPage + 2, totalPages))
-            .map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1 rounded-md border ${currentPage === page ? 'bg-[#5f59c6] text-white' : 'bg-gray-200'}`}
-              >
-                {page}
-              </button>
-            ))}
-
-          <button
-            onClick={() => setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))}
-            disabled={currentPage === totalPages}
-            className={`px-3 py-1 rounded-md border ${currentPage === totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#5f59c6] text-white hover:bg-[#5e57d7]'}`}
-          >
-            Next
-          </button>
+          <div className="flex justify-end items-center gap-4 mt-4">
+            <CommonPagination count={3} page={1} onChange={''} />
+          </div>
         </div>
 
         <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
@@ -228,7 +272,7 @@ function ListOfSalesOrder() {
                       </CFormSelect>
                     </CCol>
                   </CRow>
-                  <CRow  className="mb-3">
+                  <CRow className="mb-3">
                     <CCol md={4}>
                       <CFormInput
                         type="number"
@@ -242,12 +286,9 @@ function ListOfSalesOrder() {
                         <option value="postpay">Post Pay</option>
                       </CFormSelect>
                     </CCol>
-
-                   
                   </CRow>
-                  <CRow  className="border-b-2 border-b-black pb-3">
-
-                  <CCol md={4}>
+                  <CRow className="border-b-2 border-b-black pb-3">
+                    <CCol md={4}>
                       <label className="mr-2">Confirmation By:</label>
                       <CFormSwitch
                         label={confirmationBy === 'email' ? 'Email' : 'Oral'}
@@ -257,40 +298,42 @@ function ListOfSalesOrder() {
                         }
                       />
                     </CCol>
-
                   </CRow>
                 </CForm>
 
-                <div className='flex items-center justify-between  mt-6 mb-4'>
-                <h3 className="text-lg font-semibold ">SKU</h3>
+                <div className="flex items-center justify-between  mt-6 mb-4">
+                  <h3 className="text-lg font-semibold ">SKU</h3>
                   <CButton color="success">+Add SKU</CButton>
                 </div>
-                <div className='flex justify-between items-center gap-5'>
-                <CRow className="mb-3  flex justify-between items-center w-full">
-                  <CCol md={3}>
-                    <CFormSelect label="SKU">
-                      <option>Select SKU</option>
-                      <option value="sku1">SKU 1</option>
-                      <option value="sku2">SKU 2</option>
-                    </CFormSelect>
-                  </CCol>
+                <div className="flex justify-between items-center gap-5">
+                  <CRow className="mb-3  flex justify-between items-center w-full">
+                    <CCol md={3}>
+                      <CFormSelect label="SKU">
+                        <option>Select SKU</option>
+                        <option value="sku1">SKU 1</option>
+                        <option value="sku2">SKU 2</option>
+                      </CFormSelect>
+                    </CCol>
 
-                  <CCol md={3}>
-                    <CFormInput type="date" label="Quantity Required" placeholder="Enter Quantity" />
-                  </CCol>
-                  <CCol md={3}>
-                    <CFormInput type="number" label="Rate per SKU" placeholder="Enter Rate" />
-                  </CCol>
-                  <CCol md={3}>
-                    <CFormInput
-                      type="date"
-                      label="Acceptable Excess Unit"
-                      placeholder="Enter Excess Unit"
-                    />
-                  </CCol>
-                   
-                </CRow>
-                <MdDeleteOutline  className='h-10 w-10 mt-2 text-red-500' /> 
+                    <CCol md={3}>
+                      <CFormInput
+                        type="date"
+                        label="Quantity Required"
+                        placeholder="Enter Quantity"
+                      />
+                    </CCol>
+                    <CCol md={3}>
+                      <CFormInput type="number" label="Rate per SKU" placeholder="Enter Rate" />
+                    </CCol>
+                    <CCol md={3}>
+                      <CFormInput
+                        type="date"
+                        label="Acceptable Excess Unit"
+                        placeholder="Enter Excess Unit"
+                      />
+                    </CCol>
+                  </CRow>
+                  <MdDeleteOutline className="h-10 w-10 mt-2 text-red-500" />
                 </div>
 
                 <div className="mt-10 flex justify-end">
@@ -334,15 +377,11 @@ function ListOfSalesOrder() {
                   </CCol>
                 </CRow>
 
-
-
-
-                <div className='flex items-center justify-between  mt-6 '>
-                <h3 className="text-lg font-semibold ">Work Order Details</h3>
+                <div className="flex items-center justify-between  mt-6 ">
+                  <h3 className="text-lg font-semibold ">Work Order Details</h3>
                   <CButton color="success">Work Order</CButton>
                 </div>
 
-                
                 <p className="mb-4">
                   Work Order No: <strong>#89WODHL</strong>
                 </p>
@@ -401,7 +440,6 @@ function ListOfSalesOrder() {
                     <CFormInput type="date" label="Plan End Date" />
                   </CCol>
                 </CRow>
-               
               </CCardBody>
             </CCard>
           </div>

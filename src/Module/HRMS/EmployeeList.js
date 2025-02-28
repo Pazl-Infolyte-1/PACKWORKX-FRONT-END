@@ -25,7 +25,8 @@ import {
   CButton,
   CFormCheck,
 } from '@coreui/react'
-
+import { Pagination } from 'react-bootstrap'
+import CommonPagination from '../../components/New/Pagination'
 
 function EmployeeList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -59,13 +60,6 @@ function EmployeeList() {
   const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
   const totalPages = Math.ceil(tableData.length / rowsPerPage)
 
-
-
-
-
-
-
-
   return (
     <>
       <div style={{ maxWidth: '1280px', margin: 'auto' }}>
@@ -83,8 +77,7 @@ function EmployeeList() {
               style={{
                 backgroundColor: '#14b8a6',
                 color: 'white',
-                fontWeight: 'bold',
-                padding: '10px 16px',
+                padding: '5px 10px',
                 borderRadius: '6px',
                 border: 'none',
               }}
@@ -98,8 +91,7 @@ function EmployeeList() {
               style={{
                 backgroundColor: '#7c3aed',
                 color: 'white',
-                fontWeight: 'bold',
-                padding: '10px 16px',
+                padding: '5px 16px',
                 borderRadius: '6px',
                 border: 'none',
               }}
@@ -110,8 +102,7 @@ function EmployeeList() {
               style={{
                 backgroundColor: '#7c3aed',
                 color: 'white',
-                fontWeight: 'bold',
-                padding: '10px 16px',
+                padding: '5px 16px',
                 borderRadius: '6px',
                 border: 'none',
               }}
@@ -190,162 +181,127 @@ function EmployeeList() {
           </div>
         </div>
 
-        <div
-          style={{
-            maxWidth: '1280px',
-            margin: 'auto',
-            marginTop: '20px',
-            display: 'flex',
-            justifyContent: 'space-evenly',
-            gap: '16px',
-            alignItems: 'center',
-          }}
-        >
+        <div className="overflow-x-auto border border-gray-200 p-3 mt-1 rounded-md">
           <div
             style={{
+              maxWidth: '1280px',
+              margin: 'auto',
+              marginTop: '5px',
               display: 'flex',
-              gap: '8px',
+              justifyContent: 'space-evenly',
+              gap: '16px',
               alignItems: 'center',
-              border: '1px solid #e7e5e4',
-              padding: '8px',
-              borderRadius: '6px',
             }}
           >
-            <BiSearchAlt style={{ color: '#737373' }} />
-            <input
-              type="text"
-              placeholder="Search Employee..."
-              style={{ outline: 'none', border: 'none', backgroundColor: 'transparent' }}
-            />
+            <div
+              style={{
+                display: 'flex',
+                gap: '8px',
+                alignItems: 'center',
+                border: '1px solid #e7e5e4',
+                padding: '8px',
+                borderRadius: '6px',
+              }}
+            >
+              <BiSearchAlt style={{ color: '#737373' }} />
+              <input
+                type="text"
+                placeholder="Search Employee..."
+                style={{ outline: 'none', border: 'none', backgroundColor: 'transparent' }}
+              />
+            </div>
+
+            <select
+              style={{
+                border: '1px solid #e7e5e4',
+                padding: '8px',
+                width: '256px',
+                borderRadius: '6px',
+                color: '#737373',
+                backgroundColor: 'transparent',
+              }}
+            >
+              <option disabled selected>
+                Select Department
+              </option>
+              <option value="">Department1</option>
+              <option value="">Department2</option>
+              <option value="">Department3</option>
+            </select>
+
+            <select
+              style={{
+                border: '1px solid #e7e5e4',
+                padding: '8px',
+                width: '256px',
+                borderRadius: '6px',
+                color: '#737373',
+                backgroundColor: 'transparent',
+              }}
+            >
+              <option disabled selected>
+                Select Role
+              </option>
+              <option value="">Role1</option>
+              <option value="">Role2</option>
+              <option value="">Role3</option>
+            </select>
+
+            <select
+              style={{
+                border: '1px solid #e7e5e4',
+                padding: '8px',
+                width: '256px',
+                borderRadius: '6px',
+                color: '#737373',
+                backgroundColor: 'transparent',
+              }}
+            >
+              <option disabled selected>
+                Select Manager
+              </option>
+              <option value="">Manager1</option>
+              <option value="">Manager2</option>
+              <option value="">Manager3</option>
+            </select>
           </div>
 
-          <select
-            style={{
-              border: '1px solid #e7e5e4',
-              padding: '8px',
-              width: '256px',
-              borderRadius: '6px',
-              color: '#737373',
-              backgroundColor: 'transparent',
-            }}
-          >
-            <option disabled selected>
-              Select Department
-            </option>
-            <option value="">Department1</option>
-            <option value="">Department2</option>
-            <option value="">Department3</option>
-          </select>
-
-          <select
-            style={{
-              border: '1px solid #e7e5e4',
-              padding: '8px',
-              width: '256px',
-              borderRadius: '6px',
-              color: '#737373',
-              backgroundColor: 'transparent',
-            }}
-          >
-            <option disabled selected>
-              Select Role
-            </option>
-            <option value="">Role1</option>
-            <option value="">Role2</option>
-            <option value="">Role3</option>
-          </select>
-
-          <select
-            style={{
-              border: '1px solid #e7e5e4',
-              padding: '8px',
-              width: '256px',
-              borderRadius: '6px',
-              color: '#737373',
-              backgroundColor: 'transparent',
-            }}
-          >
-            <option disabled selected>
-              Select Manager
-            </option>
-            <option value="">Manager1</option>
-            <option value="">Manager2</option>
-            <option value="">Manager3</option>
-          </select>
+          <CTable striped hover className="mt-3 border border-gray-200">
+            <CTableHead className="bg-gray-100">
+              <CTableRow>
+                {headers.map((header, index) => (
+                  <CTableHeaderCell key={index} className="py-3 px-4 text-gray-600 font-medium">
+                    {header}
+                  </CTableHeaderCell>
+                ))}
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {currentRows.length > 0 ? (
+                currentRows.map((row, rowIndex) => (
+                  <CTableRow key={rowIndex} className="border-b ">
+                    {row.map((cell, cellIndex) => (
+                      <CTableDataCell key={cellIndex} className="py-3 px-4 text-gray-700">
+                        {cell}
+                      </CTableDataCell>
+                    ))}
+                  </CTableRow>
+                ))
+              ) : (
+                <CTableRow>
+                  <CTableDataCell colSpan={headers.length} className="text-center py-3">
+                    No data available
+                  </CTableDataCell>
+                </CTableRow>
+              )}
+            </CTableBody>
+          </CTable>
+          <div className="flex justify-end items-center mt-1">
+            <CommonPagination count={7} page={1} />
+          </div>
         </div>
 
-        <div className="overflow-x-auto border border-gray-200 px-3 mt-3 rounded-md">
-                <CTable striped hover className="mt-3 border border-gray-200">
-                  <CTableHead className="bg-gray-100">
-                    <CTableRow>
-                      {headers.map((header, index) => (
-                        <CTableHeaderCell key={index} className="py-3 px-4 text-gray-600 font-medium">
-                          {header}
-                        </CTableHeaderCell>
-                      ))}
-                    </CTableRow>
-                  </CTableHead>
-                  <CTableBody>
-                    {currentRows.length > 0 ? (
-                      currentRows.map((row, rowIndex) => (
-                        <CTableRow key={rowIndex} className="border-b ">
-                          {row.map((cell, cellIndex) => (
-                            <CTableDataCell key={cellIndex} className="py-3 px-4 text-gray-700">
-                              {cell}
-                            </CTableDataCell>
-                          ))}
-                        </CTableRow>
-                      ))
-                    ) : (
-                      <CTableRow>
-                        <CTableDataCell colSpan={headers.length} className="text-center py-3">
-                          No data available
-                        </CTableDataCell>
-                      </CTableRow>
-                    )}
-                  </CTableBody>
-                </CTable>
-              </div>
-
-
-
-              <div className="flex justify-end items-center mt-3 mb-3  space-x-2">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className={`px-3 py-1 rounded-md border ${
-            currentPage === 1
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-[#5f59c6] text-white hover:bg-[#5e57d7]'
-          }`}
-        >
-          Prev
-        </button>
-        {[...Array(totalPages)].map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentPage(index + 1)}
-            className={`px-3 py-1 rounded-md border ${
-              currentPage === index + 1 ? 'bg-[#5f59c6] text-white' : 'bg-gray-200'
-            }`}
-          >
-            {index + 1}
-          </button>
-        ))}
-        <button
-          onClick={() => setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))}
-          disabled={currentPage === totalPages}
-          className={`px-3 py-1 rounded-md border ${
-            currentPage === totalPages
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-[#5f59c6] text-white hover:bg-[#5e57d7]'
-          }`}
-        >
-          Next
-        </button>
-      </div>
-
-        <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
+        <Drawer style={{ width: '50%' }} isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
           <form action="">
             <div className="max-w-7xl mx-auto h-[90vh] border px-3 py-3 shadow-md overflow-scroll mt-6">
               <div className="flex justify-between">

@@ -23,7 +23,7 @@ const staticMenuItems = [
     groupName: 'Static Menu',
     modules: [
       {
-        moduleName: 'Dashboard',
+        moduleName: 'Admin',
         moduleIconName: 'cilSpeedometer',
         moduleKey: 'dashboard',
         subModules: [
@@ -45,9 +45,9 @@ const staticMenuItems = [
         ],
       },
       {
-        moduleName: 'User Management',
+        moduleName: 'Dashboard',
         moduleIconName: 'cilUser',
-        moduleKey: 'users',
+        moduleKey: 5006,
         subModules: [], // Empty array for a module with no submodules
       },
     ],

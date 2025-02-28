@@ -17,11 +17,30 @@ import {
 } from '@coreui/react'
 import { FaAngleDown, FaAngleUp } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
-import { cilOptions } from '@coreui/icons'
+import { cilOptions, cilBriefcase, cilCut, cilClipboard, cilTrash } from '@coreui/icons'
 import { useDrag, useDrop } from 'react-dnd'
 import './styles.css'
+import ProgressBar from './ProgressBar'
+import Dropdown from 'react-bootstrap/Dropdown'
 
 const ItemType = 'WORK_ORDER'
+
+const CustomToggle = React.forwardRef(({ onClick }, ref) => (
+  <span
+    ref={ref}
+    onClick={(e) => {
+      e.preventDefault()
+      onClick(e)
+    }}
+    style={{ cursor: 'pointer' }}
+  >
+    <CIcon
+      icon={cilOptions}
+      className="me-2 hover-pointer"
+      style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
+    />
+  </span>
+))
 
 function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
   const [, drag] = useDrag(() => ({
@@ -61,11 +80,43 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
               alignItems: 'center',
             }}
           >
-            <CIcon
-              icon={cilOptions}
-              className="me-2 hover-pointer"
-              style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
-            />
+            <Dropdown>
+              <Dropdown.Toggle as={CustomToggle} />
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => console.log('View Work Order')}>
+                  <CIcon
+                    icon={cilBriefcase}
+                    className="me-2"
+                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                  />
+                  View Work Order
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => console.log('View Sales Order')}>
+                  <CIcon
+                    icon={cilClipboard}
+                    className="me-2"
+                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                  />
+                  View Sales Order
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => console.log('Remove from Plan')}>
+                  <CIcon
+                    icon={cilTrash}
+                    className="me-2"
+                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                  />
+                  Remove from Plan
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => console.log('Split Work Order', order)}>
+                  <CIcon
+                    icon={cilCut}
+                    className="me-2"
+                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                  />
+                  Split Work Order
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </span>
         </div>
 
@@ -99,16 +150,22 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
                     borderRadius: '10px',
                     boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.16)',
                     marginTop: '10px',
-                    padding: '2px',
+                    padding: '8px', // Reduced padding to fit content
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center', // Centers content vertically
+                    alignItems: 'center', // Centers content horizontally
+                    overflow: 'hidden', // Prevents overflow
                   }}
                 >
-                  <CRow>
-                    <CCol xs={6}>
-                      <span>{wo.wo_id}</span>
+                  <CRow className="w-100 text-center p-1">
+                    <CCol xs={6} className="flex flex-col items-center">
+                      <span className="font-semibold text-sm">Work Order</span>
+                      <div className="mt-1 text-xs">{wo.wo_id}</div>
                     </CCol>
-                    <CCol xs={6}>
-                      <span>Q -</span>
-                      <div>{wo.quantity}</div>
+                    <CCol xs={6} className="flex flex-col items-center">
+                      <span className="font-semibold text-sm">Quantity (KG)</span>
+                      <div className="mt-1 text-xs">{wo.quantity}</div>
                     </CCol>
                   </CRow>
                 </CCard>
@@ -183,7 +240,67 @@ function GroupDropZone({
               whiteSpace: 'nowrap',
             }}
           >
-            {i.quantity ? `${i.finished_goods} / ${i.quantity}` : ''}
+            {i.quantity ? (
+              <>
+                {`${i.finished_goods} / ${i.quantity}`}
+                <div
+                  style={{ marginLeft: '10px', marginRight: '10px', width: '45px', height: '40px' }}
+                >
+                  <ProgressBar
+                    value={Math.min(
+                      Math.max(parseFloat(((i.finished_goods / i.quantity) * 100).toFixed(1)), 0),
+                      100,
+                    )}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                {`80 / 100`}
+                <div
+                  style={{ marginLeft: '10px', marginRight: '10px', width: '45px', height: '40px' }}
+                >
+                  <ProgressBar value={80} />
+                </div>
+              </>
+            )}
+            <Dropdown>
+              <Dropdown.Toggle as={CustomToggle} />
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => console.log('View Work Order')}>
+                  <CIcon
+                    icon={cilBriefcase}
+                    className="me-2"
+                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                  />
+                  View Work Order
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => console.log('View Sales Order')}>
+                  <CIcon
+                    icon={cilClipboard}
+                    className="me-2"
+                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                  />
+                  View Sales Order
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => console.log('Remove from Plan')}>
+                  <CIcon
+                    icon={cilTrash}
+                    className="me-2"
+                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                  />
+                  Remove from Plan
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => console.log('Split Work Order', order)}>
+                  <CIcon
+                    icon={cilCut}
+                    className="me-2"
+                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                  />
+                  Split Work Order
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </span>
         </div>
 
@@ -202,7 +319,6 @@ function GroupDropZone({
                 <span>{i.dimension}</span>
                 <span>{i.layers} PLY</span>
                 <span>{i.print}</span>
-
                 <span>Quantity :{i.quantity}</span>
                 <span>{i.route}</span>
               </>
@@ -419,6 +535,32 @@ const AllocateRM = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, au
                       )}{' '}
                       /
                       {group.items.reduce((sum, g) => (g.quantity ? sum + g.quantity : sum + 0), 0)}
+                      <div style={{ marginLeft: '10px', width: '45px', height: '40px' }}>
+                        <ProgressBar
+                          value={Math.min(
+                            Math.max(
+                              (() => {
+                                const totalFinishedGoods = group.items.reduce(
+                                  (sum, g) => sum + (g.finished_goods || 0),
+                                  0,
+                                )
+                                const totalQuantity = group.items.reduce(
+                                  (sum, g) => sum + (g.quantity || 0),
+                                  0,
+                                )
+
+                                if (totalQuantity < 1) return 0
+
+                                const percentage = (totalFinishedGoods / totalQuantity) * 100
+
+                                return parseFloat(percentage.toFixed(1)) // Ensure only one decimal place
+                              })(),
+                              0,
+                            ),
+                            100,
+                          )}
+                        />
+                      </div>
                     </span>
                   </div>
 

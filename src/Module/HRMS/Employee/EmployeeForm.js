@@ -1,307 +1,20 @@
-import React, { useState, useEffect } from 'react'
-import { IoCheckmarkCircleOutline } from 'react-icons/io5'
-import { TbSmartHome } from 'react-icons/tb'
-import { BiSearchAlt } from 'react-icons/bi'
-import Drawer from '../../components/Drawer/Drawer'
+import React from 'react'
 import { RiUserLine } from 'react-icons/ri'
 import { IoIosInformationCircleOutline } from 'react-icons/io'
 import { IoIosAt } from 'react-icons/io'
 import { FaFontAwesomeFlag } from 'react-icons/fa'
 import { RxCross1 } from 'react-icons/rx'
 import Switch from '@mui/material/Switch'
-import profile from '../../assets/images/profile.png'
-import axios from 'axios'
-import {
-  CTable,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
-  CRow,
-  CCol,
-  CFormInput,
-  CFormSelect,
-  CButton,
-  CFormCheck,
-} from '@coreui/react'
-import { Pagination } from 'react-bootstrap'
-import CommonPagination from '../../components/New/Pagination'
+import profile from '../../../assets/images/profile.png'
+import Drawer from '../../../components/Drawer/Drawer'
+function EmployeeForm({isDrawerOpen,setDrawerOpen}) {
+    const label = { inputProps: { 'aria-label': 'Switch demo' } }
 
-function EmployeeList() {
-  const [isDrawerOpen, setDrawerOpen] = useState(false)
-  const label = { inputProps: { 'aria-label': 'Switch demo' } }
-  const [data, setData] = useState([])
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get(
-          'https://mocki.io/v1/deebda74-5384-44a2-8b4e-9c19d1d7e4f9  ',
-        )
-        console.log('Table API', response.data)
-
-        setData(response.data)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-    fetchData()
-  }, [])
-
-  const tableData = data?.values && Array.isArray(data.values) ? data.values : []
-  const headers = data?.headers && Array.isArray(data.headers) ? data.headers : []
-
-  const [currentPage, setCurrentPage] = useState(1)
-  const rowsPerPage = 5
-
-  const indexOfLastRow = currentPage * rowsPerPage
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage
-  const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
-  const totalPages = Math.ceil(tableData.length / rowsPerPage)
-
+    
   return (
     <>
-      <div style={{ maxWidth: '1280px', margin: 'auto' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginTop: '20px',
-          }}
-        >
-          <h2 style={{ fontSize: '24px', fontWeight: '100' }}>Employee</h2>
-          <div style={{ display: 'flex', gap: '20px' }}>
-            <button
-              style={{
-                backgroundColor: '#14b8a6',
-                color: 'white',
-                padding: '5px 10px',
-                borderRadius: '6px',
-                border: 'none',
-              }}
-              onClick={() => {
-                setDrawerOpen(true)
-              }}
-            >
-              + Create Employee
-            </button>
-            <button
-              style={{
-                backgroundColor: '#7c3aed',
-                color: 'white',
-                padding: '5px 16px',
-                borderRadius: '6px',
-                border: 'none',
-              }}
-            >
-              Import
-            </button>
-            <button
-              style={{
-                backgroundColor: '#7c3aed',
-                color: 'white',
-                padding: '5px 16px',
-                borderRadius: '6px',
-                border: 'none',
-              }}
-            >
-              Export
-            </button>
-          </div>
-        </div>
 
-        <div
-          style={{
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            marginTop: '20px',
-            border: '1px solid #e7e5e4',
-            borderRadius: '6px',
-            padding: '10px',
-          }}
-        >
-          <div style={{ display: 'flex', gap: '32px', marginLeft: '40px' }}>
-            <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-              <TbSmartHome style={{ color: '#14b8a6' }} />
-              <span>All Datas</span>
-              <span
-                style={{
-                  backgroundColor: '#14b8a6',
-                  color: 'white',
-                  borderRadius: '6px',
-                  height: '24px',
-                  width: '40px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                5055
-              </span>
-            </div>
-            <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-              <IoCheckmarkCircleOutline />
-              <span>Active</span>
-              <span
-                style={{
-                  backgroundColor: '#14b8a6',
-                  color: 'white',
-                  borderRadius: '6px',
-                  height: '24px',
-                  width: '40px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                500
-              </span>
-            </div>
-            <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-              <IoCheckmarkCircleOutline />
-              <span>Inactive</span>
-              <span
-                style={{
-                  backgroundColor: '#14b8a6',
-                  color: 'white',
-                  borderRadius: '6px',
-                  height: '24px',
-                  width: '40px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                50
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto border border-gray-200 p-3 mt-1 rounded-md">
-          <div
-            style={{
-              maxWidth: '1280px',
-              margin: 'auto',
-              marginTop: '5px',
-              display: 'flex',
-              justifyContent: 'space-evenly',
-              gap: '16px',
-              alignItems: 'center',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                gap: '8px',
-                alignItems: 'center',
-                border: '1px solid #e7e5e4',
-                padding: '8px',
-                borderRadius: '6px',
-              }}
-            >
-              <BiSearchAlt style={{ color: '#737373' }} />
-              <input
-                type="text"
-                placeholder="Search Employee..."
-                style={{ outline: 'none', border: 'none', backgroundColor: 'transparent' }}
-              />
-            </div>
-
-            <select
-              style={{
-                border: '1px solid #e7e5e4',
-                padding: '8px',
-                width: '256px',
-                borderRadius: '6px',
-                color: '#737373',
-                backgroundColor: 'transparent',
-              }}
-            >
-              <option disabled selected>
-                Select Department
-              </option>
-              <option value="">Department1</option>
-              <option value="">Department2</option>
-              <option value="">Department3</option>
-            </select>
-
-            <select
-              style={{
-                border: '1px solid #e7e5e4',
-                padding: '8px',
-                width: '256px',
-                borderRadius: '6px',
-                color: '#737373',
-                backgroundColor: 'transparent',
-              }}
-            >
-              <option disabled selected>
-                Select Role
-              </option>
-              <option value="">Role1</option>
-              <option value="">Role2</option>
-              <option value="">Role3</option>
-            </select>
-
-            <select
-              style={{
-                border: '1px solid #e7e5e4',
-                padding: '8px',
-                width: '256px',
-                borderRadius: '6px',
-                color: '#737373',
-                backgroundColor: 'transparent',
-              }}
-            >
-              <option disabled selected>
-                Select Manager
-              </option>
-              <option value="">Manager1</option>
-              <option value="">Manager2</option>
-              <option value="">Manager3</option>
-            </select>
-          </div>
-
-          <CTable striped hover className="mt-3 border border-gray-200">
-            <CTableHead className="bg-gray-100">
-              <CTableRow>
-                {headers.map((header, index) => (
-                  <CTableHeaderCell key={index} className="py-3 px-4 text-gray-600 font-medium">
-                    {header}
-                  </CTableHeaderCell>
-                ))}
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {currentRows.length > 0 ? (
-                currentRows.map((row, rowIndex) => (
-                  <CTableRow key={rowIndex} className="border-b ">
-                    {row.map((cell, cellIndex) => (
-                      <CTableDataCell key={cellIndex} className="py-3 px-4 text-gray-700">
-                        {cell}
-                      </CTableDataCell>
-                    ))}
-                  </CTableRow>
-                ))
-              ) : (
-                <CTableRow>
-                  <CTableDataCell colSpan={headers.length} className="text-center py-3">
-                    No data available
-                  </CTableDataCell>
-                </CTableRow>
-              )}
-            </CTableBody>
-          </CTable>
-          <div className="flex justify-end items-center mt-1">
-            <CommonPagination count={7} page={1} />
-          </div>
-        </div>
-
-        <Drawer style={{ width: '50%' }} isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
+<Drawer className="w-1/2" isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
           <form action="">
             <div className="max-w-7xl mx-auto h-[90vh] border px-3 py-3 shadow-md overflow-scroll mt-6">
               <div className="flex justify-between">
@@ -768,10 +481,10 @@ function EmployeeList() {
 
               <div className="mt-5">
                 <div className="flex justify-end items-center gap-2">
-                  <button className="cursor-pointer h-12 w-165 border-0 rounded-md bg-rose-500 text-white size-24 outline-none font-medium">
+                  <button className="cursor-pointer h-8 w-165 border-0 rounded-md bg-rose-500 text-white size-24 outline-none font-medium">
                     Edit
                   </button>
-                  <button className="cursor-pointer h-12 w-165 border-0 rounded-md bg-violet-500 text-white size-24 outline-none font-medium">
+                  <button className="cursor-pointer h-8 w-165 border-0 rounded-md bg-violet-500 text-white size-24 outline-none font-medium">
                     Save
                   </button>
                 </div>
@@ -779,9 +492,11 @@ function EmployeeList() {
             </div>
           </form>
         </Drawer>
-      </div>
+
     </>
   )
 }
 
-export default EmployeeList
+export default EmployeeForm
+
+

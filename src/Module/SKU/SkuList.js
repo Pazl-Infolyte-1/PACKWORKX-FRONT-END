@@ -11,13 +11,11 @@ import apiMethods from '../../api/config';
 import { useRef } from "react";
 import { ChevronUpIcon,ChevronDownIcon } from "@heroicons/react/solid";
 
-
-"use client";
 const tablevalues = {
-
 	"tableHeaders": [
 
 		{ "id": "#","label": "#" },
+		
 
 		{ "id": "GSM","label": "GSM" },
 

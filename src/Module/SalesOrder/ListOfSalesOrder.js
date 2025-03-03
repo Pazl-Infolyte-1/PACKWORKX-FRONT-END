@@ -28,6 +28,7 @@ import { MdDeleteOutline } from 'react-icons/md'
 import CommonPagination from '../../components/New/Pagination'
 import CIcon from '@coreui/icons-react'
 import { cilOptions } from '@coreui/icons'
+import AddSalesOrder from './AddSalesOrder'
 
 function ListOfSalesOrder() {
   const [data, setData] = useState([])
@@ -248,7 +249,9 @@ function ListOfSalesOrder() {
         </div>
 
         <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
-          <div className="p-6">
+          <AddSalesOrder></AddSalesOrder>
+          {/*old sales Order*/}
+          {/*<div className="p-6">
             <CCard>
               <CCardHeader className="flex justify-between items-center bg-gray-100 p-4 rounded-t-2xl">
                 <h2 className="text-xl font-semibold">Add Sales Order</h2>
@@ -442,7 +445,7 @@ function ListOfSalesOrder() {
                 </CRow>
               </CCardBody>
             </CCard>
-          </div>
+          </div>*/}
         </Drawer>
       </div>
     </div>

@@ -31,10 +31,10 @@ import CommonPagination from '../../components/New/Pagination';
 
 "use client";
 const tablevalues = {
-
 	"tableHeaders": [
 
 		{ "id": "#","label": "#" },
+		
 
 		{ "id": "GSM","label": "GSM" },
 

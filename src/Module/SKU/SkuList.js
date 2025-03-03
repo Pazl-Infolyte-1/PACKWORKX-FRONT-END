@@ -29,7 +29,6 @@ import {
 import axios from 'axios';
 import CommonPagination from '../../components/New/Pagination';
 
-"use client";
 const tablevalues = {
 	"tableHeaders": [
 

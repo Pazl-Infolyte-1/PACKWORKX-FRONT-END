@@ -3,13 +3,16 @@ import { FaSearch, FaCircle, FaFillDrip, FaThumbtack, FaStar, FaShieldAlt, FaUse
 import { BiDollarCircle } from "react-icons/bi";
 import { CgWorkAlt } from "react-icons/cg";
 import {  FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa'
+import CommonPagination from '../../components/New/Pagination'
+import { FiFilter } from "react-icons/fi";
+
 
 const InventoryDashboard = () => {
     return (
         
         <div style={{ backgroundColor: "#f7f7f7", margin: 0, }}>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "30px", }}>
-                <StockCard title="Reels" quantity="1200" status="Enough Stock" backgroundColor="#d4edda" color="#155724" buttonColor="#286e34" icon={<BiDollarCircle />} />
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "30px"}}>
+                <StockCard title="Reels" quantity="1200" status="Enough Stock" backgroundColor="#d4edda" color="#155724" buttonColor="#286e34" height="1px" icon={<BiDollarCircle />} />
                 <StockCard title="Corrugation Glue" quantity="300" status="Low Stock" backgroundColor="#fff3cd " color="#856404" buttonColor="#856404" icon={<FaStar />} />
                 <StockCard title="Pasting Glue" quantity="50" status="Out of Stock" backgroundColor="#f8d7da " color="#721c24" buttonColor="#721c24" icon={<CgWorkAlt />} />
                 <StockCard title="Finished Goods" quantity="600" backgroundColor="#e5e5e5" color="#858585" buttonColor="#858585" icon={<FaShieldAlt />} />
@@ -53,48 +56,44 @@ const MaterialSection = () => (
     <section style={{ backgroundColor: "white", padding: "16px", marginTop: "10px", borderRadius: "8px", boxShadow: "0 1px 4px rgba(0,0,0,0.1)" }}>
         <h6>Raw Materials Types</h6>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", }}>
+            <div className="flex justify-start items-center gap-2">
             <div style={{ position: "relative", display: "flex", alignItems: "center", boxShadow: '0px 1px 4px rgba(0,0,0,0.1)',marginTop:"10px" }}>
                 <input type="text" placeholder="Search SKU by name or ID" style={{ border: "1px solid #d1d5db", padding: "3px", borderRadius: "6px", width: "280px"}} />
                 <FaSearch style={{ position: "absolute", right: "12px", color: "#6b7280" }} />
+                
+
             </div>
             <div>
-                <ButtonCommon>Filter</ButtonCommon>
+                <FiFilter className="h-6 w-6 " />
+
+                </div>
+                </div>
+            <div>
+
                 <ButtonCommon>Saved Filter</ButtonCommon>
                 <ButtonCommon>Bulk Upload</ButtonCommon>
             </div>
         </div>
         <MaterialTable />
-        <div style={{  display:"flex",justifyContent:"flex-end" ,alignItems:"center" ,marginTop:'30px',gap:'5px' }}>
-                 <FaAngleDoubleLeft style={{ fontSize: '15px', cursor: 'pointer' }} />
-                 {[1, 2, 3, 4].map((num) => (
-                   <button
-                     key={num}
-                     style={{
-                       width: '35px',
-                       height: '35px',
-                       borderRadius: '50%',
-                       backgroundColor: num === 4 ? '#c1c0e0' : '#e5e7eb',
-                       border: 'none',
-                       cursor: 'pointer',
-                     }}
-                   >
-                     {num}
-                   </button>
-                 ))}
-                 <FaAngleDoubleRight style={{ fontSize: '15px', cursor: 'pointer' }} />
-               </div>
+        <div className="flex justify-end items-center gap-4 mt-4">
+          <CommonPagination count={5} page={1} onChange={''} />
+        </div>
+      
+       
     </section>
     
 );
 
 const MaterialTable = () => (
-    <table style={{ width: "100%", marginTop: "16px", borderCollapse: "collapse", boxShadow: "0 1px 4px rgba(0,0,0,0)" }}>
+    <div className="p-2 border-2 b-gray-200 my-5 ">
+    <table style={{ width: "100%", borderCollapse: "collapse", boxShadow: "0 1px 4px rgba(0,0,0,0)",border :"1px solid lightgray "}}>
         <tbody>
             <MaterialRow icon={<FaCircle style={{ color: "#3b82f6" }} />} name="Reel - Standard" type="Standard" available="180" reorder="500" updated="2023-10-01" />
             <MaterialRow icon={<FaFillDrip style={{ color: "#ec4899" }} />} name="Glue - Pasting" type="Normal" available="200" reorder="100" updated="2023-10-01" />
             <MaterialRow icon={<FaThumbtack style={{ color: "#6366f1" }} />} name="Pin - Small" type="Medium" available="25" reorder="200" updated="2023-10-01" />
         </tbody>
     </table>
+    </div>
 );
 
 const MaterialRow = ({ icon, name, type, available, reorder, updated }) => (

@@ -53,7 +53,7 @@ const CompanyManagement = () => {
 
           {/* Top Controls */}
           
-          <CCardHeader style={{ padding: "15px", background: "#f8f9fa",position:"sticky",top:"0",zIndex:"1" }}>
+          <CCardHeader style={{ padding: "15px", background: "#f8f9fa",position:"sticky",top:"0"}}>
             <CRow className="w-100 align-items-center">
               <CCol md={6} className="d-flex gap-2">
                 <CFormInput placeholder="Start Date To End Date" style={{ maxWidth: "220px" }} />

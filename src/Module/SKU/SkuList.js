@@ -9,6 +9,8 @@ import {
 import Drawer from '../../components/Drawer/Drawer';
 import apiMethods from '../../api/config';
 import { useRef } from "react";
+import { ChevronUpIcon,ChevronDownIcon } from "@heroicons/react/solid";
+
 
 import {
 	CTable,
@@ -28,12 +30,167 @@ import axios from 'axios';
 import CommonPagination from '../../components/New/Pagination';
 
 "use client";
+const tablevalues = {
+
+	"tableHeaders": [
+
+		{ "id": "#","label": "#" },
+
+		{ "id": "GSM","label": "GSM" },
+
+		{ "id": "BF","label": "BF" },
+
+		{ "id": "Color","label": "Color" },
+
+		{ "id": "FluteType","label": "Flute Type" },
+
+		{ "id": "FluteRatio","label": "Flute Ratio" },
+
+		{ "id": "WeightInKg","label": "Weight In Kg" },
+
+		{ "id": "BurstingStrength","label": "Bursting Strength (Kg Per Cm2)" }
+
+	],
+
+	"colorOptions": [
+
+		{ "id": "1","label": "Golden Yellow" },
+
+		{ "id": "2","label": "Natural" },
+
+		{ "id": "3","label": "White" },
+
+		{ "id": "4","label": "Brown" }
+
+	],
+
+	"tableBody": [
+
+		{
+
+			"id": "Top_Layer",
+
+			"label": "Top Layer",
+
+			"GSM": { "id": "GSM","type": "input","name": "GSM","defaultValue": "180","required": true },
+
+			"BF": { "id": "BF","type": "input","name": "BF","defaultValue": "18","required": true },
+
+			"Color": {
+
+				"id": "Color",
+
+				"type": "select",
+
+				"label": "Color",
+
+				"name": "Color",
+
+				"defaultValue": "1",
+
+				"options": "colorOptions",
+
+				"required": true
+
+			},
+
+			"FluteType": { "id": "FluteType","type": "label","defaultValue": "-" },
+
+			"FluteRatio": { "id": "FluteRatio","type": "label","defaultValue": "1" },
+
+			"WeightInKg": { "id": "WeightInKg","type": "label","defaultValue": "0.102528" },
+
+			"BurstingStrength": { "id": "BurstingStrength","type": "label","defaultValue": "3.24" }
+
+		},
+
+		{
+
+			"id": "C1",
+
+			"label": "C1",
+
+			"GSM": { "id": "GSM","type": "input","name": "GSM","defaultValue": "120","required": true },
+
+			"BF": { "id": "BF","type": "input","name": "BF","defaultValue": "18","required": true },
+
+			"Color": {
+
+				"id": "Color",
+
+				"type": "select",
+
+				"label": "Color",
+
+				"name": "Color",
+
+				"defaultValue": "2",
+
+				"options": "colorOptions",
+
+				"required": true
+
+			},
+
+			"FluteType": { "id": "FluteType","type": "input","name": "FluteType","defaultValue": "B","required": true },
+
+			"FluteRatio": { "id": "FluteRatio","type": "label","defaultValue": "1.5" },
+
+			"WeightInKg": { "id": "WeightInKg","type": "label","defaultValue": "0.102528" },
+
+			"BurstingStrength": { "id": "BurstingStrength","type": "label","defaultValue": "1.08" }
+
+		},
+
+		{
+
+			"id": "L1",
+
+			"label": "L1",
+
+			"GSM": { "id": "GSM","type": "input","name": "GSM","defaultValue": "180","required": true },
+
+			"BF": { "id": "BF","type": "input","name": "BF","defaultValue": "18","required": true },
+
+			"Color": {
+
+				"id": "Color",
+
+				"type": "select",
+
+				"label": "Color",
+
+				"name": "Color",
+
+				"defaultValue": "1",
+
+				"options": "colorOptions",
+
+				"required": true
+
+			},
+
+			"FluteType": { "id": "FluteType","type": "label","defaultValue": "-" },
+
+			"FluteRatio": { "id": "FluteRatio","type": "label","defaultValue": "1" },
+
+			"WeightInKg": { "id": "WeightInKg","type": "label","defaultValue": "0.102528" },
+
+			"BurstingStrength": { "id": "BurstingStrength","type": "label","defaultValue": "3.24" }
+
+		}
+
+	]
+
+}
+
 function SkuList() {
 	const [skuType,setSkuType] = useState('')
 	const [client,setClient] = useState('')
 	const [searchSKU,setSearchSKU] = useState('')
 	const [isDrawerOpen,setDrawerOpen] = useState(false);
 	const [dynamicFields,setDynamicFields] = useState("")
+	const [data,setData] = useState(tablevalues);
 	const formRefs = useRef({});
 	const [data, setData] = useState([])
 
@@ -319,6 +476,72 @@ function SkuList() {
 												</div>
 											</div>
 										))}
+
+										<div>
+
+											<div className="top-[1150px] left-[41px] w-[98%] h-auto bg-white rounded-lg border-t border-t-gray-100 box-border shadow-md p-1 pb-5">
+												<table className="w-full border-collapse text-center">
+													<thead>
+														<tr>
+															{data.tableHeaders.map((header) => (
+																<th
+																	key={header.id}
+																	className="p-6 text-[17px] font-[Mulish] font-medium text-[#7f7f7f] tracking-[0.6px] leading-[26px] capitalize"
+																>
+																	{header.label}
+																</th>
+															))}
+														</tr>
+													</thead>
+													<tbody>
+														{data.tableBody.map((row) => (
+															<tr key={row.id}>
+																<td className="p-2 text-center text-[15px] font-[Lexend] font-semibold text-[#030303] leading-[20px]">
+																	{row.label}
+																</td>
+																{data.tableHeaders.slice(1).map((header) => (
+																	<td key={header.id} className="p-2 text-center">
+																		{row[header.id]?.type === "input" ? (
+																			<div className="flex items-center justify-center rounded-lg shadow-md bg-white p-1">
+																				<input
+																					type="text"
+																					value={row[header.id]?.defaultValue}
+																					readOnly
+																					className="w-[50px] text-center text-[#030303] text-[15px] font-[Roboto] leading-[19px] outline-none bg-transparent"
+																				/>
+																				<div className="flex flex-col ml-2">
+																					<button className="p-[2px] hover:bg-gray-200 rounded">
+																						<ChevronUpIcon className="w-3 h-3 text-gray-600" />
+																					</button>
+																					<button className="p-[2px] hover:bg-gray-200 rounded">
+																						<ChevronDownIcon className="w-3 h-3 text-gray-600" />
+																					</button>
+																				</div>
+																			</div>
+																		) : row[header.id]?.type === "select" ? (
+																			<select
+																				className="cursor-pointer w-[118px] h-[30px] px-2 border-0 box-border rounded-[10px] shadow-md bg-white text-[#030303] text-[14px] font-[Roboto] leading-[16px] outline-none"
+																				defaultValue={row[header.id]?.defaultValue}
+																			>
+																				{data.colorOptions.map((option) => (
+																					<option key={option.id} value={option.id}>
+																						{option.label}
+																					</option>
+																				))}
+																			</select>
+																		) : (
+																			<span className="text-[#030303] text-[18px] font-[Lexend] leading-[23px]">
+																				{row[header.id]?.defaultValue}
+																			</span>
+																		)}
+																	</td>
+																))}
+															</tr>
+														))}
+													</tbody>
+												</table>
+											</div>
+										</div>
 										<div className="flex justify-end gap-4 mt-4 mr-[4%]">
 											<button className="bg-[#079b54] text-white px-4 py-2 rounded-md transition">
 												Add Version

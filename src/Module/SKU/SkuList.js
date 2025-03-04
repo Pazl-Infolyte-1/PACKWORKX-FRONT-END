@@ -175,6 +175,8 @@ function SkuList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [dynamicFields, setDynamicFields] = useState('')
   const [data, setData] = useState(tablevalues)
+  const [tabledata, setTableData] = useState([])
+
   const formRefs = useRef({})
 
   useEffect(() => {
@@ -196,7 +198,7 @@ function SkuList() {
       try {
         const response = await axios.get('https://mocki.io/v1/a229e5e3-10b1-4522-ba26-314bda2ff239')
 
-        setData(response.data)
+        setTableData(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -204,8 +206,8 @@ function SkuList() {
     fetchData()
   }, [])
 
-  const tableData = data?.values && Array.isArray(data.values) ? data.values : []
-  const headers = data?.headers && Array.isArray(data.headers) ? data.headers : []
+  const tableData = tabledata?.values && Array.isArray(tabledata.values) ? tabledata.values : []
+  const headers = tableData?.headers && Array.isArray(tabledata.headers) ? tabledata.headers : []
 
   const [currentPage, setCurrentPage] = useState(1)
   const rowsPerPage = 4
@@ -301,7 +303,7 @@ function SkuList() {
                   </button>
                 ))}
                 <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
-                  <div className="flex justify-start text-[25px] font-semibold pb-4 mt-0">
+                  <div className="flex justify-start text-[20px] font-semibold pb-4 mt-0">
                     {dynamicFields?.data?.pageTitle}
                   </div>
 
@@ -309,7 +311,7 @@ function SkuList() {
                     {dynamicFields?.data?.sections.map((section) => (
                       <div key={section?.groupId} className="mb-8">
                         {/* Group Name as Subtitle */}
-                        <h2 className="text-[20px] font-semibold text-gray-700 mb-4 border-b pb-2">
+                        <h2 className="text-[18px] font-semibold text-gray-700 mb-4 border-b pb-2">
                           {section?.groupName}
                         </h2>
 
@@ -326,7 +328,7 @@ function SkuList() {
                                   ref={(el) => (formRefs.current[inputField.id] = el)}
                                   defaultValue={inputField?.defaultValue || ''}
                                   required={inputField?.required}
-                                  className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm"
+                                 className="w-full h-10 px-2 rounded-lg bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
                                 >
                                   <option value="" disabled>
                                     {inputField?.placeholder || 'Select an option'}
@@ -345,7 +347,7 @@ function SkuList() {
                                   placeholder={inputField?.placeholder || ''}
                                   defaultValue={inputField?.defaultValue || ''}
                                   required={inputField?.required}
-                                  className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none placeholder:text-sm"
+                                   className="w-full h-10 px-2 rounded-lg bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
                                 />
                               )}
                               {inputField?.type === 'url' && (
@@ -355,7 +357,7 @@ function SkuList() {
                                   placeholder={inputField?.placeholder || ''}
                                   defaultValue={inputField?.defaultValue || ''}
                                   required={inputField?.required}
-                                  className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none placeholder:text-sm"
+                                  className="w-full h-10 px-2 rounded-lg bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
                                 />
                               )}
                               {inputField?.type === 'email' && (
@@ -365,7 +367,7 @@ function SkuList() {
                                   placeholder={inputField?.placeholder || ''}
                                   defaultValue={inputField?.defaultValue || ''}
                                   required={inputField?.required}
-                                  className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none placeholder:text-sm"
+                                   className="w-full h-10 px-2 rounded-lg bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
                                 />
                               )}
 
@@ -376,7 +378,7 @@ function SkuList() {
                                   placeholder={inputField?.placeholder || ''}
                                   defaultValue={inputField?.defaultValue || ''}
                                   required={inputField?.required}
-                                  className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none placeholder:text-sm"
+                                     className="w-full h-10 px-2 rounded-lg bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
                                 />
                               )}
 
@@ -387,7 +389,7 @@ function SkuList() {
                                   placeholder={inputField?.placeholder || ''}
                                   defaultValue={inputField?.defaultValue || ''}
                                   required={inputField?.required}
-                                  className="w-full h-14 px-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none placeholder:text-sm"
+                                    className="w-full h-10 px-2 rounded-lg bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
                                 />
                               )}
 
@@ -733,7 +735,7 @@ function SkuList() {
             </CTable>
 
             <div className="flex justify-end items-center gap-4 mt-4">
-              <CommonPagination count={5} page={1} onChange={''} />
+              {/*<CommonPagination count={5} page={1} onChange={''} />*/}
             </div>
           </div>
         </div>

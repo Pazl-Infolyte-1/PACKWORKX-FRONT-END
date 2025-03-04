@@ -28,15 +28,15 @@ const AddSalesOrder = () => {
           }`}
           onClick={() => setActiveTab("skuDetails")}
         >
-          SKU Details
+          Work Order
         </span>
       </nav>
 
       {/* Content Sections */}
-      <div className="p-4 bg-white shadow-md rounded-md mt-4">
+      <div className="bg-white">
         {activeTab === "salesOrder" && (
           <div>
-         <div className="mt-4 p-4 bg-white rounded-lg border border-[#c2c2c2] shadow-md w-[100%] h-[50%]">
+         <div className="p-4 bg-white rounded-lg border border-[#c2c2c2] shadow-md w-[100%] h-[50%]">
 		 {/* Title */}
 		   <h2 className="text-lg font-semibold flex justify-start">Order Details</h2>
 		   <div className="grid grid-cols-2 grid-rows-2 gap-4 mt-4">
@@ -129,9 +129,6 @@ const AddSalesOrder = () => {
     </div>
   </div>
   </div>
-  <div className="absolute top-[334px] left-[836px] w-[290px] h-[40px] bg-white rounded-[10px] shadow-md flex items-center justify-center z-10">
-      <p className="text-black text-[15px] font-roboto leading-[23px] font-[500]">+ Create New Client</p>
-    </div>
 
   <div className="p-2 rounded-lg flex flex-col">
     <label className="text-black font-normal leading-6 mb-2 text-left">
@@ -179,7 +176,7 @@ const AddSalesOrder = () => {
 
         )}
         {activeTab === "skuDetails" && (
-          <div className="p-4 bg-white rounded-lg border border-gray-400 shadow-md w-[1100px] h-[880px]">
+          <div className="p-1 bg-white rounded-lg w-[1100px] h-full">
 
 <WorkOrders></WorkOrders>
 		</div>

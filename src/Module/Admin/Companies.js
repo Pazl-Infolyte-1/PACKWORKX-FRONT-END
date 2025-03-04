@@ -53,11 +53,11 @@ const CompanyManagement = () => {
 
           {/* Top Controls */}
           
-          <CCardHeader style={{ padding: "15px", background: "#f8f9fa",position:"sticky",top:"0"}}>
+          <CCardHeader className="p-4 bg-gray-100 sticky top-0">
             <CRow className="w-100 align-items-center">
               <CCol md={6} className="d-flex gap-2">
-                <CFormInput placeholder="Start Date To End Date" style={{ maxWidth: "220px" }} />
-                <CInputGroup style={{ maxWidth: "280px" }}>
+                <CFormInput placeholder="Start Date To End Date" className="max-w-[220px]"/>
+                <CInputGroup className="max-w-[280px]">
                   <CInputGroupText>
                     <FiSearch />
                   </CInputGroupText>
@@ -84,7 +84,7 @@ const CompanyManagement = () => {
           <CCardBody>
             <CTable hover responsive>
               <CTableHead>
-                <CTableRow style={{ background: "#f0f0f0" }}>
+                <CTableRow className="bg-gray-200">
                   <CTableHeaderCell style={{ width: "5%" ,color: "#99a5b5"}}>Id</CTableHeaderCell>
                   <CTableHeaderCell style={{ width: "25%", textAlign: "left",color: "#99a5b5" }}>Company Name</CTableHeaderCell>
                   <CTableHeaderCell style={{ width: "15%",color: "#99a5b5" }}>Package</CTableHeaderCell>
@@ -98,8 +98,8 @@ const CompanyManagement = () => {
                 {companies.map((company) => (
                   <CTableRow key={company.id} style={{ verticalAlign: "middle" }}>
                     <CTableDataCell>{company.id}</CTableDataCell>
-                    <CTableDataCell style={{ width: "20%", padding: "10px", textAlign: "left" }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap" }}>
+                    <CTableDataCell className="w-[20%] p-2 text-left">
+                      <span className="inline-flex items-center gap-2 whitespace-nowrap">
                         {company.icon}
                         <span>{company.name}</span>
                       </span>

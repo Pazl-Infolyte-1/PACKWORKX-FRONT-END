@@ -2,7 +2,7 @@ import { MdPrecisionManufacturing } from 'react-icons/md'
 import { MdEmojiObjects } from 'react-icons/md'
 import { MdEngineering } from 'react-icons/md'
 import { MdDoDisturbOn } from 'react-icons/md'
-import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa'
+
 import Drawer from '../../components/Drawer/Drawer'
 import { useState, useEffect } from 'react'
 import { RiUploadCloudLine } from 'react-icons/ri'
@@ -45,38 +45,19 @@ export default function MachineMaster() {
   const totalPages = Math.ceil(tableData.length / rowsPerPage)
 
   return (
-    <div
-      style={{
-        padding: '20px',
-        width: '100%',
-        height: '90vh',
-        border: '1px soild black',
-        backgroundColor: '#ffff',
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px' }}>
-        <h3 style={{ color: '#030303', fontSize: '20px' }}>Machine Master Dashboard</h3>
-        <button
-          style={{
-            color: '#ffff',
-            backgroundColor: '#8167e5',
-            borderRadius: '5px',
-            padding: '5px',
-          }}
-          onClick={() => setdrawopen(true)}
-        >
-          + Add Machine
-        </button>
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: '3px',
-          marginBottom: '20px',
-          width: '100%',
-        }}
-      >
+    <div className="p-5 w-full h-[100vh] border border-gray-300 bg-white">
+      <div className="flex justify-between mb-8">
+  <h3 className="text-black text-lg">Machine Master Dashboard</h3>
+  <button
+    className="text-white bg-[#8167e5] rounded-md px-3 py-1"
+    onClick={() => setdrawopen(true)}
+  >
+    + Add Machine
+  </button>
+</div>
+
+<div className="flex justify-between gap-1 mb-5 w-full">
+
         {[
           {
             label: 'Total Machine',
@@ -112,88 +93,47 @@ export default function MachineMaster() {
           },
         ].map((item, index) => (
           <div
-            key={index}
-            style={{
-              height: '100px',
-              width: '280px',
-              backgroundColor: item.bgColor,
-              borderRadius: '10px',
-              padding: '5px',
-              display: 'flex',
-              boxShadow: '0px 2px 10px rgba(3,3,3,0.1)',
-            }}
-          >
-            <div style={{ width: '100%', padding: '10px' }}>
-              <h2
-                style={{
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  color: item.color,
-                  textAlign: 'left',
-                }}
-              >
-                {item.label}
-              </h2>
-              <p
-                style={{
-                  textAlign: 'left',
-                  color: item.color,
-                  fontSize: '20px',
-                  fontWeight: 'bold',
-                  marginLeft: '10px',
-                }}
-              >
-                {item.count}
-              </p>
+          key={index}
+          className={`h-[100px] w-[270px] rounded-[10px] p-[3px] flex shadow-md gap-5`}
+          style={{ backgroundColor: item.bgColor }}
+        >
+            <div className="w-full p-3 ">
+        <h2 className={`text-left text-sm font-bold`} style={{ color: item.color }}>
+          {item.label}
+       </h2>
+           <p className={`text-left text-lg font-bold ml-2`} style={{ color: item.color }}>
+           {item.count}
+             </p>
+          </div>
+
+            <div className="w-1/5 p-2">
+           <p className="text-4xl" style={{ color: item.iconColor }}>
+             {item.icon}
+               </p>
             </div>
-            <div style={{ width: '20%', padding: '10px' }}>
-              <p style={{ fontSize: '40px', color: item.iconColor }}>{item.icon}</p>
-            </div>
+
           </div>
         ))}
       </div>
 
-      <div
-        style={{
-          backgroundColor: '#ffffff',
-          borderRadius: '10px',
-          padding: '20px',
-          border: '1px  solid #e5e7eb',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ marginLeft: '10px', fontSize: '20px' }}>Raw Material</h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <input
-              type="text"
-              placeholder="Search by Name, ID, Status"
-              style={{
-                width: '230px',
-                padding: '4px',
-                border: '1px solid #ccc',
-                borderRadius: '6px',
-              }}
-            />
-            <input
-              type="date"
-              style={{ padding: '4px', borderRadius: '6px', border: '1px solid #ccc' }}
-            />
-            <button
-              style={{
-                padding: '4px',
-                width: '50px',
-                borderRadius: '6px',
-                backgroundColor: '#8167e5',
-                color: '#ffffff',
-                outline: 'none',
-                border: 'none',
-              }}
-            >
-              Filter
-            </button>
-          </div>
-        </div>
-
+      <div className="bg-white rounded-lg p-3 border border-gray-300">
+        <div className="flex justify-between items-center">
+          <h3 className="ml-2 text-[20px]">Raw Material</h3>
+     <div className="flex items-center gap-2">
+    <input
+      type="text"
+      placeholder="Search by Name, ID, Status"
+      className="w-[230px] p-1 border border-gray-300 rounded-md"
+    />
+    <input
+      type="date"
+      className="p-1 rounded-md border border-gray-300"
+    />
+      <button className="p-1 w-[50px] rounded-md bg-[#8167e5] text-white outline-none border-none">
+        Filter
+      </button>
+    </div>
+    </div>
         <div className="border border-gray-200 px-3 mt-3 rounded-md w-[100%] ">
           <div className="overflow-x-auto  overflow-y-auto h-[300px] custom-scrollbar ">
             <CTable striped hover className="mt-3 border border-gray-200 pb-3 ">
@@ -243,271 +183,67 @@ export default function MachineMaster() {
       </div>
 
       <Drawer isOpen={isdrawopen} onClose={() => setdrawopen(false)}>
-        <div> Add/Edit Machine</div>
+      <div className="text-lg font-semibold">Add/Edit Machine</div>
 
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            background: '#f5f5f5',
-            padding: '20px',
-            borderRadius: '10px',
-            marginTop: '15px',
-          }}
-        >
-          {/* Basic Section */}
-          <div style={{ width: '30%', display: 'flex', flexDirection: 'column' }}>
-            <h5>Basic</h5>
-            <input
-              style={{
-                width: '100%',
-                padding: '10px',
-                margin: '5px 0',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-              }}
-              type="text"
-              placeholder="Machine Name"
-            />
-            <select
-              style={{
-                width: '100%',
-                padding: '10px',
-                margin: '5px 0',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-              }}
-            >
-              <option>Type 1</option>
-            </select>
-            <select
-              style={{
-                width: '100%',
-                padding: '10px',
-                margin: '5px 0',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-              }}
-            >
-              <option>Process X</option>
-            </select>
-            <input
-              style={{
-                width: '100%',
-                padding: '10px',
-                margin: '5px 0',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-              }}
-              type="text"
-              placeholder="Capacity"
-            />
-          </div>
-          <div style={{ width: '30%' }}>
-            <h5>Attributes & Parameters</h5>
-            <input
-              style={{
-                width: '100%',
-                padding: '10px',
-                margin: '5px 0',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-              }}
-              type="text"
-              placeholder="Reel Capacity"
-            />
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <input
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  margin: '5px 0',
-                  borderRadius: '5px',
-                  border: '1px solid #ccc',
-                }}
-                type="text"
-                placeholder="Custom Tag"
-              />
-              <input
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  margin: '5px 0',
-                  borderRadius: '5px',
-                  border: '1px solid #ccc',
-                }}
-                type="text"
-                placeholder="Value"
-              />
-            </div>
-            <input
-              style={{
-                width: '100%',
-                padding: '10px',
-                margin: '5px 0',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-              }}
-              type="text"
-              placeholder="Speed Parameters"
-            />
-            <input
-              style={{
-                width: '100%',
-                padding: '10px',
-                margin: '5px 0',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-              }}
-              type="text"
-              placeholder="Other Parameters"
-            />
-          </div>
-          <div style={{ width: '30%' }}>
-            <h5>Maintenance & Status</h5>
-            <input
-              style={{
-                width: '100%',
-                padding: '10px',
-                margin: '5px 0',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-              }}
-              type="text"
-              placeholder="Description of Maintenance"
-            />
-            <input
-              style={{
-                width: '100%',
-                padding: '10px',
-                margin: '5px 0',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-              }}
-              type="text"
-              placeholder="Last Date Of Maintenance"
-            />
-            <input
-              style={{
-                width: '100%',
-                padding: '10px',
-                margin: '5px 0',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-              }}
-              type="text"
-              placeholder="Next  Date Of Maintenance"
-            />
-          </div>
-        </div>
+<div className="flex justify-between bg-gray-100 p-3 rounded-lg mt-4 gap-10">
+  {/* Basic Section */}
+  <div className="w-1/3 flex flex-col">
+    <h5 className="font-semibold">Basic</h5>
+    <input className="w-full p-2 my-1 rounded border border-gray-300" type="text" placeholder="Machine Name" />
+    <select className="w-full p-2 my-1 rounded border border-gray-300">
+      <option>Type 1</option>
+    </select>
+    <select className="w-full p-2 my-1 rounded border border-gray-300">
+      <option>Process X</option>
+    </select>
+    <input className="w-full p-2 my-1 rounded border border-gray-300" type="text" placeholder="Capacity" />
+  </div>
 
-        <div
-          style={{
-            display: 'flex',
-            float: 'right',
-            marginTop: '10px',
-            gap: '20px',
-            padding: '20px',
-            borderRadius: '10px',
-          }}
-        >
-          <button
-            style={{
-              color: 'black',
-              backgroundColor: '#ffff',
-              width: '80px',
-              borderRadius: '5px',
-              padding: '5px',
-              boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            style={{
-              color: 'white',
-              backgroundColor: '#8167e5',
-              width: '80px',
-              borderRadius: '5px',
-              padding: '5px',
-              boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
-            }}
-          >
-            Save
-          </button>
-          <button
-            style={{
-              color: 'white',
-              backgroundColor: '#ff2d55',
-              width: '150px',
-              borderRadius: '5px',
-              padding: '5px',
-              boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
-            }}
-          >
-            Delete Machine
-          </button>
-        </div>
-
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            background: '#f5f5f5',
-            padding: '20px',
-            borderRadius: '10px',
-            width: '100%',
-            height: '200px',
-          }}
-        >
-          <div style={{ width: '50%', display: 'flex', flexDirection: 'column' }}>
-            <h3 style={{ fontSize: '20px', marginBottom: '10px' }}>Machine Process Integration</h3>
-            <h6>Add Machine to a Process</h6>
-
-            <select
-              style={{
-                width: '100%',
-                padding: '10px',
-                margin: '5px 0',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-              }}
-            >
-              <option>Process A</option>
-            </select>
-
-            <select
-              style={{
-                width: '100%',
-                padding: '10px',
-                margin: '5px 0',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-              }}
-            >
-              <option>Machine A</option>
-            </select>
-          </div>
-
-          <div
-            style={{
-              backgroundColor: '#fff',
-              marginTop: '60px',
-              padding: '10px 100px 10px 100px',
-              borderRadius: '5px',
-              boxShadow: '0px 0px 5px rgba(0,0,0,0.1)',
-              width: '45%',
-              height: '100px',
-            }}
-          >
-            <div style={{ justifyItems: 'center' }}>
-              <RiUploadCloudLine style={{ height: '30px', width: '30px', marginTop: '5px' }} />
-              <h6 style={{}}>Upload a File</h6>
-              <p>Select your file or drag and drop</p>
-            </div>
-          </div>
-        </div>
-      </Drawer>
+  {/* Attributes & Parameters */}
+  <div className="w-1/3">
+    <h5 className="font-semibold">Attributes & Parameters</h5>
+    <input className="w-full p-2 my-1 rounded border border-gray-300" type="text" placeholder="Reel Capacity" />
+    <div className="flex gap-2">
+      <input className="w-full p-2 my-1 rounded border border-gray-300" type="text" placeholder="Custom Tag" />
+      <input className="w-full p-2 my-1 rounded border border-gray-300" type="text" placeholder="Value" />
     </div>
+    <input className="w-full p-2 my-1 rounded border border-gray-300" type="text" placeholder="Speed Parameters" />
+    <input className="w-full p-2 my-1 rounded border border-gray-300" type="text" placeholder="Other Parameters" />
+  </div>
+
+  {/* Maintenance & Status */}
+  <div className="w-1/3 ">
+    <h5 className="font-semibold">Maintenance & Status</h5>
+    <input className="w-full p-2 my-1 rounded border border-gray-300" type="text" placeholder="Description of Maintenance" />
+    <input className="w-full p-2 my-1 rounded border border-gray-300" type="text" placeholder="Last Date Of Maintenance" />
+    <input className="w-full p-2 my-1 rounded border border-gray-300" type="text" placeholder="Next Date Of Maintenance" />
+  </div>
+</div>
+
+<div className="flex float-right  gap-3 p-3 rounded-lg">
+  <button className="text-black bg-white w-20 rounded p-1 shadow-md">Cancel</button>
+  <button className="text-white  bg-[#8167e5] w-20 rounded p-1 shadow-md">Save</button>
+  <button className="text-white bg-red-500 w-36 rounded p-1 shadow-md">Delete Machine</button>
+</div>
+
+<div className="flex justify-between bg-gray-100 p-5 rounded-lg w-full h-52 mt-4 items-center">
+  <div className="w-1/2 flex flex-col">
+    <h3 className="text-xl font-semibold mb-3">Machine Process Integration</h3>
+    <h6 className="font-medium">Add Machine to a Process</h6>
+    <select className="w-full p-2 my-1 rounded border border-gray-300">
+      <option>Process A</option>
+    </select>
+    <select className="w-full p-2 my-1 rounded border border-gray-300">
+      <option>Machine A</option>
+    </select>
+  </div>
+
+  <div className="bg-white mt-14 p-5 rounded shadow-md w-2/5 h-24 flex flex-col items-center justify-center">
+    <h6 className="font-medium"><RiUploadCloudLine style={{fontSize:'25px', marginLeft:'30px'}}/>Upload a File </h6>
+    <p className="text-sm text-gray-500">Select your file or drag and drop</p>
+  </div>
+</div>
+      </Drawer>
+    </div> 
   )
 }

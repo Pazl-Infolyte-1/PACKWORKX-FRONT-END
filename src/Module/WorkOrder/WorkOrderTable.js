@@ -7,12 +7,14 @@ import {
   CTableDataCell,
   CTableHead,
 } from '@coreui/react'
+import { cilOptions } from '@coreui/icons'
+import CIcon from '@coreui/icons-react'
 
 const WorkOrderTable = ({ cellData }) => {
   return (
     <div>
-      <div className="max-h-[500px] overflow-y-auto border border-gray-200 custom-scrollbar">
-        <CTable striped hover className="mt-3 w-full">
+      <div className="max-h-[370px] overflow-y-auto border border-gray-200 custom-scrollbar">
+        <CTable striped hover className="w-full">
           <CTableHead className="bg-gray-100 sticky top-0 z-10">
             <CTableRow>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
@@ -45,6 +47,9 @@ const WorkOrderTable = ({ cellData }) => {
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Status
               </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+                Action
+              </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
 
@@ -70,6 +75,15 @@ const WorkOrderTable = ({ cellData }) => {
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.qty}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.stage}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.status}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700 text-center">
+                    <button className="btn bg-gray-100">
+                      <CIcon
+                        icon={cilOptions}
+                        className="me-2 hover-pointer"
+                        style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
+                      />
+                    </button>
+                  </CTableDataCell>
                 </CTableRow>
               ))
             ) : (

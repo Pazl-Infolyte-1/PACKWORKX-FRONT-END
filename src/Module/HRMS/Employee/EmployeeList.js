@@ -3,31 +3,24 @@ import { IoCheckmarkCircleOutline } from 'react-icons/io5'
 import { TbSmartHome } from 'react-icons/tb'
 import { BiSearchAlt } from 'react-icons/bi'
 import axios from 'axios'
-import {
-  CTable,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
-} from '@coreui/react'
+
 import CommonPagination from '../../../components/New/Pagination'
 import EmployeeForm from './EmployeeForm'
+import EmployeeTable from './EmployeeTable'
 
 function EmployeeList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
-  
+  const [currentPage, setCurrentPage] = useState(1)
+  const rowsPerPage = 10
   const [data, setData] = useState([])
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get(
-          'https://mocki.io/v1/deebda74-5384-44a2-8b4e-9c19d1d7e4f9  ',
-        )
-        console.log('Table API', response.data)
+        const response = await axios.get('https://mocki.io/v1/b59d7f3d-51e9-4c19-8158-8915c01e011c')
+        console.log(response.data)
 
-        setData(response.data)
+        setData(response.data.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -35,22 +28,21 @@ function EmployeeList() {
     fetchData()
   }, [])
 
-  const tableData = data?.values && Array.isArray(data.values) ? data.values : []
-  const headers = data?.headers && Array.isArray(data.headers) ? data.headers : []
+ 
+  const tableData = Array.isArray(data) ? data : [];
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const rowsPerPage = 5
 
   const indexOfLastRow = currentPage * rowsPerPage
   const indexOfFirstRow = indexOfLastRow - rowsPerPage
   const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
   const totalPages = Math.ceil(tableData.length / rowsPerPage)
 
+  
   return (
     <>
       <div className="max-w-[1280px] mx-auto" >
         <div
-         className="flex justify-between items-center mt-5">
+         className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Employee</h2>
           <div className="flex gap-4">
             <button className="bg-teal-500 text-white px-2.5 py-1 rounded-md border-none hover:bg-teal-600 "
@@ -138,39 +130,29 @@ function EmployeeList() {
             </select>
           </div>
 
-          <CTable striped hover className="mt-3 border border-gray-200">
-            <CTableHead className="bg-gray-100">
-              <CTableRow>
-                {headers.map((header, index) => (
-                  <CTableHeaderCell key={index} className="py-3 px-4 text-gray-600 font-medium">
-                    {header}
-                  </CTableHeaderCell>
-                ))}
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {currentRows.length > 0 ? (
-                currentRows.map((row, rowIndex) => (
-                  <CTableRow key={rowIndex} className="border-b ">
-                    {row.map((cell, cellIndex) => (
-                      <CTableDataCell key={cellIndex} className="py-3 px-4 text-gray-700">
-                        {cell}
-                      </CTableDataCell>
-                    ))}
-                  </CTableRow>
-                ))
-              ) : (
-                <CTableRow>
-                  <CTableDataCell colSpan={headers.length} className="text-center py-3">
-                    No data available
-                  </CTableDataCell>
-                </CTableRow>
-              )}
-            </CTableBody>
-          </CTable>
-          <div className="flex justify-end items-center mt-1">
-            <CommonPagination count={7} page={1} />
-          </div>
+          <div className="border h-[80%] mt-4">
+        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
+          <EmployeeTable employeesdata={data} />
+        </div>
+      </div>
+      {/* Pagination Section */}
+      <div className="flex justify-end items-center gap-4 mt-4 mb-3">
+          <CommonPagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(event, value) => setCurrentPage(value)}
+          />
+        </div>
+
+          
+         
+
+
+
+
+
+
+
         </div>
         <div>
           <EmployeeForm isDrawerOpen={isDrawerOpen} setDrawerOpen={setDrawerOpen} />

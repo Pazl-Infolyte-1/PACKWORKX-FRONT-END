@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
-
 import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
 import CIcon from '@coreui/icons-react'
-
 import { CBadge, CNavLink, CNavItem, CSidebarNav, CNavTitle } from '@coreui/react'
 import * as iconSet from '@coreui/icons'
 import routeMappings from '../../src/routes'
@@ -57,7 +55,7 @@ export const AppSidebarNav = ({ items }) => {
           )}
           {isGroupToggler && (
             <CIcon
-              icon={iconSet.cilChevronDown}
+              icon={iconSet.cilChevronDoubleDown}
               customClassName="nav-chevron"
               style={{
                 transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',

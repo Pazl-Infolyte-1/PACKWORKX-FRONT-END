@@ -1,375 +1,229 @@
-import { useState } from 'react'
-import { CiSettings } from 'react-icons/ci'
-import { LuScanBarcode } from 'react-icons/lu'
-import { FiAlertCircle } from 'react-icons/fi'
+
+
+
+import { React, useState } from "react";
+import { CiSettings } from "react-icons/ci";
+import { LuScanBarcode } from "react-icons/lu";
+import { FiAlertCircle } from "react-icons/fi";
 
 const PurchaseOrder = () => {
-  const [files, setFiles] = useState([])
+    const [files, setFiles] = useState([]);
 
-  return (
-    <div
-      style={{
-        padding: '24px',
-        background: '#fff',
-        margin: '0 auto',
-        boxShadow: '0px 4px 6px rgba(0,0,0,0.1)',
-        borderRadius: '8px',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '16px',
-        }}
-      >
-        <button
-          style={{
-            marginBottom: '16px',
-            color: '#1d4ed8',
-            fontWeight: 'bold',
-            padding: '8px 16px',
-            border: '1px solid #1d4ed8',
-            borderRadius: '6px',
-            background: '#cae9f8',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-          }}
-        >
-          + Add a Contact
-        </button>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            style={{
-              background: '#fff',
-              border: '1px solid #ccc',
-              padding: '8px 16px',
-              borderRadius: '6px',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-            }}
-          >
-            Close
-          </button>
-          <button
-            style={{
-              background: '#8761e5',
-              color: '#fff',
-              padding: '8px 16px',
-              borderRadius: '6px',
-            }}
-          >
-            Save
-          </button>
-        </div>
-      </div>
+    // Handle file selection
+    const handleFileChange = (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        setFiles([...files, ...selectedFiles]);
+    };
+    return (
+        <div className="p-6 bg-white max-w-6xl mx-auto shadow-lg rounded-lg">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-4">
+                {/* <span className="text-gray-700"> */}
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '16px',
-          marginBottom: '16px',
-        }}
-      >
-        <div>
-          <p style={{ color: '#7f7f7f' }}>Bill</p>
-          <p style={{ color: '#030303' }}>Demo Pack works</p>
-          <p style={{ color: '#030303' }}>US</p>
-        </div>
-        <div>
-          <p style={{ color: '#7f7f7f' }}>Ship To</p>
-          <p style={{ color: '#030303' }}>Demo Pack works</p>
-          <p style={{ color: '#030303' }}>US</p>
-        </div>
-
-        <div></div>
-        <div style={{ marginLeft: 'auto' }}>
-          <table>
-            <tr>
-              <td>#</td>
-              <td>No.</td>
-              <td></td>
-              <td></td>
-              <td></td>
-
-              <td>0-00000</td>
-            </tr>
-            <tr>
-              <td>🔗</td>
-              <td>WO-</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>0000084</td>
-              <td></td>
-            </tr>
-          </table>
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '1rem',
-          marginBottom: '1rem',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div>
-            <label style={{ color: '#b7b7b7' }}>Order Date:</label>
-            <input
-              type="date"
-              defaultValue="2024-04-04"
-              style={{
-                border: '1px solid #ccc',
-                padding: '0.5rem',
-                borderRadius: '0.25rem',
-                width: '100%',
-                backgroundColor: '#f1f1f1',
-                color: '#7f7f7f',
-              }}
-            />
-          </div>
-          <div>
-            <label style={{ color: '#b7b7b7' }}>Due Date:</label>
-            <input
-              type="date"
-              defaultValue="2024-04-05"
-              style={{
-                border: '1px solid #ccc',
-                padding: '0.5rem',
-                borderRadius: '0.25rem',
-                width: '100%',
-                backgroundColor: '#f1f1f1',
-                color: '#7f7f7f',
-              }}
-            />
-          </div>
-          <div>
-            <label style={{ color: '#b7b7b7' }}>Receive By:</label>
-            <input
-              type="date"
-              defaultValue="2024-05-04"
-              style={{
-                border: '1px solid #ccc',
-                padding: '0.5rem',
-                borderRadius: '0.25rem',
-                width: '100%',
-                backgroundColor: '#f1f1f1',
-                color: '#7f7f7f',
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '16px',
-          marginBottom: '16px',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div>
-            <label style={{ color: '#b7b7b7' }}>Business:</label>
-            <select
-              style={{
-                border: '1px solid #ccc',
-                padding: '8px',
-                borderRadius: '6px',
-                width: '100px',
-                background: '#f1f1f1',
-                color: '#7f7f7f',
-              }}
-            >
-              <option>Select</option>
-            </select>
-          </div>
-          <div>
-            <label style={{ color: '#b7b7b7' }}>Class:</label>
-            <select
-              style={{
-                border: '1px solid #ccc',
-                padding: '8px',
-                borderRadius: '6px',
-                width: '100px',
-                background: '#f1f1f1',
-                color: '#7f7f7f',
-              }}
-            >
-              <option>Select</option>
-            </select>
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'start',
-              alignItems: 'center',
-              color: '#1d4ed8',
-              cursor: 'pointer',
-              marginTop: '28px',
-            }}
-          >
-            <div style={{ width: '96px' }}>+ Add firm</div>
-            <div>
-              <CiSettings />
+                {/* <span className="px-2 py-1 text-xs bg-green-200 text-green-800 rounded"> */}
+                <button className="mb-4 text-blue-600 font-bold px-4 py-2 border border-blue-600 rounded-md shadow-md bg-[#cae9f8]">
+                    + Add a Contact
+                </button>
+                {/* </span> */}
+                {/* </span> */}
+                <div className="flex gap-2">
+                    <button className="bg-white border px-4 py-2 rounded-md shadow">
+                        Close
+                    </button>
+                    <button className="bg-[#8761e5] text-white px-4 py-2 rounded-md">
+                        Save
+                    </button>
+                </div>
             </div>
-          </div>
+
+            {/* Add Contact Button */}
+
+
+            {/* Bill To & Ship To */}
+            <div className="grid grid-cols-4 gap-4 mb-4">
+                <div>
+                    <p className="text-[#7f7f7f] ">Bill</p>
+                    <p className="text-[#030303]">Demo Pack works</p>
+                    <p className="text-[#030303]">US</p>
+                </div>
+                <div>
+                    <p className="text-[#7f7f7f]">Ship To</p>
+                    <p className="text-[#030303]">Demo Pack works</p>
+                    <p className="text-[#030303]">US</p>
+                </div>
+                <div></div>
+                <div className="ml-auto">
+                    <table>
+
+                        <tr>
+                            <td>#</td>
+                            <td>No.</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>0-00000</td>
+                        </tr>
+                        <tr>
+                            <td>🔗</td>
+                            <td>Linked To</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>WO-0000084</td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+
+            {/* Order Details */}
+            <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="flex items-center space-x-2">
+                    <div>
+                        <label className="text-[#b7b7b7]">Order Date:</label>
+                        <input type="date"defaultValue="2024-04-04" className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f]" />
+                    </div>
+                    <div>
+                        <label className="text-[#b7b7b7]">Due Date:</label>
+                        <input type="date" defaultValue="2024-04-05" className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f]" />
+                    </div>
+                    <div>
+                        <label className="text-[#b7b7b7]">Receive By:</label>
+                        <input type="date" defaultValue="2024-05-04" className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f]" />
+                    </div>
+                </div>
+            </div>
+
+            {/* Business & Class */}
+            <div className="grid grid-cols-3 gap-4 mb-4 ">
+            <div className="flex items-center space-x-2">
+                <div>
+                    <label className="text-[#b7b7b7]">Business:</label>
+                    <select className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f] w-40" >
+                    {/* <select className="block w-full p-2 border rounded bg-[#f1f1f1] w-[40%] text-[#7f7f7f]"> */}
+                        <option>Select</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="text-[#b7b7b7]  ">Class:</label>
+                    <select className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f] w-40 " >
+                    {/* <select className="block w-full p-2 border rounded bg-[#f1f1f1] w-[40%] text-[#7f7f7f]"> */}
+                        <option>Select</option>
+                    </select>
+                </div>
+                <div className="flex justify-start  mt-7  items-center text-blue-600 cursor-pointer ">
+                   <div className="w-24"> + Add firm</div>  <div><CiSettings /></div>
+                </div>
+            </div>
+            </div>
+
+
+
+            {/* Product Table */}
+            <table className="w-full border-collapse border border-gray-300">
+                <thead className="bg-gray-100 text-[#b7b7b7]">
+                    <tr>
+                        <th className="border p-2">Product</th>
+                        <th className="border p-2">Product Code</th>
+                        <th className="border p-2">Description</th>
+                        <th className="border p-2">Qty</th>
+                        <th className="border p-2">UOM</th>
+                        <th className="border p-2">Price</th>
+                        <th className="border p-2">Discount</th>
+                        <th className="border p-2">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td className="border p-2">Chair Leg</td>
+                        <td className="border p-2">P-0000058</td>
+                        <td className="border p-2 flex justify-center"><FiAlertCircle /></td>
+                        <td className="border p-2">4</td>
+                        <td className="border p-2">UNIT</td>
+                        <td className="border p-2">US$ 0.00</td>
+                        <td className="border p-2">US$ 0.00</td>
+                        <td className="border p-2">US$ 0.00</td>
+                    </tr>
+                    <tr>
+                        <td className="border p-2">Backrest</td>
+                        <td className="border p-2">P-0000061</td>
+                        <td className="border p-2 flex justify-center"><FiAlertCircle /></td>
+                        <td className="border p-2">1</td>
+                        <td className="border p-2">UNIT</td>
+                        <td className="border p-2">US$ 0.00</td>
+                        <td className="border p-2">US$ 0.00</td>
+                        <td className="border p-2">US$ 0.00</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-6 text-[#567295] mt-4">
+                <span>+ Add Item</span>
+                <span className="flex items-center gap-1"><LuScanBarcode /> Scan Barcode</span>
+                <span className="text-[#567295]">- Clear all items</span>
+            </div>
+
+            <div className="flex justify-between items-start bg-white p-4 rounded-lg shadow">
+                {/* Left Side - Card Content */}
+                <div className="w-1/2">
+                    <div className="border p-6 bg-gray-100 rounded-lg min-h-[100px] text-center">
+                        {/* Show Attached Files Inside the Card */}
+                        {files.length > 0 ? (
+                            files.map((file, index) => (
+                                <p key={index} className="text-sm text-gray-700 mb-1">
+                                    {file.name}
+                                </p>
+                            ))
+                        ) : (
+                            <p className="text-sm text-gray-500">No files attached</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Right Side - Total Summary */}
+                <div className="w-1/3 text-right">
+                    <div className="flex justify-between">
+                        <p className="font-semibold text-gray-900">Sub-total</p>
+                        <span className="text-[#b7b7b7]">Rs. 100.00</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <p className="font-semibold text-gray-900">Total Discount(-)</p>
+                        <span className="text-[#b7b7b7]">Rs. 0.00</span>
+                    </div>
+                    <p className="text-[#567295] text-sm cursor-pointer mt-1 text-left">+ Add Charges/Discount</p>
+                    <div className="flex justify-between mt-2">
+                        <p className="font-semibold text-gray-900">Rounding off</p>
+                        <span className="text-gray-500">Rs. 0.00</span>
+                    </div>
+                    <hr className="my-2 border-gray-300" />
+                    <div className="flex justify-between font-bold text-lg">
+                        <p>Total (Rs.)</p>
+                        <span>Rs. 100.00</span>
+                    </div>
+                </div>
+
+            </div>
+
+            {/* Attach Files Section BELOW the card */}
+            <div className="-mt-12" >
+                <label className="text-[#567295] font-semibold mb-2 pl-[11px] cursor-pointer" >
+                    Attach Files
+                </label>
+                <input
+                    id="fileUpload"
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={handleFileChange}
+                />
+            </div>
+
+
         </div>
-      </div>
+    );
+};
 
-      <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
-        <thead style={{ background: '#f3f4f6', color: '#b7b7b7' }}>
-          <tr>
-            {[
-              'Product',
-              'Product Code',
-              'Description',
-              'Qty',
-              'UOM',
-              'Price',
-              'Discount',
-              'Amount',
-            ].map((header) => (
-              <th key={header} style={{ border: '1px solid #ccc', padding: '8px' }}>
-                {header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {[
-            { product: 'Chair Leg', code: 'P-0000058', qty: 4 },
-            { product: 'Backrest', code: 'P-0000061', qty: 1 },
-          ].map(({ product, code, qty }, index) => (
-            <tr key={index}>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>{product}</td>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>{code}</td>
-              <td style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
-                <FiAlertCircle />
-              </td>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>{qty}</td>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>UNIT</td>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>US$ 0.00</td>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>US$ 0.00</td>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>US$ 0.00</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '24px',
-          color: '#567295',
-          marginTop: '16px',
-        }}
-      >
-        <span>+ Add Item</span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <LuScanBarcode /> Scan Barcode
-        </span>
-        <span>- Clear all items</span>
-      </div>
-
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'start',
-          background: '#fff',
-          padding: '16px',
-          borderRadius: '8px',
-          boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
-        }}
-      >
-        <div
-          style={{
-            width: '50%',
-            border: '1px solid #ccc',
-            padding: '24px',
-            background: '#f3f4f6',
-            borderRadius: '8px',
-            minHeight: '100px',
-            textAlign: 'center',
-          }}
-        >
-          {files.length > 0 ? (
-            files.map((file, index) => (
-              <p key={index} style={{ fontSize: '14px', color: '#374151', marginBottom: '4px' }}>
-                {file.name}
-              </p>
-            ))
-          ) : (
-            <p style={{ fontSize: '14px', color: '#6b7280' }}>No files attached</p>
-          )}
-        </div>
-
-        <div style={{ width: '33.3333%', textAlign: 'right' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <p style={{ fontWeight: '600', color: '#1a202c' }}>Sub-total</p>
-            <span style={{ color: '#b7b7b7' }}>Rs. 100.00</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <p style={{ fontWeight: '600', color: '#1a202c' }}>Total Discount(-)</p>
-            <span style={{ color: '#b7b7b7' }}>Rs. 0.00</span>
-          </div>
-          <p
-            style={{
-              color: '#567295',
-              fontSize: '0.875rem',
-              cursor: 'pointer',
-              marginTop: '0.25rem',
-              textAlign: 'left',
-            }}
-          >
-            + Add Charges/Discount
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
-            <p style={{ fontWeight: '600', color: '#1a202c' }}>Rounding off</p>
-            <span style={{ color: '#b7b7b7' }}>Rs. 0.00</span>
-          </div>
-          <hr style={{ marginTop: '0.5rem', marginBottom: '0.5rem', borderColor: '#d1d5db' }} />
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              fontWeight: 'bold',
-              fontSize: '1.125rem',
-            }}
-          >
-            <p>Total (Rs.)</p>
-            <span>Rs. 100.00</span>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: '-48px' }}>
-        <label
-          style={{
-            color: '#374151',
-            fontWeight: '600',
-            marginBottom: '8px',
-            paddingLeft: '11px',
-            cursor: 'pointer',
-          }}
-        >
-          Attach Files
-        </label>
-        <input
-          id="fileUpload"
-          type="file"
-          multiple
-          style={{ display: 'none' }}
-          onChange={(event) => setFiles([...files, ...Array.from(event.target.files)])}
-        />
-      </div>
-    </div>
-  )
-}
-
-export default PurchaseOrder
+export default PurchaseOrder;

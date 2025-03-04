@@ -25,9 +25,6 @@ const SkuDetails =() =>{
 
 	return (
 		<div>
-				<div className="absolute top-[840px] left-[294.95px] w-[180px] h-[40px] bg-white rounded-[10px] shadow-md flex items-center justify-center z-10">
-      <p className="text-black text-[15px] font-roboto font-[500] leading-[23px]">+ Create</p>
-    </div>
   <div className="mt-4 p-4 bg-white rounded-lg border border-[#c2c2c2] shadow-md w-full h-[600px]">
     {/* Title & Button Container */}
     <div className="flex justify-between items-center">

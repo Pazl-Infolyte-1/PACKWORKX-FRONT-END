@@ -7,22 +7,8 @@ import Facebook from '../../assets/images/fb.png'
 import apiMethods from '../../api/config'
 import { IoSearch } from 'react-icons/io5'
 import axios from 'axios'
-
-import {
-  CTable,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
-  CRow,
-  CCol,
-  CFormInput,
-  CFormSelect,
-  CButton,
-  CFormCheck,
-} from '@coreui/react'
 import CommonPagination from '../../components/New/Pagination'
+import ClientTable from './ClientTable'
 
 function ClientList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -30,6 +16,8 @@ function ClientList() {
   const [dynamicFields, setDynamicFields] = useState('')
   const [commonField, setCommonField] = useState([])
   const [data, setData] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const rowsPerPage = 10
 
   const [rows, setRows] = useState([
     { salutation: '', firstName: '', lastName: '', email: '', workPhone: '', mobile: '' },
@@ -69,12 +57,10 @@ function ClientList() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get(
-          'https://mocki.io/v1/deebda74-5384-44a2-8b4e-9c19d1d7e4f9  ',
-        )
-        console.log('Table API', response.data)
+        const response = await axios.get('https://mocki.io/v1/8f36576b-ae92-4a4f-a242-c8bbfe639f52')
+        console.log(response.data)
 
-        setData(response.data)
+        setData(response.data.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -82,11 +68,7 @@ function ClientList() {
     fetchData()
   }, [])
 
-  const tableData = data?.values && Array.isArray(data.values) ? data.values : []
-  const headers = data?.headers && Array.isArray(data.headers) ? data.headers : []
-
-  const [currentPage, setCurrentPage] = useState(1)
-  const rowsPerPage = 5
+  const tableData = Array.isArray(data) ? data : []
 
   const indexOfLastRow = currentPage * rowsPerPage
   const indexOfFirstRow = indexOfLastRow - rowsPerPage
@@ -95,52 +77,22 @@ function ClientList() {
 
   return (
     <div>
-      <div style={{ width: '100%', height: '40px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="w-full h-[40px]">
+        <div className="flex justify-between items-center">
           <h4>Clients and Vendors</h4>
         </div>
       </div>
       {/* Search Bar & Add Button */}
       <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              height: '35px',
-              width: '300px',
-              gap: '2px',
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: 'white',
-                height: '100%',
-                width: '40px',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: '6px 0 0 6px',
-              }}
-            >
+        <div className="flex justify-between items-center">
+          <div className="flex items-center h-[35px] w-[300px] gap-[2px]">
+            <div className="bg-white h-full w-[40px] flex justify-center items-center rounded-l-[6px]">
               <IoSearch />
             </div>
             <input
               type="text"
               placeholder="Search"
-              style={{
-                outline: 'none',
-                height: '100%',
-                width: '100%',
-                borderRadius: '0 6px 6px 0',
-                paddingLeft: '8px',
-              }}
+              className="outline-none h-full w-full rounded-r-[6px] pl-2"
             />
           </div>
           <div className="flex justify-center items-center gap-2">
@@ -163,41 +115,21 @@ function ClientList() {
           </div>
         </div>
 
-        <CTable striped hover className="mt-3 border border-gray-200">
-          <CTableHead className="bg-gray-100">
-            <CTableRow>
-              {headers.map((header, index) => (
-                <CTableHeaderCell key={index} className="py-3 px-4 text-gray-600 font-medium">
-                  {header}
-                </CTableHeaderCell>
-              ))}
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {currentRows.length > 0 ? (
-              currentRows.map((row, rowIndex) => (
-                <CTableRow key={rowIndex} className="border-b ">
-                  {row.map((cell, cellIndex) => (
-                    <CTableDataCell key={cellIndex} className="py-3 px-4 text-gray-700">
-                      {cell}
-                    </CTableDataCell>
-                  ))}
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow>
-                <CTableDataCell colSpan={headers.length} className="text-center py-3">
-                  No data available
-                </CTableDataCell>
-              </CTableRow>
-            )}
-          </CTableBody>
-        </CTable>
-
-        <div className="flex justify-end items-center gap-4 mt-4">
-          <CommonPagination count={5} page={1} onChange={''} />
+        <div className="border h-[80%] mt-4">
+          <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
+            <ClientTable packagedata={data} />
+          </div>
+        </div>
+        {/* Pagination Section */}
+        <div className="flex justify-end items-center gap-4 mt-4 mb-3">
+          <CommonPagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(event, value) => setCurrentPage(value)}
+          />
         </div>
       </div>
+
       <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
         <div className="grid grid-cols-2 gap-2">
           {/* Left Column */}

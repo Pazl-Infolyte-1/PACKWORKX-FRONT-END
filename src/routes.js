@@ -8,8 +8,8 @@ const MachineDashboard = React.lazy(() => import('./Module/Machine/MachineDashbo
 const InventoryHandling = React.lazy(() => import('./Module/Inventory/InventoryHandling.js'))
 const Production = React.lazy(() => import('./Module/Production/Index.js'))
 const Packages = React.lazy(() => import('./Module/Admin/Packages/Packages.js'))
-const Billing = React.lazy(() => import('./Module/Admin/Billing.js'))
-const Companies = React.lazy(() => import('./Module/Admin/Companies.js'))
+const Billing = React.lazy(() => import('./Module/Admin/Billing/Billing.js'))
+const Companies = React.lazy(() => import('./Module/Admin/Companies/Companies.js'))
 const WorkOrderList = React.lazy(() => import('./Module/WorkOrder/workorderlist.js'))
 const SalesOrder = React.lazy(() => import('./Module/SalesOrder/ListOfSalesOrder.js'))
 

@@ -1,3 +1,5 @@
+
+
 import React, { useState } from "react";
 import {
   CCol,
@@ -33,37 +35,35 @@ const BillingTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  // Calculate the current rows to display
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = data.slice(indexOfFirstRow, indexOfLastRow);
 
-  // Handle pagination change
   const totalPages = Math.ceil(data.length / rowsPerPage);
 
   return (
-    <CCard style={{ padding: "10px", margin: "10px" }}>
+    <CCard className="p-4 m-4">
       <CCardBody>
-        {/* Search and Filter Section */}
-        <div style={{ display: "flex" }}>
+        <div className="flex items-center mb-4">
           <CCol md="1">
-            <CFormLabel htmlFor="search" style={{   color:" #616e80" }}>Company</CFormLabel>
+            <CFormLabel htmlFor="search" className="text-gray-600">Company</CFormLabel>
           </CCol>
-          <CInputGroup style={{ display: "flex", gap: "10px", marginBottom: "10px", marginLeft: "-15px" }}>
-            <CFormSelect style={{ maxWidth: "100px" }}>
+          <CInputGroup className="flex gap-2 ml-[-15px]">
+            <CFormSelect className="max-w-[100px]">
               <option>All</option>
             </CFormSelect>
-            <CFormInput placeholder="Start typing to search" style={{ flex: "1",backgroundcolor: "#ffffff", color: "#94a3b8" }} />
+            <CFormInput placeholder="Start typing to search" className="flex-1 bg-white text-gray-400" />
           </CInputGroup>
         </div>
 
-        {/* Table Section */}
-        <CTable bordered hover style={{ fontSize: "14px", textAlign: "center" }}>
+        <CTable bordered hover className="text-sm text-center">
           <CTableHead>
             <CTableRow>
-              {["Id", "Company", "Package", "Payment Date", "Next Payment Date", "Transaction Id", "Amount", "Payment Gateway", "Action"].map((header, index) => (
-                <CTableHeaderCell key={index} style={{ color: "#99a5b5", textAlign: "center" }}>
-                  <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "5px", width: "100%" }}>
+            {["Id", "Company", "Package", "Payment Date", "Next Payment Date", "Transaction Id", "Amount", "Payment Gateway", "Action"].map((header, index) => (
+             <CTableHeaderCell key={index} style={{ color: "#99a5b5", textAlign: "center" }}>
+              {/* {["Id", "Company", "Package", "Payment Date", "Next Payment Date", "Transaction Id", "Amount", "Payment Gateway", "Action"].map((header, index) => (
+                <CTableHeaderCell key={index} className="text-gray-600 text-center"> */}
+                  <span className="inline-flex items-center justify-center gap-2 w-full">
                     {header} <RiArrowUpDownFill />
                   </span>
                 </CTableHeaderCell>
@@ -83,8 +83,8 @@ const BillingTable = () => {
                 <CTableDataCell>{row.amount}</CTableDataCell>
                 <CTableDataCell>{row.paymentGateway}</CTableDataCell>
                 <CTableDataCell>
-                  <CButton color="light" style={{ padding: "5px 10px" }}>
-                    <FaDownload style={{ color: "gray" }} />
+                  <CButton color="light" className="p-1">
+                    <FaDownload className="text-gray-500" />
                   </CButton>
                 </CTableDataCell>
               </CTableRow>
@@ -92,18 +92,15 @@ const BillingTable = () => {
           </CTableBody>
         </CTable>
 
-        {/* Pagination and Entries Section */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "10px" }}>
-          {/* Entries Dropdown (Left Side) */}
+        <div className="flex justify-between items-center mt-4">
           <div>
-            <CFormSelect value={rowsPerPage} onChange={(e) => setRowsPerPage(Number(e.target.value))} style={{ maxWidth: "120px" }}>
+            <CFormSelect value={rowsPerPage} onChange={(e) => setRowsPerPage(Number(e.target.value))} className="max-w-[120px]">
               <option value={2}>2 Entries</option>
               <option value={5}>5 Entries</option>
               <option value={10}>10 Entries</option>
             </CFormSelect>
           </div>
 
-          {/* Pagination (Right Side) */}
           <CPagination aria-label="Page navigation">
             <CPaginationItem disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
               Previous
@@ -124,6 +121,3 @@ const BillingTable = () => {
 };
 
 export default BillingTable;
-
-
-

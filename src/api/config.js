@@ -60,7 +60,7 @@ const endpoints = {
   },
   menu: {
     sideBarMenu: {
-      url: 'https://mocki.io/v1/6c2809a3-6dda-40fe-a0f9-29583ebb907b',
+      url: 'https://mocki.io/v1/711cbc7d-a070-4077-bf97-8c1369fa075f',
       method: 'GET',
     },
   },

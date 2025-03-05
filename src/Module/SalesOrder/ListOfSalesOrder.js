@@ -248,7 +248,7 @@ function ListOfSalesOrder() {
           </div>
         </div>
 
-        <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
+        <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth="1280px">
           <AddSalesOrder></AddSalesOrder>
           {/*old sales Order*/}
           {/*<div className="p-6">

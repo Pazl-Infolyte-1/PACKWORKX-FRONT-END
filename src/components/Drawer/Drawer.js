@@ -1,10 +1,10 @@
 import React from 'react'
 import './Drawer.css' // Import the CSS file
 
-const Drawer = ({ isOpen, onClose, children }) => {
+const Drawer = ({ isOpen, onClose, children, maxWidth = "1260px" }) => {
   return (
     <div className={`drawer-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}>
-      <div className="drawer" onClick={(e) => e.stopPropagation()}>
+      <div className="drawer" style={{ maxWidth }} onClick={(e) => e.stopPropagation()}>
         {/* Close Button */}
         <button className="close-btn" onClick={onClose}>
           ✖

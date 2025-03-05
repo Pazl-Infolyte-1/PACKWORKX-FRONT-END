@@ -1,13 +1,42 @@
 
 
 
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import { CiSettings } from "react-icons/ci";
 import { LuScanBarcode } from "react-icons/lu";
 import { FiAlertCircle } from "react-icons/fi";
+import axios from "axios";
+import PO from './PO.js'
+
+
 
 const PurchaseOrder = () => {
     const [files, setFiles] = useState([]);
+    const [data, setData] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const response = await axios.get(
+                    "https://mocki.io/v1/5e679c05-c258-4f9d-b8e3-7108c9808089"
+                );
+                setData(response.data.data || []);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        }
+        fetchData();
+    }, []);
+
+    const indexOfLastRow = currentPage * rowsPerPage;
+    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+    const currentRows = data.slice(indexOfFirstRow, indexOfLastRow);
+    const totalPages = Math.ceil(data.length / rowsPerPage);
+
+
+
 
     // Handle file selection
     const handleFileChange = (event) => {
@@ -83,7 +112,7 @@ const PurchaseOrder = () => {
                 <div className="flex items-center space-x-2">
                     <div>
                         <label className="text-[#b7b7b7]">Order Date:</label>
-                        <input type="date"defaultValue="2024-04-04" className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f]" />
+                        <input type="date" defaultValue="2024-04-04" className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f]" />
                     </div>
                     <div>
                         <label className="text-[#b7b7b7]">Due Date:</label>
@@ -98,69 +127,36 @@ const PurchaseOrder = () => {
 
             {/* Business & Class */}
             <div className="grid grid-cols-3 gap-4 mb-4 ">
-            <div className="flex items-center space-x-2">
-                <div>
-                    <label className="text-[#b7b7b7]">Business:</label>
-                    <select className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f] w-40" >
-                    {/* <select className="block w-full p-2 border rounded bg-[#f1f1f1] w-[40%] text-[#7f7f7f]"> */}
-                        <option>Select</option>
-                    </select>
-                </div>
-                <div>
-                    <label className="text-[#b7b7b7]  ">Class:</label>
-                    <select className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f] w-40 " >
-                    {/* <select className="block w-full p-2 border rounded bg-[#f1f1f1] w-[40%] text-[#7f7f7f]"> */}
-                        <option>Select</option>
-                    </select>
-                </div>
-                <div className="flex justify-start  mt-7  items-center text-blue-600 cursor-pointer ">
-                   <div className="w-24"> + Add firm</div>  <div><CiSettings /></div>
+                <div className="flex items-center space-x-2">
+                    <div>
+                        <label className="text-[#b7b7b7]">Business:</label>
+                        <select className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f] w-40" >
+                            {/* <select className="block w-full p-2 border rounded bg-[#f1f1f1] w-[40%] text-[#7f7f7f]"> */}
+                            <option>Select</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="text-[#b7b7b7]  ">Class:</label>
+                        <select className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f] w-40 " >
+                            {/* <select className="block w-full p-2 border rounded bg-[#f1f1f1] w-[40%] text-[#7f7f7f]"> */}
+                            <option>Select</option>
+                        </select>
+                    </div>
+                    <div className="flex justify-start  mt-7  items-center text-blue-600 cursor-pointer ">
+                        <div className="w-24"> + Add firm</div>  <div><CiSettings /></div>
+                    </div>
                 </div>
             </div>
+
+            <div className="border h-[80%] mt-4">
+                <div className="overflow-x-auto overflow-y-auto whitespace-nowrap p-3">
+                    <PO cellData={data} />
+                </div>
             </div>
 
-
-
-            {/* Product Table */}
-            <table className="w-full border-collapse border border-gray-300">
-                <thead className="bg-gray-100 text-[#b7b7b7]">
-                    <tr>
-                        <th className="border p-2">Product</th>
-                        <th className="border p-2">Product Code</th>
-                        <th className="border p-2">Description</th>
-                        <th className="border p-2">Qty</th>
-                        <th className="border p-2">UOM</th>
-                        <th className="border p-2">Price</th>
-                        <th className="border p-2">Discount</th>
-                        <th className="border p-2">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td className="border p-2">Chair Leg</td>
-                        <td className="border p-2">P-0000058</td>
-                        <td className="border p-2 flex justify-center"><FiAlertCircle /></td>
-                        <td className="border p-2">4</td>
-                        <td className="border p-2">UNIT</td>
-                        <td className="border p-2">US$ 0.00</td>
-                        <td className="border p-2">US$ 0.00</td>
-                        <td className="border p-2">US$ 0.00</td>
-                    </tr>
-                    <tr>
-                        <td className="border p-2">Backrest</td>
-                        <td className="border p-2">P-0000061</td>
-                        <td className="border p-2 flex justify-center"><FiAlertCircle /></td>
-                        <td className="border p-2">1</td>
-                        <td className="border p-2">UNIT</td>
-                        <td className="border p-2">US$ 0.00</td>
-                        <td className="border p-2">US$ 0.00</td>
-                        <td className="border p-2">US$ 0.00</td>
-                    </tr>
-                </tbody>
-            </table>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-6 text-[#567295] mt-4">
+            <div className="flex items-center gap-6 text-[#567295] ">
                 <span>+ Add Item</span>
                 <span className="flex items-center gap-1"><LuScanBarcode /> Scan Barcode</span>
                 <span className="text-[#567295]">- Clear all items</span>
@@ -169,7 +165,7 @@ const PurchaseOrder = () => {
             <div className="flex justify-between items-start bg-white p-4 rounded-lg shadow">
                 {/* Left Side - Card Content */}
                 <div className="w-1/2">
-                    <div className="border p-6 bg-gray-100 rounded-lg min-h-[100px] text-center">
+                    <div className="border p-6 bg-gray-100 rounded-lg min-h-[150px] text-center">
                         {/* Show Attached Files Inside the Card */}
                         {files.length > 0 ? (
                             files.map((file, index) => (
@@ -178,7 +174,7 @@ const PurchaseOrder = () => {
                                 </p>
                             ))
                         ) : (
-                            <p className="text-sm text-gray-500">No files attached</p>
+                            <p className="text-sm text-gray-500 align items-center mt-10">No files attached</p>
                         )}
                     </div>
                 </div>
@@ -227,3 +223,4 @@ const PurchaseOrder = () => {
 };
 
 export default PurchaseOrder;
+

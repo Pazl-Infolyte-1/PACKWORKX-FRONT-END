@@ -2,32 +2,23 @@ import { MdPrecisionManufacturing } from 'react-icons/md'
 import { MdEmojiObjects } from 'react-icons/md'
 import { MdEngineering } from 'react-icons/md'
 import { MdDoDisturbOn } from 'react-icons/md'
-
 import Drawer from '../../components/Drawer/Drawer'
 import { useState, useEffect } from 'react'
 import { RiUploadCloudLine } from 'react-icons/ri'
 import axios from 'axios'
-import {
-  CTable,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
-} from '@coreui/react'
 import CommonPagination from '../../components/New/Pagination'
-
+import MachineDashboardTable from './MachineDashboardTable'
 export default function MachineMaster() {
   const [isdrawopen, setdrawopen] = useState(false)
-  const [data, setData] = useState([])
+  const [tableData, settableData] = useState([]) 
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get('https://mocki.io/v1/d116fece-51e7-4563-be37-d3dc674cf740')
+        const response = await axios.get('https://mocki.io/v1/f20d86a4-8382-4644-8ec1-e05dcc9b8ccd')
 
-        setData(response.data)
-        console.log(response.data)
+        settableData(response.data.data)
+        console.log(response.data.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -35,8 +26,6 @@ export default function MachineMaster() {
     fetchData()
   }, [])
 
-  const tableData = data?.values && Array.isArray(data.values) ? data.values : []
-  const headers = data?.headers && Array.isArray(data.headers) ? data.headers : []
   const [currentPage, setCurrentPage] = useState(1)
   const rowsPerPage = 4
   const indexOfLastRow = currentPage * rowsPerPage
@@ -116,69 +105,18 @@ export default function MachineMaster() {
         ))}
       </div>
 
-      <div className="bg-white rounded-lg p-3 border border-gray-300">
-        <div className="flex justify-between items-center">
-          <h3 className="ml-2 text-[20px]">Raw Material</h3>
-     <div className="flex items-center gap-2">
-    <input
-      type="text"
-      placeholder="Search by Name, ID, Status"
-      className="w-[230px] p-1 border border-gray-300 rounded-md"
-    />
-    <input
-      type="date"
-      className="p-1 rounded-md border border-gray-300"
-    />
-      <button className="p-1 w-[50px] rounded-md bg-[#8167e5] text-white outline-none border-none">
-        Filter
-      </button>
-    </div>
-    </div>
-        <div className="border border-gray-200 px-3 mt-3 rounded-md w-[100%] ">
-          <div className="overflow-x-auto  overflow-y-auto h-[300px] custom-scrollbar ">
-            <CTable striped hover className="mt-3 border border-gray-200 pb-3 ">
-              {/* Table Header */}
-              <CTableHead className="bg-gray-100 sticky top-0 ">
-                <CTableRow>
-                  {headers.map((header, index) => (
-                    <CTableHeaderCell
-                      key={index}
-                      className="py-3 px-6 text-gray-600 font-medium whitespace-nowrap min-w-[150px]"
-                    >
-                      {header}
-                    </CTableHeaderCell>
-                  ))}
-                </CTableRow>
-              </CTableHead>
+      <div className="border h-[80%] mt-4">
+        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
+          <MachineDashboardTable cellData={tableData} />
+        </div>
 
-              {/* Table Body */}
-              <CTableBody>
-                {currentRows.length > 0 ? (
-                  currentRows.map((row, rowIndex) => (
-                    <CTableRow key={rowIndex} className="border-b">
-                      {row.map((cell, cellIndex) => (
-                        <CTableDataCell
-                          key={cellIndex}
-                          className="py-3 px-6 text-gray-700 break-words min-w-[150px]"
-                        >
-                          {cell}
-                        </CTableDataCell>
-                      ))}
-                    </CTableRow>
-                  ))
-                ) : (
-                  <CTableRow>
-                    <CTableDataCell colSpan={headers.length} className="text-center py-3">
-                      No data available
-                    </CTableDataCell>
-                  </CTableRow>
-                )}
-              </CTableBody>
-            </CTable>
-          </div>
-          <div className="flex justify-end items-center mt-1">
-            <CommonPagination count={7} page={1} />
-          </div>
+        {/* Pagination Section */}
+        <div className="flex justify-end items-center gap-4 mt-4 mb-3">
+          <CommonPagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(event, value) => setCurrentPage(value)}
+          />
         </div>
       </div>
 
@@ -247,3 +185,13 @@ export default function MachineMaster() {
     </div> 
   )
 }
+
+
+
+
+
+
+
+
+
+

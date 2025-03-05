@@ -60,7 +60,7 @@ const endpoints = {
   },
   menu: {
     sideBarMenu: {
-      url: '/rbac',
+      url: 'https://mocki.io/v1/711cbc7d-a070-4077-bf97-8c1369fa075f',
       method: 'GET',
     },
   },

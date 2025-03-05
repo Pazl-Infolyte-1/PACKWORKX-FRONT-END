@@ -1,7 +1,7 @@
 import { CModal } from '@coreui/react'
 import React from 'react'
 
-const PopUp = ({ visible, setVisible, Children, size, height, width }) => {
+const PopUp = ({ visible, setVisible, children, size }) => {
   return (
     <div>
       <CModal
@@ -11,9 +11,8 @@ const PopUp = ({ visible, setVisible, Children, size, height, width }) => {
         visible={visible}
         onClose={() => setVisible(false)}
         aria-labelledby="VerticallyCenteredScrollableExample2"
-        style={{ width: width, height: height }}
       >
-        {Children}
+        {children}
       </CModal>
     </div>
   )

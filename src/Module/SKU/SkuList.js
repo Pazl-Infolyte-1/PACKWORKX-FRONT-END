@@ -27,6 +27,7 @@ import {
 } from '@coreui/react'
 import axios from 'axios'
 import CommonPagination from '../../components/New/Pagination'
+import SkuPopup from './SkuPopup'
 
 const tablevalues = {
   tableHeaders: [
@@ -176,6 +177,7 @@ function SkuList() {
   const [dynamicFields, setDynamicFields] = useState('')
   const [data, setData] = useState(tablevalues)
   const [tabledata, setTableData] = useState([])
+  const [visible, setVisible] = useState(false);
 
   const formRefs = useRef({})
 
@@ -297,6 +299,11 @@ function SkuList() {
                         console.log('sku cl;ickef')
                         setDrawerOpen(true)
                       }
+                      if (text === 'Bulk Upload') {
+                        console.log('Bulk Upload clicked')
+                        setVisible(true)
+                      }
+                      
                     }}
                   >
                     {text}
@@ -737,6 +744,10 @@ function SkuList() {
             <div className="flex justify-end items-center gap-4 mt-4">
               {/*<CommonPagination count={5} page={1} onChange={''} />*/}
             </div>
+            <div>
+              <SkuPopup visible={visible} setVisible={setVisible}/>
+            </div>
+
           </div>
         </div>
       </div>

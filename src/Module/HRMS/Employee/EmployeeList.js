@@ -90,7 +90,7 @@ function EmployeeList() {
         </div>
 
         <div className="overflow-x-auto border border-gray-200 p-3 mt-1 rounded-md">
-          <div className="max-w-[1280px] mx-auto mt-1 flex justify-evenly gap-4 items-center" >
+          <div className="max-w-[1280px] mx-auto mt-1 flex justify-evenly gap-2 items-center" >
             <div className="flex gap-2 items-center border border-[#e7e5e4] p-2 rounded-md" >
               <BiSearchAlt className="text-[#737373]" />
               <input
@@ -101,7 +101,7 @@ function EmployeeList() {
             </div>
 
             <select
-              className="border border-[#e7e5e4] p-2 w-[256px] rounded-md text-[#737373] bg-transparent">
+              className="border border-[#e7e5e4] p-2 w-[160px] rounded-md text-[#737373] bg-transparent">
               <option disabled selected>
                 Select Department
               </option>
@@ -111,7 +111,7 @@ function EmployeeList() {
             </select>
 
             <select
-             className="border border-[#e7e5e4] p-2 w-[256px] rounded-md text-[#737373] bg-transparent">
+             className="border border-[#e7e5e4] p-2 w-[160px] rounded-md text-[#737373] bg-transparent">
               <option disabled selected>
                 Select Role
               </option>
@@ -120,7 +120,7 @@ function EmployeeList() {
               <option value="">Role3</option>
             </select>
 
-            <select className="border border-[#e7e5e4] p-2 w-[256px] rounded-md text-[#737373] bg-transparent" >
+            <select className="border border-[#e7e5e4] p-2 w-[160px] rounded-md text-[#737373] bg-transparent" >
               <option disabled selected>
                 Select Manager
               </option>

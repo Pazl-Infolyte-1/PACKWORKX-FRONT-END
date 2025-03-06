@@ -32,10 +32,9 @@ function VersionsPopup({ visible, setVisible }) {
 
   return (
     <PopUp visible={visible} setVisible={setVisible} width="500px" height="500px" size="lg">
-      <CModalHeader>
-      </CModalHeader>
+      
 
-      <CModalBody>
+      <div>
         {/* Header Section */}
         <div className=" flex justify-between">
           <div>
@@ -98,13 +97,13 @@ function VersionsPopup({ visible, setVisible }) {
             </CTableBody>
           </CTable>
         </CContainer>
-      </CModalBody>
+      </div>
 
-      <CModalFooter>
+      <div className='flex justify-end items-center'>
         <button className="cursor-pointer  w-[200px] h-[35px] px-2 border-0  rounded-md shadow-md bg-[#8167e5] text-white  outline-none">
           Save As New Version
         </button>
-      </CModalFooter>
+      </div>
     </PopUp>
   )
 }

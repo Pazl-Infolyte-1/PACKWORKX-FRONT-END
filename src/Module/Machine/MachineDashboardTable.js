@@ -7,10 +7,11 @@ import {
   CTableDataCell,
   CTableHead,
 } from '@coreui/react'
+import { BsThreeDotsVertical } from "react-icons/bs";
 const MachineDashboardTable = ({ cellData }) => {
   return (
     <div>
-         <div className="overflow-y-auto max-h-[350px] custom-scrollbar">
+         <div className="overflow-y-auto  max-h-[400px] custom-scrollbar">
              <CTable striped hover className="mt-2 w-full">
               <CTableHead className="bg-gray-100 sticky top-0 ">
 
@@ -25,22 +26,25 @@ const MachineDashboardTable = ({ cellData }) => {
                 Type
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Process Count
+                Process_Count
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Status
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Last Maintenance
+                Last_Maintenance
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Next Maintenance
+                Next_Maintenance
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Speed
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Capacity
+              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+                Action
               </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -66,6 +70,7 @@ const MachineDashboardTable = ({ cellData }) => {
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.speed}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.capacity}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700"> <BsThreeDotsVertical /> </CTableDataCell>
                 </CTableRow>
               ))
             ) : (

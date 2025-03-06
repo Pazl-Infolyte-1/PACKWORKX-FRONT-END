@@ -15,7 +15,7 @@ const WorkOrderTable = ({ cellData }) => {
     <div>
       <div className="max-h-[370px] overflow-y-auto border border-gray-200 custom-scrollbar">
         <CTable striped hover className="w-full">
-          <CTableHead className="bg-gray-100 sticky top-0 z-10">
+          <CTableHead className="bg-gray-100 sticky top-0">
             <CTableRow>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Number

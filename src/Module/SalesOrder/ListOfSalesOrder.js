@@ -29,11 +29,15 @@ import CommonPagination from '../../components/New/Pagination'
 import CIcon from '@coreui/icons-react'
 import { cilOptions } from '@coreui/icons'
 import AddSalesOrder from './AddSalesOrder'
+import ActionPopup from './ActionPopup'
+import VersionsPopup from './VersionsPopup'
 
 function ListOfSalesOrder() {
   const [data, setData] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [isDrawerOpen, setDrawerOpen] = useState(false)
+  const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
+  const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [confirmationBy, setConfirmationBy] = useState('email')
   const [manufactureType, setManufactureType] = useState('inhouse')
@@ -223,7 +227,10 @@ function ListOfSalesOrder() {
                     ))}
 
                     <CTableDataCell>
-                      <CButton color="light">
+                      <CButton color="light" 
+                      onClick={() => setActionDrawerOpen(true)}
+                      // onClick={() => setVersionDrawerOpen(true)}
+                      >
                         <CIcon
                           icon={cilOptions}
                           className="me-2"
@@ -249,7 +256,7 @@ function ListOfSalesOrder() {
         </div>
 
         <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth="1280px">
-          <AddSalesOrder></AddSalesOrder>
+        <AddSalesOrder currentTab={'salesOrder'}></AddSalesOrder>
           {/*old sales Order*/}
           {/*<div className="p-6">
             <CCard>
@@ -448,6 +455,13 @@ function ListOfSalesOrder() {
           </div>*/}
         </Drawer>
       </div>
+      <div>
+      <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} />
+      </div>
+      <div>
+      <VersionsPopup visible={isVersionDrawerOpen} setVisible={() => setVersionDrawerOpen(false)} />
+      </div>
+
     </div>
   )
 }

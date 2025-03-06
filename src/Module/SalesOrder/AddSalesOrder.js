@@ -2,8 +2,8 @@ import { useState } from 'react'
 import SkuDetails from './SkuDetails'
 import WorkOrders from './WorkOrders'
 
-const AddSalesOrder = () => {
-  const [activeTab, setActiveTab] = useState('salesOrder')
+const AddSalesOrder = ({ currentTab }) => {
+  const [activeTab, setActiveTab] = useState(currentTab)
   const [isActive, setIsActive] = useState(false)
 
   return (

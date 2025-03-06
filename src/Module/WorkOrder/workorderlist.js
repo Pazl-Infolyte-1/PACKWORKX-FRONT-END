@@ -8,17 +8,13 @@ import AddButton from '../../components/New/AddButton'
 import { useSearch } from '../../components/New/SearchContext'
 import Drawer from '../../components/Drawer/Drawer'
 import AddSalesOrder from '../SalesOrder/AddSalesOrder'
-import PopUp from '../../components/New/PopUp'
-import { ModalBody } from 'react-bootstrap'
-import { CModalBody } from '@coreui/react'
 
 const WorkOrders = () => {
   const [data, setData] = useState([]) // Original API data
   const [filteredData, setFilteredData] = useState([]) // Filtered data for search
   const [searchQuery, setSearchQuery] = useState('') // Search query
   const [currentPage, setCurrentPage] = useState(1)
-  const [drawerOpen, setDrawerOpen] = useState()
-  const [visible, setVisible] = useState(true)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const rowsPerPage = 10
   const { filteredSearchData } = useSearch()
 
@@ -77,11 +73,6 @@ const WorkOrders = () => {
       <Drawer isOpen={drawerOpen} maxWidth="1280px" onClose={() => setDrawerOpen(false)}>
         <AddSalesOrder currentTab={'skuDetails'} />
       </Drawer>
-      <PopUp visible={visible} setVisible={setVisible} size="sm">
-        <CModalBody>
-          <WorkOrderTable cellData={filteredSearchData.length ? filteredSearchData : data} />{' '}
-        </CModalBody>
-      </PopUp>
     </div>
   )
 }

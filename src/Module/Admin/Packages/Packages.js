@@ -26,9 +26,7 @@ function Packages() {
     fetchData()
   }, [])
 
- 
-  const tableData = Array.isArray(data) ? data : [];
-
+  const tableData = Array.isArray(data) ? data : []
 
   const indexOfLastRow = currentPage * rowsPerPage
   const indexOfFirstRow = indexOfLastRow - rowsPerPage
@@ -76,12 +74,12 @@ function Packages() {
       </div>
       {/* Pagination Section */}
       <div className="flex justify-end items-center gap-4 mt-4 mb-3">
-          <CommonPagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(event, value) => setCurrentPage(value)}
-          />
-        </div>
+        <CommonPagination
+          count={totalPages}
+          page={currentPage}
+          onChange={(event, value) => setCurrentPage(value)}
+        />
+      </div>
       <div>
         <PackagesForm isDrawerOpen={isDrawerOpen} setDrawerOpen={setDrawerOpen} />
       </div>

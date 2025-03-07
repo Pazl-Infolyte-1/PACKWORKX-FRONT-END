@@ -72,124 +72,58 @@ function ListOfSalesOrder() {
   return (
     <div>
       <div
-        style={{
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
+        className="h-full w-full flex flex-col"
+
       >
         {/* Header */}
-        <div style={{ width: '100%', height: '40px' }}>
+        <div className="w-full h-[40px]"
+        >
           <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
+          className="flex justify-between items-center"
+
           >
             <h4>Sales Order</h4>
           </div>
         </div>
 
-        {/* Search Bar */}
-        {/* <div
-          style={{
-            marginTop: '5px',
-            height: '80px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-
-            padding: '10px',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              height: '40px',
-              width: '300px',
-              gap: '7px',
-              backgroundColor: 'white',
-              borderRadius: '6px',
-              padding: '5px',
-            }}
-          >
-            <IoSearch />
-            <input
-              type="text"
-              placeholder="Start Typing To Search"
-              style={{ width: '100%', outline: 'none', backgroundColor: 'transparent' }}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div className=" bg-white h-10 w-20 flex items-center justify-center rounded-md">
-            <button>Filter</button>
-          </div>
-        </div> */}
-
         {/* Table */}
 
         <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
           <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
+            className="flex justify-between items-center"
+
           >
             <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '35px',
-                width: '300px',
-                gap: '2px',
-              }}
+              className="flex items-center h-[35px] w-[300px] gap-[2px]"
+
             >
               <div
-                style={{
-                  backgroundColor: 'white',
-                  height: '100%',
-                  width: '40px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: '6px 0 0 6px',
-                }}
+               className="bg-white h-full w-[40px] flex justify-center items-center rounded-l-[6px]"
+
               >
                 <IoSearch />
               </div>
               <input
                 type="text"
                 placeholder="Search"
-                style={{
-                  outline: 'none',
-                  height: '100%',
-                  width: '100%',
-                  borderRadius: '0 6px 6px 0',
-                  paddingLeft: '8px',
-                }}
+                className="outline-none h-full w-full rounded-r-[6px] pl-2"
+
               />
             </div>
             <div className="flex justify-center items-center gap-2">
               <button
-                style={{
-                  backgroundColor: '#ed4040',
-                  borderRadius: '6px',
-                  height: '40px',
-                  width: '140px',
-                  color: 'white',
-                }}
+                className="bg-[#ed4040] rounded-[6px] h-[40px] w-[140px] text-white"
+
                 onClick={() => setDrawerOpen(true)}
               >
                 Add Sales Order
               </button>
             </div>
           </div>
+          <div className="border h-[80%] mt-4">
+        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
+          
+       
           <CTable striped hover className="mt-3 border border-gray-200">
             <CTableHead className="bg-gray-100">
               <CTableRow>
@@ -250,6 +184,10 @@ function ListOfSalesOrder() {
             </CTableBody>
           </CTable>
 
+          
+          </div>
+          </div>
+
           <div className="flex justify-end items-center gap-4 mt-4">
             <CommonPagination count={3} page={1} onChange={''} />
           </div>
@@ -257,202 +195,6 @@ function ListOfSalesOrder() {
 
         <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth="1280px">
         <AddSalesOrder currentTab={'salesOrder'}></AddSalesOrder>
-          {/*old sales Order*/}
-          {/*<div className="p-6">
-            <CCard>
-              <CCardHeader className="flex justify-between items-center bg-gray-100 p-4 rounded-t-2xl">
-                <h2 className="text-xl font-semibold">Add Sales Order</h2>
-                <CButton color="primary">Download</CButton>
-              </CCardHeader>
-              <CCardBody>
-                <h3 className="text-lg font-semibold mb-4">Order Details</h3>
-                <CForm>
-                  <CRow className="mb-3">
-                    <CCol md={4}>
-                      <CFormInput type="text" label="Sales Order ID" placeholder="Enter Order ID" />
-                    </CCol>
-                    <CCol md={4}>
-                      <CFormInput type="date" label="Estimated" placeholder="Enter Estimate" />
-                    </CCol>
-                    <CCol md={4}>
-                      <CFormSelect label="Client">
-                        <option>Select Client</option>
-                        <option value="client1">Client 1</option>
-                        <option value="client2">Client 2</option>
-                      </CFormSelect>
-                    </CCol>
-                  </CRow>
-                  <CRow className="mb-3">
-                    <CCol md={4}>
-                      <CFormInput
-                        type="number"
-                        label="Credit Period"
-                        placeholder="Enter Credit Period"
-                      />
-                    </CCol>
-                    <CCol md={4}>
-                      <CFormSelect label="Freight Paid">
-                        <option value="prepay">Pre Pay</option>
-                        <option value="postpay">Post Pay</option>
-                      </CFormSelect>
-                    </CCol>
-                  </CRow>
-                  <CRow className="border-b-2 border-b-black pb-3">
-                    <CCol md={4}>
-                      <label className="mr-2">Confirmation By:</label>
-                      <CFormSwitch
-                        label={confirmationBy === 'email' ? 'Email' : 'Oral'}
-                        checked={confirmationBy === 'email'}
-                        onChange={() =>
-                          setConfirmationBy(confirmationBy === 'email' ? 'oral' : 'email')
-                        }
-                      />
-                    </CCol>
-                  </CRow>
-                </CForm>
-
-                <div className="flex items-center justify-between  mt-6 mb-4">
-                  <h3 className="text-lg font-semibold ">SKU</h3>
-                  <CButton color="success">+Add SKU</CButton>
-                </div>
-                <div className="flex justify-between items-center gap-5">
-                  <CRow className="mb-3  flex justify-between items-center w-full">
-                    <CCol md={3}>
-                      <CFormSelect label="SKU">
-                        <option>Select SKU</option>
-                        <option value="sku1">SKU 1</option>
-                        <option value="sku2">SKU 2</option>
-                      </CFormSelect>
-                    </CCol>
-
-                    <CCol md={3}>
-                      <CFormInput
-                        type="date"
-                        label="Quantity Required"
-                        placeholder="Enter Quantity"
-                      />
-                    </CCol>
-                    <CCol md={3}>
-                      <CFormInput type="number" label="Rate per SKU" placeholder="Enter Rate" />
-                    </CCol>
-                    <CCol md={3}>
-                      <CFormInput
-                        type="date"
-                        label="Acceptable Excess Unit"
-                        placeholder="Enter Excess Unit"
-                      />
-                    </CCol>
-                  </CRow>
-                  <MdDeleteOutline className="h-10 w-10 mt-2 text-red-500" />
-                </div>
-
-                <div className="mt-10 flex justify-end">
-                  <div className="flex justify-between gap-5">
-                    <div className="flex gap-1">
-                      <p className="font-light">Total Quantity</p>
-                      <span className="font-light">20000</span>
-                    </div>
-
-                    <div>
-                      <div className="flex gap-3">
-                        <p className="font-light">Total :</p>
-                        <span className="font-light">740000</span>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <p className="font-light">SGST :</p>
-                        <span className="font-light">40000</span>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <p className="font-light">CGST :</p>
-                        <span className="font-light">40000</span>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <p className="font-light">Total Incl GST :</p>
-                        <span className="font-light">828800</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <CRow className="flex justify-between mt-4 border-b-2 border-black pb-3">
-                  <CCol md={6}>
-                    <CButton color="secondary">Previous Invoiced Rates</CButton>
-                  </CCol>
-                  <CCol md={6} className="flex justify-end gap-2">
-                    <CButton>Submit</CButton>
-                    <CButton color="warning">Save as Draft</CButton>
-                  </CCol>
-                </CRow>
-
-                <div className="flex items-center justify-between  mt-6 ">
-                  <h3 className="text-lg font-semibold ">Work Order Details</h3>
-                  <CButton color="success">Work Order</CButton>
-                </div>
-
-                <p className="mb-4">
-                  Work Order No: <strong>#89WODHL</strong>
-                </p>
-                <CRow className="mb-3">
-                  <CCol md={6} className="flex items-center">
-                    <label className="mr-2">How do you want to manufacture?</label>
-                    <CFormSwitch
-                      label={manufactureType.charAt(0).toUpperCase() + manufactureType.slice(1)}
-                      checked={manufactureType === 'inhouse'}
-                      onChange={() =>
-                        setManufactureType(manufactureType === 'inhouse' ? 'outsource' : 'inhouse')
-                      }
-                    />
-                  </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                  <CCol md={4}>
-                    <CFormSelect label="SKU">
-                      <option>Select SKU</option>
-                      <option value="sku1">SKU 1</option>
-                      <option value="sku2">SKU 2</option>
-                    </CFormSelect>
-                  </CCol>
-                  <CCol md={4}>
-                    <CFormInput type="text" label="SKU Version" placeholder="Enter SKU Version" />
-                  </CCol>
-                  <CCol md={4}>
-                    <CButton color="info">Version History</CButton>
-                  </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                  <CCol md={6}>
-                    <CFormInput type="number" label="Quantity" placeholder="Enter Quantity" />
-                  </CCol>
-                  <CCol md={6}>
-                    <CFormInput type="date" label="Estimated Delivery Date" />
-                  </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                  <CCol md={6}>
-                    <CFormInput type="text" label="Description" placeholder="Enter Description" />
-                  </CCol>
-                  <CCol md={6}>
-                    <CFormInput type="date" label="Estimated Plan Start Date" />
-                  </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                  <CCol md={6}>
-                    <CFormInput
-                      type="number"
-                      label="Acceptable Excess Unit"
-                      placeholder="Enter Excess Unit"
-                    />
-                  </CCol>
-                  <CCol md={6}>
-                    <CFormInput type="date" label="Plan End Date" />
-                  </CCol>
-                </CRow>
-              </CCardBody>
-            </CCard>
-          </div>*/}
         </Drawer>
       </div>
       <div>

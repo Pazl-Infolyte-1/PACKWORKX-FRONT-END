@@ -14,14 +14,19 @@ import {
   CTableBody,
   CTableRow,
   CTableDataCell,
+  CModalBody,
+  CCardHeader,
+  CModalFooter,
 } from '@coreui/react'
-import { FaAngleDown, FaAngleUp } from 'react-icons/fa'
+import { FaAngleDown, FaAngleUp, FaLock } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
 import { cilOptions, cilBriefcase, cilCut, cilClipboard, cilTrash } from '@coreui/icons'
 import { useDrag, useDrop } from 'react-dnd'
 import './styles.css'
 import ProgressBar from './ProgressBar'
 import Dropdown from 'react-bootstrap/Dropdown'
+import PopUp from '../../components/New/PopUp'
+import AllcoateRMModal from './AllcoateRMModal'
 
 const ItemType = 'WORK_ORDER'
 
@@ -42,7 +47,7 @@ const CustomToggle = React.forwardRef(({ onClick }, ref) => (
   </span>
 ))
 
-function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
+function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
     item: { sfg },
@@ -107,7 +112,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
                   />
                   Remove from Plan
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => console.log('Split Work Order', order)}>
+                <Dropdown.Item onClick={() => setVisibleSplit(true)}>
                   <CIcon
                     icon={cilCut}
                     className="me-2"
@@ -185,10 +190,15 @@ function GroupDropZone({
   addQuantity,
   visibleItemIndex,
   setVisibleItemIndex,
+  setVisibleSplit,
+  setVisibleAllocate,
 }) {
   const [, drop] = useDrop(() => ({
     accept: ItemType,
-    drop: (item) => addQuantity(i, groupIndex, item), // Handle drop
+    drop: (item) => {
+      setVisibleAllocate(true)
+      // addQuantity(i, groupIndex, item)
+    },
   }))
 
   const toggleItemCollapse = (index) => {
@@ -291,7 +301,7 @@ function GroupDropZone({
                   />
                   Remove from Plan
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => console.log('Split Work Order', order)}>
+                <Dropdown.Item onClick={() => setVisibleSplit(true)}>
                   <CIcon
                     icon={cilCut}
                     className="me-2"
@@ -366,10 +376,18 @@ function GroupDropZone({
   )
 }
 
-const AllocateRM = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyncOrders }) => {
+const AllocateRM = ({
+  workOrders,
+  setWorkOrders,
+  groupOrders,
+  setGroupOrders,
+  autoSyncOrders,
+  setVisibleSplit,
+}) => {
   const [visibleGroupIndex, setVisibleGroupIndex] = useState(null)
   const [visibleItemIndex, setVisibleItemIndex] = useState(null)
   const [advanced, setAdvanced] = useState(false)
+  const [visibleAllocate, setVisibleAllocate] = useState(false)
   const [sfgData, setSfgData] = useState([
     {
       id: 'Reel 02',
@@ -574,6 +592,8 @@ const AllocateRM = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, au
                         addQuantity={addQuantity}
                         visibleItemIndex={visibleItemIndex}
                         setVisibleItemIndex={setVisibleItemIndex}
+                        setVisibleSplit={setVisibleSplit}
+                        setVisibleAllocate={setVisibleAllocate}
                       />
                     ))}
                   </CCollapse>
@@ -700,12 +720,19 @@ const AllocateRM = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, au
                 }}
               ></div>
               {sfgData.map((sfg) => (
-                <SFGDragableCard sfg={sfg} openSFG={openSFG} setOpenSFG={setOpenSFG} />
+                <SFGDragableCard
+                  sfg={sfg}
+                  openSFG={openSFG}
+                  setOpenSFG={setOpenSFG}
+                  setVisibleSplit={setVisibleSplit}
+                />
               ))}
             </CCardBody>
           </CCard>
         </CRow>
       </CCol>
+
+      <AllcoateRMModal visibleAllocate={visibleAllocate} setVisibleAllocate={setVisibleAllocate} />
     </>
   )
 }

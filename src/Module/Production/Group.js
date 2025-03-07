@@ -19,6 +19,10 @@ import {
   CTableRow,
   CTableHead,
   CTableBody,
+  CModalHeader,
+  CModalTitle,
+  CFormInput,
+  CFormSelect,
 } from '@coreui/react'
 import { useDrag, useDrop } from 'react-dnd'
 import Dropdown from 'react-bootstrap/Dropdown'
@@ -37,6 +41,7 @@ import {
 } from '@coreui/icons'
 import './styles.css'
 import ProgressBar from './ProgressBar'
+import PopUp from '../../components/New/PopUp'
 
 const ItemType = 'WORK_ORDER'
 
@@ -100,6 +105,7 @@ function WorkOrderCard({
   setModalWorkOrder,
   modalWorkOrder,
   setVisible,
+  setVisibleSplit,
 }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
@@ -166,7 +172,7 @@ function WorkOrderCard({
                 />
                 Remove from Plan
               </Dropdown.Item>
-              <Dropdown.Item onClick={() => console.log('Split Work Order', order)}>
+              <Dropdown.Item onClick={() => setVisibleSplit(true)}>
                 <CIcon
                   icon={cilCut}
                   className="me-2"
@@ -232,8 +238,10 @@ function GroupOrderDropZone({
   removeWorkOrderFromGroup,
   removeWorkOrderFromPlan,
   setModalWorkOrder,
+  setGroupOrders,
   modalWorkOrder,
   setVisible,
+  setVisibleSplit,
 }) {
   const [, drop] = useDrop(() => ({
     accept: ItemType,
@@ -274,6 +282,7 @@ function GroupOrderDropZone({
 
         {groupOrder.items.map((item, itemIndex) => {
           const uniqueIndex = `${groupIndex}-${itemIndex}`
+          console.log('item', item)
           return (
             <CCard
               key={uniqueIndex}
@@ -356,7 +365,7 @@ function GroupOrderDropZone({
                         />
                         Remove from Plan
                       </Dropdown.Item>
-                      <Dropdown.Item onClick={() => console.log('Split Work Order', item)}>
+                      <Dropdown.Item onClick={() => setVisibleSplit(true)}>
                         <CIcon
                           icon={cilCut}
                           className="me-2"
@@ -466,18 +475,21 @@ function GroupOrderDropZone({
   )
 }
 
-const Group = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyncOrders }) => {
-  useEffect(() => {
-    console.log('group Orders', groupOrders)
-  }, [groupOrders])
-
+const Group = ({
+  workOrders,
+  setWorkOrders,
+  groupOrders,
+  setGroupOrders,
+  autoSyncOrders,
+  setVisibleSplit,
+}) => {
   const [visibleIndex, setVisibleIndex] = useState(null)
   const [groupVisibleIndex, setGroupVisibleIndex] = useState(null)
   const [modalWorkOrder, setModalWorkOrder] = useState(null)
   const [visible, setVisible] = useState(false)
+  const [selectedType, setSelectedType] = useState('')
+  const [splitVisible, setSplitVisible] = useState(false)
   const removeWorkOrderFromGroup = (order, groupIndex) => {
-    console.log('Removing order from group', order, groupIndex)
-
     setGroupOrders((prevGroups) =>
       prevGroups.map((group, index) =>
         index === groupIndex
@@ -493,8 +505,6 @@ const Group = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyn
   }
 
   const removeWorkOrderFromPlan = (order, groupIndex) => {
-    console.log('Removing order from group', order, groupIndex)
-
     setGroupOrders((prevGroups) =>
       prevGroups.map((group, index) =>
         index === groupIndex
@@ -609,6 +619,7 @@ const Group = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyn
                   setModalWorkOrder={setModalWorkOrder}
                   modalWorkOrder={modalWorkOrder}
                   setVisible={setVisible}
+                  setVisibleSplit={setVisibleSplit}
                 />
               ))}
           </CCol>
@@ -629,8 +640,10 @@ const Group = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyn
                 removeWorkOrderFromGroup={removeWorkOrderFromGroup}
                 removeWorkOrderFromPlan={removeWorkOrderFromPlan}
                 setModalWorkOrder={setModalWorkOrder}
+                setGroupOrders={setGroupOrders}
                 modalWorkOrder={modalWorkOrder}
                 setVisible={setVisible}
+                setVisibleSplit={setVisibleSplit}
               />
             ))}
         </CRow>
@@ -797,6 +810,78 @@ const Group = ({ workOrders, setWorkOrders, groupOrders, setGroupOrders, autoSyn
           </CButton>
         </CModalFooter> */}
       </CModal>
+
+      <PopUp
+        visible={splitVisible}
+        setVisible={setSplitVisible}
+        width="800px"
+        height="500px"
+        size="lg"
+      >
+        <CModalHeader>
+          <CModalTitle className="text-[#030303]">Split Work Order</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <div className="mb-3 text-[#023f81] text-[16px] flex float-right">
+            <strong>WO - #50015</strong> | <strong>Qty - 150</strong> | <strong>FG - 100</strong>
+          </div>
+          <h5 className="mb-1 text-[#023f81]">Balance Qty from Work Order:</h5>
+          <div className="mb-3 d-flex align-items-center gap-2">
+            <label className="form-label mb-0 ">Balance Qty</label>
+            <CFormInput
+              value="50"
+              disabled
+              style={{ width: '80px', height: '35px', marginLeft: '150px' }}
+            />
+          </div>
+          <div className="mb-3 d-flex align-items-center gap-2">
+            <label className="form-label mb-0 ">Allocate To</label>
+            <CFormSelect
+              onChange={(e) => setSelectedType(e.target.value)}
+              style={{ width: '150px', marginLeft: '150px' }}
+            >
+              <option value="">Select type</option>
+              <option value="Outsource">Outsource</option>
+              <option value="Purchase Order">Purchase Order</option>
+            </CFormSelect>
+            <CFormInput value="50" disabled style={{ width: '80px', height: '35px' }} />
+          </div>
+          <h5 className="text-[#023f81]">Allocated Finished Goods:</h5>
+          <div className="d-flex gap-2 mb-3">
+            <CFormSelect style={{ width: '220px', height: '35px', color: '#023f81' }}>
+              <option value="WO-50015">WO - 50015</option>
+            </CFormSelect>
+            <CFormInput style={{ width: '80px', height: '35px' }} value="50" disabled />
+            <CButton
+              style={{
+                width: '80px',
+                height: '35px',
+                backgroundColor: '#8761e5',
+                color: '#ffffff',
+              }}
+              color="success"
+            >
+              {' '}
+              Add
+            </CButton>
+          </div>
+          {/* <CListGroup style={{ maxWidth: "300px" }}>
+        <CListGroupItem className="d-flex justify-content-between">
+            <span>WO - 50015</span>
+            <span>Qty. 50</span>
+        </CListGroupItem>
+    </CListGroup> */}
+        </CModalBody>
+
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setVisible(false)}>
+            Close
+          </CButton>
+          <CButton style={{ backgroundColor: '#023f81', color: '#ffffff' }} color="primary">
+            Submit
+          </CButton>
+        </CModalFooter>
+      </PopUp>
     </>
   )
 }

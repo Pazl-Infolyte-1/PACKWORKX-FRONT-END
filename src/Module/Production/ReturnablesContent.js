@@ -42,7 +42,7 @@ const CustomToggle = React.forwardRef(({ onClick }, ref) => (
   </span>
 ))
 
-function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
+function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
     item: { sfg },
@@ -109,7 +109,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
                   />
                   Remove from Plan
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => console.log('Split Work Order', order)}>
+                <Dropdown.Item onClick={() => setVisibleSplit(true)}>
                   <CIcon
                     icon={cilCut}
                     className="me-2"
@@ -206,6 +206,7 @@ function GroupDropZone({
   addQuantity,
   visibleItemIndex,
   setVisibleItemIndex,
+  setVisibleSplit,
 }) {
   const [, drop] = useDrop(() => ({
     accept: ItemType,
@@ -310,7 +311,7 @@ function GroupDropZone({
                   />
                   Remove from Plan
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => console.log('Split Work Order', order)}>
+                <Dropdown.Item onClick={() => setVisibleSplit(true)}>
                   <CIcon
                     icon={cilCut}
                     className="me-2"
@@ -385,12 +386,13 @@ function GroupDropZone({
   )
 }
 
-const AllocateSFG = ({
+const ReturnablesContent = ({
   workOrders,
   setWorkOrders,
   groupOrders,
   setGroupOrders,
   autoSyncOrders,
+  setVisibleSplit,
 }) => {
   const [visibleGroupIndex, setVisibleGroupIndex] = useState(null)
   const [visibleItemIndex, setVisibleItemIndex] = useState(null)
@@ -655,6 +657,7 @@ const AllocateSFG = ({
                         addQuantity={addQuantity}
                         visibleItemIndex={visibleItemIndex}
                         setVisibleItemIndex={setVisibleItemIndex}
+                        setVisibleSplit={setVisibleSplit}
                       />
                     ))}
                   </CCollapse>
@@ -753,4 +756,4 @@ const AllocateSFG = ({
   )
 }
 
-export default AllocateSFG
+export default ReturnablesContent

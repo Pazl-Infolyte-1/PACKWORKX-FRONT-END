@@ -1,9 +1,15 @@
 import React from 'react';
 import PopUp from '../../components/New/PopUp';
-import {
-    CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell,
-    CButton, CModalHeader, CModalTitle, CModalBody, CModalFooter
-} from "@coreui/react";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogActions from "@mui/material/DialogActions";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Button from "@mui/material/Button";
+
 
 function SkuPopup({ visible, setVisible }) {
     const tableData = [
@@ -14,47 +20,42 @@ function SkuPopup({ visible, setVisible }) {
     ];
 
     return (
-        <PopUp visible={visible} setVisible={setVisible} width="800px" height="500px" size="lg">
-            <CModalHeader>
-                <CModalTitle>Select Die for SKU Mapping</CModalTitle>
-            </CModalHeader>
-            <CModalBody>
-                <CTable bordered hover>
-                    <CTableHead color="light">
-                        <CTableRow>
-                            <CTableHeaderCell>Die ID</CTableHeaderCell>
-                            <CTableHeaderCell>Name</CTableHeaderCell>
-                            <CTableHeaderCell>Client</CTableHeaderCell>
-                            <CTableHeaderCell>Board Size</CTableHeaderCell>
-                            <CTableHeaderCell>UPS</CTableHeaderCell>
-                        </CTableRow>
-                    </CTableHead>
-                    <CTableBody>
-                        {tableData.map((row, index) => (
-                            <CTableRow key={index}>
-                                <CTableDataCell>{row.id}</CTableDataCell>
-                                <CTableDataCell>{row.name}</CTableDataCell>
-                                <CTableDataCell>{row.client}</CTableDataCell>
-                                <CTableDataCell>{row.boardSize}</CTableDataCell>
-                                <CTableDataCell>{row.ups}</CTableDataCell>
-                            </CTableRow>
-                        ))}
-                    </CTableBody>
-                </CTable>
-
-
-            </CModalBody>
-            <CModalFooter>
-                <div className="d-flex justify-content-end gap-2 mt-3">
-                    <CButton color="success" className="text-white" onClick={() => setVisible(false)}>Cancel</CButton>
-                    <CButton color="success" className="text-white">Select</CButton>
-                </div>
-
-
-            </CModalFooter>
+        <PopUp visible={visible} setVisible={setVisible} size="2xl"  >
+             <DialogTitle style={{fontSize:'18px', marginTop:'0px'}}>Select Die for SKU Mapping</DialogTitle>
+                <TableContainer className='mt-0'  >
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Die ID</TableCell>
+                                <TableCell>Name</TableCell>
+                                <TableCell>Client</TableCell>
+                                <TableCell>Board Size</TableCell>
+                                <TableCell>UPS</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {tableData.map((row, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>{row.id}</TableCell>
+                                    <TableCell>{row.name}</TableCell>
+                                    <TableCell>{row.client}</TableCell>
+                                    <TableCell>{row.boardSize}</TableCell>
+                                    <TableCell>{row.ups}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            <DialogActions >
+                <Button style={{fontSize:'10px'}} onClick={() => setVisible(false)} color="success" variant="contained"> Cancel</Button>
+                <Button style={{fontSize:'10px'}} color="success" variant="contained">Select</Button>
+            </DialogActions>
+            
         </PopUp>
 
     );
 }
 
 export default SkuPopup;
+
+

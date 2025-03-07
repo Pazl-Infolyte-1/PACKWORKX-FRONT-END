@@ -17,8 +17,8 @@ function ReelsDetails({ visible, setVisible }) {
   ]
 
   return (
-    <PopUp visible={visible} setVisible={setVisible} size={'lg'}>
-      <div className="grid grid-cols-3 gap-3 p-3 bg-gray-100">
+    <PopUp visible={visible} setVisible={setVisible} size={'lg'} header="" showCloseButton={true} height="450px" width="910px">
+      <div className="grid grid-cols-3 gap-3 p-3 border">
         <div className="col-span-2">
           <h2 className="text-lg font-bold mb-4">Reels Details :</h2>
           <table className="w-full ">
@@ -44,8 +44,8 @@ function ReelsDetails({ visible, setVisible }) {
             </tbody>
           </table>
         </div>
-        <div>
-          <table className="w-full  mt-5 bg-orange-100">
+        <div className="w-full  mt-5 ">
+          <table className='bg-orange-100 max-w-full' >
             <thead style={{ color: '#f45b31' }}>
               <tr>
                 <th className=" px-3 py-2">Reel No</th>

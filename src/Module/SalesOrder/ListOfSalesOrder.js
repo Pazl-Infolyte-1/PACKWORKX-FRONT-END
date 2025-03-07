@@ -27,7 +27,7 @@ import {
 import { MdDeleteOutline } from 'react-icons/md'
 import CommonPagination from '../../components/New/Pagination'
 import CIcon from '@coreui/icons-react'
-import { cilOptions } from '@coreui/icons'
+import { cil3d, cilOptions } from '@coreui/icons'
 import AddSalesOrder from './AddSalesOrder'
 import ActionPopup from './ActionPopup'
 import VersionsPopup from './VersionsPopup'
@@ -167,6 +167,16 @@ function ListOfSalesOrder() {
                       >
                         <CIcon
                           icon={cilOptions}
+                          className="me-2"
+                          style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
+                        />
+                      </CButton>
+                      <CButton color="light" 
+                      onClick={() => setVersionDrawerOpen(true)}
+                      // onClick={() => setVersionDrawerOpen(true)}
+                      >
+                        <CIcon
+                          icon={cil3d}
                           className="me-2"
                           style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
                         />

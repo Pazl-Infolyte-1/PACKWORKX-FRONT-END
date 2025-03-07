@@ -13,7 +13,7 @@ function PackagesTable({ packagedata = [] }) {
   return (
     <>
       <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
-        <CTable striped hover className="mt-3 w-full">
+        <CTable striped hover className=" w-full">
           <CTableHead className="bg-gray-100 sticky top-0 ">
             <CTableRow>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">

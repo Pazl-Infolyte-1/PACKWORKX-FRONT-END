@@ -21,6 +21,8 @@ const PopUp = ({ visible, setVisible, width, height, header, showCloseButton, ch
           display: 'flex',
           flexDirection: 'column',
           p: 3,
+          overflowX:"auto",
+          overflowY:"auto"
         }}
       >
         <div className="flex justify-between items-center pb-2">

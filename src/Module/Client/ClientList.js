@@ -115,13 +115,13 @@ function ClientList() {
           </div>
         </div>
 
-        <div className="border h-[80%] mt-4">
-          <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
+        <div className=" h-[80%]">
+          <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  mt-3">
             <ClientTable packagedata={data} />
           </div>
         </div>
         {/* Pagination Section */}
-        <div className="flex justify-end items-center gap-4 mt-4 mb-3">
+        <div className="flex justify-end items-center gap-4 mt-3 ">
           <CommonPagination
             count={totalPages}
             page={currentPage}

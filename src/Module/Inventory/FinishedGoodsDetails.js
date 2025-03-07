@@ -5,21 +5,19 @@ import { IoMdEye } from 'react-icons/io'
 
 function FinishedGoodsDetails({ visible, setVisible }) {
   return (
-    <PopUp visible={visible} setVisible={setVisible} size="xxl" >
-
-
-      {/* Modal Body (Fixed Layout) */}
+    <PopUp visible={visible} setVisible={setVisible} size="xxl" header=""
+    showCloseButton={true} height="600px" width="1200px" >
       
-      <div className="h-[500px] flex gap-2 ">
+      <div className=" flex gap-2 h-[500px]">
         {/* Left Section (Scrollable Finished Goods) */}
-        <div className="w-[40%] bg-white shadow-lg rounded-lg px-4 flex flex-col ">
+        <div className="w-[40%]  shadow-lg rounded-lg px-2 flex flex-col ">
           {/* Fixed Header */}
           <div className="bg-[#8167e5] text-white text-lg font-semibold p-3 rounded-md  flex justify-center items-center h-10 mt-4 mb-2">
             Finished Goods
           </div>
 
           {/* Scrollable List */}
-          <div className="mt-2 space-y-3 overflow-y-auto flex-1 custom-scrollbar">
+          <div className="mt-2 space-y-3 overflow-y-auto flex-1 custom-scrollbar pb-3">
             {[{ id: 10022 }, { id: 10023 }, { id: 10024 }].map((item) => (
               <div key={item.id} className="border-2  rounded-md pl-3 shadow-md h-[170px]">
                 <p className="text-[#21338e] font-semibold">Finished Good ID: FG - #{item.id}</p>
@@ -51,7 +49,7 @@ function FinishedGoodsDetails({ visible, setVisible }) {
         </div>
 
         {/* Right Section (Fixed Top Info + Scrollable Layers) */}
-        <div className="w-[60%] bg-white shadow-lg rounded-lg  flex flex-col">
+        <div className="w-[60%] bg-transparent shadow-lg rounded-lg  flex flex-col">
           {/* Fixed Top Info */}
 
           <div className="border-b-2 px-4 flex justify-center items-center pt-4 ">
@@ -102,6 +100,42 @@ function FinishedGoodsDetails({ visible, setVisible }) {
                 allocation: 'FG',
                 completion: '75%',
                 fluteRatio: 10,
+              },
+              {
+                title: 'Top Layer Details',
+                gsm: 130,
+                bf: 26,
+                color: 'Yellow',
+                dimensions: '50x40',
+                allocation: 'RM',
+                completion: '75%',
+              },
+              {
+                title: 'Top Layer Details',
+                gsm: 130,
+                bf: 26,
+                color: 'Yellow',
+                dimensions: '50x40',
+                allocation: 'RM',
+                completion: '75%',
+              },
+              {
+                title: 'Top Layer Details',
+                gsm: 130,
+                bf: 26,
+                color: 'Yellow',
+                dimensions: '50x40',
+                allocation: 'RM',
+                completion: '75%',
+              },
+              {
+                title: 'Top Layer Details',
+                gsm: 130,
+                bf: 26,
+                color: 'Yellow',
+                dimensions: '50x40',
+                allocation: 'RM',
+                completion: '75%',
               },
               {
                 title: 'Top Layer Details',

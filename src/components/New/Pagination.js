@@ -9,9 +9,9 @@ const CommonPagination = ({ count, page, onChange, color = 'secondary' }) => {
       <div>
         <CFormSelect style={{ width: '110px' }} className="w-4" aria-label="Entries per page">
           <option value="5">Entries 5</option>
-          <option value="10">Show 10</option>
-          <option value="25">Show 25</option>
-          <option value="50">Show 50</option>
+          <option value="10">Entries 10</option>
+          <option value="25">Entries 25</option>
+          <option value="50">Entries 50</option>
         </CFormSelect>
       </div>
       <div>

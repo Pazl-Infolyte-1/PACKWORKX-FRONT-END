@@ -9,8 +9,6 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Button from "@mui/material/Button";
-
-
 function SkuPopup({ visible, setVisible }) {
     const tableData = [
         { id: "DIE2345", name: "Standard Die", client: "XYZ Corp", boardSize: "20x30 cm", ups: 4 },
@@ -20,37 +18,37 @@ function SkuPopup({ visible, setVisible }) {
     ];
 
     return (
-        <PopUp visible={visible} setVisible={setVisible} size="2xl"  >
-             <DialogTitle style={{fontSize:'18px', marginTop:'0px'}}>Select Die for SKU Mapping</DialogTitle>
-                <TableContainer className='mt-0'  >
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Die ID</TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Client</TableCell>
-                                <TableCell>Board Size</TableCell>
-                                <TableCell>UPS</TableCell>
+        <PopUp visible={visible} setVisible={setVisible} width="700px" height="400px" header={<div style={{ color: '#21338e', display: 'flex', marginLeft:'150px' }}>Select Die For SKU Mapping </div>} showCloseButton={false} >
+          
+            <TableContainer   >
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Die ID</TableCell>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Client</TableCell>
+                            <TableCell>Board Size</TableCell>
+                            <TableCell>UPS</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {tableData.map((row, index) => (
+                            <TableRow key={index}>
+                                <TableCell>{row.id}</TableCell>
+                                <TableCell>{row.name}</TableCell>
+                                <TableCell>{row.client}</TableCell>
+                                <TableCell>{row.boardSize}</TableCell>
+                                <TableCell>{row.ups}</TableCell>
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {tableData.map((row, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{row.id}</TableCell>
-                                    <TableCell>{row.name}</TableCell>
-                                    <TableCell>{row.client}</TableCell>
-                                    <TableCell>{row.boardSize}</TableCell>
-                                    <TableCell>{row.ups}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            <DialogActions >
-                <Button style={{fontSize:'10px'}} onClick={() => setVisible(false)} color="success" variant="contained"> Cancel</Button>
-                <Button style={{fontSize:'10px'}} color="success" variant="contained">Select</Button>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <DialogActions style={{ fontSize: '10px',padding:'10px',marginTop:'5px' }} >
+                <Button  onClick={() => setVisible(false)} color="success" variant="contained"> Colse </Button>
+                <Button  color="success" variant="contained">Select</Button>
             </DialogActions>
-            
+
         </PopUp>
 
     );

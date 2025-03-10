@@ -22,14 +22,14 @@ const InventoryDashboard = () => {
 
   const StockCard = ({ title, quantity, status, bgColor, textColor, buttonColor, icon ,modalname}) => (
     <div
-      className={`flex justify-between p-3 rounded-lg shadow-md ${bgColor} ${textColor} min-h-[151.2px]`}
+      className={`flex justify-between p-2 rounded-lg shadow-md ${bgColor} ${textColor} min-h-[130px]`}
     >
       <div>
         <h6 style={{ marginBottom: '0' }}>{title}</h6>
         <p style={{ marginBottom: '0' }}>Total Quantity: {quantity}</p>
         {status && <p style={{ marginBottom: '0' }}>Status: {status}</p>}
         <button
-          className={`text-white text-sm px-4 py-1  rounded ${buttonColor} mt-4`}
+          className={`text-white text-sm px-4 py-1  rounded ${buttonColor} mt-3`}
           onClick={modalname=="finished_goods"?() => setfinishedgoodpopup(true):() => setreelsgoodpopup(true)}
         >
           View Info
@@ -46,15 +46,15 @@ const InventoryDashboard = () => {
   )
 
   const MaterialSection = () => (
-    <section className="bg-white p-4 mt-4 rounded-lg shadow-md">
-      <h6>Raw Materials Types</h6>
+    <section className="bg-white p-2 mt-2 rounded-lg shadow-md">
+      <h5>Raw Materials Types</h5>
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="relative flex items-center shadow-md mt-2">
             <input
               type="text"
               placeholder="Search SKU by name or ID"
-              className="border border-gray-300 p-2 rounded w-72"
+              className="border border-gray-300 p-1 rounded w-72"
             />
             <FaSearch className="absolute right-3 text-gray-500" />
           </div>
@@ -66,14 +66,14 @@ const InventoryDashboard = () => {
         </div>
       </div>
       <MaterialTable />
-      <div className="flex justify-end items-center gap-4 mt-4">
+      <div className="flex justify-end items-center gap-4 mt-2">
         <CommonPagination count={5} page={1} onChange={() => {}} />
       </div>
     </section>
   )
 
   const MaterialTable = () => (
-    <div className="p-2 border border-gray-300 my-5">
+    <div className="p-2 border border-gray-300 my-2">
       <table className="w-full border-collapse shadow-md border border-gray-300">
         <tbody>
           <MaterialRow
@@ -118,8 +118,8 @@ const InventoryDashboard = () => {
   )
 
   return (
-    <div className="bg-gray-100 p-4">
-      <div className="grid grid-cols-3 gap-6">
+    <div className="bg-gray-100 p-2">
+      <div className="grid grid-cols-3 gap-3">
         <StockCard
           title="Reels"
           quantity="1200"
@@ -170,9 +170,9 @@ const InventoryDashboard = () => {
           
           icon={<FaUsers />}
         />
-        <div className="flex flex-col items-center justify-center p-6 bg-white rounded-lg shadow-md">
-          <h5 className="text-blue-800">Total Stock Value</h5>
-          <h3 className="text-2xl font-bold text-blue-800">$50,000</h3>
+        <div className="flex flex-col items-center justify-center p-2 bg-white rounded-lg shadow-md">
+          <h6 className="text-blue-800">Total Stock Value</h6>
+          <h5 className="text-2xl font-bold text-blue-800">$50,000</h5>
         </div>
       </div>
       <MaterialSection />

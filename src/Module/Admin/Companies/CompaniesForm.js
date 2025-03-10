@@ -15,18 +15,18 @@ function CompaniesForm({isDrawerOpen,setDrawerOpen}) {
   return (
     <>
     <div>
-    <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
-          <div className="text-2xl font-semibold text-center py-4">Add Company</div>
+    <Drawer maxWidth = {"1280px"} isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
+          <div className="text-2xl font-semibold text-left p-1 -ml-2 ">Add Company</div>
 
-          <div className="p-4 bg-white">
+          <div className=" bg-white sm:ml-[10%] md:ml-[10%] lg:ml-0 w-full">
             {/* Company Details Section */}
-            <h3 className="mt-4 text-xl font-semibold text-gray-700 border-b pb-2">
+            <h3 className="mt-1 text-xl font-semibold text-gray-700 border-b pb-2">
               Company Details
             </h3>
             <CCardBody>
        {/* First Row: Company Name, Email, Phone */}
          <CRow className="g-3">
-           <CCol md={4}>
+           <CCol md={4} >
              <CFormInput label="Company Name *" placeholder="Enter Company Name" />
            </CCol>
            <CCol md={4}>
@@ -86,9 +86,12 @@ function CompaniesForm({isDrawerOpen,setDrawerOpen}) {
             
 
             {/* Account Details Section */}
+
             <h3 className="mt-4 text-xl font-semibold text-gray-700 border-b pb-2">
               Account Details (First Company Admin)
             </h3>
+            <CCardBody>
+
             <CRow className="g-3">
               <CCol md={6}>
                 <CFormInput label="Name *" placeholder="Name " />
@@ -97,7 +100,7 @@ function CompaniesForm({isDrawerOpen,setDrawerOpen}) {
                 <CFormInput label=" Email(Login details will be emailted to this email)*"placeholder="Admin Email " />
               </CCol>
             </CRow>
-
+</CCardBody>
             {/* Buttons */}
             <div className="flex justify-end gap-4 mt-4">
               <CButton color="secondary" onClick={() => setDrawerOpen(false)}>

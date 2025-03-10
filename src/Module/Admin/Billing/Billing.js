@@ -17,9 +17,14 @@ import {
   CCardBody,
   CPagination,
   CPaginationItem,
+  CInputGroupText,
 } from "@coreui/react";
 import "@coreui/coreui/dist/css/coreui.min.css";
 import BillingTable from './billingtable';
+import CommonPagination from '../../../components/New/Pagination';
+import { FiSearch } from "react-icons/fi";
+
+
 
 
 const Billing = () => {
@@ -47,67 +52,47 @@ const Billing = () => {
   const totalPages = Math.ceil(data.length / rowsPerPage);
 
   return (
+    <div className=" w-full h-full">
     <CCard className="p-4 m-4">
       <CCardBody>
-        <div className="flex items-center mb-4">
-          <CCol md="1">
-            <CFormLabel htmlFor="search" className="text-gray-600">
-              Company
-            </CFormLabel>
-          </CCol>
-          <CInputGroup className="flex gap-2 ml-[-15px]">
-            <CFormSelect className="max-w-[100px]">
-              <option>All</option>
-            </CFormSelect>
-            <CFormInput
-              placeholder="Start typing to search"
-              className="flex-1 bg-white text-gray-400"
-            />
-          </CInputGroup>
-        </div>
-        <div className="border h-[80%] mt-4">
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
+
+      <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
+            <CCol xs="12" sm="auto">
+              <CFormLabel htmlFor="search" className="text-gray-600">
+                Company
+              </CFormLabel>
+            </CCol>
+            <CInputGroup className="w-full sm:w-auto ">
+  <CFormSelect className="max-w-[80px] flex-shrink-0 mr-4">
+    <option>All</option>
+  </CFormSelect>
+  <CInputGroupText>
+    <FiSearch />
+  </CInputGroupText>
+  <CFormInput className="max-w-[200px] flex-grow" placeholder="Start typing to search" />
+</CInputGroup>
+
+
+          </div>
+        <div className=" h-[80%]  ">
+        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap p-2 ">
           <BillingTable cellData={data} />
         </div>
           </div>
 
-        <div className="flex justify-between items-center mt-4">
-          <CFormSelect
-            value={rowsPerPage}
-            onChange={(e) => setRowsPerPage(Number(e.target.value))}
-            className="max-w-[120px]"
-          >
-            <option value={2}>2 Entries</option>
-            <option value={5}>5 Entries</option>
-            <option value={10}>10 Entries</option>
-          </CFormSelect>
-
-          <CPagination aria-label="Page navigation">
-            <CPaginationItem
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
-            >
-              Previous
-            </CPaginationItem>
-            {[...Array(totalPages)].map((_, index) => (
-              <CPaginationItem
-                key={index}
-                active={index + 1 === currentPage}
-                onClick={() => setCurrentPage(index + 1)}
-              >
-                {index + 1}
-              </CPaginationItem>
-            ))}
-            <CPaginationItem
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(currentPage + 1)}
-            >
-              Next
-            </CPaginationItem>
-          </CPagination>
-        </div>
+        
+      {/* Pagination Section */}
+      <div className="flex justify-end items-center gap-4 mt-4 mb-3">
+        <CommonPagination
+          count={totalPages}
+          page={currentPage}
+          onChange={(event, value) => setCurrentPage(value)}
+        />
+      </div>
+      
       </CCardBody>
     </CCard>
+    </div>
   );
 };
 

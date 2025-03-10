@@ -12,6 +12,7 @@ function ActionPopup({ visible, setVisible }) {
         setData(response.data.sections?.[0]?.data || [])
       } catch (error) {
         console.error('Error fetching data:', error)
+        console.error('Error fetching data:', error)
       }
     }
     fetchData()
@@ -19,7 +20,7 @@ function ActionPopup({ visible, setVisible }) {
   const header = () => (
     <div className="flex space-between items-center gap-52  w-full ">
       <span className="text-xl font-semibold  ">SKU - 40</span>
-      <span className='ml-64 '>
+      <span className="ml-64 ">
         <select
           id="invoiceSelect"
           className="border border-[#8167e5] rounded px-2 py-1 text-[#8167e5] focus:outline-none"

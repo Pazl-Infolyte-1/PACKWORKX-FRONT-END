@@ -28,32 +28,28 @@ function EmployeeList() {
     fetchData()
   }, [])
 
- 
-  const tableData = Array.isArray(data) ? data : [];
-
+  const tableData = Array.isArray(data) ? data : []
 
   const indexOfLastRow = currentPage * rowsPerPage
   const indexOfFirstRow = indexOfLastRow - rowsPerPage
   const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
   const totalPages = Math.ceil(tableData.length / rowsPerPage)
 
-  
   return (
     <>
-      <div className="max-w-[1280px] mx-auto" >
-        <div
-         className="flex justify-between items-center">
+      <div className="max-w-[1280px] mx-auto">
+        <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Employee</h2>
           <div className="flex gap-4">
-            <button className="bg-teal-500 text-white px-2.5 py-1 rounded-md border-none hover:bg-teal-600 "
+            <button
+              className="bg-teal-500 text-white px-2.5 py-1 rounded-md border-none hover:bg-teal-600 "
               onClick={() => {
-              setDrawerOpen(true)
+                setDrawerOpen(true)
               }}
             >
               + Create Employee
             </button>
-            <button
-              className="bg-violet-600 text-white px-4 py-1 rounded-md border-none hover:bg-violet-700">
+            <button className="bg-violet-600 text-white px-4 py-1 rounded-md border-none hover:bg-violet-700">
               Import
             </button>
             <button className="bg-violet-600 text-white px-4 py-1 rounded-md border-none hover:bg-violet-700">
@@ -67,8 +63,7 @@ function EmployeeList() {
             <div className="flex gap-1.5 items-center">
               <TbSmartHome className="text-teal-500" />
               <span>All Datas</span>
-              <span
-               className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
+              <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
                 5055
               </span>
             </div>
@@ -90,8 +85,8 @@ function EmployeeList() {
         </div>
 
         <div className="overflow-x-auto border border-gray-200 p-3 mt-1 rounded-md">
-          <div className="max-w-[1280px] mx-auto mt-1 flex justify-evenly gap-2 items-center" >
-            <div className="flex gap-2 items-center border border-[#e7e5e4] p-2 rounded-md" >
+          <div className="max-w-[1280px] mx-auto mt-1 flex justify-evenly gap-2 items-center">
+            <div className="flex gap-2 items-center border border-[#e7e5e4] p-2 rounded-md">
               <BiSearchAlt className="text-[#737373]" />
               <input
                 type="text"
@@ -101,8 +96,10 @@ function EmployeeList() {
             </div>
 
             <select
-              className="border border-[#e7e5e4] p-2 w-[160px] rounded-md text-[#737373] bg-transparent">
-              <option disabled selected>
+              className="border border-[#e7e5e4] p-2 w-[160px] rounded-md text-[#737373] bg-transparent"
+              defaultValue=""
+            >
+              <option value="" disabled>
                 Select Department
               </option>
               <option value="">Department1</option>
@@ -111,8 +108,10 @@ function EmployeeList() {
             </select>
 
             <select
-             className="border border-[#e7e5e4] p-2 w-[160px] rounded-md text-[#737373] bg-transparent">
-              <option disabled selected>
+              className="border border-[#e7e5e4] p-2 w-[160px] rounded-md text-[#737373] bg-transparent"
+              defaultValue=""
+            >
+              <option value="" disabled>
                 Select Role
               </option>
               <option value="">Role1</option>
@@ -120,8 +119,11 @@ function EmployeeList() {
               <option value="">Role3</option>
             </select>
 
-            <select className="border border-[#e7e5e4] p-2 w-[160px] rounded-md text-[#737373] bg-transparent" >
-              <option disabled selected>
+            <select
+              className="border border-[#e7e5e4] p-2 w-[160px] rounded-md text-[#737373] bg-transparent"
+              defaultValue=""
+            >
+              <option value="" disabled>
                 Select Manager
               </option>
               <option value="">Manager1</option>
@@ -131,34 +133,22 @@ function EmployeeList() {
           </div>
 
           <div className="border h-[80%] mt-4">
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
-          <EmployeeTable employeesdata={data} />
-        </div>
-      </div>
-      {/* Pagination Section */}
-      <div className="flex justify-end items-center gap-4 mt-4 mb-3">
-          <CommonPagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(event, value) => setCurrentPage(value)}
-          />
-        </div>
-
-          
-         
-
-
-
-
-
-
-
+            <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
+              <EmployeeTable employeesdata={data} />
+            </div>
+          </div>
+          {/* Pagination Section */}
+          <div className="flex justify-end items-center gap-4 mt-4 mb-3">
+            <CommonPagination
+              count={totalPages}
+              page={currentPage}
+              onChange={(event, value) => setCurrentPage(value)}
+            />
+          </div>
         </div>
         <div>
           <EmployeeForm isDrawerOpen={isDrawerOpen} setDrawerOpen={setDrawerOpen} />
         </div>
-
-        
       </div>
     </>
   )

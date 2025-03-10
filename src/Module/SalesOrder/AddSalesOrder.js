@@ -71,27 +71,31 @@ const AddSalesOrder = ({ currentTab }) => {
                 <div className="p-2 rounded-lg flex flex-col">
                   <label className="text-black font-normal leading-6 mb-2 text-left">Client</label>
                   <div className="relative w-[521px]">
-                    <select className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] font-['Mulish'] text-sm leading-[26px] outline-none appearance-none pr-10">
-                      <option value="" disabled selected>
+                    <select
+                      className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] font-['Mulish'] text-sm leading-[26px] outline-none appearance-none pr-10"
+                      defaultValue=""
+                    >
+                      <option value="" disabled>
                         Sterling Labs
                       </option>
                       <option value="client1">Client 1</option>
                       <option value="client2">Client 2</option>
                       <option value="client3">Client 3</option>
                     </select>
+
                     {/* Downward arrow inside the select field */}
                     <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#c2c2c2]">
                       <svg
-                        class="-mr-1 size-5 text-gray-400"
+                        className="-mr-1 size-5 text-gray-400"
                         viewBox="0 0 20 20"
                         fill="currentColor"
                         aria-hidden="true"
                         data-slot="icon"
                       >
                         <path
-                          fill-rule="evenodd"
+                          fillRule="evenodd"
                           d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-                          clip-rule="evenodd"
+                          clipRule="evenodd"
                         />
                       </svg>
                     </div>
@@ -116,27 +120,31 @@ const AddSalesOrder = ({ currentTab }) => {
                     Freight Paid
                   </label>
                   <div className="relative w-[521px]">
-                    <select className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-sm font-['Mulish'] leading-[26px] outline-none appearance-none pr-10">
-                      <option value="" disabled selected>
+                    <select
+                      className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-sm font-['Mulish'] leading-[26px] outline-none appearance-none pr-10"
+                      defaultValue=""
+                    >
+                      <option value="" disabled>
                         To Pay
                       </option>
                       <option value="client1">Payment 1</option>
                       <option value="client2">Payment 2</option>
                       <option value="client3">Payment 3</option>
                     </select>
+
                     {/* Downward arrow inside the select field */}
                     <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#c2c2c2]">
                       <svg
-                        class="-mr-1 size-5 text-gray-400"
+                        className="-mr-1 size-5 text-gray-400"
                         viewBox="0 0 20 20"
                         fill="currentColor"
                         aria-hidden="true"
                         data-slot="icon"
                       >
                         <path
-                          fill-rule="evenodd"
+                          fillRule="evenodd"
                           d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-                          clip-rule="evenodd"
+                          clipRule="evenodd"
                         />
                       </svg>
                     </div>

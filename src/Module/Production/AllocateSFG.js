@@ -761,8 +761,9 @@ const AllocateSFG = ({
                   borderRadius: '2px',
                 }}
               ></div>
-              {sfgData.map((sfg) => (
+              {sfgData.map((sfg, index) => (
                 <SFGDragableCard
+                  key={index}
                   sfg={sfg}
                   openSFG={openSFG}
                   setOpenSFG={setOpenSFG}

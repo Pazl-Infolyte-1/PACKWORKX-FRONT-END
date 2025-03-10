@@ -8,15 +8,6 @@ import {
   CButton,
   CCollapse,
   CFormSelect,
-  CTable,
-  CTableHeaderCell,
-  CTableHead,
-  CTableBody,
-  CTableRow,
-  CTableDataCell,
-  CModalBody,
-  CCardHeader,
-  CModalFooter,
 } from '@coreui/react'
 import { FaAngleDown, FaAngleUp, FaLock } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
@@ -25,7 +16,6 @@ import { useDrag, useDrop } from 'react-dnd'
 import './styles.css'
 import ProgressBar from './ProgressBar'
 import Dropdown from 'react-bootstrap/Dropdown'
-import PopUp from '../../components/New/PopUp'
 import AllcoateRMModal from './AllcoateRMModal'
 
 const ItemType = 'WORK_ORDER'
@@ -719,9 +709,10 @@ const AllocateRM = ({
                   borderRadius: '2px',
                 }}
               ></div>
-              {sfgData.map((sfg) => (
+              {sfgData.map((sfg, index) => (
                 <SFGDragableCard
                   sfg={sfg}
+                  key={index}
                   openSFG={openSFG}
                   setOpenSFG={setOpenSFG}
                   setVisibleSplit={setVisibleSplit}

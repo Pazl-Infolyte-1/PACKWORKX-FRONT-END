@@ -6,7 +6,7 @@ import { IoMdEye } from 'react-icons/io'
 function FinishedGoodsDetails({ visible, setVisible }) {
   return (
     <PopUp visible={visible} setVisible={setVisible} size="xxl" header=""
-    showCloseButton={true} height="600px" width="1200px" >
+    showCloseButton={true} height="610px" width="1200px" >
       
       <div className=" flex gap-2 h-[500px]">
         {/* Left Section (Scrollable Finished Goods) */}
@@ -40,7 +40,7 @@ function FinishedGoodsDetails({ visible, setVisible }) {
                     </p>
                   </div>
                   <span className="px-4">
-                    <IoMdEye className=' h-[25px] w-[25px]' />
+                    <IoMdEye className=' h-[25px] w-[25px] text-gray-500' />
                   </span>
                 </div>
               </div>

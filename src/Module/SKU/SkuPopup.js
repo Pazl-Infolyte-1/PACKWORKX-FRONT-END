@@ -18,7 +18,7 @@ function SkuPopup({ visible, setVisible }) {
     ];
 
     return (
-        <PopUp visible={visible} setVisible={setVisible} width="700px" height="400px" header={<div style={{ color: '#21338e', display: 'flex', marginLeft:'150px' }}>Select Die For SKU Mapping </div>} showCloseButton={false} >
+        <PopUp visible={visible} setVisible={setVisible} width="700px" height="430px" header={<div style={{ color: '#21338e', display: 'flex', marginLeft:'150px' }}>Select Die For SKU Mapping </div>} showCloseButton={false} >
           
             <TableContainer   >
                 <Table>

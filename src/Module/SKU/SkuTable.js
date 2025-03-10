@@ -9,7 +9,9 @@ import {
   CButton,
 } from '@coreui/react'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
-function ClientTable({ clientdata = [] }) {
+
+function SkuTable(skudata = []) {
+  console.log('datasss', JSON.stringify(skudata))
   return (
     <>
       <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
@@ -17,49 +19,54 @@ function ClientTable({ clientdata = [] }) {
           <CTableHead className="bg-gray-100 sticky top-0 ">
             <CTableRow>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Client Id
+              SKU Name
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
               Created Date
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Company
+              Modified Date
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              POC
+              SKU Type
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Contact
+              Client
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Due Amount
+              Dimensions
+              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+              Deckle
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Action
               </CTableHeaderCell>
-
             </CTableRow>
           </CTableHead>
 
           <CTableBody>
-            {clientdata.length > 0 ? (
-              clientdata.map((cell, index) => (
+            {skudata.skudata.length > 0 ? (
+              skudata.skudata.map((cell, index) => (
                 <CTableRow key={index} className="border-b">
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.client_id}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.sku_name}
+                  </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.created_date}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.company}
+                    {cell.modified_date}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.sku_type}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.client}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.poc}
+                    {cell.dimensions}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.contact}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.due_amount}
+                    {cell.deckle}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     <CButton>
@@ -82,4 +89,4 @@ function ClientTable({ clientdata = [] }) {
   )
 }
 
-export default ClientTable
+export default SkuTable

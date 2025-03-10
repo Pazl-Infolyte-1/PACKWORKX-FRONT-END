@@ -15,8 +15,8 @@ const CompaniesTable = ({ cellData }) => {
   return (
    <>
    <div>
-         <div className="max-h-[500px] overflow-y-auto border border-gray-200 custom-scrollbar">
-           <CTable striped hover className="mt-3 w-full">
+         <div className="max-h-[500px] overflow-y-auto  custom-scrollbar">
+           <CTable striped hover className="mt-3 w-full border p-3">
              <CTableHead className="bg-gray-100 sticky top-0 ">
                <CTableRow>
                  <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">

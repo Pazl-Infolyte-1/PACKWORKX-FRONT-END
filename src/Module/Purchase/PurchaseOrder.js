@@ -6,6 +6,7 @@ import { CiSettings } from "react-icons/ci";
 import { LuScanBarcode } from "react-icons/lu";
 import { FiAlertCircle } from "react-icons/fi";
 import axios from "axios";
+
 import PO from './PO.js'
 
 
@@ -69,9 +70,9 @@ const PurchaseOrder = () => {
 
 
             {/* Bill To & Ship To */}
-            <div className="grid grid-cols-4 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  mb-4">
                 <div>
-                    <p className="text-[#7f7f7f] ">Bill</p>
+                    <p className="text-[#7f7f7f]">Bill</p>
                     <p className="text-[#030303]">Demo Pack works</p>
                     <p className="text-[#030303]">US</p>
                 </div>
@@ -80,30 +81,18 @@ const PurchaseOrder = () => {
                     <p className="text-[#030303]">Demo Pack works</p>
                     <p className="text-[#030303]">US</p>
                 </div>
-                <div></div>
-                <div className="ml-auto">
-                    <table>
-
-                        <tr>
-                            <td>#</td>
-                            <td>No.</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>0-00000</td>
-                        </tr>
-                        <tr>
-                            <td>🔗</td>
-                            <td>Linked To</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>WO-0000084</td>
-                        </tr>
-
-                    </table>
+                <div className="hidden md:block"></div> 
+                <div className="ml-auto flex flex-col gap-2 w-full md:w-auto h-auto">
+                    <div className="flex items-center gap-2">
+                        <span>#</span>
+                        <span>No.</span>
+                        <span>0-00000</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span>🔗</span>
+                        <span>Linked To</span>
+                        <span>WO-0000084</span>
+                    </div>
                 </div>
             </div>
 
@@ -130,14 +119,16 @@ const PurchaseOrder = () => {
                 <div className="flex items-center space-x-2">
                     <div>
                         <label className="text-[#b7b7b7]">Business:</label>
-                        <select className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f] w-40" >
+                           <select className="border p-2 rounded  bg-[#f1f1f1] text-[#7f7f7f] w-40">
+
                             {/* <select className="block w-full p-2 border rounded bg-[#f1f1f1] w-[40%] text-[#7f7f7f]"> */}
                             <option>Select</option>
                         </select>
                     </div>
                     <div>
                         <label className="text-[#b7b7b7]  ">Class:</label>
-                        <select className="border p-2 rounded w-full border rounded bg-[#f1f1f1] text-[#7f7f7f] w-40 " >
+                        <select className="border p-2 rounded  bg-[#f1f1f1]  text-[#7f7f7f] w-40">
+
                             {/* <select className="block w-full p-2 border rounded bg-[#f1f1f1] w-[40%] text-[#7f7f7f]"> */}
                             <option>Select</option>
                         </select>
@@ -216,6 +207,8 @@ const PurchaseOrder = () => {
                     onChange={handleFileChange}
                 />
             </div>
+            
+            
 
 
         </div>
@@ -223,4 +216,5 @@ const PurchaseOrder = () => {
 };
 
 export default PurchaseOrder;
+
 

@@ -48,27 +48,28 @@ const CompanyManagement = () => {
   const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
   const totalPages = Math.ceil(tableData.length / rowsPerPage)
   return (
-    <CContainer fluid style={{ marginTop: "0px" }}>
+    <CContainer fluid style={{ marginTop: "0px",backgroundcolor: "rgba(128, 128, 128, 0.1)" }}>
       <CCard>
 
         
           {/* Top Controls */}
+          <div  className='border p-3  rounded-md '>
           
-          <CCardHeader className="p-4 bg-gray-100 sticky top-0">
-            <CRow className="w-100 align-items-center">
-              <CCol md={6} className="d-flex gap-2">
-                <CFormInput placeholder="Start Date To End Date" className="max-w-[220px]"/>
-                <CInputGroup className="max-w-[280px]">
+          <CCardHeader className="p-3  sticky top-0 ">
+            <CRow className="w-100 align-items-center ">
+              <CCol md={6} className="d-flex gap-2 ">
+                <CFormInput placeholder="Start Date To End Date" className="max-w-[220px] "/>
+                <CInputGroup className="max-w-[280px] ">
                   <CInputGroupText>
                     <FiSearch />
                   </CInputGroupText>
                   <CFormInput placeholder="Search company..." />
                 </CInputGroup>
               </CCol>
-              <CCol md={6} className="d-flex justify-content-end gap-2 ">
+              <CCol md={6} className="d-flex justify-content-end gap-2 min-w-[150.6px] h-8 ">
                 
-                <CButton color="danger" onClick={() => setDrawerOpen(true)} className="d-flex align-items-center text-white"style={{ backgroundColor: "#ed4040", borderColor: "#ed4040" }}>    
-                                <FaPlus className="me-2 text-white" /> Add Company 
+                <CButton color="danger" onClick={() => setDrawerOpen(true)} className="d-flex align-items-center text-white w-[160px] whitespace-nowrap">    
+                                <FaPlus className="me-2 text-white " /> Add Company 
                  </CButton>
 
                 <CButton color="secondary" className="d-flex align-items-center">
@@ -82,18 +83,20 @@ const CompanyManagement = () => {
           </CCardHeader>
 
           {/* Table */}
-          <div className="border h-[80%] mt-4">
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
+          <div className=" h-[80%] ">
+        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap ">
           <CompaniesTable cellData={tableData} />
         </div>
           </div>
 
-          <div className="flex justify-end items-center gap-4 mt-4 mb-3">
+          <div className="flex justify-end items-center gap-4 mt-3 ">
           <CommonPagination
             count={totalPages}
             page={currentPage}
             onChange={(event, value) => setCurrentPage(value)}
           />
+        </div>
+
         </div>
         <div>
           <CompaniesForm isDrawerOpen={isDrawerOpen} setDrawerOpen={setDrawerOpen}/>

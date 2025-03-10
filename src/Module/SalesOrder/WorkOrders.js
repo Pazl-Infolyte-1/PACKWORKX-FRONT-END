@@ -1,4 +1,3 @@
-import { ChevronDownIcon } from '@heroicons/react/solid'
 import { useState } from 'react'
 import { TrashIcon } from '@heroicons/react/solid'
 

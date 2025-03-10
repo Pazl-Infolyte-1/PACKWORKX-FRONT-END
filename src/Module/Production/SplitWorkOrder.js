@@ -30,7 +30,7 @@ const SplitWorkOrder = ({ visibleSplit, setVisibleSplit, setSelectedType }) => {
         visible={visibleSplit}
         setVisible={setVisibleSplit}
         width="880px"
-        height="480px"
+        height="580px"
         header=""
         showCloseButton={true}
       >

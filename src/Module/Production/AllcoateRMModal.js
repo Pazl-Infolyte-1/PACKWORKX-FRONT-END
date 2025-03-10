@@ -27,7 +27,7 @@ const AllcoateRMModal = ({ visibleAllocate, setVisibleAllocate }) => {
   return (
     <div>
       <PopUp visible={visibleAllocate} setVisible={setVisibleAllocate} width="700px"
-        height="650px"
+        height="680px"
         header={<div style={{color: "#030303",
           fontSize: "25px",
          marginLeft:"20px",

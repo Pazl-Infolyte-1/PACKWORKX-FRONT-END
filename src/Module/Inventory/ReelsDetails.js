@@ -17,7 +17,7 @@ function ReelsDetails({ visible, setVisible }) {
   ]
 
   return (
-    <PopUp visible={visible} setVisible={setVisible} size={'lg'} header="" showCloseButton={true} height="450px" width="910px">
+    <PopUp visible={visible} setVisible={setVisible} size={'lg'} header="" showCloseButton={true} height="480px" width="910px">
       <div className="grid grid-cols-3 gap-3 p-3 border">
         <div className="col-span-2">
           <h2 className="text-lg font-bold mb-4">Reels Details :</h2>

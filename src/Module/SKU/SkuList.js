@@ -215,6 +215,21 @@ function SkuList() {
   const indexOfFirstRow = indexOfLastRow - rowsPerPage
   const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
   const totalPages = Math.ceil(tableData.length / rowsPerPage)
+  const [minimumorderlevel, setMinimumorderlevel] = useState(0);
+
+  const [strictAdherence, setStrictAdherence] = useState(true);
+
+
+  
+  const [topLayer, setTopLayer] = useState({ gsm: 180, bf: 18,  });
+  const [c1Layer, setC1Layer] = useState({ gsm: 120, bf: 18,  });
+  const [l1Layer, setL1Layer] = useState({ gsm: 180, bf: 18,  });
+
+
+  
+
+
+
 
   const handleSubmit = () => {
     const formId = dynamicFields?.data?.formId
@@ -275,243 +290,7 @@ function SkuList() {
           ))}
         </div>
 
-        <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
-          <div className="flex justify-start text-[20px] font-semibold pb-4 mt-0">
-            {dynamicFields?.data?.pageTitle}
-          </div>
-
-          <div className="bg-white">
-            {dynamicFields?.data?.sections.map((section) => (
-              <div key={section?.groupId} className="mb-8">
-                {/* Group Name as Subtitle */}
-                <h2 className="text-[18px] font-semibold text-gray-700 mb-4 border-b pb-2">
-                  {section?.groupName}
-                </h2>
-
-                {/* Render Fields */}
-                <div className="grid grid-cols-3">
-                  {section?.inputs?.map((inputField) => (
-                    <div key={inputField?.id} className="p-2 px-4 rounded-lg">
-                      <label className="text-black text-[15px] font-medium block mb-1">
-                        {inputField?.label}
-                        {inputField?.required && <span className="text-red-500">*</span>}
-                      </label>
-                      {inputField.type === 'select' && (
-                        <select
-                          ref={(el) => (formRefs.current[inputField.id] = el)}
-                          defaultValue={inputField?.defaultValue || ''}
-                          required={inputField?.required}
-                          className="w-full h-10 px-2 rounded-lg bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
-                        >
-                          <option value="" disabled>
-                            {inputField?.placeholder || 'Select an option'}
-                          </option>
-                          {inputField?.options?.map((option) => (
-                            <option key={option?.id} value={option?.id}>
-                              {option?.label}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                      {inputField?.type === 'text' && (
-                        <input
-                          ref={(el) => (formRefs.current[inputField.id] = el)}
-                          type="text"
-                          placeholder={inputField?.placeholder || ''}
-                          defaultValue={inputField?.defaultValue || ''}
-                          required={inputField?.required}
-                          className="w-full h-10 px-2 rounded-lg bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
-                        />
-                      )}
-                      {inputField?.type === 'url' && (
-                        <input
-                          ref={(el) => (formRefs.current[inputField.id] = el)}
-                          type="text"
-                          placeholder={inputField?.placeholder || ''}
-                          defaultValue={inputField?.defaultValue || ''}
-                          required={inputField?.required}
-                          className="w-full h-10 px-2 rounded-lg bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
-                        />
-                      )}
-                      {inputField?.type === 'email' && (
-                        <input
-                          ref={(el) => (formRefs.current[inputField.id] = el)}
-                          type="email"
-                          placeholder={inputField?.placeholder || ''}
-                          defaultValue={inputField?.defaultValue || ''}
-                          required={inputField?.required}
-                          className="w-full h-10 px-2 rounded-lg bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
-                        />
-                      )}
-
-                      {inputField?.type === 'number' && (
-                        <input
-                          ref={(el) => (formRefs.current[inputField.id] = el)}
-                          type="number"
-                          placeholder={inputField?.placeholder || ''}
-                          defaultValue={inputField?.defaultValue || ''}
-                          required={inputField?.required}
-                          className="w-full h-10 px-2 rounded-lg bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
-                        />
-                      )}
-
-                      {inputField?.type === 'tel' && (
-                        <input
-                          ref={(el) => (formRefs.current[inputField.id] = el)}
-                          type="number"
-                          placeholder={inputField?.placeholder || ''}
-                          defaultValue={inputField?.defaultValue || ''}
-                          required={inputField?.required}
-                          className="w-full h-10 px-2 rounded-lg bg-white text-gray-400 text-[15px] font-['Mulish'] leading-6 outline-none placeholder:text-sm shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
-                        />
-                      )}
-
-                      {inputField?.type === 'radio' && (
-                        <div className="mt-1 flex space-x-4">
-                          {inputField?.options?.map((option) => (
-                            <label key={option?.id} className="inline-flex items-center">
-                              <input
-                                ref={(el) => (formRefs.current[inputField.id] = el)}
-                                type="radio"
-                                name={inputField?.name}
-                                value={option?.id}
-                                defaultChecked={inputField?.defaultValue == option?.id}
-                                className="w-5 h-5 text-blue-500"
-                              />
-                              <span className="ml-2 text-gray-700">{option?.label}</span>
-                            </label>
-                          ))}
-                        </div>
-                      )}
-
-                      {inputField?.type === 'checkbox' && (
-                        <div className="flex items-center mt-2">
-                          <input
-                            type="checkbox"
-                            id={`checkbox-${inputField?.id}`}
-                            className="w-5 h-5 text-blue-500"
-                            defaultChecked={inputField?.defaultValue}
-                          />
-                          <label
-                            htmlFor={`checkbox-${inputField?.id}`}
-                            className="ml-2 text-gray-700"
-                          >
-                            {inputField?.options[0]?.label}
-                          </label>
-                        </div>
-                      )}
-                      {inputField?.type === 'file' && (
-                        <input
-                          ref={(el) => (formRefs.current[inputField.id] = el)}
-                          type="file"
-                          placeholder={inputField?.placeholder || ''}
-                          defaultValue={inputField?.defaultValue || ''}
-                          required={inputField?.required}
-                          className="w-full h-14 px-2 py-2 border-0 border-t border-t-gray-100 box-border rounded-lg shadow-md bg-white text-gray-400 text-lg font-['Mulish'] leading-6 outline-none placeholder:text-sm"
-                        />
-                      )}
-                      {inputField.type === 'toggle' && (
-                        <div className="flex items-center ml-[40%] mt-[3%]">
-                          <input
-                            type="checkbox"
-                            id={`toggle-${inputField.id}`}
-                            className="hidden peer"
-                            defaultChecked={inputField.defaultValue}
-                          />
-                          <label
-                            htmlFor={`toggle-${inputField.id}`}
-                            className="relative w-[60px] h-[30px] cursor-pointer block rounded-[10px] shadow-md border border-[#8167E5] bg-white transition-all"
-                          >
-                            <span className="absolute top-1/2 left-[3px] w-[calc(50%-6px)] h-[calc(100%-6px)] bg-[#8167E5] rounded-[10px] transition-all transform -translate-y-1/2 peer-checked:left-[calc(100%-33px)]"></span>
-                          </label>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            <div>
-              <div className="top-[1150px] left-[41px] w-[98%] h-auto bg-white rounded-lg border-t border-t-gray-100 box-border shadow-md p-1 pb-5">
-                <table className="w-full border-collapse text-center">
-                  <thead>
-                    <tr>
-                      {data.tableHeaders.map((header) => (
-                        <th
-                          key={header.id}
-                          className="p-6 text-[17px] font-[Mulish] font-medium text-[#7f7f7f] tracking-[0.6px] leading-[26px] capitalize"
-                        >
-                          {header.label}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.tableBody.map((row) => (
-                      <tr key={row.id}>
-                        <td className="p-2 text-center text-[15px] font-[Lexend] font-semibold text-[#030303] leading-[20px]">
-                          {row.label}
-                        </td>
-                        {data.tableHeaders.slice(1).map((header) => (
-                          <td key={header.id} className="p-2 text-center">
-                            {row[header.id]?.type === 'input' ? (
-                              <div className="flex items-center justify-center rounded-lg shadow-md bg-white p-1">
-                                <input
-                                  type="text"
-                                  value={row[header.id]?.defaultValue}
-                                  readOnly
-                                  className="w-[50px] text-center text-[#030303] text-[15px] font-[Roboto] leading-[19px] outline-none bg-transparent"
-                                />
-                                <div className="flex flex-col ml-2">
-                                  <button className="p-[2px] hover:bg-gray-200 rounded">
-                                    <ChevronUpIcon className="w-3 h-3 text-gray-600" />
-                                  </button>
-                                  <button className="p-[2px] hover:bg-gray-200 rounded">
-                                    <ChevronDownIcon className="w-3 h-3 text-gray-600" />
-                                  </button>
-                                </div>
-                              </div>
-                            ) : row[header.id]?.type === 'select' ? (
-                              <select
-                                className="cursor-pointer w-[118px] h-[30px] px-2 border-0 box-border rounded-[10px] shadow-md bg-white text-[#030303] text-[14px] font-[Roboto] leading-[16px] outline-none"
-                                defaultValue={row[header.id]?.defaultValue}
-                              >
-                                {data.colorOptions.map((option) => (
-                                  <option key={option.id} value={option.id}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </select>
-                            ) : (
-                              <span className="text-[#030303] text-[18px] font-[Lexend] leading-[23px]">
-                                {row[header.id]?.defaultValue}
-                              </span>
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div className="flex justify-end gap-4 mt-4 mr-[4%]">
-              <button className="bg-[#079b54] text-white px-4 py-2 rounded-md transition">
-                Add Version
-              </button>
-              <button className="bg-[#079b54] text-white px-4 py-2 rounded-md transition">
-                Save As Draft
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="cursor-pointer w-[88px] h-[40px] px-2 border-0 box-border rounded-md bg-[#079b54] text-white text-[16px] font-['Poppins'] leading-[24px] outline-none"
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </Drawer>
+    
       </div>
 
       {/* SKU Boxes */}
@@ -625,6 +404,289 @@ function SkuList() {
       <div>
         <SkuPopup visible={visible} setVisible={setVisible} />
       </div>
+      <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
+      <div className="p-6">
+      <label className="block  text-2xl font-semibold ml-7">Add SKU Details</label>
+      </div>
+      <div className="p-1">
+      <label className="block  text-xl font-semibold ml-12">Default SKU Details</label>
+      </div>
+      <div className="p-4 space-y-4 max-w-6xl mx-auto">
+  <div className="grid grid-cols-3 gap-4">
+    <div>
+      <label className="block">SKU Name*</label>
+      <input placeholder="Enter SKU Name" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+  <label className="block">Client*</label>
+  <select className="p-2 border rounded w-full">
+    <option value=""  hidden>
+      Select Client
+    </option>
+    <option>Pazl.in</option>
+  </select>
+</div>
+<div>
+  <label className="block">Number of Layers</label>
+  <select className="p-2 border rounded w-full">
+    <option value=""  hidden>
+      Select Number of Layers
+    </option>
+    <option>1</option>
+  </select>
+</div>
+
+    <div>
+      <label className="block">Length*</label>
+      <input placeholder="Enter Length" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+      <label className="block">Width</label>
+      <input placeholder="Enter Width" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+      <label className="block">Height</label>
+      <input placeholder="Enter Height" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+      <label className="block">Joints</label>
+      <input placeholder="Enter Joints" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+      <label className="block">Ups</label>
+      <input placeholder="Enter Ups" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+      <label className="block">Inner/Outer Dimension</label>
+      <div className="flex space-x-4">
+        <label><input type="radio" checked readOnly /> Inner</label>
+        <label><input type="radio" readOnly /> Outer</label>
+      </div>
+    </div>
+    <div>
+      <label className="block">Flap Width</label>
+      <input placeholder="Enter Flap Width" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+      <label className="block">Flap Tolerance</label>
+      <input placeholder="Enter Flap Tolerance" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+      <label className="block">Length Trimming Tolerance</label>
+      <select className="p-2 border rounded w-full">
+        <option>Select Length Trimming Tolerance</option>
+        <option>Option 2</option>
+      </select>
+    </div>
+    <div>
+      <label className="block">Width Trimming Tolerance</label>
+      <select className="p-2 border rounded w-full">
+        <option>Select Width Trimming Tolerance</option>
+        <option>Option 2</option>
+      </select>
+    </div>
+    <div>
+      <span>Strict Adherence for All Layers</span>
+      <div 
+        className={`w-11 h-6 flex items-center bg-white border border-blue-600 rounded-full p-1 cursor-pointer ${strictAdherence ? 'bg-white' : 'bg-white'}`}
+        onClick={() => setStrictAdherence(!strictAdherence)}
+      >
+        <div 
+          className={`w-5 h-5 bg-blue-600 rounded-full shadow-md transform duration-300 ease-in-out ${strictAdherence ? 'translate-x-5' : ''}`}
+        ></div>
+      </div>
+    </div>
+    <div>
+      <label className="block">Customer Reference</label>
+      <input placeholder="Enter Customer Reference" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+      <label className="block">Reference #</label>
+      <input placeholder="Enter Reference #" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+      <label className="block">Internal ID</label>
+      <input placeholder="Enter Internal ID" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+      <label className="block">Board Size (cm²)</label>
+      <input placeholder="Enter Board Size" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+      <label className="block">Deckle Size</label>
+      <input placeholder="Enter Deckle Size" className="p-2 border rounded w-full" />
+    </div>
+    <div>
+      <label className="block">Minimum Order Level</label>
+      <input 
+        type="number" 
+        placeholder="Enter Minimum Order Level"
+        value={minimumorderlevel} 
+        onChange={(e) => setMinimumorderlevel(Number(e.target.value))} 
+        className="p-2 border rounded w-full" 
+      />
+    </div>
+  </div>
+</div>
+<div className="p-6">
+      <label className="block mb-2 text-lg font-semibold ml-7">SKU Type</label>
+      <select className="w-80 p-2 border rounded mb-4 ml-7">
+        <option>corrugated sheet</option>
+      </select>
+
+      <div className="border rounded p-4 overflow-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="text-gray-500 text-center">
+              <th className="p-2">Layer</th>
+              <th className="p-2">GSM</th>
+              <th className="p-2">BF</th>
+              <th className="p-2">Color</th>
+              <th className="p-2">Flute Type</th>
+              <th className="p-2">Flute Ratio</th>
+              <th className="p-2">Weight (Kg)</th>
+              <th className="p-2">Bursting Strength (Kg Per Cm2)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {/* Top Layer */}
+            <tr >
+              <td className="p-2 font-semibold">Top Layer</td>
+              <td className="p-2 text-center">
+                <input
+                  type="number"
+                  className="w-16 p-1 border rounded text-center"
+                  value={topLayer.gsm}
+                  onChange={(e) => setTopLayer({ ...topLayer, gsm: Number(e.target.value) })}
+                />
+              </td>
+              <td className="p-2 text-center">
+                <input
+                  type="number"
+                  className="w-16 p-1 border rounded text-center"
+                  value={topLayer.bf}
+                  onChange={(e) => setTopLayer({ ...topLayer, bf: Number(e.target.value) })}
+                />
+              </td>
+              <td className="p-2 text-center">
+  <select className="p-1 border rounded">
+    <option value="goldenyellow">Golden Yellow</option>
+    <option value="natural">Natural</option>
+    <option value="red">Red</option>
+    <option value="blue">Blue</option>
+    <option value="green">Green</option>
+  </select>
+</td>
+              <td className="p-2 text-center">
+
+              </td>
+              <td className="p-2 text-center">1</td>
+              <td className="p-2 text-center">0.102528</td>
+              <td className="p-2 text-center">3.24</td>
+            </tr>
+
+            {/* C1 Layer */}
+            <tr >
+              <td className="p-2 font-semibold">C1</td>
+              <td className="p-2 text-center">
+                <input
+                  type="number"
+                  className="w-16 p-1 border rounded text-center"
+                  value={c1Layer.gsm}
+                  onChange={(e) => setC1Layer({ ...c1Layer, gsm: Number(e.target.value) })}
+                />
+              </td>
+              <td className="p-2 text-center">
+                <input
+                  type="number"
+                  className="w-16 p-1 border rounded text-center"
+                  value={c1Layer.bf}
+                  onChange={(e) => setC1Layer({ ...c1Layer, bf: Number(e.target.value) })}
+                />
+              </td>
+              <td className="p-2 text-center">
+  <select className="p-1 border rounded">
+  <option value="natural">Natural</option>
+
+    <option value="red">Red</option>
+    <option value="goldenyellow">Golden Yellow</option>
+    <option value="blue">Blue</option>
+    <option value="green">Green</option>
+  </select>
+</td>
+<td className="p-2 text-center">
+  <select className="p-1 border rounded">
+    <option value="B">B</option>
+    <option value="C">C</option>
+  </select>
+</td>
+              <td className="p-2 text-center">1.5</td>
+              <td className="p-2 text-center">0.102528</td>
+              <td className="p-2 text-center">1.08</td>
+            </tr>
+
+            {/* L1 Layer */}
+            <tr >
+              <td className="p-2 font-semibold">L1</td>
+              <td className="p-2 text-center">
+                <input
+                  type="number"
+                  className="w-16 p-1 border rounded text-center"
+                  value={l1Layer.gsm}
+                  onChange={(e) => setL1Layer({ ...l1Layer, gsm: Number(e.target.value) })}
+                />
+              </td>
+              <td className="p-2 text-center">
+                <input
+                  type="number"
+                  className="w-16 p-1 border rounded text-center"
+                  value={l1Layer.bf}
+                  onChange={(e) => setL1Layer({ ...l1Layer, bf: Number(e.target.value) })}
+                />
+              </td>
+              <td className="p-2 text-center">
+  <select className="p-1 border rounded">
+    <option value="goldenyellow">Golden Yellow</option>
+    <option value="natural">Natural</option>
+    <option value="red">Red</option>
+    <option value="blue">Blue</option>
+    <option value="green">Green</option>
+  </select>
+</td>
+              <td className="p-2 text-center">
+               
+              </td>
+              <td className="p-2 text-center">1</td>
+              <td className="p-2 text-center">0.102528</td>
+              <td className="p-2 text-center">3.24</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div className="flex justify-end gap-4 mt-4 mr-[4%]">
+<button className="bg-[#079b54] text-white px-4 py-2 rounded-md transition">
+
+                Add Version
+</button>
+<button className="bg-[#079b54] text-white px-4 py-2 rounded-md transition">
+
+                Save As Draft
+</button>
+<button
+
+                onClick={handleSubmit}
+
+                className="cursor-pointer w-[88px] h-[40px] px-2 border-0 box-border rounded-md bg-[#079b54] text-white text-[16px] font-['Poppins'] leading-[24px] outline-none"
+>
+
+                Submit
+</button>
+</div>
+
+ 
+
+        </Drawer>
     </div>
   )
 }

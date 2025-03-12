@@ -40,41 +40,49 @@ function ClientList() {
       console.error('No data available to download')
       return
     }
-  
+
     // Define the specific keys to extract
-    const selectedKeys = ['first_name', 'last_name', 'display_name', 'email', 'mobile', 'PAN', 'created_at']
-  
+    const selectedKeys = [
+      'first_name',
+      'last_name',
+      'display_name',
+      'email',
+      'mobile',
+      'PAN',
+      'created_at',
+    ]
+
     // Function to format headers (Remove "_" and capitalize the first letter of each word)
     const formatHeader = (key) => {
       return key
         .replace(/_/g, ' ') // Replace underscores with spaces
         .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize first letter of each word
     }
-  
+
     // Add CSV Headers (Formatted Column Names)
     const csvRows = []
     csvRows.push(selectedKeys.map(formatHeader).join(','))
-  
+
     // Process Data Rows (Handling Async Format Date)
     const formattedData = await Promise.all(
       data.map(async (row) => {
         const values = await Promise.all(
           selectedKeys.map(async (key) => {
             if (key === 'created_at') {
-              return `"${await apiMethods.formatDate(row[key]) || ''}"` // Await the async function
+              return `"${(await apiMethods.formatDate(row[key])) || ''}"` // Await the async function
             }
             return `"${row[key] || ''}"`
-          })
+          }),
         )
         return values.join(',')
-      })
+      }),
     )
-  
+
     csvRows.push(...formattedData)
-  
+
     // Convert to CSV String
     const csvString = csvRows.join('\n')
-  
+
     // Create Blob and Download File
     const blob = new Blob([csvString], { type: 'text/csv' })
     const url = window.URL.createObjectURL(blob)
@@ -84,10 +92,6 @@ function ClientList() {
     a.click()
     window.URL.revokeObjectURL(url)
   }
-  
-
-
-
 
   return (
     <div className="w-full">

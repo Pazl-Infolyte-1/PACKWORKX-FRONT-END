@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { TrashIcon } from '@heroicons/react/solid'
+import VersionsPopup from './VersionsPopup'
 
 const accordionCardSummary = {
   data: [
@@ -37,6 +38,7 @@ const WorkOrders = () => {
   const [openIndices, setOpenIndices] = useState([]) // Store multiple open indices
   const [openAccordions, setOpenAccordions] = useState({})
   const [openCreateAccordion, setCreateOpenAccordion] = useState([])
+  const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
 
   const toggleAccordion = (id) => {
     setOpenAccordions((prev) => ({
@@ -285,7 +287,7 @@ const WorkOrders = () => {
                         />
 
                         {/* Button (Outside, Right End) */}
-                        <button className="ml-2 cursor-pointer w-[149px] h-[40px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
+                        <button onClick={() => setVersionDrawerOpen(true)} className="ml-2 cursor-pointer w-[149px] h-[40px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
                           Version History
                         </button>
                       </div>
@@ -368,6 +370,10 @@ const WorkOrders = () => {
           Submit Work Order
         </button>
       </div>
+      <VersionsPopup
+          visible={isVersionDrawerOpen}
+          setVisible={() => setVersionDrawerOpen(false)}
+        />
     </div>
   )
 }

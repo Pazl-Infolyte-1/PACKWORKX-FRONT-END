@@ -91,14 +91,14 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen }) {
                           style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
                         />
                       </CButton>
-                      <CButton color="light">
+                      {/*<CButton color="light">
                         <CIcon
                           icon={cilAirplay}
                           onClick={() => setVersionDrawerOpen(true)}
                           className="me-2"
                           style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
                         />
-                      </CButton>
+                      </CButton>*/}
                     </CTableDataCell>
                   </CTableRow>
                 ))

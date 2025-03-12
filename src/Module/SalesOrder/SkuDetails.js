@@ -1,7 +1,11 @@
 import { TrashIcon } from '@heroicons/react/solid'
 import { useForm, useFieldArray } from 'react-hook-form'
+import ActionPopup from './ActionPopup'
+import { useState } from 'react'
 
 const SkuDetails = () => {
+  const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
+
   const { register, control, handleSubmit } = useForm({
     defaultValues: {
       skus: [
@@ -164,7 +168,7 @@ const SkuDetails = () => {
 
           <div className="flex justify-between items-center w-full mt-10">
             {/* Left-aligned button */}
-            <button className="cursor-pointer w-[190.12px] h-[45px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-lato leading-[20px] outline-none">
+            <button onClick={() => setActionDrawerOpen(true)} className="cursor-pointer w-[190.12px] h-[45px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-lato leading-[20px] outline-none">
               Previous Invoice Rates
             </button>
 
@@ -180,6 +184,8 @@ const SkuDetails = () => {
           </div>
         </div>
       </div>
+      <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} />
+
     </div>
   )
 }

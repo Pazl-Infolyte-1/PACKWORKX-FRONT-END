@@ -58,6 +58,12 @@ const endpoints = {
       method: 'POST',
     },
   },
+  client: {
+    Clients_Vendors: {
+      url: 'https://mocki.io/v1/10d77686-3679-4445-89db-9da5fe60eb4a',
+      method: 'GET',
+    },
+  },
   menu: {
     sideBarMenu: {
       url: 'https://mocki.io/v1/711cbc7d-a070-4077-bf97-8c1369fa075f',
@@ -155,6 +161,7 @@ export const apiMethods = {
       throw error
     }
   },
+
   // Customer methods
   getCustomers: async (params) => {
     try {
@@ -224,6 +231,32 @@ export const apiMethods = {
       throw error
     }
   },
+  getClientOrVendors: async () => {
+    try {
+      const { url, method } = endpoints.client.Clients_Vendors
+      const response = await apiClient[method.toLowerCase()](url) // <-- Fix here
+
+      return response.data
+    } catch (error) {
+      console.error("Error in getClientOrVendors:", error)
+      throw error
+    }
+  },
+
+  formatDate: async (isoString) => {
+    try {
+      const date = new Date(isoString)
+      return date.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      })
+    } catch (error) {
+      console.error("Error in getClientOrVendors:", error)
+      throw error
+    }
+  },
+
 }
 
 export default apiMethods

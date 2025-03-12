@@ -3,7 +3,7 @@ import { Modal, Box } from '@mui/material'
 import CIcon from '@coreui/icons-react'
 import { cilX } from '@coreui/icons' // CoreUI Close Icon
 
-const PopUp = ({ visible, setVisible, width, height, header, showCloseButton, children }) => {
+const PopUp = ({ visible, setVisible, width, height, header, showCloseButton, children, overflowX="auto" , overflowY="auto"}) => {
   return (
     <Modal open={visible} onClose={() => setVisible(false)}>
       <Box
@@ -21,8 +21,8 @@ const PopUp = ({ visible, setVisible, width, height, header, showCloseButton, ch
           display: 'flex',
           flexDirection: 'column',
           p: 3,
-          overflowX:"auto",
-          overflowY:"auto"
+          overflowX:overflowX,
+          overflowY:overflowY
         }}
       >
         <div className="flex justify-between items-center pb-2">

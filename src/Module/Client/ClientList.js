@@ -1,138 +1,150 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import Drawer from '../../components/Drawer/Drawer'
-import same from '../../assets/images/info.png'
-import Phone from '../../assets/images/phone.png'
-import Cell from '../../assets/images/mob.png'
-import Facebook from '../../assets/images/fb.png'
-import apiMethods from '../../api/config'
 import { IoSearch } from 'react-icons/io5'
-import axios from 'axios'
+import apiMethods from '../../api/config'
 import CommonPagination from '../../components/New/Pagination'
 import ClientTable from './ClientTable'
 import ClientForm from './ClientForm'
 
 function ClientList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState('otherDetails')
-  const [dynamicFields, setDynamicFields] = useState('')
-  const [commonField, setCommonField] = useState([])
-  const [data, setData] = useState([])
+  const [data, setData] = useState([]) // Stores all fetched data
   const [currentPage, setCurrentPage] = useState(1)
   const rowsPerPage = 10
 
-  const [rows, setRows] = useState([
-    { salutation: '', firstName: '', lastName: '', email: '', workPhone: '', mobile: '' },
-    { salutation: '', firstName: '', lastName: '', email: '', workPhone: '', mobile: '' },
-  ])
-
-  const addRow = () => {
-    setRows([
-      ...rows,
-      { salutation: '', firstName: '', lastName: '', email: '', workPhone: '', mobile: '' },
-    ])
-  }
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchClientData = async () => {
       try {
-        const response = await apiMethods.getDynamicFormFields(12)
-        console.log('dynamic: client list', response)
-
-        // Set the response in state
-        setDynamicFields(response)
-
-        // Filter sections directly from response, not from state
-        const filteredSections = response?.data?.sections?.filter(
-          (section) => section.groupId === 2,
-        )
-
-        console.log('filtered sections', filteredSections)
-        setCommonField(filteredSections)
+        const response = await apiMethods.getClientOrVendors()
+        console.log('clientData:', response)
+        setData(response.data) // Assuming response.data is an array of client objects
       } catch (error) {
-        console.error('Fetch error:', error)
+        console.error('Error fetching client data:', error)
       }
     }
 
-    fetchData()
+    fetchClientData()
   }, [])
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get('https://mocki.io/v1/8f36576b-ae92-4a4f-a242-c8bbfe639f52')
-        console.log(response.data)
-
-        setData(response.data.data)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-    fetchData()
-  }, [])
-
-  const tableData = Array.isArray(data) ? data : []
-
+  // Pagination Calculations
   const indexOfLastRow = currentPage * rowsPerPage
   const indexOfFirstRow = indexOfLastRow - rowsPerPage
-  const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
-  const totalPages = Math.ceil(tableData.length / rowsPerPage)
+  const currentRows = data.slice(indexOfFirstRow, indexOfLastRow)
+  const totalPages = Math.ceil(data.length / rowsPerPage)
+
+  const handlePageChange = useCallback((event, value) => setCurrentPage(value), [])
+
+  // Function to Convert Table Data to CSV and Download
+  const downloadCSV = async () => {
+    if (!data.length) {
+      console.error('No data available to download')
+      return
+    }
+  
+    // Define the specific keys to extract
+    const selectedKeys = ['first_name', 'last_name', 'display_name', 'email', 'mobile', 'PAN', 'created_at']
+  
+    // Function to format headers (Remove "_" and capitalize the first letter of each word)
+    const formatHeader = (key) => {
+      return key
+        .replace(/_/g, ' ') // Replace underscores with spaces
+        .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize first letter of each word
+    }
+  
+    // Add CSV Headers (Formatted Column Names)
+    const csvRows = []
+    csvRows.push(selectedKeys.map(formatHeader).join(','))
+  
+    // Process Data Rows (Handling Async Format Date)
+    const formattedData = await Promise.all(
+      data.map(async (row) => {
+        const values = await Promise.all(
+          selectedKeys.map(async (key) => {
+            if (key === 'created_at') {
+              return `"${await apiMethods.formatDate(row[key]) || ''}"` // Await the async function
+            }
+            return `"${row[key] || ''}"`
+          })
+        )
+        return values.join(',')
+      })
+    )
+  
+    csvRows.push(...formattedData)
+  
+    // Convert to CSV String
+    const csvString = csvRows.join('\n')
+  
+    // Create Blob and Download File
+    const blob = new Blob([csvString], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'filtered_client_data.csv'
+    a.click()
+    window.URL.revokeObjectURL(url)
+  }
+  
+
+
+
 
   return (
-    <div>
-      <div className="w-full h-[40px]">
-        <div className="flex justify-between items-center">
-          <h4>Clients and Vendors</h4>
-        </div>
+    <div className="w-full">
+      {/* Header Section */}
+      <div className="w-full h-[40px] flex justify-between items-center">
+        <h4>Clients and Vendors</h4>
       </div>
-      {/* Search Bar & Add Button */}
+
+      {/* Search Bar & Actions */}
       <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
         <div className="flex justify-between items-center">
-          <div className="flex items-center h-[35px] w-[300px] gap-[2px] border rounded-md">
-            <div className="bg-white h-full w-[40px] flex justify-center items-center rounded-l-[6px]">
+          <div className="flex items-center h-[35px] w-[300px] gap-2 border rounded-md">
+            <div className="bg-white h-full w-[40px] flex justify-center items-center rounded-l-md">
               <IoSearch />
             </div>
             <input
               type="text"
               placeholder="Search"
-              className="outline-none h-full w-full rounded-r-[6px] pl-2"
+              className="outline-none h-full w-full rounded-r-md pl-2"
             />
           </div>
+
           <div className="flex justify-center items-center gap-2">
             <button className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto">
               Import
             </button>
 
-            <button className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto">
+            <button
+              className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto"
+              onClick={downloadCSV}
+            >
               Download
             </button>
 
             <button
               className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto"
-              onClick={() => {
-                setDrawerOpen(true)
-              }}
+              onClick={() => setDrawerOpen(true)}
             >
               Add Client
             </button>
           </div>
         </div>
 
-        <div className=" h-[80%]">
-          <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  mt-3">
-            <ClientTable clientdata={data} />
-          </div>
+        {/* Table Section */}
+        <div className="mt-3 overflow-x-auto">
+          <ClientTable clientdata={currentRows} />
         </div>
+
         {/* Pagination Section */}
-        <div className="flex justify-end items-center gap-4 mt-3 ">
-          <CommonPagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(event, value) => setCurrentPage(value)}
-          />
+        <div className="flex justify-end items-center gap-4 mt-3">
+          <CommonPagination count={totalPages} page={currentPage} onChange={handlePageChange} />
         </div>
       </div>
 
+      {/* Drawer */}
       <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth={'1280px'}>
-        <ClientForm></ClientForm>
+        <ClientForm />
       </Drawer>
     </div>
   )

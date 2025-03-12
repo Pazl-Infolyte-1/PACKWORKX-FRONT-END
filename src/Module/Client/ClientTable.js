@@ -9,6 +9,9 @@ import {
   CButton,
 } from '@coreui/react'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
+import apiMethods from '../../api/config'
+
+
 function ClientTable({ clientdata = [] }) {
   return (
     <>
@@ -17,25 +20,29 @@ function ClientTable({ clientdata = [] }) {
           <CTableHead className="bg-gray-100 sticky top-0 ">
             <CTableRow>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Client Id
+              Id
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Created Date
+              Name
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Company
+              Email
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              POC
+              Mobile Number
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Contact
+              Pan
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Due Amount
+             Created Date
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Action
+              Portal Language
+              </CTableHeaderCell>
+             
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+                Action 
               </CTableHeaderCell>
 
             </CTableRow>
@@ -47,20 +54,24 @@ function ClientTable({ clientdata = [] }) {
                 <CTableRow key={index} className="border-b">
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.client_id}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.created_date}
+                    {cell.display_name}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.company}
+                    {cell.email}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.poc}
+                    {cell.mobile}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.contact}
+                    {cell.PAN}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.due_amount}
+                    {apiMethods.formatDate(cell.created_at)}
                   </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.portal_language}
+                  </CTableDataCell>
+                 
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     <CButton>
                       <HiOutlineDotsVertical />

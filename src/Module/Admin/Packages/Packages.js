@@ -5,6 +5,7 @@ import { IoSearch } from 'react-icons/io5'
 import PackagesForm from './PackagesForm'
 import CommonPagination from '../../../components/New/Pagination'
 import PackagesTable from './PackagesTable'
+import ActionButton from '../../../components/New/ActionButton'
 
 function Packages() {
   const [data, setData] = useState([])
@@ -54,14 +55,11 @@ function Packages() {
             />
           </div>
           <div className="flex justify-center items-center gap-2">
-            <button
-              className="h-10 flex items-center bg-[#8761e5] text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto hover:bg-[#7348df] hover:text-white"
-              onClick={() => {
-                setDrawerOpen(true)
-              }}
-            >
-              Add Package
-            </button>
+            <ActionButton
+            label="Add Package"
+            onClick={()=>setDrawerOpen(true)}
+            variant='add'
+            />
           </div>
         </div>
 

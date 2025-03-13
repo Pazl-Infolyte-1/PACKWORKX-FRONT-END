@@ -136,7 +136,11 @@ export const apiMethods = {
       // Encode credentials before sending
       //   const encodedCredentials = authMiddleware.encodeAES(credentials)
       // Send encoded credentials to the server
-      const response = await apiClient[method.toLowerCase()](url, credentials)
+      const response = await apiClient[method.toLowerCase()](url, credentials,{
+        headers: {
+          'x-api-key': '4b3e77f648e5b9055a45f0812b3a4c3b88b08ff10b2f34ec21d11b6f678b6876a4014c88ff2a3c7e8e934c4f4790a94d3acb28d2f78a9b90f18960feaf3e4f99', 
+        },
+      })
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token)
@@ -238,7 +242,7 @@ export const apiMethods = {
 
       return response.data
     } catch (error) {
-      console.error("Error in getClientOrVendors:", error)
+      console.error('Error in getClientOrVendors:', error)
       throw error
     }
   },
@@ -252,11 +256,10 @@ export const apiMethods = {
         year: 'numeric',
       })
     } catch (error) {
-      console.error("Error in getClientOrVendors:", error)
+      console.error('Error in getClientOrVendors:', error)
       throw error
     }
   },
-
 }
 
 export default apiMethods

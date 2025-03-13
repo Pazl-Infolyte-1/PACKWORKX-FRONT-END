@@ -5,6 +5,8 @@ import apiMethods from '../../api/config'
 import CommonPagination from '../../components/New/Pagination'
 import ClientTable from './ClientTable'
 import ClientForm from './ClientForm'
+import ActionButton from '../../components/New/ActionButton'
+
 
 function ClientList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -115,23 +117,40 @@ function ClientList() {
           </div>
 
           <div className="flex justify-center items-center gap-2">
-            <button className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto">
+            {/* <button className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto">
               Import
-            </button>
+            </button> */}
 
-            <button
+            <ActionButton
+            height="9"
+            label="Import"
+            />
+
+            {/* <button
               className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto"
               onClick={downloadCSV}
             >
               Download
-            </button>
+            </button> */}
 
-            <button
+            <ActionButton
+            height={"9"}
+            label={"Download"}
+            onClick={downloadCSV}
+            />
+
+            {/* <button
               className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto"
               onClick={() => setDrawerOpen(true)}
             >
               Add Client
-            </button>
+            </button> */}
+
+            <ActionButton
+            height={"9"}
+            label={"Add Client"}
+            onClick={()=>setDrawerOpen(true)}
+            />
           </div>
         </div>
 

@@ -41,6 +41,7 @@ import ReturnablesContent from './ReturnablesContent'
 import PopUp from '../../components/New/PopUp'
 import { FaLock } from 'react-icons/fa'
 import SplitWorkOrder from './SplitWorkOrder'
+import Outsource_Preview from './Outsource_Preview'
 
 const Index = () => {
   const [workOrders, setWorkOrders] = useState([])
@@ -76,7 +77,7 @@ const Index = () => {
 
   const [groupOrders, setGroupOrders] = useState([])
   const [activeTab, setActiveTab] = useState('Group Layers')
-  const tabs = ['Group Layers', 'Allocate SFG', 'Allocate RM', 'Returnables']
+  const tabs = ['Group Layers', 'Allocate SFG', 'Allocate RM', 'Returnables', 'Outsource & Preview']
 
   const handleNextStep = () => {
     const currentIndex = tabs.indexOf(activeTab)
@@ -171,6 +172,14 @@ const Index = () => {
             workOrders={workOrders}
             groupOrders={groupOrders}
             setGroupOrders={setGroupOrders}
+            setWorkOrders={setWorkOrders}
+            autoSyncOrders={autoSyncOrders}
+            setVisibleSplit={setVisibleSplit}
+          />
+        )}
+        {activeTab === 'Outsource & Preview' && (
+          <Outsource_Preview
+            workOrders={workOrders}
             setWorkOrders={setWorkOrders}
             autoSyncOrders={autoSyncOrders}
             setVisibleSplit={setVisibleSplit}

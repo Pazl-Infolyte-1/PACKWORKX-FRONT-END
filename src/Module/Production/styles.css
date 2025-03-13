@@ -1,3 +1,19 @@
 .custom-collapse {
-    visibility: visible !important;
+  visibility: visible !important;
+}
+
+.no-dropdown-border .dropdown-toggle,
+.no-dropdown-border .dropdown-toggle:focus,
+.no-dropdown-border .dropdown-menu {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.no-dropdown-border .dropdown-menu {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+}
+
+.dropdown-toggle::after {
+  display: none !important;
 }

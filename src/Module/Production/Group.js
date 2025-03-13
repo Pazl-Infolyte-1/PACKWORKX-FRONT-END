@@ -62,10 +62,10 @@ const CustomToggle = React.forwardRef(({ onClick }, ref) => (
   </span>
 ))
 
-function LayerDragble({ lg }) {
+function LayerDragble({ lg, workOrderId  }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
-    item: { lg },
+    item: { lg, workOrderId  },
   }))
   return (
     <CCard
@@ -109,7 +109,12 @@ function WorkOrderCard({
 }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
-    item: { order, index },
+    item: { 
+      order, 
+      index,
+      isGroup: true,
+      layers: order.layer_group
+    },
   }))
 
   const toggleCollapse = () => {
@@ -204,7 +209,7 @@ function WorkOrderCard({
             <span>{order.route}</span>
           </div>
           {order.layer_group.map((lg) => (
-            <LayerDragble key={lg.id} lg={lg} />
+            <LayerDragble key={lg.id} lg={lg} workOrderId={order.id}  />
           ))}
           <div
             style={{
@@ -245,7 +250,15 @@ function GroupOrderDropZone({
 }) {
   const [, drop] = useDrop(() => ({
     accept: ItemType,
-    drop: (item) => addWorkOrderToGroup(item, groupIndex),
+    drop: (item) => {
+      if (item.isGroup && item.layers && item.layers.length > 0) {
+        item.layers.forEach(layer => {
+          addWorkOrderToGroup({ lg: layer, workOrderId: item.order.id }, groupIndex);
+        });
+      } else {
+        addWorkOrderToGroup(item, groupIndex);
+      }
+    },
   }))
 
   const toggleCollapse = (itemIndex) => {
@@ -282,7 +295,6 @@ function GroupOrderDropZone({
 
         {groupOrder.items.map((item, itemIndex) => {
           const uniqueIndex = `${groupIndex}-${itemIndex}`
-          console.log('item', item)
           return (
             <CCard
               key={uniqueIndex}
@@ -379,73 +391,10 @@ function GroupOrderDropZone({
 
                 <CCollapse className="custom-collapse" visible={groupVisibleIndex === uniqueIndex}>
                   <div className="mt-1">
-                    {item.sku_name ? (
-                      <>
-                        SKU Name - {item.sku_name} <br />
-                        Layers - {item.layers} <br />
-                        Print - {item.print} <br />
-                        Dimensions - {item.dimension} <br />
-                        Planned Start - {item.planned_start} <br />
-                        Planned End - {item.planned_end} <br />
-                        Quantity - {item.quantity} <br />
-                        Route - {item.route}
-                        <div className="d-flex align-items-center">
-                          <label>Finished Goods - </label>
-                          <input
-                            style={{
-                              width: '74px',
-                              height: '20px',
-                              padding: '0px 8px',
-                              border: '0.8px solid #7f7f7f',
-                              boxSizing: 'border-box',
-                              borderRadius: '6px',
-                              backgroundColor: '#ffffff',
-                              color: '#94a3b8',
-                              fontSize: '14px',
-                              fontFamily: 'Roboto',
-                              lineHeight: '21.6px',
-                              outline: 'none',
-                              justifyContent: 'end',
-                            }}
-                            type="number"
-                            defaultValue={item.finished_goods}
-                            onChange={(e) => {
-                              const newValue = e.target.value
-                              setGroupOrders((prevGroups) =>
-                                prevGroups.map((group, index) => {
-                                  if (index === groupIndex) {
-                                    return {
-                                      ...group,
-                                      items: group.items.map((order) =>
-                                        order.id === item.id
-                                          ? { ...order, finished_goods: newValue }
-                                          : order,
-                                      ),
-                                    }
-                                  }
-                                  return group
-                                }),
-                              )
-                              setWorkOrders((prevOrders) =>
-                                prevOrders.map((order) =>
-                                  order.id === item.id
-                                    ? { ...order, finished_goods: newValue }
-                                    : order,
-                                ),
-                              )
-                            }}
-                          />
-                        </div>
-                        <span>Available - {item.quantity}</span> <br />
-                      </>
-                    ) : (
-                      <>
-                        GSM - {item.gsm} <br />
-                        BF - {item.bf} <br />
-                        Dimensions - {item.dimensions} <br />
-                        Color - {item.color} <br />
-                      </>
-                    )}
+                        GSM - {item?.gsm} <br />
+                        BF - {item?.bf} <br />
+                        Dimensions - {item?.dimensions} <br />
+                        Color - {item?.color} <br />
                   </div>
 
                   <div
@@ -515,7 +464,6 @@ const Group = ({
   }
 
   const removeWOFromPlan = (order) => {
-    console.log('Removing order from plan', order)
     setWorkOrders((prevOrders) => prevOrders.filter((item) => item.id !== order.id))
   }
 
@@ -527,11 +475,9 @@ const Group = ({
         alert('Auto Sync is already added.')
         return prevGroups
       }
-      console.log('Auto sync orders', autoSyncOrders)
-      console.log('Work orders', workOrders)
       setWorkOrders(
         workOrders.filter(
-          (order) => !autoSyncOrders.items.some((a_order) => order.id === a_order.id),
+          (order) => !autoSyncOrders.items.some((a_order) => order.id === a_order.id ),
         ),
       )
 
@@ -540,28 +486,44 @@ const Group = ({
   }
 
   const addWorkOrderToGroup = (order, groupIndex) => {
-    console.log('Adding order to group', order)
 
     setGroupOrders((prevGroups) => {
       if (prevGroups[groupIndex]?.name === 'Auto Sync') {
         alert('Cannot manually add work orders to the Auto Sync group.')
         return prevGroups
       }
+      const itemToAdd = order.order
+      ? { ...order.order, workOrderId: order.order.id }
+      : { ...order.lg, workOrderId: order.workOrderId }
+
+      const isDuplicate = prevGroups[groupIndex].items.some(
+        (item) =>
+          (item.id === itemToAdd.id && item.workOrderId === itemToAdd.workOrderId) 
+      );
+  
+      if (isDuplicate) {
+        return prevGroups;
+      }
 
       if (order.order) {
         setWorkOrders((prevOrders) => prevOrders.filter((item) => item.id !== order.order.id))
       } else if (order.lg) {
         setWorkOrders((prevOrders) =>
-          prevOrders.map((wo) => ({
-            ...wo,
-            layer_group: wo.layer_group.filter((layer) => layer.id !== order.lg.id),
-          })),
+          prevOrders.map((wo) => {
+            if (wo.id === order.workOrderId) {
+              return {
+                ...wo,
+                layer_group: wo.layer_group.filter((layer) => layer.id !== order.lg.id),
+              }
+            }
+            return wo;
+          }),
         )
       }
 
       return prevGroups.map((group, index) =>
         index === groupIndex
-          ? { ...group, items: [...group.items, order.order ? order.order : order.lg] }
+          ? { ...group, items: [...group.items, itemToAdd] }
           : group,
       )
     })
@@ -607,8 +569,9 @@ const Group = ({
         </CRow>
         <CRow className="mt-3">
           <CCol xs={12}>
-            {workOrders.length > 0 &&
-              workOrders.map((order) => (
+            {workOrders
+              .filter((order) => order.layer_group && order.layer_group.length > 0)
+              .map((order) => (
                 <WorkOrderCard
                   key={order.id}
                   order={order}

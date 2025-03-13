@@ -8,6 +8,8 @@ import {
     CButton,
 } from '@coreui/react'
 import Drawer from '../../../components/Drawer/Drawer'  
+import ActionButton from '../../../components/New/ActionButton'
+
 
 function PackagesForm({ isDrawerOpen, setDrawerOpen }) {
 
@@ -124,12 +126,19 @@ function PackagesForm({ isDrawerOpen, setDrawerOpen }) {
         {/* Buttons */}
         <div className="flex justify-end gap-2 mt-4">
         
-          <button className="bg-[#8761e5] text-white w-[80px] h-10 flex justify-center items-center rounded-md hover:bg-[#7348df] hover:text-white"  onClick={() => setDrawerOpen(false)}>
-            Cancel
-          </button>
-          <button className="bg-[#8761e5] text-white w-[80px] h-10 flex justify-center items-center rounded-md hover:bg-[#7348df] hover:text-white">
-            Save
-          </button>
+          <ActionButton
+          label="Cancel"
+          onClick={()=>setDrawerOpen(false)}
+          width="[80px]"
+          height="10"
+          />
+          
+          <ActionButton
+          label="Save"
+          width="[80px]"
+          height="10"
+          borderRadius='md'
+          />
         </div>
       </Drawer>
     </>

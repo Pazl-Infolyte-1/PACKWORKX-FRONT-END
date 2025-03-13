@@ -107,13 +107,13 @@ const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
                     </div>
                     {activeDropdown === index && (
                       <div 
-                        className={`absolute right-0 sm:right-2 ${
-                          index >= cellData.length - 2 ? 'bottom-0' : 'top-0'
-                        } w-28 sm:w-36 bg-white rounded-md shadow-lg z-10 border border-gray-200`}
-                        style={{
-                          transform: `translate(${index >= cellData.length - 2 ? '0, -100%' : '0, 0%'})`,
-                        }}
-                      >
+  className="absolute right-0 sm:right-2 w-28 sm:w-36 bg-white rounded-md shadow-lg z-10 border border-gray-200"
+  style={{
+    top: index >= cellData.length - 2 ? 'auto' : '100%',
+    bottom: index >= cellData.length - 2 ? '100%' : 'auto',
+  }}
+>
+
                         <ul className="py-0">
                           <li 
                             className="px-2 sm:px-4 py-1.5 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center"

@@ -163,55 +163,55 @@ export const apiMethods = {
   },
 
   // Customer methods
-  getCustomers: async (params) => {
-    try {
-      const { url, method } = endpoints.customers.list
-      const response = await apiClient[method.toLowerCase()](url, { params })
-      return response.data
-    } catch (error) {
-      throw error
-    }
-  },
+  //getCustomers: async (params) => {
+  //  try {
+  //    const { url, method } = endpoints.customers.list
+  //    const response = await apiClient[method.toLowerCase()](url, { params })
+  //    return response.data
+  //  } catch (error) {
+  //    throw error
+  //  }
+  //},
 
-  getCustomerById: async (id) => {
-    try {
-      const { url, method } = endpoints.customers.detail
-      const response = await apiClient[method.toLowerCase()](url(id))
-      return response.data
-    } catch (error) {
-      throw error
-    }
-  },
+  //getCustomerById: async (id) => {
+  //  try {
+  //    const { url, method } = endpoints.customers.detail
+  //    const response = await apiClient[method.toLowerCase()](url(id))
+  //    return response.data
+  //  } catch (error) {
+  //    throw error
+  //  }
+  //},
 
-  createCustomer: async (customerData) => {
-    try {
-      const { url, method } = endpoints.customers.create
-      const response = await apiClient[method.toLowerCase()](url, customerData)
-      return response.data
-    } catch (error) {
-      throw error
-    }
-  },
+  //createCustomer: async (customerData) => {
+  //  try {
+  //    const { url, method } = endpoints.customers.create
+  //    const response = await apiClient[method.toLowerCase()](url, customerData)
+  //    return response.data
+  //  } catch (error) {
+  //    throw error
+  //  }
+  //},
 
-  updateCustomer: async (id, customerData) => {
-    try {
-      const { url, method } = endpoints.customers.update
-      const response = await apiClient[method.toLowerCase()](url(id), customerData)
-      return response.data
-    } catch (error) {
-      throw error
-    }
-  },
+  //updateCustomer: async (id, customerData) => {
+  //  try {
+  //    const { url, method } = endpoints.customers.update
+  //    const response = await apiClient[method.toLowerCase()](url(id), customerData)
+  //    return response.data
+  //  } catch (error) {
+  //    throw error
+  //  }
+  //},
 
-  deleteCustomer: async (id) => {
-    try {
-      const { url, method } = endpoints.customers.delete
-      const response = await apiClient[method.toLowerCase()](url(id))
-      return response.data
-    } catch (error) {
-      throw error
-    }
-  },
+  //deleteCustomer: async (id) => {
+  //  try {
+  //    const { url, method } = endpoints.customers.delete
+  //    const response = await apiClient[method.toLowerCase()](url(id))
+  //    return response.data
+  //  } catch (error) {
+  //    throw error
+  //  }
+  //},
 
   getFormFields: async (id) => {
     try {
@@ -222,15 +222,15 @@ export const apiMethods = {
       throw error
     }
   },
-  getDynamicFormFields: async (id) => {
-    try {
-      const { url, method } = endpoints.form.dynamicFormFields
-      const response = await apiClient[method.toLowerCase()](url(id))
-      return response.data
-    } catch (error) {
-      throw error
-    }
-  },
+  //getDynamicFormFields: async (id) => {
+  //  try {
+  //    const { url, method } = endpoints.form.dynamicFormFields
+  //    const response = await apiClient[method.toLowerCase()](url(id))
+  //    return response.data
+  //  } catch (error) {
+  //    throw error
+  //  }
+  //},
   getClientOrVendors: async () => {
     try {
       const { url, method } = endpoints.client.Clients_Vendors

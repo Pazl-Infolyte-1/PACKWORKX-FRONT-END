@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import same from '../../assets/images/info.png'
 import Phone from '../../assets/images/phone.png'
 import Cell from '../../assets/images/mob.png'
@@ -6,18 +6,30 @@ import Facebook from '../../assets/images/fb.png'
 import OtherDetailForm from './OtherDetailForm'
 import AddressForm from './AddressForm'
 import ContactPersonsForm from './ContactPersonsForm'
+import { HiOutlinePencilAlt } from "react-icons/hi";
 
-const ClientForm = () => {
+
+const ClientForm = ({editData}) => {
   const [activeTab, setActiveTab] = useState('otherDetails')
 
+console.log("edoit id",editData)
 
 
   return (
     <div className="p-5 grid grid-cols-2 gap-2">
       {/* Left Column */}
       <div className="ml-5">
-        <h2 className="text-lg font-semibold mb-4">New Customer</h2>
-        <div className="flex items-center mb-4">
+      <h2 className="text-lg font-semibold mb-4 flex items-center space-x-2">
+  {editData?.display_name ? (
+    <>
+      <span>Edit {editData.display_name}</span>
+      <HiOutlinePencilAlt className="w-5 h-5 text-gray-500" />
+    </>
+  ) : (
+    "New Customer"
+  )}
+</h2>
+      <div className="flex items-center mb-4">
           <label className="font-medium flex items-center">
             Customer Type <img src={same} alt="Customer Type" className="ml-2" />
           </label>

@@ -17,7 +17,8 @@ function ClientList() {
       try {
         const response = await apiMethods.getClientOrVendors()
         console.log('clientData:', response)
-        setData(response.data) // Assuming response.data is an array of client objects
+          setData(response?.data) // Assuming response.data is an array of client objects
+          console.log("res.////",response.data)
       } catch (error) {
         console.error('Error fetching client data:', error)
       }
@@ -25,18 +26,18 @@ function ClientList() {
 
     fetchClientData()
   }, [])
-
   // Pagination Calculations
   const indexOfLastRow = currentPage * rowsPerPage
   const indexOfFirstRow = indexOfLastRow - rowsPerPage
-  const currentRows = data.slice(indexOfFirstRow, indexOfLastRow)
-  const totalPages = Math.ceil(data.length / rowsPerPage)
+  const currentRows = data?.slice(indexOfFirstRow, indexOfLastRow)
+  const totalPages = Math.ceil(data?.length / rowsPerPage)
 
   const handlePageChange = useCallback((event, value) => setCurrentPage(value), [])
+  console.log("curr rows",currentRows)
 
   // Function to Convert Table Data to CSV and Download
   const downloadCSV = async () => {
-    if (!data.length) {
+    if (!data?.length) {
       console.error('No data available to download')
       return
     }
@@ -65,7 +66,7 @@ function ClientList() {
 
     // Process Data Rows (Handling Async Format Date)
     const formattedData = await Promise.all(
-      data.map(async (row) => {
+      data?.map(async (row) => {
         const values = await Promise.all(
           selectedKeys.map(async (key) => {
             if (key === 'created_at') {
@@ -99,7 +100,6 @@ function ClientList() {
       <div className="w-full h-[40px] flex justify-between items-center">
         <h4>Clients and Vendors</h4>
       </div>
-
       {/* Search Bar & Actions */}
       <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
         <div className="flex justify-between items-center">
@@ -137,7 +137,7 @@ function ClientList() {
 
         {/* Table Section */}
         <div className="mt-3 overflow-x-auto">
-          <ClientTable clientdata={currentRows} />
+          <ClientTable clientdata={data} />
         </div>
 
         {/* Pagination Section */}
@@ -147,10 +147,11 @@ function ClientList() {
       </div>
 
       {/* Drawer */}
+
       <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth={'1280px'}>
         <ClientForm />
       </Drawer>
-    </div>
+        </div>
   )
 }
 

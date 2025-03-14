@@ -1,5 +1,4 @@
 import axios from 'axios'
-// import authMiddleware from './middleware/authMiddleware'
 
 const BASE_URL = 'https://packworkx.pazl.info/api/'
 
@@ -34,7 +33,6 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access
       localStorage.removeItem('token')
       window.location.href = '/login'
     }
@@ -42,103 +40,14 @@ apiClient.interceptors.response.use(
   },
 )
 
-// src/services/api/endpoints.js
-const endpoints = {
-  auth: {
-    login: {
-      url: '/user/login',
-      method: 'POST',
-    },
-    register: {
-      url: '/auth/register',
-      method: 'POST',
-    },
-    logout: {
-      url: '/auth/logout',
-      method: 'POST',
-    },
-  },
-  client: {
-    Clients_Vendors: {
-      url: 'https://mocki.io/v1/10d77686-3679-4445-89db-9da5fe60eb4a',
-      method: 'GET',
-    },
-  },
-  menu: {
-    sideBarMenu: {
-      url: 'https://mocki.io/v1/711cbc7d-a070-4077-bf97-8c1369fa075f',
-      method: 'GET',
-    },
-  },
-  form: {
-    formfeilds: {
-      url: (id) => `/form-fields/${id}`,
-      method: 'GET',
-    },
-    dynamicFormFields: {
-      url: (id) => `/form-fields/${id}/add?=`,
-      method: 'GET',
-    },
-  },
-  customers: {
-    list: {
-      url: '/customers',
-      method: 'GET',
-    },
-    detail: {
-      url: (id) => `/customers/${id}`,
-      method: 'GET',
-    },
-    create: {
-      url: '/customers',
-      method: 'POST',
-    },
-    update: {
-      url: (id) => `/customers/${id}`,
-      method: 'PUT',
-    },
-    delete: {
-      url: (id) => `/customers/${id}`,
-      method: 'DELETE',
-    },
-  },
-  deals: {
-    list: {
-      url: '/deals',
-      method: 'GET',
-    },
-    detail: {
-      url: (id) => `/deals/${id}`,
-      method: 'GET',
-    },
-    create: {
-      url: '/deals',
-      method: 'POST',
-    },
-    update: {
-      url: (id) => `/deals/${id}`,
-      method: 'PUT',
-    },
-    delete: {
-      url: (id) => `/deals/${id}`,
-      method: 'DELETE',
-    },
-  },
-}
-
-// Updated API methods using the new endpoint structure
 export const apiMethods = {
-  // Auth methods
   login: async (credentials) => {
     console.log('credentials', credentials)
     try {
-      const { url, method } = endpoints.auth.login
-      // Encode credentials before sending
-      //   const encodedCredentials = authMiddleware.encodeAES(credentials)
-      // Send encoded credentials to the server
-      const response = await apiClient[method.toLowerCase()](url, credentials,{
+      const response = await apiClient.post('/user/login', credentials, {
         headers: {
-          'x-api-key': '4b3e77f648e5b9055a45f0812b3a4c3b88b08ff10b2f34ec21d11b6f678b6876a4014c88ff2a3c7e8e934c4f4790a94d3acb28d2f78a9b90f18960feaf3e4f99', 
+          'x-api-key':
+            '4b3e77f648e5b9055a45f0812b3a4c3b88b08ff10b2f34ec21d11b6f678b6876a4014c88ff2a3c7e8e934c4f4790a94d3acb28d2f78a9b90f18960feaf3e4f99',
         },
       })
 
@@ -153,93 +62,34 @@ export const apiMethods = {
     }
   },
 
-  // side bar menu
   getSideBarMenu: async (params) => {
     try {
       const token = localStorage.getItem('token')
       console.log('object', token)
-      const { url, method } = endpoints.menu.sideBarMenu
-      const response = await apiClient[method.toLowerCase()](url, { params })
+      const response = await apiClient.get(
+        'https://mocki.io/v1/711cbc7d-a070-4077-bf97-8c1369fa075f',
+        { params },
+      )
       return response.data
     } catch (error) {
       throw error
     }
   },
-
-  // Customer methods
-  //getCustomers: async (params) => {
-  //  try {
-  //    const { url, method } = endpoints.customers.list
-  //    const response = await apiClient[method.toLowerCase()](url, { params })
-  //    return response.data
-  //  } catch (error) {
-  //    throw error
-  //  }
-  //},
-
-  //getCustomerById: async (id) => {
-  //  try {
-  //    const { url, method } = endpoints.customers.detail
-  //    const response = await apiClient[method.toLowerCase()](url(id))
-  //    return response.data
-  //  } catch (error) {
-  //    throw error
-  //  }
-  //},
-
-  //createCustomer: async (customerData) => {
-  //  try {
-  //    const { url, method } = endpoints.customers.create
-  //    const response = await apiClient[method.toLowerCase()](url, customerData)
-  //    return response.data
-  //  } catch (error) {
-  //    throw error
-  //  }
-  //},
-
-  //updateCustomer: async (id, customerData) => {
-  //  try {
-  //    const { url, method } = endpoints.customers.update
-  //    const response = await apiClient[method.toLowerCase()](url(id), customerData)
-  //    return response.data
-  //  } catch (error) {
-  //    throw error
-  //  }
-  //},
-
-  //deleteCustomer: async (id) => {
-  //  try {
-  //    const { url, method } = endpoints.customers.delete
-  //    const response = await apiClient[method.toLowerCase()](url(id))
-  //    return response.data
-  //  } catch (error) {
-  //    throw error
-  //  }
-  //},
 
   getFormFields: async (id) => {
     try {
-      const { url, method } = endpoints.form.formfeilds
-      const response = await apiClient[method.toLowerCase()](url(id))
+      const response = await apiClient.get(`/form-fields/${id}`)
       return response.data
     } catch (error) {
       throw error
     }
   },
-  //getDynamicFormFields: async (id) => {
-  //  try {
-  //    const { url, method } = endpoints.form.dynamicFormFields
-  //    const response = await apiClient[method.toLowerCase()](url(id))
-  //    return response.data
-  //  } catch (error) {
-  //    throw error
-  //  }
-  //},
+
   getClientOrVendors: async () => {
     try {
-      const { url, method } = endpoints.client.Clients_Vendors
-      const response = await apiClient[method.toLowerCase()](url) // <-- Fix here
-
+      const response = await apiClient.get(
+        'https://mocki.io/v1/10d77686-3679-4445-89db-9da5fe60eb4a',
+      )
       return response.data
     } catch (error) {
       console.error('Error in getClientOrVendors:', error)
@@ -256,7 +106,7 @@ export const apiMethods = {
         year: 'numeric',
       })
     } catch (error) {
-      console.error('Error in getClientOrVendors:', error)
+      console.error('Error in formatDate:', error)
       throw error
     }
   },

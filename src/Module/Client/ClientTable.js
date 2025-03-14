@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CTable,
   CTableHead,
@@ -38,7 +38,10 @@ function ClientTable({ clientdata }) {
     setOpenPopoverIndex(openPopoverIndex === index ? null : index); // Toggle popover
   };
 
-
+  useEffect(() => {
+    console.log("Drawer open state changed:", isDrawerOpen);
+  }, [isDrawerOpen]);
+  
 
   return (
     <>

@@ -7,6 +7,7 @@ import OtherDetailForm from './OtherDetailForm'
 import AddressForm from './AddressForm'
 import ContactPersonsForm from './ContactPersonsForm'
 import { HiOutlinePencilAlt } from "react-icons/hi";
+import { FormProvider, useForm } from 'react-hook-form'
 
 
 const ClientForm = ({editData}) => {
@@ -14,9 +15,74 @@ const ClientForm = ({editData}) => {
 
 console.log("edoit id",editData)
 
+const methods = useForm({
+  defaultValues: editData || {
+    clientData: {
+      customer_type: "",
+      salutation: "",
+      first_name: "",
+      last_name: "",
+      display_name: "",
+      company_name: "",
+      email: "",
+      work_phone: "",
+      mobile: "",
+      PAN: "",
+      currency: "",
+      payment_terms: "",
+      enable_portal: false,
+      portal_language: "",
+      documents: {
+        id_proof: "",
+        contract: "",
+      },
+      website_url: "",
+      department: "",
+      designation: "",
+      twitter: "",
+      skype: "",
+      facebook: "",
+    },
+    addresses: [
+      {
+        type: "Billing", // Billing Address
+        attention: "",
+        country: "",
+        street1: "",
+        street2: "",
+        city: "",
+        state: "",
+        pinCode: "",
+        phone: "",
+        faxNumber: "",
+      },
+      {
+        type: "Shipping", // Shipping Address
+        attention: "",
+        country: "",
+        street1: "",
+        street2: "",
+        city: "",
+        state: "",
+        pinCode: "",
+        phone: "",
+        faxNumber: "",
+      },
+    ],
+  },
+});
 
+const { register, handleSubmit } = methods;
+const onSubmit = (data) => {
+  console.log("Form submitted with data:",JSON.stringify(data));
+  // You can send `data` to an API or handle it as needed
+};
   return (
+    <>
+        <FormProvider {...methods}>
+
     <div className="p-5 grid grid-cols-2 gap-2">
+
       {/* Left Column */}
       <div className="ml-5">
       <h2 className="text-lg font-semibold mb-4 flex items-center space-x-2">
@@ -34,13 +100,29 @@ console.log("edoit id",editData)
             Customer Type <img src={same} alt="Customer Type" className="ml-2" />
           </label>
           <div className="ml-8 flex items-center">
-            <input type="radio" name="customerType" id="business" className="mr-2" />
-            <label htmlFor="business" className="mr-4">
-              Business
-            </label>
-            <input type="radio" name="customerType" id="individual" className="mr-2" />
-            <label htmlFor="individual">Individual</label>
-          </div>
+  <input
+    type="radio"
+    {...register("clientData.customer_type")}
+    value="Business"
+    id="business"
+    className="mr-2"
+  />
+  <label htmlFor="business" className="mr-4">
+    Business
+  </label>
+  
+  <input
+    type="radio"
+    {...register("clientData.customer_type")}
+    value="Individual"
+    id="individual"
+    className="mr-2"
+  />
+  <label htmlFor="individual">
+    Individual
+  </label>
+</div>
+
         </div>
 
         <div className="flex items-center gap-2 mb-4">
@@ -48,17 +130,22 @@ console.log("edoit id",editData)
             Primary Contact <img src={same} alt="Primary Contact" className="ml-2" />
           </label>
           <div className="flex gap-2 ml-2">
-            <select className="border border-gray-300 p-2 rounded w-30">
-              <option>Salutation</option>
-            </select>
+          <select defaultValue="Mr." {...register("clientData.salutation")} className="border border-gray-300 p-2 rounded w-30">
+  <option value="" disabled>Select Salutation</option>
+  <option value="Mr." id="salutation-mr">Mr.</option>
+  <option value="Mrs." id="salutation-mrs">Mrs.</option>
+</select>
+
             <input
               type="text"
               placeholder="First Name"
+              {...register("clientData.first_name")}
               className="border border-gray-300 p-2 rounded flex-1 w-[120px]"
             />
             <input
               type="text"
               placeholder="Last Name"
+              {...register("clientData.last_name")}
               className="border border-gray-300 p-2 rounded flex-1  w-[120px]"
             />
           </div>
@@ -69,6 +156,7 @@ console.log("edoit id",editData)
           <input
             type="text"
             placeholder="Company Name"
+            {...register("clientData.company_name")}
             className="border border-gray-300 p-2 rounded ml-10 flex-1 mr-20 "
           />
         </div>
@@ -76,37 +164,59 @@ console.log("edoit id",editData)
 
       {/* Right Column */}
       <div>
-        <div className="flex items-center mb-4 mt-10">
-          <label className="font-medium text-red-500 flex items-center">
-            Display Name* <img src={same} alt="Display Name" className="ml-4" />
-          </label>
-          <select className="border border-gray-300 p-2 rounded ml-5 flex-1">
-            <option></option>
-          </select>
-        </div>
-
+      <div className="flex items-center mb-4 mt-10">
+  <label className="font-medium text-red-500 flex items-center">
+    Display Name* <img src={same} alt="Display Name" className="ml-4" />
+  </label>
+  <select defaultValue="Columbus" {...register("clientData.display_name")} className="border border-gray-300 p-2 rounded ml-5 flex-1">
+    <option value="">Select a name</option>
+    <option value="Columbus">Columbus</option>
+    <option value="Siva">Siva</option>
+    <option value="Vignesh">Vignesh</option>
+  </select>
+</div>
         <div className="flex items-center mb-4">
           <label className="font-medium flex items-center">
             Email Address <img src={same} alt="Email Address" className="ml-5" />
           </label>
           <input
             type="text"
+            {...register("clientData.email")}
             placeholder="Email Address"
             className="border border-gray-300 p-2 rounded ml-5 flex-1"
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <label className="font-medium flex items-center">
-            Phone <img src={same} alt="Phone" className="ml-2" />
-          </label>
-          <button className="border border-gray-300 p-2 rounded flex-1 flex items-center justify-center ml-20">
-            <img src={Phone} alt="Work Phone" className="mr-2" /> Work Phone
-          </button>
-          <button className="border border-gray-300 p-2 rounded flex-1 flex items-center justify-center">
-            <img src={Cell} alt="Mobile" className="mr-2" /> Mobile
-          </button>
-        </div>
+  <label className="font-medium flex items-center">
+    Phone <img src={same} alt="Phone" className="ml-2" />
+  </label>
+
+  <div className="flex flex-col flex-1">
+    <div className="flex items-center border border-gray-300 p-2 rounded">
+      <img src={Phone} alt="Work Phone" className="mr-2" />
+      <input
+        type="text"
+        {...register("clientData.work_phone")}
+        placeholder="Work Phone"
+        className="flex-1 outline-none"
+      />
+    </div>
+  </div>
+
+  <div className="flex flex-col flex-1">
+    <div className="flex items-center border border-gray-300 p-2 rounded">
+      <img src={Cell} alt="Mobile" className="mr-2" />
+      <input
+        type="text"
+        {...register("clientData.mobile")}
+        placeholder="Mobile"
+        className="flex-1 outline-none"
+      />
+    </div>
+  </div>
+</div>
+
       </div>
 
       {/* Tab Navigation */}
@@ -138,7 +248,16 @@ console.log("edoit id",editData)
           <p>Enter remarks about the customer here...</p>
         </div>
       )}
+ 
+  
+
     </div>
+    </FormProvider>
+    <div className="text-left ml-[5%]">
+			  <button className="text-white bg-purple-600 p-2 rounded w-24 mr-4" onClick={handleSubmit(onSubmit)}>Save</button>
+			  <button className="p-2 border border-gray-300 rounded w-24">Cancel</button>
+			</div>
+    </>
   )
 }
 

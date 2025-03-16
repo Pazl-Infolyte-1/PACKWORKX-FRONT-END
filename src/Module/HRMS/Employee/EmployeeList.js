@@ -7,6 +7,9 @@ import axios from 'axios'
 import CommonPagination from '../../../components/New/Pagination'
 import EmployeeForm from './EmployeeForm'
 import EmployeeTable from './EmployeeTable'
+import ActionButton from '../../../components/New/ActionButton'
+
+
 
 function EmployeeList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -40,21 +43,30 @@ function EmployeeList() {
       <div className="max-w-[1280px] mx-auto">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Employee</h2>
-          <div className="flex gap-4">
-            <button
+          <div className="flex gap-2">
+            {/* <button
               className="bg-teal-500 text-white px-2.5 py-1 rounded-md border-none hover:bg-teal-600 "
               onClick={() => {
                 setDrawerOpen(true)
               }}
             >
               + Create Employee
-            </button>
-            <button className="bg-violet-600 text-white px-4 py-1 rounded-md border-none hover:bg-violet-700">
-              Import
-            </button>
-            <button className="bg-violet-600 text-white px-4 py-1 rounded-md border-none hover:bg-violet-700">
-              Export
-            </button>
+            </button> */}
+
+            <ActionButton
+            label={" + Create Employee"}
+            onClick={()=>{setDrawerOpen(true)}}
+            customColor='bg-teal-500'
+            className='text-white hover:hover:bg-teal-600'
+            />
+
+            <ActionButton
+            label={"Import"}
+            />
+
+            <ActionButton
+            label={"Export"}
+            />
           </div>
         </div>
 

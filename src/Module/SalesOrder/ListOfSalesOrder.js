@@ -8,6 +8,7 @@ import VersionsPopup from './VersionsPopup'
 import { useSearch } from '../../components/New/SearchContext'
 import SalesOrderTable from './SalesOrderTable'
 import SearchBar from '../../components/New/SearchBar'
+import ActionButton from '../../components/New/ActionButton'
 
 function ListOfSalesOrder() {
   const [data, setData] = useState([])
@@ -57,12 +58,11 @@ function ListOfSalesOrder() {
           <div className="flex justify-between items-center">
             <SearchBar text="sales order" data={data} />
             <div className="flex justify-center items-center gap-2">
-              <button
-                className="bg-[#ed4040] rounded-[6px] h-[40px] w-[140px] text-white"
-                onClick={() => setDrawerOpen(true)}
-              >
-                Add Sales Order
-              </button>
+              <ActionButton
+              label={"Add Sales Order"}
+              onClick={() => setDrawerOpen(true)}
+              variant='add'
+              />
             </div>
           </div>
           <SalesOrderTable

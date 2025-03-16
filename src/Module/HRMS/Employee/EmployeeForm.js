@@ -6,6 +6,7 @@ import { FaFontAwesomeFlag } from 'react-icons/fa'
 import Switch from '@mui/material/Switch'
 import profile from '../../../assets/images/profile.png'
 import Drawer from '../../../components/Drawer/Drawer'
+import ActionButton from '../../../components/New/ActionButton'
 function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
   const label = { inputProps: { 'aria-label': 'Switch demo' } }
 
@@ -507,13 +508,22 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
             </div>
 
             <div className="mt-5 mb-3">
-              <div className="flex justify-end items-center gap-2">
-                <button className="cursor-pointer h-8 w-165 border-0 rounded-md bg-rose-500 text-white size-24 outline-none font-medium">
+              <div className="flex justify-end items-center gap-2 ">
+                {/* <button className="cursor-pointer h-8 w-165 border-0 rounded-md bg-rose-500 text-white size-24 outline-none font-medium">
                   Edit
-                </button>
-                <button className="cursor-pointer h-8 w-165 border-0 rounded-md bg-violet-500 text-white size-24 outline-none font-medium">
+                </button> */}
+                <ActionButton
+                label={"Edit"}
+                variant='edit'
+
+                />
+                {/* <button className="cursor-pointer h-8 w-165 border-0 rounded-md bg-violet-500 text-white size-24 outline-none font-medium">
                   Save
-                </button>
+                </button> */}
+                <ActionButton
+                label={"Save"}
+                variant='save'
+                />
               </div>
             </div>
           </div>

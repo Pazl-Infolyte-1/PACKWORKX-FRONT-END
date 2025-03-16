@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import PopUp from '../../components/New/PopUp'
+import ActionButton from '../../components/New/ActionButton'
 
 function ActionPopup({ visible, setVisible }) {
   const [data, setData] = useState([])
@@ -86,12 +87,17 @@ function ActionPopup({ visible, setVisible }) {
 
       {/* Footer with Close Button */}
       <div className="flex justify-end mt-4">
-        <button
+        {/* <button
           className="bg-[#8167e5] text-white px-4 py-2 rounded"
           onClick={() => setVisible(false)}
         >
           Close
-        </button>
+        </button> */}
+        <ActionButton
+          onClick={() => setVisible(false)}
+          variant=""
+          label="Close"
+          />
       </div>
     </PopUp>
   )

@@ -8,6 +8,9 @@ import AddButton from '../../components/New/AddButton'
 import { useSearch } from '../../components/New/SearchContext'
 import Drawer from '../../components/Drawer/Drawer'
 import AddSalesOrder from '../SalesOrder/AddSalesOrder'
+import ActionButton from '../../components/New/ActionButton'
+import { cilFilter } from '@coreui/icons'
+import CIcon from '@coreui/icons-react'
 
 const WorkOrders = () => {
   const [data, setData] = useState([]) // Original API data
@@ -50,8 +53,17 @@ const WorkOrders = () => {
       <div className="flex justify-between items-center gap-2 h-10">
         <SearchBar text="workorder" data={data} />
         <div className="flex gap-2">
-          <FilterButton />
-          <AddButton text="Work Order" onClick={() => setDrawerOpen(true)} />
+          {/* <FilterButton  /> */}
+          <ActionButton
+          label={"Filter"}
+          variant=''
+          icon={() => <CIcon icon={cilFilter} />}
+          />
+          {/* <AddButton text="Work Order" onClick={() => setDrawerOpen(true)} /> */}
+          <ActionButton
+          label={"Work Order"}
+          variant='add'
+          onClick={() => setDrawerOpen(true)}          />
         </div>
       </div>
 

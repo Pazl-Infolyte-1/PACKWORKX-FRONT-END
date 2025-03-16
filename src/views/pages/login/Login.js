@@ -23,7 +23,7 @@ const Login = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: '',
   })
   const [error, setError] = useState('')
@@ -44,22 +44,22 @@ const Login = () => {
 
     try {
       const response = await apiMethods.login({
-        userName: formData.username,
+        email: formData.email,
         password: formData.password,
       })
       console.log('response', response)
       // Assuming the API returns a token and the interceptor handles token storage
-      if (response.status === true && response.data) {
+      if (response.status === true && response) {
         // Save token or user data in localStorage or context if needed
-        localStorage.setItem('token', response.data.token)
+        localStorage.setItem('token', response.token)
         console.log('Token stored:', localStorage.getItem('token'))
 
         // Dispatch the login success action
         dispatch({
           type: 'LOGIN_SUCCESS',
           payload: {
-            user: response.data.user || { username: formData.username },
-            token: response.data.token,
+            email: response.user.email || { email: formData.email },
+            token: response.token,
           },
         })
 
@@ -97,10 +97,10 @@ const Login = () => {
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
                       <CFormInput
-                        placeholder="Username"
-                        autoComplete="username"
-                        name="username"
-                        value={formData.username}
+                        placeholder="Email"
+                        autoComplete="email"
+                        name="email"
+                        value={formData.email}
                         onChange={handleInputChange}
                         required
                       />

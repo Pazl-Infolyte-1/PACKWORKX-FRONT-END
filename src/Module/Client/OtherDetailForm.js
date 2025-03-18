@@ -27,7 +27,7 @@ const OtherDetailForm =()=>{
 			  <option value="" disabled selected>
       Select Currency
     </option>
-    <option value="INR">INR - Indian Rupee</option>
+    <option value="INR Indian Rupee">INR Indian Rupee</option>
     <option value="USD">USD - US Dollar</option>
 			  </select>
 			</div>
@@ -53,8 +53,8 @@ const OtherDetailForm =()=>{
       Select Payment Terms
     </option>
     <option value="due_on_receipt" id="due_on_receipt">Due On Receipt</option>
-    <option value="net_30" id="net_30">Net 30</option>
-    <option value="net_60" id="net_60">Net 60</option>
+    <option value="Net 30" id="net_30">Net 30</option>
+    <option value="Net 60" id="net_60">Net 60</option>
   </select>
 </div>
 
@@ -83,11 +83,11 @@ const OtherDetailForm =()=>{
   </label>
   <select defaultValue="fr"  {...register("clientData.portal_language")} className="w-full border border-gray-300 p-2 rounded ml-10">
     <option value="" disabled>Select Language</option>
-    <option value="en" id="lang-en">English</option>
-    <option value="fr" id="lang-fr">French</option>
-    <option value="es" id="lang-es">Spanish</option>
-    <option value="de" id="lang-de">German</option>
-    <option value="zh" id="lang-zh">Chinese</option>
+    <option value="English" id="lang-en">English</option>
+    <option value="French" id="lang-fr">French</option>
+    <option value="Spanish" id="lang-es">Spanish</option>
+    <option value="German" id="lang-de">German</option>
+    <option value="Chinese" id="lang-zh">Chinese</option>
   </select>
 </div>
 

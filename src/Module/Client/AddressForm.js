@@ -11,9 +11,9 @@ const addresses = watch("addresses"); // Get the addresses array
 
 	<div className="grid grid-cols-2 gap-20 bg-white shadow-md rounded-lg  p-6 w-full  ">
 	  {/* Billing Address */}
-	  {addresses.map((address, index) => (
+	  {addresses?.map((address, index) => (
 	  <div key={index}>
-		<h3 className="text-lg font-semibold mb-4">{address.type} Address</h3>
+		<h3 className="text-lg font-semibold mb-4">{address?.type} Address</h3>
 		<div className="space-y-4">
 		  <div className="flex items-center">
 			<label className="font-medium w-36">Attention</label>
@@ -27,7 +27,7 @@ const addresses = watch("addresses"); // Get the addresses array
 	defaultValue="IN"
   >
     <option value="">Select</option>
-    <option value="IN" id="india">India</option>
+    <option value="India" id="india">India</option>
     <option value="US" id="usa">United States</option>
   </select>
 </div>
@@ -37,7 +37,7 @@ const addresses = watch("addresses"); // Get the addresses array
 			<input
 			  type="text"
 			  placeholder="Street 1"
-			  {...register(`addresses?.${index}?.street1`)}
+			  {...register(`addresses.${index}.street1`)}
 			  className="flex-1 border border-gray-300 p-2 rounded-md h-12"
 			/>
 		  </div>
@@ -46,7 +46,7 @@ const addresses = watch("addresses"); // Get the addresses array
 			<input
 			  type="text"
 			  placeholder="Street 2"
-			  {...register(`addresses?.${index}?.street2`)}
+			  {...register(`addresses.${index}.street2`)}
 			  className="flex-1 border border-gray-300 p-2 rounded-md h-12"
 			/>
 		  </div>
@@ -59,13 +59,13 @@ const addresses = watch("addresses"); // Get the addresses array
 			<select  defaultValue="tn"  {...register(`addresses.${index}.state`)} className="flex-1 border border-gray-300 p-2 rounded-full">
 			  <option>Select or type to add</option>
 			  <option value="">Select</option>
-    <option value="tn" id="TamilNaduia">India</option>
-    <option value="an" id="Andra">United States</option>
+    <option value="Tamilnadu" id="TamilNaduia">Tamilnadu</option>
+    <option value="Andra" id="Andra">Andra</option>
 			</select>
 		  </div>
 		  <div className="flex items-center">
 			<label className="font-medium w-36">Pin code</label>
-			<input type="text"   {...register(`addresses?.${index}?.pinCode`)} className="flex-1 border border-gray-300 p-2 rounded-md" />
+			<input type="text" {...register(`addresses.${index}.pinCode`)} className="flex-1 border border-gray-300 p-2 rounded-md" />
 		  </div>
 		  <div className="flex items-center">
 			<label className="font-medium w-36">Phone</label>

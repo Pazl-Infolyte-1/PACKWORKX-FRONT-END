@@ -8,12 +8,20 @@ import AddressForm from './AddressForm'
 import ContactPersonsForm from './ContactPersonsForm'
 import { HiOutlinePencilAlt } from "react-icons/hi";
 import { FormProvider, useForm } from 'react-hook-form'
+import apiMethods from '../../api/config'
+import CustomAlert from '../../components/New/CustomAlert'
+import { useNavigate } from "react-router-dom";
 
 
-const ClientForm = ({editData}) => {
+const ClientForm = ({editData, closeDrawer}) => {
   const [activeTab, setActiveTab] = useState('otherDetails')
+  const [alerts, setAlerts] = useState([]);
 
-console.log("edoit id",editData)
+//console.log("edoit id",JSON.stringify(editData))
+const handleClose = () => {
+  setAlerts([]);
+};
+const navigate = useNavigate();
 
 const methods = useForm({
   defaultValues: editData || {
@@ -33,12 +41,13 @@ const methods = useForm({
       enable_portal: false,
       portal_language: "",
       documents: {
-        id_proof: "",
-        contract: "",
+        id_proof: "file1.pdf",
+        contract: "file2.pdf",
       },
       website_url: "",
       department: "",
       designation: "",
+      opening_balance:"",
       twitter: "",
       skype: "",
       facebook: "",
@@ -72,13 +81,93 @@ const methods = useForm({
   },
 });
 
-const { register, handleSubmit } = methods;
-const onSubmit = (data) => {
-  console.log("Form submitted with data:",JSON.stringify(data));
-  // You can send `data` to an API or handle it as needed
+const { register, handleSubmit ,reset} = methods;
+useEffect(() => {
+  if (editData) {
+    reset({
+      clientData: {
+        customer_type: editData.customer_type || "",
+        salutation: editData.salutation || "",
+        first_name: editData.first_name || "",
+        last_name: editData.last_name || "",
+        display_name: editData.display_name || "",
+        company_name: editData.company_name || "",
+        email: editData.email || "",
+        work_phone: editData.work_phone || "",
+        mobile: editData.mobile || "",
+        PAN: editData.PAN || "",
+        currency: editData.currency || "",
+        payment_terms: editData.payment_terms || "",
+        enable_portal: editData.enable_portal || false,
+        portal_language: editData.portal_language || "",
+        documents: JSON.parse(editData.documents || "{}"),
+        website_url: editData.website_url || "",
+        department: editData.department || "",
+        designation: editData.designation || "",
+        opening_balance:editData.opening_balance || "",
+        twitter: editData.twitter || "",
+        skype: editData.skype || "",
+        facebook: editData.facebook || "",
+        client_ref_id:editData.client_ref_id || "", //editing
+        company_id:editData.company_id || "" //editing
+      },
+      addresses: editData.addresses.map((addr, index) => ({
+        type: index === 0 ? "Billing" : "Shipping", // Assign "Billing" to first, "Shipping" to second
+        attention: addr.attention || "",
+        country: addr.country || "",
+        street1: addr.street1 || "",
+        street2: addr.street2 || "",
+        city: addr.city || "",
+        state: addr.state || "",
+        pinCode: addr.pinCode || "",
+        phone: addr.phone || "",
+        faxNumber: addr.faxNumber || "",
+      })),
+      
+    });
+  }
+}, [editData, reset]);
+const onSubmit = async (data) => {
+  try {
+    const filteredData = {
+      ...data,
+      addresses: data.addresses.map(({ type, ...rest }) => rest),
+    };
+
+    let response;
+    let successMessage;
+
+    if (editData) {
+      response = await apiMethods.editClient(editData.client_id, filteredData);
+      successMessage = "Client Edited successfully!";
+    } else {
+      response = await apiMethods.postClient(filteredData);
+      successMessage = "Client added successfully!";
+    }
+
+    console.log(successMessage, response);
+    setAlerts([{ severity: "success", message: successMessage }]);
+    setTimeout(() => {
+      setAlerts([]);
+      closeDrawer();
+    }, 3000); 
+  } catch (error) {
+    console.error("Error processing client:", error);
+    const errorMessage = error.response?.data?.message || "An unknown error occurred.";
+
+    setAlerts([{ severity: "error", message: errorMessage }]);
+    setTimeout(() => {
+      setAlerts([]);
+      closeDrawer();
+    }, 3000); 
+
+  }
+
 };
   return (
     <>
+      <CustomAlert alerts={alerts} handleClose={handleClose} />
+
         <FormProvider {...methods}>
 
     <div className="p-5 grid grid-cols-2 gap-2">
@@ -135,7 +224,26 @@ const onSubmit = (data) => {
   <option value="Mr." id="salutation-mr">Mr.</option>
   <option value="Mrs." id="salutation-mrs">Mrs.</option>
 </select>
+{/*
+            <input
+              type="text"
+              placeholder="First Name"
+              {...register("clientData.first_name")}
+              className="border border-gray-300 p-2 rounded flex-1 w-[120px]"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              {...register("clientData.last_name")}
+              className="border border-gray-300 p-2 rounded flex-1  w-[120px]"
+            />*/}
+          </div>
+        </div>
 
+        <div className="flex items-center gap-2 mb-4">
+        <label className="font-medium flex items-center w-[150px]">
+            {/*Primary Contact <img src={same} alt="Primary Contact" className="ml-2" />*/}
+          </label>
             <input
               type="text"
               placeholder="First Name"
@@ -148,8 +256,8 @@ const onSubmit = (data) => {
               {...register("clientData.last_name")}
               className="border border-gray-300 p-2 rounded flex-1  w-[120px]"
             />
-          </div>
         </div>
+
 
         <div className="flex items-center mb-4">
           <label className="font-medium">Company Name</label>
@@ -171,6 +279,7 @@ const onSubmit = (data) => {
   <select defaultValue="Columbus" {...register("clientData.display_name")} className="border border-gray-300 p-2 rounded ml-5 flex-1">
     <option value="">Select a name</option>
     <option value="Columbus">Columbus</option>
+    <option value="Ajicolumbus">Ajicolumbus</option>
     <option value="Siva">Siva</option>
     <option value="Vignesh">Vignesh</option>
   </select>
@@ -236,9 +345,8 @@ const onSubmit = (data) => {
       {activeTab === 'otherDetails' && (
        <OtherDetailForm></OtherDetailForm>
       )}
-      {activeTab === 'address' && (
-      <AddressForm></AddressForm>
-      )}
+   {activeTab === 'address' && <AddressForm />}
+
       {activeTab === 'contactPersons' && (
 <ContactPersonsForm></ContactPersonsForm>
       )}
@@ -249,14 +357,20 @@ const onSubmit = (data) => {
         </div>
       )}
  
-  
-
     </div>
     </FormProvider>
-    <div className="text-left ml-[5%]">
-			  <button className="text-white bg-purple-600 p-2 rounded w-24 mr-4" onClick={handleSubmit(onSubmit)}>Save</button>
-			  <button className="p-2 border border-gray-300 rounded w-24">Cancel</button>
-			</div>
+    <div className="flex justify-between items-center w-full px-6">
+  {/* Left side: Buttons */}
+  <div className="text-left ml-[3%]">
+    <button className="text-white bg-purple-600 p-2 rounded w-24 mr-4" onClick={handleSubmit(onSubmit)}>Save</button>
+    <button className="p-2 border border-gray-300 rounded w-24">Cancel</button>
+  </div>
+
+  {/* Right side: Alert messages */}
+  {/*{alerts.length > 0 && <div className="ml-auto"><CustomAlert alerts={alerts} /></div>}*/}
+
+</div>
+
     </>
   )
 }

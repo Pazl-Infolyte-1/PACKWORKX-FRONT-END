@@ -13,7 +13,7 @@ import CustomAlert from '../../components/New/CustomAlert'
 import { useNavigate } from "react-router-dom";
 
 
-const ClientForm = ({editData, closeDrawer}) => {
+const ClientForm = ({editData, closeDrawer,refreshClients,closeDrawerDuringAdd}) => {
   const [activeTab, setActiveTab] = useState('otherDetails')
   const [alerts, setAlerts] = useState([]);
 
@@ -147,18 +147,34 @@ const onSubmit = async (data) => {
 
     console.log(successMessage, response);
     setAlerts([{ severity: "success", message: successMessage }]);
+    if(editData){
+      setTimeout(() => {
+        setAlerts([]);
+        refreshClients();
+        closeDrawer();
+      }, 3000); 
+    }
     setTimeout(() => {
       setAlerts([]);
-      closeDrawer();
+      refreshClients();
+      closeDrawerDuringAdd();
     }, 3000); 
   } catch (error) {
     console.error("Error processing client:", error);
     const errorMessage = error.response?.data?.message || "An unknown error occurred.";
 
     setAlerts([{ severity: "error", message: errorMessage }]);
+    if(editData){
+      setTimeout(() => {
+        setAlerts([]);
+        refreshClients();
+        closeDrawer();
+      }, 3000); 
+    }
     setTimeout(() => {
       setAlerts([]);
-      closeDrawer();
+      refreshClients();
+      closeDrawerDuringAdd();
     }, 3000); 
 
   }

@@ -21,7 +21,7 @@ import { HiOutlineTrash } from "react-icons/hi";
 import CommonPagination from '../../components/New/Pagination';
 
 
-function ClientTable({ clientdata }) {
+function ClientTable({ clientdata,refreshClients }) {
   const [isModalOpen, setModalOpen] = useState(false)
   const [selectedClient, setSelectedClient] = useState(null) // Store selected client
   const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -154,7 +154,7 @@ const handlePageChange=()=>{
           <CommonPagination count={2} page={1} onChange={handlePageChange} />
         </div>*/}
       <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth={'1280px'}>
-        <ClientForm closeDrawer={() => setDrawerOpen(false)} editData={selectedClientId} />
+        <ClientForm refreshClients={refreshClients} closeDrawer={() => setDrawerOpen(false)} editData={selectedClientId} />
       </Drawer>
       </div>
     </>

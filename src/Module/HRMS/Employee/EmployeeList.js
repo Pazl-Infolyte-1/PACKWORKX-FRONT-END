@@ -40,7 +40,7 @@ function EmployeeList() {
 
   return (
     <>
-      <div className="max-w-[1280px] mx-auto">
+      <div className="">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Employee</h2>
           <div className="flex gap-2">

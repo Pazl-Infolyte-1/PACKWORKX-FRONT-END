@@ -41,6 +41,7 @@ import ReturnablesContent from './ReturnablesContent'
 import PopUp from '../../components/New/PopUp'
 import { FaLock } from 'react-icons/fa'
 import SplitWorkOrder from './SplitWorkOrder'
+import ActionButton from '../../components/New/ActionButton'
 import Outsource_Preview from './Outsource_Preview'
 
 const Index = () => {
@@ -98,18 +99,20 @@ const Index = () => {
     <div>
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h3>Order Grouping</h3>
-        <div className="ms-auto d-flex">
+        <div className="ms-auto flex flex-row gap-2">
           {activeTab === 'Group Layers' && (
-            <CButton
-              className="text-black border border-black bg-white hover:bg-black hover:text-white me-2 cursor-pointer"
-              onClick={handleAddGroup}
-            >
-              + Add Group
-            </CButton>
+            <ActionButton
+            label={" + Add Group "}
+            onClick={handleNextStep}
+            variant='add'
+            />
           )}
-          <CButton color="danger" className="text-white" onClick={handleNextStep}>
-            Next Step
-          </CButton>
+          <ActionButton
+          label={"Next Step"}
+          onClick={handleNextStep}
+          variant='delete'
+          />
+          
         </div>
       </div>
 

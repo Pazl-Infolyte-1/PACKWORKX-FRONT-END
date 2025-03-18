@@ -3,6 +3,7 @@ import { CiSettings } from 'react-icons/ci'
 import { LuScanBarcode } from 'react-icons/lu'
 import axios from 'axios'
 import PO from './PO.js'
+import ActionButton from '../../components/New/ActionButton.js'
 
 const PurchaseOrder = () => {
   const [files, setFiles] = useState([])
@@ -33,20 +34,25 @@ const PurchaseOrder = () => {
     setFiles([...files, ...selectedFiles])
   }
   return (
-    <div className="p-6 bg-white max-w-6xl mx-auto shadow-lg rounded-lg">
+    <div className="p-6 bg-white mx-auto shadow-lg rounded-lg">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         {/* <span className="text-gray-700"> */}
 
         {/* <span className="px-2 py-1 text-xs bg-green-200 text-green-800 rounded"> */}
-        <button className="mb-4 text-blue-600 font-bold px-4 py-2 border border-blue-600 rounded-md shadow-md bg-[#cae9f8]">
-          + Add a Contact
-        </button>
+
+        <ActionButton
+        label={"+ Add a Contact"}
+        />
         {/* </span> */}
         {/* </span> */}
         <div className="flex gap-2">
-          <button className="bg-white border px-4 py-2 rounded-md shadow">Close</button>
-          <button className="bg-[#8761e5] text-white px-4 py-2 rounded-md">Save</button>
+          <ActionButton
+        label={"Close"}
+        />
+        <ActionButton
+        label={"Save"}
+        />
         </div>
       </div>
 

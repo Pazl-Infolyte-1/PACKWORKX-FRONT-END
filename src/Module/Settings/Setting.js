@@ -235,7 +235,8 @@ const Setting = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-[70%] w-full xxxl:h-[90vh] bg-gray-50">
+    <div className='flex  min-h-[80vh]  w-full xxxl:h-[90vh] '>
+    <div className="flex flex-col md:flex-row w-full bg-gray-50">
       {/* Mobile menu button - only visible on small screens */}
       <div className="md:hidden p-4 bg-white shadow-sm">
       <button 
@@ -291,6 +292,7 @@ const Setting = () => {
           <EmptyState />
         )}
       </div>
+    </div>
     </div>
   );
 };

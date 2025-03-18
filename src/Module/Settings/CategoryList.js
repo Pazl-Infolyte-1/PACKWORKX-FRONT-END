@@ -82,7 +82,7 @@ const CategoryList = ({
   return (
     <div 
       ref={menuRef}
-      className="w-full md:w-64 bg-white h-[80vh] border-r border-gray-200 flex flex-col"
+      className="w-full h-full flex flex-col bg-white border-r border-gray-200"
     >
       {/* Header - simplified on mobile */}
       <div className="p-4 border-b border-gray-200">
@@ -91,7 +91,7 @@ const CategoryList = ({
       </div>
 
       {/* Category list - list layout for both mobile and desktop */}
-      <div className="overflow-y-auto overflow-x-hidden flex-grow">
+      <div className="overflow-y-auto flex-grow">
         {categories.length === 0 ? (
           <div className="p-4 text-gray-500 text-sm">No available menu</div>
         ) : (

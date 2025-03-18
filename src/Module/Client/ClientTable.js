@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CTable,
   CTableHead,
@@ -18,6 +18,7 @@ import ClientForm from './ClientForm';
 import Drawer from '../../components/Drawer/Drawer';
 import CustomPopover from '../../components/New/CustomPopover';
 import { HiOutlineTrash } from "react-icons/hi";
+import CommonPagination from '../../components/New/Pagination';
 
 
 function ClientTable({ clientdata }) {
@@ -38,8 +39,13 @@ function ClientTable({ clientdata }) {
     setOpenPopoverIndex(openPopoverIndex === index ? null : index); // Toggle popover
   };
 
-
-
+  useEffect(() => {
+    console.log("Drawer open state changed:", isDrawerOpen);
+  }, [isDrawerOpen]);
+  
+const handlePageChange=()=>{
+  return null
+}
   return (
     <>
       <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
@@ -143,9 +149,12 @@ function ClientTable({ clientdata }) {
           </CTableBody>
         </CTable>
       
-
+  
+        {/*<div className="flex justify-end items-center gap-4 mt-3">
+          <CommonPagination count={2} page={1} onChange={handlePageChange} />
+        </div>*/}
       <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth={'1280px'}>
-        <ClientForm editData={selectedClientId} />
+        <ClientForm closeDrawer={() => setDrawerOpen(false)} editData={selectedClientId} />
       </Drawer>
       </div>
     </>

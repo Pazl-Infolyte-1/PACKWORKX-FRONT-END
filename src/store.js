@@ -42,6 +42,8 @@ const changeState = (state = initialState, { type, payload, ...rest }) => {
     case 'LOGOUT':
       // Clear from localStorage
       localStorage.removeItem('authState')
+    localStorage.removeItem('token')
+
       return {
         ...state,
         auth: {

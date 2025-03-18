@@ -34,7 +34,7 @@ const PurchaseOrder = () => {
     setFiles([...files, ...selectedFiles])
   }
   return (
-    <div className="p-6 bg-white max-w-6xl mx-auto shadow-lg rounded-lg">
+    <div className="p-6 bg-white mx-auto shadow-lg rounded-lg">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         {/* <span className="text-gray-700"> */}

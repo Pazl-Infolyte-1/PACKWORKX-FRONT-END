@@ -4,7 +4,11 @@ export default {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        'xxxl': '1980px', // Custom breakpoint for large screens (4K TV, etc.)
+      },
+    },
   },
   plugins: [],
 };

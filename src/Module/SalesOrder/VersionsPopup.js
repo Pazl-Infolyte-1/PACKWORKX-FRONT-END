@@ -11,6 +11,7 @@ import {
 import PopUp from '../../components/New/PopUp'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { BiSolidUpArrow } from 'react-icons/bi'
+import ActionButton from '../../components/New/ActionButton'
 
 function VersionsPopup({ visible, setVisible }) {
   const [data, setData] = useState([])
@@ -152,9 +153,14 @@ function VersionsPopup({ visible, setVisible }) {
 
       {/* Save Button */}
       <div className="flex justify-end items-center h-15 mt-3">
-        <button className="bg-[#8167e5] text-white rounded-md h-10 w-52 flex justify-center items-center">
+        {/* <button className="bg-[#8167e5] text-white rounded-md h-10 w-52 flex justify-center items-center">
           Save as New Version
-        </button>
+        </button> */}
+        <ActionButton
+        label={" Save as New Version"}
+        />
+
+
       </div>
     </PopUp>
   )

@@ -8,10 +8,21 @@ import {
   CTableHead,
 } from '@coreui/react'
 import { BsThreeDotsVertical } from "react-icons/bs";
+import ConfirmationModal from './ConfirmationModal';
 
 const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [testm,settestm] = useState(false)
+  
+  const  testingf=()=>{
+    settestm(false)
+    alert("item deleted")
+  }
   console.log(cellData)
+
+  const handledeleteClick = ()=>{
+    settestm(true)
+  }
 
   const toggleDropdown = (index) => {
     if (activeDropdown === index) {
@@ -148,6 +159,7 @@ const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
                               e.stopPropagation();
                               onDelete && onDelete(cell);
                               setActiveDropdown(null);
+                              handledeleteClick()
                             }}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -171,6 +183,15 @@ const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
           </CTableBody>
         </CTable>
       </div>
+      <ConfirmationModal   
+        isOpen={testm}
+        onClose={() => settestm(false)}
+        onConfirm={testingf}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this item?"
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   )
 }

@@ -12,7 +12,7 @@ const Billing = React.lazy(() => import('./Module/Admin/Billing/Billing.js'))
 const Companies = React.lazy(() => import('./Module/Admin/Companies/Companies.js'))
 const WorkOrderList = React.lazy(() => import('./Module/WorkOrder/workorderlist.js'))
 const SalesOrder = React.lazy(() => import('./Module/SalesOrder/ListOfSalesOrder.js'))
-const Settings = React.lazy(() => import('./Module/Settings/Setting.js'))
+const DropDownController =  React.lazy(() => import('./Module/User/DropDownController.js'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
@@ -32,7 +32,7 @@ const routes = [
   { path: '/workorderlist', name: 'Workorderlist', element: WorkOrderList, key: 25 },
 
   { path: '/salesorder', name: 'SalesOrder', element: SalesOrder, key: 24 },
-  { path: '/settings', name: 'Settings', element: Settings, key: 6000 }
+  { path: '/users', name: 'user', element:DropDownController, key: 6000 }
 ]
 
 export default routes

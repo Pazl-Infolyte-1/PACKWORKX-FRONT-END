@@ -1,6 +1,7 @@
 import React from 'react'
 import Drawer from '../../../components/Drawer/Drawer'
 import { CCardBody, CRow, CCol, CFormInput, CFormSelect, CButton } from '@coreui/react'
+import ActionButton from '../../../components/New/ActionButton'
 
 function CompaniesForm({ isDrawerOpen, setDrawerOpen }) {
   return (
@@ -102,15 +103,28 @@ function CompaniesForm({ isDrawerOpen, setDrawerOpen }) {
             </CCardBody>
             {/* Buttons */}
             <div className="flex justify-end gap-4 mt-4">
-              <CButton color="secondary" onClick={() => setDrawerOpen(false)}>
+              {/* <CButton color="secondary" onClick={() => setDrawerOpen(false)}>
                 Cancel
-              </CButton>
-              <CButton
-                className="text-white"
-                style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
-              >
-                Save Company
-              </CButton>
+              </CButton> */}
+              <ActionButton
+              customColor=''
+              label={"cancel"}
+              variant='secondary'
+              onClick={()=>{setDrawerOpen(false)}}
+              />
+              <ActionButton
+              customColor=''
+              label={"Save Company"}
+              variant='save'
+              onClick={()=>{}}
+              />
+
+                {/* <CButton
+                  className="text-white"
+                  style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
+                >
+                  Save Company
+                </CButton> */}
             </div>
           </div>
         </Drawer>

@@ -2,6 +2,7 @@ import { TrashIcon } from '@heroicons/react/solid'
 import { useForm, useFieldArray } from 'react-hook-form'
 import ActionPopup from './ActionPopup'
 import { useState } from 'react'
+import ActionButton from '../../components/New/ActionButton'
 
 const SkuDetails = () => {
   const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
@@ -29,12 +30,17 @@ const SkuDetails = () => {
         {/* Title & Button Container */}
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Sku Details</h2>
-          <button
+          {/* <button
             className="cursor-pointer w-[132px] h-[40px] px-2 border border-[#8167E5] rounded-lg bg-transparent text-[#8167E5] text-[14px] font-['Lato'] leading-[20px] outline-none"
             onClick={() => append({ sku: '', quantity: '', rate: '', acceptableUnits: '' })}
           >
             + Add Sku
-          </button>
+          </button> */}
+          <ActionButton
+          onClick={()=>append({ sku: '', quantity: '', rate: '', acceptableUnits: '' })}
+          variant='minimal'
+          label={"+ Add Sku"}
+          />
         </div>
 
         <div className="w-[100%] h-[200px] bg-white rounded-[10px] shadow-md shadow-[rgba(3,3,3,0.1)]">
@@ -168,18 +174,32 @@ const SkuDetails = () => {
 
           <div className="flex justify-between items-center w-full mt-10">
             {/* Left-aligned button */}
-            <button onClick={() => setActionDrawerOpen(true)} className="cursor-pointer w-[190.12px] h-[45px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-lato leading-[20px] outline-none">
+            {/* <button onClick={() => setActionDrawerOpen(true)} className="cursor-pointer w-[190.12px] h-[45px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-lato leading-[20px] outline-none">
               Previous Invoice Rates
-            </button>
+            </button> */}
+            <ActionButton
+            onClick={() => setActionDrawerOpen(true)}
+            label={"Previous Invoice Rates"}
+            variant='minimal'
+            />
 
             {/* Right-aligned buttons */}
             <div className="flex gap-4">
-              <button className="cursor-pointer w-[111.12px] h-[45px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-lato leading-[20px] outline-none">
+              {/* <button className="cursor-pointer w-[111.12px] h-[45px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-lato leading-[20px] outline-none">
                 Save As Draft
-              </button>
-              <button className="cursor-pointer w-[111.12px] h-[45px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-lato leading-[20px] outline-none">
+              </button> */}
+            <ActionButton
+            label={" Save As Draft"}
+            variant='minimal'
+            />
+
+            <ActionButton
+            label={" Submit"}
+            variant='minimal'
+            />
+              {/* <button className="cursor-pointer w-[111.12px] h-[45px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-lato leading-[20px] outline-none">
                 Submit
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

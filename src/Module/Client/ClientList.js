@@ -6,18 +6,40 @@ import CommonPagination from '../../components/New/Pagination'
 import ClientTable from './ClientTable'
 import ClientForm from './ClientForm'
 import ActionButton from '../../components/New/ActionButton'
-
+import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'
+import vendorImg from "../../assets/images/vendor.png"
+import clientImg from "../../assets/images/client.jpg"
+import CustomAlert from '../../components/New/CustomAlert'
 
 function ClientList() {
-  const [isDrawerOpen, setDrawerOpen] = useState(false)
+  const [selected, setSelected] = useState("vendor");
+  const [triggerSelection, setTriggerSelection] = useState(false)
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
+
   const [data, setData] = useState([]) // Stores all fetched data
   const [currentPage, setCurrentPage] = useState(1)
   const rowsPerPage = 10
+  const handleCloseDrawer = () => {
+    setDrawerOpen(false);
+  };
+  const selectionFrame = {
+    vendor: {
+      id: 1,
+      name: "vendor",
+      image: vendorImg,
+    },
+    client: {
+      id: 2,
+      name: "client",
+      image: clientImg,
+    },
+  };
 
   useEffect(() => {
     const fetchClientData = async () => {
       try {
-        const response = await apiMethods.getClientOrVendors()
+        const response = await apiMethods.getClients()
         console.log('clientData:', response)
           setData(response?.data) // Assuming response.data is an array of client objects
           console.log("res.////",response.data)
@@ -27,13 +49,57 @@ function ClientList() {
     }
 
     fetchClientData()
-  }, [])
+  }, [isPopupOpen])
   // Pagination Calculations
   const indexOfLastRow = currentPage * rowsPerPage
   const indexOfFirstRow = indexOfLastRow - rowsPerPage
   const currentRows = data?.slice(indexOfFirstRow, indexOfLastRow)
   const totalPages = Math.ceil(data?.length / rowsPerPage)
+ 
+  const handleSelection = (selection) => {
+    const optionValue = selectionFrame[selection].id;
+    console.log(`Selected ID: ${optionValue}`);
+  
+    if (optionValue === 2) {
+      setPopupOpen(false);
+      setDrawerOpen(true);
+    } else {
+      console.log("On vendor page");
+    }
+  };
+  
+  // Updates selection but does NOT trigger `handleSelection`
+  const handleSelectAction = (selection) => {
+    setSelected(selection);
+    setTriggerSelection(true); // Ensures it runs handleSelection
 
+  };
+  
+  // Handles key events
+  const handleKeyDown = (event) => {
+    if (event.key === "ArrowRight") {
+      handleSelectAction("client");
+    } else if (event.key === "ArrowLeft") {
+      handleSelectAction("vendor");
+    } else if (event.key === "Enter") {
+      console.log("Enter Pressed: Executing Selection");
+      setTriggerSelection(true); // Mark that Enter was pressed
+    }
+  };
+  
+  // Ensures `handleSelection` runs AFTER `selected` updates
+  useEffect(() => {
+    if (triggerSelection) {
+      handleSelection(selected);
+      setTriggerSelection(false); // Reset trigger
+    }
+  }, [selected, triggerSelection]); // Runs when `selected` or `triggerSelection` changes
+  
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []); // Runs once on mount
+  
   const handlePageChange = useCallback((event, value) => setCurrentPage(value), [])
   console.log("curr rows",currentRows)
 
@@ -95,7 +161,9 @@ function ClientList() {
     a.click()
     window.URL.revokeObjectURL(url)
   }
-
+  //const alertsData = [
+  //  { severity: "success", message: "This is a success Alert." },
+  //];
   return (
     <div className="w-full">
       {/* Header Section */}
@@ -149,7 +217,8 @@ function ClientList() {
             <ActionButton
             height={"9"}
             label={"Add Client"}
-            onClick={()=>setDrawerOpen(true)}
+            //onClick={()=>setDrawerOpen(true)}
+            onClick={()=>setPopupOpen(true)}
             />
           </div>
         </div>
@@ -160,14 +229,43 @@ function ClientList() {
         </div>
 
         {/* Pagination Section */}
+        
         <div className="flex justify-end items-center gap-4 mt-3">
           <CommonPagination count={totalPages} page={currentPage} onChange={handlePageChange} />
         </div>
+        {/*<div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
+      <CustomAlert alerts={alertsData} />
+    </div>*/}
       </div>
 
       {/* Drawer */}
 
-      <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth={'1280px'}>
+      {!isDrawerOpen && (
+   <CustomPopup isOpen={isPopupOpen} onClose={() => setPopupOpen(false)} width={"w-[500px]"} height={"230px"}>
+   <div className="flex justify-center items-center space-x-12 p-6">
+     {Object.keys(selectionFrame).map((key) => (
+       <div
+         key={key}
+         className={`w-1/3 flex flex-col items-center border-4 p-2 cursor-pointer focus:outline-none ${
+           selected === key ? "border-blue-200" : "border-gray-100"
+         }`}
+         onClick={() => handleSelectAction(key)} // Mouse Click Support
+         onKeyDown={(event) => {
+           if (event.key === "Enter") handleSelectAction(key); // Keyboard Support
+         }}
+         tabIndex={0} // Makes div focusable for keyboard navigation
+         role="button" // Improves accessibility
+       >
+         <img src={selectionFrame[key].image} alt={selectionFrame[key].name} className="w-16 h-16 rounded-full" />
+         <p className="mt-2 text-sm font-semibold">{selectionFrame[key].name}</p>
+       </div>
+     ))}
+   </div>
+ </CustomPopup>
+)}
+      
+      <Drawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} maxWidth={"1280px"}>
+        {/* Pass handleCloseDrawer as a prop to ClientForm */}
         <ClientForm />
       </Drawer>
         </div>

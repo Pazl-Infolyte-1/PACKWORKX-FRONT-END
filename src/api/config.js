@@ -111,6 +111,69 @@ export const apiMethods = {
     }
   },
 
+  postClient: async (clientData) => {
+    try {
+      const token = localStorage.getItem('token') // Retrieve token before sending request
+      if (!token) {
+        throw new Error('No token found. Please log in again.')
+      }
+
+      const response = await apiClient.post('/clients', clientData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Attach token
+        },
+      })
+
+      return response.data
+    } catch (error) {
+      console.error('Error posting client:', error.response?.data || error.message)
+      throw error
+    }
+  },
+
+  editClient: async (clientId,clientData) => {
+    try {
+      const token = localStorage.getItem('token') // Retrieve token before sending request
+      if (!token) {
+        throw new Error('No token found. Please log in again.')
+      }
+
+      const response = await apiClient.put(`/clients/${clientId}`, clientData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Attach token
+        },
+      })
+
+      return response.data
+    } catch (error) {
+      console.error('Error posting client:', error.response?.data || error.message)
+      throw error
+    }
+  },
+
+  getClients: async (queryParams = {}) => {
+    try {
+      const token = localStorage.getItem("token"); // Retrieve token
+      if (!token) {
+        throw new Error("No token found. Please log in again.");
+      }
+  
+      const response = await apiClient.get("/clients", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Attach token
+        },
+        params: queryParams, // Attach query params (optional)
+      });
+  
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching clients:", error.response?.data || error.message);
+      throw error;
+    }
+  },
+  
+
+
   addSku: async (addNewSkuData) => {
     try {
       const response = await apiClient.post('/skuDetails', addNewSkuData,{

@@ -14,6 +14,7 @@ import CommonPagination from '../../components/New/Pagination'
 import { FiFilter } from 'react-icons/fi'
 import FinishedGoodsDetails from './FinishedGoodsDetails'
 import ReelsDetails from './ReelsDetails'
+import ActionButton from '../../components/New/ActionButton'
 
 const InventoryDashboard = () => {
   const [isfinishedgoodpopup, setfinishedgoodpopup] = useState(false)
@@ -61,8 +62,12 @@ const InventoryDashboard = () => {
           <FiFilter className="text-xl text-gray-700" />
         </div>
         <div className="flex gap-2">
-          <ButtonCommon>Saved Filter</ButtonCommon>
-          <ButtonCommon>Bulk Upload</ButtonCommon>
+          <ActionButton
+          label={"Saved Filter"}
+          />
+          <ActionButton
+          label={"Bulk Upload"}
+          />
         </div>
       </div>
       <MaterialTable />

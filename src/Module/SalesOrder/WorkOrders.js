@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { TrashIcon } from '@heroicons/react/solid'
 import VersionsPopup from './VersionsPopup'
+import ActionButton from '../../components/New/ActionButton'
 
 const accordionCardSummary = {
   data: [
@@ -93,12 +94,17 @@ const WorkOrders = () => {
       {/* Header Section */}
       <div className="flex justify-between items-center mt-2 mb-4 w-[1180px]">
         <h2 className="text-lg font-semibold text-[20px]">Work Orders</h2>
-        <button
+        {/* <button
           onClick={addWorkOrder}
           className="cursor-pointer w-[232px] h-[40px] px-2 border border-[#8167E5] rounded-lg bg-transparent text-[#8167E5] text-[14px] font-['Lato'] leading-[20px] outline-none"
         >
           + Create Workorders
-        </button>
+        </button> */}
+        <ActionButton
+        label={" + Create Workorders"}
+        onClick={addWorkOrder}
+        variant='minimal'
+        />
       </div>
 
       {/* Work Order Card */}
@@ -187,9 +193,13 @@ const WorkOrders = () => {
                 {/* Button & Icon Container */}
                 <div className="flex items-center gap-2">
                   {/* Button */}
-                  <button className="cursor-pointer w-[173px] h-[46px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
+                  {/* <button className="cursor-pointer w-[173px] h-[46px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
                     Download Work Order
-                  </button>
+                  </button> */}
+                  <ActionButton
+                  label={"Download Work Order"} 
+                  variant='minimal'
+                />
 
                   {workOrders.length > 0 && (
                     <TrashIcon
@@ -287,9 +297,14 @@ const WorkOrders = () => {
                         />
 
                         {/* Button (Outside, Right End) */}
-                        <button onClick={() => setVersionDrawerOpen(true)} className="ml-2 cursor-pointer w-[149px] h-[40px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
+                        {/* <button onClick={() => setVersionDrawerOpen(true)} className="ml-2 cursor-pointer w-[149px] h-[40px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
                           Version History
-                        </button>
+                        </button> */}
+                        <ActionButton
+                  label={" Version History"} 
+                  variant='minimal'
+                  onClick={() => setVersionDrawerOpen(true)}
+                />
                       </div>
                     </div>
                   </div>
@@ -366,9 +381,13 @@ const WorkOrders = () => {
         </div>
       )}
       <div className="flex justify-end">
-        <button className="cursor-pointer mt-3 w-[149px] h-[46px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
+        {/* <button className="cursor-pointer mt-3 w-[149px] h-[46px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
           Submit Work Order
-        </button>
+        </button> */}
+        <ActionButton
+          label={"Submit Work Order"}
+          variant='minimal'
+        />        
       </div>
       <VersionsPopup
           visible={isVersionDrawerOpen}

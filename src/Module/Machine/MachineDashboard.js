@@ -11,6 +11,7 @@ import ProcessDropDown from './ProcessDropDown';
 import ViewMachineData from './ViewMachineData';
 import AddButton from '../../components/New/AddButton';
 import AddFieldForm from './AddFieldForm';
+import ActionButton from '../../components/New/ActionButton';
 
 
 const machineData = [
@@ -352,12 +353,10 @@ export default function MachineMaster() {
     <div className="m-0,p-0">
       <div className="flex flex-col md:flex-row justify-between p-2 ">
         <h1 className="text-black text-xl font-bold">Machine Master Dashboard</h1>
-        <button
-          className="text-white bg-[#8167e5] rounded-md p-2"
-          onClick={() => setdrawopen(true)}
-        >
-          + Add Machine
-        </button>
+        <ActionButton
+        label={"+ Add Machine"}
+        onClick={()=>setdrawopen(true)}
+        />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 gap-3 mt-2">
@@ -625,13 +624,12 @@ export default function MachineMaster() {
             </div>
           </div>
 
-                    {/* Buttons */}
+        {/* Buttons */}
             <div className="flex flex-wrap justify-end gap-3 p-3 mt-4">
-            <button className="text-black bg-white w-20 rounded p-1 shadow-md">Cancel</button>
-            <button className="text-white bg-[#8167e5] w-20 rounded p-1 shadow-md">Save</button>
-            <button className="text-white bg-red-500 w-36 rounded p-1 shadow-md">Delete Machine</button>
+            <ActionButton label={"cancel"}variant='cancel' />
+            <ActionButton label={"Save"} variant='add'/>
+            <ActionButton variant='delete' label={"Delete Machine"}/>
           </div>
-
         </Drawer>
       </div>
     </div>

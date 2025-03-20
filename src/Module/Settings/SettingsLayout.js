@@ -12,7 +12,7 @@ const SettingsLayout = () => {
     { path: '/settings/app-settings', label: 'App Settings', icon: cilSettings },
     { path: '/settings/notification', label: 'Notification Settings', icon: cilBell },
     { path: '/settings/language', label: 'Language Settings', icon: cilLanguage },
-    { path: '/settings/profile', label: 'Super Admin Settings', icon: cilUser },
+    { path: '/settings/superAdmin', label: 'Super Admin', icon: cilUser },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -30,7 +30,7 @@ const SettingsLayout = () => {
       </div>
 
       {isDropdownOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200 shadow-md rounded-b-lg">
+        <div className="md:hidden bg-white border-b sm:overflow-y-auto border-gray-200 shadow-md rounded-b-lg">
           {menuItems.map((item) => (
             <Link
               key={item.path}

@@ -1,4 +1,8 @@
 import React from 'react'
+import settingsRoutes from './Module/Settings/SettingsRoutes.js'
+const SettingsLayout = React.lazy(() => import('./Module/Settings/SettingsLayout.js'))
+
+
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Client = React.lazy(() => import('./Module/Client/ClientList.js'))
 const SKU = React.lazy(() => import('./Module/SKU/SkuList.js'))
@@ -12,7 +16,7 @@ const Billing = React.lazy(() => import('./Module/Admin/Billing/Billing.js'))
 const Companies = React.lazy(() => import('./Module/Admin/Companies/Companies.js'))
 const WorkOrderList = React.lazy(() => import('./Module/WorkOrder/workorderlist.js'))
 const SalesOrder = React.lazy(() => import('./Module/SalesOrder/ListOfSalesOrder.js'))
-const DropDownController =  React.lazy(() => import('./Module/User/DropDownController.js'))
+const DropDownController = React.lazy(() => import('./Module/User/DropDownController.js'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
@@ -32,7 +36,14 @@ const routes = [
   { path: '/workorderlist', name: 'Workorderlist', element: WorkOrderList, key: 25 },
 
   { path: '/salesorder', name: 'SalesOrder', element: SalesOrder, key: 24 },
-  { path: '/users', name: 'user', element:DropDownController, key: 6000 }
+  { path: '/users', name: 'user', element: DropDownController, key: 6000 },
+  {
+    path: '/settings',
+    name: 'Settings',
+    element: SettingsLayout,
+    key: 5462,
+    children: settingsRoutes,
+  },
 ]
 
 export default routes

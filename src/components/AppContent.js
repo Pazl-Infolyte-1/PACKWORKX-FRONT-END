@@ -19,7 +19,18 @@ const AppContent = () => {
                   exact={route.exact}
                   name={route.name}
                   element={<route.element />}
-                />
+                >
+                  {/* Handle nested routes/children */}
+                  {route.children && 
+                    route.children.map((childRoute, childIdx) => (
+                      <Route
+                        key={`child-${childIdx}`}
+                        path={childRoute.path}
+                        element={<childRoute.element />}
+                      />
+                    ))
+                  }
+                </Route>
               )
             )
           })}
@@ -27,7 +38,6 @@ const AppContent = () => {
         </Routes>
       </Suspense>
     </CContainer>
-  // </div>
   )
 }
 

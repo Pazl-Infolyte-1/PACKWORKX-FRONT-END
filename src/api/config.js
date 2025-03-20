@@ -15,10 +15,8 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
-    console.log('Interceptor token:', token)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-      console.log('Authorization header set:', config.headers.Authorization)
     }
     return config
   },
@@ -42,7 +40,6 @@ apiClient.interceptors.response.use(
 
 export const apiMethods = {
   login: async (credentials) => {
-    console.log('credentials', credentials)
     try {
       const response = await apiClient.post('/user/login', credentials, {
         headers: {
@@ -65,7 +62,6 @@ export const apiMethods = {
   getSideBarMenu: async (params) => {
     try {
       const token = localStorage.getItem('token')
-      console.log('object', token)
       const response = await apiClient.get(
         'https://mocki.io/v1/711cbc7d-a070-4077-bf97-8c1369fa075f',
         { params },

@@ -47,7 +47,7 @@ function SkuAddEdit({
         ],
       });
     }
-  }, [editTag, strictAdherence]);   
+  }, [editTag]);   
   
   return (
     <>

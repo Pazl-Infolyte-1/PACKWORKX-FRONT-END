@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ActionButton from '../../components/New/ActionButton';
 
 function FileUploadSetting() {
   const [maxFileSize, setMaxFileSize] = useState(1024);
@@ -115,13 +116,13 @@ function FileUploadSetting() {
           />
         </div>
       </div>
-      
-      <button
+
+      <ActionButton
+        label={"Save"}
+        customColor='bg-red-500 text-white'
         onClick={handleSave}
-        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-      >
-        Save
-      </button>
+        />
+
     </div>
   );
 }

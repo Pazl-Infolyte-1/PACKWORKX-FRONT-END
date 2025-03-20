@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import ActionButton from "./../../components/New/ActionButton"
+
 
 function SuperAdmin() {
   const [showForm, setShowForm] = useState(false);
@@ -39,12 +41,11 @@ function SuperAdmin() {
         <div className='flex flex-row justify-between' >
       <h1 className="text-3xl font-bold mb-4">Super Admin</h1>
       {!showForm && (
-        <button
+        <ActionButton
           onClick={() => setShowForm(true)}
           className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mb-6"
-        >
-          Add User
-        </button>
+          label='Add User'
+        />
       )}
         </div>
 
@@ -128,18 +129,23 @@ function SuperAdmin() {
           </div>
 
           <div className="flex space-x-4">
-            <button
-              onClick={handleSave}
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-            >
-              Save
-            </button>
-            <button
+
+            <ActionButton
+        label={"Save"}
+        customColor='bg-red-500 text-white'
+        onClick={handleSave}
+        />
+            {/* <button
               onClick={handleCancel}
               className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
             >
               Cancel
-            </button>
+            </button> */}
+            <ActionButton
+            onClick={handleCancel}
+            label={"Cancel"}
+            variant='cancel'
+            />
           </div>
         </div>
       )}

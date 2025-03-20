@@ -8,20 +8,23 @@ import {
   CTableHead,
 } from '@coreui/react'
 import { BsThreeDotsVertical } from "react-icons/bs";
-import ConfirmationModal from './ConfirmationModal';
+import ConfirmationModale from '../../components/New/ConfirmationModale';
 
 const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [testm,settestm] = useState(false)
+  const [isConfirmationModalOpen,setIsConfirmationModalOpen] = useState(false)
   
-  const  testingf=()=>{
-    settestm(false)
-    alert("item deleted")
+  const handleCancel  =()=>{
+    setIsConfirmationModalOpen(false)
   }
-  console.log(cellData)
 
   const handledeleteClick = ()=>{
-    settestm(true)
+    setIsConfirmationModalOpen(true)
+  }
+
+  const handledeleteConfirmClick = ()=>{
+    setIsConfirmationModalOpen(true)
   }
 
   const toggleDropdown = (index) => {
@@ -183,10 +186,10 @@ const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
           </CTableBody>
         </CTable>
       </div>
-      <ConfirmationModal   
-        isOpen={testm}
-        onClose={() => settestm(false)}
-        onConfirm={testingf}
+      <ConfirmationModale   
+        isOpen={isConfirmationModalOpen}
+        onClose={handleCancel}
+        onConfirm={handledeleteConfirmClick}
         title="Confirm Deletion"
         message="Are you sure you want to delete this item?"
         confirmText="Delete"

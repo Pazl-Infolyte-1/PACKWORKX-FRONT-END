@@ -40,26 +40,29 @@ const CategoryList = ({
   };
 
   // Handle click outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        // Only close if we're on mobile (menu is open) and click is outside
-        if (isMobileMenuOpen) {
-          setIsMobileMenuOpen(false);
-        }
-      }
+// Handle click outside
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (
+      menuRef.current && 
+      !menuRef.current.contains(event.target) &&
+      isMobileMenuOpen
+    ) {
+      setIsMobileMenuOpen(false);
+      setEditingCategoryId(null); // Ensure edit mode is also closed
     }
+  };
 
-    // Add event listener
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
-    
-    // Cleanup event listener
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, [isMobileMenuOpen, setIsMobileMenuOpen]);
+  document.addEventListener('mousedown', handleClickOutside);
+  document.addEventListener('touchstart', handleClickOutside);
+
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+    document.removeEventListener('touchstart', handleClickOutside);
+  };
+}, [isMobileMenuOpen]);
+
+  
 
   // Handle keyboard shortcuts for edit mode
   useEffect(() => {

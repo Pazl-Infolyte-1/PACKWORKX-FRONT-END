@@ -15,13 +15,17 @@ import ActionButton from '../../components/New/ActionButton'
 
 
  
-const ClientForm = ({editData, closeDrawer,refreshClients,closeDrawerDuringAdd,refreshClientsEdit}) => {
+const ClientForm = ({editData, closeDrawer,refreshClients,closeDrawerDuringAdd,refreshClientsEdit,entity_type}) => {
   const [activeTab, setActiveTab] = useState('otherDetails')
   const [alerts, setAlerts] = useState([]);
   //const [hasGst, setHasGst] = useState(null); // Set null to avoid pre-selection
   const [gstNumber, setGstNumber] = useState('');
 const [gstData,setGstData] = useState("")
+const [entityName, setEntityName] = useState("Client");
 
+
+
+console.log("entity type", entity_type);
 //console.log("edoit id",JSON.stringify(editData))
 const handleClose = () => {
   setAlerts([]);
@@ -29,10 +33,12 @@ const handleClose = () => {
 const navigate = useNavigate();
 
 const methods = useForm({
+  mode: "onChange",
   defaultValues: editData || {
     clientData: {
       customer_type: "",
       client_ref_id:"",
+      entity_type: entityName,  
       gst_number:"",
       gst_status:false,
       salutation: "",
@@ -89,8 +95,22 @@ const methods = useForm({
   },
 });
 
-const { register, handleSubmit ,reset,watch} = methods;
+const { register, handleSubmit ,reset,watch,formState: { isValid, errors }} = methods;
+console.log("Form Values: ", watch());
+console.log("Validation Errors: ", errors);
+//const isButtonDisabled = !isValid || !!errors.gst_number;
+const isButtonDisabled = Object.keys(errors).length > 0 && !(errors.gst_number);
 
+
+console.log("entity name",entityName)
+useEffect(() => {
+  if (entity_type=== "Vendor") {
+    //setEntityName(entity_type);
+            methods.setValue("clientData.entity_type", "Vendor");
+  }else if(entity_type=== "Client"){
+    methods.setValue("clientData.entity_type", "Client");
+  }
+}, [entity_type]); // Runs only when entity_type changes
 useEffect(() => {
   if (editData) {
     reset({
@@ -98,6 +118,7 @@ useEffect(() => {
         customer_type: editData.customer_type || "",
         gst_number:editData.gst_number || "",
         gst_status: editData.gst_status ? "true" : "false",
+        entity_type:editData.entity_type || "",
         salutation: editData.salutation || "",
         first_name: editData.first_name || "",
         last_name: editData.last_name || "",
@@ -143,9 +164,10 @@ const addresses = watch("addresses");
 const gstStatus = watch("clientData.gst_status");
 const gstnumberVal = watch("clientData.gst_number")
 const isFormInvalid = () => {
-  // Check all fields in `clientData`
-  const clientDataValues = Object.values(clientData).some(
-    (value) => value === "" || value === null || value === undefined
+  // Exclude gst_number from validation
+  const clientDataValues = Object.entries(clientData).some(
+    ([key, value]) =>
+      key !== "gst_number" && (value === "" || value === null || value === undefined)
   );
 
   // Check all fields in each address inside `addresses`
@@ -157,6 +179,7 @@ const isFormInvalid = () => {
 
   return clientDataValues || addressValues;
 };
+
 const handleSearch = async () => {
   console.log("GST Number:", gstNumber);
 
@@ -241,7 +264,13 @@ const onSubmit = async (data) => {
     }, 3000); 
   
   }
-
+  useEffect(() => {
+    if (clientData?.entity_type) {
+      setValue("clientData.entity_type",clientData.entity_type);
+    }else if((editData?.entity_type)){
+      setValue("clientData.entity_type",editData?.entity_type);
+    }
+  }, [clientData, setValue,editData]);
 
 };
   return (
@@ -258,7 +287,7 @@ const onSubmit = async (data) => {
         <HiOutlinePencilAlt className="w-5 h-5 text-gray-500" />
       </>
     ) : (
-      "New Customer"
+      `New ${entity_type}`
     )}
   </h2>
   <input
@@ -497,6 +526,7 @@ const onSubmit = async (data) => {
     }`}
     onClick={handleSubmit(onSubmit)}
     disabled={isFormInvalid()} // Disable when form is invalid
+    //disabled={isButtonDisabled}
   >
     Save
   </button>

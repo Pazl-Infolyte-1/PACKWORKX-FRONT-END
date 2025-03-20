@@ -16,7 +16,8 @@ const OtherDetailForm =()=>{
 			{/* Pan */}
 			<div className="flex items-center mb-4 ">
 			  <label className="font-medium w-48 flex items-center">
-				Pan <img src={same} alt="Work Phone" className="ml-2" />
+				Pan 
+				{/*<img src={same} alt="Work Phone" className="ml-2" />*/}
 			  </label>
 			  <input type="text"  {...register("clientData.PAN")} className="w-full border border-gray-300 p-2 rounded ml-10" />
 			</div>
@@ -52,14 +53,14 @@ const OtherDetailForm =()=>{
     <option value="" disabled selected>
       Select Payment Terms
     </option>
-    <option value="due_on_receipt" id="due_on_receipt">Due On Receipt</option>
-    <option value="Net 30" id="net_30">Net 30</option>
-    <option value="Net 60" id="net_60">Net 60</option>
+    <option value="due_on_receipt">Due On Receipt</option>
+    <option value="Cash on Delevery">Cash on Delevery</option>
+    <option value="UPI">UPI</option>
   </select>
 </div>
 
 			{/* Enable Portal */}
-			<div className="flex items-center mb-4">
+			{/*<div className="flex items-center mb-4">
   <label className="font-medium flex items-center">
     Enable Portal? <img src={same} alt="Enable Portal" className="ml-2" />
   </label>
@@ -74,12 +75,13 @@ const OtherDetailForm =()=>{
   <label htmlFor="portalAccess" className="ml-2 cursor-pointer">
     Allow portal access for this customer
   </label>
-</div>
+</div>*/}
 
 			{/* Portal Language */}
 			<div className="flex items-center mb-4">
   <label className="font-medium w-48 flex items-center">
-    Portal Language <img src={same} alt="Portal Language" className="ml-2" />
+    Portal Language 
+	{/*<img src={same} alt="Portal Language" className="ml-2" />*/}
   </label>
   <select defaultValue="fr"  {...register("clientData.portal_language")} className="w-full border border-gray-300 p-2 rounded ml-10">
     <option value="" disabled>Select Language</option>
@@ -146,7 +148,7 @@ const OtherDetailForm =()=>{
 			  <label className="font-medium w-48">Twitter</label>
 			  <input {...register("clientData.twitter")} type="text" className="w-full border border-gray-300 p-2 rounded" />
 			</div>
-			<a className="block text-center mr-20 ">http://www.twitter.com/</a>
+			{/*<a className="block text-center mr-20 ">http://www.twitter.com/</a>*/}
 			{/* Skype */}
 			<div className="flex items-center mb-4 ">
 			  <label className="font-medium w-48">Skype Name/Number</label>
@@ -155,10 +157,10 @@ const OtherDetailForm =()=>{
 			{/* Facebook */}
 			<div className="flex items-center mb-4">
 			  <label className="font-medium w-48">Facebook</label>
-			  <img src={Facebook} alt="Facebook" className="ml-2 h-8 w-8" />
+			  {/*<img src={Facebook} alt="Facebook" className="ml-2 h-8 w-8" />*/}
 			  <input {...register("clientData.facebook")} type="text" className="w-full border border-gray-300 p-2 rounded" />
 			</div>
-			<a className="block text-center mr-20">http://www.facebook.com/</a>
+			{/*<a className="block text-center mr-20">http://www.facebook.com/</a>*/}
 		  </div>
 		</div>
 	)

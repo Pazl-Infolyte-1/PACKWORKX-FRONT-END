@@ -16,6 +16,7 @@ function ClientList() {
   const [triggerSelection, setTriggerSelection] = useState(false)
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [reloadData, setReloadData] = useState(false); // ✅ Trigger reload
 
   const [data, setData] = useState([]) // Stores all fetched data
   const [currentPage, setCurrentPage] = useState(1)
@@ -49,7 +50,12 @@ function ClientList() {
     }
 
     fetchClientData()
-  }, [isPopupOpen])
+  }, [reloadData])
+  
+
+  const refreshClients = () => {
+    setReloadData((prev) => !prev); // ✅ Toggle state to trigger `useEffect`
+  };
   // Pagination Calculations
   const indexOfLastRow = currentPage * rowsPerPage
   const indexOfFirstRow = indexOfLastRow - rowsPerPage
@@ -225,7 +231,7 @@ function ClientList() {
 
         {/* Table Section */}
         <div className="mt-3 overflow-x-auto">
-          <ClientTable clientdata={data} />
+          <ClientTable refreshClients={refreshClients} clientdata={data} />
         </div>
 
         {/* Pagination Section */}
@@ -266,7 +272,7 @@ function ClientList() {
       
       <Drawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} maxWidth={"1280px"}>
         {/* Pass handleCloseDrawer as a prop to ClientForm */}
-        <ClientForm />
+        <ClientForm refreshClients={refreshClients} closeDrawerDuringAdd={() => handleCloseDrawer(false)}/>
       </Drawer>
         </div>
   )

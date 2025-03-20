@@ -207,7 +207,29 @@ export const apiMethods = {
       console.error("Error fetching GST details:", error.response?.data || error.message);
       throw error;
     }
-  }
+  },
+
+  downloadClientExcel: async (queryParams = {}) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found. Please log in again.");
+      }
+  
+      const response = await apiClient.get("/clients/download/excel", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: queryParams,
+        responseType: "blob", // <-- Important! Treat response as binary data
+      });
+  
+      return response.data;
+    } catch (error) {
+      console.error("Error downloading clients:", error.response?.data || error.message);
+      throw error;
+    }
+  }  
 }
 
 export default apiMethods

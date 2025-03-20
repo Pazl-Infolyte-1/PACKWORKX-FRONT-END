@@ -19,14 +19,17 @@ import Drawer from '../../components/Drawer/Drawer';
 import CustomPopover from '../../components/New/CustomPopover';
 import { HiOutlineTrash } from "react-icons/hi";
 import CommonPagination from '../../components/New/Pagination';
+import ClientSingleViewCard from './ClientSingleViewCard';
 
-
-function ClientTable({ clientdata }) {
+function ClientTable({ clientdata,refreshClients }) {
+  //const [fakeClientData, setFakeClientData] = useState(jsonval)
   const [isModalOpen, setModalOpen] = useState(false)
   const [selectedClient, setSelectedClient] = useState(null) // Store selected client
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState(null);
+  const [isSingleViewPopup, setisSingleViewPopup] = useState(false);
+  const [singleData, setSingleData] = useState(null)
 
   const openModal = (client) => {
     setSelectedClient(client) 
@@ -46,13 +49,37 @@ function ClientTable({ clientdata }) {
 const handlePageChange=()=>{
   return null
 }
+
+const handleCloseSingleViewPopup = () => {
+  setisSingleViewPopup(false);
+  //setSelectedClientId(null); // Reset client ID
+};
+
+const openViewCard =(data)=>{
+  setisSingleViewPopup(true)
+  console.log(JSON.stringify(data))
+  setSingleData(data)
+
+}
+
+const deleteClient = async (clientId) => {
+  try {
+    const response = await apiMethods.deleteClient(clientId);
+    console.log("Client deleted successfully:", response);
+    refreshClients()
+    // Optionally, refresh the client list or show a success message
+  } catch (error) {
+    console.error("Error deleting client:", error);
+  }
+};
+
   return (
     <>
       <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
         <CTable striped hover className=" w-full m-0">
           <CTableHead className="bg-gray-100 sticky top-0 ">
             <CTableRow  style={{ height: "32px" }}>
-              <CTableHeaderCell style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">
+              <CTableHeaderCell    onClick={() => handleOpenSingleViewPopup(cell.client_id)}  style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">
               Id
               </CTableHeaderCell>
               <CTableHeaderCell style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">
@@ -85,7 +112,10 @@ const handlePageChange=()=>{
             {clientdata.length > 0 ? (
               clientdata.map((cell, index) => (
                 <CTableRow key={index} className="border-b">
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.client_id}</CTableDataCell>
+<CTableDataCell onClick={()=>openViewCard(cell)} className="py-3 px-4 text-primary text-decoration-underline cursor-pointer">
+  {cell.client_id}
+</CTableDataCell>
+
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.display_name}
                   </CTableDataCell>
@@ -113,11 +143,11 @@ const handlePageChange=()=>{
                      
                     </CButton>
                     {openPopoverIndex === index && (
-                  <CustomPopover isOpen={true} setIsOpen={() => setOpenPopoverIndex(null)} width="w-[150px]" height="h-[65px]"
+                  <CustomPopover isOpen={true} setIsOpen={() => setOpenPopoverIndex(null)} width="w-[100px]" height="h-[65px]"
                   >
                     {/*<p className="text-gray-800"><strong>Edit:</strong>  {cell.display_name}</p>*/}
                     <div className="flex items-center space-x-4">
-  <HiOutlineEye className="w-6 h-6 text-blue-500 cursor-pointer" />
+  {/*<HiOutlineEye className="w-6 h-6 text-blue-500 cursor-pointer" />*/}
   <HiOutlinePencilAlt  
     onClick={() => {
       setSelectedClientId(cell);
@@ -127,7 +157,8 @@ const handlePageChange=()=>{
     className="w-6 h-6 text-green-500 cursor-pointer" 
   />
   
-  <HiOutlineTrash className="w-6 h-6 text-red-500 cursor-pointer" />
+  <HiOutlineTrash className="w-6 h-6 text-red-500 cursor-pointer"   onClick={() => deleteClient(cell.client_id)} 
+ />
 </div>
 
 
@@ -154,8 +185,12 @@ const handlePageChange=()=>{
           <CommonPagination count={2} page={1} onChange={handlePageChange} />
         </div>*/}
       <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth={'1280px'}>
-        <ClientForm closeDrawer={() => setDrawerOpen(false)} editData={selectedClientId} />
+        <ClientForm refreshClientsEdit={refreshClients} closeDrawer={() => setDrawerOpen(false)} editData={selectedClientId} />
       </Drawer>
+
+      <CustomPopup isOpen={isSingleViewPopup} onClose={handleCloseSingleViewPopup} width={"w-[900px]"} height={"480px"}>
+        <ClientSingleViewCard clientData={singleData} />
+      </CustomPopup>
       </div>
     </>
   )

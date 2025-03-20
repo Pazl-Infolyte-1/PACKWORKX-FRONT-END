@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 const BASE_URL = 'https://packworkx.pazl.info/api/'
+const GST_URL = "http://sheet.gstincheck.co.in/check/9ee24120971acd5c17dc6cad239d99fa"
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -147,6 +148,7 @@ export const apiMethods = {
     }
   },
 
+
   getClients: async (queryParams = {}) => {
     try {
       const token = localStorage.getItem("token"); // Retrieve token
@@ -168,6 +170,40 @@ export const apiMethods = {
     }
   },
   
+  deleteClient: async (clientId) => {
+    try {
+      const token = localStorage.getItem('token'); // Retrieve token before sending request
+      if (!token) {
+        throw new Error('No token found. Please log in again.');
+      }
+  
+      const response = await apiClient.delete(`/clients/${clientId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Attach token
+        },
+      });
+  
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting client:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+  
+  getGst: async (gstNumber) => {
+    try {
+      if (!gstNumber) {
+        throw new Error("GST number is required");
+      }
+  
+      const response = await axios.get(`${GST_URL}/${gstNumber}`);
+  
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching GST details:", error.response?.data || error.message);
+      throw error;
+    }
+  },
 
 
   addSku: async (addNewSkuData) => {

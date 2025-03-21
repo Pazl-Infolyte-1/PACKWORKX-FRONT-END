@@ -8,10 +8,24 @@ import {
   CTableHead,
 } from '@coreui/react'
 import { BsThreeDotsVertical } from "react-icons/bs";
+import ConfirmationModale from '../../components/New/ConfirmationModale';
 
 const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
-  console.log(cellData)
+  const [testm,settestm] = useState(false)
+  const [isConfirmationModalOpen,setIsConfirmationModalOpen] = useState(false)
+  
+  const handleCancel  =()=>{
+    setIsConfirmationModalOpen(false)
+  }
+
+  const handledeleteClick = ()=>{
+    setIsConfirmationModalOpen(true)
+  }
+
+  const handledeleteConfirmClick = ()=>{
+    setIsConfirmationModalOpen(true)
+  }
 
   const toggleDropdown = (index) => {
     if (activeDropdown === index) {
@@ -148,6 +162,7 @@ const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
                               e.stopPropagation();
                               onDelete && onDelete(cell);
                               setActiveDropdown(null);
+                              handledeleteClick()
                             }}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -171,6 +186,15 @@ const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
           </CTableBody>
         </CTable>
       </div>
+      <ConfirmationModale   
+        isOpen={isConfirmationModalOpen}
+        onClose={handleCancel}
+        onConfirm={handledeleteConfirmClick}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this item?"
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   )
 }

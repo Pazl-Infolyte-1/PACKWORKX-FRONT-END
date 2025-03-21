@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
@@ -15,31 +15,76 @@ import { AppSidebarNav } from './AppSidebarNav'
 
 import { logo } from 'src/assets/brand/logo'
 import { sygnet } from 'src/assets/brand/sygnet'
+import apiMethods from '../api/config'
+
+// Define static menu items
+const staticMenuItems = [
+  {
+    groupName: 'Static Menu',
+    modules: [
+      {
+        moduleName: 'Admin',
+        moduleIconName: 'cilSpeedometer',
+        moduleKey: 'dashboard',
+        subModules: [
+          {
+            subModuleName: 'Packages',
+            subModuleIconName: '',
+            subModuleKey: 5001,
+          },
+          {
+            subModuleName: 'Companies',
+            subModuleIconName: '',
+            subModuleKey: 5002,
+          },
+          {
+            subModuleName: 'Billings',
+            subModuleIconName: '',
+            subModuleKey: 5003,
+          },
+        ],
+      },
+      {
+        moduleName: 'Dashboard',
+        moduleIconName: 'cilUser',
+        moduleKey: 5006,
+        subModules: [], // Empty array for a module with no submodules
+      },
+    ],
+  },
+]
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
-  const [navigation, setNavigation] = useState([])
+  const [combinedNavigation, setCombinedNavigation] = useState([...staticMenuItems])
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
+
+  // Memoize the combined navigation to prevent unnecessary re-renders
+  const getMemoizedNavigation = useCallback(() => {
+    return combinedNavigation
+  }, [combinedNavigation])
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://mocki.io/v1/48b130d9-74b7-4ea6-8b03-c30794d35c24')
+        const response = await apiMethods.getSideBarMenu()
+        console.log('API Response:', response)
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`)
+        if (response && response.data) {
+          // Create a new array reference to ensure state update
+          setCombinedNavigation([...staticMenuItems, ...response.data])
+        } else {
+          console.warn('Invalid response format, using static navigation only')
         }
-
-        const data = await response.json()
-        setNavigation(data)
       } catch (error) {
         console.error('Fetch error:', error)
+        // On error, keep using static items only
       }
     }
 
     fetchData()
-  }, []) // ✅ Runs only on initial render
+  }, [])
 
   return (
     <CSidebar
@@ -64,7 +109,7 @@ const AppSidebar = () => {
         />
       </CSidebarHeader>
 
-      <AppSidebarNav items={navigation} />
+      <AppSidebarNav items={getMemoizedNavigation()} />
 
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler

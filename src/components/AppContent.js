@@ -7,7 +7,7 @@ import routes from '../routes'
 
 const AppContent = () => {
   return (
-    <CContainer className="px-4" lg>
+    <CContainer className="px-4" fluid>
       <Suspense fallback={<CSpinner color="primary" />}>
         <Routes>
           {routes.map((route, idx) => {
@@ -19,7 +19,18 @@ const AppContent = () => {
                   exact={route.exact}
                   name={route.name}
                   element={<route.element />}
-                />
+                >
+                  {/* Handle nested routes/children */}
+                  {route.children && 
+                    route.children.map((childRoute, childIdx) => (
+                      <Route
+                        key={`child-${childIdx}`}
+                        path={childRoute.path}
+                        element={<childRoute.element />}
+                      />
+                    ))
+                  }
+                </Route>
               )
             )
           })}

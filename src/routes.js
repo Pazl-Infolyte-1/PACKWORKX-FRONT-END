@@ -1,70 +1,48 @@
 import React from 'react'
-import Index from './views/pages/SalesOrder/Index'
-import SKU from './views/pages/SKU/Index'
-import Clients from './views/pages/Clients/Index'
-import Jobs from './views/pages/Jobs/Index'
-import WorkOrders from './views/pages/WorkOrders/Index'
-import Routes from './views/pages/Routes/index'
-import MachinesTypes from './views/pages/Machines/MachineTypes'
-import IndividualMachines from './views/pages/Machines/IndividualMachine'
-import IndividualSKUTypes from './views/pages/SKU/IndividualSKUTypes'
-import SKUTypes from './views/pages/SKU/SKUTypes'
-import Employee from './views/pages/Employees/Employee'
-import EmployeeAttendancce from './views/pages/Employees/EmployeeAttendance'
-import IndividualEmployee from './views/pages/Employees/IndividualEmployee'
-import FinishedGoodAllocation from './views/pages/Jobs/FinishedGoodsAllocation'
-import ProductionPlanning from './views/pages/Jobs/ProductionPlanning'
-import RMAllocation from './views/pages/Jobs/RMAllocation'
-import SemiFinishedGoodsAllocation from './views/pages/Jobs/SemiFinishedGoodsAllocation'
-import InventoryDashboard from './views/pages/SKU/InventoryDashboard'
-import MachineMasterDashboard from './views/pages/Machines/MachineMasterDashboard'
+import settingsRoutes from './Module/Settings/SettingsRoutes.js'
+const SettingsLayout = React.lazy(() => import('./Module/Settings/SettingsLayout.js'))
+
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
+const Client = React.lazy(() => import('./Module/Client/ClientList.js'))
+const SKU = React.lazy(() => import('./Module/SKU/SkuList.js'))
+const EmployeeList = React.lazy(() => import('./Module/HRMS/Employee/EmployeeList.js'))
+const PurchaseOrder = React.lazy(() => import('./Module/Purchase/PurchaseOrder.js'))
+const MachineDashboard = React.lazy(() => import('./Module/Machine/MachineDashboard.js'))
+const InventoryHandling = React.lazy(() => import('./Module/Inventory/InventoryHandling.js'))
+const Production = React.lazy(() => import('./Module/Production/Index.js'))
+const Packages = React.lazy(() => import('./Module/Admin/Packages/Packages.js'))
+const Billing = React.lazy(() => import('./Module/Admin/Billing/Billing.js'))
+const Companies = React.lazy(() => import('./Module/Admin/Companies/Companies.js'))
+const WorkOrderList = React.lazy(() => import('./Module/WorkOrder/workorderlist.js'))
+const SalesOrder = React.lazy(() => import('./Module/SalesOrder/ListOfSalesOrder.js'))
+const DropDownController = React.lazy(() => import('./Module/User/DropDownController.js'))
+
 const routes = [
-  { path: '/', exact: true, name: 'Home' },
-  { path: '/dashboard', name: 'Dashboard', element: Dashboard },
-  { path: '/salesorder', name: 'Sales Order', element: Index },
-  { path: '/skus', name: 'SKU', element: SKU },
-  { path: '/jobs', name: 'Jobs', element: Jobs },
-  { path: '/clients', name: 'Clients', element: Clients },
-  { path: '/workorders', name: 'Work Orders', element: WorkOrders },
-  { path: '/routes', name: 'Routes', element: Routes },
-  { path: '/machines', name: 'Machines', element: MachinesTypes },
-  { path: '/machines/individualmachine', name: 'Individual Machines', element: IndividualMachines },
-  { path: '/skus/individualskutypes', name: 'Individaul SKUs', element: IndividualSKUTypes },
-  { path: '/skus/skutypes', name: 'SKU Types', element: SKUTypes },
-  { path: '/employee', name: 'Employee', element: Employee },
-  { path: '/employeeattendance', name: 'Employee Attendance', element: EmployeeAttendancce },
-  { path: '/individualemployee', name: 'Individual Employee', element: IndividualEmployee },
+  { path: '/', exact: true, name: 'Home', key: '' },
+  { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },
+  { path: '/clients', name: 'Clients', element: Client, key: 10 },
+  { path: '/SKU', name: 'SKU', element: SKU, key: 23 },
+  { path: '/employeelist', name: 'Employee List', element: EmployeeList, key: 21 },
+  { path: '/purchaseorder', name: 'Purchase Order', element: PurchaseOrder, key: 29 },
+  { path: '/machinedashboard', name: 'Machine Dashboard', element: MachineDashboard, key: 22 },
+  { path: '/inventoryhandling', name: 'Inventory Handling', element: InventoryHandling, key: 28 },
+  { path: '/production', name: 'Production', element: Production, key: 26 },
+  { path: '/packages', name: 'Packages', element: Packages, key: 5001 },
+
+  { path: '/billing', name: 'Billing', element: Billing, key: 5003 },
+  { path: '/companies', name: 'Companies', element: Companies, key: 5002 },
+
+  { path: '/workorderlist', name: 'Workorderlist', element: WorkOrderList, key: 25 },
+
+  { path: '/salesorder', name: 'SalesOrder', element: SalesOrder, key: 24 },
+  { path: '/users', name: 'user', element: DropDownController, key: 6000 },
   {
-    path: '/workorders/finishedgoodallocation',
-    name: 'Finished Goods Allocation',
-    element: FinishedGoodAllocation,
-  },
-  {
-    path: '/workorders/productionplanning',
-    name: 'Production Planning',
-    element: ProductionPlanning,
-  },
-  {
-    path: '/workorders/rmallocation',
-    name: 'RM Allocation',
-    element: RMAllocation,
-  },
-  {
-    path: '/workorders/semifinishedgoodsallocation',
-    name: 'Semi Finished Goods Allocation',
-    element: SemiFinishedGoodsAllocation,
-  },
-  {
-    path: '/skus/inventorydashboard',
-    name: 'Inventory Dashboard',
-    element: InventoryDashboard,
-  },
-  {
-    path: '/machines/masterdashboard',
-    name: 'Machine Master Dashboard',
-    element: MachineMasterDashboard,
+    path: '/settings',
+    name: 'Settings',
+    element: SettingsLayout,
+    key: 5462,
+    children: settingsRoutes,
   },
 ]
 

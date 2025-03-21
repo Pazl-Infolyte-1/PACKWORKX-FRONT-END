@@ -20,6 +20,8 @@ import CustomPopover from '../../components/New/CustomPopover';
 import { HiOutlineTrash } from "react-icons/hi";
 import CommonPagination from '../../components/New/Pagination';
 import ClientSingleViewCard from './ClientSingleViewCard';
+import DeleteModal from '../../components/New/DeleteModal';
+
 
 function ClientTable({ clientdata,refreshClients }) {
   //const [fakeClientData, setFakeClientData] = useState(jsonval)
@@ -30,6 +32,10 @@ function ClientTable({ clientdata,refreshClients }) {
   const [selectedClientId, setSelectedClientId] = useState(null);
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false);
   const [singleData, setSingleData] = useState(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedClientDeleteId, setSelectedClientDeleteId] = useState(null);  
+
+
 
   const openModal = (client) => {
     setSelectedClient(client) 
@@ -62,21 +68,40 @@ const openViewCard =(data)=>{
 
 }
 
-const deleteClient = async (clientId) => {
+const openDeleteModal = (clientId) => {
+  setSelectedClientDeleteId(clientId);
+  setIsDeleteModalOpen(true);
+};
+
+const closeDeleteModal = () => {
+  setIsDeleteModalOpen(false);
+  setSelectedClientDeleteId(null);
+};
+// Handle delete confirmation
+const deleteClient = async () => {
+  if (!selectedClientDeleteId) return;
   try {
-    const response = await apiMethods.deleteClient(clientId);
-    console.log("Client deleted successfully:", response);
-    refreshClients()
-    // Optionally, refresh the client list or show a success message
+    console.log("Client deleted:", selectedClientDeleteId);
+    // Call your delete API here
+    try {
+      const response = await apiMethods.deleteClient(clientId);
+      console.log("Client deleted successfully:", response);
+      refreshClients()
+      // Optionally, refresh the client list or show a success message
+    } catch (error) {
+      console.error("Error deleting client:", error);
+    }
   } catch (error) {
     console.error("Error deleting client:", error);
+  } finally {
+    closeDeleteModal();
   }
 };
 
   return (
     <>
       <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
-        <CTable striped hover className=" w-full m-0">
+        <CTable striped hover className=" w-full h-[500px] m-0">
           <CTableHead className="bg-gray-100 sticky top-0 ">
             <CTableRow  style={{ height: "32px" }}>
               <CTableHeaderCell    onClick={() => handleOpenSingleViewPopup(cell.client_id)}  style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">
@@ -98,7 +123,7 @@ const deleteClient = async (clientId) => {
              Created Date
               </CTableHeaderCell>
               <CTableHeaderCell style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">
-              Portal Language
+            GST Number
               </CTableHeaderCell>
              
               <CTableHeaderCell style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">
@@ -108,7 +133,7 @@ const deleteClient = async (clientId) => {
             </CTableRow>
           </CTableHead>
 
-          <CTableBody>
+          <CTableBody style={{ minHeight: "400px" }}>
             {clientdata.length > 0 ? (
               clientdata.map((cell, index) => (
                 <CTableRow key={index} className="border-b">
@@ -134,7 +159,7 @@ const deleteClient = async (clientId) => {
 
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.portal_language}
+                    {cell.gst_number}
                   </CTableDataCell>
                  
                   <CTableDataCell className="py-3 px-4 text-gray-700">
@@ -157,7 +182,8 @@ const deleteClient = async (clientId) => {
     className="w-6 h-6 text-green-500 cursor-pointer" 
   />
   
-  <HiOutlineTrash className="w-6 h-6 text-red-500 cursor-pointer"   onClick={() => deleteClient(cell.client_id)} 
+  <HiOutlineTrash className="w-6 h-6 text-red-500 cursor-pointer"               onClick={() => openDeleteModal(cell.client_id)}
+
  />
 </div>
 
@@ -191,6 +217,14 @@ const deleteClient = async (clientId) => {
       <CustomPopup isOpen={isSingleViewPopup} onClose={handleCloseSingleViewPopup} width={"w-[900px]"} height={"480px"}>
         <ClientSingleViewCard clientData={singleData} />
       </CustomPopup>
+
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={deleteClient}
+        title="Delete Confirmation"
+        message="Are you sure you want to delete this item?"
+      />
       </div>
     </>
   )

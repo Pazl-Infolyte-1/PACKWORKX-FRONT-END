@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import Drawer from '../../components/Drawer/Drawer'
-import { IoSearch } from 'react-icons/io5'
+import { IoFilter, IoFilterOutline, IoSearch } from 'react-icons/io5'
 import apiMethods from '../../api/config'
 import CommonPagination from '../../components/New/Pagination'
 import ClientTable from './ClientTable'
@@ -10,20 +10,53 @@ import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'
 import vendorImg from "../../assets/images/vendor.png"
 import clientImg from "../../assets/images/client.jpg"
 import CustomAlert from '../../components/New/CustomAlert'
+import DynamicPagination from '../../components/New/DynamicPagination'
+import { FaFilter } from 'react-icons/fa'
+import { FaChevronDown } from "react-icons/fa";
 
 function ClientList() {
   const [selected, setSelected] = useState("vendor");
   const [triggerSelection, setTriggerSelection] = useState(false)
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const [reloadData, setReloadData] = useState(false); // ✅ Trigger reload
+  const [reloadData, setReloadData] = useState(false); //Trigger reload
+  const [entityType, setEntityType] = useState(""); // State to hold entity_type
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
 
   const [data, setData] = useState([]) // Stores all fetched data
-  const [currentPage, setCurrentPage] = useState(1)
-  const rowsPerPage = 10
+  const [searchQuery, setSearchQuery] = useState(""); // State for search input
+  const [entriesPerPage, setEntriesPerPage] = useState(5); // Default value 5
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState("");
+
+  //const totalPages = Math.ceil(data.length / entriesPerPage) || 1; // Ensure total pages > 0
+  const toggleFilterPopup = () => setIsFilterOpen(!isFilterOpen);
+
+  const handleEntriesChange = (newEntries) => {
+    setEntriesPerPage(newEntries);
+    setCurrentPage(1); // Reset to page 1 when changing entries per page
+  };
+  
+  const handlePageChange = (event, newPage) => {
+    console.log("Page changed to:", newPage);
+    setCurrentPage(newPage);
+  };
   const handleCloseDrawer = () => {
     setDrawerOpen(false);
   };
+
+  console.log("curr pg",currentPage)
+  //const handlePageChange = (event, newPage) => {
+  //  setCurrentPage(newPage);
+  //};
+  //const handleEntriesChange = (newEntries) => {
+  //  setEntriesPerPage(newEntries)
+  //  console.log('Updated Entries Per Page:', newEntries)
+  //  //setCurrentPage(1) // Reset to first page when changing entries
+  //}
   const selectionFrame = {
     vendor: {
       id: 1,
@@ -40,37 +73,48 @@ function ClientList() {
   useEffect(() => {
     const fetchClientData = async () => {
       try {
-        const response = await apiMethods.getClients()
-        console.log('clientData:', response)
-          setData(response?.data) // Assuming response.data is an array of client objects
-          console.log("res.////",response.data)
+        const queryParams = {
+          ...(searchQuery && { search: searchQuery }), // Include search if present
+          limit: entriesPerPage, // Number of entries per page
+          page: currentPage, // Add page number
+          entity_type:selectedFilter
+        };
+  
+        const response = await apiMethods.getClients(queryParams);
+        console.log("clientData:", response);
+        setData(response?.data || []);
+        setTotalPage(response.totalPages);
       } catch (error) {
-        console.error('Error fetching client data:', error)
+        console.error("Error fetching client data:", error);
       }
-    }
-
-    fetchClientData()
-  }, [reloadData])
+    };
+  
+    fetchClientData();
+  }, [reloadData, searchQuery, entriesPerPage, currentPage,selectedFilter]); // Depend on these values
+  
+  
   
 
   const refreshClients = () => {
-    setReloadData((prev) => !prev); // ✅ Toggle state to trigger `useEffect`
+    setReloadData((prev) => !prev); //  Toggle state to trigger `useEffect`
   };
-  // Pagination Calculations
-  const indexOfLastRow = currentPage * rowsPerPage
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage
-  const currentRows = data?.slice(indexOfFirstRow, indexOfLastRow)
-  const totalPages = Math.ceil(data?.length / rowsPerPage)
+
+  //const totalPages = Math.ceil(data?.length / rowsPerPage)
  
   const handleSelection = (selection) => {
     const optionValue = selectionFrame[selection].id;
     console.log(`Selected ID: ${optionValue}`);
   
     if (optionValue === 2) {
+      setEntityType("Client")
       setPopupOpen(false);
       setDrawerOpen(true);
-    } else {
-      console.log("On vendor page");
+    } else if(optionValue === 1) {
+      setEntityType("Vendor")
+      setPopupOpen(false);
+      setDrawerOpen(true);
+    }else{
+      console.log("option not selected")
     }
   };
   
@@ -82,11 +126,15 @@ function ClientList() {
   };
   
   // Handles key events
+
+  let entity_type = ""
   const handleKeyDown = (event) => {
     if (event.key === "ArrowRight") {
       handleSelectAction("client");
+      setEntityType("Client"); // Update state
     } else if (event.key === "ArrowLeft") {
       handleSelectAction("vendor");
+      setEntityType("Vendor"); // Update state
     } else if (event.key === "Enter") {
       console.log("Enter Pressed: Executing Selection");
       setTriggerSelection(true); // Mark that Enter was pressed
@@ -106,67 +154,39 @@ function ClientList() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []); // Runs once on mount
   
-  const handlePageChange = useCallback((event, value) => setCurrentPage(value), [])
-  console.log("curr rows",currentRows)
+  //const handlePageChange = useCallback((event, value) => setCurrentPage(value), [])
+  //console.log("curr rows",currentRows)
 
-  // Function to Convert Table Data to CSV and Download
-  const downloadCSV = async () => {
-    if (!data?.length) {
-      console.error('No data available to download')
-      return
+  const downloadClientExcelSheet = async () => {
+    try {
+      const queryParams = {
+        ...(searchQuery && { search: searchQuery }),
+        entity_type:selectedFilter
+      };
+
+      const response = await apiMethods.downloadClientExcel(queryParams);
+  
+      // Create a Blob from the response
+      const blob = new Blob([response], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  
+      // Create a URL for the Blob
+      const url = window.URL.createObjectURL(blob);
+  
+      // Create a temporary link element
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "clients.xlsx"; // Set the downloaded file name
+      document.body.appendChild(a);
+      a.click();
+  
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Error downloading Excel:", error);
     }
-
-    // Define the specific keys to extract
-    const selectedKeys = [
-      'first_name',
-      'last_name',
-      'display_name',
-      'email',
-      'mobile',
-      'PAN',
-      'created_at',
-    ]
-
-    // Function to format headers (Remove "_" and capitalize the first letter of each word)
-    const formatHeader = (key) => {
-      return key
-        .replace(/_/g, ' ') // Replace underscores with spaces
-        .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize first letter of each word
-    }
-
-    // Add CSV Headers (Formatted Column Names)
-    const csvRows = []
-    csvRows.push(selectedKeys.map(formatHeader).join(','))
-
-    // Process Data Rows (Handling Async Format Date)
-    const formattedData = await Promise.all(
-      data?.map(async (row) => {
-        const values = await Promise.all(
-          selectedKeys.map(async (key) => {
-            if (key === 'created_at') {
-              return `"${(await apiMethods.formatDate(row[key])) || ''}"` // Await the async function
-            }
-            return `"${row[key] || ''}"`
-          }),
-        )
-        return values.join(',')
-      }),
-    )
-
-    csvRows.push(...formattedData)
-
-    // Convert to CSV String
-    const csvString = csvRows.join('\n')
-
-    // Create Blob and Download File
-    const blob = new Blob([csvString], { type: 'text/csv' })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'filtered_client_data.csv'
-    a.click()
-    window.URL.revokeObjectURL(url)
-  }
+  };
+  
   //const alertsData = [
   //  { severity: "success", message: "This is a success Alert." },
   //];
@@ -174,21 +194,68 @@ function ClientList() {
     <div className="w-full">
       {/* Header Section */}
       <div className="w-full h-[40px] flex justify-between items-center">
-        <h4>Clients and Vendors</h4>
+        <h4>Clients/Vendors</h4>
       </div>
       {/* Search Bar & Actions */}
       <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
         <div className="flex justify-between items-center">
-          <div className="flex items-center h-[35px] w-[300px] gap-2 border rounded-md">
-            <div className="bg-white h-full w-[40px] flex justify-center items-center rounded-l-md">
-              <IoSearch />
-            </div>
-            <input
-              type="text"
-              placeholder="Search"
-              className="outline-none h-full w-full rounded-r-md pl-2"
-            />
+        <div className="flex items-center gap-2">
+  {/* Search Input Container */}
+  <div className="flex items-center h-[35px] w-[300px] gap-2 border rounded-md">
+    <div className="bg-white h-full w-[40px] flex justify-center items-center rounded-l-md">
+      <IoSearch />
+    </div>
+    <input
+      type="text"
+      placeholder="Search"
+      className="outline-none h-full w-full rounded-r-md pl-2"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+    />
+  </div>
+
+  {/* Filter Icon */}
+  {/*<FaFilter onClick={toggleFilterPopup} className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-900" />*/}
+  <div className="relative inline-block text-left">
+      {/* Dropdown Button */}
+      <button
+        type="button"
+        className="inline-flex w-full justify-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50"
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+      >
+        {selectedFilter || "Entity"}
+        <FaChevronDown className="size-4 text-gray-400" />
+      </button>
+
+      {/* Dropdown Menu */}
+      {isDropdownOpen && (
+        <div className="absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5">
+          <div className="py-1">
+            <button
+              className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
+              onClick={() => {
+                setSelectedFilter("Client");
+                setIsDropdownOpen(false);
+                console.log("Selected Filter:", selectedFilter);
+              }}
+            >
+              Client
+            </button>
+            <button
+              className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
+              onClick={() => {
+                setSelectedFilter("Vendor");
+                setIsDropdownOpen(false);
+                console.log("Selected Filter:", selectedFilter);
+              }}
+            >
+              Vendor
+            </button>
           </div>
+        </div>
+      )}
+    </div>
+</div>
 
           <div className="flex justify-center items-center gap-2">
             {/* <button className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto">
@@ -210,7 +277,8 @@ function ClientList() {
             <ActionButton
             height={"9"}
             label={"Download"}
-            onClick={downloadCSV}
+            //onClick={downloadCSV}
+            onClick={downloadClientExcelSheet}
             />
 
             {/* <button
@@ -222,7 +290,7 @@ function ClientList() {
 
             <ActionButton
             height={"9"}
-            label={"Add Client"}
+            label={"+ Create New"}
             //onClick={()=>setDrawerOpen(true)}
             onClick={()=>setPopupOpen(true)}
             />
@@ -237,7 +305,14 @@ function ClientList() {
         {/* Pagination Section */}
         
         <div className="flex justify-end items-center gap-4 mt-3">
-          <CommonPagination count={totalPages} page={currentPage} onChange={handlePageChange} />
+          {/*<DynamicPagination count={totalPages} page={currentPage} onChange={handlePageChange} />*/}
+          <DynamicPagination
+         count={totalPage}
+         page={currentPage}
+         onPageChange={handlePageChange}
+         entriesPerPage={entriesPerPage}
+         onEntriesChange={handleEntriesChange}
+      />
         </div>
         {/*<div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
       <CustomAlert alerts={alertsData} />
@@ -272,8 +347,10 @@ function ClientList() {
       
       <Drawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} maxWidth={"1280px"}>
         {/* Pass handleCloseDrawer as a prop to ClientForm */}
-        <ClientForm refreshClients={refreshClients} closeDrawerDuringAdd={() => handleCloseDrawer(false)}/>
+        <ClientForm entity_type={entityType} refreshClients={refreshClients} closeDrawerDuringAdd={() => handleCloseDrawer(false)}/>
       </Drawer>
+
+
         </div>
   )
 }

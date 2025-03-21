@@ -7,7 +7,7 @@ const CommonPagination = ({ count, page, onChange, color = 'secondary' }) => {
   return (
     <div className="flex w-full items-center justify-between">
       <div>
-        <CFormSelect style={{ width: '110px' }} className="w-4" aria-label="Entries per page">
+        <CFormSelect style={{ width: '120px' }} className="w-4" aria-label="Entries per page">
           <option value="5">Entries 5</option>
           <option value="10">Entries 10</option>
           <option value="25">Entries 25</option>

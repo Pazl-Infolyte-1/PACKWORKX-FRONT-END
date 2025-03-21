@@ -10,7 +10,7 @@ const OtherDetailForm =()=>{
 	const { register } = useFormContext(); 
 
 	return (
-		<div className="flex justify-evenly m-4 px-8 bg-white shadow-md rounded-lg p-6 w-[200%]">
+		<div className="flex justify-evenly m-4 px-8 bg-white rounded-lg pr-6 pl-6 w-[200%]">
 		  {/* Left Side */}
 		  <div className="w-full pr-8">
 			{/* Pan */}

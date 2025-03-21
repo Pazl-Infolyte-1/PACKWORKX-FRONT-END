@@ -22,7 +22,7 @@ const ActionButton = ({
           case 'edit':
             return 'bg-rose-500 text-white'; 
           case 'delete':
-            return 'bg-red-500 text-white'; 
+            return 'bg-red-600 text-white'; 
           case 'cancel':
             return 'bg-white border-black text-black';
             case 'secondary':

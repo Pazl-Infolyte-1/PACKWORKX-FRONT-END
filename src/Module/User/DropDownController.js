@@ -235,66 +235,83 @@ const Setting = () => {
   };
 
   return (
-    <div className='flex  min-h-[80vh]  w-full xxxl:h-[90vh] '>
-    <div className="flex flex-col md:flex-row w-full bg-gray-50">
-      {/* Mobile menu button - only visible on small screens */}
-      <div className="md:hidden p-4 bg-white shadow-sm">
-      <button 
-        onClick={toggleMobileMenu}
-        className="flex items-center space-x-2 px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-      >
-        <span>{selectedCategory ? selectedCategory.name : 'Select Category'}</span>
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-        </svg>
-      </button>
-    </div>
-    
-    {/* Category sidebar - always visible on md screens, conditionally visible on small screens */}
-    <div className={`
-      ${isMobileMenuOpen ? 'block' : 'hidden'} 
-      md:block
-      w-[87%] md:w-64 
-      bg-white
-      shadow-sm md:shadow-md
-      absolute md:relative
-      z-10 md:z-0
-      top-30 md:top-0
-      max-h-96 md:max-h-full
-      overflow-y-auto
-    `}>
-      <CategoryList 
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={handleSelectCategory}
-        onEditCategory={handleEditCategory}
-        isMobileMenuOpen={isMobileMenuOpen}
-        setIsMobileMenuOpen={setIsMobileMenuOpen}
-      />
-    </div>
-      
-      {/* Main content area */}
-      <div className="flex-1 p-4 overflow-auto">
-        {selectedCategory ? (
-          <CategoryOptions 
-            category={selectedCategory}
-            isAddingOption={isAddingOption}
-            newOptionText={newOptionText}
-            editingOption={editingOption}
-            onAddOption={handleAddOption}
-            onUpdateOption={handleUpdateOption}
-            onDeleteOption={handleDeleteOption}
-            onSetAddingOption={setIsAddingOption}
-            onSetNewOptionText={setNewOptionText}
-            onSetEditingOption={setEditingOption}
+    <div className="flex h-[80vh] w-full xxxl:h-[90vh] overflow-hidden">
+      <div className="flex flex-col md:flex-row w-full bg-gray-50 relative">
+        {/* Mobile menu button - only visible on small screens */}
+        <div className="md:hidden p-4 bg-white shadow-sm">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="flex items-center justify-between w-full px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+          >
+            <span>{selectedCategory ? selectedCategory.name : 'Select Category'}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`h-5 w-5 transform transition-transform ${
+                isMobileMenuOpen ? 'rotate-180' : 'rotate-0'
+              }`}
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+  
+          {/* Dropdown list for categories on mobile */}
+          {isMobileMenuOpen && (
+            <div className="absolute left-4 right-4 top-[70px] bg-white shadow-lg rounded-lg overflow-hidden z-50 border border-gray-200">
+              <div className="max-h-60 overflow-y-auto">
+                <CategoryList
+                  categories={categories}
+                  selectedCategory={selectedCategory}
+                  onSelectCategory={(category) => {
+                    handleSelectCategory(category);
+                    setIsMobileMenuOpen(false); // Close dropdown after selecting
+                  }}
+                  onEditCategory={handleEditCategory}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+  
+        {/* Category sidebar - only visible on md screens and larger */}
+        <div className="hidden md:block bg-white shadow-sm md:shadow-md md:w-64">
+          <CategoryList
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={handleSelectCategory}
+            onEditCategory={handleEditCategory}
           />
-        ) : (
-          <EmptyState />
-        )}
+        </div>
+  
+        {/* Main content area */}
+        <div className="flex-1 p-4 overflow-auto">
+          {selectedCategory ? (
+            <CategoryOptions
+              category={selectedCategory}
+              isAddingOption={isAddingOption}
+              newOptionText={newOptionText}
+              editingOption={editingOption}
+              onAddOption={handleAddOption}
+              onUpdateOption={handleUpdateOption}
+              onDeleteOption={handleDeleteOption}
+              onSetAddingOption={setIsAddingOption}
+              onSetNewOptionText={setNewOptionText}
+              onSetEditingOption={setEditingOption}
+            />
+          ) : (
+            <EmptyState />
+          )}
+        </div>
       </div>
     </div>
-    </div>
   );
+  
+  
 };
 
 export default Setting;

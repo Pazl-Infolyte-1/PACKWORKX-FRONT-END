@@ -14,7 +14,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
     <>
       <Drawer className="w-1/2" isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
         <form action="">
-          <div className="max-w-7xl mx-auto h-[90vh] border px-3 py-3 shadow-md mt-6">
+          <div className="max-w-7xl mx-auto h-[90vh]  px-3 py-3  mt-6">
             <div className="flex justify-between">
               <h2>Employee</h2>
             </div>

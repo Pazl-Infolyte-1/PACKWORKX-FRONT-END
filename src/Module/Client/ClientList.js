@@ -13,6 +13,8 @@ import CustomAlert from '../../components/New/CustomAlert'
 import DynamicPagination from '../../components/New/DynamicPagination'
 import { FaFilter } from 'react-icons/fa'
 import { FaChevronDown } from "react-icons/fa";
+import { FaSyncAlt } from "react-icons/fa";
+
 
 function ClientList() {
   const [selected, setSelected] = useState("vendor");
@@ -93,6 +95,13 @@ function ClientList() {
   }, [reloadData, searchQuery, entriesPerPage, currentPage,selectedFilter]); // Depend on these values
   
   
+  const handleResetFilters = () => {
+    setSearchQuery(""); // Clear search query
+    setCurrentPage(1); // Reset to first page
+    setEntriesPerPage(5); // Reset to default entries per page
+    setSelectedFilter(""); // Clear entity filter
+    setReloadData(prev => !prev); // Toggle reloadData to trigger API call
+  };
   
 
   const refreshClients = () => {
@@ -216,45 +225,50 @@ function ClientList() {
 
   {/* Filter Icon */}
   {/*<FaFilter onClick={toggleFilterPopup} className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-900" />*/}
+  <div className="flex items-center gap-3">
+  {/* Dropdown */}
   <div className="relative inline-block text-left">
-      {/* Dropdown Button */}
-      <button
-        type="button"
-        className="inline-flex w-full justify-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50"
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-      >
-        {selectedFilter || "Entity"}
-        <FaChevronDown className="size-4 text-gray-400" />
-      </button>
+    <button
+      type="button"
+      className="inline-flex w-full justify-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50"
+      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+    >
+      {selectedFilter || "Entity"}
+      <FaChevronDown className="size-4 text-gray-400" />
+    </button>
 
-      {/* Dropdown Menu */}
-      {isDropdownOpen && (
-        <div className="absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5">
-          <div className="py-1">
-            <button
-              className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
-              onClick={() => {
-                setSelectedFilter("Client");
-                setIsDropdownOpen(false);
-                console.log("Selected Filter:", selectedFilter);
-              }}
-            >
-              Client
-            </button>
-            <button
-              className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
-              onClick={() => {
-                setSelectedFilter("Vendor");
-                setIsDropdownOpen(false);
-                console.log("Selected Filter:", selectedFilter);
-              }}
-            >
-              Vendor
-            </button>
-          </div>
+    {/* Dropdown Menu */}
+    {isDropdownOpen && (
+      <div className="absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5">
+        <div className="py-1">
+          <button
+            className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
+            onClick={() => {
+              setSelectedFilter("Client");
+              setIsDropdownOpen(false);
+            }}
+          >
+            Client
+          </button>
+          <button
+            className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
+            onClick={() => {
+              setSelectedFilter("Vendor");
+              setIsDropdownOpen(false);
+            }}
+          >
+            Vendor
+          </button>
         </div>
-      )}
-    </div>
+      </div>
+    )}
+  </div>
+
+  {/* Refresh Button */}
+  <button     onClick={handleResetFilters} className="p-2 bg-white border rounded-full shadow-md hover:bg-gray-100 transition">
+    <FaSyncAlt className="w-4 h-4 text-gray-600" />
+  </button>
+</div>
 </div>
 
           <div className="flex justify-center items-center gap-2">

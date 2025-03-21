@@ -101,13 +101,14 @@ const deleteClient = async () => {
   return (
     <>
       <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
-        <CTable striped hover className=" w-full h-[500px] m-0">
+        <div className='h-[450px]'>
+        <CTable striped hover className=" w-full  m-0">
           <CTableHead className="bg-gray-100 sticky top-0 ">
             <CTableRow  style={{ height: "32px" }}>
-              <CTableHeaderCell    onClick={() => handleOpenSingleViewPopup(cell.client_id)}  style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">
+              <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"120px"}}   onClick={() => handleOpenSingleViewPopup(cell.client_id)} className="py-3 px-4 text-gray-600 font-medium">
               Id
               </CTableHeaderCell>
-              <CTableHeaderCell style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">
+              <CTableHeaderCell style={{ whiteSpace: "nowrap",minWidth:"200px" }} className="py-3 px-4 text-gray-600 font-medium">
               Name
               </CTableHeaderCell>
               <CTableHeaderCell style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">
@@ -119,7 +120,7 @@ const deleteClient = async () => {
               <CTableHeaderCell style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">
               Pan
               </CTableHeaderCell>
-              <CTableHeaderCell style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">
+              <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"250px"}} className="py-3 px-4 text-gray-600 font-medium">
              Created Date
               </CTableHeaderCell>
               <CTableHeaderCell style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">
@@ -133,15 +134,15 @@ const deleteClient = async () => {
             </CTableRow>
           </CTableHead>
 
-          <CTableBody style={{ minHeight: "400px" }}>
+          <CTableBody >
             {clientdata.length > 0 ? (
               clientdata.map((cell, index) => (
-                <CTableRow key={index} className="border-b">
-<CTableDataCell onClick={()=>openViewCard(cell)} className="py-3 px-4 text-primary text-decoration-underline cursor-pointer">
+                <CTableRow style={{ minHeight: "100px" }} key={index} className="border-b">
+<CTableDataCell onClick={()=>openViewCard(cell)} className="py-3 px-4 text-primary text-decoration-underline cursor-pointer w-[150px]">
   {cell.client_id}
 </CTableDataCell>
 
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                  <CTableDataCell className="py-3 px-4 text-gray-700  w-[150px]">
                     {cell.display_name}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
@@ -153,7 +154,7 @@ const deleteClient = async () => {
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.PAN}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                  <CTableDataCell className="py-3 px-4 text-gray-700 w-[1000px]">
                     {/*{apiMethods.formatDate(cell.created_at)}*/}
                     {new Date(cell.created_at).toLocaleString()}
 
@@ -205,6 +206,8 @@ const deleteClient = async () => {
             )}
           </CTableBody>
         </CTable>
+        </div>
+
       
   
         {/*<div className="flex justify-end items-center gap-4 mt-3">

@@ -17,7 +17,6 @@ function SkuAddEdit({
     if (!editTag) {
       setAddNewSkuData({
         sku_name: '',
-        company_id: 8,
         client_id: 2,
         client: '',
         ply: '',

@@ -237,7 +237,6 @@ function SkuList() {
     setAddNewSkuData({
       id: selectedSku.id || '',
       sku_name: selectedSku.sku_name || '',
-      company_id: selectedSku.company_id || 8,
       client_id: selectedSku.client_id || 2,
       client: selectedSku.client || '',
       ply: selectedSku.ply || '',

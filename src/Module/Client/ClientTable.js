@@ -100,8 +100,10 @@ const deleteClient = async () => {
 
   return (
     <>
-      <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
-        <CTable striped hover className=" w-full h-[500px] m-0">
+      {/* <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
+        <CTable striped hover className=" w-full h-[500px] m-0"> */}
+            <div className={`border border-gray-200 ${clientdata.length > 0 ? "h-[350px] overflow-y-auto custom-scrollbar" : "h-[350px]"}`}>
+            <CTable striped hover className="w-full  m-0">
           <CTableHead className="bg-gray-100 sticky top-0 ">
             <CTableRow  style={{ height: "32px" }}>
               <CTableHeaderCell    onClick={() => handleOpenSingleViewPopup(cell.client_id)}  style={{ whiteSpace: "nowrap" }} className="py-3 px-4 text-gray-600 font-medium">

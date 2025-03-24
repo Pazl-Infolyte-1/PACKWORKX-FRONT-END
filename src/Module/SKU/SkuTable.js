@@ -14,7 +14,7 @@ function SkuTable(skudata = []) {
   console.log('datasss', JSON.stringify(skudata))
   return (
     <>
-      <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
+      <div className="h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
         <CTable striped hover className=" w-full m-0">
           <CTableHead className="bg-gray-100 sticky top-0 ">
             <CTableRow>

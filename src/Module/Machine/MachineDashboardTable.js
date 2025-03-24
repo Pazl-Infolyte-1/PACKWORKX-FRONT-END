@@ -49,7 +49,7 @@ const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
 
   return (
     <div>
-         <div className="overflow-y-auto  max-h-[300px] custom-scrollbar">
+         <div className="overflow-y-auto  mdd:h-[300px] sm:max-h-[300px] custom-scrollbar">
              <CTable striped hover className="mt-2 w-full">
               <CTableHead className="bg-gray-100 sticky top-0 ">
 

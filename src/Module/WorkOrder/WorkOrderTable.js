@@ -13,7 +13,7 @@ import CIcon from '@coreui/icons-react'
 const WorkOrderTable = ({ cellData }) => {
   return (
     <div>
-      <div className="max-h-[370px] overflow-y-auto border border-gray-200 custom-scrollbar">
+      <div className="h-[370px] overflow-y-auto border border-gray-200 custom-scrollbar">
         <CTable striped hover className="w-full">
           <CTableHead className="bg-gray-100 sticky top-0">
             <CTableRow>
@@ -88,7 +88,7 @@ const WorkOrderTable = ({ cellData }) => {
               ))
             ) : (
               <CTableRow>
-                <CTableDataCell colSpan={10} className="text-center py-3">
+                <CTableDataCell colSpan={11} className="text-center py-3">
                   No data available
                 </CTableDataCell>
               </CTableRow>

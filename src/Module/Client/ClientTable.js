@@ -97,21 +97,15 @@ const deleteClient = async () => {
   return (
     <>
       <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
-        <CTable striped hover className=" w-full h-[500px] m-0">
+        <div className='h-[450px]'>
+        <CTable striped hover className=" w-full  m-0">
           <CTableHead className="bg-gray-100 sticky top-0 ">
-            <CTableRow style={{ height: '32px' }}>
-              <CTableHeaderCell
-                onClick={() => handleOpenSingleViewPopup(cell.client_id)}
-                style={{ whiteSpace: 'nowrap' }}
-                className="py-3 px-4 text-gray-600 font-medium"
-              >
-                Id
+            <CTableRow  style={{ height: "32px" }}>
+              <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"120px"}}   onClick={() => handleOpenSingleViewPopup(cell.client_id)} className="py-3 px-4 text-gray-600 font-medium">
+              Id
               </CTableHeaderCell>
-              <CTableHeaderCell
-                style={{ whiteSpace: 'nowrap' }}
-                className="py-3 px-4 text-gray-600 font-medium"
-              >
-                Name
+              <CTableHeaderCell style={{ whiteSpace: "nowrap",minWidth:"200px" }} className="py-3 px-4 text-gray-600 font-medium">
+              Name
               </CTableHeaderCell>
               <CTableHeaderCell
                 style={{ whiteSpace: 'nowrap' }}
@@ -131,11 +125,8 @@ const deleteClient = async () => {
               >
                 Pan
               </CTableHeaderCell>
-              <CTableHeaderCell
-                style={{ whiteSpace: 'nowrap' }}
-                className="py-3 px-4 text-gray-600 font-medium"
-              >
-                Created Date
+              <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"250px"}} className="py-3 px-4 text-gray-600 font-medium">
+             Created Date
               </CTableHeaderCell>
               <CTableHeaderCell
                 style={{ whiteSpace: 'nowrap' }}
@@ -153,24 +144,27 @@ const deleteClient = async () => {
             </CTableRow>
           </CTableHead>
 
-          <CTableBody style={{ minHeight: '400px' }}>
+          <CTableBody >
             {clientdata.length > 0 ? (
               clientdata.map((cell, index) => (
-                <CTableRow key={index} className="border-b">
-                  <CTableDataCell
-                    onClick={() => openViewCard(cell)}
-                    className="py-3 px-4 text-primary text-decoration-underline cursor-pointer"
-                  >
-                    {cell.client_id}
-                  </CTableDataCell>
+                <CTableRow style={{ minHeight: "100px" }} key={index} className="border-b">
+<CTableDataCell onClick={()=>openViewCard(cell)} className="py-3 px-4 text-primary text-decoration-underline cursor-pointer w-[150px]">
+  {cell.client_id}
+</CTableDataCell>
 
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                  <CTableDataCell className="py-3 px-4 text-gray-700  w-[150px]">
                     {cell.display_name}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.email}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.mobile}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.PAN}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.email}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.mobile}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.PAN}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700 w-[1000px]">
                     {/*{apiMethods.formatDate(cell.created_at)}*/}
                     {new Date(cell.created_at).toLocaleString()}
                   </CTableDataCell>
@@ -217,14 +211,16 @@ const deleteClient = async () => {
             )}
           </CTableBody>
         </CTable>
+        </div>
 
-        <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth={'1280px'}>
-          <ClientForm
-            refreshClientsEdit={refreshClients}
-            closeDrawer={() => setDrawerOpen(false)}
-            editData={selectedClientId}
-          />
-        </Drawer>
+      
+  
+        {/*<div className="flex justify-end items-center gap-4 mt-3">
+          <CommonPagination count={2} page={1} onChange={handlePageChange} />
+        </div>*/}
+      <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth={'1280px'}>
+        <ClientForm refreshClientsEdit={refreshClients} closeDrawer={() => setDrawerOpen(false)} editData={selectedClientId} />
+      </Drawer>
 
         <CustomPopup
           isOpen={isSingleViewPopup}

@@ -64,7 +64,7 @@ export const apiMethods = {
     try {
       const token = localStorage.getItem('token')
       const response = await apiClient.get(
-        'https://mocki.io/v1/711cbc7d-a070-4077-bf97-8c1369fa075f',
+        'https://mocki.io/v1/06927d0e-012b-4ace-8c82-e5519674a3c0',
         { params },
       )
       return response.data

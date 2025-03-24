@@ -9,12 +9,15 @@ import './index.css'
 
 import App from './App'
 import store from './store'
+import { AuthProvider } from './Context/AuthContext'
 
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <DndProvider backend={HTML5Backend}>
       <SearchProvider>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </SearchProvider>
     </DndProvider>
   </Provider>,

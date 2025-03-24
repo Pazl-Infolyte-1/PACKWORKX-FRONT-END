@@ -12,6 +12,7 @@ import ViewMachineData from './ViewMachineData';
 import AddButton from '../../components/New/AddButton';
 import AddFieldForm from './AddFieldForm';
 import ActionButton from '../../components/New/ActionButton';
+import SearchBar from '../../components/New/SearchBar';
 
 
 const machineData = [
@@ -383,11 +384,7 @@ export default function MachineMaster() {
         <div className="flex flex-col md:flex-row items-center justify-between ">
           <h3 className="text-xl text-black font-bold">Machine Table</h3>
           <div className="flex flex-wrap gap-2">
-            <input
-              type="text"
-              placeholder="Search by Name, ID, Status, Process"
-              className="w-full sm:w-[230px] p-2 border border-gray-300 rounded-xl shadow-md bg-transparent text-gray-500 text-sm placeholder-gray-500 focus:outline-none"
-            />
+            <SearchBar text="Machine" data={tableData} />
             <input
               type="Date"
               className="w-full sm:w-auto p-2 border-none rounded-xl shadow-md bg-white text-blue-900 text-sm text-center outline-none"

@@ -103,7 +103,7 @@ const Index = () => {
           {activeTab === 'Group Layers' && (
             <ActionButton
             label={" + Add Group "}
-            onClick={handleNextStep}
+            onClick={handleAddGroup}
             variant='add'
             />
           )}

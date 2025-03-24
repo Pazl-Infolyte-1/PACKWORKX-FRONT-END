@@ -1,6 +1,5 @@
 import React from 'react';
 import PopUp from '../../components/New/PopUp';
-import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";

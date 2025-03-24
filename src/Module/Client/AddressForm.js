@@ -204,8 +204,9 @@ const addShippingAddress = () => {
 		  </div>
 		</div>
 	  </div>*/}
-	</div>
-  </div>
+      </div>
+    </div>
+  
 }
 
 export default AddressForm

@@ -16,10 +16,8 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
-    console.log('Interceptor token:', token)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-      console.log('Authorization header set:', config.headers.Authorization)
     }
     return config
   },
@@ -43,7 +41,6 @@ apiClient.interceptors.response.use(
 
 export const apiMethods = {
   login: async (credentials) => {
-    console.log('credentials', credentials)
     try {
       const response = await apiClient.post('/user/login', credentials, {
         headers: {
@@ -66,7 +63,6 @@ export const apiMethods = {
   getSideBarMenu: async (params) => {
     try {
       const token = localStorage.getItem('token')
-      console.log('object', token)
       const response = await apiClient.get(
         'https://mocki.io/v1/06927d0e-012b-4ace-8c82-e5519674a3c0',
         { params },
@@ -206,6 +202,45 @@ export const apiMethods = {
     } catch (error) {
       console.error("Error fetching GST details:", error.response?.data || error.message);
       throw error;
+    }
+  },
+
+
+  addSku: async (addNewSkuData) => {
+    try {
+      const response = await apiClient.post('/skuDetails', addNewSkuData,{
+      })
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getSkuList: async () => {
+    try {
+      const response = await apiClient.get('/skuDetails')
+      return response.data
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+
+  updateSku: async (addNewSkuData) => {
+    try {
+      const response = await apiClient.put(`/skuDetails/${addNewSkuData.id}`, addNewSkuData)
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  deleteSku: async (id) => {
+    try {
+      const response = await apiClient.delete(`/skuDetails/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(error)
     }
   },
 

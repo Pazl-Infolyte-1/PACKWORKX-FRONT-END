@@ -8,6 +8,7 @@ import CommonPagination from '../../../components/New/Pagination'
 import EmployeeForm from './EmployeeForm'
 import EmployeeTable from './EmployeeTable'
 import ActionButton from '../../../components/New/ActionButton'
+import SearchBar from '../../../components/New/SearchBar'
 
 
 
@@ -98,17 +99,10 @@ function EmployeeList() {
 
         <div className="overflow-x-auto border border-gray-200 p-3 mt-1 rounded-md">
           <div className="max-w-[1280px] mx-auto mt-1 flex justify-evenly gap-2 items-center">
-            <div className="flex gap-2 items-center border border-[#e7e5e4] p-2 rounded-md">
-              <BiSearchAlt className="text-[#737373]" />
-              <input
-                type="text"
-                placeholder="Search Employee..."
-                className="outline-none border-none bg-transparent"
-              />
-            </div>
+            <SearchBar text={'Employee'} data={tableData} />
 
             <select
-              className="border border-[#e7e5e4] p-2 w-[160px] rounded-md text-[#737373] bg-transparent"
+              className="bg-white border border-[#e7e5e4] p-[6px] rounded-md "
               defaultValue=""
             >
               <option value="" disabled>
@@ -120,7 +114,7 @@ function EmployeeList() {
             </select>
 
             <select
-              className="border border-[#e7e5e4] p-2 w-[160px] rounded-md text-[#737373] bg-transparent"
+              className="border border-[#e7e5e4] p-[6px] rounded-md"
               defaultValue=""
             >
               <option value="" disabled>
@@ -132,7 +126,7 @@ function EmployeeList() {
             </select>
 
             <select
-              className="border border-[#e7e5e4] p-2 w-[160px] rounded-md text-[#737373] bg-transparent"
+              className="border border-[#e7e5e4] p-[6px] rounded-md"
               defaultValue=""
             >
               <option value="" disabled>

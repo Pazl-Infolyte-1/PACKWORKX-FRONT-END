@@ -42,6 +42,7 @@ import {
 import './styles.css'
 import ProgressBar from './ProgressBar'
 import PopUp from '../../components/New/PopUp'
+import ThreeDotMenu from '../../components/ThreeDotMenu'
 
 const ItemType = 'WORK_ORDER'
 
@@ -62,11 +63,12 @@ const CustomToggle = React.forwardRef(({ onClick }, ref) => (
   </span>
 ))
 
-function LayerDragble({ lg, workOrderId  }) {
+function LayerDragble({ lg, workOrderId }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
-    item: { lg, workOrderId  },
+    item: { lg, workOrderId },
   }))
+
   return (
     <CCard
       ref={drag}
@@ -109,11 +111,11 @@ function WorkOrderCard({
 }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
-    item: { 
-      order, 
+    item: {
+      order,
       index,
       isGroup: true,
-      layers: order.layer_group
+      layers: order.layer_group,
     },
   }))
 
@@ -150,43 +152,38 @@ function WorkOrderCard({
           >
             {order.order_id} {visibleIndex === index ? <FaAngleUp /> : <FaAngleDown />}
           </span>
-          <Dropdown>
-            <Dropdown.Toggle as={CustomToggle} />
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={() => console.log('View Work Order', order)}>
-                <CIcon
-                  icon={cilBriefcase}
-                  className="me-2"
-                  style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                />
-                View Work Order
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => console.log('View Sales Order', order)}>
-                <CIcon
-                  icon={cilClipboard}
-                  className="me-2"
-                  style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                />
-                View Sales Order
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => removeWOFromPlan(order)}>
-                <CIcon
-                  icon={cilTrash}
-                  className="me-2"
-                  style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                />
-                Remove from Plan
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => setVisibleSplit(true)}>
-                <CIcon
-                  icon={cilCut}
-                  className="me-2"
-                  style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                />
-                Split Work Order
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+          <ThreeDotMenu
+            value={[
+              {
+                label: 'View Work Order',
+                icon: cilBriefcase,
+                onClick: () => {
+                  console.log('View Work Order')
+                },
+              },
+              {
+                label: 'View Sales Order',
+                icon: cilClipboard,
+                onClick: () => {
+                  console.log('View Sales Order')
+                },
+              },
+              {
+                label: 'Remove from Plan',
+                icon: cilTrash,
+                onClick: () => {
+                  removeWOFromPlan(order)
+                },
+              },
+              {
+                label: 'Split Work Order',
+                icon: cilCut,
+                onClick: () => {
+                  setVisibleSplit(true)
+                },
+              },
+            ]}
+          />
         </div>
 
         <CCollapse className="custom-collapse" visible={visibleIndex === index}>
@@ -209,7 +206,7 @@ function WorkOrderCard({
             <span>{order.route}</span>
           </div>
           {order.layer_group.map((lg) => (
-            <LayerDragble key={lg.id} lg={lg} workOrderId={order.id}  />
+            <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
           ))}
           <div
             style={{
@@ -252,11 +249,11 @@ function GroupOrderDropZone({
     accept: ItemType,
     drop: (item) => {
       if (item.isGroup && item.layers && item.layers.length > 0) {
-        item.layers.forEach(layer => {
-          addWorkOrderToGroup({ lg: layer, workOrderId: item.order.id }, groupIndex);
-        });
+        item.layers.forEach((layer) => {
+          addWorkOrderToGroup({ lg: layer, workOrderId: item.order.id }, groupIndex)
+        })
       } else {
-        addWorkOrderToGroup(item, groupIndex);
+        addWorkOrderToGroup(item, groupIndex)
       }
     },
   }))
@@ -391,10 +388,10 @@ function GroupOrderDropZone({
 
                 <CCollapse className="custom-collapse" visible={groupVisibleIndex === uniqueIndex}>
                   <div className="mt-1">
-                        GSM - {item?.gsm} <br />
-                        BF - {item?.bf} <br />
-                        Dimensions - {item?.dimensions} <br />
-                        Color - {item?.color} <br />
+                    GSM - {item?.gsm} <br />
+                    BF - {item?.bf} <br />
+                    Dimensions - {item?.dimensions} <br />
+                    Color - {item?.color} <br />
                   </div>
 
                   <div
@@ -477,7 +474,7 @@ const Group = ({
       }
       setWorkOrders(
         workOrders.filter(
-          (order) => !autoSyncOrders.items.some((a_order) => order.id === a_order.id ),
+          (order) => !autoSyncOrders.items.some((a_order) => order.id === a_order.id),
         ),
       )
 
@@ -486,23 +483,21 @@ const Group = ({
   }
 
   const addWorkOrderToGroup = (order, groupIndex) => {
-
     setGroupOrders((prevGroups) => {
       if (prevGroups[groupIndex]?.name === 'Auto Sync') {
         alert('Cannot manually add work orders to the Auto Sync group.')
         return prevGroups
       }
       const itemToAdd = order.order
-      ? { ...order.order, workOrderId: order.order.id }
-      : { ...order.lg, workOrderId: order.workOrderId }
+        ? { ...order.order, workOrderId: order.order.id }
+        : { ...order.lg, workOrderId: order.workOrderId }
 
       const isDuplicate = prevGroups[groupIndex].items.some(
-        (item) =>
-          (item.id === itemToAdd.id && item.workOrderId === itemToAdd.workOrderId) 
-      );
-  
+        (item) => item.id === itemToAdd.id && item.workOrderId === itemToAdd.workOrderId,
+      )
+
       if (isDuplicate) {
-        return prevGroups;
+        return prevGroups
       }
 
       if (order.order) {
@@ -516,15 +511,13 @@ const Group = ({
                 layer_group: wo.layer_group.filter((layer) => layer.id !== order.lg.id),
               }
             }
-            return wo;
+            return wo
           }),
         )
       }
 
       return prevGroups.map((group, index) =>
-        index === groupIndex
-          ? { ...group, items: [...group.items, itemToAdd] }
-          : group,
+        index === groupIndex ? { ...group, items: [...group.items, itemToAdd] } : group,
       )
     })
   }

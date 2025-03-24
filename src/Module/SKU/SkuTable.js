@@ -9,29 +9,13 @@ import {
 } from '@coreui/react'
 import { Dropdown } from 'react-bootstrap'
 import CIcon from '@coreui/icons-react'
-import { cilCut, cilOptions, cilTrash } from '@coreui/icons'
+import { cilHandPointRight, cilOptions, cilPencil, cilTrash } from '@coreui/icons'
 import apiMethods from '../../api/config'
 import SkuDetails from './SkuDetails'
+import ThreeDotMenu from '../../components/ThreeDotMenu'
 
 function SkuTable({ skudata, handleSkuEdit, editTag }) {
-  const [showPopUp, setShowPopUp] = useState(null)
-
-  const CustomToggle = React.forwardRef(({ onClick }, ref) => (
-    <span
-      ref={ref}
-      onClick={(e) => {
-        e.preventDefault()
-        onClick(e)
-      }}
-      style={{ cursor: 'pointer' }}
-    >
-      <CIcon
-        icon={cilOptions}
-        className="me-2 hover-pointer"
-        style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
-      />
-    </span>
-  ))
+    const [showPopUp, setShowPopUp] = useState(null)
 
   const handleSkuDelete = async (id) => {
     await apiMethods.deleteSku(id)
@@ -94,27 +78,31 @@ function SkuTable({ skudata, handleSkuEdit, editTag }) {
                   {cell.deckle_size}
                 </CTableDataCell>
                 <CTableDataCell className="py-3 px-2 text-gray-700">
-                  <Dropdown>
-                    <Dropdown.Toggle as={CustomToggle} />
-                    <Dropdown.Menu>
-                      <Dropdown.Item onClick={() => handleSkuEdit(cell.id)}>
-                        <CIcon
-                          icon={cilCut}
-                          className="me-2"
-                          style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                        />
-                        Edit
-                      </Dropdown.Item>
-                      <Dropdown.Item onClick={() => handleSkuDelete(cell.id)}>
-                        <CIcon
-                          icon={cilTrash}
-                          className="me-2"
-                          style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                        />
-                        Delete
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
+                  <ThreeDotMenu
+                      value={[
+                        {
+                          label: 'View',
+                          icon: cilHandPointRight,
+                          onClick: () => {
+                            console.log('View')
+                          },
+                        },
+                        {
+                          label: 'Edit',
+                          icon: cilPencil,
+                          onClick: () => {
+                            handleSkuEdit(cell.id)
+                          },
+                        },
+                        {
+                          label: 'Delete',
+                          icon: cilTrash,
+                          onClick: () => {
+                            handleSkuDelete(cell.id)
+                          },
+                        },
+                      ]}
+                    />
                 </CTableDataCell>
 
                 <SkuDetails

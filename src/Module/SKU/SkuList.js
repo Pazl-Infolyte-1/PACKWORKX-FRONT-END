@@ -10,6 +10,7 @@ import SkuTable from './SkuTable'
 import { useNavigate } from 'react-router-dom'
 import SkuAddEdit from './SkuAddEdit'
 import ActionButton from '../../components/New/ActionButton'
+import SearchBar from '../../components/New/SearchBar'
 
 const tablevalues = {
   tableHeaders: [
@@ -404,13 +405,7 @@ function SkuList() {
 
       {/* Filters */}
       <div className="flex items-center justify-between flex-wrap gap-2 mt-2 w-full">
-        <input
-          type="text"
-          placeholder="Search SKU"
-          value={searchSKU}
-          onChange={(e) => setSearchSKU(e.target.value)}
-          className="w-full sm:w-[350px] p-2 rounded-lg shadow-md bg-white text-[#424242] outline-none border-none"
-        />
+        <SearchBar text="SKU" data={skudata} />
 
         <div className="flex justify-between gap-2 w-full sm:w-auto">
           <select

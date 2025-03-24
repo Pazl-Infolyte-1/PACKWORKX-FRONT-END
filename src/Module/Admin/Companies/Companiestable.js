@@ -8,7 +8,8 @@ import {
   CTableDataCell,
   CTableHead,
 } from '@coreui/react';
-import { BsThreeDotsVertical } from "react-icons/bs";
+import ThreeDotMenu from '../../../components/ThreeDotMenu';
+import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons';
 
 
 const CompaniesTable = ({ cellData }) => {
@@ -62,8 +63,31 @@ const CompaniesTable = ({ cellData }) => {
                      <CTableDataCell className="py-3 px-4 text-gray-700">{cell.last_activity}</CTableDataCell>
                      <CTableDataCell className="py-3 px-4 text-gray-700">{cell.status}</CTableDataCell>
                      <CTableDataCell className="py-3 px-4 text-gray-700">
-                     <BsThreeDotsVertical />
-
+                     <ThreeDotMenu
+                      value={[
+                        {
+                          label: 'View',
+                          icon: cilHandPointRight,
+                          onClick: () => {
+                            console.log('View')
+                          },
+                        },
+                        {
+                          label: 'Edit',
+                          icon: cilPencil,
+                          onClick: () => {
+                            console.log('Edit')
+                          },
+                        },
+                        {
+                          label: 'Delete',
+                          icon: cilTrash,
+                          onClick: () => {
+                            console.log('Delete')
+                          },
+                        },
+                      ]}
+                    />
                      </CTableDataCell>
                      
                    </CTableRow>

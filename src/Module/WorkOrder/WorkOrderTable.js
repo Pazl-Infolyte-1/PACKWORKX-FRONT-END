@@ -7,8 +7,9 @@ import {
   CTableDataCell,
   CTableHead,
 } from '@coreui/react'
-import { cilOptions } from '@coreui/icons'
+import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
+import ThreeDotMenu from '../../components/ThreeDotMenu'
 
 const WorkOrderTable = ({ cellData }) => {
   return (
@@ -76,13 +77,31 @@ const WorkOrderTable = ({ cellData }) => {
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.stage}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.status}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700 text-center">
-                    <button className="btn bg-gray-100">
-                      <CIcon
-                        icon={cilOptions}
-                        className="me-2 hover-pointer"
-                        style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
-                      />
-                    </button>
+                    <ThreeDotMenu
+                      value={[
+                        {
+                          label: 'View',
+                          icon: cilHandPointRight,
+                          onClick: () => {
+                            console.log('View')
+                          },
+                        },
+                        {
+                          label: 'Edit',
+                          icon: cilPencil,
+                          onClick: () => {
+                            console.log('Edit')
+                          },
+                        },
+                        {
+                          label: 'Delete',
+                          icon: cilTrash,
+                          onClick: () => {
+                            console.log('Delete')
+                          },
+                        },
+                      ]}
+                    />
                   </CTableDataCell>
                 </CTableRow>
               ))

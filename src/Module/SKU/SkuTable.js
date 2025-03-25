@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   CTable,
   CTableHead,
@@ -6,86 +6,124 @@ import {
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-  CButton,
 } from '@coreui/react'
-import { HiOutlineDotsVertical } from 'react-icons/hi'
+import { Dropdown } from 'react-bootstrap'
+import CIcon from '@coreui/icons-react'
+import { cilHandPointRight, cilOptions, cilPencil, cilTrash } from '@coreui/icons'
+import apiMethods from '../../api/config'
+import SkuDetails from './SkuDetails'
+import ThreeDotMenu from '../../components/ThreeDotMenu'
 
-function SkuTable(skudata = []) {
-  console.log('datasss', JSON.stringify(skudata))
+function SkuTable({ skudata, handleSkuEdit, editTag }) {
+    const [showPopUp, setShowPopUp] = useState(null)
+
+  const handleSkuDelete = async (id) => {
+    await apiMethods.deleteSku(id)
+  }
+
   return (
-    <>
-      <div className="h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
-        <CTable striped hover className=" w-full m-0">
-          <CTableHead className="bg-gray-100 sticky top-0 ">
-            <CTableRow>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+    <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
+      <CTable striped hover className="w-full m-0">
+        <CTableHead className="bg-gray-100 sticky top-0 z-10">
+          <CTableRow className='text-center'>
+            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">
               SKU Name
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+            </CTableHeaderCell>
+            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Created Date
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+            </CTableHeaderCell>
+            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Modified Date
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+            </CTableHeaderCell>
+            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               SKU Type
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+            </CTableHeaderCell>
+            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Client
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+            </CTableHeaderCell>
+            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Dimensions
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+            </CTableHeaderCell>
+            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Deckle
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Action
-              </CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
+            </CTableHeaderCell>
+            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+              Action
+            </CTableHeaderCell>
+          </CTableRow>
+        </CTableHead>
 
-          <CTableBody>
-            {skudata.skudata.length > 0 ? (
-              skudata.skudata.map((cell, index) => (
-                <CTableRow key={index} className="border-b">
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.sku_name}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.created_date}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.modified_date}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.sku_type}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.client}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.dimensions}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.deckle}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    <CButton>
-                      <HiOutlineDotsVertical />
-                    </CButton>
-                  </CTableDataCell>
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow>
-                <CTableDataCell colSpan={10} className="text-center py-3">
-                  No data available
+        <CTableBody>
+          {skudata.length > 0 ? (
+            skudata.map((cell, index) => (
+              <CTableRow key={index} className="border-b text-center">
+                <CTableDataCell
+                  onClick={() => setShowPopUp(cell.id)}
+                  className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start "
+                >
+                  {cell.sku_name}
                 </CTableDataCell>
+                <CTableDataCell className="py-3 px-2 text-gray-700">
+                  {cell.created_date}
+                </CTableDataCell>
+                <CTableDataCell className="py-3 px-2 text-gray-700">
+                  {cell.modified_date}
+                </CTableDataCell>
+                <CTableDataCell className="py-3 px-2 text-gray-700">{cell.sku_type}</CTableDataCell>
+                <CTableDataCell className="py-3 px-2 text-gray-700">{cell.client}</CTableDataCell>
+                <CTableDataCell className="py-3 px-2 text-gray-700">
+                  {cell.dimensions}
+                </CTableDataCell>
+                <CTableDataCell className="py-3 px-2 text-gray-700">
+                  {cell.deckle_size}
+                </CTableDataCell>
+                <CTableDataCell className="py-3 px-2 text-gray-700">
+                  <ThreeDotMenu
+                      value={[
+                        {
+                          label: 'View',
+                          icon: cilHandPointRight,
+                          onClick: () => {
+                            console.log('View')
+                          },
+                        },
+                        {
+                          label: 'Edit',
+                          icon: cilPencil,
+                          onClick: () => {
+                            handleSkuEdit(cell.id)
+                          },
+                        },
+                        {
+                          label: 'Delete',
+                          icon: cilTrash,
+                          onClick: () => {
+                            handleSkuDelete(cell.id)
+                          },
+                        },
+                      ]}
+                    />
+                </CTableDataCell>
+
+                <SkuDetails
+                  showPopUp={showPopUp}
+                  cell={cell}
+                  editTag={editTag}
+                  setShowPopUp={setShowPopUp}
+                  handleSkuEdit={handleSkuEdit}
+                />
               </CTableRow>
-            )}
-          </CTableBody>
-        </CTable>
-      </div>
-    </>
+            ))
+          ) : (
+            <CTableRow>
+              <CTableDataCell colSpan={8} className="text-center py-3">
+                No data available
+              </CTableDataCell>
+            </CTableRow>
+          )}
+        </CTableBody>
+      </CTable>
+    </div>
   )
 }
 

@@ -8,7 +8,8 @@ import {
   CTableDataCell,
   CButton,
 } from '@coreui/react'
-import { HiOutlineDotsVertical } from 'react-icons/hi'
+import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
+import ThreeDotMenu from '../../../components/ThreeDotMenu'
 function PackagesTable({ packagedata = [] }) {
   return (
     <>
@@ -38,7 +39,6 @@ function PackagesTable({ packagedata = [] }) {
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Action
               </CTableHeaderCell>
-
             </CTableRow>
           </CTableHead>
 
@@ -63,9 +63,31 @@ function PackagesTable({ packagedata = [] }) {
                     {cell.module_in_package}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    <CButton>
-                      <HiOutlineDotsVertical />
-                    </CButton>
+                    <ThreeDotMenu
+                      value={[
+                        {
+                          label: 'View',
+                          icon: cilHandPointRight,
+                          onClick: () => {
+                            console.log('View')
+                          },
+                        },
+                        {
+                          label: 'Edit',
+                          icon: cilPencil,
+                          onClick: () => {
+                            console.log('Edit')
+                          },
+                        },
+                        {
+                          label: 'Delete',
+                          icon: cilTrash,
+                          onClick: () => {
+                            console.log('Delete')
+                          },
+                        },
+                      ]}
+                    />
                   </CTableDataCell>
                 </CTableRow>
               ))

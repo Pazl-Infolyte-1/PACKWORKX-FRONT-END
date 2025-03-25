@@ -84,7 +84,6 @@ apiClient.interceptors.response.use(
 
 export const apiMethods = {
   login: async (credentials) => {
-    console.log('credentials', credentials)
     try {
       const response = await apiClient.post('/user/login', credentials, {
         headers: {
@@ -110,7 +109,7 @@ export const apiMethods = {
     try {
       // const token = localStorage.getItem('token')
       const response = await apiClient.get(
-        'https://mocki.io/v1/711cbc7d-a070-4077-bf97-8c1369fa075f',
+        'https://mocki.io/v1/06927d0e-012b-4ace-8c82-e5519674a3c0',
         { params },
       )
       return response.data
@@ -254,6 +253,45 @@ export const apiMethods = {
     } catch (error) {
       console.error("Error fetching GST details:", error.response?.data || error.message);
       throw error;
+    }
+  },
+
+
+  addSku: async (addNewSkuData) => {
+    try {
+      const response = await apiClient.post('/skuDetails', addNewSkuData,{
+      })
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getSkuList: async () => {
+    try {
+      const response = await apiClient.get('/skuDetails')
+      return response.data
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+
+  updateSku: async (addNewSkuData) => {
+    try {
+      const response = await apiClient.put(`/skuDetails/${addNewSkuData.id}`, addNewSkuData)
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  deleteSku: async (id) => {
+    try {
+      const response = await apiClient.delete(`/skuDetails/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(error)
     }
   },
 

@@ -278,9 +278,8 @@ const onSubmit = async (data) => {
       <CustomAlert alerts={alerts} handleClose={handleClose} />
 
         <FormProvider {...methods}>
-
-        <div className="flex items-center mb-4 ml-8">
-  <h2 className="text-lg font-semibold flex items-center space-x-2">
+        <div className="flex items-center ml-8 pt-2">
+  <h2 className="text-xl font-semibold flex items-center space-x-2 ml-9 w-48 flex">
     {editData?.display_name ? (
       <>
         <span>Edit {editData.display_name}</span>
@@ -292,7 +291,7 @@ const onSubmit = async (data) => {
   </h2>
   <input
     type="text"
-    placeholder="Client Ref Id"
+    placeholder={`${entity_type} Ref Id`}
     {...register("clientData.client_ref_id")}
     className="border border-gray-300 p-2 rounded w-full sm:w-[320px] ml-[100px]"
   />
@@ -301,7 +300,7 @@ const onSubmit = async (data) => {
 
       <div className="ml-8 grid grid-cols-2 items-center w-full h-[70px]">
   {/* Column 1: GST Question & Radio Buttons */}
-  <div className="flex items-center space-x-4">
+  <div className="flex items-center space-x-4 ml-9">
     <p className="font-medium mb-[5px] text-[#8761e5]">Do you have GST?</p>
 
     <label className="flex items-center space-x-2">
@@ -327,18 +326,20 @@ const onSubmit = async (data) => {
   </div>
 
   {/* Column 2: GST Input Field + Search Button (Aligned Right) */}
-
   {gstStatus === "true" && (
-      <div className="flex items-center space-x-2 justify-center mb-[5px]">
-        <input
-          type="text"
-          placeholder="Enter GST Number"
-          {...register("clientData.gst_number")}
-          className="border p-2 rounded w-64"
-        />
-        <ActionButton height={"9"} label={"Search"} onClick={handleSearch} />
-      </div>
-    )}
+  <div className="flex items-center space-x-2 justify-start mb-[5px] ml-5">
+    <label className="font-medium flex items-center mr-4">GST Number</label>
+    <input
+      type="text"
+      placeholder="Enter GST Number"
+      {...register("clientData.gst_number")}
+      className="border p-2 rounded w-64 ml-2" 
+    />
+    <ActionButton height={"9"} label={"Search"} onClick={handleSearch} />
+  </div>
+)}
+
+
 </div>
 
     <div className="p-3 grid grid-cols-2 gap-2">
@@ -346,7 +347,7 @@ const onSubmit = async (data) => {
       {/* Left Column */}
       <div className="ml-5">
 
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-4 ml-8">
           <label className="font-medium flex items-center">
             Customer Type 
             {/*<img src={same} alt="Customer Type" className="ml-2" />*/}
@@ -377,8 +378,8 @@ const onSubmit = async (data) => {
 
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
-  <label className="font-medium flex items-center w-[150px]">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4 ml-8">
+  <label className="font-medium flex items-center w-[240px]">
     Full Name 
     {/*<img src={same} alt="Primary Contact" className="ml-2" />*/}
   </label>
@@ -398,34 +399,35 @@ const onSubmit = async (data) => {
       type="text"
       placeholder="First Name"
       {...register("clientData.first_name")}
-      className="border border-gray-300 p-2 rounded w-full sm:w-[130px]"
+      className="border border-gray-300 p-2 rounded w-full sm:w-[144px]"
     />
 
     <input
       type="text"
       placeholder="Last Name"
       {...register("clientData.last_name")}
-      className="border border-gray-300 p-2 rounded w-full sm:w-[130px]"
+      className="border border-gray-300 p-2 rounded w-full sm:w-[144px]"
     />
   </div>
 </div>
 
 
-<div className="flex flex-col sm:flex-row items-center mb-4">
+<div className="flex flex-col sm:flex-row items-center mb-4 ml-8">
   {/* Company Name */}
-  <label className="font-medium w-[150px]">Company Name</label>
+  <label className="font-medium w-48 flex items-center">Company Name</label>
   <input
     type="text"
     placeholder="Company Name"
     {...register("clientData.company_name")}
-    className="border border-gray-300 p-2 rounded w-full sm:w-[320px]"
+    className="w-full border border-gray-300 p-2 rounded ml-10"
+    
   />
 </div>
       </div>
 
       {/* Right Column */}
       <div name="rightdiv" className="mt-[-8px] sm:mt-[-17px] ml-[15px]">
-      <div className="flex flex-col sm:flex-row items-center mb-4">
+      <div className="flex flex-col sm:flex-row items-center mb-4 ml-8">
   {/* Display Name */}
   <label className="font-medium w-[120px] text-red-500">Display Name*</label>
   <input
@@ -436,7 +438,7 @@ const onSubmit = async (data) => {
   />
 </div>
 
-        <div className="flex items-center mb-4">
+        <div className="flex items-center mb-4 ml-8">
           <label className="font-medium flex items-center">
             Email Address 
             {/*<img src={same} alt="Email Address" className="ml-5" />*/}
@@ -449,7 +451,7 @@ const onSubmit = async (data) => {
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-8">
   <label className="font-medium flex items-center w-[112px]">
     Phone 
     {/*<img src={same} alt="Phone" className="ml-2" />*/}
@@ -481,7 +483,6 @@ const onSubmit = async (data) => {
 </div>
 
       </div>
-
       {/* Tab Navigation */}
       <div className="col-span-2 flex ml-5 border-b pb-1">
         {/*TEMPORARY HIDING CONTACTS AND REMARKS*/}

@@ -64,7 +64,7 @@ const OtherDetailForm =()=>{
     />
   </div>
 
-  <div className="flex items-center">
+  {/*<div className="flex items-center">
     <label className="font-medium w-44">Contract</label>
     <input
       type="file"
@@ -72,7 +72,7 @@ const OtherDetailForm =()=>{
       className="w-full border border-gray-300 p-2 rounded"
       accept="application/pdf"
     />
-  </div>
+  </div>*/}
 </div>
 
 

@@ -71,7 +71,7 @@ function EmployeeList() {
           </div>
         </div>
 
-        <div className="h-10 flex items-center mt-2 border border-gray-300 rounded-md ">
+        <div className="h-10 flex items-center mt-1.5  border border-gray-300 rounded-md ">
           <div className="flex gap-8 ml-5">
             <div className="flex gap-1.5 items-center">
               <TbSmartHome className="text-teal-500" />
@@ -97,7 +97,7 @@ function EmployeeList() {
           </div>
         </div>
 
-        <div className="overflow-x-auto border border-gray-200 p-3 mt-1 rounded-md">
+        <div className="overflow-x-auto border border-gray-200 px-3 py-1 mt-1 rounded-md">
           <div className="max-w-[1280px] mx-auto mt-1 flex justify-evenly gap-2 items-center">
             <SearchBar text={'Employee'} data={tableData} />
 
@@ -138,13 +138,13 @@ function EmployeeList() {
             </select>
           </div>
 
-          <div className="border h-[80%] mt-4">
+          <div className="border h-[80%] mt-2">
             <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
               <EmployeeTable employeesdata={data} />
             </div>
           </div>
           {/* Pagination Section */}
-          <div className="flex justify-end items-center gap-4 mt-4 mb-3">
+          <div className="flex justify-end items-center gap-4 mt-2 mb-3">
             <CommonPagination
               count={totalPages}
               page={currentPage}

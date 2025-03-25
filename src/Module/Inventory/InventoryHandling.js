@@ -15,6 +15,7 @@ import { FiFilter } from 'react-icons/fi'
 import FinishedGoodsDetails from './FinishedGoodsDetails'
 import ReelsDetails from './ReelsDetails'
 import ActionButton from '../../components/New/ActionButton'
+import SearchBar from '../../components/New/SearchBar'
 
 const InventoryDashboard = () => {
   const [isfinishedgoodpopup, setfinishedgoodpopup] = useState(false)
@@ -51,14 +52,7 @@ const InventoryDashboard = () => {
       <h5>Raw Materials Types</h5>
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <div className="relative flex items-center shadow-md mt-2">
-            <input
-              type="text"
-              placeholder="Search SKU by name or ID"
-              className="border border-gray-300 p-1 rounded w-72"
-            />
-            <FaSearch className="absolute right-3 text-gray-500" />
-          </div>
+          <SearchBar text="Raw Materials Types" data={[]} />
           <FiFilter className="text-xl text-gray-700" />
         </div>
         <div className="flex gap-2">

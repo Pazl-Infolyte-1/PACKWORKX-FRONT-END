@@ -11,11 +11,14 @@ const SearchBar = ({ text, data }) => {
     setQuery(newQuery)
     handleSearch(newQuery, data)
   }
+  console.log(query);
+  
+  
 
   return (
     <div>
-      <div className="flex items-center h-[35px] w-[300px] gap-[2px]">
-        <div className="bg-white h-full w-10 flex justify-center items-center rounded-l-md">
+      <div className="flex items-center h-[35px] w-[300px] gap-[2px] border border-gray-300 rounded-md">
+        <div className="bg-white h-full w-10 flex justify-center items-center rounded-l-md border-r-[1px]">
           <IoSearch />
         </div>
         <input

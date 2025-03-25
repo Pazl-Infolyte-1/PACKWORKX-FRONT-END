@@ -7,25 +7,26 @@ import ClientTable from './ClientTable'
 import ClientForm from './ClientForm'
 import ActionButton from '../../components/New/ActionButton'
 import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'
-import vendorImg from "../../assets/images/vendor.png"
-import clientImg from "../../assets/images/client.jpg"
+import vendorImg from '../../assets/images/vendor.png'
+import clientImg from '../../assets/images/client.jpg'
 import CustomAlert from '../../components/New/CustomAlert'
 import DynamicPagination from '../../components/New/DynamicPagination'
 import { FaFilter } from 'react-icons/fa'
-import { FaChevronDown } from "react-icons/fa";
+import { FaChevronDown } from 'react-icons/fa'
+import SearchBar from '../../components/New/SearchBar'
 import { FaSyncAlt } from "react-icons/fa";
 import Loader from '../../components/New/Loader'
 
 function ClientList() {
-  const [selected, setSelected] = useState("vendor");
+  const [selected, setSelected] = useState('vendor')
   const [triggerSelection, setTriggerSelection] = useState(false)
-  const [isPopupOpen, setPopupOpen] = useState(false);
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const [reloadData, setReloadData] = useState(false); //Trigger reload
-  const [entityType, setEntityType] = useState(""); // State to hold entity_type
+  const [isPopupOpen, setPopupOpen] = useState(false)
+  const [isDrawerOpen, setDrawerOpen] = useState(false)
+  const [reloadData, setReloadData] = useState(false) //Trigger reload
+  const [entityType, setEntityType] = useState('') // State to hold entity_type
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPage, setTotalPage] = useState(1)
 
   const [data, setData] = useState([]) // Stores all fetched data
   const [searchQuery, setSearchQuery] = useState(""); // State for search input
@@ -37,22 +38,22 @@ function ClientList() {
   
 
   //const totalPages = Math.ceil(data.length / entriesPerPage) || 1; // Ensure total pages > 0
-  const toggleFilterPopup = () => setIsFilterOpen(!isFilterOpen);
+  const toggleFilterPopup = () => setIsFilterOpen(!isFilterOpen)
 
   const handleEntriesChange = (newEntries) => {
-    setEntriesPerPage(newEntries);
-    setCurrentPage(1); // Reset to page 1 when changing entries per page
-  };
-  
-  const handlePageChange = (event, newPage) => {
-    console.log("Page changed to:", newPage);
-    setCurrentPage(newPage);
-  };
-  const handleCloseDrawer = () => {
-    setDrawerOpen(false);
-  };
+    setEntriesPerPage(newEntries)
+    setCurrentPage(1) // Reset to page 1 when changing entries per page
+  }
 
-  console.log("curr pg",currentPage)
+  const handlePageChange = (event, newPage) => {
+    console.log('Page changed to:', newPage)
+    setCurrentPage(newPage)
+  }
+  const handleCloseDrawer = () => {
+    setDrawerOpen(false)
+  }
+
+  console.log('curr pg', currentPage)
   //const handlePageChange = (event, newPage) => {
   //  setCurrentPage(newPage);
   //};
@@ -64,15 +65,15 @@ function ClientList() {
   const selectionFrame = {
     vendor: {
       id: 1,
-      name: "vendor",
+      name: 'vendor',
       image: vendorImg,
     },
     client: {
       id: 2,
-      name: "client",
+      name: 'client',
       image: clientImg,
     },
-  };
+  }
 
   useEffect(() => {
     const fetchClientData = async () => {
@@ -108,64 +109,63 @@ function ClientList() {
   
 
   const refreshClients = () => {
-    setReloadData((prev) => !prev); //  Toggle state to trigger `useEffect`
-  };
+    setReloadData((prev) => !prev) //  Toggle state to trigger `useEffect`
+  }
 
   //const totalPages = Math.ceil(data?.length / rowsPerPage)
- 
+
   const handleSelection = (selection) => {
-    const optionValue = selectionFrame[selection].id;
-    console.log(`Selected ID: ${optionValue}`);
-  
+    const optionValue = selectionFrame[selection].id
+    console.log(`Selected ID: ${optionValue}`)
+
     if (optionValue === 2) {
-      setEntityType("Client")
-      setPopupOpen(false);
-      setDrawerOpen(true);
-    } else if(optionValue === 1) {
-      setEntityType("Vendor")
-      setPopupOpen(false);
-      setDrawerOpen(true);
-    }else{
-      console.log("option not selected")
+      setEntityType('Client')
+      setPopupOpen(false)
+      setDrawerOpen(true)
+    } else if (optionValue === 1) {
+      setEntityType('Vendor')
+      setPopupOpen(false)
+      setDrawerOpen(true)
+    } else {
+      console.log('option not selected')
     }
-  };
-  
+  }
+
   // Updates selection but does NOT trigger `handleSelection`
   const handleSelectAction = (selection) => {
-    setSelected(selection);
-    setTriggerSelection(true); // Ensures it runs handleSelection
+    setSelected(selection)
+    setTriggerSelection(true) // Ensures it runs handleSelection
+  }
 
-  };
-  
   // Handles key events
 
-  let entity_type = ""
+  let entity_type = ''
   const handleKeyDown = (event) => {
-    if (event.key === "ArrowRight") {
-      handleSelectAction("client");
-      setEntityType("Client"); // Update state
-    } else if (event.key === "ArrowLeft") {
-      handleSelectAction("vendor");
-      setEntityType("Vendor"); // Update state
-    } else if (event.key === "Enter") {
-      console.log("Enter Pressed: Executing Selection");
-      setTriggerSelection(true); // Mark that Enter was pressed
+    if (event.key === 'ArrowRight') {
+      handleSelectAction('client')
+      setEntityType('Client') // Update state
+    } else if (event.key === 'ArrowLeft') {
+      handleSelectAction('vendor')
+      setEntityType('Vendor') // Update state
+    } else if (event.key === 'Enter') {
+      console.log('Enter Pressed: Executing Selection')
+      setTriggerSelection(true) // Mark that Enter was pressed
     }
-  };
-  
+  }
+
   // Ensures `handleSelection` runs AFTER `selected` updates
   useEffect(() => {
     if (triggerSelection) {
-      handleSelection(selected);
-      setTriggerSelection(false); // Reset trigger
+      handleSelection(selected)
+      setTriggerSelection(false) // Reset trigger
     }
-  }, [selected, triggerSelection]); // Runs when `selected` or `triggerSelection` changes
-  
+  }, [selected, triggerSelection]) // Runs when `selected` or `triggerSelection` changes
+
   useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []); // Runs once on mount
-  
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, []) // Runs once on mount
+
   //const handlePageChange = useCallback((event, value) => setCurrentPage(value), [])
   //console.log("curr rows",currentRows)
 
@@ -173,32 +173,34 @@ function ClientList() {
     try {
       const queryParams = {
         ...(searchQuery && { search: searchQuery }),
-        entity_type:selectedFilter
-      };
+        entity_type: selectedFilter,
+      }
 
-      const response = await apiMethods.downloadClientExcel(queryParams);
-  
+      const response = await apiMethods.downloadClientExcel(queryParams)
+
       // Create a Blob from the response
-      const blob = new Blob([response], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-  
+      const blob = new Blob([response], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      })
+
       // Create a URL for the Blob
-      const url = window.URL.createObjectURL(blob);
-  
+      const url = window.URL.createObjectURL(blob)
+
       // Create a temporary link element
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "clients.xlsx"; // Set the downloaded file name
-      document.body.appendChild(a);
-      a.click();
-  
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'clients.xlsx' // Set the downloaded file name
+      document.body.appendChild(a)
+      a.click()
+
       // Clean up
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
     } catch (error) {
-      console.error("Error downloading Excel:", error);
+      console.error('Error downloading Excel:', error)
     }
-  };
-  
+  }
+
   //const alertsData = [
   //  { severity: "success", message: "This is a success Alert." },
   //];
@@ -212,20 +214,9 @@ function ClientList() {
       {/* Search Bar & Actions */}
       <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
         <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-  {/* Search Input Container */}
-  <div className="flex items-center h-[35px] w-[300px] gap-2 border rounded-md">
-    <div className="bg-white h-full w-[40px] flex justify-center items-center rounded-l-md">
-      <IoSearch />
-    </div>
-    <input
-      type="text"
-      placeholder="Search"
-      className="outline-none h-full w-full rounded-r-md pl-2"
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-    />
-  </div>
+          <div className="flex items-center gap-2">
+            {/* Search Input Container */}
+            <SearchBar text="Client" data={data} />
 
   {/* Filter Icon */}
   {/*<FaFilter onClick={toggleFilterPopup} className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-900" />*/}
@@ -290,10 +281,7 @@ function ClientList() {
               Import
             </button> */}
 
-            <ActionButton
-            height="9"
-            label="Import"
-            />
+            <ActionButton height="9" label="Import" />
 
             {/* <button
               className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto"
@@ -332,16 +320,16 @@ function ClientList() {
         </div>
 
         {/* Pagination Section */}
-        
+
         <div className="flex justify-end items-center gap-4 mt-3">
           {/*<DynamicPagination count={totalPages} page={currentPage} onChange={handlePageChange} />*/}
           <DynamicPagination
-         count={totalPage}
-         page={currentPage}
-         onPageChange={handlePageChange}
-         entriesPerPage={entriesPerPage}
-         onEntriesChange={handleEntriesChange}
-      />
+            count={totalPage}
+            page={currentPage}
+            onPageChange={handlePageChange}
+            entriesPerPage={entriesPerPage}
+            onEntriesChange={handleEntriesChange}
+          />
         </div>
         {/*<div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
       <CustomAlert alerts={alertsData} />
@@ -351,36 +339,47 @@ function ClientList() {
       {/* Drawer */}
 
       {!isDrawerOpen && (
-   <CustomPopup isOpen={isPopupOpen} onClose={() => setPopupOpen(false)} width={"w-[500px]"} height={"230px"}>
-   <div className="flex justify-center items-center space-x-12 p-6">
-     {Object.keys(selectionFrame).map((key) => (
-       <div
-         key={key}
-         className={`w-1/3 flex flex-col items-center border-4 p-2 cursor-pointer focus:outline-none ${
-           selected === key ? "border-blue-200" : "border-gray-100"
-         }`}
-         onClick={() => handleSelectAction(key)} // Mouse Click Support
-         onKeyDown={(event) => {
-           if (event.key === "Enter") handleSelectAction(key); // Keyboard Support
-         }}
-         tabIndex={0} // Makes div focusable for keyboard navigation
-         role="button" // Improves accessibility
-       >
-         <img src={selectionFrame[key].image} alt={selectionFrame[key].name} className="w-16 h-16 rounded-full" />
-         <p className="mt-2 text-sm font-semibold">{selectionFrame[key].name}</p>
-       </div>
-     ))}
-   </div>
- </CustomPopup>
-)}
-      
-      <Drawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} maxWidth={"1280px"} title={`New ${entityType}`}>
+        <CustomPopup
+          isOpen={isPopupOpen}
+          onClose={() => setPopupOpen(false)}
+          width={'w-[500px]'}
+          height={'230px'}
+        >
+          <div className="flex justify-center items-center space-x-12 p-6">
+            {Object.keys(selectionFrame).map((key) => (
+              <div
+                key={key}
+                className={`w-1/3 flex flex-col items-center border-4 p-2 cursor-pointer focus:outline-none ${
+                  selected === key ? 'border-blue-200' : 'border-gray-100'
+                }`}
+                onClick={() => handleSelectAction(key)} // Mouse Click Support
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') handleSelectAction(key) // Keyboard Support
+                }}
+                tabIndex={0} // Makes div focusable for keyboard navigation
+                role="button" // Improves accessibility
+              >
+                <img
+                  src={selectionFrame[key].image}
+                  alt={selectionFrame[key].name}
+                  className="w-16 h-16 rounded-full"
+                />
+                <p className="mt-2 text-sm font-semibold">{selectionFrame[key].name}</p>
+              </div>
+            ))}
+          </div>
+        </CustomPopup>
+      )}
+
+      <Drawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} maxWidth={'1280px'}>
         {/* Pass handleCloseDrawer as a prop to ClientForm */}
-        <ClientForm entity_type={entityType} refreshClients={refreshClients} closeDrawerDuringAdd={() => handleCloseDrawer(false)}/>
+        <ClientForm
+          entity_type={entityType}
+          refreshClients={refreshClients}
+          closeDrawerDuringAdd={() => handleCloseDrawer(false)}
+        />
       </Drawer>
-
-
-        </div>
+    </div>
   )
 }
 

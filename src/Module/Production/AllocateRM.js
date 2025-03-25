@@ -9,7 +9,7 @@ import {
   CCollapse,
   CFormSelect,
 } from '@coreui/react'
-import { FaAngleDown, FaAngleUp, FaLock } from 'react-icons/fa'
+import { FaAngleDown, FaAngleUp } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
 import { cilOptions, cilBriefcase, cilCut, cilClipboard, cilTrash } from '@coreui/icons'
 import { useDrag, useDrop } from 'react-dnd'
@@ -17,6 +17,7 @@ import './styles.css'
 import ProgressBar from './ProgressBar'
 import Dropdown from 'react-bootstrap/Dropdown'
 import AllcoateRMModal from './AllcoateRMModal'
+import ThreeDotMenu from '../../components/ThreeDotMenu'
 
 const ItemType = 'WORK_ORDER'
 
@@ -75,43 +76,38 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
               alignItems: 'center',
             }}
           >
-            <Dropdown>
-              <Dropdown.Toggle as={CustomToggle} />
-              <Dropdown.Menu>
-                <Dropdown.Item onClick={() => console.log('View Work Order')}>
-                  <CIcon
-                    icon={cilBriefcase}
-                    className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                  />
-                  View Work Order
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => console.log('View Sales Order')}>
-                  <CIcon
-                    icon={cilClipboard}
-                    className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                  />
-                  View Sales Order
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => console.log('Remove from Plan')}>
-                  <CIcon
-                    icon={cilTrash}
-                    className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                  />
-                  Remove from Plan
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => setVisibleSplit(true)}>
-                  <CIcon
-                    icon={cilCut}
-                    className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                  />
-                  Split Work Order
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+            <ThreeDotMenu
+              value={[
+                {
+                  label: 'View Work Order',
+                  icon: cilBriefcase,
+                  onClick: () => {
+                    console.log('View Work Order')
+                  },
+                },
+                {
+                  label: 'View Sales Order',
+                  icon: cilClipboard,
+                  onClick: () => {
+                    console.log('View Sales Order')
+                  },
+                },
+                {
+                  label: 'Remove from Plan',
+                  icon: cilTrash,
+                  onClick: () => {
+                    console.log('Remove from Plan')
+                  },
+                },
+                {
+                  label: 'Split Work Order',
+                  icon: cilCut,
+                  onClick: () => {
+                    setVisibleSplit(true)
+                  },
+                },
+              ]}
+            />
           </span>
         </div>
 

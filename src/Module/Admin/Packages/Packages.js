@@ -6,6 +6,7 @@ import PackagesForm from './PackagesForm'
 import CommonPagination from '../../../components/New/Pagination'
 import PackagesTable from './PackagesTable'
 import ActionButton from '../../../components/New/ActionButton'
+import SearchBar from '../../../components/New/SearchBar'
 
 function Packages() {
   const [data, setData] = useState([])
@@ -44,16 +45,7 @@ function Packages() {
       {/* Search Bar & Add Button */}
       <div className=" overflow-x-auto border border-gray-200 p-3 rounded-md ">
         <div className="flex justify-between items-center">
-          <div className="flex items-center h-[35px] w-[300px] gap-[2px]">
-            <div className="bg-white h-full w-10 flex justify-center items-center rounded-l-[6px]">
-              <IoSearch />
-            </div>
-            <input
-              type="text"
-              placeholder="Search"
-              className="outline-none h-full w-full rounded-r-md pl-2"
-            />
-          </div>
+          <SearchBar text="Packages" data={data}/>
           <div className="flex justify-center items-center gap-2">
             <ActionButton
             label="Add Package"

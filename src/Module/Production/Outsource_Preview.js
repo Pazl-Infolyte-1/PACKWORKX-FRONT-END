@@ -5,18 +5,14 @@ import {
   CCollapse,
   CFormInput,
   CRow,
-  CDropdown,
-  CDropdownToggle,
-  CDropdownMenu,
-  CDropdownItem,
   CFormSelect,
   CContainer,
 } from '@coreui/react'
 import React, { useState } from 'react'
 import { FaAngleUp, FaAngleDown } from 'react-icons/fa'
-import CIcon from '@coreui/icons-react'
-import { cilBriefcase, cilClipboard, cilCut, cilTrash, cilOptions } from '@coreui/icons'
+import { cilBriefcase, cilClipboard, cilCut, cilTrash } from '@coreui/icons'
 import './styles.css'
+import ThreeDotMenu from '../../components/ThreeDotMenu'
 
 function Outsource_Preview({ workOrders, setWorkOrders, setVisibleSplit }) {
   const [groupVisibleIndex, setGroupVisibleIndex] = useState(null)
@@ -29,31 +25,14 @@ function Outsource_Preview({ workOrders, setWorkOrders, setVisibleSplit }) {
     setWorkOrders((prevOrders) => prevOrders.filter((wo) => wo.id !== item.id))
   }
 
-  const CustomMenu = React.forwardRef(
-    ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
-      return (
-        <div
-          ref={ref}
-          style={{
-            ...style,
-            border: 'none',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-            padding: '8px 0',
-          }}
-          className={`${className || ''}`}
-          aria-labelledby={labeledBy}
-        >
-          {children}
-        </div>
-      )
-    },
-  )
-
   return (
     <CContainer fluid className="p-0">
       <CRow className="g-0 my-2">
         <CCol md={4}>
-          <div className="bg-success text-white d-flex align-items-center justify-content-center" style={{ height: '48px' }}>
+          <div
+            className="bg-success text-white d-flex align-items-center justify-content-center"
+            style={{ height: '48px' }}
+          >
             <span className="m-0">Completely Planned Orders</span>
           </div>
           <div className="mx-2">
@@ -78,53 +57,38 @@ function Outsource_Preview({ workOrders, setWorkOrders, setVisibleSplit }) {
                         {item.quantity ? `${item.finished_goods} / ${item.quantity}` : ''}
                       </span>
 
-                      <CDropdown>
-                        <CDropdownToggle
-                          className="p-0 m-0 bg-transparent border-0"
-                          style={{ boxShadow: 'none' }}
-                          caret={false}
-                        >
-                          <CIcon
-                            icon={cilOptions}
-                            className="me-2 cursor-pointer"
-                            style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
-                          />
-                        </CDropdownToggle>
-                        <CDropdownMenu as={CustomMenu}>
-                          <CDropdownItem onClick={() => console.log('View Work Order', item)}>
-                            <CIcon
-                              icon={cilBriefcase}
-                              className="me-2"
-                              style={{ color: '#8167e5', fontSize: '1.4rem' }}
-                            />
-                            View Work Order
-                          </CDropdownItem>
-                          <CDropdownItem onClick={() => console.log('View Sales Order', item)}>
-                            <CIcon
-                              icon={cilClipboard}
-                              className="me-2"
-                              style={{ color: '#8167e5', fontSize: '1.4rem' }}
-                            />
-                            View Sales Order
-                          </CDropdownItem>
-                          <CDropdownItem onClick={() => removeWOFromPlan(item)}>
-                            <CIcon
-                              icon={cilTrash}
-                              className="me-2"
-                              style={{ color: '#8167e5', fontSize: '1.4rem' }}
-                            />
-                            Remove from Plan
-                          </CDropdownItem>
-                          <CDropdownItem onClick={() => setVisibleSplit(true)}>
-                            <CIcon
-                              icon={cilCut}
-                              className="me-2"
-                              style={{ color: '#8167e5', fontSize: '1.4rem' }}
-                            />
-                            Split Work Order
-                          </CDropdownItem>
-                        </CDropdownMenu>
-                      </CDropdown>
+                      <ThreeDotMenu
+                        value={[
+                          {
+                            label: 'View Work Order',
+                            icon: cilBriefcase,
+                            onClick: () => {
+                              console.log('View Work Order')
+                            },
+                          },
+                          {
+                            label: 'View Sales Order',
+                            icon: cilClipboard,
+                            onClick: () => {
+                              console.log('View Sales Order')
+                            },
+                          },
+                          {
+                            label: 'Remove from Plan',
+                            icon: cilTrash,
+                            onClick: () => {
+                              removeWOFromPlan(item)
+                            },
+                          },
+                          {
+                            label: 'Split Work Order',
+                            icon: cilCut,
+                            onClick: () => {
+                              setVisibleSplit(true)
+                            },
+                          },
+                        ]}
+                      />
                     </div>
                   </div>
 
@@ -154,11 +118,7 @@ function Outsource_Preview({ workOrders, setWorkOrders, setVisibleSplit }) {
                         <div className="d-flex align-items-center">
                           <p className="m-0">Finished Goods:</p>
                           <div className="ms-3" style={{ width: '160px' }}>
-                            <CFormInput
-                              type="number"
-                              size="sm"
-                              className="text-center"
-                            />
+                            <CFormInput type="number" size="sm" className="text-center" />
                           </div>
                         </div>
                       </CCol>
@@ -170,7 +130,10 @@ function Outsource_Preview({ workOrders, setWorkOrders, setVisibleSplit }) {
           </div>
         </CCol>
         <CCol md={8}>
-          <div className="bg-warning text-white d-flex align-items-center justify-content-center" style={{ height: '48px' }}>
+          <div
+            className="bg-warning text-white d-flex align-items-center justify-content-center"
+            style={{ height: '48px' }}
+          >
             <p className="m-0">Unfulfilled Orders</p>
           </div>
           <div className="mx-3">
@@ -203,53 +166,38 @@ function Outsource_Preview({ workOrders, setWorkOrders, setVisibleSplit }) {
                         {item.quantity ? `${item.finished_goods} / ${item.quantity}` : ''}
                       </span>
 
-                      <CDropdown>
-                        <CDropdownToggle
-                          className="p-0 m-0 bg-transparent border-0"
-                          style={{ boxShadow: 'none' }}
-                          caret={false}
-                        >
-                          <CIcon
-                            icon={cilOptions}
-                            className="me-2 cursor-pointer"
-                            style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
-                          />
-                        </CDropdownToggle>
-                        <CDropdownMenu as={CustomMenu}>
-                          <CDropdownItem onClick={() => console.log('View Work Order', item)}>
-                            <CIcon
-                              icon={cilBriefcase}
-                              className="me-2"
-                              style={{ color: '#8167e5', fontSize: '1.4rem' }}
-                            />
-                            Out Source
-                          </CDropdownItem>
-                          <CDropdownItem onClick={() => console.log('View Sales Order', item)}>
-                            <CIcon
-                              icon={cilClipboard}
-                              className="me-2"
-                              style={{ color: '#8167e5', fontSize: '1.4rem' }}
-                            />
-                            Raise PO
-                          </CDropdownItem>
-                          <CDropdownItem onClick={() => removeWOFromPlan(item)}>
-                            <CIcon
-                              icon={cilTrash}
-                              className="me-2"
-                              style={{ color: '#8167e5', fontSize: '1.4rem' }}
-                            />
-                            Remove from Plan
-                          </CDropdownItem>
-                          <CDropdownItem onClick={() => setVisibleSplit(true)}>
-                            <CIcon
-                              icon={cilCut}
-                              className="me-2"
-                              style={{ color: '#8167e5', fontSize: '1.4rem' }}
-                            />
-                            Split Work Order
-                          </CDropdownItem>
-                        </CDropdownMenu>
-                      </CDropdown>
+                      <ThreeDotMenu
+                        value={[
+                          {
+                            label: 'Out Source',
+                            icon: cilBriefcase,
+                            onClick: () => {
+                              console.log('Out Source')
+                            },
+                          },
+                          {
+                            label: 'Raise PO',
+                            icon: cilClipboard,
+                            onClick: () => {
+                              console.log('Raise PO')
+                            },
+                          },
+                          {
+                            label: 'Remove from Plan',
+                            icon: cilTrash,
+                            onClick: () => {
+                              removeWOFromPlan(item)
+                            },
+                          },
+                          {
+                            label: 'Split Work Order',
+                            icon: cilCut,
+                            onClick: () => {
+                              setVisibleSplit(true)
+                            },
+                          },
+                        ]}
+                      />
                     </div>
                   </div>
 
@@ -269,11 +217,7 @@ function Outsource_Preview({ workOrders, setWorkOrders, setVisibleSplit }) {
                         <div className="d-flex align-items-center">
                           <p className="m-0">Finished Goods:</p>
                           <div className="ms-3" style={{ width: '160px' }}>
-                            <CFormInput
-                              type="number"
-                              size="sm"
-                              className="text-center"
-                            />
+                            <CFormInput type="number" size="sm" className="text-center" />
                           </div>
                         </div>
                       </CCol>

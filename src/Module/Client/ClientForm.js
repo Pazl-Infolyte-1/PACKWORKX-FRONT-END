@@ -12,20 +12,58 @@ import apiMethods from '../../api/config'
 import CustomAlert from '../../components/New/CustomAlert'
 import { useNavigate } from "react-router-dom";
 import ActionButton from '../../components/New/ActionButton'
-
+import Loader from '../../components/New/Loader'
+import {
+  CRow,
+  CCol,
+  CCard,
+  CCardBody,
+  CCardText,
+  CNav,
+  CNavItem,
+  CNavLink,
+  CButton,
+  CCollapse,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CTable,
+  CCardHeader,
+  CFormInput,
+  CFormSelect,
+  CModal,
+  CListGroup,
+  CListGroupItem,
+  CTableRow,
+  CTableHead,
+  CTableDataCell,
+  CTableHeaderCell,
+  CTableBody,
+} from '@coreui/react'
+import { useFormContext, useFieldArray } from "react-hook-form";
 
  
 const ClientForm = ({editData, closeDrawer,refreshClients,closeDrawerDuringAdd,refreshClientsEdit,entity_type}) => {
-  const [activeTab, setActiveTab] = useState('otherDetails')
+  const [activeTab, setActiveTab] = useState('Other Details')
   const [alerts, setAlerts] = useState([]);
   //const [hasGst, setHasGst] = useState(null); // Set null to avoid pre-selection
   const [gstNumber, setGstNumber] = useState('');
 const [gstData,setGstData] = useState("")
 const [entityName, setEntityName] = useState("Client");
-
-
-
+const [loading, setLoading] = useState(false);
+const [addressAdded, setAddressAdded] = useState(0); // Initialize with 0
+  const tabs = ['Other Details', 'Address']
+  const handleNextStep = () => {
+    const currentIndex = tabs.indexOf(activeTab)
+    if (currentIndex < tabs.length - 1) {
+      setActiveTab(tabs[currentIndex + 1])
+    }
+  }
 console.log("entity type", entity_type);
+const handleAddAddress = () => {
+  setAddressAdded((prev) => prev + 1); // Increment counter on each click
+};
 //console.log("edoit id",JSON.stringify(editData))
 const handleClose = () => {
   setAlerts([]);
@@ -77,7 +115,7 @@ const methods = useForm({
         state: "",
         pinCode: "",
         phone: "",
-        faxNumber: "",
+        //faxNumber: "",
       },
       {
         type: "Shipping", // Shipping Address
@@ -89,13 +127,13 @@ const methods = useForm({
         state: "",
         pinCode: "",
         phone: "",
-        faxNumber: "",
+        //faxNumber: "",
       },
     ],
   },
 });
 
-const { register, handleSubmit ,reset,watch,formState: { isValid, errors }} = methods;
+const { register, handleSubmit ,reset,watch,formState: { isValid, errors },control} = methods;
 console.log("Form Values: ", watch());
 console.log("Validation Errors: ", errors);
 //const isButtonDisabled = !isValid || !!errors.gst_number;
@@ -153,7 +191,7 @@ useEffect(() => {
         state: addr.state || "",
         pinCode: addr.pinCode || "",
         phone: addr.phone || "",
-        faxNumber: addr.faxNumber || "",
+        //faxNumber: addr.faxNumber || "",
       })),
       
     });
@@ -163,6 +201,36 @@ const clientData = watch("clientData");
 const addresses = watch("addresses");
 const gstStatus = watch("clientData.gst_status");
 const gstnumberVal = watch("clientData.gst_number")
+
+
+const { fields, append, remove } = useFieldArray({
+  control,
+  name: "addresses",
+});
+
+const [expandedIndices, setExpandedIndices] = useState({});
+
+const addShippingAddress = () => {
+  append({
+    type: "Shipping",
+    attention: "",
+    country: "",
+    street1: "",
+    street2: "",
+    city: "",
+    state: "",
+    pinCode: "",
+    phone: "",
+    // faxNumber: "",
+  });
+
+  // Expand the newly added card by default
+  setExpandedIndices((prev) => ({ ...prev, [fields.length]: false }));
+};
+
+const toggleExpand = (index) => {
+  setExpandedIndices((prev) => ({ ...prev, [index]: !prev[index] }));
+};
 const isFormInvalid = () => {
   // Exclude gst_number from validation
   const clientDataValues = Object.entries(clientData).some(
@@ -182,34 +250,34 @@ const isFormInvalid = () => {
 
 const handleSearch = async () => {
   console.log("GST Number:", gstNumber);
+  setLoading(true); // Show loader before API call
 
   try {
     const response = await apiMethods.getGst(gstnumberVal);
     console.log("clientData:", response);
 
-    // Assuming response.data contains the actual data
-    //const response = gstjson
     setGstData(response?.data);
 
+    // Extract trade name and address
+    const tradeName = response?.data?.tradeNam || "";
+    const address = response?.data?.pradr?.adr || "";
 
-        // Extract trade name and address
-        const tradeName = response?.data?.tradeNam || "";
-        const address = response?.data?.pradr?.adr || "";
-    
-        // Update form values using setValue from useForm
-        methods.setValue("clientData.company_name", tradeName);
-        methods.setValue("addresses.0.street1", address);
+    // Update form values using setValue from useForm
+    methods.setValue("clientData.company_name", tradeName);
+    methods.setValue("addresses.0.street1", address);
 
-    // Log extracted values
     console.log("Trade Name:", tradeName);
     console.log("Address:", address);
-    console.log("res.////",JSON.stringify(response?.data));
+    console.log("res.////", JSON.stringify(response?.data));
   } catch (error) {
     console.error("Error fetching client data:", error);
+  } finally {
+    setLoading(false); // Hide loader after API call
   }
 };
-
 const onSubmit = async (data) => {
+  setLoading(true); // Show loader before API call
+
   try {
     const filteredData = {
       ...data,
@@ -228,42 +296,42 @@ const onSubmit = async (data) => {
     }
 
     console.log(successMessage, response);
-    setAlerts([{ severity: "success", message: successMessage }]);
-    if(editData){
+    setAlerts([{ severity: "success", message: response?.message }]);
+
+    if (editData) {
       setTimeout(() => {
         setAlerts([]);
         refreshClientsEdit();
         closeDrawer();
         reset();
-      }, 3000); 
+      }, 3000);
     }
+
     setTimeout(() => {
       setAlerts([]);
       refreshClients();
       closeDrawerDuringAdd();
       reset();
-    }, 3000); 
+    }, 3000);
   } catch (error) {
     console.error("Error processing client:", error);
     const errorMessage = error.response?.data?.message || "An unknown error occurred.";
 
     setAlerts([{ severity: "error", message: errorMessage }]);
-    if(editData){
+
+    if (editData) {
       setTimeout(() => {
         setAlerts([]);
-        //refreshClientsEdit();
-        //closeDrawer();
-        //reset();
-      }, 3000); 
+      }, 3000);
     }
+
     setTimeout(() => {
       setAlerts([]);
-      //refreshClients();
-      //closeDrawerDuringAdd();
-      //reset();
-    }, 3000); 
-  
+    }, 3000);
+  } finally {
+    setLoading(false); // Hide loader after API call
   }
+
   useEffect(() => {
     if (clientData?.entity_type) {
       setValue("clientData.entity_type",clientData.entity_type);
@@ -272,237 +340,229 @@ const onSubmit = async (data) => {
     }
   }, [clientData, setValue,editData]);
 
+
+
 };
   return (
     <>
+    <Loader isLoading={loading} />
       <CustomAlert alerts={alerts} handleClose={handleClose} />
 
         <FormProvider {...methods}>
-        <div className="flex items-center ml-8 pt-2">
-  <h2 className="text-xl font-semibold flex items-center space-x-2 ml-9 w-48 flex">
-    {editData?.display_name ? (
-      <>
-        <span>Edit {editData.display_name}</span>
-        <HiOutlinePencilAlt className="w-5 h-5 text-gray-500" />
-      </>
-    ) : (
-      `New ${entity_type}`
-    )}
-  </h2>
-  <input
+        <div className="pb-4 -r-4 pl-4 relative border-b border-gray-300">
+  {/* Title Section - Outside Cards */}
+  <div className="flex items-center ml-6 md:mt-6 sm:mt-6 ">
+  {/* Title with Icon */}
+  {/*<h2 className="text-xl font-semibold flex items-center gap-x-1.5 absolute lg:top-1 md:top-10 sm:top-10 left-8">
+  {editData?.display_name ? (
+    <>
+      Edit {editData.display_name}
+      <HiOutlinePencilAlt className="w-4 h-4 text-gray-500" />
+    </>
+  ) : (
+    <>
+      <span className="font-bold">New {entity_type} </span>
+    </>
+  )}
+</h2>*/}
+
+
+  {/* Move Input Close to Title */}
+  {/*<input
     type="text"
-    placeholder={`${entity_type} Ref Id`}
+    placeholder={`${entity_type} Id`}
     {...register("clientData.client_ref_id")}
-    className="border border-gray-300 p-2 rounded w-full sm:w-[320px] ml-[100px]"
-  />
+    className="border border-gray-300 p-1.5 rounded w-40 text-sm focus:ring-2 focus:ring-indigo-400 ml-4"
+  />*/}
+  
 </div>
 
 
-      <div className="ml-8 grid grid-cols-2 items-center w-full h-[70px]">
-  {/* Column 1: GST Question & Radio Buttons */}
-  <div className="flex items-center space-x-4 ml-9">
-    <p className="font-medium mb-[5px] text-[#8761e5]">Do you have GST?</p>
+  {/* Main Layout - Left & Right Cards */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {/* Left Card */}
+    <div className="bg-white p-6">
+      {/* Customer Type (Single Row) */}
+        {/* Do You Have GST? - Moved to Left Card */}
+        <div className="flex items-center mb-4">
+        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Client Id</label>
+        <input type="text"  placeholder={`${entity_type} Id`}{...register("clientData.client_ref_id")} className="border p-2 rounded flex-1" />
+      </div>
 
+      <div className="mb-4 flex items-center">
+        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Customer Type</label>
+        <div className="flex items-center space-x-6 h-10">
+          <label className="flex items-center space-x-2">
+            <input type="radio" {...register("clientData.customer_type")} value="Business" />
+            <span>Business</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input type="radio" {...register("clientData.customer_type")} value="Individual" />
+            <span>Individual</span>
+          </label>
+        </div>
+      </div>
+
+      {/* Full Name (Single Row) */}
+      <div className="flex items-center mb-4">
+        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Full Name</label>
+        <div className="flex gap-2">
+          <select {...register("clientData.salutation")} className="border p-2 rounded w-28">
+            <option value="" disabled>Salutation</option>
+            <option value="Mr.">Mr.</option>
+            <option value="Mrs.">Mrs.</option>
+          </select>
+          <input type="text" placeholder="First Name" {...register("clientData.first_name")} className="border p-2 rounded w-28" />
+          <input type="text" placeholder="Last Name" {...register("clientData.last_name")} className="border p-2 rounded w-28" />
+        </div>
+      </div>
+
+      {/* Company Name */}
+      <div className="flex items-center mb-4">
+        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Company</label>
+        <input type="text" placeholder="Company Name" {...register("clientData.company_name")} className="border p-2 rounded flex-1" />
+      </div>
+
+
+      <div className="mb-4 flex items-center">
+  <label className="font-medium w-40 text-indigo-600 after:content-['*'] after:text-red-500 after:ml-1">Do you have GST?</label>
+  <div className="flex items-center space-x-6 h-10">
     <label className="flex items-center space-x-2">
-      <input
-        type="radio"
-        name="gst"
-        value="true"
-        className="cursor-pointer accent-blue-600"
-        {...register("clientData.gst_status")}
-      />
+      <input type="radio" {...register("clientData.gst_status")} value="true" />
       <span>Yes</span>
     </label>
-
     <label className="flex items-center space-x-2">
-      <input
-        type="radio"
-        value="false"
-        className="cursor-pointer accent-blue-600"
-        {...register("clientData.gst_status")}
-      />
+      <input type="radio" {...register("clientData.gst_status")} value="false" />
       <span>No</span>
     </label>
   </div>
+</div>
+    
+    </div>
 
-  {/* Column 2: GST Input Field + Search Button (Aligned Right) */}
-  {gstStatus === "true" && (
-  <div className="flex items-center space-x-2 justify-start mb-[5px] ml-5">
-    <label className="font-medium flex items-center mr-4">GST Number</label>
-    <input
-      type="text"
-      placeholder="Enter GST Number"
-      {...register("clientData.gst_number")}
-      className="border p-2 rounded w-64 ml-2" 
-    />
-    <ActionButton height={"9"} label={"Search"} onClick={handleSearch} />
+    {/* Right Card */}
+    <div className="bg-white p-6 h-72">
+      {/* Display Name */}
+        {/* GST Number - Moved to Right Card */}
+
+        <div className="flex items-center mb-4 h-10">
+        {/*<label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Display Name</label>
+        <input type="text" placeholder="Enter display name" {...register("clientData.display_name")} className="border p-2 rounded flex-1" />*/}
+      </div>
+
+
+        <div className="flex items-center mb-4">
+        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Display Name</label>
+        <input type="text" placeholder="Enter display name" {...register("clientData.display_name")} className="border p-2 rounded flex-1" />
+      </div>
+
+   
+
+      {/* Email */}
+      <div className="flex items-center mb-4">
+      <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">
+  Email
+</label>
+
+        <input disabled={editData} type="text" placeholder="Email Address" {...register("clientData.email")} className="border p-2 rounded flex-1" />
+      </div>
+
+      {/* Phone Numbers */}
+      <div className="flex items-center mb-4">
+        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Phone</label>
+        <div className="flex space-x-2">
+          <div className="flex items-center border p-2 rounded w-[180px]">
+            <img src={Phone} alt="Work Phone" className="w-5 mr-2" />
+            <input type="text" {...register("clientData.work_phone")} placeholder="Work" className="outline-none flex-1" />
+          </div>
+          <div className="flex items-center border p-2 rounded w-[180px]">
+            <img src={Cell} alt="Mobile" className="w-5 mr-2" />
+            <input type="text" {...register("clientData.mobile")} placeholder="Mobile" className="outline-none flex-1" />
+          </div>
+        </div>
+      </div>
+
+
+      {gstStatus === "true" && (
+  <div className="mb-4 flex items-center">
+    <label className="font-medium w-40 flex items-center leading-none after:content-['*'] after:text-red-500 after:ml-1">
+      GST Number
+    </label>
+    <div className="flex items-center space-x-4">
+      <input 
+        type="text" 
+        placeholder="Enter GST Number" 
+        {...register("clientData.gst_number")} 
+        className="border p-2 rounded w-60"
+      />
+      <ActionButton height={"9"} label={"Search"} onClick={handleSearch} />
+    </div>
   </div>
 )}
 
 
-</div>
-
-    <div className="p-3 grid grid-cols-2 gap-2">
-
-      {/* Left Column */}
-      <div className="ml-5">
-
-      <div className="flex items-center mb-4 ml-8">
-          <label className="font-medium flex items-center">
-            Customer Type 
-            {/*<img src={same} alt="Customer Type" className="ml-2" />*/}
-          </label>
-          <div className="ml-8 flex items-center">
-  <input
-    type="radio"
-    {...register("clientData.customer_type")}
-    value="Business"
-    id="business"
-    className="mr-2"
-  />
-  <label htmlFor="business" className="mr-4">
-    Business
-  </label>
-  
-  <input
-    type="radio"
-    {...register("clientData.customer_type")}
-    value="Individual"
-    id="individual"
-    className="mr-2"
-  />
-  <label htmlFor="individual">
-    Individual
-  </label>
-</div>
-
-        </div>
-
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4 ml-8">
-  <label className="font-medium flex items-center w-[240px]">
-    Full Name 
-    {/*<img src={same} alt="Primary Contact" className="ml-2" />*/}
-  </label>
-  
-  <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full">
-    <select 
-      defaultValue="Mr." 
-      {...register("clientData.salutation")} 
-      className="border border-gray-300 p-2 rounded w-full sm:w-16"
-    >
-      <option value="" disabled>--</option>
-      <option value="Mr." id="salutation-mr">Mr.</option>
-      <option value="Mrs." id="salutation-mrs">Mrs.</option>
-    </select>
-
-    <input
-      type="text"
-      placeholder="First Name"
-      {...register("clientData.first_name")}
-      className="border border-gray-300 p-2 rounded w-full sm:w-[144px]"
-    />
-
-    <input
-      type="text"
-      placeholder="Last Name"
-      {...register("clientData.last_name")}
-      className="border border-gray-300 p-2 rounded w-full sm:w-[144px]"
-    />
+    </div>
   </div>
-</div>
 
-
-<div className="flex flex-col sm:flex-row items-center mb-4 ml-8">
-  {/* Company Name */}
-  <label className="font-medium w-48 flex items-center">Company Name</label>
-  <input
-    type="text"
-    placeholder="Company Name"
-    {...register("clientData.company_name")}
-    className="w-full border border-gray-300 p-2 rounded ml-10"
     
-  />
-</div>
-      </div>
-
-      {/* Right Column */}
-      <div name="rightdiv" className="mt-[-8px] sm:mt-[-17px] ml-[15px]">
-      <div className="flex flex-col sm:flex-row items-center mb-4 ml-8">
-  {/* Display Name */}
-  <label className="font-medium w-[120px] text-red-500">Display Name*</label>
-  <input
-    type="text"
-    placeholder="Enter display name"
-    {...register("clientData.display_name")}
-    className="border border-gray-300 p-2 rounded flex-1"
-  />
-</div>
-
-        <div className="flex items-center mb-4 ml-8">
-          <label className="font-medium flex items-center">
-            Email Address 
-            {/*<img src={same} alt="Email Address" className="ml-5" />*/}
-          </label>
-          <input
-            type="text"
-            {...register("clientData.email")}
-            placeholder="Email Address"
-            className="border border-gray-300 p-2 rounded ml-5 flex-1"
-          />
+  {/*{activeTab === "Address" && (
+    <ActionButton height={"7"} label={"+ Add "} className="ml-auto" onClick={handleAddAddress}  />
+  )}*/}
+ <div className="d-flex justify-content-between align-items-center mb-3">
+        <h5 className='h-10'>Address Details</h5>
+        <div className="ms-auto flex flex-row gap-2">
+          {activeTab === 'Address' && (
+            <ActionButton
+            label={" + Add "}
+            onClick={addShippingAddress}
+            variant='add'
+            />
+          )}
+          
         </div>
-
-        <div className="flex items-center gap-2 ml-8">
-  <label className="font-medium flex items-center w-[112px]">
-    Phone 
-    {/*<img src={same} alt="Phone" className="ml-2" />*/}
-  </label>
-
-  <div className="flex flex-col flex-1">
-    <div className="flex items-center border border-gray-300 p-2 rounded">
-      <img src={Phone} alt="Work Phone" className="mr-2" />
-      <input
-        type="text"
-        {...register("clientData.work_phone")}
-        placeholder="Work Phone"
-        className="flex-1 outline-none"
-      />
-    </div>
-  </div>
-
-  <div className="flex flex-col flex-1">
-    <div className="flex items-center border border-gray-300 p-2 rounded">
-      <img src={Cell} alt="Mobile" className="mr-2" />
-      <input
-        type="text"
-        {...register("clientData.mobile")}
-        placeholder="Mobile"
-        className="flex-1 outline-none"
-      />
-    </div>
-  </div>
-</div>
-
       </div>
-      {/* Tab Navigation */}
-      <div className="col-span-2 flex ml-5 border-b pb-1">
-        {/*TEMPORARY HIDING CONTACTS AND REMARKS*/}
-      {/*['otherDetails', 'address', 'contactPersons', 'remarks']*/}
-        {['otherDetails', 'address'].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`mr-6 pb-2 border-b-2 ${activeTab === tab ? 'border-blue-500 text-blue-500' : 'border-transparent text-black'} focus:outline-none`}
-          >
-            {tab.charAt(0).toUpperCase() + tab.slice(1).replace(/([A-Z])/g, ' $1')}
-          </button>
-        ))}
-      </div>
+  <CCol xs={12}>
+        <CNav variant="tabs">
+          {tabs.map((tab) => (
+            <CNavItem key={tab}>
+              <CNavLink
+                active={activeTab === tab}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setActiveTab(tab)
+                }}
+                style={{
+                  backgroundColor: activeTab === tab ? '#8761e5' : 'transparent',
+                  color: activeTab === tab ? '#ffffff' : '#8761e5',
+                  cursor: 'pointer',
+                }}
+              >
+                {tab}
+              </CNavLink>
+            </CNavItem>
+          ))}
+        </CNav>
+      </CCol>
+
+      <CRow>
+        {activeTab === 'Other Details' && (
+           <OtherDetailForm></OtherDetailForm>
+        )}
+        {activeTab === 'Address' && (
+        <AddressForm  fields={fields}
+        remove={remove}
+        expandedIndices={expandedIndices}
+        toggleExpand={toggleExpand}  />
+        )}
+      </CRow>
+
+
       {/* className="w-100% h-10 p-6 bg-white shadow-md rounded-lg" */}
       {/* Tab Content */}
-      {activeTab === 'otherDetails' && (
+      {/*{activeTab === 'otherDetails' && (
        <OtherDetailForm></OtherDetailForm>
       )}
-   {activeTab === 'address' && <AddressForm />}
+   {activeTab === 'address' && <AddressForm addressAdded={addressAdded} />}*/}
 
       {activeTab === 'contactPersons' && (
 <ContactPersonsForm></ContactPersonsForm>
@@ -516,18 +576,24 @@ const onSubmit = async (data) => {
  
     </div>
     </FormProvider>
-    <div className="flex justify-between items-center w-full px-6">
+    <div className="flex justify-between items-center w-full px-6 pt-3">
   {/* Left side: Buttons */}
-  <div className="text-left ml-[3%]">
-  <button
+  <div className="text-left ml-[2%]">
+  {/*<button
     className={`p-2 rounded w-24 mr-4 text-white ${
       isFormInvalid()
         ? "bg-gray-400 cursor-not-allowed" // Grey when disabled
         : "bg-purple-600 hover:bg-purple-700" // Purple when enabled
     }`}
     onClick={handleSubmit(onSubmit)}
-    disabled={isFormInvalid()} // Disable when form is invalid
+    //disabled={isFormInvalid()} // Disable when form is invalid
     //disabled={isButtonDisabled}
+  >
+    Save
+  </button>*/}
+  <button
+    className="p-2 rounded w-24 mr-4 text-white bg-purple-600 hover:bg-purple-700"
+    onClick={handleSubmit(onSubmit)}
   >
     Save
   </button>

@@ -37,6 +37,7 @@
     "chart.js": "^4.4.7",
     "classnames": "^2.5.1",
     "core-js": "^3.40.0",
+    "idb": "^8.0.2",
     "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
@@ -51,6 +52,7 @@
     "react-router-dom": "^7.1.5",
     "redux": "5.0.1",
     "simplebar-react": "^3.3.0",
+    "sql.js": "^1.13.0",
     "yup": "^1.6.1"
   },
   "devDependencies": {

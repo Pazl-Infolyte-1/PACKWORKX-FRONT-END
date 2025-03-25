@@ -15,7 +15,7 @@ import SkuDetails from './SkuDetails'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 
 function SkuTable({ skudata, handleSkuEdit, editTag }) {
-    const [showPopUp, setShowPopUp] = useState(null)
+  const [showPopUp, setShowPopUp] = useState(null)
 
   const handleSkuDelete = async (id) => {
     await apiMethods.deleteSku(id)
@@ -54,8 +54,8 @@ function SkuTable({ skudata, handleSkuEdit, editTag }) {
         </CTableHead>
 
         <CTableBody>
-          {skudata.length > 0 ? (
-            skudata.map((cell, index) => (
+        {skudata.length > 0 ? (
+           skudata.filter((item) => item.status === 'active').map((cell, index) => (
               <CTableRow key={index} className="border-b text-center">
                 <CTableDataCell
                   onClick={() => setShowPopUp(cell.id)}
@@ -113,7 +113,7 @@ function SkuTable({ skudata, handleSkuEdit, editTag }) {
                   handleSkuEdit={handleSkuEdit}
                 />
               </CTableRow>
-            ))
+           ))
           ) : (
             <CTableRow>
               <CTableDataCell colSpan={8} className="text-center py-3">

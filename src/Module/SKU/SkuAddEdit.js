@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton';
+import { AuthContext } from '../../Context/AuthContext';
 
 function SkuAddEdit({
   handleChange,
@@ -13,11 +14,13 @@ function SkuAddEdit({
   const [topLayer, setTopLayer] = useState({ gsm: 180, bf: 18 })
   const [c1Layer, setC1Layer] = useState({ gsm: 120, bf: 18 })
   const [l1Layer, setL1Layer] = useState({ gsm: 180, bf: 18 })
+  const {user} = useContext(AuthContext)
+  
   useEffect(() => {
     if (!editTag) {
       setAddNewSkuData({
         sku_name: '',
-        client_id: 2,
+        client_id: user.id,
         client: '',
         ply: '',
         length: '',

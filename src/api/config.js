@@ -208,7 +208,7 @@ export const apiMethods = {
 
   addSku: async (addNewSkuData) => {
     try {
-      const response = await apiClient.post('/skuDetails', addNewSkuData,{
+      const response = await apiClient.post('/sku-details', addNewSkuData,{
       })
       return response.data
     } catch (error) {
@@ -218,7 +218,7 @@ export const apiMethods = {
 
   getSkuList: async () => {
     try {
-      const response = await apiClient.get('/skuDetails')
+      const response = await apiClient.get('/sku-details')
       return response.data
     } catch (error) {
       console.error(error);
@@ -228,7 +228,7 @@ export const apiMethods = {
 
   updateSku: async (addNewSkuData) => {
     try {
-      const response = await apiClient.put(`/skuDetails/${addNewSkuData.id}`, addNewSkuData)
+      const response = await apiClient.put(`/sku-details/${addNewSkuData.id}`, addNewSkuData)
       return response.data
     } catch (error) {
       console.error(error)
@@ -237,7 +237,7 @@ export const apiMethods = {
 
   deleteSku: async (id) => {
     try {
-      const response = await apiClient.delete(`/skuDetails/${id}`)
+      const response = await apiClient.delete(`/sku-details/${id}`)
       return response.data
     } catch (error) {
       console.error(error)

@@ -54,10 +54,7 @@ const Login = () => {
         // Save token or user data in localStorage or context if needed
         // localStorage.setItem('token', response.token)
         await saveToken(response.token)
-        const token = await getToken()
-        if(token){
-          alert('login token saved')
-        }
+
 
         
         // Dispatch the login success action

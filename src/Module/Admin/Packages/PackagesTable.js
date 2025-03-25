@@ -16,7 +16,7 @@ function PackagesTable({ packagedata = [] }) {
           {/* <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar"> */}
       <div className="h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
         <CTable striped hover className=" w-full m-0">
-          <CTableHead className="bg-gray-100 sticky top-0 ">
+          <CTableHead className="bg-gray-100 sticky top-0 z-10 ">
             <CTableRow>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Name

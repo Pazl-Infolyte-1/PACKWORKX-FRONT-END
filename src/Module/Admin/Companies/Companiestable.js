@@ -20,7 +20,7 @@ const CompaniesTable = ({ cellData }) => {
            <CTable striped hover className="mt-3 w-full border p-3"> */}
             <div className={`border border-gray-200 ${cellData.length > 0 ? "h-[350px] overflow-y-auto custom-scrollbar " : "h-[350px]"}`}>
             <CTable striped hover className="w-full m-0 ">
-             <CTableHead className="bg-gray-100 sticky top-0 ">
+             <CTableHead className="bg-gray-100 sticky top-0 z-10">
                <CTableRow>
                  <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                    ID

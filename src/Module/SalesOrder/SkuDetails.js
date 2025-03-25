@@ -26,7 +26,7 @@ const SkuDetails = () => {
 
   return (
     <div>
-      <div className="mt-4 p-4 bg-white rounded-lg border border-[#c2c2c2] shadow-md w-full h-[600px]">
+      <div className="mt-2 p-4 bg-white rounded-lg border border-[#c2c2c2] w-full max-h-[600px]">
         {/* Title & Button Container */}
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Sku Details</h2>
@@ -43,12 +43,12 @@ const SkuDetails = () => {
           />
         </div>
 
-        <div className="w-[100%] h-[200px] bg-white rounded-[10px] shadow-md shadow-[rgba(3,3,3,0.1)]">
-          <div className="overflow-x-auto p-5">
-            <div className="max-h-[150px] overflow-y-auto rounded-lg">
-              <table className="min-w-full bg-white rounded-lg max-h-[1250px]">
+        <div className="w-[100%] max-h-[200px] mt-4 rounded-[10px] border border-[#c2c2c2]">
+          <div className="overflow-x-auto p-2">
+            <div className="max-h-[150px]  overflow-y-auto rounded-lg">
+              <table className="min-w-full bg-white rounded-lg max-h-[1250px] ">
                 {/* Table Head */}
-                <thead className="sticky top-0 bg-white z-10">
+                <thead className="sticky  top-0 bg-white z-10">
                   <tr>
                     <th className="px-4 py-2 text-left">Sku</th>
                     <th className="px-4 py-2 text-left">Quantity Required</th>
@@ -120,16 +120,10 @@ const SkuDetails = () => {
               </table>
             </div>
           </div>
-          <div className="mt-10">
-            <table className="w-[500px] ml-[50%] mb-[1%]">
-              {/*<thead>
-          <tr className="bg-gray-200">
-            <th className="border px-4 py-2">Column 1</th>
-            <th className="border px-4 py-2">Column 2</th>
-            <th className="border px-4 py-2">Column 3</th>
-          </tr>
-        </thead>*/}
-              <tbody>
+          </div>
+          <div className=" flex flex-row-reverse  mt-4 ">
+            <table className="">
+              <tbody className='gap-4'>
                 <tr>
                   <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                     Total Qty:2000
@@ -202,7 +196,6 @@ const SkuDetails = () => {
               </button> */}
             </div>
           </div>
-        </div>
       </div>
       <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} />
 

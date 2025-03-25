@@ -9,7 +9,7 @@ const AddSalesOrder = ({ currentTab }) => {
   return (
     <div className="screen p-4">
       {/* Navigation Tabs */}
-      <nav className="bg-white shadow-md p-3 rounded-md flex gap-6 border-b">
+      <nav className="bg-white p-3 rounded-md flex gap-6 border">
         <span
           className={`pb-2 cursor-pointer font-medium ${
             activeTab === 'salesOrder'
@@ -36,7 +36,7 @@ const AddSalesOrder = ({ currentTab }) => {
       <div className="bg-white">
         {activeTab === 'salesOrder' && (
           <div>
-            <div className="p-4 bg-white rounded-lg border border-[#c2c2c2] shadow-md w-[100%] h-[50%]">
+            <div className="p-2 mt-2 bg-white rounded-lg border border-[#c2c2c2] w-[100%] h-[50%]">
               {/* Title */}
               <h2 className="text-lg font-semibold flex justify-start">Order Details</h2>
               <div className="grid grid-cols-2 grid-rows-2 gap-4 mt-4">

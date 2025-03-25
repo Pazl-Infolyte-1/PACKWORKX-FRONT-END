@@ -94,6 +94,7 @@ const deleteClient = async () => {
   }
 };
 
+//console.log("edit data",selectedClientId?.entity_type)
   return (
     <>
       <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
@@ -218,7 +219,7 @@ const deleteClient = async () => {
         {/*<div className="flex justify-end items-center gap-4 mt-3">
           <CommonPagination count={2} page={1} onChange={handlePageChange} />
         </div>*/}
-      <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth={'1280px'}>
+      <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth={'1280px'} title={`Edit ${selectedClientId?.entity_type}`}>
         <ClientForm refreshClientsEdit={refreshClients} closeDrawer={() => setDrawerOpen(false)} editData={selectedClientId} />
       </Drawer>
 

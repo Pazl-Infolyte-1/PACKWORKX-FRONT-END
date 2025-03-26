@@ -45,7 +45,7 @@ const SkuDetails = () => {
 
         <div className="w-[100%] max-h-[200px] mt-4 rounded-[10px] border border-[#c2c2c2]">
           <div className="overflow-x-auto p-2">
-            <div className="max-h-[150px]  overflow-y-auto rounded-lg">
+            <div className="max-h-[150px]  overflow-y-auto custom-scrollbar rounded-lg">
               <table className="min-w-full bg-white rounded-lg max-h-[1250px] ">
                 {/* Table Head */}
                 <thead className="sticky  top-0 bg-white z-10">

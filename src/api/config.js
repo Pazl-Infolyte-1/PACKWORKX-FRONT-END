@@ -105,16 +105,38 @@ export const apiMethods = {
     }
   },
 
-  getSideBarMenu: async (params) => {
+  //getSideBarMenu: async (params) => {
+  //  try {
+  //    const token = localStorage.getItem('token')
+  //    console.log('object', token)
+  //    const response = await apiClient.get(
+  //      'https://mocki.io/v1/711cbc7d-a070-4077-bf97-8c1369fa075f',
+  //      { params },
+  //    )
+  //    return response.data
+  //  } catch (error) {
+  //    throw error
+  //  }
+  //},
+
+  getSideBarMenu: async (queryParams = {}) => {
     try {
-      // const token = localStorage.getItem('token')
-      const response = await apiClient.get(
-        'https://mocki.io/v1/06927d0e-012b-4ace-8c82-e5519674a3c0',
-        { params },
-      )
-      return response.data
+      const token = localStorage.getItem("token"); // Retrieve token
+      if (!token) {
+        throw new Error("No token found. Please log in again.");
+      }
+  
+      const response = await apiClient.get("/rbac", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Attach token
+        },
+        params: queryParams, // Attach query params (optional)
+      });
+  
+      return response.data;
     } catch (error) {
-      throw error
+      console.error("Error fetching clients:", error.response?.data || error.message);
+      throw error;
     }
   },
 
@@ -175,6 +197,7 @@ export const apiMethods = {
   },
 
   editClient: async (clientId,clientData) => {
+    console.log(clientId,"client124")
     try {
       // const token = localStorage.getItem('token') // Retrieve token before sending request
       const token = await getToken()

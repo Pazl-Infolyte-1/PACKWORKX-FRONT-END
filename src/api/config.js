@@ -121,7 +121,8 @@ export const apiMethods = {
 
   getSideBarMenu: async (queryParams = {}) => {
     try {
-      const token = localStorage.getItem("token"); // Retrieve token
+      // const token = localStorage.getItem("token"); // Retrieve token
+      const token = await getToken()
       if (!token) {
         throw new Error("No token found. Please log in again.");
       }

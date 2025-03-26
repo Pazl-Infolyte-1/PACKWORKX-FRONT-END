@@ -44,7 +44,7 @@ import {
 import { useFormContext, useFieldArray } from "react-hook-form";
 
  
-const ClientForm = ({editData, closeDrawer,refreshClients,closeDrawerDuringAdd,refreshClientsEdit,entity_type}) => {
+const ClientForm = ({editData, closeDrawer,refreshClients,closeDrawerDuringAdd,refreshClientsEdit,entity_type,resetForm}) => {
   const [activeTab, setActiveTab] = useState('Other Details')
   const [alerts, setAlerts] = useState([]);
   //const [hasGst, setHasGst] = useState(null); // Set null to avoid pre-selection
@@ -94,7 +94,7 @@ const methods = useForm({
       portal_language: "",
       documents: {
         id_proof: "file1.pdf",
-        contract: "file2.pdf",
+        //contract: "file2.pdf",
       },
       website_url: "",
       department: "",
@@ -202,7 +202,11 @@ const addresses = watch("addresses");
 const gstStatus = watch("clientData.gst_status");
 const gstnumberVal = watch("clientData.gst_number")
 
-
+useEffect(() => {
+  if (resetForm) {
+    reset();  // Reset form fields
+  }
+}, [resetForm, reset]);
 const { fields, append, remove } = useFieldArray({
   control,
   name: "addresses",
@@ -288,6 +292,8 @@ const onSubmit = async (data) => {
     let successMessage;
 
     if (editData) {
+      const clientId = editData.client_id.replace(/\D/g, "");
+response = await apiMethods.editClient(clientId, filteredData);
       response = await apiMethods.editClient(editData.client_id, filteredData);
       successMessage = "Client Edited successfully!";
     } else {
@@ -343,6 +349,12 @@ const onSubmit = async (data) => {
 
 
 };
+
+
+const handleCancel=()=>{
+  closeDrawerDuringAdd();
+  reset();
+}
   return (
     <>
     <Loader isLoading={loading} />
@@ -379,7 +391,7 @@ const onSubmit = async (data) => {
 
 
   {/* Main Layout - Left & Right Cards */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-65">
     {/* Left Card */}
     <div className="bg-white p-6">
       {/* Customer Type (Single Row) */}
@@ -389,6 +401,19 @@ const onSubmit = async (data) => {
         <input type="text"  placeholder={`${entity_type} Id`}{...register("clientData.client_ref_id")} className="border p-2 rounded flex-1" />
       </div>
 
+      <div className="mb-4 flex items-center">
+  <label className="font-medium w-40 text-indigo-600 after:content-['*'] after:text-red-500 after:ml-1">Do you have GST?</label>
+  <div className="flex items-center space-x-6 h-10">
+    <label className="flex items-center space-x-2">
+      <input type="radio" {...register("clientData.gst_status")} value="true" />
+      <span>Yes</span>
+    </label>
+    <label className="flex items-center space-x-2">
+      <input type="radio" {...register("clientData.gst_status")} value="false" />
+      <span>No</span>
+    </label>
+  </div>
+</div>
       <div className="mb-4 flex items-center">
         <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Customer Type</label>
         <div className="flex items-center space-x-6 h-10">
@@ -424,19 +449,7 @@ const onSubmit = async (data) => {
       </div>
 
 
-      <div className="mb-4 flex items-center">
-  <label className="font-medium w-40 text-indigo-600 after:content-['*'] after:text-red-500 after:ml-1">Do you have GST?</label>
-  <div className="flex items-center space-x-6 h-10">
-    <label className="flex items-center space-x-2">
-      <input type="radio" {...register("clientData.gst_status")} value="true" />
-      <span>Yes</span>
-    </label>
-    <label className="flex items-center space-x-2">
-      <input type="radio" {...register("clientData.gst_status")} value="false" />
-      <span>No</span>
-    </label>
-  </div>
-</div>
+
     
     </div>
 
@@ -449,7 +462,26 @@ const onSubmit = async (data) => {
         {/*<label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Display Name</label>
         <input type="text" placeholder="Enter display name" {...register("clientData.display_name")} className="border p-2 rounded flex-1" />*/}
       </div>
-
+      {gstStatus !== "true" && (   <div className="flex items-center mb-4 h-10">
+        {/*<label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Display Name</label>
+        <input type="text" placeholder="Enter display name" {...register("clientData.display_name")} className="border p-2 rounded flex-1" />*/}
+      </div>)}
+      {gstStatus === "true" && (
+  <div className="mb-4 flex items-center h-10">
+    <label className="font-medium w-40 flex items-center leading-none after:content-['*'] after:text-red-500 after:ml-1">
+      GST Number
+    </label>
+    <div className="flex items-center space-x-4">
+      <input 
+        type="text" 
+        placeholder="Enter GST Number" 
+        {...register("clientData.gst_number")} 
+        className="border p-2 rounded w-60"
+      />
+      <ActionButton height={"9"} label={"Search"} onClick={handleSearch} />
+    </div>
+  </div>
+)}
 
         <div className="flex items-center mb-4">
         <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Display Name</label>
@@ -482,25 +514,6 @@ const onSubmit = async (data) => {
         </div>
       </div>
 
-
-      {gstStatus === "true" && (
-  <div className="mb-4 flex items-center">
-    <label className="font-medium w-40 flex items-center leading-none after:content-['*'] after:text-red-500 after:ml-1">
-      GST Number
-    </label>
-    <div className="flex items-center space-x-4">
-      <input 
-        type="text" 
-        placeholder="Enter GST Number" 
-        {...register("clientData.gst_number")} 
-        className="border p-2 rounded w-60"
-      />
-      <ActionButton height={"9"} label={"Search"} onClick={handleSearch} />
-    </div>
-  </div>
-)}
-
-
     </div>
   </div>
 
@@ -508,9 +521,9 @@ const onSubmit = async (data) => {
   {/*{activeTab === "Address" && (
     <ActionButton height={"7"} label={"+ Add "} className="ml-auto" onClick={handleAddAddress}  />
   )}*/}
- <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className='h-10'>Address Details</h5>
-        <div className="ms-auto flex flex-row gap-2">
+  
+ <div className="d-flex justify-content-between align-items-center h-7">
+        <div className="ms-auto flex flex-row">
           {activeTab === 'Address' && (
             <ActionButton
             label={" + Add "}
@@ -597,7 +610,7 @@ const onSubmit = async (data) => {
   >
     Save
   </button>
-    <button className="p-2 border border-gray-300 rounded w-24">Cancel</button>
+    <button className="p-2 border border-gray-300 rounded w-24" onClick={handleCancel}>Cancel</button>
   </div>
 
   {/* Right side: Alert messages */}

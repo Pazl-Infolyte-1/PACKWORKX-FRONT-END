@@ -250,8 +250,9 @@ export const apiMethods = {
   },
 
   updateSku: async (addNewSkuData) => {
+    const { id, ...dataWithoutId } = addNewSkuData;
     try {
-      const response = await apiClient.put(`/sku-details/${addNewSkuData.id}`, addNewSkuData)
+      const response = await apiClient.put(`/sku-details/${addNewSkuData.id}`, dataWithoutId)
       return response.data
     } catch (error) {
       console.error(error)

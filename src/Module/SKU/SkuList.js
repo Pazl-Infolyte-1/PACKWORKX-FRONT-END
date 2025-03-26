@@ -166,6 +166,7 @@ function SkuList() {
   const [strictAdherence, setStrictAdherence] = useState(false)
   const [editTag, setEditTag] = useState(false)
   const [pagination, setPagination] = useState(null)
+  const [refresh, setRefresh] = useState(false)
   const { user } = useContext(AuthContext)
 
   const [addNewSkuData, setAddNewSkuData] = useState({
@@ -199,7 +200,6 @@ function SkuList() {
         color: '',
         flute_type: '',
         flute_ratio: '',
-        // weight: '',
       },
     ],
   })
@@ -227,9 +227,11 @@ function SkuList() {
       if (editTag) {
         await apiMethods.updateSku(addNewSkuData)
         setEditTag(false)
+        setRefresh((prev)=>!prev)
       } else {
         await apiMethods.addSku(addNewSkuData)
         setDrawerOpen(false)
+        setRefresh((prev)=>!prev)
       }
     } catch (error) {
       console.error(error)
@@ -264,8 +266,13 @@ function SkuList() {
       sku_type: selectedSku.sku_type || '',
       sku_values: selectedSku.sku_values || [
         {
+          layer: '',
+          gsm: '',
+          bf: '',
           material: '',
           color: '',
+          flute_type: '',
+          flute_ratio: '',
         },
       ],
     })
@@ -284,13 +291,13 @@ function SkuList() {
       }
     }
     fetchData()
-  }, [])
+  }, [refresh])
 
   return (
     <div>
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-x-2 -my-2">
-        <h1 className="sm:text-[32px] font-bold text-[#424242]">SKU</h1>
+        <h1 className="sm:text-[32px] text-[#424242]">SKU</h1>
         <span className="sm:text-[18px] font-semibold text-[#424242] ">
           Total SKU Count: {pagination?.totalCount}
         </span>
@@ -370,7 +377,7 @@ function SkuList() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center justify-between flex-wrap gap-2 mt-2 w-full">
+      <div className="flex items-center justify-between flex-wrap gap-2 my-3 w-full">
         <SearchBar text="SKU" data={skudata} />
 
         <div className="flex justify-between gap-2 w-full sm:w-auto">
@@ -378,7 +385,7 @@ function SkuList() {
             value={skuType}
             onChange={(e) => setSkuType(e.target.value)}
             className="sm:w-[150px] p-2 rounded-lg shadow-md bg-white text-[#424242] outline-none border-none"
-          >
+            >
             <option value="" disabled>
               SKU Type
             </option>
@@ -391,7 +398,7 @@ function SkuList() {
             value={client}
             onChange={(e) => setClient(e.target.value)}
             className="sm:w-[150px] p-2 rounded-lg shadow-md bg-white text-[#424242] outline-none border-none"
-          >
+            >
             <option value="" disabled>
               Client
             </option>

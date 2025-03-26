@@ -21,10 +21,9 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
   const [deleteModal, setDeleteModal] = useState(false)
 
   const handleSkuDelete = async (id) => {
-    console.log(id);
     await apiMethods.deleteSku(id)
+    setDeleteModal(false)
     setSkuData((prevTypes) => prevTypes.filter((type) => type.id !== id))
-
   }
 
   const closeDeleteModal = () => {
@@ -32,7 +31,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
   }
 
   return (
-    <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
+    <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar">
       <CTable striped hover className="w-full m-0">
         <CTableHead className="bg-gray-100 sticky top-0 z-10">
           <CTableRow className="text-center">
@@ -121,7 +120,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
                   <ConfirmationModale
                     isOpen={deleteModal}
                     onClose={closeDeleteModal}
-                    onConfirm={handleSkuDelete(cell.id)}
+                    onConfirm={() => handleSkuDelete(cell.id)}
                     title="Delete Confirmation"
                     message="Are you sure you want to delete this item?"
                   />

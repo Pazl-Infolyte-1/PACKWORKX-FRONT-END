@@ -10,7 +10,6 @@
 	visibility: hidden;
 	transition: opacity 0.3s ease-in-out;
 	z-index: 1000; /* Ensure overlay is above other elements */
-
 }
 
 /* Drawer Container */
@@ -19,17 +18,43 @@
 	bottom: 0;
 	right: -100%; 
 	width: 90%;
-	/*max-width: 1260px;*/
 	height: 92vh;
 	background: white;
 	box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
 	transition: right 0.3s ease-in-out;
 	display: flex;
 	flex-direction: column;
-	padding: 20px;
+	padding: 15px;
 	overflow-y: auto;
 	z-index: 1100; /* Ensure drawer is above overlay */
+}
 
+/* Drawer Header */
+.drawer-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	/*padding: 8px 10px;*/
+	margin-bottom: 5px;
+	/*border-bottom: 1px solid #ddd;*/
+	z-index: 1100;
+
+}
+
+/* Drawer Title */
+.drawer-title {
+	font-size: 20px;
+	font-weight: bold;
+	flex: 1; /* Allow title to take space */
+	text-align: start; /* Center title */
+	margin-left: 20px;
+	z-index: 1100;
+
+}
+
+/* Drawer Content */
+.drawer-content {
+	/*padding: 10px 5px; */
 }
 
 /* When the drawer is open */
@@ -44,31 +69,57 @@
 
 /* Close Button */
 .close-btn {
-	position: absolute;
-	top: 10px;
-	right: 15px;
 	background: none;
 	border: none;
-	font-size: 20px;
+	font-size: 18px;
 	cursor: pointer;
+	margin-left: auto; /* Push to right */
+	z-index: 1100;
 }
 
 /* Responsive adjustments */
-@media (max-width: 1024px) {
-	.drawer {
-		width: 100%;
-		height: 100vh; 
-	}
-}
-
 @media (max-width: 768px) {
 	.drawer {
-		padding: 15px;
+		width: 100%;
+		height: 100vh;
+		padding: 10px;
+		padding-top: 50px; /* Ensure space for header */
+	}
+	.drawer-header {
+		position: sticky;
+		margin-top: 20px;
+		background: white; /* Ensure visibility */
+		/*padding: 6px 8px;*/
+		z-index: 1200; /* Increase z-index to be above content */
+		box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Optional for better visibility */
+	}
+	.drawer-title {
+		font-size: 14px;
+		margin-left: 5px;
+	}
+	.close-btn {
+		font-size: 16px;
 	}
 }
 
+/* Mobile adjustments */
 @media (max-width: 480px) {
 	.drawer {
-		padding: 10px;
+		padding: 8px;
+		padding-top: 60px; /* Increase padding to prevent overlap */
+	}
+	.drawer-header {
+		position: sticky;
+		top: 0;
+		background: white;
+		padding: 5px 6px;
+		z-index: 1200; /* Keep it above content */
+		box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+	}
+	.drawer-title {
+		font-size: 13px;
+	}
+	.close-btn {
+		font-size: 14px;
 	}
 }

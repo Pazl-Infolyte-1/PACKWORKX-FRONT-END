@@ -14,6 +14,7 @@ import { AppSidebarNav } from './AppSidebarNav'
 import { logo } from 'src/assets/brand/logo'
 import { sygnet } from 'src/assets/brand/sygnet'
 import apiMethods from '../api/config'
+import { AppSideBarNew } from './AppSideBarNew'
 
 // Define static menu items
 const staticMenuItems = [
@@ -46,10 +47,79 @@ const staticMenuItems = [
         moduleName: 'Dashboard',
         moduleIconName: 'cilUser',
         moduleKey: 5006,
-        subModules: [], // Empty array for a module with no submodules
+        subModules: [],
       },
     ],
   },
+  {
+    "groupName": "Assets",
+    "modules": [
+        {
+            "moduleName": "Clients/Vendor",
+            "moduleIconName": "cilUserPlus",
+            "moduleKey": 10,
+            "subModules": []
+        },
+        {
+            "moduleName": "HRMS",
+            "moduleIconName": "cilUser",
+            "moduleKey": 21,
+            "subModules": []
+        },
+        {
+            "moduleName": "Machine",
+            "moduleIconName": "cilSettings",
+            "moduleKey": 22,
+            "subModules": []
+        }
+    ]
+},
+{
+    "groupName": "Order Management",
+    "modules": [
+        {
+            "moduleName": "Sales Order",
+            "moduleIconName": "cilColorBorder",
+            "moduleKey": 24,
+            "subModules": []
+        },
+        {
+            "moduleName": "Work Order",
+            "moduleIconName": "cilDescription",
+            "moduleKey": 25,
+            "subModules": []
+        },
+        {
+            "moduleName": "SKU Details",
+            "moduleIconName": "cilList",
+            "moduleKey": 23,
+            "subModules": []
+        },
+        {
+            "moduleName": "Production",
+            "moduleIconName": "cilTruck",
+            "moduleKey": 26,
+            "subModules": []
+        }
+    ]
+},
+{
+    "groupName": "Warehouse Management",
+    "modules": [
+        {
+            "moduleName": "Purchase Order",
+            "moduleIconName": "cilBriefcase",
+            "moduleKey": 29,
+            "subModules": []
+        },
+        {
+            "moduleName": "Inventory",
+            "moduleIconName": "cilIndustry",
+            "moduleKey": 28,
+            "subModules": []
+        }
+    ]
+}
 ]
 
 const AppSidebar = () => {
@@ -57,7 +127,7 @@ const AppSidebar = () => {
   const [combinedNavigation, setCombinedNavigation] = useState([...staticMenuItems])
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
-
+const [filteringDatas,setFilteringDatas]=useState([])
   // Memoize the combined navigation to prevent unnecessary re-renders
   const getMemoizedNavigation = useCallback(() => {
     return combinedNavigation
@@ -71,7 +141,10 @@ const AppSidebar = () => {
 
         if (response && response.data) {
           // Create a new array reference to ensure state update
-          setCombinedNavigation([...staticMenuItems, ...response.data])
+          //setCombinedNavigation([...staticMenuItems, ...response.data])
+          //setCombinedNavigation([...staticMenuItems, ...response.data])
+          setFilteringDatas(response.data)
+          setCombinedNavigation([...staticMenuItems])
         } else {
           console.warn('Invalid response format, using static navigation only')
         }
@@ -108,7 +181,7 @@ const AppSidebar = () => {
       </CSidebarHeader>
 
       <AppSidebarNav items={getMemoizedNavigation()} />
-
+      {/*<AppSideBarNew items={getMemoizedNavigation()} />*/}
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler
           onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}

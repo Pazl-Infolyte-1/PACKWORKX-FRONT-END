@@ -126,6 +126,12 @@ const deleteClient = async () => {
               <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"120px"}}   onClick={() => openViewCard(cell)} className="py-3 px-4 text-gray-600 font-medium">
               Id
               </CTableHeaderCell>
+              <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"190px"}}   onClick={() => openViewCard(cell)} className="py-3 px-4 text-gray-600 font-medium">
+              Reference Id
+              </CTableHeaderCell>
+              <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"120px"}}   onClick={() => openViewCard(cell)} className="py-3 px-4 text-gray-600 font-medium">
+                Entity
+              </CTableHeaderCell>
               <CTableHeaderCell style={{ whiteSpace: "nowrap",minWidth:"200px" }} className="py-3 px-4 text-gray-600 font-medium">
               Name
               </CTableHeaderCell>
@@ -147,14 +153,16 @@ const deleteClient = async () => {
               >
                 Pan
               </CTableHeaderCell>
-              <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"250px"}} className="py-3 px-4 text-gray-600 font-medium">
-             Created Date
-              </CTableHeaderCell>
+           
               <CTableHeaderCell
                 style={{ whiteSpace: 'nowrap' }}
                 className="py-3 px-4 text-gray-600 font-medium"
               >
                 GST Number
+              </CTableHeaderCell>
+
+              <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"250px"}} className="py-3 px-4 text-gray-600 font-medium">
+             Created Date
               </CTableHeaderCell>
 
               <CTableHeaderCell
@@ -173,7 +181,12 @@ const deleteClient = async () => {
 <CTableDataCell onClick={()=>openViewCard(cell)} className="py-3 px-4 text-primary text-decoration-underline cursor-pointer w-[150px]">
   {cell.client_id}
 </CTableDataCell>
-
+<CTableDataCell className="py-3 px-4 text-gray-700  w-[550px]">
+                    {cell.client_ref_id}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700  w-[150px]">
+                    {cell.entity_type}
+                  </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700  w-[150px]">
                     {cell.display_name}
                   </CTableDataCell>
@@ -186,21 +199,21 @@ const deleteClient = async () => {
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.PAN}
                   </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.gst_number}
+                  </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700 w-[1000px]">
                     {/*{apiMethods.formatDate(cell.created_at)}*/}
                     {new Date(cell.created_at).toLocaleString()}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.gst_number}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
                     <ThreeDotMenu
                       value={[
                         {
-                          label: 'View',
+                          label: 'Add Sku',
                           icon: cilHandPointRight,
                           onClick: () => {
-                            console.log('View')
+                            console.log('Add Sku')
                           },
                         },
                         {

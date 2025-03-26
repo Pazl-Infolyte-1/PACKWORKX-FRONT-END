@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { FaBoxOpen } from 'react-icons/fa'
 import { MdTakeoutDining, MdOutlineSettingsInputComposite, MdCheckroom } from 'react-icons/md'
 import Drawer from '../../components/Drawer/Drawer'
@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import SkuAddEdit from './SkuAddEdit'
 import ActionButton from '../../components/New/ActionButton'
 import SearchBar from '../../components/New/SearchBar'
+import { AuthContext } from '../../Context/AuthContext'
 
 const tablevalues = {
   tableHeaders: [
@@ -164,12 +165,12 @@ function SkuList() {
   const [skudata, setSkuData] = useState([])
   const [strictAdherence, setStrictAdherence] = useState(false)
   const [editTag, setEditTag] = useState(false)
-  const navigate = useNavigate()
+  const [pagination, setPagination] = useState(null)
+  const { user } = useContext(AuthContext)
+
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: '',
-    company_id: 8,
-    client_id: 2,
-    client: '',
+    client_id: user.id,
     ply: '',
     length: '',
     width: '',
@@ -191,8 +192,14 @@ function SkuList() {
     sku_type: '',
     sku_values: [
       {
+        layer: '',
+        gsm: '',
+        bf: '',
         material: '',
         color: '',
+        flute_type: '',
+        flute_ratio: '',
+        // weight: '',
       },
     ],
   })
@@ -218,13 +225,11 @@ function SkuList() {
   const handleAddSkuSubmit = async () => {
     try {
       if (editTag) {
-        console.log(addNewSkuData);
-        
         await apiMethods.updateSku(addNewSkuData)
-        navigate('/SKU')
+        setEditTag(false)
       } else {
         await apiMethods.addSku(addNewSkuData)
-        navigate('/SKU')
+        setDrawerOpen(false)
       }
     } catch (error) {
       console.error(error)
@@ -232,13 +237,12 @@ function SkuList() {
   }
 
   const handleSkuEdit = (id) => {
-    const selectedSku = skudata.find((sku) => sku.id === id);
+    const selectedSku = skudata.find((sku) => sku.id === id)
     setEditTag(true)
     setAddNewSkuData({
       id: selectedSku.id || '',
       sku_name: selectedSku.sku_name || '',
-      client_id: selectedSku.client_id || 2,
-      client: selectedSku.client || '',
+      client_id: selectedSku.client_id || 1,
       ply: selectedSku.ply || '',
       length: selectedSku.length || '',
       width: selectedSku.width || '',
@@ -272,66 +276,30 @@ function SkuList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const response = await apiMethods.getDynamicFormFields(11)
-        const response = await axios.get('https://mocki.io/v1/388d6512-3fdf-4fe9-8cf2-0588e51ceb38')
-        setDynamicFields(response.data)
-      } catch (error) {
-        console.error('Fetch error:', error)
-      }
-    }
-
-    fetchData()
-  }, [])
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get('https://mocki.io/v1/a229e5e3-10b1-4522-ba26-314bda2ff239')
-
-        setTableData(response.data)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-    fetchData()
-  }, [])
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
         const response = await apiMethods.getSkuList()
-        setSkuData(response.data.data)
+        setSkuData(response.data)
+        setPagination(response.pagination)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
     fetchData()
   }, [])
-
-  const tableData = tabledata?.values && Array.isArray(tabledata.values) ? tabledata.values : []
-  const headers = tableData?.headers && Array.isArray(tabledata.headers) ? tabledata.headers : []
-
-  const [currentPage, setCurrentPage] = useState(1)
-  const rowsPerPage = 4
-
-  const indexOfLastRow = currentPage * rowsPerPage
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage
-  const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
-  const totalPages = Math.ceil(tableData.length / rowsPerPage)
-  const [minimumorderlevel, setMinimumorderlevel] = useState(0);
 
   return (
     <div>
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-x-2 -my-2">
         <h1 className="sm:text-[32px] font-bold text-[#424242]">SKU</h1>
-        <span className="sm:text-[18px] font-semibold text-[#424242] ">Total SKU Count: 475</span>
+        <span className="sm:text-[18px] font-semibold text-[#424242] ">
+          Total SKU Count: {pagination?.totalCount}
+        </span>
         <div className="flex gap-2 items-center justify-between w-full sm:w-auto">
           {['Add SKU', 'Bulk Upload', 'Export to Excel'].map((text, index) => (
             <ActionButton
               key={index}
               label={text}
-              customColor='bg-[#21338e]'
+              customColor="bg-[#21338e]"
               className="sm:h-8 flex items-center font-bold text-white px-2 rounded-lg shadow-md border-none cursor-pointer"
               onClick={() => {
                 if (text === 'Add SKU') {
@@ -341,8 +309,7 @@ function SkuList() {
                   setVisible(true)
                 }
               }}
-            >
-            </ActionButton>
+            ></ActionButton>
           ))}
         </div>
       </div>
@@ -435,18 +402,23 @@ function SkuList() {
         </div>
       </div>
 
-      <div className='mb-1'>
+      <div className="mb-1">
         <div className="overflow-x-auto overflow-y-auto whitespace-nowrap mt-2 ">
-          <SkuTable skudata={skudata} handleSkuEdit={handleSkuEdit} editTag={editTag} />
+          <SkuTable skudata={skudata} setSkuData={setSkuData} handleSkuEdit={handleSkuEdit} editTag={editTag} />
         </div>
       </div>
 
       {/* Pagination Section */}
       <div className="flex justify-end items-center gap-4">
         <CommonPagination
-          count={totalPages}
-          page={currentPage}
-          onChange={(event, value) => setCurrentPage(value)}
+          count={pagination?.totalPages || 1}
+          page={pagination?.currentPage ?? 1}
+          onChange={(event, value) =>
+            setPagination((prev) => ({
+              ...prev,
+              currentPage: value,
+            }))
+          }
         />
       </div>
       <div>

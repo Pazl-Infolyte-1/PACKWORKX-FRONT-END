@@ -212,18 +212,36 @@ function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
             {/* Materials Card */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
               <div className="p-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                <h2 className="text-xl font-semibold text-gray-800">
                   Materials & Specifications
                 </h2>
+                <h1 className="text-sm font-semibold text-gray-800 mb-4">
+                  Sku Type: <span>{cell.sku_type}</span>
+                </h1>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead>
                       <tr>
                         <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Material
+                          Layer
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          GSM
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          BF
                         </th>
                         <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Color
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Flute Type
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Flute Ratio
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Material
                         </th>
                       </tr>
                     </thead>
@@ -231,7 +249,13 @@ function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
                       {cell.sku_values?.map((value, index) => (
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                            {value.material}
+                            {value.layer}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                            {value.gsm}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                            {value.bf}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                             <div className="flex items-center">
@@ -241,6 +265,15 @@ function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
                               ></div>
                               {value.color}
                             </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                            {value.flute_type}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                            {value.flute_ratio}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                            {value.material}
                           </td>
                         </tr>
                       ))}

@@ -264,7 +264,25 @@ export const apiMethods = {
       console.error("Error downloading clients:", error.response?.data || error.message);
       throw error;
     }
-  }  
-}
+  },
+
+  getSkuType: async () => {
+    try {
+      const response = await apiClient.get('/sku-details/sku-type/get')
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  deleteSkuType: async (id) => {
+    try {
+      return await apiClient.delete(`/sku-details/sku-type/${id}`)
+    } catch (error) {
+      console.error(error);
+      
+    }
+  }
+ }
 
 export default apiMethods

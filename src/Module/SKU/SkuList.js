@@ -166,13 +166,11 @@ function SkuList() {
   const [strictAdherence, setStrictAdherence] = useState(false)
   const [editTag, setEditTag] = useState(false)
   const [pagination, setPagination] = useState(null)
-  const navigate = useNavigate()
-  const {user} = useContext(AuthContext)
-  
+  const { user } = useContext(AuthContext)
+
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: '',
     client_id: user.id,
-    client: '',
     ply: '',
     length: '',
     width: '',
@@ -194,8 +192,14 @@ function SkuList() {
     sku_type: '',
     sku_values: [
       {
+        layer: '',
+        gsm: '',
+        bf: '',
         material: '',
         color: '',
+        flute_type: '',
+        flute_ratio: '',
+        // weight: '',
       },
     ],
   })
@@ -221,13 +225,11 @@ function SkuList() {
   const handleAddSkuSubmit = async () => {
     try {
       if (editTag) {
-        console.log(addNewSkuData);
-        
         await apiMethods.updateSku(addNewSkuData)
         setEditTag(false)
       } else {
         await apiMethods.addSku(addNewSkuData)
-        setEditTag(false)
+        setDrawerOpen(false)
       }
     } catch (error) {
       console.error(error)
@@ -235,13 +237,12 @@ function SkuList() {
   }
 
   const handleSkuEdit = (id) => {
-    const selectedSku = skudata.find((sku) => sku.id === id);
+    const selectedSku = skudata.find((sku) => sku.id === id)
     setEditTag(true)
     setAddNewSkuData({
       id: selectedSku.id || '',
       sku_name: selectedSku.sku_name || '',
-      client_id: selectedSku.client_id || 2,
-      client: selectedSku.client || '',
+      client_id: selectedSku.client_id || 1,
       ply: selectedSku.ply || '',
       length: selectedSku.length || '',
       width: selectedSku.width || '',
@@ -290,13 +291,15 @@ function SkuList() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-x-2 -my-2">
         <h1 className="sm:text-[32px] font-bold text-[#424242]">SKU</h1>
-        <span className="sm:text-[18px] font-semibold text-[#424242] ">Total SKU Count: {pagination?.totalCount}</span>
+        <span className="sm:text-[18px] font-semibold text-[#424242] ">
+          Total SKU Count: {pagination?.totalCount}
+        </span>
         <div className="flex gap-2 items-center justify-between w-full sm:w-auto">
           {['Add SKU', 'Bulk Upload', 'Export to Excel'].map((text, index) => (
             <ActionButton
               key={index}
               label={text}
-              customColor='bg-[#21338e]'
+              customColor="bg-[#21338e]"
               className="sm:h-8 flex items-center font-bold text-white px-2 rounded-lg shadow-md border-none cursor-pointer"
               onClick={() => {
                 if (text === 'Add SKU') {
@@ -306,8 +309,7 @@ function SkuList() {
                   setVisible(true)
                 }
               }}
-            >
-            </ActionButton>
+            ></ActionButton>
           ))}
         </div>
       </div>
@@ -400,21 +402,23 @@ function SkuList() {
         </div>
       </div>
 
-      <div className='mb-1'>
+      <div className="mb-1">
         <div className="overflow-x-auto overflow-y-auto whitespace-nowrap mt-2 ">
-          <SkuTable skudata={skudata} handleSkuEdit={handleSkuEdit} editTag={editTag} />
+          <SkuTable skudata={skudata} setSkuData={setSkuData} handleSkuEdit={handleSkuEdit} editTag={editTag} />
         </div>
       </div>
 
       {/* Pagination Section */}
       <div className="flex justify-end items-center gap-4">
         <CommonPagination
-          count={pagination?.totalPages}
-          page={pagination?.currentPage}
-          onChange={(event, value) => setPagination((prev) => ({ 
-            ...prev, 
-            currentPage: value 
-          }))}
+          count={pagination?.totalPages || 1}
+          page={pagination?.currentPage ?? 1}
+          onChange={(event, value) =>
+            setPagination((prev) => ({
+              ...prev,
+              currentPage: value,
+            }))
+          }
         />
       </div>
       <div>

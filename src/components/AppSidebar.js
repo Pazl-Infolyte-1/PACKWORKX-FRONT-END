@@ -10,9 +10,7 @@ import {
   CSidebarToggler,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-
 import { AppSidebarNav } from './AppSidebarNav'
-
 import { logo } from 'src/assets/brand/logo'
 import { sygnet } from 'src/assets/brand/sygnet'
 import apiMethods from '../api/config'
@@ -173,7 +171,7 @@ const [filteringDatas,setFilteringDatas]=useState([])
       <CSidebarHeader className="border-bottom d-flex align-items-center justify-content-between p-3">
         <CSidebarBrand to="/">
           <CIcon icon={logo} height={32} />
-          <CIcon icon={sygnet} height={32} />
+          {(!unfoldable && sidebarShow) && <CIcon icon={sygnet} height={32}/>}
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"

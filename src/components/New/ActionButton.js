@@ -9,7 +9,8 @@ const ActionButton = ({
   className = '',
   customColor = '',
   borderRadius = 'lg',
-  icon: Icon
+  icon: Icon,
+  type = 'button' // ✅ Add type with a default value
 }) => {
     const getButtonStyle = () => {
         if (customColor) {
@@ -46,6 +47,7 @@ const ActionButton = ({
 
   return (
     <button
+    type={type}
       className={`${heightClass} ${widthClass} ${radiusClass} flex  items-center justify-center px-3 py-1 shadow-md border-none cursor-pointer reoun   ${getButtonStyle()} ${className}`}
       onClick={onClick}
     >

@@ -17,6 +17,7 @@ import ClientSingleViewCard from './ClientSingleViewCard';
 import DeleteModal from '../../components/New/DeleteModal';
 import ThreeDotMenu from '../../components/ThreeDotMenu';
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons';
+import CustomAlert from '../../components/New/CustomAlert'
 
 
 function ClientTable({ clientdata,refreshClients }) {
@@ -30,9 +31,12 @@ function ClientTable({ clientdata,refreshClients }) {
   const [singleData, setSingleData] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedClientDeleteId, setSelectedClientDeleteId] = useState(null);  
+  const [alerts, setAlerts] = useState([]);
 
 
-
+  const handleClose = () => {
+    setAlerts([]);
+  };
   const openModal = (client) => {
     setSelectedClient(client) 
     //setModalOpen(true)
@@ -65,6 +69,7 @@ const openViewCard =(data)=>{
 }
 
 const openDeleteModal = (clientId) => {
+  console.log("del id",clientId)
   setSelectedClientDeleteId(clientId);
   setIsDeleteModalOpen(true);
 };
@@ -74,22 +79,36 @@ const closeDeleteModal = () => {
   setSelectedClientDeleteId(null);
 };
 // Handle delete confirmation
+
 const deleteClient = async () => {
   if (!selectedClientDeleteId) return;
+
   try {
-    console.log("Client deleted:", selectedClientDeleteId);
-    // Call your delete API here
-    try {
-      const response = await apiMethods.deleteClient(clientId);
-      console.log("Client deleted successfully:", response);
-      refreshClients()
-      // Optionally, refresh the client list or show a success message
-    } catch (error) {
-      console.error("Error deleting client:", error);
+    console.log("Attempting to delete client:", selectedClientDeleteId);
+    const clientId = selectedClientDeleteId.replace(/\D/g, ""); 
+
+    const response = await apiMethods.deleteClient(clientId);
+
+    if (!response?.status) {
+      // If API responds with { "status": false }, treat it as an error
+      throw new Error(response?.message || "Failed to delete client");
     }
+
+    console.log("Client deleted successfully:", response);
+
+    setAlerts([{ severity: "success", message: response?.message }]);
   } catch (error) {
     console.error("Error deleting client:", error);
+    
+    setAlerts([
+      { severity: "error", message: error?.message || "Something went wrong" }
+    ]);
   } finally {
+    setTimeout(() => {
+      setAlerts([]);
+      refreshClients();
+    }, 3000);
+
     closeDeleteModal();
   }
 };
@@ -97,12 +116,14 @@ const deleteClient = async () => {
 //console.log("edit data",selectedClientId?.entity_type)
   return (
     <>
+          <CustomAlert alerts={alerts} handleClose={handleClose} />
+
       <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
         <div className='h-[450px]'>
         <CTable striped hover className=" w-full  m-0">
           <CTableHead className="bg-gray-100 sticky top-0 ">
             <CTableRow  style={{ height: "32px" }}>
-              <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"120px"}}   onClick={() => handleOpenSingleViewPopup(cell.client_id)} className="py-3 px-4 text-gray-600 font-medium">
+              <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"120px"}}   onClick={() => openViewCard(cell)} className="py-3 px-4 text-gray-600 font-medium">
               Id
               </CTableHeaderCell>
               <CTableHeaderCell style={{ whiteSpace: "nowrap",minWidth:"200px" }} className="py-3 px-4 text-gray-600 font-medium">
@@ -195,7 +216,7 @@ const deleteClient = async () => {
                           label: 'Delete',
                           icon: cilTrash,
                           onClick: () => {
-                            openDeleteModal(cell.client_id)
+                            openDeleteModal(cell?.client_id)
                           },
                         },
                       ]}

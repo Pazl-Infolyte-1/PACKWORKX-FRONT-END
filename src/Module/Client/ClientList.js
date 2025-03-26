@@ -216,7 +216,20 @@ function ClientList() {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             {/* Search Input Container */}
-            <SearchBar text="Client" data={data} />
+            {/*<SearchBar text="Client" data={data} />*/}
+            <div className="flex items-center h-[35px] w-[300px] gap-2 border rounded-md">
+    <div className="bg-white h-full w-[40px] flex justify-center items-center rounded-l-md">
+      <IoSearch />
+    </div>
+    <input
+      type="text"
+      placeholder="Search"
+      className="outline-none h-full w-full rounded-r-md pl-2"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+    />
+  </div>
+
 
   {/* Filter Icon */}
   {/*<FaFilter onClick={toggleFilterPopup} className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-900" />*/}
@@ -270,9 +283,16 @@ function ClientList() {
 
 
   {/* Refresh Button */}
-  <ActionButton     onClick={handleResetFilters} variant='secondary' label={"Clear"} height={"9"}>
+  {/*<ActionButton     onClick={handleResetFilters} variant='secondary' label={"Clear"} height={"9"}>
     {/*<FaSyncAlt className="w-4 h-4 text-gray-600" />*/}
-  </ActionButton>
+  {/*</ActionButton>}*/}
+  <button 
+  onClick={handleResetFilters} 
+  className="bg-gray-500 text-white text-sm px-3 py-[6px] rounded-md hover:bg-gray-600 transition-all"
+>
+  Clear
+</button>
+
 </div>
 </div>
 
@@ -371,12 +391,13 @@ function ClientList() {
         </CustomPopup>
       )}
 
-      <Drawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} maxWidth={'1280px'}>
+      <Drawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} maxWidth={'1280px'} title={`New ${entityType}`}>
         {/* Pass handleCloseDrawer as a prop to ClientForm */}
         <ClientForm
           entity_type={entityType}
           refreshClients={refreshClients}
           closeDrawerDuringAdd={() => handleCloseDrawer(false)}
+          resetForm={isDrawerOpen}
         />
       </Drawer>
     </div>

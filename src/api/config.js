@@ -151,6 +151,7 @@ export const apiMethods = {
   },
 
   editClient: async (clientId,clientData) => {
+    console.log(clientId,"client124")
     try {
       const token = localStorage.getItem('token') // Retrieve token before sending request
       if (!token) {

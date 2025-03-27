@@ -66,6 +66,9 @@ export const AppSideBarNew = ({ giveAccess }) => {
   const settingModules = giveAccess.filter(module => module.module_group === "Settings");
   const shouldDisplaySettings = settingModules.some(module => module.modules_description?.trim() !== "");
 
+  const accountsModules = giveAccess.filter(module => module.module_group === "Accounts");
+  const shouldDisplayAccounts = accountsModules.some(module => module.modules_description?.trim() !== "");
+
 
   return (
     <CSidebarNav as={SimpleBar}>
@@ -105,6 +108,59 @@ export const AppSideBarNew = ({ giveAccess }) => {
       {/*<CNavItem>
         <CNavLink as={NavLink} to="/dashboard">{navLink('Dashboard', 'cilUser')}</CNavLink>
       </CNavItem>*/}
+
+
+
+{/*superAdmin*/}
+{/*accounts*/}
+{shouldDisplayAccounts && (
+        <>
+          <CNavTitle>Accounts</CNavTitle>
+          {accountsModules.map((module,index) => {
+            if (module.modules_description === "Companies") {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/">
+                    {navLink("Companies","cibCircle")}
+                  </CNavLink>
+                </CNavItem>
+              );
+            }
+            if (module.modules_description === "Packages") {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/">
+                    {navLink("Packages","cibCodepen")}
+                  </CNavLink>
+                </CNavItem>
+              );
+            }
+            if (module.modules_description === "Billing") {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/">
+                    {navLink("Billing","cibFaceit")}
+                  </CNavLink>
+                </CNavItem>
+              );
+            }
+            if (module.modules_description === "Offline Request") {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/">
+                    {navLink("Offline Request","cibDiscourse")}
+                  </CNavLink>
+                </CNavItem>
+              );
+            }
+            return null;
+          })}
+        </>
+      )}
+
+
+
+
       {/*dashboard*/}
       {shouldDisplayDashboard && (
         <>
@@ -168,7 +224,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === "Attendance") {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="">
+                  <CNavLink as={NavLink} to="/">
                     {navLink("Attendance","cilUser")}
                   </CNavLink>
                 </CNavItem>
@@ -241,8 +297,8 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === "Sales Return") {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="">
-                    {navLink("Sales Return","cilIndustry")}
+                  <CNavLink as={NavLink} to="/">
+                    {navLink("Sales Return","cilAt")}
                   </CNavLink>
                 </CNavItem>
               );
@@ -250,8 +306,8 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === "Purchase Return") {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="">
-                    {navLink("Purchase Return","cilIndustry")}
+                  <CNavLink as={NavLink} to="/">
+                    {navLink("Purchase Return","cibHighly")}
                   </CNavLink>
                 </CNavItem>
               );
@@ -270,7 +326,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === "Reports") {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="">
+                  <CNavLink as={NavLink} to="/">
                     {navLink("Reports","cilFile")}
                   </CNavLink>
                 </CNavItem>
@@ -286,15 +342,25 @@ export const AppSideBarNew = ({ giveAccess }) => {
         <>
           <CNavTitle>Settings</CNavTitle>
           {settingModules.map((module,index) => {
+              if (module.modules_description === "Admin Faq") {
+                return (
+                  <CNavItem key={index}>
+                    <CNavLink as={NavLink} to="/">
+                      {navLink("Admin Faq","cilBullhorn")}
+                    </CNavLink>
+                  </CNavItem>
+                );
+              }
             if (module.modules_description === "Settings") {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="">
+                  <CNavLink as={NavLink} to="/">
                     {navLink("Settings","cilSettings")}
                   </CNavLink>
                 </CNavItem>
               );
             }
+          
             return null;
           })}
         </>

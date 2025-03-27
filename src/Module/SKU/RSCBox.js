@@ -228,7 +228,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
         </div>
 
         <div>
-          <label className="block text-[16px] font-medium mb-2">Length Trimming Tolerance</label>
+          <label className="block text-[16px] font-medium mb-2">Trimming Tolerance</label>
           <select
             name="length_trimming_tolerance"
             id="length_trimming_tolerance"
@@ -241,7 +241,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
           </select>
         </div>
 
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="block text-[16px] font-medium mb-2">Width Trimming Tolerance</label>
           <select
             name="width_trimming_tolerance"
@@ -253,7 +253,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
             <option>0.2</option>
             <option>0.1</option>
           </select>
-        </div>
+        </div> */}
       </div>
 
       <div className="grid grid-cols-3 gap-4">

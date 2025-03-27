@@ -29,6 +29,7 @@ function SkuList() {
   const [strictAdherence, setStrictAdherence] = useState(false)
   const [editTag, setEditTag] = useState(false)
   const [pagination, setPagination] = useState(null)
+  const [dashboard, setDashboard] = useState(null)
   const [refresh, setRefresh] = useState(false)
   const [clientDiasble, setClientDisable] = useState(false)
   const { user } = useContext(AuthContext)
@@ -183,6 +184,7 @@ function SkuList() {
         setSkuData(response.data)
         setClient(clientResponse.data)
         setPagination(response.pagination)
+        setDashboard(response.dashboard)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -205,9 +207,9 @@ function SkuList() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-x-2 -my-2">
         <h1 className="sm:text-[32px] text-[#424242]">SKU</h1>
-        <span className="sm:text-[18px] font-semibold text-[#424242] ">
+        {/* <span className="sm:text-[18px] font-semibold text-[#424242] ">
           Total SKU Count: {pagination?.totalCount}
-        </span>
+        </span> */}
         <div className="flex gap-2 items-center justify-between w-full sm:w-auto">
           {['Add SKU', 'Bulk Upload', 'Export to Excel'].map((text, index) => (
             <ActionButton
@@ -232,29 +234,29 @@ function SkuList() {
       <div className="flex justify-between items-center flex-wrap gap-2 mt-3">
         {[
           {
-            name: 'Corrugated Box',
-            count: 10000,
+            name: 'RSC Box',
+            count: dashboard?.rSCbox,
             color: '#286eb1',
             bgColor: '#2e2d6d',
             icon: <FaBoxOpen className="text-white text-2xl" />,
           },
           {
-            name: 'Die Cut Box',
-            count: 200,
+            name: 'Corrugated Sheet',
+            count: dashboard?.corrugatedSheet,
             color: '#ffeeaa',
             bgColor: '#ffcc00',
             icon: <MdTakeoutDining className="text-white text-2xl" />,
           },
           {
-            name: 'Composite Item',
-            count: 75,
+            name: 'Die Cut Box',
+            count: dashboard?.dieCutbox,
             color: '#aad3ff',
             bgColor: '#007aff',
             icon: <MdOutlineSettingsInputComposite className="text-white text-2xl" />,
           },
           {
-            name: 'Custom Item',
-            count: 50,
+            name: 'Total SKU',
+            count: pagination?.totalCount,
             color: '#c3f2cb',
             bgColor: '#4cd964',
             icon: <MdCheckroom className="text-white text-2xl" />,

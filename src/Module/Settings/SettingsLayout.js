@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { cilSettings, cilUser, cilBell, cilLanguage, cilSearch, cilMenu } from '@coreui/icons';
+import { cilSettings, cilUser, cilBell, cilLanguage, cilSearch, cilMenu,cilOptions,cilApplicationsSettings  } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import EmptyState from '../User/EmptyState';
 import SearchBar from '../../components/New/SearchBar';
@@ -14,6 +14,8 @@ const SettingsLayout = () => {
     { path: '/settings/notification', label: 'Notification Settings', icon: cilBell },
     { path: '/settings/language', label: 'Language Settings', icon: cilLanguage },
     { path: '/settings/superAdmin', label: 'Super Admin', icon: cilUser },
+    { path: '/settings/dropdown', label: 'Dropdown Settings', icon: cilApplicationsSettings  },
+
   ];
 
   const isActive = (path) => location.pathname === path;

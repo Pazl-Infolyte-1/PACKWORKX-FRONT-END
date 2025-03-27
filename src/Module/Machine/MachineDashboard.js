@@ -351,8 +351,8 @@ export default function MachineMaster() {
 
 
   return (
-    <div className="m-0,p-0">
-      <div className="flex flex-col md:flex-row justify-between p-2 ">
+    <div className="m-0 p-0">
+      <div className="flex flex-col md:flex-row justify-between px-2 ">
         <h1 className="text-black text-xl font-bold">Machine Master Dashboard</h1>
         <ActionButton
         label={"+ Add Machine"}

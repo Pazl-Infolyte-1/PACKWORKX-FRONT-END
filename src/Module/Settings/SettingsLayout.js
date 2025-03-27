@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { cilSettings, cilUser, cilBell, cilLanguage, cilSearch, cilMenu } from '@coreui/icons';
+import { cilSettings, cilUser, cilBell, cilLanguage, cilSearch, cilMenu,cilOptions,cilApplicationsSettings  } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import EmptyState from '../User/EmptyState';
+import SearchBar from '../../components/New/SearchBar';
 
 const SettingsLayout = () => {
   const location = useLocation();
@@ -13,6 +14,8 @@ const SettingsLayout = () => {
     { path: '/settings/notification', label: 'Notification Settings', icon: cilBell },
     { path: '/settings/language', label: 'Language Settings', icon: cilLanguage },
     { path: '/settings/superAdmin', label: 'Super Admin', icon: cilUser },
+    { path: '/settings/dropdown', label: 'Dropdown Settings', icon: cilApplicationsSettings  },
+
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -48,14 +51,7 @@ const SettingsLayout = () => {
       <aside className="hidden md:flex w-64 flex-col bg-white border-r border-gray-200">
         <div className="p-4 border-b border-gray-200">
           <h1 className="text-lg font-semibold text-gray-800">Settings</h1>
-          <div className="mt-2 relative w-full">
-            <CIcon icon={cilSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search settings..."
-              className="w-full pl-10 pr-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
+          <SearchBar text={'Search Settings'} data={menuItems}/>
         </div>
 
         <div

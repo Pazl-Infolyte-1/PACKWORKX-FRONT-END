@@ -19,6 +19,7 @@ const App = () => {
   const storedTheme = useSelector((state) => state.theme)
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
 
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.href.split('?')[1])
     const theme = urlParams.get('theme') && urlParams.get('theme').match(/^[A-Za-z0-9\s]+/)[0]

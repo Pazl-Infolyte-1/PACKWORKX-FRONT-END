@@ -1,530 +1,407 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { RiUserLine } from 'react-icons/ri'
-import { IoIosInformationCircleOutline } from 'react-icons/io'
 import { IoIosAt } from 'react-icons/io'
-import { FaFontAwesomeFlag } from 'react-icons/fa'
 import Switch from '@mui/material/Switch'
 import profile from '../../../assets/images/profile.png'
 import Drawer from '../../../components/Drawer/Drawer'
 import ActionButton from '../../../components/New/ActionButton'
+
+// Placeholder data for dropdowns (would typically come from API)
+const DEPARTMENT_OPTIONS = [
+  { id: 1, name: 'Engineering' },
+  { id: 2, name: 'Human Resources' },
+  { id: 3, name: 'Marketing' }
+];
+
+const DESIGNATION_OPTIONS = [
+  { id: 1, name: 'Junior Developer' },
+  { id: 2, name: 'Senior Developer' },
+  { id: 3, name: 'Manager' }
+];
+
+const CompanyAddressOption = [
+  { id: 1, name: 'Hueston,Germany' },
+  { id: 2, name: 'Munich,Germany' },
+  { id: 3, name: 'London,UK' }
+];
+
+const REPORTING_OPTIONS = [
+  { id: 1, name: 'Jane Smith' },
+  { id: 2, name: 'Mike Johnson' },
+  { id: 3, name: 'Sarah Williams' }
+];
+
+const Role_Options = [
+  { id: 1, name: 'Upper Management' },
+  { id: 2, name: 'Ethical Hacking Persistance' },
+  { id: 3, name: 'Localised Publisher' }
+];
+
+const EMPLOYMENT_TYPES = [
+  'Full-time',
+  'Part-time',
+  'Contract',
+  'Freelance'
+];
+
+
+
 function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
   const label = { inputProps: { 'aria-label': 'Switch demo' } }
+
+  // State to manage form data
+  const [formData, setFormData] = useState({
+    name: 'John Doe',
+    email: 'john.doe@examplse.com',
+    password: 'securePassword123',
+    mobile: '9876543210',
+    employee_id: 'EMP567',
+    address: '789 Street Name',
+    skills: 'john_doe',
+    department_id: 1,
+    designation_id: 3,
+    joining_date: '',
+    date_of_birth: '',
+    about_me: 'Software Engineer',
+    reporting_to: 3,
+    contract_end_date: '',
+    employment_type: 'Full-time',
+    company_address_id: 10,
+    role_id: '1',
+  });
+
+  // Handle input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Form Data:', formData);
+    // TODO: Implement API call here
+  };
 
   return (
     <>
       <Drawer className="w-1/2" isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
-        <form action="">
-          <div className="max-w-7xl mx-auto h-[90vh] border px-3 py-3 shadow-md mt-6">
-            <div className="flex justify-between">
-              <h2>Employee</h2>
+        <form onSubmit={handleSubmit} className=''>
+          <div className="max-w-7xl mx-auto h-[90vh] px-3 py-3 mt-6 overflow-y-auto">
+            <div className="flex justify-between p-2">
+              <h2 className="text-xl font-bold">Employee Form</h2>
             </div>
-            <div className=" h-25  mt-5  flex justify-center items-center ">
+            
+            <div className="h-25 mt-5 flex flex-col justify-between items-center">
               <div>
-                <img src={profile} alt="" />
+                <img src={profile} alt="Profile" className="w-32 h-32 rounded-full" />
               </div>
             </div>
-            <div className="flex space-x-3 justify-start mt-2 items-center text-black">
-              <h6>Employee ID</h6>
-              <IoIosInformationCircleOutline />
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <input
-                  type="text"
-                  className="w-full outline-none text-zinc-500 px-3"
-                  placeholder="Enter Employee ID"
-                />
-                <RiUserLine className="pr-2 h-10 w-10" />
-              </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Enter Employee ID .
-              </label>
-            </div>
-
-            <div className="flex space-x-3 justify-between mt-4 items-center  w-full rounded-md h-15">
-              <h6 htmlFor="" className="w-1/2">
-                First Name{' '}
-              </h6>
-              <h6 htmlFor="" className="w-1/2">
-                last Name{' '}
-              </h6>
-            </div>
-
-            <div className="flex space-x-3 mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-1/2 rounded-md h-15">
-                <input
-                  type="text"
-                  className="w-full outline-none text-zinc-500 px-3"
-                  placeholder="Enter First Name"
-                />
-                <RiUserLine className="pr-2 h-10 w-10" />
-              </div>
-
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-1/2 rounded-md h-15">
-                <input
-                  type="text"
-                  className="w-full outline-none text-zinc-500 px-3"
-                  placeholder="Enter Last Name"
-                />
-                <RiUserLine className="pr-2 h-10 w-10" />
-              </div>
-            </div>
-            <div className="flex space-x-3 justify-between mt-2 items-center  w-full rounded-md h-15">
-              <label htmlFor="" className="w-1/2">
-                Enter First Name .
-              </label>
-              <label htmlFor="" className="w-1/2">
-                Enter last Name .
-              </label>
-            </div>
-
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Email</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <input
-                  type="email"
-                  className="w-full outline-none text-zinc-500 px-3"
-                  placeholder="name@company.com"
-                />
-                <IoIosAt className="pr-2 h-10 w-10" />
-              </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Enter Email .
-              </label>
-            </div>
-
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Gender</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <select
-                  name=""
-                  id=""
-                  className=" h-10 w-full outline-none text-zinc-500 px-3"
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Select Gender
-                  </option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Select Gender .
-              </label>
-            </div>
-
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>DOB</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <input
-                  type="date"
-                  className=" h-10 w-full outline-none text-zinc-500 px-3"
-                  placeholder="00/00/0000"
-                />
-              </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Select DOB .
-              </label>
-            </div>
-
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Contact Number *</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <div className="w-20 h-10 flex space-x-2 bg-slate-100 gap-2">
-                  <button className="ml-2">
-                    <FaFontAwesomeFlag />
-                  </button>
-                  <button>+91</button>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+              {/* Name */}
+              <div>
+                <h6 className="mb-2">Name</h6>
+                <div className="flex items-center border border-stone-200 rounded-md">
+                  <input
+                    type="text"
+                    name="name"
+                    className="w-full outline-none text-zinc-500 px-3 py-2"
+                    placeholder="Enter Your Name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                  />
+                  <RiUserLine className="pr-2 h-10 w-10" />
                 </div>
-                <input
-                  type="tel"
-                  className=" h-10 w-full outline-none text-zinc-500 px-3"
-                  placeholder="Enter Your Number"
-                />
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Enter Your Contact number with country code .
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Branch</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <select
-                  name=""
-                  id=""
-                  className=" h-10 w-full outline-none text-zinc-500 px-3"
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Select Branch
-                  </option>
-                  <option value="">Branch 1</option>
-                  <option value="">Branch 2</option>
-                  <option value="">Branch 3</option>
-                  <option value="">Branch 4</option>
-                  <option value="">Branch 5</option>
-                </select>
+              {/* Email */}
+              <div>
+                <h6 className="mb-2">Email</h6>
+                <div className="flex items-center border border-stone-200 rounded-md">
+                  <input
+                    type="email"
+                    name="email"
+                    className="w-full outline-none text-zinc-500 px-3 py-2"
+                    placeholder="name@company.com"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
+                  <IoIosAt className="pr-2 h-10 w-10" />
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Select Branch .
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Primary Department</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <select
-                  name=""
-                  id=""
-                  className=" h-10 w-full outline-none text-zinc-500 px-3"
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Select Primary Department
-                  </option>
-                  <option value="">Department 1</option>
-                  <option value="">Department 2</option>
-                  <option value="">Department 3</option>
-                  <option value="">Department 4</option>
-                  <option value="">Department 5</option>
-                </select>
+              {/* Employee ID */}
+              <div>
+                <h6 className="mb-2">Employee ID</h6>
+                <div className="flex items-center border border-stone-200 rounded-md">
+                  <input
+                    type="text"
+                    name="employee_id"
+                    className="w-full outline-none text-zinc-500 px-3 py-2"
+                    placeholder="Enter Employee ID"
+                    value={formData.employee_id}
+                    onChange={handleInputChange}
+                  />
+                  <RiUserLine className="pr-2 h-10 w-10" />
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Select Branch .
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Report Manager</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <select
-                  name=""
-                  id=""
-                  className=" h-10 w-full outline-none text-zinc-500 px-3"
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Select Report Manager
-                  </option>
-                  <option value="">Manager 1</option>
-                  <option value="">Manager 2</option>
-                  <option value="">Manager 3</option>
-                  <option value="">Manager 4</option>
-                  <option value="">Manager 5</option>
-                </select>
+              {/* Mobile */}
+              <div>
+                <h6 className="mb-2">Mobile Number</h6>
+                <div className="flex items-center border border-stone-200 rounded-md">
+                  <input
+                    type="tel"
+                    name="mobile"
+                    className="w-full outline-none text-zinc-500 px-3 py-2"
+                    placeholder="Enter Mobile Number"
+                    value={formData.mobile}
+                    onChange={handleInputChange}
+                  />
+                  <RiUserLine className="pr-2 h-10 w-10" />
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Select Branch .
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Role</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <select
-                  name=""
-                  id=""
-                  className=" h-10 w-full outline-none text-zinc-500 px-3"
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Select Role
-                  </option>
-                  <option value="">Role 1</option>
-                  <option value="">Role 2</option>
-                  <option value="">Role 3</option>
-                  <option value="">Role 4</option>
-                  <option value="">Role 5</option>
-                </select>
+              {/* PassWord */}
+              <div>
+                <h6 className="mb-2">Password</h6>
+                <div className="flex items-center border border-stone-200 rounded-md">
+                  <input
+                    type="password"
+                    name="password"
+                    className="w-full outline-none text-zinc-500 px-3 py-2"
+                    placeholder="Enter Password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                  />
+                  <RiUserLine className="pr-2 h-10 w-10" />
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Select Branch .
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Work Shedule</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <select
-                  name=""
-                  id=""
-                  className=" h-10 w-full outline-none text-zinc-500 px-3"
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Select Work Shedule
-                  </option>
-                  <option value="">Work Shedule 1</option>
-                  <option value="">Work Shedule 2</option>
-                  <option value="">Work Shedule 3</option>
-                  <option value="">Work Shedule 4</option>
-                  <option value="">Work Shedule 5</option>
-                </select>
+                 {/* Company Address */}
+              <div>
+                <h6 className="mb-2">Company Address</h6>
+                <div className="border border-stone-200 rounded-md">
+                  <select
+                    name="company_address_id"
+                    className="h-10 w-full outline-none text-zinc-500 px-3"
+                    value={formData.company_address_id}
+                    onChange={handleInputChange}
+                  >
+                    {CompanyAddressOption.map(dept => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Select Branch .
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Joining Date</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15 ">
-                <input
-                  type="date"
-                  className=" h-10 w-full outline-none text-zinc-500 px-3"
-                  placeholder="06-02-2007"
-                />
+              {/* Department */}
+              <div>
+                <h6 className="mb-2">Department</h6>
+                <div className="border border-stone-200 rounded-md">
+                  <select
+                    name="department_id"
+                    className="h-10 w-full outline-none text-zinc-500 px-3"
+                    value={formData.department_id}
+                    onChange={handleInputChange}
+                  >
+                    {DEPARTMENT_OPTIONS.map(dept => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Select Your Joining Date .
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Id Proof</h6>
-            </div>
-
-            <div className=" mt-2">
-              <div className="flex items-center justify-start border border-stone-200 w-full rounded-md h-10  gap-2">
-                <label
-                  htmlFor="file-upload"
-                  className="cursor-pointer bg-gray-100 hover:bg-gray-300 text-slate-400 py-2 px-4 rounded"
-                >
-                  Choose File
-                </label>
-                <input type="file" id="file-upload" className="hidden" />
-                <span className="text-zinc-500">No file chosen</span>
+              {/* Designation */}
+              <div>
+                <h6 className="mb-2">Designation</h6>
+                <div className="border border-stone-200 rounded-md">
+                  <select
+                    name="designation_id"
+                    className="h-10 w-full outline-none text-zinc-500 px-3"
+                    value={formData.designation_id}
+                    onChange={handleInputChange}
+                  >
+                    {DESIGNATION_OPTIONS.map(desig => (
+                      <option key={desig.id} value={desig.id}>
+                        {desig.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <label htmlFor="" className="text-neutral-500 mt-2">
-                Select ID Proof.
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Time Zone</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15 ">
-                <input
-                  type="datetime-local"
-                  className=" h-10 w-full outline-none text-zinc-500 px-3"
-                  placeholder="06-02-2007"
-                />
+                            {/* Designation */}
+                            <div>
+                <h6 className="mb-2">Role</h6>
+                <div className="border border-stone-200 rounded-md">
+                  <select
+                    name="role_id"
+                    className="h-10 w-full outline-none text-zinc-500 px-3"
+                    value={formData.role_id}
+                    onChange={handleInputChange}
+                  >
+                    {Role_Options.map(desig => (
+                      <option key={desig.id} value={desig.id}>
+                        {desig.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Select Time Zone .
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Time Zone</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15 ">
-                <input
-                  type=""
-                  className=" h-10 w-full outline-none text-zinc-500 px-3"
-                  placeholder="06-02-2007"
-                />
+              {/* Joining Date */}
+              <div>
+                <h6 className="mb-2">Joining Date</h6>
+                <div className="border border-stone-200 rounded-md">
+                  <input
+                    type="date"
+                    name="joining_date"
+                    className="h-10 w-full outline-none text-zinc-500 px-3"
+                    value={formData.joining_date}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Select Time Zone .
-              </label>
-            </div>
 
-            <div>
-              <div className="flex items-center space-x-3 mt-4">
-                <span className="text-black"> Is Active</span>
+              {/* Date of Birth */}
+              <div>
+                <h6 className="mb-2">Date of Birth</h6>
+                <div className="border border-stone-200 rounded-md">
+                  <input
+                    type="date"
+                    name="date_of_birth"
+                    className="h-10 w-full outline-none text-zinc-500 px-3"
+                    value={formData.date_of_birth}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
-              <Switch {...label} defaultChecked />
-            </div>
-            <label htmlFor="" className="text-nutral-500 mt-2">
-              Check if is Active State .
-            </label>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Aadhar Number</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <input
-                  type="text"
-                  className="w-full outline-none text-zinc-500 px-3"
-                  placeholder="Enter Aadhar Number"
-                />
-                <RiUserLine className="pr-2 h-10 w-10" />
+              {/* About Me */}
+              <div>
+                <h6 className="mb-2">About Me</h6>
+                <div className="border border-stone-200 rounded-md">
+                  <input
+                    type="text"
+                    name="about_me"
+                    className="h-10 w-full outline-none text-zinc-500 px-3"
+                    placeholder="Enter About Me"
+                    value={formData.about_me}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Enter Aadhar Number.
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Pan Number</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <input
-                  type="text"
-                  className="w-full outline-none text-zinc-500 px-3"
-                  placeholder="Enter Pan Number"
-                />
-                <RiUserLine className="pr-2 h-10 w-10" />
+              {/* Reporting To */}
+              <div>
+                <h6 className="mb-2">Reporting To</h6>
+                <div className="border border-stone-200 rounded-md">
+                  <select
+                    name="reporting_to"
+                    className="h-10 w-full outline-none text-zinc-500 px-3"
+                    value={formData.reporting_to}
+                    onChange={handleInputChange}
+                  >
+                    {REPORTING_OPTIONS.map(manager => (
+                      <option key={manager.id} value={manager.id}>
+                        {manager.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Enter Pan Number.
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Pan Card</h6>
-            </div>
-
-            <div className=" mt-2">
-              <div className="flex items-center justify-start border border-stone-200 w-full rounded-md h-10  gap-2">
-                <label
-                  htmlFor="file-upload"
-                  className="cursor-pointer bg-gray-100 hover:bg-gray-300 text-slate-400 py-2 px-4 rounded"
-                >
-                  Choose File
-                </label>
-                <input type="file" id="file-upload" className="hidden" />
-                <span className="text-zinc-500">No file chosen</span>
+              {/* Employment Type */}
+              <div>
+                <h6 className="mb-2">Employment Type</h6>
+                <div className="border border-stone-200 rounded-md">
+                  <select
+                    name="employment_type"
+                    className="h-10 w-full outline-none text-zinc-500 px-3"
+                    value={formData.employment_type}
+                    onChange={handleInputChange}
+                  >
+                    {EMPLOYMENT_TYPES.map(type => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <label htmlFor="" className="text-neutral-500 mt-2">
-                Choose pan card.
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Bank Number</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <input
-                  type="text"
-                  className="w-full outline-none text-zinc-500 px-3"
-                  placeholder="Enter Bank Number"
-                />
-                <RiUserLine className="pr-2 h-10 w-10" />
+              {/* Contract End Date */}
+              <div>
+                <h6 className="mb-2">Contract End Date</h6>
+                <div className="border border-stone-200 rounded-md">
+                  <input
+                    type="date"
+                    name="contract_end_date"
+                    className="h-10 w-full outline-none text-zinc-500 px-3"
+                    value={formData.contract_end_date}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Enter Bank Number.
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Account Number</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <input
-                  type="text"
-                  className="w-full outline-none text-zinc-500 px-3"
-                  placeholder="Enter Account  Number"
-                />
-                <RiUserLine className="pr-2 h-10 w-10" />
+              {/* Address */}
+              <div>
+                <h6 className="mb-2">Address</h6>
+                <div className="flex items-center border border-stone-200 rounded-md">
+                  <input
+                    type="text"
+                    name="address"
+                    className="w-full outline-none text-zinc-500 px-3 py-2"
+                    placeholder="Enter Address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                  />
+                  <RiUserLine className="pr-2 h-10 w-10" />
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Enter Account Number.
-              </label>
-            </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>IFSC Code</h6>
-            </div>
-            <div className=" mt-2">
-              <div className="flex space-x-3 justify-between mt-2 items-center border border-stone-200 w-full rounded-md h-15">
-                <input
-                  type="text"
-                  className="w-full outline-none text-zinc-500 px-3"
-                  placeholder="Enter IFSC Code"
-                />
-                <RiUserLine className="pr-2 h-10 w-10" />
+              {/* Skills */}
+              <div>
+                <h6 className="mb-2">Skills</h6>
+                <div className="flex items-center border border-stone-200 rounded-md">
+                  <input
+                    type="text"
+                    name="skills"
+                    className="w-full outline-none text-zinc-500 px-3 py-2"
+                    placeholder="Enter Skills"
+                    value={formData.skills}
+                    onChange={handleInputChange}
+                  />
+                  <RiUserLine className="pr-2 h-10 w-10" />
+                </div>
               </div>
-              <label htmlFor="" className="text-nutral-500 mt-2">
-                {' '}
-                Enter IFSC Code.
-              </label>
             </div>
 
-            <div className="flex space-x-3 justify-start mt-4 items-center text-black">
-              <h6>Bank Passbook</h6>
-            </div>
-
-            <div className=" mt-2">
-              <div className="flex items-center justify-start border border-stone-200 w-full rounded-md h-10  gap-2">
-                <label
-                  htmlFor="file-upload"
-                  className="cursor-pointer bg-gray-100 hover:bg-gray-300 text-slate-400 py-2 px-4 rounded"
-                >
-                  Choose File
-                </label>
-                <input type="file" id="file-upload" className="hidden" />
-                <span className="text-zinc-500">No file chosen</span>
-              </div>
-              <label htmlFor="" className="text-neutral-500 mt-2">
-                Choose Bank Passbook.
-              </label>
-            </div>
-
-            <div className="mt-5 mb-3">
-              <div className="flex justify-end items-center gap-2 ">
-                {/* <button className="cursor-pointer h-8 w-165 border-0 rounded-md bg-rose-500 text-white size-24 outline-none font-medium">
-                  Edit
-                </button> */}
-                <ActionButton
-                label={"Edit"}
+            {/* Action Buttons */}
+            <div className="p-4 flex justify-end space-x-4">
+              <ActionButton
+                label="Edit"
                 variant='edit'
-
-                />
-                {/* <button className="cursor-pointer h-8 w-165 border-0 rounded-md bg-violet-500 text-white size-24 outline-none font-medium">
-                  Save
-                </button> */}
-                <ActionButton
-                label={"Save"}
+                type="button"
+                onClick={() => {
+                  // TODO: Implement edit functionality
+                  console.log('Edit clicked');
+                }}
+              />
+              <ActionButton
+                label="Save"
                 variant='save'
-                />
-              </div>
+                type="submit"
+              />
             </div>
           </div>
         </form>

@@ -12,13 +12,13 @@ import {
 } from '@coreui/react'
 import React from 'react'
 
-function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen }) {
+function SalesOrderTable({  data, setActionDrawerOpen, setVersionDrawerOpen }) {
   return (
     <>
       <div className=" h-[80%] ">
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  mt-3">
+        <div className="overflow-x-auto  h-[350px]  border whitespace-nowrap  mt-3">
           <CTable striped hover className="border border-gray-200">
-            <CTableHead className="bg-gray-100">
+          <CTableHead className="bg-gray-100 sticky top-0 z-10">
               <CTableRow>
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                   Number
@@ -104,7 +104,7 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen }) {
                 ))
               ) : (
                 <CTableRow>
-                  <CTableDataCell colSpan={data.length} className="text-center py-3">
+                  <CTableDataCell colSpan={8} className="text-center py-3">
                     No data available
                   </CTableDataCell>
                 </CTableRow>

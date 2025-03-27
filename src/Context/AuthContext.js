@@ -1,12 +1,13 @@
 import { createContext, useEffect, useState } from "react";
+import { getToken } from "../db/tokenService";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+  useEffect(async() => {
+    const token = await getToken()
 
     if (token) {
       try {

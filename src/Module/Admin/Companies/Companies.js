@@ -31,7 +31,6 @@ const CompanyManagement = () => {
     async function fetchData() {
       try {
         const response = await axios.get('https://mocki.io/v1/b4c413b7-c6d8-4005-913a-8766c2a43170')
-        console.log(response.data)
         setData(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)

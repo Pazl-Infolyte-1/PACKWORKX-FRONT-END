@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getToken, saveToken } from '../db/tokenService'
 
 const BASE_URL = 'https://packworkx.pazl.info/api/'
 const GST_URL = "http://sheet.gstincheck.co.in/check/9ee24120971acd5c17dc6cad239d99fa"
@@ -13,11 +14,45 @@ const apiClient = axios.create({
 })
 
 // Request interceptor
+// apiClient.interceptors.request.use(
+//   (config) => {
+//     const token = localStorage.getItem('token')
+    
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`
+//     }
+//     return config
+//   },
+//   (error) => {
+//     console.error('Request interceptor error:', error)
+//     return Promise.reject(error)
+//   },
+// )
+
+// // Response interceptor
+// apiClient.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response?.status === 401) {
+//       localStorage.removeItem('token')
+//       window.location.href = '/login'
+//     }
+//     return Promise.reject(error)
+//   },
+// )
+
+// Request interceptor
 apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+  async (config) => {
+    try {
+      // Fetch the token from SQL.js database
+      const token = await getToken()
+
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    } catch (error) {
+      console.error('Error fetching token from DB:', error)
     }
     return config
   },
@@ -30,10 +65,18 @@ apiClient.interceptors.request.use(
 // Response interceptor
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      window.location.href = '/login'
+      try {
+        // Clear the token from SQL.js if unauthorized
+        const { deleteToken } = await import('../db/tokenService')
+        await deleteToken()
+
+        // Redirect to the login page
+        window.location.href = '/login'
+      } catch (dbError) {
+        console.error('Error clearing token from DB:', dbError)
+      }
     }
     return Promise.reject(error)
   },
@@ -50,7 +93,9 @@ export const apiMethods = {
       })
 
       if (response.data.token) {
-        localStorage.setItem('token', response.data.token)
+        // localStorage.setItem('token', response.data.token)
+        await saveToken(response.data.token)
+
       }
 
       return response.data
@@ -76,7 +121,8 @@ export const apiMethods = {
 
   getSideBarMenu: async (queryParams = {}) => {
     try {
-      const token = localStorage.getItem("token"); // Retrieve token
+      // const token = localStorage.getItem("token"); // Retrieve token
+      const token = await getToken()
       if (!token) {
         throw new Error("No token found. Please log in again.");
       }
@@ -132,7 +178,8 @@ export const apiMethods = {
 
   postClient: async (clientData) => {
     try {
-      const token = localStorage.getItem('token') // Retrieve token before sending request
+      // const token = localStorage.getItem('token') // Retrieve token before sending request
+      const token = await getToken()
       if (!token) {
         throw new Error('No token found. Please log in again.')
       }
@@ -153,7 +200,8 @@ export const apiMethods = {
   editClient: async (clientId,clientData) => {
     console.log(clientId,"client124")
     try {
-      const token = localStorage.getItem('token') // Retrieve token before sending request
+      // const token = localStorage.getItem('token') // Retrieve token before sending request
+      const token = await getToken()
       if (!token) {
         throw new Error('No token found. Please log in again.')
       }
@@ -174,7 +222,9 @@ export const apiMethods = {
 
   getClients: async (queryParams = {}) => {
     try {
-      const token = localStorage.getItem("token"); // Retrieve token
+      // const token = localStorage.getItem("token"); // Retrieve token
+      const token = await getToken()
+
       if (!token) {
         throw new Error("No token found. Please log in again.");
       }
@@ -195,7 +245,9 @@ export const apiMethods = {
   
   deleteClient: async (clientId) => {
     try {
-      const token = localStorage.getItem('token'); // Retrieve token before sending request
+      // const token = localStorage.getItem('token'); // Retrieve token before sending request
+      const token = await getToken()
+
       if (!token) {
         throw new Error('No token found. Please log in again.');
       }
@@ -270,7 +322,8 @@ export const apiMethods = {
 
   downloadClientExcel: async (queryParams = {}) => {
     try {
-      const token = localStorage.getItem("token");
+      // const token = localStorage.getItem("token");
+      const token = await getToken()
       if (!token) {
         throw new Error("No token found. Please log in again.");
       }

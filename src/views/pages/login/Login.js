@@ -18,6 +18,7 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import { apiMethods } from '../../../api/config'
 import { useDispatch } from 'react-redux'
+import { getToken, saveToken } from '../../../db/tokenService'
 
 const Login = () => {
   const navigate = useNavigate()
@@ -51,9 +52,11 @@ const Login = () => {
       // Assuming the API returns a token and the interceptor handles token storage
       if (response.status === true && response) {
         // Save token or user data in localStorage or context if needed
-        localStorage.setItem('token', response.token)
-        console.log('Token stored:', localStorage.getItem('token'))
+        // localStorage.setItem('token', response.token)
+        await saveToken(response.token)
 
+
+        
         // Dispatch the login success action
         dispatch({
           type: 'LOGIN_SUCCESS',

@@ -49,7 +49,7 @@ const Billing = () => {
 
   return (
     <div className=" w-full h-full">
-      <CCard className="p-4 m-4">
+      <CCard className="p-4 m-2">
         <CCardBody>
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
             <CCol xs="12" sm="auto">

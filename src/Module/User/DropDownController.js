@@ -217,6 +217,7 @@ const Setting = () => {
   }, [isMobileMenuOpen]);
 
   const handleDeleteOption = (optionId) => {
+    console.log("del",optionId)
     const updatedCategories = categories.map(category => {
       if (category.id === selectedCategory.id) {
         return {
@@ -233,7 +234,18 @@ const Setting = () => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-
+  const handleDeleteCategory = (categoryId) => {
+    if (window.confirm("Are you sure you want to delete this category?")) {
+      const updatedCategories = categories.filter(category => category.id !== categoryId);
+      setCategories(updatedCategories);
+  
+      // If the deleted category was the selected one, clear selection
+      if (selectedCategory?.id === categoryId) {
+        setSelectedCategory(null);
+      }
+    }
+  };
+  
   return (
     <div className="flex h-[80vh] w-full xxxl:h-[90vh] overflow-hidden">
       <div className="flex flex-col md:flex-row w-full bg-gray-50 relative">
@@ -272,6 +284,7 @@ const Setting = () => {
                     setIsMobileMenuOpen(false); // Close dropdown after selecting
                   }}
                   onEditCategory={handleEditCategory}
+                  onDeleteCategory={handleDeleteCategory}
                 />
               </div>
             </div>
@@ -285,6 +298,8 @@ const Setting = () => {
             selectedCategory={selectedCategory}
             onSelectCategory={handleSelectCategory}
             onEditCategory={handleEditCategory}
+            onDeleteCategory={handleDeleteCategory}
+
           />
         </div>
   

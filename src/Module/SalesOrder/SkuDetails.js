@@ -46,10 +46,10 @@ const SkuDetails = () => {
         <div className="w-[100%] max-h-[200px] mt-4 rounded-[10px] border border-[#c2c2c2]">
           <div className="overflow-x-auto p-2">
             <div className="max-h-[150px]  overflow-y-auto custom-scrollbar rounded-lg">
-              <table className="min-w-full bg-white rounded-lg max-h-[1250px] ">
+              <table className="min-w-full bg-white rounded-lg max-h-[1250px]  border-collapse  ">
                 {/* Table Head */}
                 <thead className="sticky  top-0 bg-white z-10">
-                  <tr>
+                  <tr className='border-b-2'>
                     <th className="px-4 py-2 text-left">Sku</th>
                     <th className="px-4 py-2 text-left">Quantity Required</th>
                     <th className="px-4 py-2 text-left">Rate Per Sku</th>
@@ -61,7 +61,7 @@ const SkuDetails = () => {
                 {/* Table Body */}
                 <tbody className="h-[60px]">
                   {fields.map((item, index) => (
-                    <tr key={item.id} className="hover:bg-gray-50">
+                    <tr key={item.id} className="hover:bg-gray-50 border-t">
                       {/* SKU Dropdown */}
                       <td className="px-4 py-2">
                         <select

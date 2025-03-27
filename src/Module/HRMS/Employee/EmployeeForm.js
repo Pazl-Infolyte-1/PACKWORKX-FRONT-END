@@ -13,9 +13,9 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
 
   // State to manage form data
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name:'',
     email: '',
+    password:'',
     employeeId: '',
     gender: '',
     dob: '',
@@ -36,7 +36,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
     bankNumber: '',
     accountNumber: '',
     ifscCode: '',
-    bankPassbook: null
+    bankPassbook: null,
   });
 
   // Handle input changes
@@ -101,30 +101,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
             {/* Grid layout for two-column form */}
             <div className="grid  grid-cols-1 sm:grid-cols-2 gap-4 p-4">
               {/* First Name and Last Name */}
-              <div>
-                <h6 className="mb-2">First Name</h6>
-                <div className="flex items-center border border-stone-200 rounded-md">
-                  <input
-                    type="text"
-                    name="firstName"
-                    className="w-full outline-none text-zinc-500 px-3 py-2"
-                    placeholder="Enter First Name"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                  />
-                  <RiUserLine className="pr-2 h-10 w-10" />
-                </div>
-              </div>
               
               <div>
-                <h6 className="mb-2">Last Name</h6>
+                <h6 className="mb-2"> Name</h6>
                 <div className="flex items-center border border-stone-200 rounded-md">
                   <input
                     type="text"
                     name="lastName"
                     className="w-full outline-none text-zinc-500 px-3 py-2"
-                    placeholder="Enter Last Name"
-                    value={formData.lastName}
+                    placeholder="Enter Your Name"
+                    value={formData.name}
                     onChange={handleInputChange}
                   />
                   <RiUserLine className="pr-2 h-10 w-10" />

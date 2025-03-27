@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import SkuDetails from './SkuDetails'
 import WorkOrders from './WorkOrders'
+import { CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
 
 const AddSalesOrder = ({ currentTab }) => {
   const [activeTab, setActiveTab] = useState(currentTab)
@@ -9,7 +10,7 @@ const AddSalesOrder = ({ currentTab }) => {
   return (
     <div className="screen p-4">
       {/* Navigation Tabs */}
-      <nav className="bg-white p-3 rounded-md flex gap-6 border">
+      {/* <nav className="bg-white p-3 rounded-md flex gap-6 border-b">
         <span
           className={`pb-2 cursor-pointer font-medium ${
             activeTab === 'salesOrder'
@@ -30,7 +31,44 @@ const AddSalesOrder = ({ currentTab }) => {
         >
           Work Order
         </span>
-      </nav>
+      </nav> */}
+
+      <CCol xs={12}>
+              <CNav variant="tabs">
+                  <CNavItem key={'salesOrder'}>
+                    <CNavLink
+                      active={activeTab === 'salesOrder'}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setActiveTab('salesOrder')
+                      }}
+                      style={{
+                        backgroundColor: activeTab === 'salesOrder' ? '#8761e5' : 'transparent',
+                        color: activeTab === 'salesOrder' ? '#ffffff' : '#8761e5',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {'Add Sales Order'}
+                    </CNavLink>
+                  </CNavItem>
+                  <CNavItem key={'skuDetails'}>
+                    <CNavLink
+                      active={activeTab === 'skuDetails'}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setActiveTab('skuDetails')
+                      }}
+                      style={{
+                        backgroundColor: activeTab === 'skuDetails' ? '#8761e5' : 'transparent',
+                        color: activeTab === 'skuDetails' ? '#ffffff' : '#8761e5',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {'Work Order'}
+                    </CNavLink>
+                  </CNavItem>
+              </CNav>
+            </CCol>
 
       {/* Content Sections */}
       <div className="bg-white">
@@ -39,7 +77,7 @@ const AddSalesOrder = ({ currentTab }) => {
             <div className="p-2 mt-2 bg-white rounded-lg border border-[#c2c2c2] w-[100%] h-[50%]">
               {/* Title */}
               <h2 className="text-lg font-semibold flex justify-start">Order Details</h2>
-              <div className="grid grid-cols-2 grid-rows-2 gap-4 mt-4">
+              <div className="grid grid-cols-2 grid-rows-2 gap-1 mt-4">
                 {/* Item 1 - Split into Two Inputs */}
                 <div className="p-2 rounded-lg flex gap-4">
                   {/* Sales Order Id */}

@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux'
 import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
 import './scss/examples.scss'
-import { useDatabase } from './hooks/useDatabase'
 
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
 
@@ -19,7 +18,7 @@ const App = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
   const storedTheme = useSelector((state) => state.theme)
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
-  useDatabase(); // Load and persist DB
+
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.href.split('?')[1])

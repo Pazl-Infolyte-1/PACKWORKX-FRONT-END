@@ -9,7 +9,8 @@ function Input({
   placeholder = "", 
   name, 
   id,
-  type = 'text'
+  type = 'text',
+  readOnly = false
 }) {
   return (
     <div className={`font-sans text-black ${className}`}>
@@ -21,6 +22,7 @@ function Input({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
+        readOnly={readOnly}
         className={`w-full p-2 mt-2 shadow-md border-l-2 rounded-md ${inputClassName}`}
       />
     </div>

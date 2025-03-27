@@ -1,43 +1,50 @@
-import React, { useState, useEffect, useImperativeHandle , forwardRef} from 'react';
-import { useSearch } from './SearchContext';
-import { IoSearch } from 'react-icons/io5';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
+import { useSearch } from './SearchContext'
+import { IoSearch } from 'react-icons/io5'
 
 const SearchBar = forwardRef(({ text, data }, ref) => {
-  const { handleSearch, clearSearch: contextClearSearch } = useSearch();
-  const [query, setQuery] = useState('');
-  const [debounceTimer, setDebounceTimer] = useState(null);
+  const { handleSearch, clearSearch: contextClearSearch } = useSearch()
+  const [query, setQuery] = useState('')
+  const [debounceTimer, setDebounceTimer] = useState(null)
 
   useImperativeHandle(ref, () => ({
     clearSearch: () => {
-      setQuery('');
+      setQuery('')
       contextClearSearch()
       if (debounceTimer) {
-        clearTimeout(debounceTimer);
+        clearTimeout(debounceTimer)
       }
-    }
-  }));
+    },
+  }))
+
   const handleChange = (event) => {
-    const newQuery = event.target.value;
-    setQuery(newQuery);
+    const newQuery = event.target.value
+    setQuery(newQuery)
 
     if (debounceTimer) {
-      clearTimeout(debounceTimer);
+      clearTimeout(debounceTimer)
     }
 
     setDebounceTimer(
       setTimeout(() => {
-        handleSearch(newQuery, data);
-      }, 500)
-    );
-  };
+        if (newQuery.trim() === '') {
+          // If input is empty, show all data
+          contextClearSearch()
+        } else {
+          // Perform search
+          handleSearch(newQuery, data)
+        }
+      }, 500),
+    )
+  }
 
   useEffect(() => {
     return () => {
       if (debounceTimer) {
-        clearTimeout(debounceTimer);
+        clearTimeout(debounceTimer)
       }
-    };
-  }, [debounceTimer]);
+    }
+  }, [debounceTimer])
 
   return (
     <div>
@@ -54,7 +61,7 @@ const SearchBar = forwardRef(({ text, data }, ref) => {
         />
       </div>
     </div>
-  );
-});
+  )
+})
 
-export default SearchBar;
+export default SearchBar

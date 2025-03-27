@@ -354,7 +354,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === "Settings") {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/">
+                  <CNavLink as={NavLink} to="/settings">
                     {navLink("Settings","cilSettings")}
                   </CNavLink>
                 </CNavItem>

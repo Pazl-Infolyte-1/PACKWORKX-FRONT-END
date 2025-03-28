@@ -382,6 +382,7 @@ function SkuList() {
       </div>
       <Drawer
         isOpen={isDrawerOpen || editTag}
+        title={editTag ? 'Edit SKU Details' : 'Add SKU Details'}
         onClose={() => (setDrawerOpen(false), setEditTag(false), setClientDisable(false))}
       >
         <SkuAddEdit

@@ -16,30 +16,32 @@ function RSCBox({
   setAddNewSkuData,
   updateSkuValues,
 }) {
-  // New function to calculate board size
+  //  calculate board size and UPS
   const calculateBoardSize = (data) => {
     const length = parseFloat(data.length) || 0
     const width = parseFloat(data.width) || 0
     const height = parseFloat(data.height) || 0
     const lengthTrimmingTolerance = parseFloat(data.length_trimming_tolerance) || 0
     const flapWidth = parseFloat(data.flap_width) || 0
+    const deckleSize = parseFloat(data.deckle_size) || 0
 
-    // Calculate board sizes with specific formulas
-    const lengthBoardSize = (length * width) + lengthTrimmingTolerance + flapWidth
-    const widthBoardSize = (width * height )+ lengthTrimmingTolerance
+    const lengthBoardSize = length * width + lengthTrimmingTolerance + flapWidth
+    const widthBoardSize = width * height + lengthTrimmingTolerance
 
-    // Calculate total board size by multiplying length and width board sizes
     const totalBoardSize = lengthBoardSize * widthBoardSize
 
-    // Update board sizes
+    const ups = widthBoardSize > 0 ? Math.floor(deckleSize / widthBoardSize) : 0
+
+    // Return calculated values
     return {
       length_board_size_cm2: lengthBoardSize.toFixed(2),
       width_board_size_cm2: widthBoardSize.toFixed(2),
       board_size_cm2: totalBoardSize.toFixed(2),
+      ups: ups.toFixed(2),
     }
   }
 
-  // Modified handleChange to include board size calculation
+  // Modified handleChange to include board size and UPS calculation
   const modifiedHandleChange = (e) => {
     const { name, value } = e.target
     const updatedSkuData = {
@@ -48,12 +50,19 @@ function RSCBox({
     }
 
     // Calculate board sizes if relevant fields change
-    const boardSizeFields = ['length', 'width', 'height', 'length_trimming_tolerance', 'flap_width']
+    const boardSizeFields = [
+      'length',
+      'width',
+      'height',
+      'length_trimming_tolerance',
+      'flap_width',
+      'deckle_size',
+    ]
 
     if (boardSizeFields.includes(name)) {
       const boardSizeUpdates = calculateBoardSize(updatedSkuData)
 
-      // Update state with both the changed field and calculated board sizes
+      // Update state with both the changed field and calculated board sizes and UPS
       setAddNewSkuData((prev) => ({
         ...prev,
         [name]: value,
@@ -72,6 +81,7 @@ function RSCBox({
       handleChange(e)
     }
   }
+
   return (
     <>
       <div className="grid grid-cols-3 gap-4">

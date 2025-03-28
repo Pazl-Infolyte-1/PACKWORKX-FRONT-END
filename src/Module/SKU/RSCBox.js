@@ -99,8 +99,8 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
               Select Client
             </option>
             {client?.map((item, index) => (
-              <option key={index} value={item.client_id}>
-                {item.display_name || item.client_id}
+              <option key={index} value={item.display_name}>
+                {item.display_name}
               </option>
             ))}
           </select>
@@ -132,7 +132,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
               name="height"
               value={addNewSkuData.height}
               onChange={handleChange}
-              placeholder="Height"
+              placeholder="Depth"
               className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
             ></input>
             <div className="w-1/4 flex justify-end relative">
@@ -283,6 +283,24 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
           value={addNewSkuData.internal_id}
           onChange={handleChange}
           placeholder="internal id"
+        />
+        <Input
+          skuName="Length Board Size"
+          id="board_size_cm2"
+          name="board_size_cm2"
+          value={addNewSkuData.length_board_size_cm2}
+          onChange={handleChange}
+          placeholder="board size"
+          readOnly={true}
+        />
+        <Input
+          skuName="Width Board Size"
+          id="board_size_cm2"
+          name="board_size_cm2"
+          value={addNewSkuData.width_board_size_cm2}
+          onChange={handleChange}
+          placeholder="board size"
+          readOnly={true}
         />
 
         <Input

@@ -51,6 +51,8 @@ function SkuAddEdit({
         flap_tolerance: null,
         length_trimming_tolerance: null,
         width_trimming_tolerance: null,
+        width_board_size_cm2:null,
+        length_board_size_cm2:null,
         strict_adherence: strictAdherence,
         customer_reference: null,
         reference_number: null,
@@ -261,7 +263,7 @@ function SkuAddEdit({
                   <th className="p-2">Color</th>
                   <th className="p-2">Flute Type</th>
                   <th className="p-2">Flute Ratio</th>
-                  <th className="p-2">material</th>
+                  <th className="p-2">Material</th>
                   <th className="p-2">Weight (Kg)</th>
                   <th className="p-2">
                     Bursting Strength <br />{' '}

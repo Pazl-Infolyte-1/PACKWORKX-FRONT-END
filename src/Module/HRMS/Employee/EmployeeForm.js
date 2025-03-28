@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { RiUserLine } from 'react-icons/ri'
 import { IoIosAt } from 'react-icons/io'
 import Switch from '@mui/material/Switch'
 import profile from '../../../assets/images/profile.png'
 import Drawer from '../../../components/Drawer/Drawer'
 import ActionButton from '../../../components/New/ActionButton'
+import axios from 'axios'
+import apiMethods from '../../../api/config'
 
 // Placeholder data for dropdowns (would typically come from API)
 const DEPARTMENT_OPTIONS = [
@@ -68,7 +70,57 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
     employment_type: 'Full-time',
     company_address_id: 10,
     role_id: '1',
+    image: '',
   });
+
+  // State for dropdown options
+  const [dropdownOptions, setDropdownOptions] = useState({
+    countries: [],
+    companiesAddresses: [],
+    departments: [],
+    designations: [],
+    roles: []
+  });
+
+  useEffect(() => {
+    const fetchDropDownData = async () => {
+      try {
+        const [
+          countriesResponse,
+          companiesAddressResponse,
+          departmentsResponse,
+          designationsResponse,
+          rolesResponse
+        ] = await Promise.all([
+          apiMethods.getCountries(),
+          apiMethods.getCompanyAddress(),
+          apiMethods.getDepartmentsList(),
+          apiMethods.getDesignation(),
+          apiMethods.getRoles()
+        ]);
+
+        setDropdownOptions({
+          countries: countriesResponse?.data?.data,
+          companiesAddresses: companiesAddressResponse?.data?.data,
+          departments: departmentsResponse?.data?.data,
+          designations: designationsResponse?.data?.data,
+          roles: rolesResponse?.data?.data
+        });
+      } catch (error) {
+        console.error('Error fetching dropdown data:', error);
+      }
+    };
+
+    fetchDropDownData();
+  }, []);
+
+  // If you want to log after state update, use useEffect
+  useEffect(() => {
+    // console.log('Dropdown Options Updated:', dropdownOptions.companiesAddresses);
+    console.log('Dropdown Options Updated:', dropdownOptions);
+  }, [dropdownOptions]);
+
+
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -80,11 +132,54 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     console.log('Form Data:', formData);
+
+    const response = await apiMethods.createNewEmployee(formData)
+    console.log(response)
     // TODO: Implement API call here
   };
+
+  const [previewImage, setPreviewImage] = useState(profile);
+  const fileInputRef = useRef(null);
+
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Update the preview image with the uploaded image
+        setPreviewImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    //upload image in db
+    const formData = new FormData();
+    formData.append('file', file)
+    try {
+      const response = await apiMethods.uploadFile(formData)
+
+      if (response?.data?.success) {
+        const fileUrl = response.data.data.file_url;
+
+        setFormData((prevState) => ({
+          ...prevState,
+          image: fileUrl
+        })
+        )
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
 
   return (
     <>
@@ -94,13 +189,23 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
             <div className="flex justify-between p-2">
               <h2 className="text-xl font-bold">Employee Form</h2>
             </div>
-            
-            <div className="h-25 mt-5 flex flex-col justify-between items-center">
-              <div>
-                <img src={profile} alt="Profile" className="w-32 h-32 rounded-full" />
-              </div>
+
+            <div className="flex flex-col items-center justify-center">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageUpload}
+                accept="image/*"
+                className="hidden"
+              />
+              <img
+                src={previewImage}
+                alt="Profile"
+                onClick={handleImageClick}
+                className="w-32 h-32 rounded-full object-cover cursor-pointer hover:opacity-70 transition-opacity"
+              />
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
               {/* Name */}
               <div>
@@ -182,7 +287,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                 </div>
               </div>
 
-                 {/* Company Address */}
+              {/* Company Address */}
               <div>
                 <h6 className="mb-2">Company Address</h6>
                 <div className="border border-stone-200 rounded-md">
@@ -192,9 +297,9 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                     value={formData.company_address_id}
                     onChange={handleInputChange}
                   >
-                    {CompanyAddressOption.map(dept => (
+                    {dropdownOptions.companiesAddresses.map(dept => (
                       <option key={dept.id} value={dept.id}>
-                        {dept.name}
+                        {dept.address}
                       </option>
                     ))}
                   </select>
@@ -211,9 +316,9 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                     value={formData.department_id}
                     onChange={handleInputChange}
                   >
-                    {DEPARTMENT_OPTIONS.map(dept => (
+                    {dropdownOptions.departments.map(dept => (
                       <option key={dept.id} value={dept.id}>
-                        {dept.name}
+                        {dept.department_name}
                       </option>
                     ))}
                   </select>
@@ -230,7 +335,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                     value={formData.designation_id}
                     onChange={handleInputChange}
                   >
-                    {DESIGNATION_OPTIONS.map(desig => (
+                    {dropdownOptions.designations.map(desig => (
                       <option key={desig.id} value={desig.id}>
                         {desig.name}
                       </option>
@@ -239,8 +344,8 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                 </div>
               </div>
 
-                            {/* Designation */}
-                            <div>
+              {/* Designation */}
+              <div>
                 <h6 className="mb-2">Role</h6>
                 <div className="border border-stone-200 rounded-md">
                   <select
@@ -249,7 +354,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                     value={formData.role_id}
                     onChange={handleInputChange}
                   >
-                    {Role_Options.map(desig => (
+                    {dropdownOptions.roles.map(desig => (
                       <option key={desig.id} value={desig.id}>
                         {desig.name}
                       </option>

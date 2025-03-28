@@ -1,11 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
 import { AuthContext } from '../../Context/AuthContext'
-import Input from '../../components/New/Input'
 import apiMethods from '../../api/config'
-import { BsChevronDown } from 'react-icons/bs'
-import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash } from '@coreui/icons'
+import RSCBox from './RSCBox'
+import CorrugatedSheet from './CorrugatedSheet'
+import DieCutBox from './DieCutBox'
 
 function SkuAddEdit({
   handleChange,
@@ -15,8 +14,11 @@ function SkuAddEdit({
   editTag,
   addNewSkuData,
   setAddNewSkuData,
+  client,
+  skuType,
+  setSkuType,
+  clientDiasble,
 }) {
-  const [skuType, setSkuType] = useState([])
   const { user } = useContext(AuthContext)
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
@@ -34,36 +36,38 @@ function SkuAddEdit({
   useEffect(() => {
     if (!editTag) {
       setAddNewSkuData({
-        sku_name: '',
-        client_id:user.id,
-        ply: '',
-        length: '',
-        width: '',
-        height: '',
-        joints: '',
-        ups: '',
-        inner_outer_dimension: '',
-        flap_width: '',
-        flap_tolerance: '',
-        length_trimming_tolerance: '',
-        width_trimming_tolerance: '',
+        sku_name: null,
+        client_id: user.id,
+        ply: null,
+        client: null,
+        length: null,
+        width: null,
+        height: null,
+        unit: null,
+        joints: null,
+        ups: null,
+        inner_outer_dimension: null,
+        flap_width: null,
+        flap_tolerance: null,
+        length_trimming_tolerance: null,
+        width_trimming_tolerance: null,
         strict_adherence: strictAdherence,
-        customer_reference: '',
-        reference_number: '',
-        internal_id: '',
-        board_size_cm2: '',
-        deckle_size: '',
-        minimum_order_level: '',
-        sku_type: '',
+        customer_reference: null,
+        reference_number: null,
+        internal_id: null,
+        board_size_cm2: null,
+        deckle_size: null,
+        minimum_order_level: null,
+        sku_type: 'RSC box',
         sku_values: [
           {
-            layer: '',
-            gsm: '',
-            bf: '',
-            material: '',
-            color: '',
-            flute_type: '',
-            flute_ratio: '',
+            layer: null,
+            gsm: null,
+            bf: null,
+            material: null,
+            color: null,
+            flute_type: null,
+            flute_ratio: null,
           },
         ],
       })
@@ -96,22 +100,130 @@ function SkuAddEdit({
     }))
   }
 
-  const handleDeleteSkuType = async (id) => {
-    try {
-      await apiMethods.deleteSkuType(id)
-      setSkuType((prevTypes) => prevTypes.filter((type) => type.id !== id))
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  // const handleDeleteSkuType = async (id) => {
+  //   try {
+  //     await apiMethods.deleteSkuType(id)
+  //     setSkuType((prevTypes) => prevTypes.filter((type) => type.id !== id))
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
 
   const handleSkuValuesChange = (index, field, value) => {
     setAddNewSkuData((prevData) => {
-      const updatedSkuValues = [...prevData.sku_values] // Copy the array
-      updatedSkuValues[index] = { ...updatedSkuValues[index], [field]: value } // Update specific field
-      return { ...prevData, sku_values: updatedSkuValues } // Update state
+      const updatedSkuValues = [...prevData.sku_values]
+      updatedSkuValues[index] = { ...updatedSkuValues[index], [field]: value }
+      return { ...prevData, sku_values: updatedSkuValues }
     })
   }
+
+  const plyLayerConfigurations = {
+    2: [
+      { layer: 'Top Layer', type: 'Top Layer' },
+      { layer: 'Corrugated Layer', type: 'Corrugated Layer' },
+    ],
+    3: [
+      { layer: 'Top Layer', type: 'Top Layer' },
+      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+    ],
+    5: [
+      { layer: 'Top Layer', type: 'Top Layer' },
+      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+    ],
+    7: [
+      { layer: 'Top Layer', type: 'Top Layer' },
+      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
+      { layer: 'Liner Layer 3', type: 'Liner Layer 3' },
+    ],
+    9: [
+      { layer: 'Top Layer', type: 'Top Layer' },
+      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
+      { layer: 'Liner Layer 3', type: 'Liner Layer 3' },
+      { layer: 'Corrugated Layer 4', type: 'Corrugated Layer 4' },
+      { layer: 'Liner Layer 4', type: 'Liner Layer 4' },
+    ],
+  }
+
+  const updateSkuValues = (plyCount) => {
+    const layerConfig = plyLayerConfigurations[plyCount] || []
+
+    const newSkuValues = layerConfig.map((layer) => ({
+      layer: layer.layer,
+      gsm: '',
+      bf: '',
+      material: '',
+      color: '',
+      flute_type: '',
+      flute_ratio: '',
+    }))
+
+    setAddNewSkuData((prevData) => ({
+      ...prevData,
+      ply: plyCount,
+      sku_values: newSkuValues,
+    }))
+  }
+
+  const skuComponents = {
+    'RSC box': (
+      <RSCBox
+        dropdownRef={dropdownRef}
+        addNewSkuData={addNewSkuData}
+        setIsOpen={setIsOpen}
+        isOpen={isOpen}
+        handleChange={handleChange}
+        handleSelect={handleSelect}
+        clientDiasble={clientDiasble}
+        client={client}
+        skuType={skuType}
+        setAddNewSkuData={setAddNewSkuData}
+        updateSkuValues={updateSkuValues}
+      />
+    ),
+    'Corrugated Sheet': (
+      <CorrugatedSheet
+        dropdownRef={dropdownRef}
+        addNewSkuData={addNewSkuData}
+        setIsOpen={setIsOpen}
+        isOpen={isOpen}
+        handleChange={handleChange}
+        handleSelect={handleSelect}
+        clientDiasble={clientDiasble}
+        client={client}
+        skuType={skuType}
+        setAddNewSkuData={setAddNewSkuData}
+        updateSkuValues={updateSkuValues}
+      />
+    ),
+    'Die Cut box': (
+      <DieCutBox
+        dropdownRef={dropdownRef}
+        addNewSkuData={addNewSkuData}
+        setIsOpen={setIsOpen}
+        isOpen={isOpen}
+        handleChange={handleChange}
+        handleSelect={handleSelect}
+        clientDiasble={clientDiasble}
+        client={client}
+        skuType={skuType}
+        setAddNewSkuData={setAddNewSkuData}
+        updateSkuValues={updateSkuValues}
+      />
+    ),
+  }
+
   return (
     <div className="p-6 bg-white rounded-lg">
       <div className="mb-6">
@@ -120,159 +232,8 @@ function SkuAddEdit({
         </h2>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <Input
-          skuName="SKU Name"
-          id="sku_name"
-          name="sku_name"
-          value={addNewSkuData.sku_name}
-          onChange={handleChange}
-          placeholder="SKU Name"
-        />
-
-        <div>
-          <label className="block text-[16px] font-medium mb-2">Ply</label>
-          <select
-            name="ply"
-            id="ply"
-            value={addNewSkuData.ply}
-            onChange={handleChange}
-            className="w-full p-2 shadow-md border-l-2 rounded-md"
-          >
-            <option value="" hidden>
-              Select Number of Layers
-            </option>
-            <option value={3}>3</option>
-            <option value={5}>5</option>
-            <option value={7}>7</option>
-            <option value={9}>9</option>
-          </select>
-        </div>
-
-        <div className="flex gap-3">
-          <Input
-            skuName="Length"
-            id="length"
-            name="length"
-            value={addNewSkuData.length}
-            onChange={handleChange}
-            placeholder="length"
-          />
-
-          <Input
-            skuName="Width"
-            id="width"
-            name="width"
-            value={addNewSkuData.width}
-            onChange={handleChange}
-            placeholder="width"
-          />
-
-          <Input
-            skuName="Height"
-            id="height"
-            name="height"
-            value={addNewSkuData.height}
-            onChange={handleChange}
-            placeholder="height"
-          />
-        </div>
-
-        <div className="flex gap-3">
-          <Input
-            skuName="Joints"
-            id="joints"
-            name="joints"
-            value={addNewSkuData.joints}
-            onChange={handleChange}
-            placeholder="joints"
-          />
-
-          <Input
-            skuName="UPS"
-            id="ups"
-            name="ups"
-            value={addNewSkuData.ups}
-            onChange={handleChange}
-            placeholder="ups"
-          />
-        </div>
-        <div>
-          <label className="block text-[16px] font-medium mb-2">Inner/Outer Dimension</label>
-          <div className="flex space-x-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="inner_outer_dimension"
-                value="Inner"
-                checked={addNewSkuData.inner_outer_dimension === 'Inner'}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Inner
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="inner_outer_dimension"
-                value="Outer"
-                checked={addNewSkuData.inner_outer_dimension === 'Outer'}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Outer
-            </label>
-          </div>
-        </div>
-
-        <div className="flex gap-3">
-          <Input
-            skuName="Flap Width"
-            id="flap_width"
-            name="flap_width"
-            value={addNewSkuData.flap_width}
-            onChange={handleChange}
-            placeholder="flap width"
-          />
-
-          <Input
-            skuName="Flap Tolerance"
-            id="flap_tolerance"
-            name="flap_tolerance"
-            value={addNewSkuData.flap_tolerance}
-            onChange={handleChange}
-            placeholder="flap tolerance"
-          />
-        </div>
-
-        <div>
-          <label className="block text-[16px] font-medium mb-2">Length Trimming Tolerance</label>
-          <select
-            name="length_trimming_tolerance"
-            id="length_trimming_tolerance"
-            value={addNewSkuData.length_trimming_tolerance}
-            onChange={handleChange}
-            className="w-full p-2 shadow-md border-l-2 rounded-md"
-          >
-            <option>0.2</option>
-            <option>0.1</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-[16px] font-medium mb-2">Width Trimming Tolerance</label>
-          <select
-            name="width_trimming_tolerance"
-            id="width_trimming_tolerance"
-            value={addNewSkuData.width_trimming_tolerance}
-            onChange={handleChange}
-            className="w-full p-2 shadow-md border-l-2 rounded-md"
-          >
-            <option>0.2</option>
-            <option>0.1</option>
-          </select>
-        </div>
-      </div>
+      {/* conditional rendring according to sku_type */}
+      {skuComponents[addNewSkuData.sku_type] || null}
 
       <div className="flex items-center my-3 space-x-2">
         <span className="text-[16px] font-medium">Strict Adherence for All Layers</span>
@@ -288,226 +249,111 @@ function SkuAddEdit({
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <Input
-          skuName="Customer Reference"
-          id="customer_reference"
-          name="customer_reference"
-          value={addNewSkuData.customer_reference}
-          onChange={handleChange}
-          placeholder="customer reference"
-        />
-
-        <Input
-          skuName="Reference #"
-          id="reference_number"
-          name="reference_number"
-          value={addNewSkuData.reference_number}
-          onChange={handleChange}
-          placeholder="reference number"
-        />
-
-        <Input
-          skuName="Internal ID"
-          id="internal_id"
-          name="internal_id"
-          value={addNewSkuData.internal_id}
-          onChange={handleChange}
-          placeholder="internal id"
-        />
-
-        <Input
-          skuName="Board Size (cm²)"
-          id="board_size_cm2"
-          name="board_size_cm2"
-          value={addNewSkuData.board_size_cm2}
-          onChange={handleChange}
-          placeholder="board size"
-        />
-
-        <Input
-          skuName="Deckle Size"
-          id="deckle_size"
-          name="deckle_size"
-          value={addNewSkuData.deckle_size}
-          onChange={handleChange}
-          placeholder="deckle size"
-        />
-
-        <Input
-          skuName="Minimum Order Level"
-          id="minimum_order_level"
-          name="minimum_order_level"
-          type="number"
-          value={addNewSkuData.minimum_order_level}
-          onChange={handleChange}
-          placeholder="minimum order level"
-        />
-      </div>
-
-      <div className="w-[32%]">
-        <label className="block text-[16px] font-medium m-2">SKU Type</label>
-        <div className="relative w-full" ref={dropdownRef}>
-          <div
-            className="p-2 my-2 h-10 border border-gray-300 rounded cursor-pointer flex justify-between items-center"
-            onClick={() => setIsOpen((prev) => !prev)}
-          >
-            <span>{addNewSkuData.sku_type || 'Select Type'}</span>
-            <BsChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-          </div>
-
-          {isOpen && (
-            <ul
-              className={`absolute left-0 right-0 mt-1 overflow-y-auto bg-white border border-gray-300 rounded z-10 h-40`}
-            >
-              {skuType.map((option) => (
-                <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-100">
-                  <li className="p-2 cursor-pointer w-full" onClick={() => handleSelect(option)}>
-                    {option.sku_type}
-                  </li>
-                  {editTag && (
-                    <div className="flex items-center gap-2">
-                      <CIcon icon={cilPencil} className="cursor-pointer" />
-                      <CIcon
-                        icon={cilTrash}
-                        style={{ color: 'red' }}
-                        className="cursor-pointer"
-                        onClick={() => handleDeleteSkuType(option.id)}
-                      />
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              <li
-                className="p-2 font-semibold text-blue-600 hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleSelect({ value: 'addMore', label: 'Add More Procedure' })}
-              >
-                Add More Procedure
-              </li>
-            </ul>
-          )}
-        </div>
-      </div>
-
-      <div className="mt-6">
-        <div className="border rounded-lg overflow-auto">
-          <table className="w-full">
-            <thead className="bg-gray-100">
-              <tr className="text-gray-500 text-center">
-                <th className="p-2">Layer</th>
-                <th className="p-2">GSM</th>
-                <th className="p-2">BF</th>
-                <th className="p-2">Color</th>
-                <th className="p-2">Flute Type</th>
-                <th className="p-2">Flute Ratio</th>
-                <th className="p-2">material</th>
-                <th className="p-2">Weight (Kg)</th>
-                <th className="p-2">
-                  Bursting Strength <br />{' '}
-                  <span className="text-xs">
-                    (Kg Per Cm<sup>2</sup>
-                  </span>
-                  )
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {addNewSkuData?.sku_values?.map((item, index) => (
-                <tr key={index}>
-                  <td className="p-2 text-center">
-                    <select
-                      className="p-1 border rounded w-full"
-                      value={item.layer || 'Select'}
-                      onChange={(e) => handleSkuValuesChange(index, 'layer', e.target.value)}
-                    >
-                      <option hidden>Select</option>
-                      <option value={'Top Layer'}>Top Layer</option>
-                    </select>
-                  </td>
-                  <td className="p-2 text-center">
-                    <input
-                      type="text"
-                      className="w-20 p-1 border rounded text-center"
-                      value={item.gsm || ''}
-                      placeholder="gsm"
-                      onChange={(e) => handleSkuValuesChange(index, 'gsm', e.target.value)}
-                    />
-                  </td>
-                  <td className="p-2 text-center">
-                    <input
-                      type="number"
-                      className="w-20 p-1 border rounded text-center"
-                      value={item.bf || ''}
-                      placeholder="bf"
-                      onChange={(e) => handleSkuValuesChange(index, 'bf', Number(e.target.value))}
-                    />
-                  </td>
-                  <td className="p-2 text-center">
-                    <select
-                      className="p-1 border rounded w-full"
-                      value={item.color || 'Select'}
-                      onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
-                    >
-                      <option hidden>Select</option>
-                      <option value={'yellow'}>Yellow</option>
-                      <option value={'blue'}>Blue</option>
-                    </select>
-                  </td>
-                  <td className="p-2 text-center">
-                    <select
-                      className="p-1 border rounded w-full"
-                      value={item.flute_type || 'Select'}
-                      onChange={(e) => handleSkuValuesChange(index, 'flute_type', e.target.value)}
-                    >
-                      <option hidden>Select</option>
-                      <option value={'flex'}>flex</option>
-                    </select>
-                  </td>
-                  <td className="p-2 text-center">
-                    <input
-                      type="text"
-                      className="p-1 border rounded text-center"
-                      value={item.flute_ratio || ''}
-                      placeholder="flute ratio"
-                      onChange={(e) => handleSkuValuesChange(index, 'flute_ratio', e.target.value)}
-                    />
-                  </td>
-                  <td className="p-2 text-center">
-                    <select
-                      className="p-1 border rounded w-full"
-                      value={item.material || 'Select'}
-                      onChange={(e) => handleSkuValuesChange(index, 'material', e.target.value)}
-                    >
-                      <option>Select</option>
-                      <option>Sheet</option>
-                      <option>Box</option>
-                    </select>
-                  </td>
-                  <td className="p-2 text-center">
-                    <input
-                      type="text"
-                      className="p-1 border rounded text-center"
-                      // value={item.weight || ''}
-                      placeholder="weight"
-                      // onChange={(e) => handleSkuValuesChange(index, 'weight', e.target.value)}
-                    />
-                  </td>
-                  <td className="p-2 text-center">
-                    <input
-                      type="text"
-                      className="p-1 border rounded text-center"
-                      // value={item.gsm || ''}
-                      placeholder="brusting_strength"
-                      // onChange={(e) => handleSkuValuesChange(index, 'gsm', e.target.value)}
-                    />
-                  </td>
+      {addNewSkuData.ply && (
+        <div className="mt-6">
+          <div className="border rounded-lg overflow-auto">
+            <table className="w-full">
+              <thead className="bg-gray-100">
+                <tr className="text-gray-500 text-center">
+                  <th className="p-2">Layer</th>
+                  <th className="p-2">GSM</th>
+                  <th className="p-2">BF</th>
+                  <th className="p-2">Color</th>
+                  <th className="p-2">Flute Type</th>
+                  <th className="p-2">Flute Ratio</th>
+                  <th className="p-2">material</th>
+                  <th className="p-2">Weight (Kg)</th>
+                  <th className="p-2">
+                    Bursting Strength <br />{' '}
+                    <span className="text-xs">
+                      (Kg Per Cm<sup>2</sup>
+                    </span>
+                    )
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {addNewSkuData?.sku_values?.map((item, index) => (
+                  <tr key={index} className="flex-wrap">
+                    <td className="p-2 text-center w-full sm:w-2/12 md:w-2/12 lg:w-2/12 ">
+                      <input
+                        type="text"
+                        placeholder="Layers"
+                        className="p-1 border rounded w-full"
+                        value={item.layer}
+                        onChange={(e) => handleSkuValuesChange(index, 'layer', e.target.value)}
+                      />
+                    </td>
+                    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                      <input
+                        type="text"
+                        className="p-1 border rounded text-center w-full"
+                        value={item.gsm || ''}
+                        placeholder="gsm"
+                        onChange={(e) => handleSkuValuesChange(index, 'gsm', e.target.value)}
+                      />
+                    </td>
+                    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                      <input
+                        type="number"
+                        className="p-1 border rounded text-center w-full"
+                        value={item.bf || ''}
+                        placeholder="bf"
+                        onChange={(e) => handleSkuValuesChange(index, 'bf', Number(e.target.value))}
+                      />
+                    </td>
+                    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                      <input
+                        type="text"
+                        placeholder="Color"
+                        className="p-1 border rounded w-full"
+                        value={item.color}
+                        onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
+                      />
+                    </td>
+                    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                      <select
+                        className="p-1 border rounded w-full"
+                        value={item.flute_type || 'Select'}
+                        onChange={(e) => handleSkuValuesChange(index, 'flute_type', e.target.value)}
+                      >
+                        <option hidden>Select</option>
+                        <option value={'flex'}>flex</option>
+                      </select>
+                    </td>
+                    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                      <input
+                        type="text"
+                        className="p-1 border rounded text-center w-full"
+                        value={item.flute_ratio || ''}
+                        placeholder="flute ratio"
+                        onChange={(e) =>
+                          handleSkuValuesChange(index, 'flute_ratio', e.target.value)
+                        }
+                      />
+                    </td>
+                    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                      <input
+                        type="text"
+                        placeholder="Material"
+                        className="p-1 border rounded w-full"
+                        value={item.material}
+                        onChange={(e) => handleSkuValuesChange(index, 'material', e.target.value)}
+                      />
+                    </td>
+                    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                      <p>N/A</p>
+                    </td>
+                    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                      <p>N/A</p>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="flex justify-end space-x-4 mt-6">
         <ActionButton

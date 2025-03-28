@@ -18,6 +18,7 @@ import DeleteModal from '../../components/New/DeleteModal';
 import ThreeDotMenu from '../../components/ThreeDotMenu';
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons';
 import CustomAlert from '../../components/New/CustomAlert'
+import { useNavigate } from 'react-router-dom'
 
 
 function ClientTable({ clientdata,refreshClients }) {
@@ -32,6 +33,7 @@ function ClientTable({ clientdata,refreshClients }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedClientDeleteId, setSelectedClientDeleteId] = useState(null);  
   const [alerts, setAlerts] = useState([]);
+  const navigate = useNavigate()
 
 
   const handleClose = () => {
@@ -113,7 +115,6 @@ const deleteClient = async () => {
   }
 };
 
-//console.log("edit data",selectedClientId?.entity_type)
   return (
     <>
           <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -213,7 +214,13 @@ const deleteClient = async () => {
                           label: 'Add Sku',
                           icon: cilHandPointRight,
                           onClick: () => {
-                            console.log('Add Sku')
+                            navigate('/SKU', {
+                              state: {
+                                initialRender: true,
+                                clientdata: clientdata,
+                                client_id: cell.client_id,
+                              },
+                            })
                           },
                         },
                         {
@@ -250,9 +257,9 @@ const deleteClient = async () => {
 
       
   
-        {/*<div className="flex justify-end items-center gap-4 mt-3">
+        {/* <div className="flex justify-end items-center gap-4 mt-3">
           <CommonPagination count={2} page={1} onChange={handlePageChange} />
-        </div>*/}
+        </div> */}
       <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth={'1280px'} title={`Edit ${selectedClientId?.entity_type}`}>
         <ClientForm refreshClientsEdit={refreshClients} closeDrawer={() => setDrawerOpen(false)} editData={selectedClientId} />
       </Drawer>

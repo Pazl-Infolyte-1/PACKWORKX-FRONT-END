@@ -7,13 +7,10 @@ import {
   CTableBody,
   CTableDataCell,
 } from '@coreui/react'
-import { Dropdown } from 'react-bootstrap'
-import CIcon from '@coreui/icons-react'
-import { cilHandPointRight, cilOptions, cilPencil, cilTrash } from '@coreui/icons'
+import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import apiMethods from '../../api/config'
 import SkuDetails from './SkuDetails'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import DeleteModal from '../../components/New/DeleteModal'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 
 function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
@@ -39,12 +36,6 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
               SKU Name
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Created Date
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Modified Date
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               SKU Type
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
@@ -56,6 +47,12 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Deckle
             </CTableHeaderCell>
+            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+              Created Date
+            </CTableHeaderCell>
+            {/* <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+              Modified Date
+            </CTableHeaderCell> */}
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Action
             </CTableHeaderCell>
@@ -75,21 +72,21 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
                     {cell.sku_name}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
-                    {cell.created_date}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2 text-gray-700">
-                    {cell.modified_date}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2 text-gray-700">
                     {cell.sku_type}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">{cell.client}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
-                    {cell.dimensions}
+                  {cell.length && cell.width && cell.height ? [cell.length, cell.width, cell.height].join(" x ") : 'N/A'}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
                     {cell.deckle_size}
                   </CTableDataCell>
+                  <CTableDataCell className="py-3 px-2 text-gray-700">
+                    {cell.created_date}
+                  </CTableDataCell>
+                  {/* <CTableDataCell className="py-3 px-2 text-gray-700">
+                    {cell.modified_date}
+                  </CTableDataCell> */}
                   <CTableDataCell className="py-3 px-2 text-gray-700">
                     <ThreeDotMenu
                       value={[

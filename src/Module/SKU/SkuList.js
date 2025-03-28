@@ -1,208 +1,96 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { FaBoxOpen } from 'react-icons/fa'
-import { MdTakeoutDining, MdOutlineSettingsInputComposite, MdCheckroom } from 'react-icons/md'
+import {
+  MdTakeoutDining,
+  MdOutlineSettingsInputComposite,
+  MdCheckroom,
+  MdClearAll,
+} from 'react-icons/md'
 import Drawer from '../../components/Drawer/Drawer'
 import apiMethods from '../../api/config'
-import axios from 'axios'
 import CommonPagination from '../../components/New/Pagination'
 import SkuPopup from './SkuPopup'
 import SkuTable from './SkuTable'
-import { useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import SkuAddEdit from './SkuAddEdit'
 import ActionButton from '../../components/New/ActionButton'
 import SearchBar from '../../components/New/SearchBar'
 import { AuthContext } from '../../Context/AuthContext'
-
-const tablevalues = {
-  tableHeaders: [
-    { id: '#', label: '#' },
-
-    { id: 'GSM', label: 'GSM' },
-
-    { id: 'BF', label: 'BF' },
-
-    { id: 'Color', label: 'Color' },
-
-    { id: 'FluteType', label: 'Flute Type' },
-
-    { id: 'FluteRatio', label: 'Flute Ratio' },
-
-    { id: 'WeightInKg', label: 'Weight In Kg' },
-
-    { id: 'BurstingStrength', label: 'Bursting Strength (Kg Per Cm2)' },
-  ],
-
-  colorOptions: [
-    { id: '1', label: 'Golden Yellow' },
-
-    { id: '2', label: 'Natural' },
-
-    { id: '3', label: 'White' },
-
-    { id: '4', label: 'Brown' },
-  ],
-
-  tableBody: [
-    {
-      id: 'Top_Layer',
-
-      label: 'Top Layer',
-
-      GSM: { id: 'GSM', type: 'input', name: 'GSM', defaultValue: '180', required: true },
-
-      BF: { id: 'BF', type: 'input', name: 'BF', defaultValue: '18', required: true },
-
-      Color: {
-        id: 'Color',
-
-        type: 'select',
-
-        label: 'Color',
-
-        name: 'Color',
-
-        defaultValue: '1',
-
-        options: 'colorOptions',
-
-        required: true,
-      },
-
-      FluteType: { id: 'FluteType', type: 'label', defaultValue: '-' },
-
-      FluteRatio: { id: 'FluteRatio', type: 'label', defaultValue: '1' },
-
-      WeightInKg: { id: 'WeightInKg', type: 'label', defaultValue: '0.102528' },
-
-      BurstingStrength: { id: 'BurstingStrength', type: 'label', defaultValue: '3.24' },
-    },
-
-    {
-      id: 'C1',
-
-      label: 'C1',
-
-      GSM: { id: 'GSM', type: 'input', name: 'GSM', defaultValue: '120', required: true },
-
-      BF: { id: 'BF', type: 'input', name: 'BF', defaultValue: '18', required: true },
-
-      Color: {
-        id: 'Color',
-
-        type: 'select',
-
-        label: 'Color',
-
-        name: 'Color',
-
-        defaultValue: '2',
-
-        options: 'colorOptions',
-
-        required: true,
-      },
-
-      FluteType: {
-        id: 'FluteType',
-        type: 'input',
-        name: 'FluteType',
-        defaultValue: 'B',
-        required: true,
-      },
-
-      FluteRatio: { id: 'FluteRatio', type: 'label', defaultValue: '1.5' },
-
-      WeightInKg: { id: 'WeightInKg', type: 'label', defaultValue: '0.102528' },
-
-      BurstingStrength: { id: 'BurstingStrength', type: 'label', defaultValue: '1.08' },
-    },
-
-    {
-      id: 'L1',
-
-      label: 'L1',
-
-      GSM: { id: 'GSM', type: 'input', name: 'GSM', defaultValue: '180', required: true },
-
-      BF: { id: 'BF', type: 'input', name: 'BF', defaultValue: '18', required: true },
-
-      Color: {
-        id: 'Color',
-
-        type: 'select',
-
-        label: 'Color',
-
-        name: 'Color',
-
-        defaultValue: '1',
-
-        options: 'colorOptions',
-
-        required: true,
-      },
-
-      FluteType: { id: 'FluteType', type: 'label', defaultValue: '-' },
-
-      FluteRatio: { id: 'FluteRatio', type: 'label', defaultValue: '1' },
-
-      WeightInKg: { id: 'WeightInKg', type: 'label', defaultValue: '0.102528' },
-
-      BurstingStrength: { id: 'BurstingStrength', type: 'label', defaultValue: '3.24' },
-    },
-  ],
-}
+import { useSearch } from '../../components/New/SearchContext'
 
 function SkuList() {
-  const [skuType, setSkuType] = useState('')
-  const [client, setClient] = useState('')
-  const [searchSKU, setSearchSKU] = useState('')
+  const [skuType, setSkuType] = useState([])
+  const [client, setClient] = useState([])
+  const [selectedClient, setSelectedClient] = useState('')
+  const [selectedSkuType, setSelectedSkuType] = useState('')
   const [isDrawerOpen, setDrawerOpen] = useState(false)
-  const [dynamicFields, setDynamicFields] = useState('')
-  const [data, setData] = useState(tablevalues)
-  const [tabledata, setTableData] = useState([])
   const [visible, setVisible] = useState(false)
   const [skudata, setSkuData] = useState([])
   const [strictAdherence, setStrictAdherence] = useState(false)
   const [editTag, setEditTag] = useState(false)
   const [pagination, setPagination] = useState(null)
+  const [dashboard, setDashboard] = useState(null)
   const [refresh, setRefresh] = useState(false)
+  const [clientDiasble, setClientDisable] = useState(false)
+  const [limit, setLimit] = useState(10)
   const { user } = useContext(AuthContext)
+  const { searchQuery, setSearchQuery, filteredSearchData } = useSearch()
+  const location = useLocation()
+  const searchBarRef = useRef(null);
+
 
   const [addNewSkuData, setAddNewSkuData] = useState({
-    sku_name: '',
+    sku_name: null,
     client_id: user.id,
-    ply: '',
-    length: '',
-    width: '',
-    height: '',
-    joints: '',
-    ups: '',
-    inner_outer_dimension: '',
-    flap_width: '',
-    flap_tolerance: '',
-    length_trimming_tolerance: '',
-    width_trimming_tolerance: '',
+    client: null,
+    ply: null,
+    length: null,
+    width: null,
+    height: null,
+    unit: null,
+    joints: null,
+    ups: null,
+    inner_outer_dimension: null,
+    flap_width: null,
+    flap_tolerance: null,
+    length_trimming_tolerance: null,
+    width_trimming_tolerance: null,
     strict_adherence: strictAdherence,
-    customer_reference: '',
-    reference_number: '',
-    internal_id: '',
-    board_size_cm2: '',
-    deckle_size: '',
-    minimum_order_level: '',
-    sku_type: '',
+    customer_reference: null,
+    reference_number: null,
+    internal_id: null,
+    board_size_cm2: null,
+    deckle_size: null,
+    minimum_order_level: null,
+    sku_type: 'RSC box',
     sku_values: [
       {
-        layer: '',
-        gsm: '',
-        bf: '',
-        material: '',
-        color: '',
-        flute_type: '',
-        flute_ratio: '',
+        layer: null,
+        gsm: null,
+        bf: null,
+        material: null,
+        color: null,
+        flute_type: null,
+        flute_ratio: null,
       },
     ],
   })
+
+  useEffect(() => {
+    if (location.state?.initialRender) {
+      setDrawerOpen(true)
+      setClientDisable(true)
+    }
+    if (location.state?.clientdata) {
+      setClient(location.state?.clientdata)
+    }
+    if (location.state?.client_id) {
+      setAddNewSkuData((prevState) => ({
+        ...prevState,
+        client: location.state?.client_id,
+      }))
+    }
+  }, [location.state])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -227,11 +115,11 @@ function SkuList() {
       if (editTag) {
         await apiMethods.updateSku(addNewSkuData)
         setEditTag(false)
-        setRefresh((prev)=>!prev)
+        setRefresh((prev) => !prev)
       } else {
         await apiMethods.addSku(addNewSkuData)
         setDrawerOpen(false)
-        setRefresh((prev)=>!prev)
+        setRefresh((prev) => !prev)
       }
     } catch (error) {
       console.error(error)
@@ -245,10 +133,12 @@ function SkuList() {
       id: selectedSku.id || '',
       sku_name: selectedSku.sku_name || '',
       client_id: selectedSku.client_id || 1,
+      client: selectedSku.client || '',
       ply: selectedSku.ply || '',
       length: selectedSku.length || '',
       width: selectedSku.width || '',
       height: selectedSku.height || '',
+      unit: selectedSku.unit || '',
       joints: selectedSku.joints || '',
       ups: selectedSku.ups || '',
       inner_outer_dimension: selectedSku.inner_outer_dimension || '',
@@ -283,24 +173,44 @@ function SkuList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getSkuList()
+        const response = await apiMethods.getSkuList({
+          search: searchQuery || '',
+          client: selectedClient || '',
+          sku_type: selectedSkuType || '',
+          page: pagination?.currentPage || 1,
+          limit: limit,
+        })
+        const clientResponse = await apiMethods.getClients()
+    
         setSkuData(response.data)
+        setClient(clientResponse.data)
         setPagination(response.pagination)
+        setDashboard(response.dashboard)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
     fetchData()
-  }, [refresh])
+  }, [refresh, selectedClient, searchQuery, pagination?.currentPage, selectedSkuType, limit])
+
+  // Clear all filters
+  const handleClearFilters = () => {
+    // Clear the search input using the ref
+    if (searchBarRef.current) {
+      searchBarRef.current.clearSearch();
+    }
+    setSelectedSkuType('')
+    setSelectedClient('')
+  }
 
   return (
     <div>
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-x-2 -my-2">
         <h1 className="sm:text-[32px] text-[#424242]">SKU</h1>
-        <span className="sm:text-[18px] font-semibold text-[#424242] ">
+        {/* <span className="sm:text-[18px] font-semibold text-[#424242] ">
           Total SKU Count: {pagination?.totalCount}
-        </span>
+        </span> */}
         <div className="flex gap-2 items-center justify-between w-full sm:w-auto">
           {['Add SKU', 'Bulk Upload', 'Export to Excel'].map((text, index) => (
             <ActionButton
@@ -325,29 +235,29 @@ function SkuList() {
       <div className="flex justify-between items-center flex-wrap gap-2 mt-3">
         {[
           {
-            name: 'Corrugated Box',
-            count: 10000,
+            name: 'RSC Box',
+            count: dashboard?.rSCbox,
             color: '#286eb1',
             bgColor: '#2e2d6d',
             icon: <FaBoxOpen className="text-white text-2xl" />,
           },
           {
-            name: 'Die Cut Box',
-            count: 200,
+            name: 'Corrugated Sheet',
+            count: dashboard?.corrugatedSheet,
             color: '#ffeeaa',
             bgColor: '#ffcc00',
             icon: <MdTakeoutDining className="text-white text-2xl" />,
           },
           {
-            name: 'Composite Item',
-            count: 75,
+            name: 'Die Cut Box',
+            count: dashboard?.dieCutbox,
             color: '#aad3ff',
             bgColor: '#007aff',
             icon: <MdOutlineSettingsInputComposite className="text-white text-2xl" />,
           },
           {
-            name: 'Custom Item',
-            count: 50,
+            name: 'Total SKU',
+            count: pagination?.totalCount,
             color: '#c3f2cb',
             bgColor: '#4cd964',
             icon: <MdCheckroom className="text-white text-2xl" />,
@@ -378,40 +288,55 @@ function SkuList() {
 
       {/* Filters */}
       <div className="flex items-center justify-between flex-wrap gap-2 my-3 w-full">
-        <SearchBar text="SKU" data={skudata} />
+        <SearchBar text="SKU" data={skudata} ref={searchBarRef}/>
 
         <div className="flex justify-between gap-2 w-full sm:w-auto">
           <select
-            value={skuType}
-            onChange={(e) => setSkuType(e.target.value)}
+            value={selectedSkuType}
+            onChange={(e) => setSelectedSkuType(e.target.value)}
             className="sm:w-[150px] p-2 rounded-lg shadow-md bg-white text-[#424242] outline-none border-none"
-            >
+          >
             <option value="" disabled>
               SKU Type
             </option>
-            <option value="type1">Type 1</option>
-            <option value="type2">Type 2</option>
-            <option value="type3">Type 3</option>
+            {skuType.map((option, index) => (
+              <option key={index} value={option.sku_type}>
+                {option.sku_type}
+              </option>
+            ))}
           </select>
 
           <select
-            value={client}
-            onChange={(e) => setClient(e.target.value)}
+            value={selectedClient}
+            onChange={(e) => setSelectedClient(e.target.value)}
             className="sm:w-[150px] p-2 rounded-lg shadow-md bg-white text-[#424242] outline-none border-none"
-            >
-            <option value="" disabled>
-              Client
-            </option>
-            <option value="client1">Client 1</option>
-            <option value="client2">Client 2</option>
-            <option value="client3">Client 3</option>
+          >
+            <option value="">Select Client</option>
+            {client.map((item, index) => (
+              <option key={index} value={item.client_id}>
+                {item.display_name || item.client_id}
+              </option>
+            ))}
           </select>
+          <ActionButton
+            label={'Clear All'}
+            variant="minimal"
+            customColor="black"
+            className="bg-white"
+            icon={MdClearAll}
+            onClick={handleClearFilters}
+          />
         </div>
       </div>
 
       <div className="mb-1">
         <div className="overflow-x-auto overflow-y-auto whitespace-nowrap mt-2 ">
-          <SkuTable skudata={skudata} setSkuData={setSkuData} handleSkuEdit={handleSkuEdit} editTag={editTag} />
+          <SkuTable
+            skudata={filteredSearchData.length > 0 ? filteredSearchData : skudata}
+            setSkuData={setSkuData}
+            handleSkuEdit={handleSkuEdit}
+            editTag={editTag}
+          />
         </div>
       </div>
 
@@ -419,13 +344,24 @@ function SkuList() {
       <div className="flex justify-end items-center gap-4">
         <CommonPagination
           count={pagination?.totalPages || 1}
-          page={pagination?.currentPage ?? 1}
-          onChange={(event, value) =>
+          page={pagination?.currentPage || 1}
+          onChange={(event, value) => {
             setPagination((prev) => ({
               ...prev,
               currentPage: value,
             }))
-          }
+            setRefresh((prev) => !prev)
+          }}
+          onLimitChange={(newLimit) => {
+            setLimit(newLimit)
+            // Reset to first page when changing limit
+            setPagination((prev) => ({
+              ...prev,
+              currentPage: 1,
+            }))
+            setRefresh((prev) => !prev)
+          }}
+          limit={limit}
         />
       </div>
       <div>
@@ -433,7 +369,7 @@ function SkuList() {
       </div>
       <Drawer
         isOpen={isDrawerOpen || editTag}
-        onClose={() => (setDrawerOpen(false), setEditTag(false))}
+        onClose={() => (setDrawerOpen(false), setEditTag(false), setClientDisable(false))}
       >
         <SkuAddEdit
           handleChange={handleChange}
@@ -443,6 +379,11 @@ function SkuList() {
           editTag={editTag}
           addNewSkuData={addNewSkuData}
           setAddNewSkuData={setAddNewSkuData}
+          client={client}
+          setClient={setClient}
+          clientDiasble={clientDiasble}
+          skuType={skuType}
+          setSkuType={setSkuType}
         />
       </Drawer>
     </div>

@@ -50,9 +50,9 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Created Date
             </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+            {/* <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Modified Date
-            </CTableHeaderCell>
+            </CTableHeaderCell> */}
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Action
             </CTableHeaderCell>
@@ -84,9 +84,9 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
                   <CTableDataCell className="py-3 px-2 text-gray-700">
                     {cell.created_date}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2 text-gray-700">
+                  {/* <CTableDataCell className="py-3 px-2 text-gray-700">
                     {cell.modified_date}
-                  </CTableDataCell>
+                  </CTableDataCell> */}
                   <CTableDataCell className="py-3 px-2 text-gray-700">
                     <ThreeDotMenu
                       value={[

@@ -76,7 +76,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">{cell.client}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
-                  {[cell.length, cell.width, cell.height].join(" x ")}
+                  {cell.length && cell.width && cell.height ? [cell.length, cell.width, cell.height].join(" x ") : 'N/A'}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
                     {cell.deckle_size}

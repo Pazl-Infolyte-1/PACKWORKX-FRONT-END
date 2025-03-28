@@ -31,6 +31,7 @@ function SkuList() {
   const [pagination, setPagination] = useState(null)
   const [refresh, setRefresh] = useState(false)
   const [clientDiasble, setClientDisable] = useState(false)
+  const [limit, setLimit] = useState(10)
   const { user } = useContext(AuthContext)
   const { searchQuery, setSearchQuery, filteredSearchData } = useSearch()
   const location = useLocation()
@@ -176,7 +177,7 @@ function SkuList() {
           client: selectedClient || '',
           sku_type: selectedSkuType || '',
           page: pagination?.currentPage || 1,
-          limit: 10,
+          limit: limit,
         })
         const clientResponse = await apiMethods.getClients()
     
@@ -188,7 +189,7 @@ function SkuList() {
       }
     }
     fetchData()
-  }, [refresh, selectedClient, searchQuery, pagination?.currentPage, selectedSkuType])
+  }, [refresh, selectedClient, searchQuery, pagination?.currentPage, selectedSkuType, limit])
 
   // Clear all filters
   const handleClearFilters = () => {
@@ -349,6 +350,16 @@ function SkuList() {
             }))
             setRefresh((prev) => !prev)
           }}
+          onLimitChange={(newLimit) => {
+            setLimit(newLimit)
+            // Reset to first page when changing limit
+            setPagination((prev) => ({
+              ...prev,
+              currentPage: 1,
+            }))
+            setRefresh((prev) => !prev)
+          }}
+          limit={limit}
         />
       </div>
       <div>

@@ -236,6 +236,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
             onChange={handleChange}
             className="w-full p-2 shadow-md border-l-2 rounded-md"
           >
+            <option hidden>Select</option>
             <option>0.2</option>
             <option>0.1</option>
           </select>

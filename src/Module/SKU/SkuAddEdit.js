@@ -223,7 +223,6 @@ function SkuAddEdit({
       />
     ),
   }
-console.log(addNewSkuData.sku_type,"skutype");
 
   return (
     <div className="p-6 bg-white rounded-lg">

@@ -16,7 +16,6 @@ function RSCBox({
   setAddNewSkuData,
   updateSkuValues,
 }) {
-  //  calculate board size and UPS
   const calculateBoardSize = (data) => {
     const length = parseFloat(data.length) || 0
     const width = parseFloat(data.width) || 0
@@ -25,14 +24,13 @@ function RSCBox({
     const flapWidth = parseFloat(data.flap_width) || 0
     const deckleSize = parseFloat(data.deckle_size) || 0
 
-    const lengthBoardSize = length * width + lengthTrimmingTolerance + flapWidth
+    const lengthBoardSize = length * width * 2 + lengthTrimmingTolerance + flapWidth
     const widthBoardSize = width * height + lengthTrimmingTolerance
 
     const totalBoardSize = lengthBoardSize * widthBoardSize
 
     const ups = widthBoardSize > 0 ? Math.floor(deckleSize / widthBoardSize) : 0
 
-    // Return calculated values
     return {
       length_board_size_cm2: lengthBoardSize.toFixed(2),
       width_board_size_cm2: widthBoardSize.toFixed(2),
@@ -404,7 +402,7 @@ function RSCBox({
           id="deckle_size"
           name="deckle_size"
           value={addNewSkuData.deckle_size}
-          onChange={handleChange}
+          onChange={modifiedHandleChange}
           placeholder="deckle size"
         />
 

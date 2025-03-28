@@ -11,12 +11,16 @@ import {
 import ThreeDotMenu from '../../../components/ThreeDotMenu'
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 function EmployeeTable({ employeesdata = [] }) {
+  console.log(employeesdata,'from employee table')
   return (
     <>
       <div className="h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
         <CTable striped hover className=" w-full m-0">
           <CTableHead className="bg-gray-100 sticky top-0 z-10  ">
             <CTableRow>
+            <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+                ID
+              </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Name
               </CTableHeaderCell>
@@ -27,8 +31,9 @@ function EmployeeTable({ employeesdata = [] }) {
                 Department
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Work Schedule
+                Designation
               </CTableHeaderCell>
+
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Reporting Manager
               </CTableHeaderCell>
@@ -40,23 +45,39 @@ function EmployeeTable({ employeesdata = [] }) {
               </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
+          
 
           <CTableBody>
             {employeesdata.length > 0 ? (
               employeesdata.map((cell, index) => (
                 <CTableRow key={index} className="border-b">
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.name}</CTableDataCell>
+                                    <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.employee_id}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.employee_name}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.role}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.department}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.work_schedule}
+                    {cell.designation}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.reporting_manager}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.Status}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {/* {cell.user_status} */}
+                    <span
+                  className={`px-2.5 py-1 rounded-full text-sm font-medium ${
+                    cell.user_status === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  {cell.user_status}
+                </span>
+                    </CTableDataCell>
+                  
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     <ThreeDotMenu
                       value={[

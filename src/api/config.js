@@ -366,7 +366,68 @@ export const apiMethods = {
       console.error(error);
       
     }
-  }
+  },
+  getCountries: async()=>{
+    try {
+      return await apiClient.get(`/common-service/countries`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getCompanyAddress: async()=>{
+    try {
+      return await apiClient.get(`/companies-address`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getDepartmentsList: async()=>{
+    try {
+      return await apiClient.get(`/departments`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getDesignation: async()=>{
+    try {
+      return await apiClient.get(`/designations`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getRoles: async()=>{
+    try {
+      return await apiClient.get(`/role`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  uploadFile: async(file)=>{
+    try {
+      return await apiClient.post('/file/upload',file, {
+        headers: { "Content-Type": "multipart/form-data",},
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  createNewEmployee:async(employeeForm)=>{
+    try {
+      return await apiClient.post('/user/register',employeeForm)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  GetEmployeelist: async()=>{
+    try {
+      return await apiClient.get('/user/employees')
+    } catch (error) {
+      console.log(error)
+    }
+  }  
+
  }
 
 export default apiMethods

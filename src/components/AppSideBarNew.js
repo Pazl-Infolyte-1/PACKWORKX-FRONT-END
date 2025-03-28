@@ -6,26 +6,26 @@ import * as iconSet from '@coreui/icons'
 import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
 import { cilCloudDownload,cilLayers,cilPuzzle,cilSpeedometer } from '@coreui/icons'
-
-
+ 
+ 
 export const AppSideBarNew = ({ giveAccess }) => {
   console.log("datas////",giveAccess)
   const [expandedModules,setExpandedModules] = useState({})
-
+ 
   const toggleGroup = (moduleId) => {
     setExpandedModules((prevState) => ({
       ...prevState,
       [moduleId]: !prevState[moduleId],
     }))
   }
-
+ 
   const navLink = (title,icon) => (
     <div className="d-flex align-items-center">
       {icon && iconSet[icon] && <CIcon icon={iconSet[icon]} className="nav-icon" />}
       <span>{title}</span>
     </div>
   )
-
+ 
   const NavGroup = ({ moduleId,title,icon,children }) => (
     <div className="nav-group">
       <div
@@ -50,26 +50,26 @@ export const AppSideBarNew = ({ giveAccess }) => {
   )
   const assetModules = giveAccess.filter(module => module.module_group === "Assets");
   const shouldDisplayAssets = assetModules.some(module => module.modules_description?.trim() !== "");
-
+ 
   const dashboardModules = giveAccess.filter(module => module.module_group === "Dashboard");
   const shouldDisplayDashboard = dashboardModules.some(module => module.modules_description?.trim() !== "");
-
+ 
   const hrmsModules = giveAccess.filter(module => module.module_group === "HRMS");
   const shouldDisplayHrms = hrmsModules.some(module => module.modules_description?.trim() !== "");
-
+ 
   const orderManagementModules = giveAccess.filter(module => module.module_group === "Order Management");
   const shouldDisplayOrderManagement = orderManagementModules.some(module => module.modules_description?.trim() !== "");
-
+ 
   const reportModules = giveAccess.filter(module => module.module_group === "Reports");
   const shouldDisplayReports = reportModules.some(module => module.modules_description?.trim() !== "");
-
+ 
   const settingModules = giveAccess.filter(module => module.module_group === "Settings");
   const shouldDisplaySettings = settingModules.some(module => module.modules_description?.trim() !== "");
-
+ 
   const accountsModules = giveAccess.filter(module => module.module_group === "Accounts");
   const shouldDisplayAccounts = accountsModules.some(module => module.modules_description?.trim() !== "");
-
-
+ 
+ 
   return (
     <CSidebarNav as={SimpleBar}>
       {/*<CNavTitle>Static Menu</CNavTitle>
@@ -108,9 +108,9 @@ export const AppSideBarNew = ({ giveAccess }) => {
       {/*<CNavItem>
         <CNavLink as={NavLink} to="/dashboard">{navLink('Dashboard', 'cilUser')}</CNavLink>
       </CNavItem>*/}
-
-
-
+ 
+ 
+ 
 {/*superAdmin*/}
 {/*accounts*/}
 {shouldDisplayAccounts && (
@@ -157,10 +157,10 @@ export const AppSideBarNew = ({ giveAccess }) => {
           })}
         </>
       )}
-
-
-
-
+ 
+ 
+ 
+ 
       {/*dashboard*/}
       {shouldDisplayDashboard && (
         <>
@@ -179,7 +179,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
           })}
         </>
       )}
-
+ 
       {/*AssetGroup*/}
       {shouldDisplayAssets && (
         <>
@@ -234,7 +234,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
           })}
         </>
       )}
-
+ 
       {/*ordermanagement*/}
       {shouldDisplayOrderManagement && (
         <>
@@ -314,10 +314,10 @@ export const AppSideBarNew = ({ giveAccess }) => {
             }
             return null;
           })}
-
+ 
         </>
       )}
-
+ 
       {/*reports*/}
       {shouldDisplayReports && (
         <>
@@ -336,7 +336,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
           })}
         </>
       )}
-
+ 
       {/*Settings*/}
       {shouldDisplaySettings && (
         <>
@@ -360,19 +360,19 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               );
             }
-          
+         
             return null;
           })}
         </>
       )}
-
+ 
       {/*<CNavItem>
         <CNavLink as={NavLink} to="/employeelist">{navLink('HRMS', 'cilUser')}</CNavLink>
       </CNavItem>*/}
       {/*<CNavItem>
         <CNavLink as={NavLink} to="/machinedashboard">{navLink('Machine', 'cilSettings')}</CNavLink>
       </CNavItem>
-
+ 
       <CNavTitle>Order Management</CNavTitle>
       <CNavItem>
         <CNavLink as={NavLink} to="/salesorder">{navLink('Sales Order', 'cilColorBorder')}</CNavLink>
@@ -386,7 +386,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
       <CNavItem>
         <CNavLink as={NavLink} to="/production">{navLink('Production', 'cilTruck')}</CNavLink>
       </CNavItem>
-
+ 
       <CNavTitle>Warehouse Management</CNavTitle>
       <CNavItem>
         <CNavLink as={NavLink} to="/purchaseorder">{navLink('Purchase Order', 'cilBriefcase')}</CNavLink>
@@ -397,4 +397,3 @@ export const AppSideBarNew = ({ giveAccess }) => {
     </CSidebarNav>
   )
 }
-

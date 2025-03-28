@@ -3,6 +3,8 @@ import { IoCheckmarkCircleOutline } from 'react-icons/io5'
 import { TbSmartHome } from 'react-icons/tb'
 import { BiSearchAlt } from 'react-icons/bi'
 import axios from 'axios'
+import apiMethods from '../../../api/config'
+
 
 import CommonPagination from '../../../components/New/Pagination'
 import EmployeeForm from './EmployeeForm'
@@ -21,15 +23,14 @@ function EmployeeList() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get('https://mocki.io/v1/b59d7f3d-51e9-4c19-8158-8915c01e011c')
-        console.log(response.data)
-
+        const response = await apiMethods.GetEmployeelist()
         setData(response.data.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
     fetchData()
+
   }, [])
 
   const tableData = Array.isArray(data) ? data : []

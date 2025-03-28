@@ -358,7 +358,93 @@ export const apiMethods = {
       console.error(error);
       
     }
-  }
+  },
+
+  //companies
+  getCompanies: async (queryParams = {}) => {
+   
+      try {
+        const token = localStorage.getItem("token");
+  
+        if (!token) {
+          throw new Error("No token found. Please log in again.");
+        }
+  
+        const response = await apiClient.get("/companies", {
+          headers: { Authorization: `Bearer ${token}` },
+          params: queryParams, // Pass query parameters if needed
+        });
+  
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching companies:", error.response?.data || error.message);
+        throw error;
+      }
+    },
+
+
+    createCompany: async (companyData) => {
+      try {
+        const token = localStorage.getItem('token') // Retrieve token before sending request
+        // const token = await getToken()
+        if (!token) {
+          throw new Error('No token found. Please log in again.')
+        }
+  
+        const response = await apiClient.post('/companies', companyData, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Attach token
+          },
+        })
+  
+        return response.data
+      } catch (error) {
+        console.error('Error posting client:', error.response?.data || error.message)
+        throw error
+      }
+    },
+    updateCompany: async (companyId,companyData) => {
+      console.log(companyId,"client124")
+      try {
+        const token = localStorage.getItem('token') // Retrieve token before sending request
+        // const token = await getToken()
+        if (!token) {
+          throw new Error('No token found. Please log in again.')
+        }
+  
+        const response = await apiClient.put(`/clients/${companyId}`, companyData, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Attach token
+          },
+        })
+  
+        return response.data
+      } catch (error) {
+        console.error('Error posting client:', error.response?.data || error.message)
+        throw error
+      }
+    },
+    deleteCompany: async (companyId) => {
+      try {
+        const token = localStorage.getItem('token'); // Retrieve token before sending request
+        // const token = await getToken()
+  
+        if (!token) {
+          throw new Error('No token found. Please log in again.');
+        }
+    
+        const response = await apiClient.delete(`/companies/${companyId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Attach token
+          },
+        });
+    
+        return response.data;
+      } catch (error) {
+        console.error('Error deleting company:', error.response?.data || error.message);
+        throw error;
+      }
+    },
  }
 
 export default apiMethods

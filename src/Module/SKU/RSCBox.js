@@ -3,7 +3,75 @@ import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
 import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash } from '@coreui/icons'
 
-function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData, updateSkuValues}) {
+function RSCBox({
+  dropdownRef,
+  addNewSkuData,
+  isOpen,
+  handleChange,
+  clientDiasble,
+  client,
+  setIsOpen,
+  handleSelect,
+  skuType,
+  setAddNewSkuData,
+  updateSkuValues,
+}) {
+  // New function to calculate board size
+  const calculateBoardSize = (data) => {
+    const length = parseFloat(data.length) || 0
+    const width = parseFloat(data.width) || 0
+    const height = parseFloat(data.height) || 0
+    const lengthTrimmingTolerance = parseFloat(data.length_trimming_tolerance) || 0
+    const flapWidth = parseFloat(data.flap_width) || 0
+
+    // Calculate board sizes with specific formulas
+    const lengthBoardSize = (length * width) + lengthTrimmingTolerance + flapWidth
+    const widthBoardSize = (width * height )+ lengthTrimmingTolerance
+
+    // Calculate total board size by multiplying length and width board sizes
+    const totalBoardSize = lengthBoardSize * widthBoardSize
+
+    // Update board sizes
+    return {
+      length_board_size_cm2: lengthBoardSize.toFixed(2),
+      width_board_size_cm2: widthBoardSize.toFixed(2),
+      board_size_cm2: totalBoardSize.toFixed(2),
+    }
+  }
+
+  // Modified handleChange to include board size calculation
+  const modifiedHandleChange = (e) => {
+    const { name, value } = e.target
+    const updatedSkuData = {
+      ...addNewSkuData,
+      [name]: value,
+    }
+
+    // Calculate board sizes if relevant fields change
+    const boardSizeFields = ['length', 'width', 'height', 'length_trimming_tolerance', 'flap_width']
+
+    if (boardSizeFields.includes(name)) {
+      const boardSizeUpdates = calculateBoardSize(updatedSkuData)
+
+      // Update state with both the changed field and calculated board sizes
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        [name]: value,
+        ...boardSizeUpdates,
+      }))
+    } else {
+      // For other fields, just update normally
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        [name]: value,
+      }))
+    }
+
+    // Call original handleChange if it exists
+    if (handleChange) {
+      handleChange(e)
+    }
+  }
   return (
     <>
       <div className="grid grid-cols-3 gap-4">
@@ -57,7 +125,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
           skuName="SKU Name"
           id="sku_name"
           name="sku_name"
-          value={addNewSkuData.sku_name }
+          value={addNewSkuData.sku_name}
           onChange={handleChange}
           placeholder="SKU Name"
         />
@@ -113,7 +181,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
               id="length"
               name="length"
               value={addNewSkuData.length}
-              onChange={handleChange}
+              onChange={modifiedHandleChange}
               placeholder="Length"
               className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
             ></input>{' '}
@@ -122,7 +190,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
               id="width"
               name="width"
               value={addNewSkuData.width}
-              onChange={handleChange}
+              onChange={modifiedHandleChange}
               placeholder="Width"
               className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
             ></input>{' '}
@@ -131,7 +199,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
               id="height"
               name="height"
               value={addNewSkuData.height}
-              onChange={handleChange}
+              onChange={modifiedHandleChange}
               placeholder="Depth"
               className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
             ></input>
@@ -213,7 +281,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
             id="flap_width"
             name="flap_width"
             value={addNewSkuData.flap_width}
-            onChange={handleChange}
+            onChange={modifiedHandleChange}
             placeholder="flap width"
           />
 
@@ -226,8 +294,16 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
             placeholder="flap tolerance"
           />
         </div>
+        <Input
+          skuName="Trimming tolerance"
+          id="length_trimming_tolerance"
+          name="length_trimming_tolerance"
+          value={addNewSkuData.length_trimming_tolerance}
+          onChange={modifiedHandleChange}
+          placeholder="trimming tolerance"
+        />
 
-        <div>
+        {/* <div>
           <label className="block text-[16px] font-medium mb-2">Trimming Tolerance</label>
           <select
             name="length_trimming_tolerance"
@@ -240,7 +316,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
             <option>0.2</option>
             <option>0.1</option>
           </select>
-        </div>
+        </div> */}
 
         {/* <div className="mb-4">
           <label className="block text-[16px] font-medium mb-2">Width Trimming Tolerance</label>
@@ -286,19 +362,19 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
         />
         <Input
           skuName="Length Board Size"
-          id="board_size_cm2"
-          name="board_size_cm2"
+          id="length_board_size_cm2"
+          name="length_board_size_cm2"
           value={addNewSkuData.length_board_size_cm2}
-          onChange={handleChange}
+          // onChange={modifiedHandleChange}
           placeholder="board size"
           readOnly={true}
         />
         <Input
           skuName="Width Board Size"
-          id="board_size_cm2"
-          name="board_size_cm2"
+          id="width_board_size_cm2"
+          name="width_board_size_cm2"
           value={addNewSkuData.width_board_size_cm2}
-          onChange={handleChange}
+          // onChange={modifiedHandleChange}
           placeholder="board size"
           readOnly={true}
         />
@@ -308,8 +384,8 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
           id="board_size_cm2"
           name="board_size_cm2"
           value={addNewSkuData.board_size_cm2}
-          onChange={handleChange}
-          placeholder="board size"
+          // onChange={modifiedHandleChange}
+          placeholder="Total Board size"
           readOnly={true}
         />
 

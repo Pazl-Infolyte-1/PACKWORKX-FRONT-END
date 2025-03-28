@@ -51,6 +51,8 @@ function SkuAddEdit({
         flap_tolerance: null,
         length_trimming_tolerance: null,
         width_trimming_tolerance: null,
+        width_board_size_cm2:null,
+        length_board_size_cm2:null,
         strict_adherence: strictAdherence,
         customer_reference: null,
         reference_number: null,

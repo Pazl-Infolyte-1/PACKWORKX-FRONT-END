@@ -36,8 +36,7 @@ function SkuList() {
   const { user } = useContext(AuthContext)
   const { searchQuery, setSearchQuery, filteredSearchData } = useSearch()
   const location = useLocation()
-  const searchBarRef = useRef(null);
-
+  const searchBarRef = useRef(null)
 
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
@@ -54,6 +53,8 @@ function SkuList() {
     flap_width: null,
     flap_tolerance: null,
     length_trimming_tolerance: null,
+    width_board_size_cm2:null,
+    length_board_size_cm2:null,
     width_trimming_tolerance: null,
     strict_adherence: strictAdherence,
     customer_reference: null,
@@ -181,7 +182,7 @@ function SkuList() {
           limit: limit,
         })
         const clientResponse = await apiMethods.getClients()
-    
+
         setSkuData(response.data)
         setClient(clientResponse.data)
         setPagination(response.pagination)
@@ -197,10 +198,19 @@ function SkuList() {
   const handleClearFilters = () => {
     // Clear the search input using the ref
     if (searchBarRef.current) {
-      searchBarRef.current.clearSearch();
+      searchBarRef.current.clearSearch()
     }
     setSelectedSkuType('')
     setSelectedClient('')
+  }
+
+  const handleSkuExelExport = async () => {
+    await apiMethods.getSkuExcelExport({
+      search: searchQuery,
+      sku_type: selectedSkuType,
+      client: selectedClient,
+      status: 'active'
+    })
   }
 
   return (
@@ -224,6 +234,9 @@ function SkuList() {
                 }
                 if (text === 'Bulk Upload') {
                   setVisible(true)
+                }
+                if (text === 'Export to Excel') {
+                  handleSkuExelExport()
                 }
               }}
             ></ActionButton>
@@ -287,8 +300,8 @@ function SkuList() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center justify-between flex-wrap gap-2 my-3 w-full">
-        <SearchBar text="SKU" data={skudata} ref={searchBarRef}/>
+      <div className="flex items-center justify-between flex-wrap gap-2 my-4 p-3 w-full bg-white border border-gray-200 border-b-transparent">
+        <SearchBar text="SKU" data={skudata} ref={searchBarRef} />
 
         <div className="flex justify-between gap-2 w-full sm:w-auto">
           <select
@@ -329,8 +342,8 @@ function SkuList() {
         </div>
       </div>
 
-      <div className="mb-1">
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap mt-2 ">
+      <div className="-my-6">
+        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap ">
           <SkuTable
             skudata={filteredSearchData.length > 0 ? filteredSearchData : skudata}
             setSkuData={setSkuData}
@@ -341,7 +354,7 @@ function SkuList() {
       </div>
 
       {/* Pagination Section */}
-      <div className="flex justify-end items-center gap-4">
+      <div className="flex justify-end items-center gap-4 mt-[40px]">
         <CommonPagination
           count={pagination?.totalPages || 1}
           page={pagination?.currentPage || 1}

@@ -27,8 +27,22 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
     setDeleteModal(false)
   }
 
+  const formatDate = (dateString) => {
+    if (!dateString) return ''
+
+    return new Date(dateString).toLocaleString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    })
+  }
+
   return (
-    <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar">
+    <div className="h-[300px] overflow-y-auto border border-gray-200 custom-scrollbar">
       <CTable striped hover className="w-full m-0">
         <CTableHead className="bg-gray-100 sticky top-0 z-10">
           <CTableRow className="text-center">
@@ -84,7 +98,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
                     {cell.deckle_size}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
-                    {cell.created_date}
+                    {formatDate(cell.updated_at)}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
                     <span

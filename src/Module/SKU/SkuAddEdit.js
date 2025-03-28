@@ -228,11 +228,6 @@ function SkuAddEdit({
 
   return (
     <div className="p-6 bg-white rounded-lg">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold">
-          {editTag ? 'Update SKU Details' : 'Add SKU Details'}
-        </h2>
-      </div>
 
       {/* conditional rendring according to sku_type */}
       {skuComponents[addNewSkuData.sku_type] || null}

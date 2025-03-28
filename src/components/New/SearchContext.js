@@ -23,8 +23,13 @@ export const SearchProvider = ({ children }) => {
     }
   }
 
+  const clearSearch = () => {
+    setSearchQuery('')
+    setFilteredSearchData([])
+  }
+
   return (
-    <SearchContext.Provider value={{ searchQuery, filteredSearchData, handleSearch }}>
+    <SearchContext.Provider value={{ searchQuery, filteredSearchData, handleSearch, clearSearch }}>
       {children}
     </SearchContext.Provider>
   )

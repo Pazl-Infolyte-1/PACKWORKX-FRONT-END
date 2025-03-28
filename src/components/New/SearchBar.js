@@ -1,19 +1,50 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
 import { useSearch } from './SearchContext'
 import { IoSearch } from 'react-icons/io5'
 
-const SearchBar = ({ text, data }) => {
-  const { handleSearch } = useSearch()
+const SearchBar = forwardRef(({ text, data }, ref) => {
+  const { handleSearch, clearSearch: contextClearSearch } = useSearch()
   const [query, setQuery] = useState('')
+  const [debounceTimer, setDebounceTimer] = useState(null)
+
+  useImperativeHandle(ref, () => ({
+    clearSearch: () => {
+      setQuery('')
+      contextClearSearch()
+      if (debounceTimer) {
+        clearTimeout(debounceTimer)
+      }
+    },
+  }))
 
   const handleChange = (event) => {
     const newQuery = event.target.value
     setQuery(newQuery)
-    handleSearch(newQuery, data)
+
+    if (debounceTimer) {
+      clearTimeout(debounceTimer)
+    }
+
+    setDebounceTimer(
+      setTimeout(() => {
+        if (newQuery.trim() === '') {
+          // If input is empty, show all data
+          contextClearSearch()
+        } else {
+          // Perform search
+          handleSearch(newQuery, data)
+        }
+      }, 500),
+    )
   }
-  console.log(query);
-  
-  
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimer) {
+        clearTimeout(debounceTimer)
+      }
+    }
+  }, [debounceTimer])
 
   return (
     <div>
@@ -31,6 +62,6 @@ const SearchBar = ({ text, data }) => {
       </div>
     </div>
   )
-}
+})
 
 export default SearchBar

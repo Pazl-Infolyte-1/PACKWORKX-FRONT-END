@@ -51,7 +51,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
               Created Date
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Modified Date
+              Status
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Action
@@ -76,7 +76,9 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">{cell.client}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
-                  {cell.length && cell.width && cell.height ? [cell.length, cell.width, cell.height].join(" x ") : 'N/A'}
+                    {cell.length && cell.width && cell.height
+                      ? [cell.length, cell.width, cell.height].join(' x ')
+                      : 'N/A'}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
                     {cell.deckle_size}
@@ -85,7 +87,15 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
                     {cell.created_date}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
-                    {cell.modified_date}
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        cell.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {cell.status}
+                    </span>
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
                     <ThreeDotMenu

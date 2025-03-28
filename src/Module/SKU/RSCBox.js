@@ -99,8 +99,8 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
               Select Client
             </option>
             {client?.map((item, index) => (
-              <option key={index} value={item.client_id}>
-                {item.display_name || item.client_id}
+              <option key={index} value={item.display_name}>
+                {item.display_name}
               </option>
             ))}
           </select>

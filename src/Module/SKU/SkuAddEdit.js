@@ -261,7 +261,7 @@ function SkuAddEdit({
                   <th className="p-2">Color</th>
                   <th className="p-2">Flute Type</th>
                   <th className="p-2">Flute Ratio</th>
-                  <th className="p-2">material</th>
+                  <th className="p-2">Material</th>
                   <th className="p-2">Weight (Kg)</th>
                   <th className="p-2">
                     Bursting Strength <br />{' '}

@@ -53,25 +53,47 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
 
   // State to manage form data
   const [formData, setFormData] = useState({
-    name: 'John Doe',
-    email: 'john.doe@examplse.com',
-    password: 'securePassword123',
-    mobile: '9876543210',
-    employee_id: 'EMP567',
-    address: '789 Street Name',
-    skills: 'john_doe',
-    department_id: 1,
-    designation_id: 3,
+    name: '',
+    email: '',
+    password: '',
+    mobile: '',
+    employee_id: '',
+    address: '',
+    skills: '',
+    department_id: null ,
+    designation_id: null,
     joining_date: '',
     date_of_birth: '',
-    about_me: 'Software Engineer',
-    reporting_to: 3,
+    about_me: '',
+    reporting_to: null,
     contract_end_date: '',
-    employment_type: 'Full-time',
-    company_address_id: 10,
-    role_id: '1',
+    employment_type: '',
+    company_address_id:null,
+    role_id: null,
     image: '',
   });
+
+  // const [formData, setFormData] = useState({
+  //   name: 'Johny Doe',
+  //   email: 'johnyydoe@example.com',
+  //   password: '123456',
+  //   mobile: '9876543210',
+  //   employee_id: 'EMP123',
+  //   address: '123, Main Street, City',
+  //   skills: 'React, Node.js, MySQL',
+  //   department_id: 1,
+  //   designation_id: 1,
+  //   joining_date: '2024-01-15',
+  //   date_of_birth: '1995-08-20',
+  //   about_me: 'Passionate software developer with experience in MERN stack.',
+  //   reporting_to: 3,
+  //   contract_end_date: '2026-01-15',
+  //   employment_type: 'Full-time',
+  //   company_address_id: 1,
+  //   role_id: 4,
+  //   image: '',
+  // });
+  
 
   // State for dropdown options
   const [dropdownOptions, setDropdownOptions] = useState({
@@ -115,10 +137,10 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
   }, []);
 
   // If you want to log after state update, use useEffect
-  useEffect(() => {
-    // console.log('Dropdown Options Updated:', dropdownOptions.companiesAddresses);
-    console.log('Dropdown Options Updated:', dropdownOptions);
-  }, [dropdownOptions]);
+  // useEffect(() => {
+  //   // console.log('Dropdown Options Updated:', dropdownOptions.companiesAddresses);
+  //   console.log('Dropdown Options Updated:', dropdownOptions);
+  // }, [dropdownOptions]);
 
 
 
@@ -127,7 +149,12 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
     const { name, value } = e.target;
     setFormData(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: 
+        // Convert to number for specific fields, keep as is for others
+        ['department_id', 'designation_id', 'reporting_to', 'company_address_id', 'role_id']
+        .includes(name) 
+          ? (value === '' ? null : Number(value)) 
+          : value
     }));
   };
 
@@ -297,6 +324,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                     value={formData.company_address_id}
                     onChange={handleInputChange}
                   >
+                    <option value="" disabled selected>Select Company Address</option>
                     {dropdownOptions.companiesAddresses.map(dept => (
                       <option key={dept.id} value={dept.id}>
                         {dept.address}
@@ -316,6 +344,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                     value={formData.department_id}
                     onChange={handleInputChange}
                   >
+                    <option value="" disabled selected>Select Department</option>
                     {dropdownOptions.departments.map(dept => (
                       <option key={dept.id} value={dept.id}>
                         {dept.department_name}
@@ -335,6 +364,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                     value={formData.designation_id}
                     onChange={handleInputChange}
                   >
+                    <option value="" disabled selected>Select Designation</option>
                     {dropdownOptions.designations.map(desig => (
                       <option key={desig.id} value={desig.id}>
                         {desig.name}
@@ -354,6 +384,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                     value={formData.role_id}
                     onChange={handleInputChange}
                   >
+                    <option value="" disabled selected>Select Role</option>
                     {dropdownOptions.roles.map(desig => (
                       <option key={desig.id} value={desig.id}>
                         {desig.name}
@@ -416,8 +447,10 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                     value={formData.reporting_to}
                     onChange={handleInputChange}
                   >
+                    <option value="" disabled selected>Select Reporting To</option>
+                    
                     {REPORTING_OPTIONS.map(manager => (
-                      <option key={manager.id} value={manager.id}>
+                      <option key={manager.id} value={+manager.id}>
                         {manager.name}
                       </option>
                     ))}
@@ -435,6 +468,8 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                     value={formData.employment_type}
                     onChange={handleInputChange}
                   >
+                    <option value="" disabled selected>Select Employment Type</option>
+                    
                     {EMPLOYMENT_TYPES.map(type => (
                       <option key={type} value={type}>
                         {type}

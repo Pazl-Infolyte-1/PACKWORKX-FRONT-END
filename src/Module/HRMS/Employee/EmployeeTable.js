@@ -30,6 +30,9 @@ function EmployeeTable({ employeesdata = [] }) {
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Department
               </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+                Designation
+              </CTableHeaderCell>
 
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Reporting Manager
@@ -57,9 +60,24 @@ function EmployeeTable({ employeesdata = [] }) {
                     {cell.department}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.designation}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.reporting_manager}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.user_status}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {/* {cell.user_status} */}
+                    <span
+                  className={`px-2.5 py-1 rounded-full text-sm font-medium ${
+                    cell.user_status === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  {cell.user_status}
+                </span>
+                    </CTableDataCell>
+                  
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     <ThreeDotMenu
                       value={[

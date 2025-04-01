@@ -257,21 +257,21 @@ function SkuList() {
         {[
           {
             name: 'RSC Box',
-            count: dashboard?.rSCbox,
+            count: dashboard?.rscbox,
             color: '#286eb1',
             bgColor: '#2e2d6d',
             icon: <FaBoxOpen className="text-white text-2xl" />,
           },
           {
-            name: 'Corrugated Sheet',
-            count: dashboard?.corrugatedSheet,
+            name: 'Board',
+            count: dashboard?.board,
             color: '#ffeeaa',
             bgColor: '#ffcc00',
             icon: <MdTakeoutDining className="text-white text-2xl" />,
           },
           {
             name: 'Die Cut Box',
-            count: dashboard?.dieCutbox,
+            count: dashboard?.diecutbox,
             color: '#aad3ff',
             bgColor: '#007aff',
             icon: <MdOutlineSettingsInputComposite className="text-white text-2xl" />,

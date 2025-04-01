@@ -88,9 +88,14 @@ function SkuList() {
     if (location.state?.client_id) {
       setAddNewSkuData((prevState) => ({
         ...prevState,
-        client: location.state?.client_id,
+        client: location.state?.client_id,  
       }))
     }
+
+      // Clear the location state after using it to prevent side effects on refresh
+  if (location.state) {
+    window.history.replaceState({}, document.title);
+  }
   }, [location.state])
 
   const handleChange = (event) => {
@@ -173,6 +178,9 @@ function SkuList() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (location.state?.skipInitialFetch && !refresh) {
+        return;
+      }
       try {
         const response = await apiMethods.getSkuList({
           search: searchQuery || '',
@@ -192,7 +200,7 @@ function SkuList() {
       }
     }
     fetchData()
-  }, [refresh, selectedClient, searchQuery, pagination?.currentPage, selectedSkuType, limit])
+  }, [refresh, selectedClient, searchQuery, pagination?.currentPage, selectedSkuType, limit,location.state?.skipInitialFetch])
 
   // Clear all filters
   const handleClearFilters = () => {

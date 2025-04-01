@@ -7,12 +7,18 @@ const CustomAlert = ({ alerts, handleClose }) => {
         <div
           key={index}
           className={`w-80 p-4 text-white rounded-lg shadow-lg transition-all duration-300 ${
-            alert.severity === "success" ? "bg-green-500" : "bg-red-500"
+            alert.severity === "success"
+              ? "bg-green-500"
+              : alert.severity === "warning"
+              ? "bg-yellow-500"
+              : "bg-red-500"
           }`}
         >
           <div className="flex justify-between items-center">
             <span>{alert.message}</span>
-            <button onClick={handleClose} className="text-white font-bold ml-4">×</button>
+            <button onClick={handleClose} className="text-white font-bold ml-4">
+              ×
+            </button>
           </div>
         </div>
       ))}

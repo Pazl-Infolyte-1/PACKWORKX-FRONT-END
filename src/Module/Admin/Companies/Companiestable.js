@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   CTable,
   CTableRow,
@@ -10,12 +10,88 @@ import {
 } from '@coreui/react';
 import ThreeDotMenu from '../../../components/ThreeDotMenu';
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons';
+import CompaniesForm from './CompaniesForm';
+import DeleteModal from '../../../components/New/DeleteModal';
+import apiMethods from '../../../api/config';
+import CustomPopup from '../../../components/New/CustomPopupModal/CustomPopup';
+import CompaniesSingleViewCard from './CompaniesSingleViewCard';
 
 
-const CompaniesTable = ({ cellData }) => {
+const CompaniesTable = ({ cellData,refreshTable }) => {
+  const [isDrawerOpen, setDrawerOpen] = useState(false)
+  const [editingData, setEditingData] = useState(null)
+  const [selectedCompanyDeleteId, setSelectedCompanyDeleteId] = useState(null);  
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isSingleViewPopup, setisSingleViewPopup] = useState(false);
+  const [singleData, setSingleData] = useState(null)
+
+  console.log("cell data",cellData)
+  const openDeleteModal = (CompanyId) => {
+    console.log("del id",CompanyId)
+    setSelectedCompanyDeleteId(CompanyId);
+    setIsDeleteModalOpen(true);
+  };
+  
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedCompanyDeleteId(null);
+  };
+  const deleteCompany = async () => {
+    if (!selectedCompanyDeleteId) return;
+  
+    try {
+      console.log("Attempting to delete Company:", selectedCompanyDeleteId);
+      const CompanyId = selectedCompanyDeleteId; 
+  
+      const response = await apiMethods.deleteCompany(CompanyId);
+  
+      if (!response?.status) {
+        // If API responds with { "status": false }, treat it as an error
+        throw new Error(response?.message || "Failed to delete Company");
+      }
+  
+      console.log("Company deleted successfully:", response);
+  
+      setAlerts([{ severity: "success", message: response?.message }]);
+    } catch (error) {
+      console.error("Error deleting Company:", error);
+      
+      setAlerts([
+        { severity: "error", message: error?.message || "Something went wrong" }
+      ]);
+    } finally {
+      setTimeout(() => {
+        setAlerts([]);
+      }, 3000);
+  
+      closeDeleteModal();
+      refreshTable();
+
+    }
+  };
+  
+const openViewCard =(data)=>{
+  setisSingleViewPopup(true)
+  console.log(JSON.stringify(data))
+  setSingleData(data)
+
+}
+const handleCloseSingleViewPopup = () => {
+  setisSingleViewPopup(false);
+  //setSelectedClientId(null); // Reset client ID
+};
+
   return (
    <>
+     <DeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={closeDeleteModal}
+          onConfirm={deleteCompany}
+          title="Delete Confirmation"
+          message="Are you sure you want to delete this item?"
+        />
    <div>
+
          {/* <div className="max-h-[500px] overflow-y-auto  custom-scrollbar">
            <CTable striped hover className="mt-3 w-full border p-3"> */}
             <div className={`border border-gray-200 ${cellData.length > 0 ? "h-[350px] overflow-y-auto custom-scrollbar " : "h-[350px]"}`}>
@@ -51,18 +127,17 @@ const CompaniesTable = ({ cellData }) => {
                {cellData.length > 0 ? (
                  cellData.map((cell, index) => (
                    <CTableRow key={index} className="border-b">
-                     <CTableDataCell className="py-3 px-4 text-gray-700">
+                     <CTableDataCell onClick={()=>openViewCard(cell)} className="py-3 px-4 text-primary text-decoration-underline cursor-pointer w-[150px]">
                        {cell.id}
                      </CTableDataCell>
                      <CTableDataCell className="py-3 px-4 text-gray-700">
                        {cell.company_name}
                      </CTableDataCell>
-                     <CTableDataCell className="py-3 px-4 text-gray-700">{cell.package}</CTableDataCell>
+                     <CTableDataCell className="py-3 px-4 text-gray-700">{cell.package_type}</CTableDataCell>
                      <CTableDataCell className="py-3 px-4 text-gray-700">
-                       {cell. register_date}
-                      
+                       {new Date(cell.created_at).toLocaleString()}
                      </CTableDataCell>
-                     <CTableDataCell className="py-3 px-4 text-gray-700">{cell.last_activity}</CTableDataCell>
+                     <CTableDataCell className="py-3 px-4 text-gray-700">{cell.last_login}</CTableDataCell>
                      <CTableDataCell className="py-3 px-4 text-gray-700">{cell.status}</CTableDataCell>
                      <CTableDataCell className="py-3 px-4 text-gray-700">
                      <ThreeDotMenu
@@ -79,13 +154,15 @@ const CompaniesTable = ({ cellData }) => {
                           icon: cilPencil,
                           onClick: () => {
                             console.log('Edit')
+                            setDrawerOpen(true)
+                            setEditingData(cell)
                           },
                         },
                         {
                           label: 'Delete',
                           icon: cilTrash,
                           onClick: () => {
-                            console.log('Delete')
+                            openDeleteModal(cell?.id)
                           },
                         },
                       ]}
@@ -105,7 +182,15 @@ const CompaniesTable = ({ cellData }) => {
            </CTable>
          </div>
        </div>
-   
+       <CompaniesForm  isDrawerOpen={isDrawerOpen} setDrawerOpen={setDrawerOpen} editdata={editingData} />
+       <CustomPopup
+          isOpen={isSingleViewPopup}
+          onClose={handleCloseSingleViewPopup}
+          width={'w-[900px]'}
+          height={'480px'}
+        >
+          <CompaniesSingleViewCard companyData={singleData} />
+        </CustomPopup>
    </>
   );
 };

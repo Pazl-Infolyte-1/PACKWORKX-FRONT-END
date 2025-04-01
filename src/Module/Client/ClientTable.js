@@ -244,6 +244,7 @@ const handleEdit = (cell) => {
                                 initialRender: true,
                                 clientdata: clientdata,
                                 client_id: cell.client_id,
+                                skipInitialFetch: true
                               },
                             })
                           },

@@ -144,24 +144,30 @@ export const apiMethods = {
     }
   },
   //companies
-  getCompanies: async (queryParams = {}) => {
+  getCompanies: async (queryParams = {}, singleId) => {
+    console.log("api id", singleId);
     try {
-      const token = localStorage.getItem('token')
-
+      const token = localStorage.getItem('token');
+  
       if (!token) {
-        throw new Error('No token found. Please log in again.')
+        throw new Error('No token found. Please log in again.');
       }
-
-      const response = await apiClient.get('/companies',{
+  
+      // If singleId exists, append it to the endpoint, otherwise, use "/companies"
+      const url = singleId ? `/companies/${singleId}` : '/companies';
+  
+      const response = await apiClient.get(url, {
         headers: { Authorization: `Bearer ${token}` },
         params: queryParams, // Pass query parameters if needed
-      })
-      return response.data
+      });
+  
+      return response.data;
     } catch (error) {
-      console.error('Error fetching companies:',error.response?.data || error.message)
-      throw error
+      console.error('Error fetching companies:', error.response?.data || error.message);
+      throw error;
     }
   },
+  
   createCompany: async (companyData) => {
     try {
       const token = localStorage.getItem('token') // Retrieve token before sending request

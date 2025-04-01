@@ -15,6 +15,7 @@ import DeleteModal from '../../../components/New/DeleteModal';
 import apiMethods from '../../../api/config';
 import CustomPopup from '../../../components/New/CustomPopupModal/CustomPopup';
 import CompaniesSingleViewCard from './CompaniesSingleViewCard';
+import PopUp from '../../../components/New/PopUp';
 
 
 const CompaniesTable = ({ cellData,refreshTable }) => {
@@ -23,7 +24,7 @@ const CompaniesTable = ({ cellData,refreshTable }) => {
   const [selectedCompanyDeleteId, setSelectedCompanyDeleteId] = useState(null);  
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false);
-  const [singleData, setSingleData] = useState(null)
+  const [singleDataId, setSingleDataId] = useState(null)
 
   console.log("cell data",cellData)
   const openDeleteModal = (CompanyId) => {
@@ -73,7 +74,7 @@ const CompaniesTable = ({ cellData,refreshTable }) => {
 const openViewCard =(data)=>{
   setisSingleViewPopup(true)
   console.log(JSON.stringify(data))
-  setSingleData(data)
+  setSingleDataId(data.id)
 
 }
 const handleCloseSingleViewPopup = () => {
@@ -183,14 +184,24 @@ const handleCloseSingleViewPopup = () => {
          </div>
        </div>
        <CompaniesForm  isDrawerOpen={isDrawerOpen} setDrawerOpen={setDrawerOpen} editdata={editingData} />
-       <CustomPopup
+       {/*<CustomPopup
           isOpen={isSingleViewPopup}
           onClose={handleCloseSingleViewPopup}
           width={'w-[900px]'}
           height={'480px'}
         >
           <CompaniesSingleViewCard companyData={singleData} />
-        </CustomPopup>
+        </CustomPopup>*/}
+
+        <PopUp
+          visible={isSingleViewPopup}
+          setVisible={handleCloseSingleViewPopup} 
+          showCloseButton={true}
+          width={'70vw'}
+        >
+          {/*<ClientSingleViewCard clientData={singleData} handleEdit={handleEdit}/>*/}
+          <CompaniesSingleViewCard companyId={singleDataId} />
+        </PopUp>
    </>
   );
 };

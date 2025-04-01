@@ -130,7 +130,7 @@ const handleEdit = (cell) => {
       <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
         <div className='h-[450px]'>
         <CTable striped hover className=" w-full  m-0">
-          <CTableHead className="bg-gray-100 sticky top-0 ">
+          <CTableHead className="bg-gray-100 sticky top-0 z-10">
             <CTableRow  style={{ height: "32px" }}>
               <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"120px"}}   onClick={() => openViewCard(cell)} className="py-3 px-4 text-gray-600 font-medium">
               Id
@@ -173,7 +173,12 @@ const handleEdit = (cell) => {
               <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"250px"}} className="py-3 px-4 text-gray-600 font-medium">
              Created Date
               </CTableHeaderCell>
-
+              <CTableHeaderCell
+                style={{ whiteSpace: 'nowrap' }}
+                className="py-3 px-4 text-gray-600 font-medium"
+              >
+                Status
+              </CTableHeaderCell>
               <CTableHeaderCell
                 style={{ whiteSpace: 'nowrap' }}
                 className="py-3 px-4 text-gray-600 font-medium"
@@ -214,6 +219,18 @@ const handleEdit = (cell) => {
                   <CTableDataCell className="py-3 px-4 text-gray-700 w-[1000px]">
                     {/*{apiMethods.formatDate(cell.created_at)}*/}
                     {new Date(cell.created_at).toLocaleString()}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {/*{cell.status}*/}
+                    <span
+                  className={`px-2.5 py-1 rounded-full text-sm font-medium ${
+                    cell.status === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  {cell.status}
+                </span>
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     <ThreeDotMenu

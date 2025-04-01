@@ -264,8 +264,28 @@ const handleSearch = async () => {
     methods.setValue("clientData.company_name", tradeName);
     methods.setValue("addresses.0.street1", address);
 
+    console.log("Trade Name:", tradeName);
+    console.log("Address:", address);
+    console.log("res.////", JSON.stringify(response?.data));
+    const alerts = [{ severity: "success", message: response?.message || "GST details fetched successfully" }];
+
+    // Check if credit is not available
+    if (response?.gstDetails?.flag === false && response?.gstDetails?.message) {
+      alerts.push({ severity: "warning", message: response.gstDetails.message });
+    }
+
+    setAlerts(alerts); // Update alert messages
+    setTimeout(() => {
+      setAlerts([]);
+    }, 3000);
   } catch (error) {
     console.error("Error fetching client data:", error);
+
+    // Set error message
+    setAlerts([{ severity: "error", message: error.response?.data?.message || "Failed to fetch GST details" }]);
+    setTimeout(() => {
+      setAlerts([]); // Clear alerts after 3 seconds
+    }, 3000);
   } finally {
     setLoading(false); // Hide loader after API call
   }
@@ -341,10 +361,15 @@ response = await apiMethods.editClient(clientId, filteredData);
 };
 
 
-const handleCancel=()=>{
-  closeDrawerDuringAdd();
+const handleCancel = () => {
+  if (typeof closeDrawer === "function") {
+    closeDrawer();
+  } else if (typeof closeDrawerDuringAdd === "function") {
+    closeDrawerDuringAdd();
+  }
   reset();
-}
+};
+
   return (
     <>
     <Loader isLoading={loading} />
@@ -422,13 +447,13 @@ const handleCancel=()=>{
       <div className="flex items-center mb-4">
         <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Full Name</label>
         <div className="flex gap-2">
-          <select {...register("clientData.salutation")} className="border p-2 rounded w-28">
+          <select {...register("clientData.salutation")} className="border p-2 rounded w-28 ml-[38px]">
             <option value="" disabled>Salutation</option>
             <option value="Mr.">Mr.</option>
             <option value="Mrs.">Mrs.</option>
           </select>
-          <input type="text" placeholder="First Name" {...register("clientData.first_name")} className="border p-2 rounded w-28" />
-          <input type="text" placeholder="Last Name" {...register("clientData.last_name")} className="border p-2 rounded w-28" />
+          <input type="text" placeholder="First Name" {...register("clientData.first_name")} className="border p-2 rounded w-full" />
+          <input type="text" placeholder="Last Name" {...register("clientData.last_name")} className="border p-2 rounded w-full" />
         </div>
       </div>
 
@@ -466,9 +491,9 @@ const handleCancel=()=>{
         type="text" 
         placeholder="Enter GST Number" 
         {...register("clientData.gst_number")} 
-        className="border p-2 rounded w-60"
+        className="border p-2 rounded w-[295px]"
       />
-      <ActionButton height={"9"} label={"Search"} onClick={handleSearch} />
+      <ActionButton height={"9"} label={"Search"} onClick={handleSearch} className='ml-[20px]' />
     </div>
   </div>
 )}
@@ -491,18 +516,31 @@ const handleCancel=()=>{
 
       {/* Phone Numbers */}
       <div className="flex items-center mb-4">
-        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Phone</label>
-        <div className="flex space-x-2">
-          <div className="flex items-center border p-2 rounded w-[180px]">
-            <img src={Phone} alt="Work Phone" className="w-5 mr-2" />
-            <input type="text" {...register("clientData.work_phone")} placeholder="Work" className="outline-none flex-1" />
-          </div>
-          <div className="flex items-center border p-2 rounded w-[180px]">
-            <img src={Cell} alt="Mobile" className="w-5 mr-2" />
-            <input type="text" {...register("clientData.mobile")} placeholder="Mobile" className="outline-none flex-1" />
-          </div>
-        </div>
-      </div>
+  <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">
+    Phone
+  </label>
+  <div className="flex space-x-2">
+    <div className="flex items-center border p-2 rounded w-[190px]">
+      <img src={Phone} alt="Work Phone" className="mr-2" />
+      <input
+        type="text"
+        {...register("clientData.work_phone")}
+        placeholder="Work"
+        className="outline-none w-full"
+      />
+    </div>
+    <div className="flex items-center border p-2 rounded w-[190px]">
+      <img src={Cell} alt="Mobile" className="mr-2" />
+      <input
+        type="text"
+        {...register("clientData.mobile")}
+        placeholder="Mobile"
+        className="outline-none w-full"
+      />
+    </div>
+  </div>
+</div>
+
 
     </div>
   </div>

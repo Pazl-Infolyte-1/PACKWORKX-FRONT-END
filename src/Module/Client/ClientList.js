@@ -77,7 +77,7 @@ function ClientList() {
 
   useEffect(() => {
     const fetchClientData = async () => {
-      setLoading(true); // Show loader before API call
+      //setLoading(true); // Show loader before API call
       try {
         const queryParams = {
           ...(searchQuery && { search: searchQuery }),
@@ -247,7 +247,7 @@ function ClientList() {
 
   {/* Dropdown Menu */}
   {isDropdownOpen && (
-    <div className="absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5">
+    <div className="absolute right-0 z-20 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5">
       <div className="py-1">
         <button
           className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"

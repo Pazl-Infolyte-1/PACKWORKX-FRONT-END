@@ -188,7 +188,7 @@ export const apiMethods = {
       if (!token) {
         throw new Error('No token found. Please log in again.')
       }
-      const response = await apiClient.put(`/clients/${companyId}`,companyData,{
+      const response = await apiClient.put(`/companies/${companyId}`,companyData,{
         headers: {
           Authorization: `Bearer ${token}`, // Attach token
         },
@@ -325,21 +325,46 @@ export const apiMethods = {
       throw error
     }
   },
+  //getGst: async (gstNumber) => {
+  //  try {
+  //    if (!gstNumber) {
+  //      throw new Error('GST number is required')
+  //    }
+
+  //    const response = await axios.get(`${GST_URL}/${gstNumber}`)
+
+  //    return response.data
+  //  } catch (error) {
+  //    console.error('Error fetching GST details:',error.response?.data || error.message)
+  //    throw error
+  //  }
+  //},
+
   getGst: async (gstNumber) => {
     try {
-      if (!gstNumber) {
-        throw new Error('GST number is required')
+      const token = localStorage.getItem("token"); // Retrieve token before sending request
+  
+      if (!token) {
+        throw new Error("No token found. Please log in again.");
       }
-
-      const response = await axios.get(`${GST_URL}/${gstNumber}`)
-
-      return response.data
+  
+      const response = await apiClient.post(
+        "/clients/check-gst",
+        { gst_number: gstNumber },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Attach token
+          },
+        }
+      );
+  
+      return response.data;
     } catch (error) {
-      console.error('Error fetching GST details:',error.response?.data || error.message)
-      throw error
+      console.error("Error fetching GST details:", error.response?.data || error.message);
+      throw error;
     }
   },
-
+  
   addSku: async (addNewSkuData) => {
     try {
       const response = await apiClient.post('/sku-details',addNewSkuData,{})

@@ -27,8 +27,22 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
     setDeleteModal(false)
   }
 
+  const formatDate = (dateString) => {
+    if (!dateString) return ''
+
+    return new Date(dateString).toLocaleString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    })
+  }
+
   return (
-    <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar">
+    <div className="h-[300px] overflow-y-auto border border-gray-200 custom-scrollbar">
       <CTable striped hover className="w-full m-0">
         <CTableHead className="bg-gray-100 sticky top-0 z-10">
           <CTableRow className="text-center">
@@ -50,9 +64,9 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Created Date
             </CTableHeaderCell>
-            {/* <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Modified Date
-            </CTableHeaderCell> */}
+            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+              Status
+            </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Action
             </CTableHeaderCell>
@@ -76,17 +90,27 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">{cell.client}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
-                  {cell.length && cell.width && cell.height ? [cell.length, cell.width, cell.height].join(" x ") : 'N/A'}
+                    {cell.length && cell.width && cell.height
+                      ? [cell.length, cell.width, cell.height].join(' x ')
+                      : 'N/A'}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
                     {cell.deckle_size}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
-                    {cell.created_date}
+                    {formatDate(cell.updated_at)}
                   </CTableDataCell>
-                  {/* <CTableDataCell className="py-3 px-2 text-gray-700">
-                    {cell.modified_date}
-                  </CTableDataCell> */}
+                  <CTableDataCell className="py-3 px-2 text-gray-700">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        cell.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {cell.status}
+                    </span>
+                  </CTableDataCell>
                   <CTableDataCell className="py-3 px-2 text-gray-700">
                     <ThreeDotMenu
                       value={[

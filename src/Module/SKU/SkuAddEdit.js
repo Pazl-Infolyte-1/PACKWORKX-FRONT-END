@@ -18,10 +18,50 @@ function SkuAddEdit({
   skuType,
   setSkuType,
   clientDiasble,
+  refresh
 }) {
   const { user } = useContext(AuthContext)
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
+
+  const createInitialSkuData = () => ({
+    sku_name: null,
+    client_id: user.id,
+    ply: null,
+    client: null,
+    length: null,
+    width: null,
+    height: null,
+    unit: null,
+    joints: null,
+    ups: null,
+    inner_outer_dimension: null,
+    flap_width: null,
+    flap_tolerance: null,
+    length_trimming_tolerance: null,
+    width_trimming_tolerance: null,
+    width_board_size_cm2: null,
+    length_board_size_cm2: null,
+    strict_adherence: strictAdherence,
+    customer_reference: null,
+    reference_number: null,
+    internal_id: null,
+    board_size_cm2: null,
+    deckle_size: null,
+    minimum_order_level: null,
+    sku_type: 'RSC box',
+    sku_values: [
+      {
+        layer: null,
+        gsm: null,
+        bf: null,
+        material: null,
+        color: null,
+        flute_type: null,
+        flute_ratio: null,
+      },
+    ],
+  })
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -35,44 +75,9 @@ function SkuAddEdit({
 
   useEffect(() => {
     if (!editTag) {
-      setAddNewSkuData({
-        sku_name: null,
-        client_id: user.id,
-        ply: null,
-        client: null,
-        length: null,
-        width: null,
-        height: null,
-        unit: null,
-        joints: null,
-        ups: null,
-        inner_outer_dimension: null,
-        flap_width: null,
-        flap_tolerance: null,
-        length_trimming_tolerance: null,
-        width_trimming_tolerance: null,
-        strict_adherence: strictAdherence,
-        customer_reference: null,
-        reference_number: null,
-        internal_id: null,
-        board_size_cm2: null,
-        deckle_size: null,
-        minimum_order_level: null,
-        sku_type: 'RSC box',
-        sku_values: [
-          {
-            layer: null,
-            gsm: null,
-            bf: null,
-            material: null,
-            color: null,
-            flute_type: null,
-            flute_ratio: null,
-          },
-        ],
-      })
+      setAddNewSkuData(createInitialSkuData())
     }
-  }, [editTag])
+  }, [editTag, refresh])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,7 +90,6 @@ function SkuAddEdit({
     }
     fetchData()
   }, [])
-
   const handleSelect = (option) => {
     if (option.value === 'addMore') {
       // Handle add more procedure logic if needed
@@ -93,11 +97,14 @@ function SkuAddEdit({
       return
     }
     setIsOpen(false)
-    // Update the sku_type in addNewSkuData
-    setAddNewSkuData((prevData) => ({
-      ...prevData,
+
+    const baseSkuData = {
+      ...createInitialSkuData(), 
+      client: addNewSkuData.client,
       sku_type: option.sku_type || option.value,
-    }))
+    }
+
+    setAddNewSkuData(baseSkuData)
   }
 
   // const handleDeleteSkuType = async (id) => {
@@ -226,11 +233,6 @@ function SkuAddEdit({
 
   return (
     <div className="p-6 bg-white rounded-lg">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold">
-          {editTag ? 'Update SKU Details' : 'Add SKU Details'}
-        </h2>
-      </div>
 
       {/* conditional rendring according to sku_type */}
       {skuComponents[addNewSkuData.sku_type] || null}
@@ -261,7 +263,7 @@ function SkuAddEdit({
                   <th className="p-2">Color</th>
                   <th className="p-2">Flute Type</th>
                   <th className="p-2">Flute Ratio</th>
-                  <th className="p-2">material</th>
+                  <th className="p-2">Material</th>
                   <th className="p-2">Weight (Kg)</th>
                   <th className="p-2">
                     Bursting Strength <br />{' '}

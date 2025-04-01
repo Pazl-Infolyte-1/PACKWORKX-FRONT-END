@@ -14,11 +14,12 @@ import "../../components/New/CustomPopupModal/CustomPopup.css"
 import ClientForm from './ClientForm';
 import Drawer from '../../components/Drawer/Drawer';
 import ClientSingleViewCard from './ClientSingleViewCard';
-import DeleteModal from '../../components/New/DeleteModal';
 import ThreeDotMenu from '../../components/ThreeDotMenu';
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons';
 import CustomAlert from '../../components/New/CustomAlert'
 import { useNavigate } from 'react-router-dom'
+import ConfirmationModale from '../../components/New/ConfirmationModale'
+import PopUp from '../../components/New/PopUp'
 
 
 function ClientTable({ clientdata,refreshClients }) {
@@ -115,6 +116,13 @@ const deleteClient = async () => {
   }
 };
 
+const handleEdit = (cell) => {
+  setisSingleViewPopup(false)
+  setSelectedClientId(cell)
+  setDrawerOpen(true)
+  setOpenPopoverIndex(null)
+}
+
   return (
     <>
           <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -184,10 +192,10 @@ const deleteClient = async () => {
             {clientdata.length > 0 ? (
               clientdata.map((cell, index) => (
                 <CTableRow style={{ minHeight: "100px" }} key={index} className="border-b">
-<CTableDataCell onClick={()=>openViewCard(cell)} className="py-3 px-4 text-primary text-decoration-underline cursor-pointer w-[150px]">
-  {cell.client_id}
-</CTableDataCell>
-<CTableDataCell className="py-3 px-4 text-gray-700  w-[550px]">
+                  <CTableDataCell onClick={()=>openViewCard(cell)} className="py-3 px-4 !text-blue-600 font-semibold text-decoration-underline cursor-pointer w-[150px]">
+                    {cell.client_id}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700  w-[550px]">
                     {cell.client_ref_id}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700  w-[150px]">
@@ -244,9 +252,7 @@ const deleteClient = async () => {
                           label: 'Edit',
                           icon: cilPencil,
                           onClick: () => {
-                            setSelectedClientId(cell)
-                            setDrawerOpen(true)
-                            setOpenPopoverIndex(null)
+                            handleEdit(cell)
                           },
                         },
                         {
@@ -281,16 +287,16 @@ const deleteClient = async () => {
         <ClientForm refreshClientsEdit={refreshClients} closeDrawer={() => setDrawerOpen(false)} editData={selectedClientId} />
       </Drawer>
 
-        <CustomPopup
-          isOpen={isSingleViewPopup}
-          onClose={handleCloseSingleViewPopup}
-          width={'w-[900px]'}
-          height={'480px'}
+        <PopUp
+          visible={isSingleViewPopup}
+          setVisible={setisSingleViewPopup} 
+          showCloseButton={true}
+          width={'70vw'}
         >
-          <ClientSingleViewCard clientData={singleData} />
-        </CustomPopup>
+          <ClientSingleViewCard clientData={singleData} handleEdit={handleEdit}/>
+        </PopUp>
 
-        <DeleteModal
+        <ConfirmationModale
           isOpen={isDeleteModalOpen}
           onClose={closeDeleteModal}
           onConfirm={deleteClient}

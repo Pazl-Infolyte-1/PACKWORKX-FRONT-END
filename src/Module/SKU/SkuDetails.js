@@ -96,18 +96,24 @@ function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
                   Dimensions & Specifications
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500">Length</span>
-                    <span className="text-gray-800 mt-1">{cell.length}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500">Width</span>
-                    <span className="text-gray-800 mt-1">{cell.width}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500">Height</span>
-                    <span className="text-gray-800 mt-1">{cell.height}</span>
-                  </div>
+                  {cell.length && (
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-500">Length</span>
+                      <span className="text-gray-800 mt-1">{cell.length}</span>
+                    </div>
+                  )}
+                  {cell.width && (
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-500">Width</span>
+                      <span className="text-gray-800 mt-1">{cell.width}</span>
+                    </div>
+                  )}
+                  {cell.height && (
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-500">Height</span>
+                      <span className="text-gray-800 mt-1">{cell.height}</span>
+                    </div>
+                  )}
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Flap Width</span>
                     <span className="text-gray-800 mt-1">{cell.flap_width}</span>
@@ -124,10 +130,14 @@ function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
                     <span className="text-sm font-medium text-gray-500">Ply</span>
                     <span className="text-gray-800 mt-1">{cell.ply}</span>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500">Inner/Outer Dimension</span>
-                    <span className="text-gray-800 mt-1">{cell.inner_outer_dimension}</span>
-                  </div>
+                  {cell.inner_outer_dimension && (
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-500">
+                        Inner/Outer Dimension
+                      </span>
+                      <span className="text-gray-800 mt-1">{cell.inner_outer_dimension}</span>
+                    </div>
+                  )}
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Board Size (cm²)</span>
                     <span className="text-gray-800 mt-1">{cell.board_size_cm2}</span>
@@ -155,56 +165,22 @@ function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
                     <span className="text-sm font-medium text-gray-500">Flap Tolerance</span>
                     <span className="text-gray-800 mt-1">{cell.flap_tolerance}</span>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500">
-                      Length Trimming Tolerance
-                    </span>
-                    <span className="text-gray-800 mt-1">{cell.length_trimming_tolerance}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500">
-                      Width Trimming Tolerance
-                    </span>
-                    <span className="text-gray-800 mt-1">{cell.width_trimming_tolerance}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500">Strict Adherence</span>
-                    <span className="flex items-center mt-1">
-                      {cell.strict_adherence ? (
-                        <span className="inline-flex items-center text-green-800">
-                          <svg
-                            className="w-4 h-4 mr-1"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          Yes
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center text-red-800">
-                          <svg
-                            className="w-4 h-4 mr-1"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          No
-                        </span>
-                      )}
-                    </span>
-                  </div>
+                  {cell.length_trimming_tolerance && (
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-500">
+                        Length Trimming Tolerance
+                      </span>
+                      <span className="text-gray-800 mt-1">{cell.length_trimming_tolerance}</span>
+                    </div>
+                  )}
+                  {cell.width_trimming_tolerance && (
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-500">
+                        Width Trimming Tolerance
+                      </span>
+                      <span className="text-gray-800 mt-1">{cell.width_trimming_tolerance}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -212,12 +188,48 @@ function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
             {/* Materials Card */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
               <div className="p-6">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  Materials & Specifications
-                </h2>
-                <h1 className="text-sm font-semibold text-gray-800 mb-4">
+                <h2 className="text-xl font-semibold text-gray-800">Materials & Specifications</h2>
+                <h1 className="text-sm font-semibold text-gray-800 ">
                   Sku Type: <span>{cell.sku_type}</span>
                 </h1>
+                <div className="flex items-center mb-3">
+                  <span className="text-sm font-medium ">Strict Adherence:</span>
+                  <span className="flex items-center ml-2">
+                    {cell.strict_adherence ? (
+                      <span className="inline-flex items-center text-green-800">
+                        Yes
+                        <svg
+                          className="w-4 h-4 mr-1"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center text-red-800">
+                        No
+                        <svg
+                          className="w-4 h-4 mr-1"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </span>
+                    )}
+                  </span>
+                </div>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead>

@@ -60,11 +60,9 @@ const [addressAdded, setAddressAdded] = useState(0); // Initialize with 0
       setActiveTab(tabs[currentIndex + 1])
     }
   }
-console.log("entity type", entity_type);
 const handleAddAddress = () => {
   setAddressAdded((prev) => prev + 1); // Increment counter on each click
 };
-//console.log("edoit id",JSON.stringify(editData))
 const handleClose = () => {
   setAlerts([]);
 };
@@ -134,13 +132,11 @@ const methods = useForm({
 });
 
 const { register, handleSubmit ,reset,watch,formState: { isValid, errors },control} = methods;
-console.log("Form Values: ", watch());
-console.log("Validation Errors: ", errors);
+
 //const isButtonDisabled = !isValid || !!errors.gst_number;
 const isButtonDisabled = Object.keys(errors).length > 0 && !(errors.gst_number);
 
 
-console.log("entity name",entityName)
 useEffect(() => {
   if (entity_type=== "Vendor") {
     //setEntityName(entity_type);
@@ -253,12 +249,10 @@ const isFormInvalid = () => {
 };
 
 const handleSearch = async () => {
-  console.log("GST Number:", gstNumber);
   setLoading(true); // Show loader before API call
 
   try {
     const response = await apiMethods.getGst(gstnumberVal);
-    console.log("clientData:", response);
 
     setGstData(response?.data);
 
@@ -318,7 +312,6 @@ response = await apiMethods.editClient(clientId, filteredData);
       successMessage = "Client added successfully!";
     }
 
-    console.log(successMessage, response);
     setAlerts([{ severity: "success", message: response?.message }]);
 
     if (editData) {

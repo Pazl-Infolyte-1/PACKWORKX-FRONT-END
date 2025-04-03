@@ -100,22 +100,22 @@ function DieCutBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
               Select Client
             </option>
             {client?.map((item, index) => (
-              <option key={index} value={item.client_id}>
-                {item.display_name || item.client_id}
+              <option key={index} value={item.display_name}>
+                {item.display_name}
               </option>
             ))}
           </select>
         </div>
 
-        <div className="flex gap-3">
-          <Input
+        <div>
+          {/*<Input
             skuName="Joints"
             id="joints"
             name="joints"
             value={addNewSkuData.joints}
             onChange={handleChange}
             placeholder="joints"
-          />
+          />*/}
 
           <Input
             skuName="UPS"
@@ -128,7 +128,7 @@ function DieCutBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
         </div>
 
         <div className="flex gap-3">
-          <Input
+          {/*<Input
             skuName="Flap Width"
             id="flap_width"
             name="flap_width"
@@ -144,10 +144,10 @@ function DieCutBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
             value={addNewSkuData.flap_tolerance}
             onChange={handleChange}
             placeholder="flap tolerance"
-          />
+          />*/}
         </div>
 
-        <div>
+        {/*<div>
           <label className="block text-[16px] font-medium mb-2">Trimming Tolerance</label>
           <select
             name="length_trimming_tolerance"
@@ -160,7 +160,7 @@ function DieCutBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
             <option>0.2</option>
             <option>0.1</option>
           </select>
-        </div>
+        </div>*/}
 
         {/* <div className="mb-4">
           <label className="block text-[16px] font-medium mb-2">Width Trimming Tolerance</label>

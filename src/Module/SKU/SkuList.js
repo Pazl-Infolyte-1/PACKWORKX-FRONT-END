@@ -26,6 +26,7 @@ function SkuList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [visible, setVisible] = useState(false)
   const [skudata, setSkuData] = useState([])
+  const [editedSkudata, setEditedSkuData] = useState(null)
   const [strictAdherence, setStrictAdherence] = useState(false)
   const [editTag, setEditTag] = useState(false)
   const [pagination, setPagination] = useState(null)
@@ -36,8 +37,8 @@ function SkuList() {
   const { user } = useContext(AuthContext)
   const { searchQuery, setSearchQuery, filteredSearchData } = useSearch()
   const location = useLocation()
-  const searchBarRef = useRef(null);
-
+  console.log("location///",location?.state?.client_id)
+  const searchBarRef = useRef(null)
 
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
@@ -47,13 +48,15 @@ function SkuList() {
     length: null,
     width: null,
     height: null,
-    unit: null,
+    unit: "mm",
     joints: null,
     ups: null,
     inner_outer_dimension: null,
     flap_width: null,
     flap_tolerance: null,
     length_trimming_tolerance: null,
+    width_board_size_cm2:null,
+    length_board_size_cm2:null,
     width_trimming_tolerance: null,
     strict_adherence: strictAdherence,
     customer_reference: null,
@@ -75,7 +78,8 @@ function SkuList() {
       },
     ],
   })
-
+ 
+  
   useEffect(() => {
     if (location.state?.initialRender) {
       setDrawerOpen(true)
@@ -87,9 +91,14 @@ function SkuList() {
     if (location.state?.client_id) {
       setAddNewSkuData((prevState) => ({
         ...prevState,
-        client: location.state?.client_id,
+        client: location.state?.client_id,  
       }))
     }
+
+      // Clear the location state after using it to prevent side effects on refresh
+  if (location.state) {
+    window.history.replaceState({}, document.title);
+  }
   }, [location.state])
 
   const handleChange = (event) => {
@@ -113,6 +122,9 @@ function SkuList() {
   const handleAddSkuSubmit = async () => {
     try {
       if (editTag) {
+        //console.log("get sku datas",editedSkudata.sku_values)
+        //console.log("edit sku datas",addNewSkuData.sku_values)
+        //return null;
         await apiMethods.updateSku(addNewSkuData)
         setEditTag(false)
         setRefresh((prev) => !prev)
@@ -128,7 +140,9 @@ function SkuList() {
 
   const handleSkuEdit = (id) => {
     const selectedSku = skudata.find((sku) => sku.id === id)
+    console.log("selected sku",selectedSku)
     setEditTag(true)
+    setEditedSkuData(selectedSku)
     setAddNewSkuData({
       id: selectedSku.id || '',
       sku_name: selectedSku.sku_name || '',
@@ -172,6 +186,13 @@ function SkuList() {
 
   useEffect(() => {
     const fetchData = async () => {
+      // skip sku get call
+      console.log("check location",location.state?.skipInitialFetch)
+      console.log("refresh",refresh)
+
+      if (location.state?.skipInitialFetch && !refresh) {
+        return;
+      }
       try {
         const response = await apiMethods.getSkuList({
           search: searchQuery || '',
@@ -181,7 +202,7 @@ function SkuList() {
           limit: limit,
         })
         const clientResponse = await apiMethods.getClients()
-    
+
         setSkuData(response.data)
         setClient(clientResponse.data)
         setPagination(response.pagination)
@@ -191,16 +212,25 @@ function SkuList() {
       }
     }
     fetchData()
-  }, [refresh, selectedClient, searchQuery, pagination?.currentPage, selectedSkuType, limit])
+  }, [refresh, selectedClient, searchQuery, pagination?.currentPage, selectedSkuType, limit,location.state?.skipInitialFetch])
 
   // Clear all filters
   const handleClearFilters = () => {
     // Clear the search input using the ref
     if (searchBarRef.current) {
-      searchBarRef.current.clearSearch();
+      searchBarRef.current.clearSearch()
     }
     setSelectedSkuType('')
     setSelectedClient('')
+  }
+
+  const handleSkuExelExport = async () => {
+    await apiMethods.getSkuExcelExport({
+      search: searchQuery,
+      sku_type: selectedSkuType,
+      client: selectedClient,
+      status: 'active'
+    })
   }
 
   return (
@@ -225,6 +255,9 @@ function SkuList() {
                 if (text === 'Bulk Upload') {
                   setVisible(true)
                 }
+                if (text === 'Export to Excel') {
+                  handleSkuExelExport()
+                }
               }}
             ></ActionButton>
           ))}
@@ -236,28 +269,28 @@ function SkuList() {
         {[
           {
             name: 'RSC Box',
-            count: dashboard?.rSCbox,
+            count: dashboard?.rscbox || 0,
             color: '#286eb1',
             bgColor: '#2e2d6d',
             icon: <FaBoxOpen className="text-white text-2xl" />,
           },
           {
-            name: 'Corrugated Sheet',
-            count: dashboard?.corrugatedSheet,
+            name: 'Board',
+            count: dashboard?.board || 0,
             color: '#ffeeaa',
             bgColor: '#ffcc00',
             icon: <MdTakeoutDining className="text-white text-2xl" />,
           },
           {
             name: 'Die Cut Box',
-            count: dashboard?.dieCutbox,
+            count: dashboard?.diecutbox || 0,
             color: '#aad3ff',
             bgColor: '#007aff',
             icon: <MdOutlineSettingsInputComposite className="text-white text-2xl" />,
           },
           {
             name: 'Total SKU',
-            count: pagination?.totalCount,
+            count: pagination?.totalCount || 0,
             color: '#c3f2cb',
             bgColor: '#4cd964',
             icon: <MdCheckroom className="text-white text-2xl" />,
@@ -287,8 +320,8 @@ function SkuList() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center justify-between flex-wrap gap-2 my-3 w-full">
-        <SearchBar text="SKU" data={skudata} ref={searchBarRef}/>
+      <div className="flex items-center justify-between flex-wrap gap-2 my-4 p-3 w-full bg-white border border-gray-200 border-b-transparent">
+        <SearchBar text="SKU" data={skudata} ref={searchBarRef} />
 
         <div className="flex justify-between gap-2 w-full sm:w-auto">
           <select
@@ -329,8 +362,8 @@ function SkuList() {
         </div>
       </div>
 
-      <div className="mb-1">
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap mt-2 ">
+      <div className="-my-6">
+        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap ">
           <SkuTable
             skudata={filteredSearchData.length > 0 ? filteredSearchData : skudata}
             setSkuData={setSkuData}
@@ -341,7 +374,7 @@ function SkuList() {
       </div>
 
       {/* Pagination Section */}
-      <div className="flex justify-end items-center gap-4">
+      <div className="flex justify-end items-center gap-4 mt-[40px]">
         <CommonPagination
           count={pagination?.totalPages || 1}
           page={pagination?.currentPage || 1}
@@ -369,6 +402,7 @@ function SkuList() {
       </div>
       <Drawer
         isOpen={isDrawerOpen || editTag}
+        title={editTag ? 'Edit SKU Details' : 'Add SKU Details'}
         onClose={() => (setDrawerOpen(false), setEditTag(false), setClientDisable(false))}
       >
         <SkuAddEdit
@@ -384,6 +418,8 @@ function SkuList() {
           clientDiasble={clientDiasble}
           skuType={skuType}
           setSkuType={setSkuType}
+          locationvalue={location?.state?.client_id}
+          //onUnitChange={handleUnitChange}
         />
       </Drawer>
     </div>

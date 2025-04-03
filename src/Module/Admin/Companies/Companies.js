@@ -20,33 +20,63 @@ import CommonPagination from '../../../components/New/Pagination'
 import CompaniesForm from './CompaniesForm'
 import ActionButton from '../../../components/New/ActionButton'
 import SearchBar from '../../../components/New/SearchBar'
+import apiMethods from '../../../api/config'
+import Loader from '../../../components/New/Loader'
 const CompanyManagement = () => {
   const [showForm, setShowForm] = useState(false)
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [data, setData] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const rowsPerPage = 10
+  const [loading, setLoading] = useState(false);
+
+  //useEffect(() => {
+  //  async function fetchData() {
+  //    try {
+  //      const response = await axios.get('https://mocki.io/v1/b4c413b7-c6d8-4005-913a-8766c2a43170')
+  //      setData(response.data)
+  //    } catch (error) {
+  //      console.error('Error fetching data:', error)
+  //    }
+  //  }
+  //  fetchData()
+  //}, [])
+  const fetchCompanyData = async () => {
+    setLoading(true); // Show loader before API call
+    try {
+      const queryParams = {
+        // search: searchQuery,
+        // limit: entriesPerPage,
+        // page: currentPage,
+        // entity_type: selectedFilter,
+      };
+
+      const response = await apiMethods.getCompanies(queryParams);
+      console.log("Company Data:", response);
+      setData(response?.data || []);
+      // setTotalPage(response.totalPages);
+    } catch (error) {
+      console.error("Error fetching company data:", error);
+    } finally {
+      setLoading(false); // Hide loader after API call
+    }
+  };
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get('https://mocki.io/v1/b4c413b7-c6d8-4005-913a-8766c2a43170')
-        setData(response.data)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-    fetchData()
-  }, [])
+  
+    fetchCompanyData();
+  }, []); // Add dependencies if required
+  //[reloadData, searchQuery, entriesPerPage, currentPage, selectedFilter]
+  //const tableData = data?.data && Array.isArray(data.data) ? data.data : []
 
-  const tableData = data?.data && Array.isArray(data.data) ? data.data : []
-
-  const indexOfLastRow = currentPage * rowsPerPage
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage
-  const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
-  const totalPages = Math.ceil(tableData.length / rowsPerPage)
+  //const indexOfLastRow = currentPage * rowsPerPage
+  //const indexOfFirstRow = indexOfLastRow - rowsPerPage
+  //const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
+  //const totalPages = Math.ceil(tableData.length / rowsPerPage)
   return (
     <CContainer fluid style={{ marginTop: '0px', backgroundcolor: 'rgba(128, 128, 128, 0.1)' }}>
+                <Loader isLoading={loading} />
+      
       <CCard>
         {/* Top Controls */}
         <div className="border p-3  rounded-md ">
@@ -54,7 +84,7 @@ const CompanyManagement = () => {
             <CRow className="w-100 align-items-center ">
               <CCol md={6} className="d-flex gap-2 ">
                 <CFormInput placeholder="Start Date To End Date" className="max-w-[220px] " />
-                <SearchBar text="Company" data={tableData} />
+                {/*<SearchBar text="Company" data={tableData} />*/}
               </CCol>
               <CCol md={6} className="d-flex justify-content-end gap-2 min-w-[150.6px] h-8 ">
                 {/* <CButton color="danger" onClick={() => setDrawerOpen(true)} className="d-flex align-items-center text-white w-[160px] whitespace-nowrap">    
@@ -83,20 +113,20 @@ const CompanyManagement = () => {
           {/* Table */}
           <div className=" h-[80%] ">
             <div className="overflow-x-auto overflow-y-auto whitespace-nowrap ">
-              <CompaniesTable cellData={tableData} />
+              <CompaniesTable refreshTable={fetchCompanyData} cellData={data} />
             </div>
           </div>
 
           <div className="flex justify-end items-center gap-4 mt-3 ">
-            <CommonPagination
+            {/*<CommonPagination
               count={totalPages}
               page={currentPage}
               onChange={(event, value) => setCurrentPage(value)}
-            />
+            />*/}
           </div>
         </div>
         <div>
-          <CompaniesForm isDrawerOpen={isDrawerOpen} setDrawerOpen={setDrawerOpen} />
+          <CompaniesForm refreshTable={fetchCompanyData} isDrawerOpen={isDrawerOpen} setDrawerOpen={setDrawerOpen} />
         </div>
       </CCard>
     </CContainer>

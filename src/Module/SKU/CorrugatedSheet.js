@@ -99,8 +99,8 @@ function CorrugatedSheet({dropdownRef, addNewSkuData, isOpen, handleChange, clie
               Select Client
             </option>
             {client?.map((item, index) => (
-              <option key={index} value={item.client_id}>
-                {item.display_name || item.client_id}
+              <option key={index} value={item.display_name}>
+                {item.display_name}
               </option>
             ))}
           </select>

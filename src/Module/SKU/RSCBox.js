@@ -3,7 +3,172 @@ import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
 import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash } from '@coreui/icons'
 
-function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData, updateSkuValues}) {
+function RSCBox({
+  dropdownRef,
+  addNewSkuData,
+  isOpen,
+  handleChange,
+  clientDiasble,
+  client,
+  setIsOpen,
+  handleSelect,
+  skuType,
+  setAddNewSkuData,
+  updateSkuValues,
+  locationvalue,
+  onUnitChange
+}) {
+  console.log("show client obj",setAddNewSkuData)
+  console.log("show client if",client)
+  const filteredClient = locationvalue 
+  ? client.find(client => client.client_id === locationvalue) 
+  : null;
+
+console.log("show client obj", locationvalue);
+console.log("show client if", JSON.stringify(filteredClient));
+
+  const calculateBoardSize = (data) => {
+    const length = parseFloat(data.length) || 0
+    const width = parseFloat(data.width) || 0
+    const height = parseFloat(data.height) || 0
+    const lengthTrimmingTolerance = parseFloat(data.length_trimming_tolerance) || 0
+    const flapWidth = parseFloat(data.flap_width) || 0
+    const deckleSize = parseFloat(data.deckle_size) || 0
+    const lengthBoardSize = length * width * 2 + lengthTrimmingTolerance + flapWidth
+    const widthBoardSize = width * height + lengthTrimmingTolerance
+
+    const totalBoardSize = lengthBoardSize * widthBoardSize
+
+    const ups = widthBoardSize > 0 ? Math.floor(deckleSize / widthBoardSize) : 0
+    return {
+      length_board_size_cm2: lengthBoardSize.toFixed(2),
+      width_board_size_cm2: widthBoardSize.toFixed(2),
+      board_size_cm2: totalBoardSize.toFixed(2),
+      ups: ups.toFixed(2),
+    }
+  }
+
+  //const modifiedHandleChange = (e) => {
+  //  const { name, value } = e.target
+  //  const updatedSkuData = {
+  //    ...addNewSkuData,
+  //    [name]: value,
+  //  }
+
+  //  // Calculate board sizes if relevant fields change
+  //  const boardSizeFields = [
+  //    'length',
+  //    'width',
+  //    'height',
+  //    'length_trimming_tolerance',
+  //    'flap_width',
+  //    'deckle_size',
+  //  ]
+
+  //  if (boardSizeFields.includes(name)) {
+  //    const boardSizeUpdates = calculateBoardSize(updatedSkuData)
+
+  //    // Update state with both the changed field and calculated board sizes and UPS
+  //    setAddNewSkuData((prev) => ({
+  //      ...prev,
+  //      [name]: value,
+  //      ...boardSizeUpdates,
+  //    }))
+  //  } else {
+  //    // For other fields, just update normally
+  //    setAddNewSkuData((prev) => ({
+  //      ...prev,
+  //      [name]: value,
+  //    }))
+  //  }
+
+  //  // Call original handleChange if it exists
+  //  if (handleChange) {
+  //    handleChange(e)
+  //  }
+  //}
+
+  const MM_TO_INCH = 0.0393701;
+  const INCH_TO_MM = 25.4;
+  
+  const modifiedHandleChange = (e) => {
+      const { name, value } = e.target;
+      let updatedValue = parseFloat(value);
+  
+      if (!isNaN(updatedValue)) {
+          if (addNewSkuData.unit === "mm") {
+              updatedValue = parseFloat(updatedValue.toFixed(2)); // Store in mm (rounded)
+          } else if (addNewSkuData.unit === "in") {
+              updatedValue = parseFloat((updatedValue * MM_TO_INCH).toFixed(2)); // Convert to inches (rounded)
+          }
+      }
+  
+      const updatedSkuData = { ...addNewSkuData, [name]: updatedValue };
+  
+      // Recalculate board size if needed
+      const boardSizeFields = [
+          "length",
+          "width",
+          "height",
+          "length_board_size_cm2",
+          "width_board_size_cm2",
+          "board_size_cm2",
+      ];
+  
+      if (boardSizeFields.includes(name)) {
+          const boardSizeUpdates = calculateBoardSize(updatedSkuData);
+          setAddNewSkuData((prev) => ({
+              ...prev,
+              [name]: updatedValue,
+              ...boardSizeUpdates,
+          }));
+      } else {
+          setAddNewSkuData((prev) => ({
+              ...prev,
+              [name]: updatedValue,
+          }));
+      }
+  
+      if (handleChange) {
+          handleChange(e);
+      }
+  };
+  
+  // Handle Unit Change (Convert Both Dimensions & Board Size)
+  const handleUnitChange = (e) => {
+      const newUnit = e.target.value;
+  
+      setAddNewSkuData((prev) => {
+          const convertValue = (val) =>
+              isNaN(val) ? "" : parseFloat((newUnit === "mm" ? val * INCH_TO_MM : val * MM_TO_INCH).toFixed(2));
+  
+          return {
+              ...prev,
+              unit: newUnit,
+              length: convertValue(prev.length),
+              width: convertValue(prev.width),
+              height: convertValue(prev.height),
+  
+              // Convert board size values as well
+              length_board_size_cm2: convertValue(prev.length_board_size_cm2),
+              width_board_size_cm2: convertValue(prev.width_board_size_cm2),
+              board_size_cm2: parseFloat(
+                  (convertValue(prev.length_board_size_cm2) * convertValue(prev.width_board_size_cm2)).toFixed(2)
+              ), // Update total board size
+          };
+      });
+  };
+  
+  //const modifiedHandleChange1 = (e) => {
+  //  const { name, value } = e.target;
+  //  setAddNewSkuData((prev) => ({
+  //    ...prev,
+  //    [name]: value,
+  //  }));
+  //};
+
+
+  
   return (
     <>
       <div className="grid grid-cols-3 gap-4">
@@ -57,7 +222,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
           skuName="SKU Name"
           id="sku_name"
           name="sku_name"
-          value={addNewSkuData.sku_name }
+          value={addNewSkuData.sku_name}
           onChange={handleChange}
           placeholder="SKU Name"
         />
@@ -85,7 +250,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
           </select>
         </div>
 
-        <div>
+        {/*<div>
           <label className="block text-[16px] font-medium mb-2">Client Name</label>
           <select
             name="client"
@@ -99,12 +264,33 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
               Select Client
             </option>
             {client?.map((item, index) => (
-              <option key={index} value={item.client_id}>
-                {item.display_name || item.client_id}
+              <option key={index} value={item.display_name}>
+                {item.display_name}
               </option>
             ))}
           </select>
-        </div>
+        </div>*/}
+        <div>
+  <label className="block text-[16px] font-medium mb-2">Client Name</label>
+  <select
+    name="client"
+    id="client"
+    disabled={clientDiasble}
+    value={filteredClient ? filteredClient.client_id : addNewSkuData.client || ''}
+    onChange={handleChange}
+    className="w-full p-2 shadow-md border-l-2 rounded-md"
+  >
+    <option value="" hidden>
+      Select Client
+    </option>
+    {client?.map((item, index) => (
+      <option key={index} value={item.client_id}>
+        {item.display_name}
+      </option>
+    ))}
+  </select>
+</div>
+
 
         <div className="">
           <p className="text-[16px] font-medium">Dimensions</p>
@@ -113,7 +299,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
               id="length"
               name="length"
               value={addNewSkuData.length}
-              onChange={handleChange}
+              onChange={modifiedHandleChange}
               placeholder="Length"
               className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
             ></input>{' '}
@@ -122,7 +308,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
               id="width"
               name="width"
               value={addNewSkuData.width}
-              onChange={handleChange}
+              onChange={modifiedHandleChange}
               placeholder="Width"
               className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
             ></input>{' '}
@@ -131,8 +317,53 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
               id="height"
               name="height"
               value={addNewSkuData.height}
-              onChange={handleChange}
-              placeholder="Height"
+              onChange={modifiedHandleChange}
+              placeholder="Depth"
+              className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
+            ></input>
+            <div className="w-1/4 flex justify-end relative">
+            <select
+  value={addNewSkuData.unit || "mm"}
+  onChange={handleUnitChange} 
+  className="w-3/4 appearance-none bg-blue-500 text-white py-2 px-3 rounded-r-md focus:outline-none"
+>
+  <option value="mm" className="bg-white text-black">mm</option>
+  <option value="in" className="bg-white text-black">in</option>
+</select>
+
+              <div className="pointer-events-none absolute inset-y-1 right-0 flex items-center px-2 text-black">
+                <CIcon icon={cilChevronCircleDownAlt} size="small" className="text-white" />
+              </div>
+            </div>
+          </div>
+        </div>
+ {/*<div className="">
+          <p className="text-[16px] font-medium">Dimensions</p>
+          <div className="h-10 shadow-md border-l-2 rounded-md -my-2 flex items-center">
+            <input
+              id="length"
+              name="length"
+              value={addNewSkuData.length}
+              onChange={modifiedHandleChange}
+              placeholder="Length"
+              className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
+            ></input>{' '}
+            x
+            <input
+              id="width"
+              name="width"
+              value={addNewSkuData.width}
+              onChange={modifiedHandleChange}
+              placeholder="Width"
+              className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
+            ></input>{' '}
+            x
+            <input
+              id="height"
+              name="height"
+              value={addNewSkuData.height}
+              onChange={modifiedHandleChange}
+              placeholder="Depth"
               className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
             ></input>
             <div className="w-1/4 flex justify-end relative">
@@ -147,7 +378,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
                 className="w-3/4 appearance-none bg-blue-500 text-white py-2 px-3 rounded-r-md focus:outline-none"
               >
                 <option value="cm" className="bg-white text-black">
-                  cm
+                  mm
                 </option>
                 <option value="in" className="bg-white text-black">
                   in
@@ -158,7 +389,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
               </div>
             </div>
           </div>
-        </div>
+        </div>*/}
 
         <div className="flex gap-3">
           <Input
@@ -171,12 +402,12 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
           />
 
           <Input
-            skuName="UPS"
-            id="ups"
-            name="ups"
-            value={addNewSkuData.ups}
-            readOnly={true}
-            placeholder="ups"
+            skuName="Deckle Size"
+            id="deckle_size"
+            name="deckle_size"
+            value={addNewSkuData.deckle_size}
+            onChange={modifiedHandleChange}
+            placeholder="deckle size"
           />
         </div>
         <div>
@@ -207,27 +438,35 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
           </div>
         </div>
 
-        <div className="flex gap-3">
-          <Input
-            skuName="Flap Width"
-            id="flap_width"
-            name="flap_width"
-            value={addNewSkuData.flap_width}
-            onChange={handleChange}
-            placeholder="flap width"
-          />
+        {/* <div className="flex gap-3"> */}
+        <Input
+          skuName="Flap Width"
+          id="flap_width"
+          name="flap_width"
+          value={addNewSkuData.flap_width}
+          onChange={modifiedHandleChange}
+          placeholder="flap width"
+        />
 
-          <Input
+        {/* <Input
             skuName="Flap Tolerance"
             id="flap_tolerance"
             name="flap_tolerance"
             value={addNewSkuData.flap_tolerance}
             onChange={handleChange}
             placeholder="flap tolerance"
-          />
-        </div>
+          /> */}
+        {/* </div> */}
+        <Input
+          skuName="Trimming tolerance"
+          id="length_trimming_tolerance"
+          name="length_trimming_tolerance"
+          value={addNewSkuData.length_trimming_tolerance}
+          onChange={modifiedHandleChange}
+          placeholder="trimming tolerance"
+        />
 
-        <div>
+        {/* <div>
           <label className="block text-[16px] font-medium mb-2">Trimming Tolerance</label>
           <select
             name="length_trimming_tolerance"
@@ -240,7 +479,7 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
             <option>0.2</option>
             <option>0.1</option>
           </select>
-        </div>
+        </div> */}
 
         {/* <div className="mb-4">
           <label className="block text-[16px] font-medium mb-2">Width Trimming Tolerance</label>
@@ -266,7 +505,6 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
           onChange={handleChange}
           placeholder="customer reference"
         />
-
         <Input
           skuName="Reference #"
           id="reference_number"
@@ -275,7 +513,6 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
           onChange={handleChange}
           placeholder="reference number"
         />
-
         <Input
           skuName="Internal ID"
           id="internal_id"
@@ -284,24 +521,114 @@ function RSCBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble
           onChange={handleChange}
           placeholder="internal id"
         />
+         <div className="">
+          <p className="text-[16px] font-medium">Board Size</p>
+          <div className="h-10 shadow-md border-l-2 rounded-md -my-2 flex items-center">
+            <input
+              id="length_board_size_cm2"
+              name="length_board_size_cm2"
+              value={addNewSkuData.length_board_size_cm2}
+              onChange={modifiedHandleChange}
+              placeholder="Length"
+              className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
+            ></input>{' '}
+            x
+            <input
+              id="width_board_size_cm2"
+              name="width_board_size_cm2"
+              value={addNewSkuData.width_board_size_cm2}
+              onChange={modifiedHandleChange}
+              placeholder="Width"
+              className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
+            ></input>{' '}
+            =
+            <input
+              id="board_size_cm2"
+              name="board_size_cm2"
+              value={addNewSkuData.board_size_cm2}
+              onChange={modifiedHandleChange}
+              placeholder="Total "
+              readOnly={true}
+              className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
+            ></input>
+            <div className="w-1/4 flex justify-end relative">
+            <select
+  value={addNewSkuData.unit || "mm"}
+  onChange={handleUnitChange} 
+  className="w-3/4 appearance-none bg-blue-500 text-white py-2 px-3 rounded-r-md focus:outline-none"
+>
+  <option value="mm" className="bg-white text-black">mm</option>
+  <option value="in" className="bg-white text-black">in</option>
+</select>
+
+              <div className="pointer-events-none absolute inset-y-1 right-0 flex items-center px-2 text-black">
+                <CIcon icon={cilChevronCircleDownAlt} size="small" className="text-white" />
+              </div>
+            </div>
+          </div>
+        </div>
+       {/*<div className="">
+          <p className="text-[16px] font-medium">Board Size</p>
+          <div className="h-10 shadow-md border-l-2 rounded-md -my-2 flex items-center">
+            <input
+              id="length_board_size_cm2"
+              name="length_board_size_cm2"
+              value={addNewSkuData.length_board_size_cm2}
+              onChange={modifiedHandleChange}
+              placeholder="Length"
+              className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
+            ></input>{' '}
+            x
+            <input
+              id="width_board_size_cm2"
+              name="width_board_size_cm2"
+              value={addNewSkuData.width_board_size_cm2}
+              onChange={modifiedHandleChange}
+              placeholder="Width"
+              className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
+            ></input>{' '}
+            =
+            <input
+              id="board_size_cm2"
+              name="board_size_cm2"
+              value={addNewSkuData.board_size_cm2}
+              onChange={modifiedHandleChange}
+              placeholder="Total "
+              readOnly={true}
+              className="w-1/4 p-1 text-center focus:outline-none focus:border-transparent"
+            ></input>
+            <div className="w-1/4 flex justify-end relative">
+              <select
+                value={addNewSkuData.unit || 'cm'}
+                onChange={(e) => {
+                  setAddNewSkuData((prev) => ({
+                    ...prev,
+                    unit: e.target.value,
+                  }))
+                }}
+                className="w-3/4 appearance-none bg-blue-500 text-white py-2 px-3 rounded-r-md focus:outline-none"
+              >
+                <option value="cm" className="bg-white text-black">
+                  cm
+                </option>
+                <option value="in" className="bg-white text-black">
+                  in
+                </option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-1 right-0 flex items-center px-2 text-black">
+                <CIcon icon={cilChevronCircleDownAlt} size="small" className="text-white" />
+              </div>
+            </div>
+          </div>
+        </div>*/}
 
         <Input
-          skuName="Board Size (cm²)"
-          id="board_size_cm2"
-          name="board_size_cm2"
-          value={addNewSkuData.board_size_cm2}
-          onChange={handleChange}
-          placeholder="board size"
-          readOnly={true}
-        />
-
-        <Input
-          skuName="Deckle Size"
-          id="deckle_size"
-          name="deckle_size"
-          value={addNewSkuData.deckle_size}
-          onChange={handleChange}
-          placeholder="deckle size"
+          skuName="UPS"
+          id="ups"
+          name="ups"
+          value={addNewSkuData.ups}
+          //readOnly={true}
+          placeholder="ups"
         />
 
         <Input

@@ -21,6 +21,7 @@ function EmployeeList() {
   const rowsPerPage = 10
   const [employeesData, setEmployeesData] = useState([])
   const [CurrentEmployeeId , setCurrentEmployeeId] = useState(null);
+  
 
   // State to manage form data
   const [formData, setFormData] = useState({
@@ -112,45 +113,69 @@ function EmployeeList() {
   }, [])
 
 
-  const tableData = Array.isArray(formData) ? formData : []
+  // const tableData = Array.isArray(formData) ? formData : []
 
-  const indexOfLastRow = currentPage * rowsPerPage
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage
-  const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
-  const totalPages = Math.ceil(tableData.length / rowsPerPage)
+  // const indexOfLastRow = currentPage * rowsPerPage
+  // const indexOfFirstRow = indexOfLastRow - rowsPerPage
+  // const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
+  // const totalPages = Math.ceil(tableData.length / rowsPerPage)
 
-  const handleEdit = async (id) => {
+  const handlePageChange = (event, newPage) => {
+    setEmployeesData((prev) => ({ ...prev, currentPage: newPage }));
+  };
+
+const handleEdit = async (id, userId) => {
     setIsEdit(true);
-    setCurrentEmployeeId(id)
-    const selectedData = await apiMethods.getEmployeeData(id)
-    const selectedEmployee = selectedData.data.data;
+    setCurrentEmployeeId(userId);
     
+    try {
+        // Log the request parameters
+        console.log('Requesting employee data for ID:', id);
+        
+        const response = await apiMethods.getEmployeeData(id);
+        
+        // Log the full response to see its structure
+        console.log('API Response:', response);
+        
+        if (!response || !response.data || !response.data.data) {
+            console.error('Invalid API response structure:', response);
+            return;
+        }
+        
+        const selectedEmployee = response.data.data;
+        console.log('Selected Employee Data:', selectedEmployee);
+        
+        // Set form data and then open drawer
 
-    console.log(selectedEmployee, 'Selected Employee Data');
-
-
-    setFormData({
-        name: selectedEmployee.user_name || '',
-        email: selectedEmployee.user_email || '',
-        password: selectedEmployee.password || '',
-        mobile: selectedEmployee.mobile || '',
-        employee_id: selectedEmployee.employee_id || '',
-        address: selectedEmployee.address || '',
-        skills: selectedEmployee.skills || '',
-        department_id:selectedEmployee.department_id, 
-        designation_id:selectedEmployee.designation_id ,
-        company_address_id:selectedEmployee.company_address_id,
-        role_id: selectedEmployee.role_id,
-        reporting_to:selectedEmployee.reporting_to,
-        joining_date: selectedEmployee.joining_date || '',
-        date_of_birth: selectedEmployee.date_of_birth || '',
-        about_me: selectedEmployee.about_me || '',
-        contract_end_date: selectedEmployee.contract_end_date || '',
-        employment_type: selectedEmployee.employment_type || '',
-        image: selectedEmployee.image || '',
-    });
-
-    setDrawerOpen(true);
+        setFormData({
+          name: selectedEmployee.user_name || '',
+          email: selectedEmployee.user_email || '',
+          password: selectedEmployee.password || '',
+          mobile: selectedEmployee.mobile || '',
+          employee_id: selectedEmployee.employee_id || '',
+          address: selectedEmployee.address || '',
+          skills: selectedEmployee.skills || '',
+          department_id:selectedEmployee.department_id, 
+          designation_id:selectedEmployee.designation_id ,
+          company_address_id:selectedEmployee.company_address_id,
+          role_id: selectedEmployee.role_id,
+          reporting_to:selectedEmployee.reporting_to,
+          joining_date: selectedEmployee.joining_date || '',
+          date_of_birth: selectedEmployee.date_of_birth || '',
+          about_me: selectedEmployee.about_me || '',
+          contract_end_date: selectedEmployee.contract_end_date || '',
+          employment_type: selectedEmployee.employment_type || '',
+          image: selectedEmployee.image || '',
+      });
+        
+        // Add a delay before opening the drawer to ensure state is updated
+        setTimeout(() => {
+            setDrawerOpen(true);
+            console.log('Current form data after setting:', formData); // This will likely show stale data due to closure
+        }, 100);
+    } catch (error) {
+        console.error('Error fetching employee data:', error);
+    }
 };
 
   console.log(formData,'fasfdaf')
@@ -163,7 +188,30 @@ function EmployeeList() {
     try {
         let response;
         if (isEdit) {
-            response = await apiMethods.editEmployee(CurrentEmployeeId,formData);
+          const employee = {
+            aboutMe: "55",
+            address: "Mattathodi house, moolath parambil",
+            companyAddressId: 1,
+            contractEndDate: "2025-04-08",
+            dateOfBirth: "2025-04-04",
+            departmentId: 1,
+            designationId: 2,
+            email: "editeduser14544.s@pazl.info",
+            employeeId: "EMP567",
+            employmentType: "Full-time",
+            image: "localhost",
+            joiningDate: "2025-04-11",
+            mobile: "8606893474",
+            name: "Edited",
+            password: "123123123",
+            reportingTo: 3,
+            roleId: 1,
+            skills: "aa"
+          }  ;
+          console.log("edit api called")
+          
+            response = await apiMethods.editEmployee(CurrentEmployeeId,employee);
+            console.log("edit api called")
         } else {
             response = await apiMethods.createNewEmployee(formData);
         }
@@ -193,6 +241,8 @@ function EmployeeList() {
               role_id: null,
               image: '',
             })
+            fetchEmployeeData()
+
         } else {
             alert('Something went wrong. Please try again.');
         }
@@ -266,7 +316,8 @@ function EmployeeList() {
 
         <div className="overflow-x-auto border border-gray-200 px-3 py-1 mt-1 rounded-md">
           <div className="max-w-[1280px] mx-auto mt-1 flex justify-evenly gap-2 items-center">
-            <SearchBar text={'Employee'} data={tableData} />
+          {/* <SearchBar text={'Employee'} data={tableData} /> */}
+          <SearchBar text={'Employee'} data={employeesData} />
 
             <select
               className="bg-white border border-[#e7e5e4] p-[6px] rounded-md "
@@ -313,10 +364,10 @@ function EmployeeList() {
           {/* Pagination Section */}
           <div className="flex justify-end items-center gap-4 mt-2 mb-3">
             <CommonPagination
-              count={totalPages}
-              page={currentPage}
-              onChange={(event, value) => setCurrentPage(value)}
-            />
+              count={employeesData.totalPages}
+              page={employeesData.currentPage}
+              onChange={handlePageChange}
+              />
           </div>
         </div>
         <div>

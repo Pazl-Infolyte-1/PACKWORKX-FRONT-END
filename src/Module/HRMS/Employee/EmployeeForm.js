@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { RiUserLine } from 'react-icons/ri'
+import { RiCheckLine, RiCloseLine, RiUserLine } from 'react-icons/ri'
 import { IoIosAt } from 'react-icons/io'
 import Switch from '@mui/material/Switch'
 import profile from '../../../assets/images/profile.png'
@@ -46,52 +46,65 @@ const EMPLOYMENT_TYPES = [
   'Freelance'
 ];
 
+// Default empty form state
+const defaultFormState = {
+  name: '',
+  email: '',
+  password: '',
+  mobile: '',
+  employee_id: '',
+  address: '',
+  skills: '',
+  department_id: null,
+  designation_id: null,
+  joining_date: '',
+  date_of_birth: '',
+  about_me: '',
+  reporting_to: null,
+  contract_end_date: '',
+  employment_type: '',
+  company_address_id: null,
+  role_id: null,
+  image: '',
+};
 
-
-function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, handleSubmit, isEdit,dropdownOptions  }) {
+function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, handleSubmit, isEdit, dropdownOptions }) {
   const label = { inputProps: { 'aria-label': 'Switch demo' } }
   
   // Add this at the top with your other useState/useEffect hooks
-const fileInputRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const [previewImage, setPreviewImage] = useState('');
+  const [skills, setSkills] = useState([]);
+  const [inputValue, setInputValue] = useState("");
 
-const handleImageClick = () => {
-  fileInputRef.current.click();
-};
+  // This effect monitors drawer close events
+  useEffect(() => {
+    // When drawer closes, reset the form
+    if (!isDrawerOpen) {
+      resetForm();
+    }
+  }, [isDrawerOpen]);
 
- useEffect(()=>{
-  if(!isEdit){
-    setFormData({
-    name:'',
-    email: '',
-    password: '',
-    mobile: '',
-    employee_id: '',
-    address: '',
-    skills: '',
-    department_id: null,
-    designation_id: null,
-    joining_date: '',
-    date_of_birth: '',
-    about_me: '',
-    reporting_to: null,
-    contract_end_date: '',
-    employment_type: '',
-    company_address_id: null,
-    role_id: null,
-    image: '',
-    })
-  }
- },[isEdit])
+  // Function to reset the form to default state
+  const resetForm = () => {
+    setFormData(defaultFormState);
+    setSkills([]);
+    setInputValue("");
+    setPreviewImage('');
+  };
+
+  // Handle drawer close with form reset
+  const handleCloseDrawer = () => {
+    setDrawerOpen(false);
+    // Form will be reset by the useEffect above when isDrawerOpen becomes false
+  };
+
 
   // If you want to log after state update, use useEffect
   useEffect(() => {
-    // console.log('Dropdown Options Updated:', dropdownOptions.companiesAddresses);
     console.log('Dropdown Options Updated:', isEdit);
   }, [isEdit]);
 
-
-
-  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -105,22 +118,22 @@ const handleImageClick = () => {
     }));
   };
 
-
-
-const [previewImage, setPreviewImage] = useState('');
-
-useEffect(() => {
+  useEffect(() => {
     if (formData.image) {
-        setPreviewImage(formData.image); // Update preview when image URL is available
+      setPreviewImage(formData.image); // Update preview when image URL is available
     }
-}, [formData.image]);
+  }, [formData.image]);
 
-const handleImageUpload = async (event) => {
-  try {
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleImageUpload = async (event) => {
+    try {
       const file = event.target.files[0];
       if (!file) {
-          console.error("No file selected");
-          return;
+        console.error("No file selected");
+        return;
       }
 
       const formData = new FormData();
@@ -129,30 +142,71 @@ const handleImageUpload = async (event) => {
       const apiResponse = await apiMethods.uploadFile(formData);
 
       if (!apiResponse || !apiResponse.data || !apiResponse.data.data) {
-          throw new Error("Invalid response from the server");
+        throw new Error("Invalid response from the server");
       }
 
       const fileUrl = apiResponse.data.data.file_url;
       if (!fileUrl) {
-          throw new Error("File URL not found in the response");
+        throw new Error("File URL not found in the response");
       }
 
       console.log("Uploaded file URL:", fileUrl);
 
       setFormData((prev) => ({
-          ...prev,
-          image: fileUrl, // Corrected syntax for state update
+        ...prev,
+        image: fileUrl, // Corrected syntax for state update
       }));
-  } catch (error) {
+    } catch (error) {
       console.error("Error uploading image:", error.message || error);
       alert("Failed to upload image. Please try again.");
-  }
-};
+    }
+  };
 
+  const handleAddSkill = () => {
+    if (inputValue.trim() && !skills.includes(inputValue.trim())) {
+      const updatedSkills = [...skills, inputValue.trim()];
+      setSkills(updatedSkills);
+      setFormData((prev) => ({
+        ...prev,
+        skills: updatedSkills.join(","), // Store as string in formData
+      }));
+      setInputValue(""); // Clear input after adding
+    }
+  };
+
+  const handleRemoveSkill = (skill) => {
+    const updatedSkills = skills.filter((s) => s !== skill);
+    setSkills(updatedSkills);
+    setFormData((prev) => ({
+      ...prev,
+      skills: updatedSkills.join(","), // Store as string in formData
+    }));
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddSkill();
+    }
+  };
+
+useEffect(() => {
+  if (isEdit && formData.skills) {  // Fix the typo: skill -> skills
+    console.log(formData, 'from skills effect')
+    const skillsArray = formData.skills.split(",").map((s) => s.trim());
+    console.log(skillsArray, 'skills array')
+    setSkills(skillsArray);
+    setFormData((prev) => ({
+      ...prev,
+      skills: formData.skills, // Keep it as a string for submission
+    }));
+  } else if (!isEdit) {
+  }
+}, [isEdit, formData.skills]); // Add formData.skills to dependency array
 
   return (
     <>
-      <Drawer className="w-1/2" isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
+      <Drawer className="w-1/2" isOpen={isDrawerOpen} onClose={handleCloseDrawer}>
         <form onSubmit={handleSubmit} className=''>
           <div className="max-w-7xl mx-auto h-[90vh] px-3 py-3 mt-6 overflow-y-auto">
             <div className="flex justify-between p-2">
@@ -167,13 +221,12 @@ const handleImageUpload = async (event) => {
                 accept="image/*"
                 className="hidden"
               />
-<img
-    src={formData.image || profile} 
-    alt="Profile"
-    className="w-24 h-24 rounded-full cursor-pointer"
-    onClick={handleImageClick}
-/>
-
+              <img
+                src={formData.image || profile} 
+                alt="Profile"
+                className="w-24 h-24 rounded-full cursor-pointer"
+                onClick={handleImageClick}
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
@@ -241,7 +294,7 @@ const handleImageUpload = async (event) => {
                 </div>
               </div>
 
-              {/* PassWord */}
+              {/* Password */}
               <div>
                 <h6 className="mb-2">Password</h6>
                 <div className="flex items-center border border-stone-200 rounded-md">
@@ -264,10 +317,10 @@ const handleImageUpload = async (event) => {
                   <select
                     name="company_address_id"
                     className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.company_address_id}
+                    value={formData.company_address_id || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled selected>Select Company Address</option>
+                    <option value="" disabled>Select Company Address</option>
                     {dropdownOptions.companiesAddresses.map(dept => (
                       <option key={dept.id} value={dept.id}>
                         {dept.address}
@@ -284,10 +337,10 @@ const handleImageUpload = async (event) => {
                   <select
                     name="department_id"
                     className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.department_id}
+                    value={formData.department_id || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled selected>Select Department</option>
+                    <option value="" disabled>Select Department</option>
                     {dropdownOptions.departments.map(dept => (
                       <option key={dept.id} value={dept.id}>
                         {dept.department_name}
@@ -304,10 +357,10 @@ const handleImageUpload = async (event) => {
                   <select
                     name="designation_id"
                     className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.designation_id}
+                    value={formData.designation_id || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled selected>Select Designation</option>
+                    <option value="" disabled>Select Designation</option>
                     {dropdownOptions.designations.map(desig => (
                       <option key={desig.id} value={desig.id}>
                         {desig.name}
@@ -317,17 +370,17 @@ const handleImageUpload = async (event) => {
                 </div>
               </div>
 
-              {/* Designation */}
+              {/* Role */}
               <div>
                 <h6 className="mb-2">Role</h6>
                 <div className="border border-stone-200 rounded-md">
                   <select
                     name="role_id"
                     className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.role_id}
+                    value={formData.role_id || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled selected>Select Role</option>
+                    <option value="" disabled>Select Role</option>
                     {dropdownOptions.roles.map(desig => (
                       <option key={desig.id} value={desig.id}>
                         {desig.name}
@@ -387,10 +440,10 @@ const handleImageUpload = async (event) => {
                   <select
                     name="reporting_to"
                     className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.reporting_to}
+                    value={formData.reporting_to || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled selected>Select Reporting To</option>
+                    <option value="" disabled>Select Reporting To</option>
                     
                     {REPORTING_OPTIONS.map(manager => (
                       <option key={manager.id} value={+manager.id}>
@@ -408,10 +461,10 @@ const handleImageUpload = async (event) => {
                   <select
                     name="employment_type"
                     className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.employment_type}
+                    value={formData.employment_type || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled selected>Select Employment Type</option>
+                    <option value="" disabled>Select Employment Type</option>
                     
                     {EMPLOYMENT_TYPES.map(type => (
                       <option key={type} value={type}>
@@ -455,16 +508,33 @@ const handleImageUpload = async (event) => {
               {/* Skills */}
               <div>
                 <h6 className="mb-2">Skills</h6>
-                <div className="flex items-center border border-stone-200 rounded-md">
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {skills.map((skill, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center bg-gray-200 text-gray-700 px-3 py-1 rounded-md"
+                    >
+                      {skill}
+                      <RiCloseLine
+                        className="ml-2 cursor-pointer text-red-500 hover:text-red-700"
+                        onClick={() => handleRemoveSkill(skill)}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center border border-stone-200 rounded-md p-2">
                   <input
                     type="text"
-                    name="skills"
-                    className="w-full outline-none text-zinc-500 px-3 py-2"
+                    className="w-full outline-none text-zinc-500 px-2 py-1"
                     placeholder="Enter Skills"
-                    value={formData.skills}
-                    onChange={handleInputChange}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
                   />
-                  <RiUserLine className="pr-2 h-10 w-10" />
+                  <RiCheckLine
+                    className="text-green-500 cursor-pointer w-6 h-6"
+                    onClick={handleAddSkill}
+                  />
                 </div>
               </div>
             </div>

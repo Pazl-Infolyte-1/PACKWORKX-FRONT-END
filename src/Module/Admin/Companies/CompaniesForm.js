@@ -7,6 +7,8 @@ import apiMethods from '../../../api/config';
 import CustomAlert from '../../../components/New/CustomAlert';
 
 function CompaniesForm({ isDrawerOpen, setDrawerOpen,refreshTable,editdata }) {
+
+  console.log("edit form data",editdata)
   const [alerts, setAlerts] = useState([]);
   const {
     register,
@@ -36,15 +38,18 @@ function CompaniesForm({ isDrawerOpen, setDrawerOpen,refreshTable,editdata }) {
   }, [editdata, reset]);
 
   const onSubmit = (data) => {
-    const formattedData = {
-      ...data,
-      companyAccountDetails: [
-        {
-          accountName: data.accountName,
-          accountEmail: data.accountEmail,
-        },
-      ],
-    };
+    const formattedData = { ...data };
+
+    // Add companyAccountDetails only if it's NOT an edit
+    if (!editdata) {
+        formattedData.companyAccountDetails = [
+            {
+                accountName: data.accountName,
+                accountEmail: data.accountEmail,
+            },
+        ];
+
+    }
 
     delete formattedData.accountName;
     delete formattedData.accountEmail;
@@ -101,7 +106,7 @@ function CompaniesForm({ isDrawerOpen, setDrawerOpen,refreshTable,editdata }) {
               <p className="text-red-500">{errors.name?.message}</p>
             </CCol>
             <CCol md={4}>
-              <CFormInput label="Company Email *" placeholder="Enter Company Email" {...register("email", { required: "Email is required" })} />
+              <CFormInput label="Company Email *" placeholder="Enter Company Email" {...register("email")} />
               <p className="text-red-500">{errors.email?.message}</p>
             </CCol>
             <CCol md={4}>
@@ -167,11 +172,11 @@ function CompaniesForm({ isDrawerOpen, setDrawerOpen,refreshTable,editdata }) {
         <CCardBody>
           <CRow className="g-3">
             <CCol md={6}>
-              <CFormInput label="Name *" placeholder="Name" {...register("accountName", { required: "Name is required" })} />
+              <CFormInput  disabled={!!editdata} label="Name *" placeholder="Name" {...register("accountName")} />
               <p className="text-red-500">{errors.adminName?.message}</p>
             </CCol>
             <CCol md={6}>
-              <CFormInput label="Email (Login details will be emailed) *" placeholder="Account Email" {...register("accountEmail", { required: "Email is required" })} />
+              <CFormInput  disabled={!!editdata} label="Email (Login details will be emailed) *" placeholder="Account Email" {...register("accountEmail")} />
               <p className="text-red-500">{errors.adminEmail?.message}</p>
             </CCol>
           </CRow>

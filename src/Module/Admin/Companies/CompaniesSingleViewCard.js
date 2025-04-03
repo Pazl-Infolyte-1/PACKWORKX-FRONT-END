@@ -1,72 +1,122 @@
-const CompaniesSingleViewCard = ({ companyData }) => {
-	if (!companyData) return null;
-  
-	return (
-	  <>
-		<h2 className="text-lg font-semibold mb-4">
-		  Company Details - {companyData.company_name}
-		</h2>
-  
-		<div className="overflow-auto max-h-[400px] p-4 w-full">
-		  <div className="grid grid-cols-2 gap-4 text-sm">
-			<div>
-			  <strong>Company ID:</strong> {companyData.id}
-			</div>
-			<div>
-			  <strong>Company Name:</strong> {companyData.company_name}
-			</div>
-			<div>
-			  <strong>Email:</strong> {companyData.company_email}
-			</div>
-			<div>
-			  <strong>Phone:</strong> {companyData.company_phone}
-			</div>
-			<div>
-			  <strong>Website:</strong>{" "}
-			  <a
-				href={companyData.website}
-				className="text-blue-500 underline"
-				target="_blank"
-				rel="noopener noreferrer"
-			  >
-				{companyData.website}
-			  </a>
-			</div>
-			<div>
-			  <strong>Address:</strong> {companyData.address}
-			</div>
-			<div>
-			  <strong>Timezone:</strong> {companyData.timezone}
-			</div>
-			<div>
-			  <strong>Currency ID:</strong> {companyData.currency_id}
-			</div>
-			<div>
-			  <strong>Package Type:</strong> {companyData.package_type}
-			</div>
-			<div>
-			  <strong>Auth Theme:</strong> {companyData.auth_theme}
-			</div>
-			<div>
-			  <strong>Status:</strong> {companyData.status}
-			</div>
-		  </div>
-  
-		  {/* Display the company logo */}
-		  {companyData.logo && (
-			<div className="mt-4">
-			  <h3 className="text-lg font-semibold">Company Logo</h3>
-			  <img
-				src={companyData.logo}
-				alt="Company Logo"
-				className="w-32 h-32 object-contain border rounded-md"
-			  />
-			</div>
-		  )}
-		</div>
-	  </>
-	);
+import React, { useEffect, useState } from 'react';
+import apiMethods from '../../../api/config';
+
+const ClientSingleViewCard = ({ companyId, handleEdit }) => {
+console.log("companyId is",companyId)
+
+const[singleViewDatas,setSingleViewDatas]=useState(null)
+ const fetchCompanyData = async () => {
+	try {
+	  const queryParams = {
+	  };
+
+	  const response = await apiMethods.getCompanies(queryParams,companyId);
+	  console.log("Company Data:", response);
+	  setSingleViewDatas(response?.data || []);
+	  // setTotalPage(response.totalPages);
+	} catch (error) {
+	  console.error("Error fetching company data:", error);
+	} 
   };
+
+  useEffect(() => {
   
-  export default CompaniesSingleViewCard;
-  
+	if (companyId) {
+		fetchCompanyData();
+	  }
+  }, [companyId]); // Add dependencies if required
+  return (
+	<>
+  <div className="border rounded-lg overflow-auto max-h-[600px]">
+    <div className="bg-white p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">Company Details</h2>
+        <button className="px-4 py-1 bg-red-500 text-white rounded"    onClick={() => handleEdit(singleViewDatas)}>Edit</button>
+      </div>
+
+      <div className="border rounded-lg mb-4">
+        <div className="grid grid-cols-3 gap-4 p-4">
+          <div>
+            <label className="text-sm font-medium text-gray-500">Company ID</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.id}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Company Name</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.company_name}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Email</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.company_email}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Phone</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.company_phone}</div>
+          </div>
+          {/*<div>
+            <label className="text-sm font-medium text-gray-500">Logo</label>
+            <div className="mt-1">
+              <img src={singleViewDatas?.logo} alt="Company Logo" className="w-20 h-20 object-contain" />
+            </div>
+          </div>*/}
+          <div>
+            <label className="text-sm font-medium text-gray-500">Website</label>
+            <div className="text-gray-800 mt-1">
+              <a href={singleViewDatas?.website} target="_blank" rel="noopener noreferrer">
+                {singleViewDatas?.website}
+              </a>
+            </div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Currency</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.currency_id}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Timezone</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.timezone}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Package Type</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.package_type}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Date Format</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.date_format}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Time Format</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.time_format}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Locale</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.locale}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Latitude</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.latitude}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Longitude</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.longitude}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Status</label>
+            <div className="text-gray-800 mt-1">{singleViewDatas?.status}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Last Updated At</label>
+            <div className="text-gray-800 mt-1"> {new Date(singleViewDatas?.updated_at).toLocaleString()}</div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">Created At</label>
+            <div className="text-gray-800 mt-1">{new Date(singleViewDatas?.created_at).toLocaleString()}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</>
+
+  );
+}
+
+export default ClientSingleViewCard;

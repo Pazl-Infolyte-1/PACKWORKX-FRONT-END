@@ -172,6 +172,7 @@ function EmployeeList() {
             alert('Success!');
             setDrawerOpen(false);
             setIsEdit(false)
+            fetchEmployeeData()
             setFormData({
               name: '',
               email: '',

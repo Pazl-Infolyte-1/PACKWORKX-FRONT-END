@@ -505,6 +505,30 @@ export const apiMethods = {
       console.log(error)
     }
   },
+  DeleteEmployee: async (id) => {
+    try {
+      return await apiClient.delete(`/user/employees/${id}`)
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  editEmployee:async(id,body)=>{
+    try {
+      alert(id)
+      
+      return await apiClient.put(`/user/employees/${id}`,body)
+
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  getEmployeeData:async(id)=>{
+    try {
+      return await apiClient.get(`/user/employees/${id}`)
+    } catch (error) {
+      console.log(error)
+    }
+  },
 }
 
 export default apiMethods

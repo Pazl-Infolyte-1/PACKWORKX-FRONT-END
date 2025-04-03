@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, use } from 'react'
 import { IoCheckmarkCircleOutline } from 'react-icons/io5'
 import { TbSmartHome } from 'react-icons/tb'
 import { BiSearchAlt } from 'react-icons/bi'
@@ -17,28 +17,192 @@ import SearchBar from '../../../components/New/SearchBar'
 function EmployeeList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+  const [isEdit, setIsEdit] = useState(false)
   const rowsPerPage = 10
-  const [data, setData] = useState([])
+  const [employeesData, setEmployeesData] = useState([])
+  const [CurrentEmployeeId , setCurrentEmployeeId] = useState(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await apiMethods.GetEmployeelist()
-        setData(response.data.data)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
+  // State to manage form data
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    mobile: '',
+    employee_id: '',
+    address: '',
+    skills: '',
+    department_id: null,
+    designation_id: null,
+    joining_date: '', 
+    date_of_birth: '',
+    about_me: '',
+    reporting_to: null,
+    contract_end_date: '',
+    employment_type: '',
+    company_address_id: null,
+    role_id: null,
+    image: '',
+  });
+
+    const [dropdownOptions, setDropdownOptions] = useState({
+      countries: [],
+      companiesAddresses: [],
+      departments: [],
+      designations: [],
+      roles: []
+    });
+  
+    useEffect(() => {
+      const fetchDropDownData = async () => {
+        try {
+          const [
+            countriesResponse,
+            companiesAddressResponse,
+            departmentsResponse,
+            designationsResponse,
+            rolesResponse
+          ] = await Promise.all([
+            apiMethods.getCountries(),
+            apiMethods.getCompanyAddress(),
+            apiMethods.getDepartmentsList(),
+            apiMethods.getDesignation(),
+            apiMethods.getRoles()
+          ]);
+  
+          setDropdownOptions({
+            countries: countriesResponse?.data?.data,
+            companiesAddresses: companiesAddressResponse?.data?.data,
+            departments: departmentsResponse?.data?.data,
+            designations: designationsResponse?.data?.data,
+            roles: rolesResponse?.data?.data
+          });
+        } catch (error) {
+          console.error('Error fetching dropdown data:', error);
+        }
+      };
+  
+      fetchDropDownData();
+    }, []);
+
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const response = await apiMethods.GetEmployeelist()
+  //       setEmployeesData(response.data.data)
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error)
+  //     }
+  //   }
+  //   fetchData()
+
+  // }, [])
+
+  const fetchEmployeeData = async () => {
+    try {
+      const response = await apiMethods.GetEmployeelist()
+      setEmployeesData(response.data.data)
+    } catch (error) {
+      console.error('Error fetching data:', error)
     }
-    fetchData()
-
+  }
+  
+  // Initial data fetch on component mount
+  useEffect(() => {
+    fetchEmployeeData()
   }, [])
 
-  const tableData = Array.isArray(data) ? data : []
+
+  const tableData = Array.isArray(formData) ? formData : []
 
   const indexOfLastRow = currentPage * rowsPerPage
   const indexOfFirstRow = indexOfLastRow - rowsPerPage
   const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
   const totalPages = Math.ceil(tableData.length / rowsPerPage)
+
+  const handleEdit = async (id) => {
+    setIsEdit(true);
+    setCurrentEmployeeId(id)
+    const selectedData = await apiMethods.getEmployeeData(id)
+    const selectedEmployee = selectedData.data.data;
+    
+
+    console.log(selectedEmployee, 'Selected Employee Data');
+
+
+    setFormData({
+        name: selectedEmployee.user_name || '',
+        email: selectedEmployee.user_email || '',
+        password: selectedEmployee.password || '',
+        mobile: selectedEmployee.mobile || '',
+        employee_id: selectedEmployee.employee_id || '',
+        address: selectedEmployee.address || '',
+        skills: selectedEmployee.skills || '',
+        department_id:selectedEmployee.department_id, 
+        designation_id:selectedEmployee.designation_id ,
+        company_address_id:selectedEmployee.company_address_id,
+        role_id: selectedEmployee.role_id,
+        reporting_to:selectedEmployee.reporting_to,
+        joining_date: selectedEmployee.joining_date || '',
+        date_of_birth: selectedEmployee.date_of_birth || '',
+        about_me: selectedEmployee.about_me || '',
+        contract_end_date: selectedEmployee.contract_end_date || '',
+        employment_type: selectedEmployee.employment_type || '',
+        image: selectedEmployee.image || '',
+    });
+
+    setDrawerOpen(true);
+};
+
+  console.log(formData,'fasfdaf')
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log('Form Data:', formData);
+
+
+    try {
+        let response;
+        if (isEdit) {
+            response = await apiMethods.editEmployee(CurrentEmployeeId,formData);
+        } else {
+            response = await apiMethods.createNewEmployee(formData);
+        }
+
+        if (response?.status === 200 || response?.status === 201) {
+            alert('Success!');
+            setDrawerOpen(false);
+            setIsEdit(false)
+            setFormData({
+              name: '',
+              email: '',
+              password: '',
+              mobile: '',
+              employee_id: '',
+              address: '',
+              skills: '',
+              department_id: null,
+              designation_id: null,
+              joining_date: '',
+              date_of_birth: '',
+              about_me: '',
+              reporting_to: null,
+              contract_end_date: '',
+              employment_type: '',
+              company_address_id: null,
+              role_id: null,
+              image: '',
+            })
+        } else {
+            alert('Something went wrong. Please try again.');
+        }
+
+        console.log(response);
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred. Please check your input and try again.');
+    }
+};
+
 
   return (
     <>
@@ -56,18 +220,19 @@ function EmployeeList() {
             </button> */}
 
             <ActionButton
-            label={" + Create Employee"}
-            onClick={()=>{setDrawerOpen(true)}}
-            customColor='bg-teal-500'
-            className='text-white hover:hover:bg-teal-600'
+              label={" + Create Employee"}
+              onClick={() => { setDrawerOpen(true), setIsEdit(false);
+              }}
+              customColor='bg-teal-500'
+              className='text-white hover:hover:bg-teal-600'
             />
 
             <ActionButton
-            label={"Import"}
+              label={"Import"}
             />
 
             <ActionButton
-            label={"Export"}
+              label={"Export"}
             />
           </div>
         </div>
@@ -141,7 +306,7 @@ function EmployeeList() {
 
           <div className="border h-[80%] mt-2">
             <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
-              <EmployeeTable employeesdata={data} />
+              <EmployeeTable employeesdata={employeesData}  handleEdit={handleEdit} fetchEmployeeData={fetchEmployeeData} />
             </div>
           </div>
           {/* Pagination Section */}
@@ -154,7 +319,7 @@ function EmployeeList() {
           </div>
         </div>
         <div>
-          <EmployeeForm isDrawerOpen={isDrawerOpen} setDrawerOpen={setDrawerOpen} />
+          <EmployeeForm isDrawerOpen={isDrawerOpen} setDrawerOpen={setDrawerOpen} formData={formData} setFormData={setFormData} isEdit={isEdit} handleSubmit={handleSubmit} dropdownOptions={dropdownOptions} />
         </div>
       </div>
     </>

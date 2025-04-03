@@ -48,19 +48,27 @@ const EMPLOYMENT_TYPES = [
 
 
 
-function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
+function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, handleSubmit, isEdit,dropdownOptions  }) {
   const label = { inputProps: { 'aria-label': 'Switch demo' } }
+  
+  // Add this at the top with your other useState/useEffect hooks
+const fileInputRef = useRef(null);
 
-  // State to manage form data
-  const [formData, setFormData] = useState({
-    name: '',
+const handleImageClick = () => {
+  fileInputRef.current.click();
+};
+
+ useEffect(()=>{
+  if(!isEdit){
+    setFormData({
+    name:'',
     email: '',
     password: '',
     mobile: '',
     employee_id: '',
     address: '',
     skills: '',
-    department_id: null ,
+    department_id: null,
     designation_id: null,
     joining_date: '',
     date_of_birth: '',
@@ -68,79 +76,18 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
     reporting_to: null,
     contract_end_date: '',
     employment_type: '',
-    company_address_id:null,
+    company_address_id: null,
     role_id: null,
     image: '',
-  });
-
-  // const [formData, setFormData] = useState({
-  //   name: 'Johny Doe',
-  //   email: 'johnyydoe@example.com',
-  //   password: '123456',
-  //   mobile: '9876543210',
-  //   employee_id: 'EMP123',
-  //   address: '123, Main Street, City',
-  //   skills: 'React, Node.js, MySQL',
-  //   department_id: 1,
-  //   designation_id: 1,
-  //   joining_date: '2024-01-15',
-  //   date_of_birth: '1995-08-20',
-  //   about_me: 'Passionate software developer with experience in MERN stack.',
-  //   reporting_to: 3,
-  //   contract_end_date: '2026-01-15',
-  //   employment_type: 'Full-time',
-  //   company_address_id: 1,
-  //   role_id: 4,
-  //   image: '',
-  // });
-  
-
-  // State for dropdown options
-  const [dropdownOptions, setDropdownOptions] = useState({
-    countries: [],
-    companiesAddresses: [],
-    departments: [],
-    designations: [],
-    roles: []
-  });
-
-  useEffect(() => {
-    const fetchDropDownData = async () => {
-      try {
-        const [
-          countriesResponse,
-          companiesAddressResponse,
-          departmentsResponse,
-          designationsResponse,
-          rolesResponse
-        ] = await Promise.all([
-          apiMethods.getCountries(),
-          apiMethods.getCompanyAddress(),
-          apiMethods.getDepartmentsList(),
-          apiMethods.getDesignation(),
-          apiMethods.getRoles()
-        ]);
-
-        setDropdownOptions({
-          countries: countriesResponse?.data?.data,
-          companiesAddresses: companiesAddressResponse?.data?.data,
-          departments: departmentsResponse?.data?.data,
-          designations: designationsResponse?.data?.data,
-          roles: rolesResponse?.data?.data
-        });
-      } catch (error) {
-        console.error('Error fetching dropdown data:', error);
-      }
-    };
-
-    fetchDropDownData();
-  }, []);
+    })
+  }
+ },[isEdit])
 
   // If you want to log after state update, use useEffect
-  // useEffect(() => {
-  //   // console.log('Dropdown Options Updated:', dropdownOptions.companiesAddresses);
-  //   console.log('Dropdown Options Updated:', dropdownOptions);
-  // }, [dropdownOptions]);
+  useEffect(() => {
+    // console.log('Dropdown Options Updated:', dropdownOptions.companiesAddresses);
+    console.log('Dropdown Options Updated:', isEdit);
+  }, [isEdit]);
 
 
 
@@ -158,54 +105,49 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
     }));
   };
 
-  // Handle form submission
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-    console.log('Form Data:', formData);
 
-    const response = await apiMethods.createNewEmployee(formData)
-    console.log(response)
-    // TODO: Implement API call here
-  };
 
-  const [previewImage, setPreviewImage] = useState(profile);
-  const fileInputRef = useRef(null);
+const [previewImage, setPreviewImage] = useState('');
 
-  const handleImageClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // Update the preview image with the uploaded image
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+useEffect(() => {
+    if (formData.image) {
+        setPreviewImage(formData.image); // Update preview when image URL is available
     }
+}, [formData.image]);
 
-    //upload image in db
-    const formData = new FormData();
-    formData.append('file', file)
-    try {
-      const response = await apiMethods.uploadFile(formData)
-
-      if (response?.data?.success) {
-        const fileUrl = response.data.data.file_url;
-
-        setFormData((prevState) => ({
-          ...prevState,
-          image: fileUrl
-        })
-        )
+const handleImageUpload = async (event) => {
+  try {
+      const file = event.target.files[0];
+      if (!file) {
+          console.error("No file selected");
+          return;
       }
 
-    } catch (error) {
-      console.log(error)
-    }
-  };
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const apiResponse = await apiMethods.uploadFile(formData);
+
+      if (!apiResponse || !apiResponse.data || !apiResponse.data.data) {
+          throw new Error("Invalid response from the server");
+      }
+
+      const fileUrl = apiResponse.data.data.file_url;
+      if (!fileUrl) {
+          throw new Error("File URL not found in the response");
+      }
+
+      console.log("Uploaded file URL:", fileUrl);
+
+      setFormData((prev) => ({
+          ...prev,
+          image: fileUrl, // Corrected syntax for state update
+      }));
+  } catch (error) {
+      console.error("Error uploading image:", error.message || error);
+      alert("Failed to upload image. Please try again.");
+  }
+};
 
 
   return (
@@ -225,12 +167,13 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                 accept="image/*"
                 className="hidden"
               />
-              <img
-                src={previewImage}
-                alt="Profile"
-                onClick={handleImageClick}
-                className="w-32 h-32 rounded-full object-cover cursor-pointer hover:opacity-70 transition-opacity"
-              />
+<img
+    src={formData.image || profile} 
+    alt="Profile"
+    className="w-24 h-24 rounded-full cursor-pointer"
+    onClick={handleImageClick}
+/>
+
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">

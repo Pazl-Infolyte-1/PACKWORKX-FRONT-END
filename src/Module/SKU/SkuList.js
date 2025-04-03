@@ -26,6 +26,7 @@ function SkuList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [visible, setVisible] = useState(false)
   const [skudata, setSkuData] = useState([])
+  const [editedSkudata, setEditedSkuData] = useState(null)
   const [strictAdherence, setStrictAdherence] = useState(false)
   const [editTag, setEditTag] = useState(false)
   const [pagination, setPagination] = useState(null)
@@ -36,6 +37,7 @@ function SkuList() {
   const { user } = useContext(AuthContext)
   const { searchQuery, setSearchQuery, filteredSearchData } = useSearch()
   const location = useLocation()
+  console.log("location///",location?.state?.client_id)
   const searchBarRef = useRef(null)
 
   const [addNewSkuData, setAddNewSkuData] = useState({
@@ -46,7 +48,7 @@ function SkuList() {
     length: null,
     width: null,
     height: null,
-    unit: null,
+    unit: "mm",
     joints: null,
     ups: null,
     inner_outer_dimension: null,
@@ -76,7 +78,8 @@ function SkuList() {
       },
     ],
   })
-
+ 
+  
   useEffect(() => {
     if (location.state?.initialRender) {
       setDrawerOpen(true)
@@ -119,6 +122,9 @@ function SkuList() {
   const handleAddSkuSubmit = async () => {
     try {
       if (editTag) {
+        //console.log("get sku datas",editedSkudata.sku_values)
+        //console.log("edit sku datas",addNewSkuData.sku_values)
+        //return null;
         await apiMethods.updateSku(addNewSkuData)
         setEditTag(false)
         setRefresh((prev) => !prev)
@@ -134,7 +140,9 @@ function SkuList() {
 
   const handleSkuEdit = (id) => {
     const selectedSku = skudata.find((sku) => sku.id === id)
+    console.log("selected sku",selectedSku)
     setEditTag(true)
+    setEditedSkuData(selectedSku)
     setAddNewSkuData({
       id: selectedSku.id || '',
       sku_name: selectedSku.sku_name || '',
@@ -178,6 +186,10 @@ function SkuList() {
 
   useEffect(() => {
     const fetchData = async () => {
+      // skip sku get call
+      console.log("check location",location.state?.skipInitialFetch)
+      console.log("refresh",refresh)
+
       if (location.state?.skipInitialFetch && !refresh) {
         return;
       }
@@ -257,28 +269,28 @@ function SkuList() {
         {[
           {
             name: 'RSC Box',
-            count: dashboard?.rscbox,
+            count: dashboard?.rscbox || 0,
             color: '#286eb1',
             bgColor: '#2e2d6d',
             icon: <FaBoxOpen className="text-white text-2xl" />,
           },
           {
             name: 'Board',
-            count: dashboard?.board,
+            count: dashboard?.board || 0,
             color: '#ffeeaa',
             bgColor: '#ffcc00',
             icon: <MdTakeoutDining className="text-white text-2xl" />,
           },
           {
             name: 'Die Cut Box',
-            count: dashboard?.diecutbox,
+            count: dashboard?.diecutbox || 0,
             color: '#aad3ff',
             bgColor: '#007aff',
             icon: <MdOutlineSettingsInputComposite className="text-white text-2xl" />,
           },
           {
             name: 'Total SKU',
-            count: pagination?.totalCount,
+            count: pagination?.totalCount || 0,
             color: '#c3f2cb',
             bgColor: '#4cd964',
             icon: <MdCheckroom className="text-white text-2xl" />,
@@ -406,6 +418,8 @@ function SkuList() {
           clientDiasble={clientDiasble}
           skuType={skuType}
           setSkuType={setSkuType}
+          locationvalue={location?.state?.client_id}
+          //onUnitChange={handleUnitChange}
         />
       </Drawer>
     </div>

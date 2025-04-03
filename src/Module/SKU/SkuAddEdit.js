@@ -18,8 +18,12 @@ function SkuAddEdit({
   skuType,
   setSkuType,
   clientDiasble,
-  refresh
+  refresh,
+  locationvalue,
+  onUnitChange
 }) {
+
+  console.log("location sku add",locationvalue)
   const { user } = useContext(AuthContext)
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
@@ -62,7 +66,6 @@ function SkuAddEdit({
       },
     ],
   })
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -197,9 +200,12 @@ function SkuAddEdit({
         skuType={skuType}
         setAddNewSkuData={setAddNewSkuData}
         updateSkuValues={updateSkuValues}
+        locationvalue={locationvalue}
+        //onUnitChange={handleUnitChange}
       />
     ),
-    'Corrugated Sheet': (
+    //'Corrugated Sheet': (
+    'Board': (
       <CorrugatedSheet
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}

@@ -31,7 +31,7 @@ const[singleViewDatas,setSingleViewDatas]=useState(null)
     <div className="bg-white p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Company Details</h2>
-        <button className="px-4 py-1 bg-red-500 text-white rounded">Edit</button>
+        <button className="px-4 py-1 bg-red-500 text-white rounded"    onClick={() => handleEdit(singleViewDatas)}>Edit</button>
       </div>
 
       <div className="border rounded-lg mb-4">
@@ -52,12 +52,12 @@ const[singleViewDatas,setSingleViewDatas]=useState(null)
             <label className="text-sm font-medium text-gray-500">Phone</label>
             <div className="text-gray-800 mt-1">{singleViewDatas?.company_phone}</div>
           </div>
-          <div>
+          {/*<div>
             <label className="text-sm font-medium text-gray-500">Logo</label>
             <div className="mt-1">
               <img src={singleViewDatas?.logo} alt="Company Logo" className="w-20 h-20 object-contain" />
             </div>
-          </div>
+          </div>*/}
           <div>
             <label className="text-sm font-medium text-gray-500">Website</label>
             <div className="text-gray-800 mt-1">
@@ -104,11 +104,11 @@ const[singleViewDatas,setSingleViewDatas]=useState(null)
           </div>
           <div>
             <label className="text-sm font-medium text-gray-500">Last Updated At</label>
-            <div className="text-gray-800 mt-1">{singleViewDatas?.updated_at}</div>
+            <div className="text-gray-800 mt-1"> {new Date(singleViewDatas?.updated_at).toLocaleString()}</div>
           </div>
           <div>
             <label className="text-sm font-medium text-gray-500">Created At</label>
-            <div className="text-gray-800 mt-1">{singleViewDatas?.created_at}</div>
+            <div className="text-gray-800 mt-1">{new Date(singleViewDatas?.created_at).toLocaleString()}</div>
           </div>
         </div>
       </div>

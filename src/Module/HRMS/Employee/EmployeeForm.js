@@ -639,12 +639,12 @@ useEffect(() => {
             {/* Action Buttons */}
             <div className="p-4 flex justify-end space-x-4">
               <ActionButton
-                label="Edit"
-                variant='edit'
+                label="Cancel"
+                variant='cancel'
                 type="button"
                 onClick={() => {
                   // TODO: Implement edit functionality
-                  console.log('Edit clicked');
+                    setDrawerOpen(false)
                 }}
               />
               <ActionButton

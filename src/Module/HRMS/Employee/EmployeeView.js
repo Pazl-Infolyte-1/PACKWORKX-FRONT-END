@@ -50,6 +50,15 @@ function EmployeeView({ employeeData, showEmployeeData, setVisible }) {
                     >
                       {employeeData.employment_type}
                     </span>
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        employeeData.status === 'Full-time'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-blue-100 text-blue-800'
+                      }`}
+                    >
+                      {employeeData.employment_type}
+                    </span>
                   </div>
                 </div>
               </div>

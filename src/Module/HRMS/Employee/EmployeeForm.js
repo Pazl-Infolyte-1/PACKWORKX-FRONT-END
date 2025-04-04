@@ -217,12 +217,9 @@ useEffect(() => {
 
   return (
     <>
-      <Drawer className="w-1/2" isOpen={isDrawerOpen} onClose={handleCloseDrawer}>
+      <Drawer className="w-1/2" isOpen={isDrawerOpen} onClose={handleCloseDrawer}title={isEdit?"Edit Employee":"Add Employee"}>
         <form onSubmit={handleSubmit} className=''>
           <div className="max-w-7xl mx-auto h-[90vh] px-3 py-3 mt-6 overflow-y-auto">
-            <div className="flex justify-between p-2">
-              <h2 className="text-xl font-bold">Employee Form</h2>
-            </div>
 
             <div className="flex flex-col items-center justify-center">
               <input

@@ -28,6 +28,13 @@ function EmployeeList() {
   const [showEmployeeData,setShowEmployeeData] = useState(false)
   const [viewEmployeeData,setViewEmployeeData] = useState(null);
   const { searchQuery, setSearchQuery, filteredSearchData,handleSearch } = useSearch() ///need to verify
+  const [status,setFilterStatus] = useState('');
+
+
+
+  const handleStatus = (event)=>{
+    setFilterStatus(event.target.value);
+  }
 
   
 
@@ -175,6 +182,8 @@ function EmployeeList() {
         search: searchQuery,
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,
+        status: status, // Include the status parameter in the API call
+
       })
       setEmployeesData(response.data.data)
       setEmployeeResponse(response.data)
@@ -187,10 +196,9 @@ function EmployeeList() {
     setPaginationParams(prev => ({
       ...prev,
       currentPage: 1 // Reset to page 1 whenever search query changes
-      
     })
   );
-  }, [searchQuery]);
+  }, [searchQuery,status]);
   
   // Initial data fetch on component mount
   useEffect(() => {
@@ -422,8 +430,7 @@ function EmployeeList() {
 </select>
 
 <select
-  id="role-filter"
-  className="border border-[#e7e5e4] p-[6px] rounded-md filter-dropdown"
+  className="border border-[#e7e5e4] p-[6px] rounded-md "
   defaultValue=""
   onChange={HandleFilter}
 >
@@ -461,13 +468,13 @@ function EmployeeList() {
   id="status-filter"
   className="border border-[#e7e5e4] p-[6px] rounded-md filter-dropdown"
   defaultValue=""
-  onChange={HandleFilter}
+  onChange={handleStatus}
 >
               <option value="" disabled>
                 status
               </option>
-              <option value="active">Active</option>
-              <option value="deactive">Inactive</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
             </select>
               </div>
           </div>

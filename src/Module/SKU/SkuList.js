@@ -37,7 +37,7 @@ function SkuList() {
   const { user } = useContext(AuthContext)
   const { searchQuery, setSearchQuery, filteredSearchData } = useSearch()
   const location = useLocation()
-  console.log("location///",location?.state?.client_id)
+  console.log('location///', location?.state?.client_id)
   const searchBarRef = useRef(null)
 
   const [addNewSkuData, setAddNewSkuData] = useState({
@@ -48,7 +48,7 @@ function SkuList() {
     length: null,
     width: null,
     height: null,
-    unit: "mm",
+    unit: 'mm',
     joints: null,
     ups: null,
     select_dies:null,
@@ -58,8 +58,8 @@ function SkuList() {
     flap_width: null,
     flap_tolerance: null,
     length_trimming_tolerance: null,
-    width_board_size_cm2:null,
-    length_board_size_cm2:null,
+    width_board_size_cm2: null,
+    length_board_size_cm2: null,
     width_trimming_tolerance: null,
     strict_adherence: strictAdherence,
     customer_reference: null,
@@ -81,8 +81,7 @@ function SkuList() {
       },
     ],
   })
- 
-  
+
   useEffect(() => {
     if (location.state?.initialRender) {
       setDrawerOpen(true)
@@ -94,14 +93,14 @@ function SkuList() {
     if (location.state?.client_id) {
       setAddNewSkuData((prevState) => ({
         ...prevState,
-        client: location.state?.client_id,  
+        client: location.state?.client_id,
       }))
     }
 
-      // Clear the location state after using it to prevent side effects on refresh
-  if (location.state) {
-    window.history.replaceState({}, document.title);
-  }
+    // Clear the location state after using it to prevent side effects on refresh
+    if (location.state) {
+      window.history.replaceState({}, document.title)
+    }
   }, [location.state])
 
   const handleChange = (event) => {
@@ -143,7 +142,7 @@ function SkuList() {
 
   const handleSkuEdit = (id) => {
     const selectedSku = skudata.find((sku) => sku.id === id)
-    console.log("selected sku",selectedSku)
+    console.log('selected sku', selectedSku)
     setEditTag(true)
     setEditedSkuData(selectedSku)
     setAddNewSkuData({
@@ -193,11 +192,11 @@ function SkuList() {
   useEffect(() => {
     const fetchData = async () => {
       // skip sku get call
-      console.log("check location",location.state?.skipInitialFetch)
-      console.log("refresh",refresh)
+      console.log('check location', location.state?.skipInitialFetch)
+      console.log('refresh', refresh)
 
       if (location.state?.skipInitialFetch && !refresh) {
-        return;
+        return
       }
       try {
         const response = await apiMethods.getSkuList({
@@ -218,7 +217,15 @@ function SkuList() {
       }
     }
     fetchData()
-  }, [refresh, selectedClient, searchQuery, pagination?.currentPage, selectedSkuType, limit,location.state?.skipInitialFetch])
+  }, [
+    refresh,
+    selectedClient,
+    searchQuery,
+    pagination?.currentPage,
+    selectedSkuType,
+    limit,
+    location.state?.skipInitialFetch,
+  ])
 
   // Clear all filters
   const handleClearFilters = () => {
@@ -235,7 +242,7 @@ function SkuList() {
       search: searchQuery,
       sku_type: selectedSkuType,
       client: selectedClient,
-      status: 'active'
+      status: 'active',
     })
   }
 

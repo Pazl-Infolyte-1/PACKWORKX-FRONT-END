@@ -504,11 +504,23 @@ export const apiMethods = {
       console.error(error)
     }
   },
-  GetEmployeelist: async () => {
+  GetEmployeelist: async (params) => {
+    console.log(params)
     try {
-      return await apiClient.get('/user/employees')
+      const response = await apiClient.get('/user/employees',{
+        params: {
+          page: params.page || 1,
+          limit: params.limit || 10,
+          search: params.search || '', 
+          department:params.department,
+          role:params.role,
+          reportingManager:params.reportingManager,
+          status:params.status
+        },
+      })
+      return response
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   },
   getSkuExcelExport: async (params) => {
@@ -568,6 +580,54 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  getPackages: async (params) => {
+    try {
+      return await apiClient.get('/packages', {params})
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  AddPacakges: async (payload) => {
+    try {
+      return await apiClient.post('/packages/create',payload)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  
+  UpdatePacakges: async (id,payload) => {
+    try {
+      return await apiClient.put(`/packages/update/${id}`,payload)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  DeletePacakges: async (id) => {
+    try {
+      return await apiClient.delete(`/packages/delete/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getCurrency: async () => {
+    try {
+      return await apiClient.get('/common-service/currency')
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getModule: async () => {
+    try {
+      return await apiClient.get('/common-service/module')
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
 }
 
 export default apiMethods

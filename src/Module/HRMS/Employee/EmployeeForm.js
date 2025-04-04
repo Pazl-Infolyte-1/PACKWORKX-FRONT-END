@@ -7,6 +7,7 @@ import Drawer from '../../../components/Drawer/Drawer'
 import ActionButton from '../../../components/New/ActionButton'
 import axios from 'axios'
 import apiMethods from '../../../api/config'
+import { CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CFormInput } from '@coreui/react'
 
 // Placeholder data for dropdowns (would typically come from API)
 const DEPARTMENT_OPTIONS = [
@@ -66,6 +67,8 @@ const defaultFormState = {
   company_address_id: null,
   role_id: null,
   image: '',
+  country_phonecode:null,
+  country_id:null
 };
 
 function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, handleSubmit, isEdit, dropdownOptions }) {
@@ -93,11 +96,19 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
     setPreviewImage('');
   };
 
+  const [selectedCountry, setSelectedCountry] = useState(null);
+
+  const handleCountrySelect = (country) => {
+    setSelectedCountry(country);
+    handleInputChange({ target: { name: "country_code", value: country.phonecode } });
+  };
   // Handle drawer close with form reset
   const handleCloseDrawer = () => {
     setDrawerOpen(false);
+
     // Form will be reset by the useEffect above when isDrawerOpen becomes false
   };
+
 
 
   // If you want to log after state update, use useEffect
@@ -111,7 +122,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
       ...prevState,
       [name]: 
         // Convert to number for specific fields, keep as is for others
-        ['department_id', 'designation_id', 'reporting_to', 'company_address_id', 'role_id']
+        ['department_id', 'designation_id', 'reporting_to', 'company_address_id', 'role_id',"country_phonecode","country_id"]
         .includes(name) 
           ? (value === '' ? null : Number(value)) 
           : value
@@ -280,20 +291,106 @@ useEffect(() => {
 
               {/* Mobile */}
               <div>
-                <h6 className="mb-2">Mobile Number</h6>
-                <div className="flex items-center border border-stone-200 rounded-md">
-                  <input
-                    type="tel"
-                    name="mobile"
-                    className="w-full outline-none text-zinc-500 px-3 py-2"
-                    placeholder="Enter Mobile Number"
-                    value={formData.mobile}
-                    onChange={handleInputChange}
+  <h6 className="mb-2">Mobile Number</h6>
+  <div className="flex border border-stone-200 rounded-md">
+    {/* Country code dropdown using CoreUI components with fixed layout */}
+    <CDropdown className='max-h-2.5'>
+      <CDropdownToggle 
+        color="light" 
+        className="border-0 rounded-0 border-r border-stone-200 h-10"
+        style={{ 
+          paddingRight: "30px", // Extra padding for the dropdown caret
+          position: "relative"  // For proper caret positioning
+        }}
+      >
+        {formData.country_id ? (
+          <div className=" flex pr-4 align-items-center">
+            {(() => {
+              const selectedCountry = dropdownOptions.countries.find(
+                country => country.id === formData.country_id
+              );
+              
+              return selectedCountry ? (
+                <>
+                  <img
+                    src={`https://flagcdn.com/w40/${selectedCountry.iso.toLowerCase()}.png`}
+                    alt={selectedCountry.nicename}
+                    className="me-2"
+                    style={{ width: "24px", height: "16px" }}
                   />
-                  <RiUserLine className="pr-2 h-10 w-10" />
-                </div>
-              </div>
+                  <span>+{selectedCountry.phonecode}</span>
+                </>
+              ) : (
+                <span>Select</span>
+              );
+            })()}
+          </div>
+        ) : (
+          <span>Select</span>
+        )}
+        {/* Custom dropdown indicator - hides the default one */}
+        <style jsx>{`
+          .dropdown-toggle::after {
+            display: none !important;
+          }
+        `}</style>
+        {/* Custom dropdown caret positioned to the right */}
+        <span 
+          style={{ 
+            position: "absolute", 
+            right: "3px", 
+            top: "50%", 
+            transform: "translateY(-50%)"
+          }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+          </svg>
+        </span>
+      </CDropdownToggle>
+      <CDropdownMenu className="py-1">
+        <div className="px-3 py-2 border-bottom">
+          <CFormInput
+            type="text"
+            placeholder="Search countries"
+            size="sm"
+            className="mb-0"
+          />
+        </div>
+        {dropdownOptions.countries &&
+          dropdownOptions.countries.map((country) => (
+            <CDropdownItem
+              key={country.id}
+              onClick={() => {
+                handleInputChange({ target: { name: "country_phonecode", value: country.phonecode } });
+                handleInputChange({ target: { name: "country_id", value: country.id } });
+              }}
+              className="d-flex align-items-center py-2"
+            >
+              <img
+                src={`https://flagcdn.com/w40/${country.iso.toLowerCase()}.png`}
+                alt={country.nicename}
+                className="me-2"
+                style={{ width: "24px", height: "16px" }}
+              />
+              <span className="me-auto">{country.nicename}</span>
+              <span className="text-primary">+{country.phonecode}</span>
+            </CDropdownItem>
+          ))}
+      </CDropdownMenu>
+    </CDropdown>
 
+    {/* Phone number input */}
+    <CFormInput
+      type="tel"
+      name="mobile"
+      placeholder="Enter Mobile Number"
+      value={formData.mobile || ""}
+      onChange={handleInputChange}
+      className="border-0 h-10"
+    />
+  </div>
+</div>
               {/* Password */}
               <div>
                 <h6 className="mb-2">Password</h6>
@@ -446,7 +543,7 @@ useEffect(() => {
                     <option value="" disabled>Select Reporting To</option>
                     
                     {REPORTING_OPTIONS.map(manager => (
-                      <option key={manager.id} value={+manager.id}>
+                      <option key={manager.id} value={3}>
                         {manager.name}
                       </option>
                     ))}
@@ -542,12 +639,12 @@ useEffect(() => {
             {/* Action Buttons */}
             <div className="p-4 flex justify-end space-x-4">
               <ActionButton
-                label="Edit"
-                variant='edit'
+                label="Cancel"
+                variant='cancel'
                 type="button"
                 onClick={() => {
                   // TODO: Implement edit functionality
-                  console.log('Edit clicked');
+                    setDrawerOpen(false)
                 }}
               />
               <ActionButton

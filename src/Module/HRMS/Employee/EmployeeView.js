@@ -40,7 +40,7 @@ function EmployeeView({ employeeData, showEmployeeData, setVisible }) {
                     <h1 className="text-3xl font-bold text-gray-800">{employeeData.user_name}</h1>
                     <p className="text-gray-500 mt-1">#{employeeData.employee_id}</p>
                   </div>
-                  <div className="mt-2 sm:mt-0">
+                  <div className="mt-2 sm:mt-0  ">
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-medium ${
                         employeeData.employment_type === 'Full-time'
@@ -49,6 +49,15 @@ function EmployeeView({ employeeData, showEmployeeData, setVisible }) {
                       }`}
                     >
                       {employeeData.employment_type}
+                    </span>
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        employeeData.user_status === 'active'
+                          ? 'bg-green-800 text-white'
+                          : 'bg-red-700 text-white '
+                      }`}
+                    >
+                      {employeeData.user_status}
                     </span>
                   </div>
                 </div>

@@ -74,7 +74,26 @@ function EmployeeTable({ employeesdata = [], handleEdit,fetchEmployeeData,handle
                                     <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.employee_id}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.employee_name}</CTableDataCell>
+                  <CTableDataCell className="py-3  text-gray-700">
+                  <div className="flex items-center gap-1">
+                      {/* Profile Image - Round Shape */}
+                      <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                        {cell.image ? (
+                          <img 
+                            src={cell.image} 
+                            alt={`${cell.employee_name}'s profile`}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-600 font-medium">
+                            {cell.employee_name?.charAt(0)?.toUpperCase() || '?'}
+                          </div>
+                        )}
+                      </div>
+                      {/* Employee Name */}
+                      <span>{cell.employee_name}</span>
+                    </div>
+                        </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.role}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.department}

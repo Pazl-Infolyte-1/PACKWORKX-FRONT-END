@@ -13,6 +13,7 @@ import ActionButton from '../../../components/New/ActionButton'
 import SearchBar from '../../../components/New/SearchBar'
 import EmployeeView from './EmployeeView'
 import { useSearch } from '../../../components/New/SearchContext'
+import { paginationClasses } from '@mui/material'
 
 
 
@@ -26,9 +27,13 @@ function EmployeeList() {
   const [EmployeeResponse,setEmployeeResponse] = useState(null);
   const [showEmployeeData,setShowEmployeeData] = useState(false)
   const [viewEmployeeData,setViewEmployeeData] = useState(null);
-  const { searchQuery, setSearchQuery, filteredSearchData } = useSearch() ///need to verify
+  const { searchQuery, setSearchQuery, filteredSearchData,handleSearch } = useSearch() ///need to verify
+
+  
+
+  
   const searchBarRef = useRef(null)
-  const [limit, setLimit] = useState(10)
+  const [filter,setFilter]=useState('')
   
   const [paginationParams, setPaginationParams] = useState({
     currentPage: 1,
@@ -42,11 +47,27 @@ function EmployeeList() {
     }));
   };
 
+  // const HandleFilter = (e)=>{
+  //   // setSearchQuery(active)
+  //   console.log(e.target.value)
+  //   setHandleFilter(e.target.value)
+  //   searchBarRef.setQuery(e.target.value)
+  // }
+
+  const HandleFilter = (e) => {
+    const selectedValue = e.target.value
+    setFilter(selectedValue)
+  
+    // Trigger search globally
+    handleSearch(selectedValue, employeesData)
+  }
+
   const handleLimitChange1 = (newLimit) => {
     setPaginationParams({
       currentPage: 1, // Always reset to page 1 when changing limit
       pageSize: newLimit
     });
+    
   };
   
   
@@ -81,7 +102,12 @@ function EmployeeList() {
       companiesAddresses: [],
       departments: [],
       designations: [],
-      roles: []
+      roles: [],
+      reporting_to: [
+       { id: 3, name: 'Jane Smith' },
+      { id: 3, name: 'Mike Johnson' },
+      { id: 3, name: 'Sarah Williams' }
+      ]
     });
   
     useEffect(() => {
@@ -133,11 +159,10 @@ function EmployeeList() {
 
 
   const fetchEmployeeData = async () => {
+
     try {
       const response = await apiMethods.GetEmployeelist({
-        search: searchQuery || '',
-        // page: EmployeeResponse?.currentPage || 1,
-        // limit: EmployeeResponse?.pageSize || 10,
+        search: searchQuery,
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,
       })
@@ -147,20 +172,29 @@ function EmployeeList() {
       console.error('Error fetching data:', error)
     }
   }
+
+  useEffect(() => {
+    setPaginationParams(prev => ({
+      ...prev,
+      currentPage: 1 // Reset to page 1 whenever search query changes
+      
+    })
+  );
+  }, [searchQuery]);
   
   // Initial data fetch on component mount
   useEffect(() => {
     fetchEmployeeData()
-  }, [searchQuery,paginationParams])
+  }, [searchQuery,paginationParams,filter,setPaginationParams.current])
 
 
-  const handlePageChange = (event, newPage) => {
-    // console.log(employeesData)
-    // console.log(EmployeeResponse)
-    setEmployeeResponse((prev) => ({ ...prev, currentPage: newPage }));
-    console.log("called page change")
-    console.log(EmployeeResponse)
-  };
+  // const handlePageChange = (event, newPage) => {
+  //   // console.log(employeesData)
+  //   // console.log(EmployeeResponse)
+  //   setEmployeeResponse((prev) => ({ ...prev, currentPage: newPage }));
+  //   console.log("called page change")
+  //   console.log(EmployeeResponse)
+  // };
 
   const handleView = async (id)=>{
     try{
@@ -216,8 +250,8 @@ function EmployeeList() {
           contract_end_date: selectedEmployee.contract_end_date || '',
           employment_type: selectedEmployee.employment_type || '',
           image: selectedEmployee.image || '',
-          country_phonecode:selectedEmployee.country_phonecode,
-          country_id:selectedEmployee.country_id
+          country_phonecode:selectedEmployee.country_phonecode||'',
+          country_id:selectedEmployee.country_id||''
       });
         
         // Add a delay before opening the drawer to ensure state is updated
@@ -311,15 +345,15 @@ function EmployeeList() {
     <>
       <div className="">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Employee</h2>
+          <h2 className="text-2xl font-bold"> Employee</h2>
           <div className="flex gap-2">
 
             <ActionButton
-              label={" + Create Employee"}
+              label={" + Add Employee"}
               onClick={() => { setDrawerOpen(true), setIsEdit(false);
               }}
-              customColor='bg-teal-500'
-              className='text-white hover:hover:bg-teal-600'
+              variant='add'
+              className='text-white'
             />
 
             <ActionButton
@@ -358,45 +392,71 @@ function EmployeeList() {
         </div>
 
         <div className="overflow-x-auto border border-gray-200 px-3 py-1 mt-1 rounded-md">
-          <div className="max-w-[1280px] mx-auto mt-1 flex justify-evenly gap-2 items-center">
+          <div className="max-w-[1280px] mx-auto mt-1 flex justify-between gap-2">
              <SearchBar text="Employees" data={employeesData} ref={searchBarRef} />
-
-
-            <select
-              className="bg-white border border-[#e7e5e4] p-[6px] rounded-md "
-              defaultValue=""
-            >
-              <option value="" disabled>
-                Select Department
-              </option>
-              <option value="">Department1</option>
-              <option value="">Department2</option>
-              <option value="">Department3</option>
-            </select>
+             <div className='flex justify-end gap-3'>
+             <select
+  className="bg-white border border-[#e7e5e4] p-[6px] rounded-md"
+  defaultValue=""
+  onChange={HandleFilter}
+>
+  <option value="" disabled>
+    Select Department
+  </option>
+  {dropdownOptions.departments.map((department) => (
+    <option key={department.id} value={department.department_name}>
+      {department.department_name}
+    </option>
+  ))}
+</select>
 
             <select
               className="border border-[#e7e5e4] p-[6px] rounded-md"
               defaultValue=""
-            >
+              onChange={HandleFilter}
+              >
               <option value="" disabled>
                 Select Role
               </option>
-              <option value="">Role1</option>
-              <option value="">Role2</option>
-              <option value="">Role3</option>
+              {
+                dropdownOptions.roles.map((role)=>(
+                  <option key={role.id} value={role.name}>
+                  {role.name}
+                </option>
+                ))
+              }
+           
             </select>
+
+            {/* <select
+              className="border border-[#e7e5e4] p-[6px] rounded-md"
+              defaultValue=""
+              onChange={HandleFilter}
+              >
+              <option value="" disabled>
+              Reporting Manager 
+              </option>
+              {
+                dropdownOptions.reporting_to?.map((manager)=>(
+                  <option key={manager.id} value={manager.name}>
+                  {manager.name}
+                </option>
+                ))
+              }
+            </select> */}
 
             <select
               className="border border-[#e7e5e4] p-[6px] rounded-md"
               defaultValue=""
-            >
+              onChange={HandleFilter}
+              >
               <option value="" disabled>
-                Select Manager
+                status
               </option>
-              <option value="">Manager1</option>
-              <option value="">Manager2</option>
-              <option value="">Manager3</option>
+              <option value="active">Active</option>
+              <option value="deactive">Inactive</option>
             </select>
+              </div>
           </div>
 
           <div className="border h-[80%] mt-2">

@@ -512,6 +512,10 @@ export const apiMethods = {
           page: params.page || 1,
           limit: params.limit || 10,
           search: params.search || '', 
+          department:params.department,
+          role:params.role,
+          reportingManager:params.reportingManager,
+          status:params.status
         },
       })
       return response

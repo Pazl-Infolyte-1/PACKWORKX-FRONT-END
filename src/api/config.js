@@ -504,11 +504,19 @@ export const apiMethods = {
       console.error(error)
     }
   },
-  GetEmployeelist: async () => {
+  GetEmployeelist: async (params) => {
+    console.log(params)
     try {
-      return await apiClient.get('/user/employees')
+      const response = await apiClient.get('/user/employees',{
+        params: {
+          page: params.page || 1,
+          limit: params.limit || 10,
+          search: params.search || '', 
+        },
+      })
+      return response
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   },
   getSkuExcelExport: async (params) => {

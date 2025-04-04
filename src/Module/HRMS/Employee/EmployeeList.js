@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from 'react'
+import React, { useState, useEffect, use, useRef } from 'react'
 import { IoCheckmarkCircleOutline } from 'react-icons/io5'
 import { TbSmartHome } from 'react-icons/tb'
 import { BiSearchAlt } from 'react-icons/bi'
@@ -12,6 +12,7 @@ import EmployeeTable from './EmployeeTable'
 import ActionButton from '../../../components/New/ActionButton'
 import SearchBar from '../../../components/New/SearchBar'
 import EmployeeView from './EmployeeView'
+import { useSearch } from '../../../components/New/SearchContext'
 
 
 
@@ -25,7 +26,12 @@ function EmployeeList() {
   const [EmployeeResponse,setEmployeeResponse] = useState(null);
   const [showEmployeeData,setShowEmployeeData] = useState(false)
   const [viewEmployeeData,setViewEmployeeData] = useState(null);
-  const [searchQuery, setSearchQuery] = useState(""); // State for search input
+  const { searchQuery, setSearchQuery, filteredSearchData } = useSearch() ///need to verify
+  const searchBarRef = useRef(null)
+  const [limit, setLimit] = useState(10)
+  
+
+  
   
   
 
@@ -106,9 +112,16 @@ function EmployeeList() {
 
   // }, [])
 
+
+
+
   const fetchEmployeeData = async () => {
     try {
-      const response = await apiMethods.GetEmployeelist()
+      const response = await apiMethods.GetEmployeelist({
+        search: searchQuery || '',
+        page: EmployeeResponse?.currentPage || 1,
+        limit: EmployeeResponse?.pageSize || 10,
+      })
       setEmployeesData(response.data.data)
       setEmployeeResponse(response.data)
     } catch (error) {
@@ -119,19 +132,15 @@ function EmployeeList() {
   // Initial data fetch on component mount
   useEffect(() => {
     fetchEmployeeData()
-  }, [])
+  }, [searchQuery,EmployeeResponse?.currentPage,EmployeeResponse?.pageSize])
 
-
-  // const tableData = Array.isArray(formData) ? formData : []
-
-  // const indexOfLastRow = currentPage * rowsPerPage
-  // const indexOfFirstRow = indexOfLastRow - rowsPerPage
-  // const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
-  // const totalPages = Math.ceil(tableData.length / rowsPerPage)
 
   const handlePageChange = (event, newPage) => {
-    setEmployeesData((prev) => ({ ...prev, currentPage: newPage }));
-    console.log(employeesData)
+    // console.log(employeesData)
+    // console.log(EmployeeResponse)
+    setEmployeeResponse((prev) => ({ ...prev, currentPage: newPage }));
+    console.log("called page change")
+    console.log(EmployeeResponse)
   };
 
   const handleView = async (id)=>{
@@ -331,8 +340,8 @@ function EmployeeList() {
 
         <div className="overflow-x-auto border border-gray-200 px-3 py-1 mt-1 rounded-md">
           <div className="max-w-[1280px] mx-auto mt-1 flex justify-evenly gap-2 items-center">
-          {/* <SearchBar text={'Employee'} data={tableData} /> */}
-          <SearchBar text={'Employee'} data={employeesData} />
+             <SearchBar text="Employees" data={employeesData} ref={searchBarRef} />
+
 
             <select
               className="bg-white border border-[#e7e5e4] p-[6px] rounded-md "
@@ -373,7 +382,12 @@ function EmployeeList() {
 
           <div className="border h-[80%] mt-2">
             <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
-              <EmployeeTable employeesdata={employeesData}  handleEdit={handleEdit} fetchEmployeeData={fetchEmployeeData} handleView={handleView} />
+              <EmployeeTable
+               employeesdata={employeesData}
+               handleEdit={handleEdit}
+               fetchEmployeeData={fetchEmployeeData}
+               handleView={handleView}
+                />
               <EmployeeView
               showEmployeeData={showEmployeeData}
               employeeData={viewEmployeeData}
@@ -383,9 +397,14 @@ function EmployeeList() {
           {/* Pagination Section */}
           <div className="flex justify-end items-center gap-4 mt-2 mb-3">
             <CommonPagination
-              count={employeesData.totalPages}
-              page={employeesData.currentPage}
+              count={EmployeeResponse?.totalPages}
+              page={EmployeeResponse?.entPage}
               onChange={handlePageChange}
+              onLimitChange={(newlimit)=>{
+                setEmployeeResponse((prev) => ({ ...prev, currentPage: 1 }))
+                setEmployeeResponse((prev) => ({ ...prev, pageSize: newlimit }))
+              }}
+              limit={EmployeeResponse?.pageSize}
               />
           </div>
         </div>

@@ -504,11 +504,19 @@ export const apiMethods = {
       console.error(error)
     }
   },
-  GetEmployeelist: async () => {
+  GetEmployeelist: async (params) => {
+    console.log(params)
     try {
-      return await apiClient.get('/user/employees')
+      const response = await apiClient.get('/user/employees',{
+        params: {
+          page: params.page || 1,
+          limit: params.limit || 10,
+          search: params.search || '', 
+        },
+      })
+      return response
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   },
   getSkuExcelExport: async (params) => {
@@ -535,6 +543,46 @@ export const apiMethods = {
     }
   },
 
+   DeleteEmployee: async (id) => {
+    try {
+      return await apiClient.delete(`/user/employees/${id}`)
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  editEmployee:async(id,body)=>{
+    try {
+
+      alert(id)
+      return await apiClient.put(`/user/employees/${id}`,body)
+
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  getEmployeeData:async(id)=>{
+    try {
+      return await apiClient.get(`/user/employees/${id}`)
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  getSkuListOptions: async () => {
+    try {
+      const response = await apiClient.get('/sku-details',{
+        //params: {
+        //  search: params.search || '',
+        //  client: params.client || '',
+        //  sku_type: params.sku_type || '',
+        //  page: params.page || 1,
+        //  limit: params.limit || 10,
+        //},
+      })
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
   getPackages: async (params) => {
     try {
       return await apiClient.get('/packages', {params})
@@ -583,7 +631,7 @@ export const apiMethods = {
     }
   },
 
- }
+}
 
 export default apiMethods
 

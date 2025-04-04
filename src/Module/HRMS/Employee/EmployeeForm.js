@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { RiUserLine } from 'react-icons/ri'
+import { RiCheckLine, RiCloseLine, RiUserLine } from 'react-icons/ri'
 import { IoIosAt } from 'react-icons/io'
 import Switch from '@mui/material/Switch'
 import profile from '../../../assets/images/profile.png'
@@ -7,6 +7,7 @@ import Drawer from '../../../components/Drawer/Drawer'
 import ActionButton from '../../../components/New/ActionButton'
 import axios from 'axios'
 import apiMethods from '../../../api/config'
+import { CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CFormInput } from '@coreui/react'
 
 // Placeholder data for dropdowns (would typically come from API)
 const DEPARTMENT_OPTIONS = [
@@ -46,171 +47,177 @@ const EMPLOYMENT_TYPES = [
   'Freelance'
 ];
 
+// Default empty form state
+const defaultFormState = {
+  name: '',
+  email: '',
+  password: '',
+  mobile: '',
+  employee_id: '',
+  address: '',
+  skills: '',
+  department_id: null,
+  designation_id: null,
+  joining_date: '',
+  date_of_birth: '',
+  about_me: '',
+  reporting_to: null,
+  contract_end_date: '',
+  employment_type: '',
+  company_address_id: null,
+  role_id: null,
+  image: '',
+  country_phonecode:null,
+  country_id:null
+};
 
-
-function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
+function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, handleSubmit, isEdit, dropdownOptions }) {
   const label = { inputProps: { 'aria-label': 'Switch demo' } }
-
-  // State to manage form data
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    mobile: '',
-    employee_id: '',
-    address: '',
-    skills: '',
-    department_id: null ,
-    designation_id: null,
-    joining_date: '',
-    date_of_birth: '',
-    about_me: '',
-    reporting_to: null,
-    contract_end_date: '',
-    employment_type: '',
-    company_address_id:null,
-    role_id: null,
-    image: '',
-  });
-
-  // const [formData, setFormData] = useState({
-  //   name: 'Johny Doe',
-  //   email: 'johnyydoe@example.com',
-  //   password: '123456',
-  //   mobile: '9876543210',
-  //   employee_id: 'EMP123',
-  //   address: '123, Main Street, City',
-  //   skills: 'React, Node.js, MySQL',
-  //   department_id: 1,
-  //   designation_id: 1,
-  //   joining_date: '2024-01-15',
-  //   date_of_birth: '1995-08-20',
-  //   about_me: 'Passionate software developer with experience in MERN stack.',
-  //   reporting_to: 3,
-  //   contract_end_date: '2026-01-15',
-  //   employment_type: 'Full-time',
-  //   company_address_id: 1,
-  //   role_id: 4,
-  //   image: '',
-  // });
   
+  // Add this at the top with your other useState/useEffect hooks
+  const fileInputRef = useRef(null);
+  const [previewImage, setPreviewImage] = useState('');
+  const [skills, setSkills] = useState([]);
+  const [inputValue, setInputValue] = useState("");
 
-  // State for dropdown options
-  const [dropdownOptions, setDropdownOptions] = useState({
-    countries: [],
-    companiesAddresses: [],
-    departments: [],
-    designations: [],
-    roles: []
-  });
-
+  // This effect monitors drawer close events
   useEffect(() => {
-    const fetchDropDownData = async () => {
-      try {
-        const [
-          countriesResponse,
-          companiesAddressResponse,
-          departmentsResponse,
-          designationsResponse,
-          rolesResponse
-        ] = await Promise.all([
-          apiMethods.getCountries(),
-          apiMethods.getCompanyAddress(),
-          apiMethods.getDepartmentsList(),
-          apiMethods.getDesignation(),
-          apiMethods.getRoles()
-        ]);
+    // When drawer closes, reset the form
+    if (!isDrawerOpen) {
+      resetForm();
+    }
+  }, [isDrawerOpen]);
 
-        setDropdownOptions({
-          countries: countriesResponse?.data?.data,
-          companiesAddresses: companiesAddressResponse?.data?.data,
-          departments: departmentsResponse?.data?.data,
-          designations: designationsResponse?.data?.data,
-          roles: rolesResponse?.data?.data
-        });
-      } catch (error) {
-        console.error('Error fetching dropdown data:', error);
-      }
-    };
+  // Function to reset the form to default state
+  const resetForm = () => {
+    setFormData(defaultFormState);
+    setSkills([]);
+    setInputValue("");
+    setPreviewImage('');
+  };
 
-    fetchDropDownData();
-  }, []);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+
+  const handleCountrySelect = (country) => {
+    setSelectedCountry(country);
+    handleInputChange({ target: { name: "country_code", value: country.phonecode } });
+  };
+  // Handle drawer close with form reset
+  const handleCloseDrawer = () => {
+    setDrawerOpen(false);
+
+    // Form will be reset by the useEffect above when isDrawerOpen becomes false
+  };
+
+
 
   // If you want to log after state update, use useEffect
-  // useEffect(() => {
-  //   // console.log('Dropdown Options Updated:', dropdownOptions.companiesAddresses);
-  //   console.log('Dropdown Options Updated:', dropdownOptions);
-  // }, [dropdownOptions]);
+  useEffect(() => {
+    console.log('Dropdown Options Updated:', isEdit);
+  }, [isEdit]);
 
-
-
-  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
       ...prevState,
       [name]: 
         // Convert to number for specific fields, keep as is for others
-        ['department_id', 'designation_id', 'reporting_to', 'company_address_id', 'role_id']
+        ['department_id', 'designation_id', 'reporting_to', 'company_address_id', 'role_id',"country_phonecode","country_id"]
         .includes(name) 
           ? (value === '' ? null : Number(value)) 
           : value
     }));
   };
 
-  // Handle form submission
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-    console.log('Form Data:', formData);
-
-    const response = await apiMethods.createNewEmployee(formData)
-    console.log(response)
-    // TODO: Implement API call here
-  };
-
-  const [previewImage, setPreviewImage] = useState(profile);
-  const fileInputRef = useRef(null);
+  useEffect(() => {
+    if (formData.image) {
+      setPreviewImage(formData.image); // Update preview when image URL is available
+    }
+  }, [formData.image]);
 
   const handleImageClick = () => {
     fileInputRef.current.click();
   };
 
   const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // Update the preview image with the uploaded image
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    //upload image in db
-    const formData = new FormData();
-    formData.append('file', file)
     try {
-      const response = await apiMethods.uploadFile(formData)
-
-      if (response?.data?.success) {
-        const fileUrl = response.data.data.file_url;
-
-        setFormData((prevState) => ({
-          ...prevState,
-          image: fileUrl
-        })
-        )
+      const file = event.target.files[0];
+      if (!file) {
+        console.error("No file selected");
+        return;
       }
 
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const apiResponse = await apiMethods.uploadFile(formData);
+
+      if (!apiResponse || !apiResponse.data || !apiResponse.data.data) {
+        throw new Error("Invalid response from the server");
+      }
+
+      const fileUrl = apiResponse.data.data.file_url;
+      if (!fileUrl) {
+        throw new Error("File URL not found in the response");
+      }
+
+      console.log("Uploaded file URL:", fileUrl);
+
+      setFormData((prev) => ({
+        ...prev,
+        image: fileUrl, // Corrected syntax for state update
+      }));
     } catch (error) {
-      console.log(error)
+      console.error("Error uploading image:", error.message || error);
+      alert("Failed to upload image. Please try again.");
     }
   };
 
+  const handleAddSkill = () => {
+    if (inputValue.trim() && !skills.includes(inputValue.trim())) {
+      const updatedSkills = [...skills, inputValue.trim()];
+      setSkills(updatedSkills);
+      setFormData((prev) => ({
+        ...prev,
+        skills: updatedSkills.join(","), // Store as string in formData
+      }));
+      setInputValue(""); // Clear input after adding
+    }
+  };
+
+  const handleRemoveSkill = (skill) => {
+    const updatedSkills = skills.filter((s) => s !== skill);
+    setSkills(updatedSkills);
+    setFormData((prev) => ({
+      ...prev,
+      skills: updatedSkills.join(","), // Store as string in formData
+    }));
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddSkill();
+    }
+  };
+
+useEffect(() => {
+  if (isEdit && formData.skills) {  // Fix the typo: skill -> skills
+    console.log(formData, 'from skills effect')
+    const skillsArray = formData.skills.split(",").map((s) => s.trim());
+    console.log(skillsArray, 'skills array')
+    setSkills(skillsArray);
+    setFormData((prev) => ({
+      ...prev,
+      skills: formData.skills, // Keep it as a string for submission
+    }));
+  } else if (!isEdit) {
+  }
+}, [isEdit, formData.skills]); // Add formData.skills to dependency array
 
   return (
     <>
-      <Drawer className="w-1/2" isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
+      <Drawer className="w-1/2" isOpen={isDrawerOpen} onClose={handleCloseDrawer}>
         <form onSubmit={handleSubmit} className=''>
           <div className="max-w-7xl mx-auto h-[90vh] px-3 py-3 mt-6 overflow-y-auto">
             <div className="flex justify-between p-2">
@@ -226,10 +233,10 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                 className="hidden"
               />
               <img
-                src={previewImage}
+                src={formData.image || profile} 
                 alt="Profile"
+                className="w-24 h-24 rounded-full cursor-pointer"
                 onClick={handleImageClick}
-                className="w-32 h-32 rounded-full object-cover cursor-pointer hover:opacity-70 transition-opacity"
               />
             </div>
 
@@ -284,21 +291,107 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
 
               {/* Mobile */}
               <div>
-                <h6 className="mb-2">Mobile Number</h6>
-                <div className="flex items-center border border-stone-200 rounded-md">
-                  <input
-                    type="tel"
-                    name="mobile"
-                    className="w-full outline-none text-zinc-500 px-3 py-2"
-                    placeholder="Enter Mobile Number"
-                    value={formData.mobile}
-                    onChange={handleInputChange}
+  <h6 className="mb-2">Mobile Number</h6>
+  <div className="flex border border-stone-200 rounded-md">
+    {/* Country code dropdown using CoreUI components with fixed layout */}
+    <CDropdown className='max-h-2.5'>
+      <CDropdownToggle 
+        color="light" 
+        className="border-0 rounded-0 border-r border-stone-200 h-10"
+        style={{ 
+          paddingRight: "30px", // Extra padding for the dropdown caret
+          position: "relative"  // For proper caret positioning
+        }}
+      >
+        {formData.country_id ? (
+          <div className=" flex pr-4 align-items-center">
+            {(() => {
+              const selectedCountry = dropdownOptions.countries.find(
+                country => country.id === formData.country_id
+              );
+              
+              return selectedCountry ? (
+                <>
+                  <img
+                    src={`https://flagcdn.com/w40/${selectedCountry.iso.toLowerCase()}.png`}
+                    alt={selectedCountry.nicename}
+                    className="me-2"
+                    style={{ width: "24px", height: "16px" }}
                   />
-                  <RiUserLine className="pr-2 h-10 w-10" />
-                </div>
-              </div>
+                  <span>+{selectedCountry.phonecode}</span>
+                </>
+              ) : (
+                <span>Select</span>
+              );
+            })()}
+          </div>
+        ) : (
+          <span>Select</span>
+        )}
+        {/* Custom dropdown indicator - hides the default one */}
+        <style jsx>{`
+          .dropdown-toggle::after {
+            display: none !important;
+          }
+        `}</style>
+        {/* Custom dropdown caret positioned to the right */}
+        <span 
+          style={{ 
+            position: "absolute", 
+            right: "3px", 
+            top: "50%", 
+            transform: "translateY(-50%)"
+          }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+          </svg>
+        </span>
+      </CDropdownToggle>
+      <CDropdownMenu className="py-1">
+        <div className="px-3 py-2 border-bottom">
+          <CFormInput
+            type="text"
+            placeholder="Search countries"
+            size="sm"
+            className="mb-0"
+          />
+        </div>
+        {dropdownOptions.countries &&
+          dropdownOptions.countries.map((country) => (
+            <CDropdownItem
+              key={country.id}
+              onClick={() => {
+                handleInputChange({ target: { name: "country_phonecode", value: country.phonecode } });
+                handleInputChange({ target: { name: "country_id", value: country.id } });
+              }}
+              className="d-flex align-items-center py-2"
+            >
+              <img
+                src={`https://flagcdn.com/w40/${country.iso.toLowerCase()}.png`}
+                alt={country.nicename}
+                className="me-2"
+                style={{ width: "24px", height: "16px" }}
+              />
+              <span className="me-auto">{country.nicename}</span>
+              <span className="text-primary">+{country.phonecode}</span>
+            </CDropdownItem>
+          ))}
+      </CDropdownMenu>
+    </CDropdown>
 
-              {/* PassWord */}
+    {/* Phone number input */}
+    <CFormInput
+      type="tel"
+      name="mobile"
+      placeholder="Enter Mobile Number"
+      value={formData.mobile || ""}
+      onChange={handleInputChange}
+      className="border-0 h-10"
+    />
+  </div>
+</div>
+              {/* Password */}
               <div>
                 <h6 className="mb-2">Password</h6>
                 <div className="flex items-center border border-stone-200 rounded-md">
@@ -321,10 +414,10 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                   <select
                     name="company_address_id"
                     className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.company_address_id}
+                    value={formData.company_address_id || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled selected>Select Company Address</option>
+                    <option value="" disabled>Select Company Address</option>
                     {dropdownOptions.companiesAddresses.map(dept => (
                       <option key={dept.id} value={dept.id}>
                         {dept.address}
@@ -341,10 +434,10 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                   <select
                     name="department_id"
                     className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.department_id}
+                    value={formData.department_id || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled selected>Select Department</option>
+                    <option value="" disabled>Select Department</option>
                     {dropdownOptions.departments.map(dept => (
                       <option key={dept.id} value={dept.id}>
                         {dept.department_name}
@@ -361,10 +454,10 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                   <select
                     name="designation_id"
                     className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.designation_id}
+                    value={formData.designation_id || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled selected>Select Designation</option>
+                    <option value="" disabled>Select Designation</option>
                     {dropdownOptions.designations.map(desig => (
                       <option key={desig.id} value={desig.id}>
                         {desig.name}
@@ -374,17 +467,17 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                 </div>
               </div>
 
-              {/* Designation */}
+              {/* Role */}
               <div>
                 <h6 className="mb-2">Role</h6>
                 <div className="border border-stone-200 rounded-md">
                   <select
                     name="role_id"
                     className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.role_id}
+                    value={formData.role_id || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled selected>Select Role</option>
+                    <option value="" disabled>Select Role</option>
                     {dropdownOptions.roles.map(desig => (
                       <option key={desig.id} value={desig.id}>
                         {desig.name}
@@ -444,10 +537,10 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                   <select
                     name="reporting_to"
                     className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.reporting_to}
+                    value={formData.reporting_to || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled selected>Select Reporting To</option>
+                    <option value="" disabled>Select Reporting To</option>
                     
                     {REPORTING_OPTIONS.map(manager => (
                       <option key={manager.id} value={+manager.id}>
@@ -465,10 +558,10 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
                   <select
                     name="employment_type"
                     className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.employment_type}
+                    value={formData.employment_type || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled selected>Select Employment Type</option>
+                    <option value="" disabled>Select Employment Type</option>
                     
                     {EMPLOYMENT_TYPES.map(type => (
                       <option key={type} value={type}>
@@ -512,16 +605,33 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen }) {
               {/* Skills */}
               <div>
                 <h6 className="mb-2">Skills</h6>
-                <div className="flex items-center border border-stone-200 rounded-md">
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {skills.map((skill, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center bg-gray-200 text-gray-700 px-3 py-1 rounded-md"
+                    >
+                      {skill}
+                      <RiCloseLine
+                        className="ml-2 cursor-pointer text-red-500 hover:text-red-700"
+                        onClick={() => handleRemoveSkill(skill)}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center border border-stone-200 rounded-md p-2">
                   <input
                     type="text"
-                    name="skills"
-                    className="w-full outline-none text-zinc-500 px-3 py-2"
+                    className="w-full outline-none text-zinc-500 px-2 py-1"
                     placeholder="Enter Skills"
-                    value={formData.skills}
-                    onChange={handleInputChange}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
                   />
-                  <RiUserLine className="pr-2 h-10 w-10" />
+                  <RiCheckLine
+                    className="text-green-500 cursor-pointer w-6 h-6"
+                    onClick={handleAddSkill}
+                  />
                 </div>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   CTable,
   CTableHead,
@@ -10,11 +10,31 @@ import {
 } from '@coreui/react'
 import ThreeDotMenu from '../../../components/ThreeDotMenu'
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
-function EmployeeTable({ employeesdata = [] }) {
-  console.log(employeesdata,'from employee table')
+import ConfirmationModale from '../../../components/New/ConfirmationModale'
+import apiMethods from '../../../api/config'
+function EmployeeTable({ employeesdata = [], handleEdit,fetchEmployeeData,handleView }) {
+  const [isConfirmationModaleOpen,setIsConfirmationModaleOpen] = useState(false)
+  const [selectedEmployee,setSelectedEmployee] = useState('')
+
+  const deleteEmployee = (id)=>
+  {
+    setSelectedEmployee(id)
+    setIsConfirmationModaleOpen(true)
+  }
+
+  const handleDeleteEmployee= async()=>{
+   const response =  await apiMethods.DeleteEmployee(selectedEmployee)
+   console.log(response)
+   setIsConfirmationModaleOpen(false)
+   if (fetchEmployeeData) {
+    fetchEmployeeData()
+  }
+  }
+  
+
   return (
     <>
-      <div className="h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
+      <div className=" h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
         <CTable striped hover className=" w-full m-0">
           <CTableHead className="bg-gray-100 sticky top-0 z-10  ">
             <CTableRow>
@@ -85,21 +105,21 @@ function EmployeeTable({ employeesdata = [] }) {
                           label: 'View',
                           icon: cilHandPointRight,
                           onClick: () => {
-                            console.log('View')
+                            handleView(cell.id)
                           },
                         },
                         {
                           label: 'Edit',
                           icon: cilPencil,
                           onClick: () => {
-                            console.log('Edit')
+                            handleEdit(cell.id,cell.user_id)
                           },
                         },
                         {
                           label: 'Delete',
                           icon: cilTrash,
                           onClick: () => {
-                            console.log('Delete')
+                            deleteEmployee(cell.id)
                           },
                         },
                       ]}
@@ -117,6 +137,13 @@ function EmployeeTable({ employeesdata = [] }) {
           </CTableBody>
         </CTable>
       </div>
+      <ConfirmationModale
+      isOpen={isConfirmationModaleOpen}
+      title='Confirm Deletion'
+      message='Are you sure you want to delete this item?'
+      onClose={()=>{setIsConfirmationModaleOpen(false)}}
+      onConfirm={handleDeleteEmployee}
+      />
     </>
   )
 }

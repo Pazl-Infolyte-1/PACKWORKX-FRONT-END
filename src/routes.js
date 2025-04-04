@@ -17,6 +17,12 @@ const Companies = React.lazy(() => import('./Module/Admin/Companies/Companies.js
 const WorkOrderList = React.lazy(() => import('./Module/WorkOrder/workorderlist.js'))
 const SalesOrder = React.lazy(() => import('./Module/SalesOrder/ListOfSalesOrder.js'))
 const DropDownController = React.lazy(() => import('./Module/User/DropDownController.js'))
+const Attendance = React.lazy(() => import('./Module/Attendance/Attendance.js'))
+const SalesReturn = React.lazy(() => import('./Module/SalesReturn/SalesReturn.js'))
+const PurchaseReturn = React.lazy(() => import('./Module/PurchaseReturn/PurchaseReturn.js'))
+const Reports = React.lazy(() => import('./Module/Reports/Reports.js'))
+
+
 
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
@@ -36,6 +42,10 @@ const routes = [
   { path: '/workorderlist', name: 'Workorderlist', element: WorkOrderList, key: 25 },
 
   { path: '/salesorder', name: 'SalesOrder', element: SalesOrder, key: 24 },
+  { path: '/attendance', name: 'Attendance', element: Attendance, key: '' },
+  { path: '/salesReturn', name: 'Sales Return', element: SalesReturn, key: '' },
+  { path: '/purchaseReturn', name: 'Purchase Return', element: PurchaseReturn, key: '' },
+  { path: '/reports', name: 'Reports', element: Reports, key: '' },
   { path: '/users', name: 'user', element: DropDownController, key: 6000 },
   {
     path: '/settings',

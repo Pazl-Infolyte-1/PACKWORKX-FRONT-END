@@ -51,6 +51,7 @@ function SkuList() {
     unit: "mm",
     joints: null,
     ups: null,
+    select_dies:null,
     inner_outer_dimension: null,
     flap_width: null,
     flap_tolerance: null,
@@ -155,6 +156,7 @@ function SkuList() {
       unit: selectedSku.unit || '',
       joints: selectedSku.joints || '',
       ups: selectedSku.ups || '',
+      select_dies:selectedSku.select_dies || '',
       inner_outer_dimension: selectedSku.inner_outer_dimension || '',
       flap_width: selectedSku.flap_width || '',
       flap_tolerance: selectedSku.flap_tolerance || '',
@@ -419,6 +421,7 @@ function SkuList() {
           skuType={skuType}
           setSkuType={setSkuType}
           locationvalue={location?.state?.client_id}
+          closedrawer={setDrawerOpen}
           //onUnitChange={handleUnitChange}
         />
       </Drawer>

@@ -2,15 +2,34 @@ import React from 'react';
 
 const ClientSingleViewCard = ({ clientData, handleEdit }) => {
   if (!clientData) return null;
-
+console.log("client data",clientData.status)
   return (
     <>
       <div className="border rounded-lg overflow-auto max-h-[600px]">
         <div className="bg-white p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Client Details</h2>
-            <button onClick={()=>handleEdit(clientData)} className="px-4 py-1 bg-red-500 text-white rounded">Edit</button>
-          </div>
+        <div className="flex justify-between items-center mb-4">
+  <h2 className="text-lg font-semibold">Client Details</h2>
+  
+  <div className="flex items-center gap-4">
+    <span
+      className={`px-3 py-1 rounded-full text-sm font-medium ${
+        clientData.status === 'active'
+          ? 'bg-green-100 text-green-800'
+          : 'bg-gray-100 text-gray-800'
+      }`}
+    >
+      {clientData.status}
+    </span>
+    
+    <button
+      onClick={() => handleEdit(clientData)}
+      className="px-4 py-1 bg-red-500 text-white rounded"
+    >
+      Edit
+    </button>
+  </div>
+</div>
+
 
           <div className="border rounded-lg mb-4">
             <div className="grid grid-cols-3 gap-4 p-4">

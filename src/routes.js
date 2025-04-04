@@ -21,6 +21,9 @@ const Attendance = React.lazy(() => import('./Module/Attendance/Attendance.js'))
 const SalesReturn = React.lazy(() => import('./Module/SalesReturn/SalesReturn.js'))
 const PurchaseReturn = React.lazy(() => import('./Module/PurchaseReturn/PurchaseReturn.js'))
 const Reports = React.lazy(() => import('./Module/Reports/Reports.js'))
+const OfflineRequest = React.lazy(() => import('./Module/OfflineRequest/OfflineRequest.js'))
+const AdminFaq = React.lazy(() => import('./Module/AdminFaq/AdminFaq.js'))
+
 
 
 
@@ -46,6 +49,8 @@ const routes = [
   { path: '/salesReturn', name: 'Sales Return', element: SalesReturn, key: '' },
   { path: '/purchaseReturn', name: 'Purchase Return', element: PurchaseReturn, key: '' },
   { path: '/reports', name: 'Reports', element: Reports, key: '' },
+  { path: '/offlineRequest', name: 'Offline Request', element: OfflineRequest, key: '' },
+  { path: '/adminFaq', name: 'Admin Faq', element: AdminFaq, key: '' },
   { path: '/users', name: 'user', element: DropDownController, key: 6000 },
   {
     path: '/settings',

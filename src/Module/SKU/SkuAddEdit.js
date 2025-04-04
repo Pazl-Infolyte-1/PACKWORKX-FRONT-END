@@ -8,6 +8,7 @@ import DieCutBox from './DieCutBox'
 import { FaAngleDown, FaAngleUp, FaEllipsisV, FaRedoAlt, FaEye } from 'react-icons/fa'
 import PopUp from '../../components/New/PopUp'
 import FluteTypeView from './FluteTypeView'
+import Composite from './Composite'
 
 function SkuAddEdit({
   handleChange,
@@ -227,6 +228,21 @@ function SkuAddEdit({
     ),
     'Die Cut box': (
       <DieCutBox
+        dropdownRef={dropdownRef}
+        addNewSkuData={addNewSkuData}
+        setIsOpen={setIsOpen}
+        isOpen={isOpen}
+        handleChange={handleChange}
+        handleSelect={handleSelect}
+        clientDiasble={clientDiasble}
+        client={client}
+        skuType={skuType}
+        setAddNewSkuData={setAddNewSkuData}
+        updateSkuValues={updateSkuValues}
+      />
+    ),
+    'Composite\r\n': (
+      <Composite
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
         setIsOpen={setIsOpen}

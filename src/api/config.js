@@ -557,7 +557,6 @@ export const apiMethods = {
   editEmployee:async(id,body)=>{
     try {
 
-      alert(id)
       return await apiClient.put(`/user/employees/${id}`,body)
 
     } catch (error) {

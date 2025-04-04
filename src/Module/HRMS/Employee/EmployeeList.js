@@ -56,8 +56,18 @@ function EmployeeList() {
 
   const HandleFilter = (e) => {
     const selectedValue = e.target.value
+    const selectedDropdownId = e.target.id
+    
+    // Clear other dropdowns
+    document.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+      if (dropdown.id !== selectedDropdownId) {
+        dropdown.value = ''
+      }
+    })
+    
+    // Set the filter value
     setFilter(selectedValue)
-  
+    
     // Trigger search globally
     handleSearch(selectedValue, employeesData)
   }
@@ -185,7 +195,7 @@ function EmployeeList() {
   // Initial data fetch on component mount
   useEffect(() => {
     fetchEmployeeData()
-  }, [searchQuery,paginationParams,filter,setPaginationParams.current])
+  }, [paginationParams])
 
 
   // const handlePageChange = (event, newPage) => {
@@ -303,7 +313,7 @@ function EmployeeList() {
         }
 
         if (response?.status === 200 || response?.status === 201) {
-            alert('Success!');
+            // alert('Success!');
             setDrawerOpen(false);
             setIsEdit(false)
             fetchEmployeeData()
@@ -330,13 +340,13 @@ function EmployeeList() {
             fetchEmployeeData()
 
         } else {
-            alert('Something went wrong. Please try again.');
+            // console.log('Something went wrong. Please try again.');
         }
 
         console.log(response);
     } catch (error) {
         console.error('Error submitting form:', error);
-        alert('An error occurred. Please check your input and try again.');
+        console.log('An error occurred. Please check your input and try again.');
     }
 };
 
@@ -396,7 +406,8 @@ function EmployeeList() {
              <SearchBar text="Employees" data={employeesData} ref={searchBarRef} />
              <div className='flex justify-end gap-3'>
              <select
-  className="bg-white border border-[#e7e5e4] p-[6px] rounded-md"
+  id="department-filter"
+  className="bg-white border border-[#e7e5e4] p-[6px] rounded-md filter-dropdown"
   defaultValue=""
   onChange={HandleFilter}
 >
@@ -410,11 +421,12 @@ function EmployeeList() {
   ))}
 </select>
 
-            <select
-              className="border border-[#e7e5e4] p-[6px] rounded-md"
-              defaultValue=""
-              onChange={HandleFilter}
-              >
+<select
+  id="role-filter"
+  className="border border-[#e7e5e4] p-[6px] rounded-md filter-dropdown"
+  defaultValue=""
+  onChange={HandleFilter}
+>
               <option value="" disabled>
                 Select Role
               </option>
@@ -445,11 +457,12 @@ function EmployeeList() {
               }
             </select> */}
 
-            <select
-              className="border border-[#e7e5e4] p-[6px] rounded-md"
-              defaultValue=""
-              onChange={HandleFilter}
-              >
+<select
+  id="status-filter"
+  className="border border-[#e7e5e4] p-[6px] rounded-md filter-dropdown"
+  defaultValue=""
+  onChange={HandleFilter}
+>
               <option value="" disabled>
                 status
               </option>

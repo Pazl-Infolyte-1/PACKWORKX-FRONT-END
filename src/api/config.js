@@ -586,6 +586,54 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  getPackages: async (params) => {
+    try {
+      return await apiClient.get('/packages', {params})
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  AddPacakges: async (payload) => {
+    try {
+      return await apiClient.post('/packages/create',payload)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  
+  UpdatePacakges: async (id,payload) => {
+    try {
+      return await apiClient.put(`/packages/update/${id}`,payload)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  DeletePacakges: async (id) => {
+    try {
+      return await apiClient.delete(`/packages/delete/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getCurrency: async () => {
+    try {
+      return await apiClient.get('/common-service/currency')
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getModule: async () => {
+    try {
+      return await apiClient.get('/common-service/module')
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
 }
 
 export default apiMethods

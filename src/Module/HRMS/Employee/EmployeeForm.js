@@ -543,7 +543,7 @@ useEffect(() => {
                     <option value="" disabled>Select Reporting To</option>
                     
                     {REPORTING_OPTIONS.map(manager => (
-                      <option key={manager.id} value={+manager.id}>
+                      <option key={manager.id} value={3}>
                         {manager.name}
                       </option>
                     ))}

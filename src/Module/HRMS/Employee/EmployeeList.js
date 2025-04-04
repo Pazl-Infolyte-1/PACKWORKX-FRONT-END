@@ -13,6 +13,7 @@ import ActionButton from '../../../components/New/ActionButton'
 import SearchBar from '../../../components/New/SearchBar'
 import EmployeeView from './EmployeeView'
 import { useSearch } from '../../../components/New/SearchContext'
+import { paginationClasses } from '@mui/material'
 
 
 
@@ -27,6 +28,7 @@ function EmployeeList() {
   const [showEmployeeData,setShowEmployeeData] = useState(false)
   const [viewEmployeeData,setViewEmployeeData] = useState(null);
   const { searchQuery, setSearchQuery, filteredSearchData,handleSearch } = useSearch() ///need to verify
+
   
 
   
@@ -65,6 +67,7 @@ function EmployeeList() {
       currentPage: 1, // Always reset to page 1 when changing limit
       pageSize: newLimit
     });
+    
   };
   
   
@@ -156,9 +159,10 @@ function EmployeeList() {
 
 
   const fetchEmployeeData = async () => {
+
     try {
       const response = await apiMethods.GetEmployeelist({
-        search: filter,
+        search: searchQuery,
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,
       })
@@ -168,11 +172,20 @@ function EmployeeList() {
       console.error('Error fetching data:', error)
     }
   }
+
+  useEffect(() => {
+    setPaginationParams(prev => ({
+      ...prev,
+      currentPage: 1 // Reset to page 1 whenever search query changes
+      
+    })
+  );
+  }, [searchQuery]);
   
   // Initial data fetch on component mount
   useEffect(() => {
     fetchEmployeeData()
-  }, [searchQuery,paginationParams,filter])
+  }, [searchQuery,paginationParams,filter,setPaginationParams.current])
 
 
   // const handlePageChange = (event, newPage) => {
@@ -237,8 +250,8 @@ function EmployeeList() {
           contract_end_date: selectedEmployee.contract_end_date || '',
           employment_type: selectedEmployee.employment_type || '',
           image: selectedEmployee.image || '',
-          country_phonecode:selectedEmployee.country_phonecode,
-          country_id:selectedEmployee.country_id
+          country_phonecode:selectedEmployee.country_phonecode||'',
+          country_id:selectedEmployee.country_id||''
       });
         
         // Add a delay before opening the drawer to ensure state is updated
@@ -415,7 +428,7 @@ function EmployeeList() {
            
             </select>
 
-            <select
+            {/* <select
               className="border border-[#e7e5e4] p-[6px] rounded-md"
               defaultValue=""
               onChange={HandleFilter}
@@ -430,7 +443,7 @@ function EmployeeList() {
                 </option>
                 ))
               }
-            </select>
+            </select> */}
 
             <select
               className="border border-[#e7e5e4] p-[6px] rounded-md"
@@ -449,7 +462,7 @@ function EmployeeList() {
           <div className="border h-[80%] mt-2">
             <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
               <EmployeeTable
-               employeesdata={filteredSearchData.length > 0 ? filteredSearchData : employeesData}
+               employeesdata={employeesData}
                handleEdit={handleEdit}
                fetchEmployeeData={fetchEmployeeData}
                handleView={handleView}

@@ -1,7 +1,7 @@
 import React from 'react';
 import PopUp from '../../../components/New/PopUp';
 
-function EmployeeView({ employeeData, showEmployeeData, setShowEmployeeData }) {
+function EmployeeView({ employeeData, showEmployeeData, setVisible }) {
   if (!employeeData) return null;
 
   const formatDate = (dateString) => {
@@ -16,7 +16,7 @@ function EmployeeView({ employeeData, showEmployeeData, setShowEmployeeData }) {
     <PopUp
       visible={showEmployeeData}
       showCloseButton={true}
-      setVisible={() => setShowEmployeeData(false)}
+      setVisible={() => setVisible(false)}
       height={'95vh'}
       width={'70vw'}
     >

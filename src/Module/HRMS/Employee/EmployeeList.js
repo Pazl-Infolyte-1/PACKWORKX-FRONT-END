@@ -410,6 +410,7 @@ function EmployeeList() {
               <EmployeeView
               showEmployeeData={showEmployeeData}
               employeeData={viewEmployeeData}
+              setVisible = {setViewEmployeeData}
               />
             </div>
           </div>

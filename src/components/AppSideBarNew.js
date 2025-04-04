@@ -147,7 +147,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === "Offline Request") {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/">
+                  <CNavLink as={NavLink} to="/offlineRequest">
                     {navLink("Offline Request","cibDiscourse")}
                   </CNavLink>
                 </CNavItem>
@@ -345,7 +345,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
               if (module.modules_description === "Admin Faq") {
                 return (
                   <CNavItem key={index}>
-                    <CNavLink as={NavLink} to="/">
+                    <CNavLink as={NavLink} to="/adminFaq">
                       {navLink("Admin Faq","cilBullhorn")}
                     </CNavLink>
                   </CNavItem>

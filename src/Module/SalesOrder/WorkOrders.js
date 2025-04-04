@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TrashIcon } from '@heroicons/react/solid'
 import VersionsPopup from './VersionsPopup'
 import ActionButton from '../../components/New/ActionButton'
+import apiMethods from '../../api/config'
 
 const accordionCardSummary = {
   data: [
@@ -27,7 +28,28 @@ const WorkOrders = () => {
   const [openAccordions, setOpenAccordions] = useState({})
   const [openCreateAccordion, setCreateOpenAccordion] = useState([1])
   const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
+  const [skuList, setSkuList] = useState([]);
 
+  useEffect(() => {
+    const fetchSkuList = async () => {
+      try {
+        const response = await apiMethods.getSkuListOptions();
+        setSkuList(response.data); // Assuming data is inside 'data'
+      } catch (error) {
+        console.error("Failed to fetch SKU list:", error);
+      }
+    };
+
+    fetchSkuList();
+  }, []);
+
+  const handleChange = (e) => {
+    const selectedId = parseInt(e.target.value); // since option values are string
+    const selectedSku = skuList.find((sku) => sku.id === selectedId);
+  
+    console.log("Selected SKU ID:", selectedId);
+    console.log("Selected SKU Data:", selectedSku);
+  };
   const toggleAccordion = (id) => {
     setOpenAccordions((prev) => ({
       ...prev,
@@ -257,17 +279,23 @@ const WorkOrders = () => {
               {openCreateAccordion.includes(order.id) && (
                 <div className="mt-2 p-3 border-t border-gray-300">
                   <div className="w-full p-1 flex flex-row gap-4">
-                    <div className="p-2">
-                      <label className="block text-gray-800 font-medium mb-1 ml-2">SKU</label>
-                      <select className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] text-sm rounded-md bg-white text-[#030303] outline-none ml-2">
-                        <option value="" disabled selected>
-                          Select SKU
-                        </option>
-                        <option value="sterling">Sterling Labs</option>
-                        <option value="client1">Client 1</option>
-                        <option value="client2">Client 2</option>
-                      </select>
-                    </div>
+                  <div className="p-2">
+      <label className="block text-gray-800 font-medium mb-1 ml-2">SKU</label>
+      <select
+        className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] text-sm rounded-md bg-white text-[#030303] outline-none ml-2"
+        defaultValue=""
+        onChange={handleChange}
+      >
+        <option value="" disabled>
+          Select SKU
+        </option>
+        {skuList.map((sku) => (
+          <option key={sku.id} value={sku.id}>
+            {sku.sku_name}
+          </option>
+        ))}
+      </select>
+    </div>
 
                     <div className="p-2 relative w-full">
                       <label className="block text-gray-800 font-medium mb-1 ml-2">

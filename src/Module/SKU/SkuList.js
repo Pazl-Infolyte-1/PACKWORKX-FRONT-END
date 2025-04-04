@@ -42,7 +42,7 @@ function SkuList() {
 
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
-    client_id: user.id,
+    client_id: user?.id,
     client: null,
     ply: null,
     length: null,
@@ -51,7 +51,9 @@ function SkuList() {
     unit: 'mm',
     joints: null,
     ups: null,
-    select_dies: null,
+    select_dies:null,
+    no_of_parts:null,
+    composite_type:null,
     inner_outer_dimension: null,
     flap_width: null,
     flap_tolerance: null,
@@ -155,7 +157,9 @@ function SkuList() {
       unit: selectedSku.unit || '',
       joints: selectedSku.joints || '',
       ups: selectedSku.ups || '',
-      select_dies: selectedSku.select_dies || '',
+      select_dies:selectedSku.select_dies || '',
+      no_of_parts:selectedSku?.no_of_parts || '',
+      composite_type:selectedSku?.composite_type || '',
       inner_outer_dimension: selectedSku.inner_outer_dimension || '',
       flap_width: selectedSku.flap_width || '',
       flap_tolerance: selectedSku.flap_tolerance || '',
@@ -410,6 +414,7 @@ function SkuList() {
         <SkuPopup visible={visible} setVisible={setVisible} />
       </div>
       <Drawer
+      maxWidth = "1280px"
         isOpen={isDrawerOpen || editTag}
         title={editTag ? 'Edit SKU Details' : 'Add SKU Details'}
         onClose={() => (setDrawerOpen(false), setEditTag(false), setClientDisable(false))}

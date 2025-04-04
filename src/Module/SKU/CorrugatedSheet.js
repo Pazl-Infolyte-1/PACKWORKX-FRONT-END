@@ -20,7 +20,7 @@ function CorrugatedSheet({dropdownRef, addNewSkuData, isOpen, handleChange, clie
 
             {isOpen && (
               <ul
-                className={`absolute left-0 right-0 mt-1 overflow-y-auto bg-white border border-gray-300 rounded z-10 h-40`}
+                className={`absolute left-0 right-0 mt-1 overflow-y-auto bg-white border border-gray-300 rounded z-10 h-30`}
               >
                 {skuType.map((option) => (
                   <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-100">

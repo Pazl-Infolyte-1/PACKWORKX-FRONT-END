@@ -543,7 +543,7 @@ useEffect(() => {
                     <option value="" disabled>Select Reporting To</option>
                     
                     {REPORTING_OPTIONS.map(manager => (
-                      <option key={manager.id} value={+manager.id}>
+                      <option key={manager.id} value={3}>
                         {manager.name}
                       </option>
                     ))}
@@ -639,12 +639,12 @@ useEffect(() => {
             {/* Action Buttons */}
             <div className="p-4 flex justify-end space-x-4">
               <ActionButton
-                label="Edit"
-                variant='edit'
+                label="Cancel"
+                variant='cancel'
                 type="button"
                 onClick={() => {
                   // TODO: Implement edit functionality
-                  console.log('Edit clicked');
+                    setDrawerOpen(false)
                 }}
               />
               <ActionButton

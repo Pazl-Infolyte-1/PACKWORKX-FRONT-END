@@ -224,7 +224,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === "Attendance") {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/">
+                  <CNavLink as={NavLink} to="/attendance">
                     {navLink("Attendance","cilUser")}
                   </CNavLink>
                 </CNavItem>
@@ -297,7 +297,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === "Sales Return") {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/">
+                  <CNavLink as={NavLink} to="/salesReturn">
                     {navLink("Sales Return","cilAt")}
                   </CNavLink>
                 </CNavItem>
@@ -306,7 +306,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === "Purchase Return") {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/">
+                  <CNavLink as={NavLink} to="/purchaseReturn">
                     {navLink("Purchase Return","cibHighly")}
                   </CNavLink>
                 </CNavItem>
@@ -326,7 +326,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === "Reports") {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/">
+                  <CNavLink as={NavLink} to="/reports">
                     {navLink("Reports","cilFile")}
                   </CNavLink>
                 </CNavItem>

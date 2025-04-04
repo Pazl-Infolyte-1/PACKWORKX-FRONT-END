@@ -17,20 +17,7 @@ const accordionCardSummary = {
       ],
       content:
         'An oil is any nonpolar chemical substance that is composed primarily of hydrocarbons and is hydrophobic (does not mix with water) and lipophilic (mixes with other oils). Oils are usually flammable and surface active. Most oils are unsaturated lipids that are liquid at room temperature.',
-    },
-    {
-      id: 2,
-      title: 'Work Order-#WO-1001',
-      details: ['60ml', 'Version 2', '5100', '02/18/2025', '02/24/2025'],
-      buttons: [
-        { id: 1, name: 'High', bgColor: '#7d7d7d', textColor: '#f9f9f9' },
-        { id: 2, name: 'InHouse', bgColor: '#8167e5', textColor: '#fefefe' },
-        { id: 3, name: 'Prod Planning', bgColor: '#ffd000', textColor: 'white' },
-        { id: 4, name: 'Pending', bgColor: '#ff2d55', textColor: 'white' },
-      ],
-      content:
-        'An oil is any nonpolar chemical substance that is composed primarily of hydrocarbons and is hydrophobic (does not mix with water) and lipophilic (mixes with other oils). Oils are usually flammable and surface active. Most oils are unsaturated lipids that are liquid at room temperature.',
-    },
+    }
   ],
 }
 
@@ -38,7 +25,7 @@ const WorkOrders = () => {
   const [selectedOption, setSelectedOption] = useState('inhouse')
   const [openIndices, setOpenIndices] = useState([]) // Store multiple open indices
   const [openAccordions, setOpenAccordions] = useState({})
-  const [openCreateAccordion, setCreateOpenAccordion] = useState([])
+  const [openCreateAccordion, setCreateOpenAccordion] = useState([1])
   const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
 
   const toggleAccordion = (id) => {
@@ -56,7 +43,7 @@ const WorkOrders = () => {
   }
 
   const [workOrders, setWorkOrders] = useState([
-    //{ id: 1, sku: "", skuVersion: "", quantity: "", deliveryDate: "", description: "", startDate: "", excessUnits: "", endDate: "" }
+    { id: 1, sku: "", skuVersion: "", quantity: "", deliveryDate: "", description: "", startDate: "", excessUnits: "", endDate: "" }
   ])
 
   // Function to add a new work order

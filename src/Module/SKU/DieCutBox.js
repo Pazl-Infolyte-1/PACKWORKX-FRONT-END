@@ -125,9 +125,35 @@ function DieCutBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
             onChange={handleChange}
             placeholder="ups"
           />
+ 
+{/*<Input
+            skuName="Select Dies"
+            id="dies"
+            name="dies"
+            value={addNewSkuData.dies}
+            onChange={handleChange}
+            placeholder="Select Dies"
+          />*/}
         </div>
 
-        <div className="flex gap-3">
+        <div>
+        <div>
+          <label className="block text-[16px] font-medium mb-2">Select Dies</label>
+          <select
+            name="select_dies"
+            id="select_dies"
+            //disabled={clientDiasble}
+            value={addNewSkuData.select_dies || ''}
+            onChange={handleChange}
+            className="w-full p-2 shadow-md border-l-2 rounded-md"
+          >
+           {["Die 1", "Die 2"].map((die, index) => (
+      <option key={index} value={die}>
+        {die}
+      </option>
+    ))}
+          </select>
+        </div>
           {/*<Input
             skuName="Flap Width"
             id="flap_width"

@@ -11,6 +11,7 @@ import EmployeeForm from './EmployeeForm'
 import EmployeeTable from './EmployeeTable'
 import ActionButton from '../../../components/New/ActionButton'
 import SearchBar from '../../../components/New/SearchBar'
+import EmployeeView from './EmployeeView'
 
 
 
@@ -21,6 +22,11 @@ function EmployeeList() {
   const rowsPerPage = 10
   const [employeesData, setEmployeesData] = useState([])
   const [CurrentEmployeeId , setCurrentEmployeeId] = useState(null);
+  const [EmployeeResponse,setEmployeeResponse] = useState(null);
+  const [showEmployeeData,setShowEmployeeData] = useState(false)
+  const [viewEmployeeData,setViewEmployeeData] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(""); // State for search input
+  
   
 
   // State to manage form data
@@ -43,6 +49,8 @@ function EmployeeList() {
     company_address_id: null,
     role_id: null,
     image: '',
+    country_phonecode:null,
+    country_id:null
   });
 
     const [dropdownOptions, setDropdownOptions] = useState({
@@ -102,6 +110,7 @@ function EmployeeList() {
     try {
       const response = await apiMethods.GetEmployeelist()
       setEmployeesData(response.data.data)
+      setEmployeeResponse(response.data)
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -122,9 +131,22 @@ function EmployeeList() {
 
   const handlePageChange = (event, newPage) => {
     setEmployeesData((prev) => ({ ...prev, currentPage: newPage }));
+    console.log(employeesData)
   };
 
-const handleEdit = async (id, userId) => {
+  const handleView = async (id)=>{
+    try{
+      console.log("Requesting for data for employee");
+      const response = await apiMethods.getEmployeeData(id);
+      setViewEmployeeData(response.data.data)
+      setShowEmployeeData(true)
+
+    }catch(err){
+      console.log(err);
+    }
+  }
+
+  const handleEdit = async (id, userId) => {
     setIsEdit(true);
     setCurrentEmployeeId(userId);
     
@@ -158,7 +180,7 @@ const handleEdit = async (id, userId) => {
           department_id:selectedEmployee.department_id, 
           designation_id:selectedEmployee.designation_id ,
           company_address_id:selectedEmployee.company_address_id,
-          role_id: selectedEmployee.role_id,
+          role_id: selectedEmployee.role_id||"",
           reporting_to:selectedEmployee.reporting_to,
           joining_date: selectedEmployee.joining_date || '',
           date_of_birth: selectedEmployee.date_of_birth || '',
@@ -166,6 +188,8 @@ const handleEdit = async (id, userId) => {
           contract_end_date: selectedEmployee.contract_end_date || '',
           employment_type: selectedEmployee.employment_type || '',
           image: selectedEmployee.image || '',
+          country_phonecode:selectedEmployee.country_phonecode,
+          country_id:selectedEmployee.country_id
       });
         
         // Add a delay before opening the drawer to ensure state is updated
@@ -188,29 +212,29 @@ const handleEdit = async (id, userId) => {
     try {
         let response;
         if (isEdit) {
-          const employee = {
-            aboutMe: "55",
-            address: "Mattathodi house, moolath parambil",
-            companyAddressId: 1,
-            contractEndDate: "2025-04-08",
-            dateOfBirth: "2025-04-04",
-            departmentId: 1,
-            designationId: 2,
-            email: "editeduser14544.s@pazl.info",
-            employeeId: "EMP567",
-            employmentType: "Full-time",
-            image: "localhost",
-            joiningDate: "2025-04-11",
-            mobile: "8606893474",
-            name: "Edited",
-            password: "123123123",
-            reportingTo: 3,
-            roleId: 1,
-            skills: "aa"
-          }  ;
-          console.log("edit api called")
+          // const employee = {
+          //   aboutMe: "55",
+          //   address: "Mattathodi house, moolath parambil",
+          //   companyAddressId: 1,
+          //   contractEndDate: "2025-04-08",
+          //   dateOfBirth: "2025-04-04",
+          //   departmentId: 1,
+          //   designationId: 2,
+          //   email: "editeduser14544.s@pazl.info",
+          //   employeeId: "EMP567",
+          //   employmentType: "Full-time",
+          //   image: "localhost",
+          //   joiningDate: "2025-04-11",
+          //   mobile: "8606893474",
+          //   name: "Edited",
+          //   password: "123123123",
+          //   reportingTo: 3,
+          //   roleId: 1,
+          //   skills: "aa"
+          // }  ;
+          // console.log("edit api called")
           
-            response = await apiMethods.editEmployee(CurrentEmployeeId,employee);
+            response = await apiMethods.editEmployee(CurrentEmployeeId,formData);
             console.log("edit api called")
         } else {
             response = await apiMethods.createNewEmployee(formData);
@@ -261,14 +285,6 @@ const handleEdit = async (id, userId) => {
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Employee</h2>
           <div className="flex gap-2">
-            {/* <button
-              className="bg-teal-500 text-white px-2.5 py-1 rounded-md border-none hover:bg-teal-600 "
-              onClick={() => {
-                setDrawerOpen(true)
-              }}
-            >
-              + Create Employee
-            </button> */}
 
             <ActionButton
               label={" + Create Employee"}
@@ -294,22 +310,21 @@ const handleEdit = async (id, userId) => {
               <TbSmartHome className="text-teal-500" />
               <span>All Datas</span>
               <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
-                5055
+                {EmployeeResponse?.totalRecords}
               </span>
             </div>
             <div className="flex gap-1.5 items-center">
               <IoCheckmarkCircleOutline />
               <span>Active</span>
               <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
-                500
-              </span>
+              {EmployeeResponse?.activeEmployees}              </span>
             </div>
             <div className="flex gap-1.5 items-center">
               <IoCheckmarkCircleOutline />
               <span>Inactive</span>
               <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
-                50
-              </span>
+              {EmployeeResponse?.inactiveEmployees}
+               </span>
             </div>
           </div>
         </div>
@@ -358,7 +373,11 @@ const handleEdit = async (id, userId) => {
 
           <div className="border h-[80%] mt-2">
             <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
-              <EmployeeTable employeesdata={employeesData}  handleEdit={handleEdit} fetchEmployeeData={fetchEmployeeData} />
+              <EmployeeTable employeesdata={employeesData}  handleEdit={handleEdit} fetchEmployeeData={fetchEmployeeData} handleView={handleView} />
+              <EmployeeView
+              showEmployeeData={showEmployeeData}
+              employeeData={viewEmployeeData}
+              />
             </div>
           </div>
           {/* Pagination Section */}

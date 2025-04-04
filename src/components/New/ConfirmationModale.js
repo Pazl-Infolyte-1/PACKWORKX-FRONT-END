@@ -4,7 +4,7 @@ const ConfirmationModale = ({ isOpen, onClose, onConfirm, title, message, confir
   if (!isOpen) return null; 
   
   return ( 
-    <div className="fixed inset-0 flex items-center justify-center bg-transparent bg-opacity-50 z-50 p-4"> 
+    <div className="absolute inset-0 top-0  flex items-center justify-center bg-black bg-opacity-50 z-50 p-4"> 
       <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full border border-gray-200 transform transition-all">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-800">{title || 'Are you sure?'}</h2>

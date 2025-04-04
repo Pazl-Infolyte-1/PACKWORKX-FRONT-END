@@ -30,7 +30,24 @@ function EmployeeList() {
   const searchBarRef = useRef(null)
   const [limit, setLimit] = useState(10)
   
+  const [paginationParams, setPaginationParams] = useState({
+    currentPage: 1,
+    pageSize: 10
+  });
 
+  const handlePageChange1 = (event, newPage) => {
+    setPaginationParams(prev => ({
+      ...prev,
+      currentPage: newPage
+    }));
+  };
+
+  const handleLimitChange1 = (newLimit) => {
+    setPaginationParams({
+      currentPage: 1, // Always reset to page 1 when changing limit
+      pageSize: newLimit
+    });
+  };
   
   
   
@@ -119,8 +136,10 @@ function EmployeeList() {
     try {
       const response = await apiMethods.GetEmployeelist({
         search: searchQuery || '',
-        page: EmployeeResponse?.currentPage || 1,
-        limit: EmployeeResponse?.pageSize || 10,
+        // page: EmployeeResponse?.currentPage || 1,
+        // limit: EmployeeResponse?.pageSize || 10,
+        page: paginationParams.currentPage,
+        limit: paginationParams.pageSize,
       })
       setEmployeesData(response.data.data)
       setEmployeeResponse(response.data)
@@ -132,7 +151,7 @@ function EmployeeList() {
   // Initial data fetch on component mount
   useEffect(() => {
     fetchEmployeeData()
-  }, [searchQuery,EmployeeResponse?.currentPage,EmployeeResponse?.pageSize])
+  }, [searchQuery,paginationParams])
 
 
   const handlePageChange = (event, newPage) => {
@@ -398,13 +417,11 @@ function EmployeeList() {
           <div className="flex justify-end items-center gap-4 mt-2 mb-3">
             <CommonPagination
               count={EmployeeResponse?.totalPages}
-              page={EmployeeResponse?.entPage}
-              onChange={handlePageChange}
-              onLimitChange={(newlimit)=>{
-                setEmployeeResponse((prev) => ({ ...prev, currentPage: 1 }))
-                setEmployeeResponse((prev) => ({ ...prev, pageSize: newlimit }))
-              }}
-              limit={EmployeeResponse?.pageSize}
+  page={paginationParams.currentPage}
+  onChange={handlePageChange1}
+  onLimitChange={handleLimitChange1}
+  limit={paginationParams.pageSize}
+
               />
           </div>
         </div>

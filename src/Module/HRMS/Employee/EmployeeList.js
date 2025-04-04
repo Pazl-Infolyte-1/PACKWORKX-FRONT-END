@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from 'react'
+import React, { useState, useEffect, use, useRef } from 'react'
 import { IoCheckmarkCircleOutline } from 'react-icons/io5'
 import { TbSmartHome } from 'react-icons/tb'
 import { BiSearchAlt } from 'react-icons/bi'
@@ -11,6 +11,8 @@ import EmployeeForm from './EmployeeForm'
 import EmployeeTable from './EmployeeTable'
 import ActionButton from '../../../components/New/ActionButton'
 import SearchBar from '../../../components/New/SearchBar'
+import EmployeeView from './EmployeeView'
+import { useSearch } from '../../../components/New/SearchContext'
 
 
 
@@ -21,6 +23,33 @@ function EmployeeList() {
   const rowsPerPage = 10
   const [employeesData, setEmployeesData] = useState([])
   const [CurrentEmployeeId , setCurrentEmployeeId] = useState(null);
+  const [EmployeeResponse,setEmployeeResponse] = useState(null);
+  const [showEmployeeData,setShowEmployeeData] = useState(false)
+  const [viewEmployeeData,setViewEmployeeData] = useState(null);
+  const { searchQuery, setSearchQuery, filteredSearchData } = useSearch() ///need to verify
+  const searchBarRef = useRef(null)
+  const [limit, setLimit] = useState(10)
+  
+  const [paginationParams, setPaginationParams] = useState({
+    currentPage: 1,
+    pageSize: 10
+  });
+
+  const handlePageChange1 = (event, newPage) => {
+    setPaginationParams(prev => ({
+      ...prev,
+      currentPage: newPage
+    }));
+  };
+
+  const handleLimitChange1 = (newLimit) => {
+    setPaginationParams({
+      currentPage: 1, // Always reset to page 1 when changing limit
+      pageSize: newLimit
+    });
+  };
+  
+  
   
 
   // State to manage form data
@@ -43,6 +72,8 @@ function EmployeeList() {
     company_address_id: null,
     role_id: null,
     image: '',
+    country_phonecode:null,
+    country_id:null
   });
 
     const [dropdownOptions, setDropdownOptions] = useState({
@@ -98,10 +129,20 @@ function EmployeeList() {
 
   // }, [])
 
+
+
+
   const fetchEmployeeData = async () => {
     try {
-      const response = await apiMethods.GetEmployeelist()
+      const response = await apiMethods.GetEmployeelist({
+        search: searchQuery || '',
+        // page: EmployeeResponse?.currentPage || 1,
+        // limit: EmployeeResponse?.pageSize || 10,
+        page: paginationParams.currentPage,
+        limit: paginationParams.pageSize,
+      })
       setEmployeesData(response.data.data)
+      setEmployeeResponse(response.data)
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -110,21 +151,30 @@ function EmployeeList() {
   // Initial data fetch on component mount
   useEffect(() => {
     fetchEmployeeData()
-  }, [])
+  }, [searchQuery,paginationParams])
 
-
-  // const tableData = Array.isArray(formData) ? formData : []
-
-  // const indexOfLastRow = currentPage * rowsPerPage
-  // const indexOfFirstRow = indexOfLastRow - rowsPerPage
-  // const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow)
-  // const totalPages = Math.ceil(tableData.length / rowsPerPage)
 
   const handlePageChange = (event, newPage) => {
-    setEmployeesData((prev) => ({ ...prev, currentPage: newPage }));
+    // console.log(employeesData)
+    // console.log(EmployeeResponse)
+    setEmployeeResponse((prev) => ({ ...prev, currentPage: newPage }));
+    console.log("called page change")
+    console.log(EmployeeResponse)
   };
 
-const handleEdit = async (id, userId) => {
+  const handleView = async (id)=>{
+    try{
+      console.log("Requesting for data for employee");
+      const response = await apiMethods.getEmployeeData(id);
+      setViewEmployeeData(response.data.data)
+      setShowEmployeeData(true)
+
+    }catch(err){
+      console.log(err);
+    }
+  }
+
+  const handleEdit = async (id, userId) => {
     setIsEdit(true);
     setCurrentEmployeeId(userId);
     
@@ -158,7 +208,7 @@ const handleEdit = async (id, userId) => {
           department_id:selectedEmployee.department_id, 
           designation_id:selectedEmployee.designation_id ,
           company_address_id:selectedEmployee.company_address_id,
-          role_id: selectedEmployee.role_id,
+          role_id: selectedEmployee.role_id||"",
           reporting_to:selectedEmployee.reporting_to,
           joining_date: selectedEmployee.joining_date || '',
           date_of_birth: selectedEmployee.date_of_birth || '',
@@ -166,6 +216,8 @@ const handleEdit = async (id, userId) => {
           contract_end_date: selectedEmployee.contract_end_date || '',
           employment_type: selectedEmployee.employment_type || '',
           image: selectedEmployee.image || '',
+          country_phonecode:selectedEmployee.country_phonecode,
+          country_id:selectedEmployee.country_id
       });
         
         // Add a delay before opening the drawer to ensure state is updated
@@ -188,29 +240,29 @@ const handleEdit = async (id, userId) => {
     try {
         let response;
         if (isEdit) {
-          const employee = {
-            aboutMe: "55",
-            address: "Mattathodi house, moolath parambil",
-            companyAddressId: 1,
-            contractEndDate: "2025-04-08",
-            dateOfBirth: "2025-04-04",
-            departmentId: 1,
-            designationId: 2,
-            email: "editeduser14544.s@pazl.info",
-            employeeId: "EMP567",
-            employmentType: "Full-time",
-            image: "localhost",
-            joiningDate: "2025-04-11",
-            mobile: "8606893474",
-            name: "Edited",
-            password: "123123123",
-            reportingTo: 3,
-            roleId: 1,
-            skills: "aa"
-          }  ;
-          console.log("edit api called")
+          // const employee = {
+          //   aboutMe: "55",
+          //   address: "Mattathodi house, moolath parambil",
+          //   companyAddressId: 1,
+          //   contractEndDate: "2025-04-08",
+          //   dateOfBirth: "2025-04-04",
+          //   departmentId: 1,
+          //   designationId: 2,
+          //   email: "editeduser14544.s@pazl.info",
+          //   employeeId: "EMP567",
+          //   employmentType: "Full-time",
+          //   image: "localhost",
+          //   joiningDate: "2025-04-11",
+          //   mobile: "8606893474",
+          //   name: "Edited",
+          //   password: "123123123",
+          //   reportingTo: 3,
+          //   roleId: 1,
+          //   skills: "aa"
+          // }  ;
+          // console.log("edit api called")
           
-            response = await apiMethods.editEmployee(CurrentEmployeeId,employee);
+            response = await apiMethods.editEmployee(CurrentEmployeeId,formData);
             console.log("edit api called")
         } else {
             response = await apiMethods.createNewEmployee(formData);
@@ -261,14 +313,6 @@ const handleEdit = async (id, userId) => {
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Employee</h2>
           <div className="flex gap-2">
-            {/* <button
-              className="bg-teal-500 text-white px-2.5 py-1 rounded-md border-none hover:bg-teal-600 "
-              onClick={() => {
-                setDrawerOpen(true)
-              }}
-            >
-              + Create Employee
-            </button> */}
 
             <ActionButton
               label={" + Create Employee"}
@@ -294,30 +338,29 @@ const handleEdit = async (id, userId) => {
               <TbSmartHome className="text-teal-500" />
               <span>All Datas</span>
               <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
-                5055
+                {EmployeeResponse?.totalRecords}
               </span>
             </div>
             <div className="flex gap-1.5 items-center">
               <IoCheckmarkCircleOutline />
               <span>Active</span>
               <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
-                500
-              </span>
+              {EmployeeResponse?.activeEmployees}              </span>
             </div>
             <div className="flex gap-1.5 items-center">
               <IoCheckmarkCircleOutline />
               <span>Inactive</span>
               <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
-                50
-              </span>
+              {EmployeeResponse?.inactiveEmployees}
+               </span>
             </div>
           </div>
         </div>
 
         <div className="overflow-x-auto border border-gray-200 px-3 py-1 mt-1 rounded-md">
           <div className="max-w-[1280px] mx-auto mt-1 flex justify-evenly gap-2 items-center">
-          {/* <SearchBar text={'Employee'} data={tableData} /> */}
-          <SearchBar text={'Employee'} data={employeesData} />
+             <SearchBar text="Employees" data={employeesData} ref={searchBarRef} />
+
 
             <select
               className="bg-white border border-[#e7e5e4] p-[6px] rounded-md "
@@ -358,15 +401,28 @@ const handleEdit = async (id, userId) => {
 
           <div className="border h-[80%] mt-2">
             <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
-              <EmployeeTable employeesdata={employeesData}  handleEdit={handleEdit} fetchEmployeeData={fetchEmployeeData} />
+              <EmployeeTable
+               employeesdata={employeesData}
+               handleEdit={handleEdit}
+               fetchEmployeeData={fetchEmployeeData}
+               handleView={handleView}
+                />
+              <EmployeeView
+              showEmployeeData={showEmployeeData}
+              employeeData={viewEmployeeData}
+              setVisible = {setViewEmployeeData}
+              />
             </div>
           </div>
           {/* Pagination Section */}
           <div className="flex justify-end items-center gap-4 mt-2 mb-3">
             <CommonPagination
-              count={employeesData.totalPages}
-              page={employeesData.currentPage}
-              onChange={handlePageChange}
+              count={EmployeeResponse?.totalPages}
+  page={paginationParams.currentPage}
+  onChange={handlePageChange1}
+  onLimitChange={handleLimitChange1}
+  limit={paginationParams.pageSize}
+
               />
           </div>
         </div>

@@ -12,7 +12,7 @@ import ThreeDotMenu from '../../../components/ThreeDotMenu'
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../../components/New/ConfirmationModale'
 import apiMethods from '../../../api/config'
-function EmployeeTable({ employeesdata = [], handleEdit,fetchEmployeeData }) {
+function EmployeeTable({ employeesdata = [], handleEdit,fetchEmployeeData,handleView }) {
   const [isConfirmationModaleOpen,setIsConfirmationModaleOpen] = useState(false)
   const [selectedEmployee,setSelectedEmployee] = useState('')
 
@@ -105,7 +105,7 @@ function EmployeeTable({ employeesdata = [], handleEdit,fetchEmployeeData }) {
                           label: 'View',
                           icon: cilHandPointRight,
                           onClick: () => {
-                            console.log('View')
+                            handleView(cell.id)
                           },
                         },
                         {

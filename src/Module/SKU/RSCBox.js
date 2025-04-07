@@ -20,15 +20,11 @@ function RSCBox({
   locationvalue,
   onUnitChange
 }) {
-  console.log("show client obj",setAddNewSkuData)
-  console.log("show client if",client)
   const filteredClient = locationvalue 
   ? client.find(client => client.client_id === locationvalue) 
   : null;
   const [unitTooltip, setUnitTooltip] = useState("Enter Millimeter");
 
-console.log("show client obj", locationvalue);
-console.log("show client if", JSON.stringify(filteredClient));
 
 const calculateBoardSize = (data) => {
   const length = parseFloat(data.length) || 0;
@@ -176,7 +172,6 @@ const calculateBoardSize = (data) => {
   //  }));
   //};
 
-console.log("sku type",JSON.stringify(skuType))
   
   return (
     <>

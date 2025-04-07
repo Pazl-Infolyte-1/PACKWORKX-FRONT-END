@@ -24,9 +24,9 @@ function EmployeeView({ employeeData, showEmployeeData, setVisible }) {
         <div className="max-w-6xl mx-auto p-6">
           {/* Header with Employee Image */}
           <header className="mb-8">
-            <div className="flex items-start gap-6">
+            <div className="flex items-center gap-6">
               {/* Employee Image */}
-              <div className="h-32 w-32 rounded-full overflow-hidden border-2 border-gray-200 shadow-sm flex-shrink-0">
+              <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-gray-200 shadow-sm flex-shrink-0">
                 <img 
                   src={employeeData.image || "/api/placeholder/128/128"} 
                   alt={`${employeeData.user_name}`} 
@@ -37,7 +37,7 @@ function EmployeeView({ employeeData, showEmployeeData, setVisible }) {
               <div className="flex-1">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
                   <div>
-                    <h1 className="text-3xl font-bold text-gray-800">{employeeData.user_name}</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">{employeeData.user_name}</h1>
                     <p className="text-gray-500 mt-1">#{employeeData.employee_id}</p>
                   </div>
                   <div className="mt-2 sm:mt-0  ">

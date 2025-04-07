@@ -34,7 +34,7 @@ function PackagesDetails({ showPopUp, cell, setShowPopUp, onEdit }) {
                   variant="edit"
                   height={8}
                   width={24}
-                  onClick={() => onEdit(cell.id)}
+                  onClick={() => onEdit(cell)}
                 />
               </div>
             </div>

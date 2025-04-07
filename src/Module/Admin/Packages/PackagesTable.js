@@ -12,15 +12,20 @@ import ThreeDotMenu from '../../../components/ThreeDotMenu'
 import apiMethods from '../../../api/config'
 import Loading from '../../../components/New/Loading'
 import PackagesDetails from './PackagesDetails'
+import CustomAlert from '../../../components/New/CustomAlert'
 
-function PackagesTable({ packagedata = [], onEdit, setData, loading, showPopUp, setShowPopUp }) {
+function PackagesTable({ packagedata = [], onEdit, setData, loading, showPopUp, setShowPopUp, setAlerts, alerts }) {
   const handleDelete = async (id) => {
     await apiMethods.DeletePacakges(id)
     setData((prev) => prev.filter((item) => item.id !== id))
+    setAlerts([{ severity: 'success', message: 'Package deleted successfully!' }])
   }
+
+  const handleClose = () => setAlerts([])
 
   return (
     <div className="relative h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
+      <CustomAlert alerts={alerts} handleClose={handleClose}/>
       <CTable striped hover className="w-full m-0">
         <CTableHead className="bg-gray-100 sticky top-0 z-10">
           <CTableRow>

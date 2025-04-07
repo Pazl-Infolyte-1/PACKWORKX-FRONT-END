@@ -13,9 +13,10 @@ function Packages() {
   const [isEdit, setIsEdit] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState(null)
   const [limit, setLimit] = useState(10)
-  const { searchQuery, setSearchQuery, filteredSearchData } = useSearch()
+  const { searchQuery } = useSearch()
   const searchBarRef = useRef(null)
   const [loading, setLoading] = useState(true)
+  const [showPopUp, setShowPopUp] = useState(null)
   const [pagination, setPagination] = useState({
     page: 1,
     totalPages: 1,
@@ -74,7 +75,7 @@ function Packages() {
 
   const handleEditPackage = (packageItem) => {
     setIsEdit(true)
-
+    setShowPopUp(null)
     const editFormData = {
       name: packageItem.name,
       description: packageItem.description,
@@ -158,7 +159,14 @@ function Packages() {
 
         <div className=" h-[80%] ">
           <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  mt-3">
-            <PackagesTable packagedata={data} onEdit={handleEditPackage} setData={setData} loading={loading} />
+            <PackagesTable
+              packagedata={data}
+              onEdit={handleEditPackage}
+              setData={setData}
+              loading={loading}
+              showPopUp={showPopUp}
+              setShowPopUp={setShowPopUp}
+            />
           </div>
         </div>
         {/* Pagination Section */}

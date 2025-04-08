@@ -128,14 +128,13 @@ function SkuList() {
     try {
       if (editTag) {
         const response = await apiMethods.updateSku(addNewSkuData)
-      
 
         if (response?.status === 200) {
           setEditTag(false)
           setRefresh((prev) => !prev)
           setAlerts([{ severity: 'success', message: response.data.message || 'Sku updated successfully!' }])
         } else {
-          setAlerts([{ severity: 'error', message: response.error}])
+          setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong'}])
         }
       } else {
         if (boardSizeError) {
@@ -148,14 +147,14 @@ function SkuList() {
         if (response?.status === 201) {
           setDrawerOpen(false)
           setRefresh((prev) => !prev)
-          setAlerts([{ severity: 'success', message: 'Sku updated successfully!' }])
+          setAlerts([{ severity: 'success', message: 'Sku Added successfully!' }])
         } else {
-          setAlerts([{ severity: 'error', message: response.message || 'Something went wrong' }])
+          setAlerts([{ severity: 'error', message: response.data.message || 'Something went wrong' }])
         }
       }
     } catch (error) {
       console.error(error)
-      setAlerts([{ severity: 'error', message: error.message || 'Something went wrong' }])
+      setAlerts([{ severity: 'error', message: error?.response?.data?.message|| 'Something went wrong' }])
     }
   }
 
@@ -171,7 +170,7 @@ function SkuList() {
       ply: selectedSku.ply || null,
       length: selectedSku.length || null,
       width: selectedSku.width || null,
-      height: selectedSku.height || null,
+      height: selectedSku.height || '',
       unit: selectedSku.unit || null,
       joints: selectedSku.joints || null,
       ups: selectedSku.ups || null,
@@ -269,7 +268,6 @@ function SkuList() {
 
   return (
     <div>
-       <CustomAlert alerts={alerts} handleClose={handleClose} />
       {/* Header */}
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className="flex items-center justify-between flex-wrap gap-x-2 -my-2">

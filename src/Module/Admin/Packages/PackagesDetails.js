@@ -1,8 +1,10 @@
 import React from 'react'
 import PopUp from '../../../components/New/PopUp'
 import ActionButton from '../../../components/New/ActionButton'
+import apiMethods from '../../../api/config'
 
 function PackagesDetails({ showPopUp, cell, setShowPopUp, onEdit }) {
+  
   return (
     <PopUp
       visible={showPopUp === cell.id}
@@ -72,11 +74,11 @@ function PackagesDetails({ showPopUp, cell, setShowPopUp, onEdit }) {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium text-gray-500">Created at</span>
-                  <span className="text-gray-800 mt-1">{cell.created_at}</span>
+                  <span className="text-gray-800 mt-1">{apiMethods.formatDate(cell.created_at)}</span>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium text-gray-500">Updated at</span>
-                  <span className="text-gray-800 mt-1">{cell.updated_at}</span>
+                  <span className="text-gray-800 mt-1">{apiMethods.formatDate(cell.updated_at)}</span>
                 </div>
               </div>
             </div>
@@ -147,7 +149,7 @@ function PackagesDetails({ showPopUp, cell, setShowPopUp, onEdit }) {
             <div className="p-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Package Module</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {cell.module_in_package.map((module, index) => (
+                {cell?.module_in_package?.map((module, index) => (
                   <div key={index} className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">{module}</span>
                   </div>

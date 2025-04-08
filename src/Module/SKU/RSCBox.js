@@ -337,6 +337,7 @@ const handleClose = () => {
             <input
               id="length"
               name="length"
+              type='number'
               value={addNewSkuData.length}
               onChange={modifiedHandleChange}
               placeholder="Length"
@@ -347,6 +348,7 @@ const handleClose = () => {
             <input
               id="width"
               name="width"
+              type='number'
               value={addNewSkuData.width}
               onChange={modifiedHandleChange}
               placeholder="Width"
@@ -357,6 +359,7 @@ const handleClose = () => {
             <input
               id="height"
               name="height"
+              type='number'
               value={addNewSkuData.height}
               onChange={modifiedHandleChange}
               placeholder="Depth"

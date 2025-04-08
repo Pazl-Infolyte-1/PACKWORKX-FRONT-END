@@ -20,12 +20,6 @@ const compositeTypes = [
 function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData,editedSkudata,
 	 updateSkuValues}) {
 
-		console.log("edit data",JSON.stringify(addNewSkuData.part_value))
-    console.log("part count",JSON.stringify(addNewSkuData.part_count))
-		console.log("edit addNewSkuData",JSON.stringify(addNewSkuData))
-
-
-
 	const [skuFields, setSkuFields] = useState([]);
 	const [skuList, setSkuList] = useState([]);
   const [skuDropdown, setSkuDropdown] = useState([]);

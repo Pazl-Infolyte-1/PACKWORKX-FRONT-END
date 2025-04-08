@@ -128,14 +128,14 @@ function SkuList() {
     try {
       if (editTag) {
         const response = await apiMethods.updateSku(addNewSkuData)
-        console.log(response?.status, 'jdn')
+      
 
         if (response?.status === 200) {
           setEditTag(false)
           setRefresh((prev) => !prev)
-          setAlerts([{ severity: 'success', message: 'Sku Edited successfully!' }])
+          setAlerts([{ severity: 'success', message: response.data.message || 'Sku updated successfully!' }])
         } else {
-          setAlerts([{ severity: 'error', message: 'Something went wrong' }])
+          setAlerts([{ severity: 'error', message: response.error}])
         }
       } else {
         if (boardSizeError) {
@@ -144,67 +144,64 @@ function SkuList() {
           return null; // 🔴 Stop submission
         }
         setAlerts([]);
-        console.log("boardsize",boardSizeError)
         const response = await apiMethods.addSku(addNewSkuData)
-        if (response?.status === 200) {
+        if (response?.status === 201) {
           setDrawerOpen(false)
           setRefresh((prev) => !prev)
           setAlerts([{ severity: 'success', message: 'Sku updated successfully!' }])
         } else {
-          setAlerts([{ severity: 'error', message: 'Something went wrong' }])
+          setAlerts([{ severity: 'error', message: response.message || 'Something went wrong' }])
         }
       }
     } catch (error) {
-      console.log(error, 'jdn')
       console.error(error)
-      setAlerts([{ severity: 'error', message: 'Something went wrong' }])
+      setAlerts([{ severity: 'error', message: error.message || 'Something went wrong' }])
     }
   }
 
   const handleSkuEdit = (id) => {
     const selectedSku = skudata.find((sku) => sku.id === id)
-    console.log('selected sku', JSON.stringify(selectedSku))
     setEditTag(true)
     setEditedSkuData(selectedSku)
     setAddNewSkuData({
-      id: selectedSku.id || '',
-      sku_name: selectedSku.sku_name || '',
+      id: selectedSku.id || null,
+      sku_name: selectedSku.sku_name || null,
       client_id: selectedSku.client_id || 1,
-      client: selectedSku.client || '',
-      ply: selectedSku.ply || '',
-      length: selectedSku.length || '',
-      width: selectedSku.width || '',
-      height: selectedSku.height || '',
-      unit: selectedSku.unit || '',
-      joints: selectedSku.joints || '',
-      ups: selectedSku.ups || '',
-      select_dies: selectedSku.select_dies || '',
-      no_of_parts: selectedSku?.no_of_parts || '',
-      composite_type: selectedSku?.composite_type || '',
-      inner_outer_dimension: selectedSku.inner_outer_dimension || '',
-      flap_width: selectedSku.flap_width || '',
-      flap_tolerance: selectedSku.flap_tolerance || '',
-      length_trimming_tolerance: selectedSku.length_trimming_tolerance || '',
-      width_trimming_tolerance: selectedSku.width_trimming_tolerance || '',
+      client: selectedSku.client || null,
+      ply: selectedSku.ply || null,
+      length: selectedSku.length || null,
+      width: selectedSku.width || null,
+      height: selectedSku.height || null,
+      unit: selectedSku.unit || null,
+      joints: selectedSku.joints || null,
+      ups: selectedSku.ups || null,
+      select_dies: selectedSku.select_dies || null,
+      no_of_parts: selectedSku?.no_of_parts || null,
+      composite_type: selectedSku?.composite_type || null,
+      inner_outer_dimension: selectedSku.inner_outer_dimension || null,
+      flap_width: selectedSku.flap_width || null,
+      flap_tolerance: selectedSku.flap_tolerance || null,
+      length_trimming_tolerance: selectedSku.length_trimming_tolerance || null,
+      width_trimming_tolerance: selectedSku.width_trimming_tolerance || null,
       strict_adherence: selectedSku.strict_adherence || false,
-      customer_reference: selectedSku.customer_reference || '',
-      reference_number: selectedSku.reference_number || '',
-      internal_id: selectedSku.internal_id || '',
-      board_size_cm2: selectedSku.board_size_cm2 || '',
-      deckle_size: selectedSku.deckle_size || '',
-      minimum_order_level: selectedSku.minimum_order_level || '',
-      sku_type: selectedSku.sku_type || '',
+      customer_reference: selectedSku.customer_reference || null,
+      reference_number: selectedSku.reference_number || null,
+      internal_id: selectedSku.internal_id || null,
+      board_size_cm2: selectedSku.board_size_cm2 || null,
+      deckle_size: selectedSku.deckle_size || null,
+      minimum_order_level: selectedSku.minimum_order_level || null,
+      sku_type: selectedSku.sku_type || null,
       part_value: selectedSku.part_value || [],
       part_count:selectedSku.part_count,
       sku_values: selectedSku.sku_values || [
         {
-          layer: '',
-          gsm: '',
-          bf: '',
-          material: '',
-          color: '',
-          flute_type: '',
-          flute_ratio: '',
+          layer: null,
+          gsm: null,
+          bf: null,
+          material: null,
+          color: null,
+          flute_type: null,
+          flute_ratio: null,
         },
       ],
     })

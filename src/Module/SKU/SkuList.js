@@ -17,6 +17,7 @@ import ActionButton from '../../components/New/ActionButton'
 import SearchBar from '../../components/New/SearchBar'
 import { AuthContext } from '../../Context/AuthContext'
 import { useSearch } from '../../components/New/SearchContext'
+import CustomAlert from '../../components/New/CustomAlert'
 
 function SkuList() {
   const [skuType, setSkuType] = useState([])
@@ -34,10 +35,10 @@ function SkuList() {
   const [refresh, setRefresh] = useState(false)
   const [clientDiasble, setClientDisable] = useState(false)
   const [limit, setLimit] = useState(10)
+  const [alerts, setAlerts] = useState([])
   const { user } = useContext(AuthContext)
   const { searchQuery, setSearchQuery, filteredSearchData } = useSearch()
   const location = useLocation()
-  console.log('location///', location?.state?.client_id)
   const searchBarRef = useRef(null)
 
   const [addNewSkuData, setAddNewSkuData] = useState({
@@ -51,9 +52,9 @@ function SkuList() {
     unit: 'mm',
     joints: null,
     ups: null,
-    select_dies:null,
-    no_of_parts:null,
-    composite_type:null,
+    select_dies: null,
+    no_of_parts: null,
+    composite_type: null,
     inner_outer_dimension: null,
     flap_width: null,
     flap_tolerance: null,
@@ -124,19 +125,30 @@ function SkuList() {
   const handleAddSkuSubmit = async () => {
     try {
       if (editTag) {
-        //console.log("get sku datas",editedSkudata.sku_values)
-        //console.log("edit sku datas",addNewSkuData.sku_values)
-        //return null;
-        await apiMethods.updateSku(addNewSkuData)
-        setEditTag(false)
-        setRefresh((prev) => !prev)
+        const response = await apiMethods.updateSku(addNewSkuData)
+        console.log(response?.status, 'jdn')
+
+        if (response?.status === 200) {
+          setEditTag(false)
+          setRefresh((prev) => !prev)
+          setAlerts([{ severity: 'success', message: 'Sku Edited successfully!' }])
+        } else {
+          setAlerts([{ severity: 'error', message: 'Something went wrong' }])
+        }
       } else {
-        await apiMethods.addSku(addNewSkuData)
-        setDrawerOpen(false)
-        setRefresh((prev) => !prev)
+        const response = await apiMethods.addSku(addNewSkuData)
+        if (response?.status === 200) {
+          setDrawerOpen(false)
+          setRefresh((prev) => !prev)
+          setAlerts([{ severity: 'success', message: 'Sku updated successfully!' }])
+        } else {
+          setAlerts([{ severity: 'error', message: 'Something went wrong' }])
+        }
       }
     } catch (error) {
+      console.log(error, 'jdn')
       console.error(error)
+      setAlerts([{ severity: 'error', message: 'Something went wrong' }])
     }
   }
 
@@ -157,9 +169,9 @@ function SkuList() {
       unit: selectedSku.unit || '',
       joints: selectedSku.joints || '',
       ups: selectedSku.ups || '',
-      select_dies:selectedSku.select_dies || '',
-      no_of_parts:selectedSku?.no_of_parts || '',
-      composite_type:selectedSku?.composite_type || '',
+      select_dies: selectedSku.select_dies || '',
+      no_of_parts: selectedSku?.no_of_parts || '',
+      composite_type: selectedSku?.composite_type || '',
       inner_outer_dimension: selectedSku.inner_outer_dimension || '',
       flap_width: selectedSku.flap_width || '',
       flap_tolerance: selectedSku.flap_tolerance || '',
@@ -192,9 +204,6 @@ function SkuList() {
   useEffect(() => {
     const fetchData = async () => {
       // skip sku get call
-      console.log('check location', location.state?.skipInitialFetch)
-      console.log('refresh', refresh)
-
       if (location.state?.skipInitialFetch && !refresh) {
         return
       }
@@ -246,9 +255,14 @@ function SkuList() {
     })
   }
 
+  const handleClose = () => {
+    setAlerts([])
+  }
+
   return (
     <div>
       {/* Header */}
+      <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className="flex items-center justify-between flex-wrap gap-x-2 -my-2">
         <h1 className="sm:text-[32px] text-[#424242]">SKU</h1>
         {/* <span className="sm:text-[18px] font-semibold text-[#424242] ">
@@ -382,6 +396,8 @@ function SkuList() {
             setSkuData={setSkuData}
             handleSkuEdit={handleSkuEdit}
             editTag={editTag}
+            alerts={alerts}
+            setAlerts={setAlerts}
           />
         </div>
       </div>
@@ -414,7 +430,7 @@ function SkuList() {
         <SkuPopup visible={visible} setVisible={setVisible} />
       </div>
       <Drawer
-      maxWidth = "1280px"
+        maxWidth="1280px"
         isOpen={isDrawerOpen || editTag}
         title={editTag ? 'Edit SKU Details' : 'Add SKU Details'}
         onClose={() => (setDrawerOpen(false), setEditTag(false), setClientDisable(false))}

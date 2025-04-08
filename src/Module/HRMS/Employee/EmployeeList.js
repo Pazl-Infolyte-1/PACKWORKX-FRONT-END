@@ -14,6 +14,7 @@ import SearchBar from '../../../components/New/SearchBar'
 import EmployeeView from './EmployeeView'
 import { useSearch } from '../../../components/New/SearchContext'
 import { paginationClasses } from '@mui/material'
+import CustomAlert from '../../../components/New/CustomAlert'
 
 
 
@@ -23,55 +24,33 @@ function EmployeeList() {
   const [isEdit, setIsEdit] = useState(false)
   const rowsPerPage = 10
   const [employeesData, setEmployeesData] = useState([])
-  const [CurrentEmployeeId , setCurrentEmployeeId] = useState(null);
-  const [EmployeeResponse,setEmployeeResponse] = useState(null);
-  const [showEmployeeData,setShowEmployeeData] = useState(false)
-  const [viewEmployeeData,setViewEmployeeData] = useState(null);
-  const { searchQuery, setSearchQuery, filteredSearchData,handleSearch } = useSearch() ///need to verify
-
-  
-
-  
+  const [CurrentEmployeeId, setCurrentEmployeeId] = useState(null);
+  const [EmployeeResponse, setEmployeeResponse] = useState(null);
+  const [showEmployeeData, setShowEmployeeData] = useState(false)
+  const [viewEmployeeData, setViewEmployeeData] = useState(null);
+  const { searchQuery, setSearchQuery, filteredSearchData, handleSearch } = useSearch() ///need to verify
+  const [status, setFilterStatus] = useState('');
+  const [alerts, setAlerts] = useState([]);
   const searchBarRef = useRef(null)
-  const [filter,setFilter]=useState('')
-  
+  const [loading,setLoading]=useState(true)
+  const [filter, setFilter] = useState('')
   const [paginationParams, setPaginationParams] = useState({
     currentPage: 1,
     pageSize: 10
   });
 
-  const handlePageChange1 = (event, newPage) => {
-    setPaginationParams(prev => ({
-      ...prev,
-      currentPage: newPage
-    }));
-  };
-
-  // const HandleFilter = (e)=>{
-  //   // setSearchQuery(active)
-  //   console.log(e.target.value)
-  //   setHandleFilter(e.target.value)
-  //   searchBarRef.setQuery(e.target.value)
-  // }
-
-  const HandleFilter = (e) => {
-    const selectedValue = e.target.value
-    setFilter(selectedValue)
-  
-    // Trigger search globally
-    handleSearch(selectedValue, employeesData)
-  }
-
-  const handleLimitChange1 = (newLimit) => {
-    setPaginationParams({
-      currentPage: 1, // Always reset to page 1 when changing limit
-      pageSize: newLimit
-    });
-    
-  };
-  
-  
-  
+  const [dropdownOptions, setDropdownOptions] = useState({
+    countries: [],
+    companiesAddresses: [],
+    departments: [],
+    designations: [],
+    roles: [],
+    reporting_to: [
+      { id: 3, name: 'Jane Smith' },
+      { id: 3, name: 'Mike Johnson' },
+      { id: 3, name: 'Sarah Williams' }
+    ]
+  });
 
   // State to manage form data
   const [formData, setFormData] = useState({
@@ -84,7 +63,7 @@ function EmployeeList() {
     skills: '',
     department_id: null,
     designation_id: null,
-    joining_date: '', 
+    joining_date: '',
     date_of_birth: '',
     about_me: '',
     reporting_to: null,
@@ -93,178 +72,113 @@ function EmployeeList() {
     company_address_id: null,
     role_id: null,
     image: '',
-    country_phonecode:null,
-    country_id:null
+    country_phonecode: null,
+    country_id: null
   });
 
-    const [dropdownOptions, setDropdownOptions] = useState({
-      countries: [],
-      companiesAddresses: [],
-      departments: [],
-      designations: [],
-      roles: [],
-      reporting_to: [
-       { id: 3, name: 'Jane Smith' },
-      { id: 3, name: 'Mike Johnson' },
-      { id: 3, name: 'Sarah Williams' }
-      ]
-    });
-  
-    useEffect(() => {
-      const fetchDropDownData = async () => {
-        try {
-          const [
-            countriesResponse,
-            companiesAddressResponse,
-            departmentsResponse,
-            designationsResponse,
-            rolesResponse
-          ] = await Promise.all([
-            apiMethods.getCountries(),
-            apiMethods.getCompanyAddress(),
-            apiMethods.getDepartmentsList(),
-            apiMethods.getDesignation(),
-            apiMethods.getRoles()
-          ]);
-  
-          setDropdownOptions({
-            countries: countriesResponse?.data?.data,
-            companiesAddresses: companiesAddressResponse?.data?.data,
-            departments: departmentsResponse?.data?.data,
-            designations: designationsResponse?.data?.data,
-            roles: rolesResponse?.data?.data
-          });
-        } catch (error) {
-          console.error('Error fetching dropdown data:', error);
-        }
-      };
-  
-      fetchDropDownData();
-    }, []);
+  useEffect(() => {
+    const fetchDropDownData = async () => {
+      try {
+        const [
+          countriesResponse,
+          companiesAddressResponse,
+          departmentsResponse,
+          designationsResponse,
+          rolesResponse
+        ] = await Promise.all([
+          apiMethods.getCountries(),
+          apiMethods.getCompanyAddress(),
+          apiMethods.getDepartmentsList(),
+          apiMethods.getDesignation(),
+          apiMethods.getRoles()
+        ]);
 
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const response = await apiMethods.GetEmployeelist()
-  //       setEmployeesData(response.data.data)
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error)
-  //     }
-  //   }
-  //   fetchData()
+        setDropdownOptions({
+          countries: countriesResponse?.data?.data,
+          companiesAddresses: companiesAddressResponse?.data?.data,
+          departments: departmentsResponse?.data?.data,
+          designations: designationsResponse?.data?.data,
+          roles: rolesResponse?.data?.data
+        });
+      } catch (error) {
+        console.error('Error fetching dropdown data:', error);
+      }
+    };
 
-  // }, [])
+    fetchDropDownData();
+  }, []);
 
-
-
-
-  const fetchEmployeeData = async () => {
-
-    try {
-      const response = await apiMethods.GetEmployeelist({
-        search: searchQuery,
-        page: paginationParams.currentPage,
-        limit: paginationParams.pageSize,
-      })
-      setEmployeesData(response.data.data)
-      setEmployeeResponse(response.data)
-    } catch (error) {
-      console.error('Error fetching data:', error)
-    }
-  }
 
   useEffect(() => {
     setPaginationParams(prev => ({
       ...prev,
       currentPage: 1 // Reset to page 1 whenever search query changes
-      
     })
-  );
-  }, [searchQuery]);
-  
+    );
+  }, [searchQuery, status]);
+
   // Initial data fetch on component mount
   useEffect(() => {
     fetchEmployeeData()
-  }, [searchQuery,paginationParams,filter,setPaginationParams.current])
+  }, [paginationParams])
 
-
-  // const handlePageChange = (event, newPage) => {
-  //   // console.log(employeesData)
-  //   // console.log(EmployeeResponse)
-  //   setEmployeeResponse((prev) => ({ ...prev, currentPage: newPage }));
-  //   console.log("called page change")
-  //   console.log(EmployeeResponse)
-  // };
-
-  const handleView = async (id)=>{
-    try{
-      console.log("Requesting for data for employee");
-      const response = await apiMethods.getEmployeeData(id);
-      setViewEmployeeData(response.data.data)
-      setShowEmployeeData(true)
-
-    }catch(err){
-      console.log(err);
-    }
-  }
 
   const handleEdit = async (id, userId) => {
     setIsEdit(true);
     setCurrentEmployeeId(userId);
-    
+
     try {
-        // Log the request parameters
-        console.log('Requesting employee data for ID:', id);
-        
-        const response = await apiMethods.getEmployeeData(id);
-        
-        // Log the full response to see its structure
-        console.log('API Response:', response);
-        
-        if (!response || !response.data || !response.data.data) {
-            console.error('Invalid API response structure:', response);
-            return;
-        }
-        
-        const selectedEmployee = response.data.data;
-        console.log('Selected Employee Data:', selectedEmployee);
-        
-        // Set form data and then open drawer
+      // Log the request parameters
+      console.log('Requesting employee data for ID:', id);
 
-        setFormData({
-          name: selectedEmployee.user_name || '',
-          email: selectedEmployee.user_email || '',
-          password: selectedEmployee.password || '',
-          mobile: selectedEmployee.mobile || '',
-          employee_id: selectedEmployee.employee_id || '',
-          address: selectedEmployee.address || '',
-          skills: selectedEmployee.skills || '',
-          department_id:selectedEmployee.department_id, 
-          designation_id:selectedEmployee.designation_id ,
-          company_address_id:selectedEmployee.company_address_id,
-          role_id: selectedEmployee.role_id||"",
-          reporting_to:selectedEmployee.reporting_to,
-          joining_date: selectedEmployee.joining_date || '',
-          date_of_birth: selectedEmployee.date_of_birth || '',
-          about_me: selectedEmployee.about_me || '',
-          contract_end_date: selectedEmployee.contract_end_date || '',
-          employment_type: selectedEmployee.employment_type || '',
-          image: selectedEmployee.image || '',
-          country_phonecode:selectedEmployee.country_phonecode||'',
-          country_id:selectedEmployee.country_id||''
+      const response = await apiMethods.getEmployeeData(id);
+
+      // Log the full response to see its structure
+      console.log('API Response:', response);
+
+      if (!response || !response.data || !response.data.data) {
+        console.error('Invalid API response structure:', response);
+        return;
+      }
+
+      const selectedEmployee = response.data.data;
+      console.log('Selected Employee Data:', selectedEmployee);
+
+      // Set form data and then open drawer
+
+      setFormData({
+        name: selectedEmployee.user_name || '',
+        email: selectedEmployee.user_email || '',
+        password: selectedEmployee.password || '',
+        mobile: selectedEmployee.mobile || '',
+        employee_id: selectedEmployee.employee_id || '',
+        address: selectedEmployee.address || '',
+        skills: selectedEmployee.skills || '',
+        department_id: selectedEmployee.department_id,
+        designation_id: selectedEmployee.designation_id,
+        company_address_id: selectedEmployee.company_address_id,
+        role_id: selectedEmployee.role_id || "",
+        reporting_to: selectedEmployee.reporting_to,
+        joining_date: selectedEmployee.joining_date || '',
+        date_of_birth: selectedEmployee.date_of_birth || '',
+        about_me: selectedEmployee.about_me || '',
+        contract_end_date: selectedEmployee.contract_end_date || '',
+        employment_type: selectedEmployee.employment_type || '',
+        image: selectedEmployee.image || '',
+        country_phonecode: selectedEmployee.country_phonecode || '',
+        country_id: selectedEmployee.country_id || ''
       });
-        
-        // Add a delay before opening the drawer to ensure state is updated
-        setTimeout(() => {
-            setDrawerOpen(true);
-            console.log('Current form data after setting:', formData); // This will likely show stale data due to closure
-        }, 100);
-    } catch (error) {
-        console.error('Error fetching employee data:', error);
-    }
-};
 
-  console.log(formData,'fasfdaf')
+      // Add a delay before opening the drawer to ensure state is updated
+      setTimeout(() => {
+        setDrawerOpen(true);
+        console.log('Current form data after setting:', formData); // This will likely show stale data due to closure
+      }, 100);
+    } catch (error) {
+      console.error('Error fetching employee data:', error);
+    }
+  };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -272,77 +186,155 @@ function EmployeeList() {
 
 
     try {
-        let response;
-        if (isEdit) {
-          // const employee = {
-          //   aboutMe: "55",
-          //   address: "Mattathodi house, moolath parambil",
-          //   companyAddressId: 1,
-          //   contractEndDate: "2025-04-08",
-          //   dateOfBirth: "2025-04-04",
-          //   departmentId: 1,
-          //   designationId: 2,
-          //   email: "editeduser14544.s@pazl.info",
-          //   employeeId: "EMP567",
-          //   employmentType: "Full-time",
-          //   image: "localhost",
-          //   joiningDate: "2025-04-11",
-          //   mobile: "8606893474",
-          //   name: "Edited",
-          //   password: "123123123",
-          //   reportingTo: 3,
-          //   roleId: 1,
-          //   skills: "aa"
-          // }  ;
-          // console.log("edit api called")
-          
-            response = await apiMethods.editEmployee(CurrentEmployeeId,formData);
-            console.log("edit api called")
-        } else {
-            response = await apiMethods.createNewEmployee(formData);
-        }
+      let response;
+      if (isEdit) {
 
-        if (response?.status === 200 || response?.status === 201) {
-            alert('Success!');
-            setDrawerOpen(false);
-            setIsEdit(false)
-            fetchEmployeeData()
-            setFormData({
-              name: '',
-              email: '',
-              password: '',
-              mobile: '',
-              employee_id: '',
-              address: '',
-              skills: '',
-              department_id: null,
-              designation_id: null,
-              joining_date: '',
-              date_of_birth: '',
-              about_me: '',
-              reporting_to: null,
-              contract_end_date: '',
-              employment_type: '',
-              company_address_id: null,
-              role_id: null,
-              image: '',
-            })
-            fetchEmployeeData()
+        response = await apiMethods.editEmployee(CurrentEmployeeId, formData);
+        console.log("edit api called")
+      } else {
+        response = await apiMethods.createNewEmployee(formData);
+      }
 
-        } else {
-            alert('Something went wrong. Please try again.');
-        }
+      if (response?.status === 200 || response?.status === 201) {
+        // alert('Success!'); 
+        setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
 
-        console.log(response);
+        setTimeout(() => {
+          handleClose()
+        }, 3000)
+
+        setDrawerOpen(false);
+        setIsEdit(false)
+        fetchEmployeeData()
+        setFormData({
+          name: '',
+          email: '',
+          password: '',
+          mobile: '',
+          employee_id: '',
+          address: '',
+          skills: '',
+          department_id: null,
+          designation_id: null,
+          joining_date: '',
+          date_of_birth: '',
+          about_me: '',
+          reporting_to: null,
+          contract_end_date: '',
+          employment_type: '',
+          company_address_id: null,
+          role_id: null,
+          image: '',
+        })
+        fetchEmployeeData()
+
+      } else {
+        console.log('Something went wrong. Please try again.');
+        setAlerts([{ severity: "error", message: "Failed To Update Employee " }]);
+      }
+
+      console.log(response);
     } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('An error occurred. Please check your input and try again.');
+      console.error('Error submitting form:', error);
+      console.log('An error occurred. Please check your input and try again.');
     }
-};
+  };
 
+
+  const handlePageChange1 = (event, newPage) => {
+    setPaginationParams(prev => ({
+      ...prev,
+      currentPage: newPage
+    }));
+  };
+
+  const handleLimitChange1 = (newLimit) => {
+    setPaginationParams({
+      currentPage: 1, // Always reset to page 1 when changing limit
+      pageSize: newLimit
+    });
+
+  };
+
+
+  const HandleFilter = (e) => {
+    const selectedValue = e.target.value
+    const selectedDropdownId = e.target.id
+
+    // Clear other dropdowns
+    document.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+      if (dropdown.id !== selectedDropdownId) {
+        dropdown.value = ''
+      }
+    })
+
+    // Set the filter value
+    setFilter(selectedValue)
+
+    // Trigger search globally
+    handleSearch(selectedValue, employeesData)
+  }
+
+
+
+  const fetchEmployeeData = async () => {
+    setLoading(true)
+    try {
+      const response = await apiMethods.GetEmployeelist({
+        search: searchQuery,
+        page: paginationParams.currentPage,
+        limit: paginationParams.pageSize,
+        status: status, // Include the status parameter in the API call
+
+      })
+      setEmployeesData(response.data.data)
+      setEmployeeResponse(response.data)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+    finally{
+      setLoading(false)
+    }
+  }
+
+
+  const handleView = async (id) => {
+    try {
+      console.log("Requesting for data for employee");
+      const response = await apiMethods.getEmployeeData(id);
+      setViewEmployeeData(response.data.data)
+      setShowEmployeeData(true)
+
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const handleStatus = (event) => {
+    setFilterStatus(event.target.value);
+  }
+
+  const handleClose = () => {
+    setAlerts([]);
+  };
+
+  const clearFilters = () => {
+    document.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+      dropdown.value = ''
+    })
+
+    setFilter("")
+    setFilterStatus("")
+    // setSelectedStatus("");
+    searchBarRef.current.clearSearch(); // Assuming searchBarRef has a clearSearch method
+
+  }
 
   return (
     <>
+
+      <CustomAlert alerts={alerts} handleClose={handleClose} />
+
       <div className="">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold"> Employee</h2>
@@ -350,7 +342,8 @@ function EmployeeList() {
 
             <ActionButton
               label={" + Add Employee"}
-              onClick={() => { setDrawerOpen(true), setIsEdit(false);
+              onClick={() => {
+                setDrawerOpen(true), setIsEdit(false);
               }}
               variant='add'
               className='text-white'
@@ -379,57 +372,59 @@ function EmployeeList() {
               <IoCheckmarkCircleOutline />
               <span>Active</span>
               <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
-              {EmployeeResponse?.activeEmployees}              </span>
+                {EmployeeResponse?.activeEmployees}              </span>
             </div>
             <div className="flex gap-1.5 items-center">
               <IoCheckmarkCircleOutline />
               <span>Inactive</span>
               <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
-              {EmployeeResponse?.inactiveEmployees}
-               </span>
+                {EmployeeResponse?.inactiveEmployees}
+              </span>
             </div>
           </div>
         </div>
 
         <div className="overflow-x-auto border border-gray-200 px-3 py-1 mt-1 rounded-md">
           <div className="max-w-[1280px] mx-auto mt-1 flex justify-between gap-2">
-             <SearchBar text="Employees" data={employeesData} ref={searchBarRef} />
-             <div className='flex justify-end gap-3'>
-             <select
-  className="bg-white border border-[#e7e5e4] p-[6px] rounded-md"
-  defaultValue=""
-  onChange={HandleFilter}
->
-  <option value="" disabled>
-    Select Department
-  </option>
-  {dropdownOptions.departments.map((department) => (
-    <option key={department.id} value={department.department_name}>
-      {department.department_name}
-    </option>
-  ))}
-</select>
+            {/* <div className='flex gap-3'> */}
+              <SearchBar text="Employees" data={employeesData} ref={searchBarRef} />
+              <div className='flex justify-end gap-3'>
+                <select
+                  id="department-filter"
+                  className="bg-white border border-[#e7e5e4] p-[6px] h-[35px] rounded-md filter-dropdown"
+                  defaultValue=""
+                  onChange={HandleFilter}
+                >
+                  <option value="" disabled>
+                    Select Department
+                  </option>
+                  {dropdownOptions.departments.map((department) => (
+                    <option key={department.id} value={department.department_name}>
+                      {department.department_name}
+                    </option>
+                  ))}
+                </select>
 
-            <select
-              className="border border-[#e7e5e4] p-[6px] rounded-md"
-              defaultValue=""
-              onChange={HandleFilter}
-              >
-              <option value="" disabled>
-                Select Role
-              </option>
-              {
-                dropdownOptions.roles.map((role)=>(
-                  <option key={role.id} value={role.name}>
-                  {role.name}
-                </option>
-                ))
-              }
-           
-            </select>
+                <select
+                  className="border border-[#e7e5e4] p-[6px] h-[35px] rounded-md filter-dropdown"
+                  defaultValue=""
+                  onChange={HandleFilter}
+                >
+                  <option value="" disabled>
+                    Select Role
+                  </option>
+                  {
+                    dropdownOptions.roles.map((role) => (
+                      <option key={role.id} value={role.name}>
+                        {role.name}
+                      </option>
+                    ))
+                  }
 
-            {/* <select
-              className="border border-[#e7e5e4] p-[6px] rounded-md"
+                </select>
+
+                {/* <select
+              className="border border-[#e7e5e4] p-[6px] h-[35px] rounded-md"
               defaultValue=""
               onChange={HandleFilter}
               >
@@ -443,34 +438,49 @@ function EmployeeList() {
                 </option>
                 ))
               }
-            </select> */}
+              </select> */}
 
-            <select
-              className="border border-[#e7e5e4] p-[6px] rounded-md"
-              defaultValue=""
-              onChange={HandleFilter}
-              >
-              <option value="" disabled>
-                status
-              </option>
-              <option value="active">Active</option>
-              <option value="deactive">Inactive</option>
-            </select>
+                <select
+                  id="status-filter"
+                  className="border border-[#e7e5e4] p-[6px] h-[35px] rounded-md"
+                  defaultValue=""
+                  value={status}
+                  onChange={handleStatus}
+                >
+                  <option value="" disabled>
+                    status
+                  </option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+                    <button
+    className="border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition flex items-center gap-1"
+    onClick={clearFilters}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+    Clear Filters
+  </button>
               </div>
+            {/* </div> */}
+
+
           </div>
 
           <div className="border h-[80%] mt-2">
             <div className="overflow-x-auto overflow-y-auto whitespace-nowrap  p-3">
               <EmployeeTable
-               employeesdata={employeesData}
-               handleEdit={handleEdit}
-               fetchEmployeeData={fetchEmployeeData}
-               handleView={handleView}
-                />
+                employeesdata={employeesData}
+                handleEdit={handleEdit}
+                fetchEmployeeData={fetchEmployeeData}
+                handleView={handleView}
+                loading={loading}
+              />
               <EmployeeView
-              showEmployeeData={showEmployeeData}
-              employeeData={viewEmployeeData}
-              setVisible = {setViewEmployeeData}
+                showEmployeeData={showEmployeeData}
+                employeeData={viewEmployeeData}
+                setVisible={setViewEmployeeData}
               />
             </div>
           </div>
@@ -478,12 +488,12 @@ function EmployeeList() {
           <div className="flex justify-end items-center gap-4 mt-2 mb-3">
             <CommonPagination
               count={EmployeeResponse?.totalPages}
-  page={paginationParams.currentPage}
-  onChange={handlePageChange1}
-  onLimitChange={handleLimitChange1}
-  limit={paginationParams.pageSize}
+              page={paginationParams.currentPage}
+              onChange={handlePageChange1}
+              onLimitChange={handleLimitChange1}
+              limit={paginationParams.pageSize}
 
-              />
+            />
           </div>
         </div>
         <div>

@@ -51,11 +51,13 @@ console.log("upsval",data)
 //7.2 Width of the board (along glue lines)= (Box Depth +Box Width) + Trimming Tolerance Width (default 20)
 console.log("board width",widthBoardSize)
   const totalBoardSize = lengthBoardSize * widthBoardSize;
+  const deckleSizeVal=widthBoardSize*upsval;
   if (widthBoardSize * upsval < deckleSize) {
     return {
       length_board_size_cm2: lengthBoardSize.toFixed(2),
       width_board_size_cm2: widthBoardSize.toFixed(2),
       board_size_cm2: totalBoardSize.toFixed(2),
+      deckle_size:deckleSizeVal.toFixed(2),
       ups: upsval.toFixed(),
       error: `Deckle size should be less than or equal to (${(widthBoardSize * upsval).toFixed(2)})`,
     };
@@ -65,6 +67,7 @@ console.log("board width",widthBoardSize)
     length_board_size_cm2: lengthBoardSize.toFixed(2),
     width_board_size_cm2: widthBoardSize.toFixed(2),
     board_size_cm2: totalBoardSize.toFixed(2),
+    deckle_size:deckleSizeVal.toFixed(2),
     ups: upsval.toFixed(),
     error: "", // No error
   };

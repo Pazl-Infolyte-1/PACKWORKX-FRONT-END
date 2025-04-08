@@ -6,6 +6,7 @@ import ActionButton from '../../../components/New/ActionButton'
 import SearchBar from '../../../components/New/SearchBar'
 import apiMethods from '../../../api/config'
 import { useSearch } from '../../../components/New/SearchContext'
+import CustomAlert from '../../../components/New/CustomAlert'
 
 function Packages() {
   const [data, setData] = useState([])
@@ -17,6 +18,7 @@ function Packages() {
   const searchBarRef = useRef(null)
   const [loading, setLoading] = useState(true)
   const [showPopUp, setShowPopUp] = useState(null)
+  const [alerts, setAlerts] = useState([])
   const [pagination, setPagination] = useState({
     page: 1,
     totalPages: 1,
@@ -117,18 +119,34 @@ function Packages() {
       }
 
       if (isEdit && selectedPackage) {
-        await apiMethods.UpdatePacakges(selectedPackage.id, payload)
+        const response = await apiMethods.UpdatePacakges(selectedPackage.id, payload)
+        if (response.status === 200) {
+          setAlerts([{ severity: 'success', message: 'Package updated successfully!' }])
+          fetchData()
+          setDrawerOpen(false)
+          setFormData(defaultFormData)
+          setIsEdit(false)
+          setSelectedPackage(null)
+        } else {
+          setAlerts([{ severity: 'error', message: 'Something went wrong' }])
+        }
       } else {
-        await apiMethods.AddPacakges(payload)
+        const response = await apiMethods.AddPacakges(payload)
+        if (response.status === 201) {
+          setAlerts([{ severity: 'success', message: 'Package added successfully!' }])
+          fetchData()
+          setDrawerOpen(false)
+          setFormData(defaultFormData)
+          setIsEdit(false)
+          setSelectedPackage(null)
+        }
+        else {
+          setAlerts([{ severity: 'error', message: 'Something went wrong' }])
+        }
       }
-
-      fetchData()
-      setDrawerOpen(false)
-      setFormData(defaultFormData)
-      setIsEdit(false)
-      setSelectedPackage(null)
     } catch (error) {
       console.error(error)
+      setAlerts([{ severity: 'error', message: 'Something went wrong' }])
     }
   }
 
@@ -139,8 +157,11 @@ function Packages() {
     setSelectedPackage(null)
   }
 
+  const handleClose = () => setAlerts([])
+
   return (
     <div>
+      <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className="w-full h-[40px]">
         <div className="flex justify-between items-center">
           <h4>Packages</h4>
@@ -166,6 +187,8 @@ function Packages() {
               loading={loading}
               showPopUp={showPopUp}
               setShowPopUp={setShowPopUp}
+              alerts={alerts}
+              setAlerts={setAlerts}
             />
           </div>
         </div>

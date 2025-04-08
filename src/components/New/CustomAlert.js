@@ -1,6 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const CustomAlert = ({ alerts, handleClose }) => {
+  
+  useEffect(() => {
+    if (alerts.length > 0) {
+      const timer = setTimeout(() => {
+        handleClose();
+      }, 2000);
+
+      return () => clearTimeout(timer); 
+    }
+  }, [alerts]);
+
   return (
     <div className="fixed top-20 right-4 z-[9999] space-y-2">
       {alerts.map((alert, index) => (

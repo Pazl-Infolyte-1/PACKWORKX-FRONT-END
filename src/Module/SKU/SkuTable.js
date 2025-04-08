@@ -12,8 +12,9 @@ import apiMethods from '../../api/config'
 import SkuDetails from './SkuDetails'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
+import CustomAlert from '../../components/New/CustomAlert'
 
-function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
+function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAlerts }) {
   const [showPopUp, setShowPopUp] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
 
@@ -21,6 +22,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
     await apiMethods.deleteSku(id)
     setDeleteModal(false)
     setSkuData((prevTypes) => prevTypes.filter((type) => type.id !== id))
+    setAlerts([{ severity: 'success', message: 'Sku deleted successfully!' }])
   }
 
   const closeDeleteModal = () => {
@@ -41,8 +43,13 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
     })
   }
 
+  const handleClose = () => {
+    setAlerts([]);
+  };
+
   return (
     <div className="h-[300px] overflow-y-auto border border-gray-200 custom-scrollbar">
+      <CustomAlert alerts={alerts} handleClose={handleClose}/>
       <CTable striped hover className="w-full m-0">
         <CTableHead className="bg-gray-100 sticky top-0 z-10">
           <CTableRow className="text-center">

@@ -9,7 +9,6 @@ import { cilCloudDownload,cilLayers,cilPuzzle,cilSpeedometer } from '@coreui/ico
  
  
 export const AppSideBarNew = ({ giveAccess }) => {
-  console.log("datas////",giveAccess)
   const [expandedModules,setExpandedModules] = useState({})
  
   const toggleGroup = (moduleId) => {

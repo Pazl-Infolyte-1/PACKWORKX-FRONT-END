@@ -37,8 +37,6 @@ const AppSidebar = () => {
       try {
         const response = await apiMethods.getSideBarMenu()
 
-        console.log('API Response:',response)
-
         if (response && response.data) {
           // Create a new array reference to ensure state update
           //setCombinedNavigation([...staticMenuItems, ...response.data])

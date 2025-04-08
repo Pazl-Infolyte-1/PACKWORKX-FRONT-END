@@ -31,8 +31,6 @@ function RSCBox({
   : null;
   const [unitTooltip, setUnitTooltip] = useState("Enter Millimeter");
 
-console.log("show client obj", locationvalue);
-console.log("show client if", JSON.stringify(filteredClient));
 
 const calculateBoardSize = (data) => {
   const length = parseFloat(data.length) || 0;

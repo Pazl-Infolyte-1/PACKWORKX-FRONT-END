@@ -30,7 +30,6 @@ function SkuAddEdit({
   editedSkudata
 }) {
 
-  console.log("location sku add",locationvalue)
   const { user } = useContext(AuthContext)
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)

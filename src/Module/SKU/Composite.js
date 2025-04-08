@@ -2,42 +2,142 @@ import Input from '../../components/New/Input'
 import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
 import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash } from '@coreui/icons'
-import { useState } from 'react';
-
+import { useEffect, useState } from 'react';
+import apiMethods from '../../api/config';
+import { IoTrash } from "react-icons/io5";
+import React from 'react';
+import ActionButton from '../../components/New/ActionButton';
 const compositeTypes = [
-	{ id: 1, name: "Type 1" },
-	{ id: 2, name: "Type 2" },
+	{ id: "1", name: "Partition" },
+	{ id: "2", name: "Panel" },
   ];
+  
 
   const skuTypes = [
 	{ id: 1, name: "Charger" },
 	{ id: 2, name: "Laptop" },
   ];
-function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData, updateSkuValues}) {
-	const [partRows, setPartRows] = useState([]);
+function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData,editedSkudata,
+	 updateSkuValues}) {
 
-	const handleChangecompositeTypes = (e) => {
-		const { name, value } = e.target;
-		const updated = { ...addNewSkuData, [name]: value };
-	
-		setAddNewSkuData(updated);
-	
-		// If user updates no_of_parts, regenerate table rows
-		if (name === 'no_of_parts') {
-		  const count = parseInt(value, 10) || 0;
-		  const rows = Array.from({ length: count }, (_, i) => ({
-			part_sku: '',
-			part_ratio: '',
-		  }));
-		  setPartRows(rows);
-		}
-	  };
-	  // Handle table row input changes
-	  const handleRowChange = (index, field, value) => {
-		const updatedRows = [...partRows];
-		updatedRows[index][field] = value;
-		setPartRows(updatedRows);
-	  };
+		console.log("edit data",JSON.stringify(addNewSkuData.part_value))
+    console.log("part count",JSON.stringify(addNewSkuData.part_count))
+		console.log("edit addNewSkuData",JSON.stringify(addNewSkuData))
+
+
+
+	const [skuFields, setSkuFields] = useState([]);
+	const [skuList, setSkuList] = useState([]);
+  const [skuDropdown, setSkuDropdown] = useState([]);
+
+  const handleCompositeTypeChange = (e) => {
+    const selectedType = e.target.value;
+    console.log("Selected Type:", selectedType);
+  
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      composite_type: selectedType,
+    }));
+  };
+  
+  const fetchSkuList = async () => {
+    try {
+      const response = await apiMethods.getSkuListOptions();
+      setSkuList(response.data); // Assuming data is inside 'data'
+      console.log("composite datas",response.data)
+    } catch (error) {
+      console.error("Failed to fetch SKU list:", error);
+    }
+    };
+  
+	    useEffect(() => {
+
+		  fetchSkuList();
+		}, []);
+
+		const handleAddSkuField = () => {
+			setSkuFields((prev) => [...prev, { id: '', ratio: '', key: Date.now() }]);
+		  };
+		  
+      const handleChangeSkuSelect = (index, value) => {
+        setSkuFields((prev) => {
+          const updatedFields = [...prev];
+          const matchedSku = skuList.find(sku => sku.id === value); // Find the SKU based on the selected value
+      
+          // Update the specific field at the given index
+          updatedFields[index] = {
+            ...updatedFields[index], // Keep the existing properties
+            id: value, // Update the id with the selected value
+            sku_name: matchedSku ? matchedSku.sku_name : '', // Update sku_name based on selection
+            ratio: matchedSku ? matchedSku.ratio : '', // Optionally update ratio if needed
+          };
+      
+          return updatedFields; // Return the updated fields
+        });
+      };
+      const handleChangeRatio = (index, value) => {
+        const updated = [...skuFields];
+        updated[index].ratio = parseFloat(value); // Ensure it's a number
+        setSkuFields(updated);
+      };
+      
+		  const handleRemoveSkuField = (key) => {
+			setSkuFields((prev) => prev.filter((field) => field.key !== key));
+		  };
+		  
+		  useEffect(() => {
+			const part_value = skuFields
+			  .filter((field) => field.id !== "")
+			  .map((field) => {
+				const selectedSku = skuList.find(
+				  (sku) => sku.id === parseInt(field.id)
+				);
+				return {
+				  sku_id: selectedSku?.id,
+				  sku_name: selectedSku?.sku_name,
+				  ratio: field.ratio,
+				};
+			  });
+		  
+  console.log("part_value length:", part_value.length);
+			setAddNewSkuData((prev) => ({
+			  ...prev,
+			  part_value,
+			  part_count: part_value.length,
+			}));
+		  }, [skuFields, skuList]);
+		  
+
+      useEffect(() => {
+        if (addNewSkuData?.part_value?.length > 0) {
+          const fetchSkuList = async () => {
+            try {
+              const response = await apiMethods.getSkuListOptions();
+              const skuData = response.data;
+              setSkuDropdown(skuData);
+              console.log("edit filter datas", skuData);
+      
+              // Now process after data is fetched
+              const newSkuFields = addNewSkuData.part_value.map((part) => {
+                const matchedSku = skuData.find(sku => sku.id === part.sku_id);
+                return {
+                  id: matchedSku ? matchedSku.id : '',
+                  sku_name: matchedSku ? matchedSku.sku_name : '',
+                  ratio: part.ratio,
+                  key: Date.now() + Math.random(),
+                };
+              });
+      
+              setSkuFields((prev) => [...prev, ...newSkuFields]);
+            } catch (error) {
+              console.error("Failed to fetch SKU list:", error);
+            }
+          };
+      
+          fetchSkuList();
+        }
+      }, []);
+      
   return (
 	<>
 	  <div className="grid grid-cols-3 gap-4">
@@ -48,7 +148,7 @@ function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
 			  className="p-2 my-2 h-10 border border-gray-300 rounded cursor-pointer flex justify-between items-center"
 			  onClick={() => setIsOpen((prev) => !prev)}
 			>
-			  <span>{addNewSkuData.sku_type || 'Select Type'}</span>
+			  <span>{addNewSkuData?.sku_type || 'Select Type'}</span>
 			  <BsChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
 			</div>
 
@@ -91,335 +191,209 @@ function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
 		  skuName="SKU Name"
 		  id="sku_name"
 		  name="sku_name"
-		  value={addNewSkuData.sku_name}
+		  value={addNewSkuData?.sku_name}
 		  onChange={handleChange}
 		  placeholder="SKU Name"
 		/>
-
-		<div>
-		  <label className="block text-[16px] font-medium mb-2">Ply</label>
-		  <select
-			name="ply"
-			id="ply"
-			value={addNewSkuData.ply}
-			onChange={(e) => {
-			  const selectedPly = Number(e.target.value)
-			  updateSkuValues(selectedPly)
-			}}
-			className="w-full p-2 shadow-md border-l-2 rounded-md"
-		  >
-			<option value="" hidden>
-			  Select Number of Layers
-			</option>
-			<option value={2}>2 Ply</option>
-			<option value={3}>3 Ply</option>
-			<option value={5}>5 Ply</option>
-			<option value={7}>7 Ply</option>
-			<option value={9}>9 Ply</option>
-		  </select>
-		</div>
-
-		<div>
-		  <label className="block text-[16px] font-medium mb-2">Client Name</label>
-		  <select
-			name="client"
-			id="client"
-			disabled={clientDiasble}
-			value={addNewSkuData.client || ''}
-			onChange={handleChange}
-			className="w-full p-2 shadow-md border-l-2 rounded-md"
-		  >
-			<option value="" hidden>
-			  Select Client
-			</option>
-			{client?.map((item, index) => (
-			  <option key={index} value={item.display_name}>
-				{item.display_name}
-			  </option>
-			))}
-		  </select>
-		</div>
-
-		<div>
-		  {/*<Input
-			skuName="Joints"
-			id="joints"
-			name="joints"
-			value={addNewSkuData.joints}
-			onChange={handleChange}
-			placeholder="joints"
-		  />*/}
-
-		  <Input
-			skuName="UPS"
-			id="ups"
-			name="ups"
-			value={addNewSkuData.ups}
-			onChange={handleChange}
-			placeholder="ups"
-		  />
- 
-{/*<Input
-			skuName="Select Dies"
-			id="dies"
-			name="dies"
-			value={addNewSkuData.dies}
-			onChange={handleChange}
-			placeholder="Select Dies"
-		  />*/}
-		</div>
-
-		<div>
-		<div>
-		  <label className="block text-[16px] font-medium mb-2">Select Dies</label>
-		  <select
-			name="select_dies"
-			id="select_dies"
-			//disabled={clientDiasble}
-			value={addNewSkuData.select_dies || ''}
-			onChange={handleChange}
-			className="w-full p-2 shadow-md border-l-2 rounded-md"
-		  >
-		   {["Die 1", "Die 2"].map((die, index) => (
-	  <option key={index} value={die}>
-		{die}
-	  </option>
-	))}
-		  </select>
-		</div>
-		  {/*<Input
-			skuName="Flap Width"
-			id="flap_width"
-			name="flap_width"
-			value={addNewSkuData.flap_width}
-			onChange={handleChange}
-			placeholder="flap width"
-		  />
-
-		  <Input
-			skuName="Flap Tolerance"
-			id="flap_tolerance"
-			name="flap_tolerance"
-			value={addNewSkuData.flap_tolerance}
-			onChange={handleChange}
-			placeholder="flap tolerance"
-		  />*/}
-		</div>
-
-		{/*<div>
-		  <label className="block text-[16px] font-medium mb-2">Trimming Tolerance</label>
-		  <select
-			name="length_trimming_tolerance"
-			id="length_trimming_tolerance"
-			value={addNewSkuData.length_trimming_tolerance}
-			onChange={handleChange}
-			className="w-full p-2 shadow-md border-l-2 rounded-md"
-		  >
-			<option hidden>Select</option>
-			<option>0.2</option>
-			<option>0.1</option>
-		  </select>
-		</div>*/}
-
-		{/* <div className="mb-4">
-		  <label className="block text-[16px] font-medium mb-2">Width Trimming Tolerance</label>
-		  <select
-			name="width_trimming_tolerance"
-			id="width_trimming_tolerance"
-			value={addNewSkuData.width_trimming_tolerance}
-			onChange={handleChange}
-			className="w-full p-2 shadow-md border-l-2 rounded-md"
-		  >
-			<option>0.2</option>
-			<option>0.1</option>
-		  </select>
-		</div> */}
-	  </div>
-
-	  <div className="grid grid-cols-3 gap-4">
-		<Input
-		  skuName="Customer Reference"
-		  id="customer_reference"
-		  name="customer_reference"
-		  value={addNewSkuData.customer_reference}
-		  onChange={handleChange}
-		  placeholder="customer reference"
-		/>
-
-		<Input
-		  skuName="Reference #"
-		  id="reference_number"
-		  name="reference_number"
-		  value={addNewSkuData.reference_number}
-		  onChange={handleChange}
-		  placeholder="reference number"
-		/>
-
-		<Input
-		  skuName="Internal ID"
-		  id="internal_id"
-		  name="internal_id"
-		  value={addNewSkuData.internal_id}
-		  onChange={handleChange}
-		  placeholder="internal id"
-		/>
-
-		<Input
-		  skuName="Board Size (cm²)"
-		  id="board_size_cm2"
-		  name="board_size_cm2"
-		  value={addNewSkuData.board_size_cm2}
-		  onChange={handleChange}
-		  placeholder="board size"
-		/>
-
-		<Input
-		  skuName="Deckle Size"
-		  id="deckle_size"
-		  name="deckle_size"
-		  value={addNewSkuData.deckle_size}
-		  onChange={handleChange}
-		  placeholder="deckle size"
-		/>
-
-		<Input
-		  skuName="Minimum Order Level"
-		  id="minimum_order_level"
-		  name="minimum_order_level"
-		  type="number"
-		  value={addNewSkuData.minimum_order_level}
-		  onChange={handleChange}
-		  placeholder="minimum order level"
-		/>
-	  </div>
-
-	  <div className="grid grid-cols-3 gap-4">
-      <div>
-        <label className="block text-[16px] font-medium mb-2">Composite Type</label>
-        <select
-          name="composite_type"
-          id="composite_type"
-          value={addNewSkuData.composite_type}
-          onChange={handleChangecompositeTypes}
-          className="w-full p-2 shadow-md border-l-2 rounded-md"
-        >
-          <option value="" disabled>Select Type</option>
-          {compositeTypes.map((type) => (
-            <option key={type.id} value={type.id}>
-              {type.name}
+		  <div>
+          <label className="block text-[16px] font-medium mb-2">Client Name</label>
+          <select
+            name="client"
+            id="client"
+            disabled={clientDiasble}
+            value={addNewSkuData?.client || ''}
+            onChange={handleChange}
+            className="w-full p-2 shadow-md border-l-2 rounded-md"
+          >
+            <option value="" hidden>
+              Select Client
             </option>
-          ))}
-        </select>
-      </div>
-
-      {addNewSkuData.composite_type === '2' && (
-    <Input
-	skuName="No of Parts"
-	id="no_of_parts"
-	name="no_of_parts"
-	type="number"
-	value={addNewSkuData.no_of_parts}
-	onChange={handleChangecompositeTypes}
-	placeholder="No of Parts"
-  />
-      )}
-    </div>
-	  
-  {/* Table for SKU and Ratio */}
-  {addNewSkuData.composite_type === "2" && partRows.length > 0 && (
-        <table className="w-[60%] border border-gray-300 mt-4">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2 text-left">SKU</th>
-              <th className="border px-4 py-2 text-left">Ratio</th>
-            </tr>
-          </thead>
-          <tbody>
-            {partRows.map((row, index) => (
-              <tr key={index}>
-                <td className="border px-4 py-2">
-                  <select
-                    value={row.part_sku}
-                    onChange={(e) => handleRowChange(index, "part_sku", e.target.value)}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="">Select SKU</option>
-                    {skuTypes.map((sku) => (
-                      <option key={sku.id} value={sku.id}>
-                        {sku.name}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-				<td className="border px-4 py-2">
-					
-				<div className="w-[380px] h-10 shadow-md border-l-2 rounded-md -my-2 flex items-center">
-
-    <input
-      type="number"
-      placeholder="Length"
-      value={row.ratio?.length || ''}
-      onChange={(e) =>
-        handleRowChange(index, 'ratio', {
-          ...row.ratio,
-          length: e.target.value,
-        })
-      }
-      className="w-1/4 p-1 text-center focus:outline-none"
-    />
-    x
-    <input
-      type="number"
-      placeholder="Width"
-      value={row.ratio?.width || ''}
-      onChange={(e) =>
-        handleRowChange(index, 'ratio', {
-          ...row.ratio,
-          width: e.target.value,
-        })
-      }
-      className="w-1/4 p-1 text-center focus:outline-none"
-    />
-    x
-    <input
-      type="number"
-      placeholder="Height"
-      value={row.ratio?.height || ''}
-      onChange={(e) =>
-        handleRowChange(index, 'ratio', {
-          ...row.ratio,
-          height: e.target.value,
-        })
-      }
-      className="w-1/4 p-1 text-center focus:outline-none"
-    />
-    <div className="w-1/4 flex justify-end relative">
-      <select
-        value={row.ratio?.unit || 'mm'}
-        onChange={(e) =>
-          handleRowChange(index, 'ratio', {
-            ...row.ratio,
-            unit: e.target.value,
-          })
-        }
-        className="w-3/4 appearance-none bg-blue-500 text-white py-2 px-3 rounded-r-md focus:outline-none"
-        title="Select unit of measurement"
-      >
-        <option value="mm" className="bg-white text-black">mm</option>
-        <option value="in" className="bg-white text-black">in</option>
-      </select>
-      <div className="pointer-events-none absolute inset-y-1 right-0 flex items-center px-2 text-black">
-        <CIcon icon={cilChevronCircleDownAlt} size="small" className="text-white" />
-      </div>
-    </div>
-  </div>
-</td>
-
-              </tr>
+            {client?.map((item, index) => (
+              <option key={index} value={item.display_name}>
+                {item.display_name}
+              </option>
             ))}
-          </tbody>
-        </table>
-      )}
+          </select>
+        </div>
+
+		<div>
+          <label className="block text-[16px] font-medium mb-2">Ply</label>
+          <select
+            name="ply"
+            id="ply"
+            value={addNewSkuData?.ply}
+            onChange={(e) => {
+              const selectedPly = Number(e.target.value)
+              updateSkuValues(selectedPly)
+            }}
+            className="w-full p-2 shadow-md border-l-2 rounded-md"
+          >
+            <option value="" hidden>
+              Select Number of Layers
+            </option>
+            <option value={2}>2 Ply</option>
+            <option value={3}>3 Ply</option>
+            <option value={5}>5 Ply</option>
+            <option value={7}>7 Ply</option>
+            <option value={9}>9 Ply</option>
+          </select>
+        </div>
+
+        <div>
+  <label className="block text-[16px] font-medium mb-2">Partition Panel</label>
+  <select
+    name="composite_type"
+    id="composite_type"
+    value={addNewSkuData?.composite_type}
+    className="w-full p-2 shadow-md border-l-2 rounded-md"
+    onChange={handleCompositeTypeChange}
+  >
+    <option value="" disabled>Select Type</option>
+    <option value="Partition">Partition</option>
+    <option value="Panel">Panel</option>
+  </select>
+</div>
+
+
+
+
+{/*
+<div className="w-[380px] h-10 shadow-md border-l-2 rounded-md -my-2 flex items-center">
+
+<input
+  type="ratio1"
+  placeholder="ratio1"
+  value={""}
+  className="w-1/4 p-1 text-center focus:outline-none"
+/>
+x
+<input
+  type="ratio2"
+  placeholder="ratio2"
+  value={""}
+  className="w-1/4 p-1 text-center focus:outline-none"
+/>
+x
+<input
+  type="ratio3"
+  placeholder="ratio3"
+  value={""}
+  className="w-1/4 p-1 text-center focus:outline-none"
+/>
+</div>*/}
+
+</div>
+{addNewSkuData?.composite_type && (
+<ActionButton
+label={" + Add "}
+onClick={handleAddSkuField}
+variant='add'
+className='mt-4 mb-4'
+/>
+)}
+  {skuFields.length > 0 && (
+<h2 className="text-sm font-medium text-gray-700 mb-1">Select SKU</h2>)}
+<div className="mt-2 w-full overflow-auto">
+    {skuFields.length > 0 && (
+      <div className="mt-4 flex flex-wrap gap-4 min-w-[900px]">
+        {skuFields.map((field, index) => (
+          <div
+            key={field.key}
+            className="relative p-2 w-[180px] border border-gray-200 rounded-md bg-white shadow-sm"
+          >
+            <button
+              type="button"
+              onClick={() => handleRemoveSkuField(field.key)}
+              className="absolute top-1 right-1 text-gray-500 hover:text-red-600"
+              title="Remove"
+            >
+              <IoTrash size={16} />
+            </button>
+
+            <label className="block text-gray-800 font-medium text-sm mb-1">
+              SKU {index + 1}
+            </label>
+            <select
+              className="w-full h-[30px] px-1 border border-gray-300 text-sm rounded-md bg-white text-black outline-none"
+              value={field.id} // This will show the default selected SKU id
+              onChange={(e) => handleChangeSkuSelect(index, e.target.value)}
+            >
+           {addNewSkuData.part_value.length === 0 &&( <option value="" disabled>
+                Select SKU
+              </option>)} 
+              {skuList.map((sku) => (
+                <option key={sku.id} value={sku.id}>
+                  {sku.sku_name} {/* Display SKU name */}
+                </option>
+              ))}
+            </select>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+{skuFields.length > 0 && (
+<h2 className="text-sm font-medium text-gray-700 mt-4 mb-1">Ratio</h2>)}
+
+{/* Ratio Input Fields at Bottom */}
+{skuFields.length > 0 && (
+  <div className="mt-6 flex flex-wrap items-center gap-2">
+    {skuFields.map((field, index) => (
+      <React.Fragment key={field.key}>
+        <input
+          type="number"
+          placeholder={`ratio${index + 1}`}
+          value={field.ratio ?? ''} // Ensure it doesn't break on undefined/null
+          onChange={(e) => handleChangeRatio(index, e.target.value)}
+          className="w-[80px] p-1 text-center focus:outline-none border border-gray-300 rounded"
+        />
+        {index < skuFields.length - 1 && (
+          <span className="mx-1 text-gray-600 text-sm">x</span>
+        )}
+      </React.Fragment>
+    ))}
+  </div>
+)}
+
+
+
+
+{/* Submit Button */}
+{/*{skuFields.length > 0 && (
+  <div className="mt-6">
+    <button
+      type="button"
+      onClick={handleSubmitSkuFields}
+      className="px-4 py-2 bg-green-600 text-white text-sm rounded-md shadow hover:bg-green-700 transition duration-200"
+    >
+      ✅ Submit Parts
+    </button>
+  </div>
+)}*/}
+		
+		{/*<div className="w-[380px] h-10 shadow-md border-l-2 rounded-md -my-2 flex items-center">
+
+<input
+  type="ratio"
+  placeholder="ratio1"
+  value={""}
+  className="w-1/4 p-1 text-center focus:outline-none"
+/>
+x
+<input
+  type="ratio2"
+  placeholder="ratio2"
+  value={""}
+  className="w-1/4 p-1 text-center focus:outline-none"
+/>
+x
+<input
+  type="ratio3"
+  placeholder="ratio3"
+  value={""}
+  className="w-1/4 p-1 text-center focus:outline-none"
+/>
+</div>*/}
 	</>
   )
 }

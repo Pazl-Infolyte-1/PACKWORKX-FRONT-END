@@ -40,7 +40,7 @@ function SkuList() {
   const { searchQuery, setSearchQuery, filteredSearchData } = useSearch()
   const location = useLocation()
   const searchBarRef = useRef(null)
-
+  const [boardSizeError, setBoardSizeError] = useState("");
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
     client_id: user?.id,
@@ -58,10 +58,10 @@ function SkuList() {
     inner_outer_dimension: null,
     flap_width: null,
     flap_tolerance: null,
-    length_trimming_tolerance: null,
+    length_trimming_tolerance: 20,
     width_board_size_cm2: null,
     length_board_size_cm2: null,
-    width_trimming_tolerance: null,
+    width_trimming_tolerance: 20,
     strict_adherence: strictAdherence,
     customer_reference: null,
     reference_number: null,
@@ -70,6 +70,8 @@ function SkuList() {
     deckle_size: null,
     minimum_order_level: null,
     sku_type: 'RSC box',
+    part_value:[],
+    part_count:null,
     sku_values: [
       {
         layer: null,
@@ -136,6 +138,13 @@ function SkuList() {
           setAlerts([{ severity: 'error', message: 'Something went wrong' }])
         }
       } else {
+        if (boardSizeError) {
+          console.warn("Blocked submission due to board size error:", boardSizeError);
+          setAlerts([{ severity: "error", message: boardSizeError}]);
+          return null; // 🔴 Stop submission
+        }
+        setAlerts([]);
+        console.log("boardsize",boardSizeError)
         const response = await apiMethods.addSku(addNewSkuData)
         if (response?.status === 200) {
           setDrawerOpen(false)
@@ -154,7 +163,7 @@ function SkuList() {
 
   const handleSkuEdit = (id) => {
     const selectedSku = skudata.find((sku) => sku.id === id)
-    console.log('selected sku', selectedSku)
+    console.log('selected sku', JSON.stringify(selectedSku))
     setEditTag(true)
     setEditedSkuData(selectedSku)
     setAddNewSkuData({
@@ -185,6 +194,8 @@ function SkuList() {
       deckle_size: selectedSku.deckle_size || '',
       minimum_order_level: selectedSku.minimum_order_level || '',
       sku_type: selectedSku.sku_type || '',
+      part_value: selectedSku.part_value || [],
+      part_count:selectedSku.part_count,
       sku_values: selectedSku.sku_values || [
         {
           layer: '',
@@ -261,6 +272,7 @@ function SkuList() {
 
   return (
     <div>
+       <CustomAlert alerts={alerts} handleClose={handleClose} />
       {/* Header */}
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className="flex items-center justify-between flex-wrap gap-x-2 -my-2">
@@ -450,7 +462,9 @@ function SkuList() {
           setSkuType={setSkuType}
           locationvalue={location?.state?.client_id}
           closedrawer={setDrawerOpen}
+          setBoardSizeError={setBoardSizeError}
           //onUnitChange={handleUnitChange}
+          editedSkudata={editedSkudata}
         />
       </Drawer>
     </div>

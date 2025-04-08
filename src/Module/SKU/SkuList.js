@@ -18,10 +18,8 @@ import SearchBar from '../../components/New/SearchBar'
 import { AuthContext } from '../../Context/AuthContext'
 import { useSearch } from '../../components/New/SearchContext'
 import CustomAlert from '../../components/New/CustomAlert'
-import CustomAlert from '../../components/New/CustomAlert'
 
 function SkuList() {
-  const [alerts, setAlerts] = useState([]);
   const [skuType, setSkuType] = useState([])
   const [client, setClient] = useState([])
   const [selectedClient, setSelectedClient] = useState('')

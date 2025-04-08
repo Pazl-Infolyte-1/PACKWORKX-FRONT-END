@@ -17,8 +17,10 @@ import ActionButton from '../../components/New/ActionButton'
 import SearchBar from '../../components/New/SearchBar'
 import { AuthContext } from '../../Context/AuthContext'
 import { useSearch } from '../../components/New/SearchContext'
+import CustomAlert from '../../components/New/CustomAlert'
 
 function SkuList() {
+  const [alerts, setAlerts] = useState([]);
   const [skuType, setSkuType] = useState([])
   const [client, setClient] = useState([])
   const [selectedClient, setSelectedClient] = useState('')
@@ -39,7 +41,7 @@ function SkuList() {
   const location = useLocation()
   console.log('location///', location?.state?.client_id)
   const searchBarRef = useRef(null)
-
+  const [boardSizeError, setBoardSizeError] = useState("");
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
     client_id: user?.id,
@@ -57,10 +59,10 @@ function SkuList() {
     inner_outer_dimension: null,
     flap_width: null,
     flap_tolerance: null,
-    length_trimming_tolerance: null,
+    length_trimming_tolerance: 20,
     width_board_size_cm2: null,
     length_board_size_cm2: null,
-    width_trimming_tolerance: null,
+    width_trimming_tolerance: 20,
     strict_adherence: strictAdherence,
     customer_reference: null,
     reference_number: null,
@@ -69,6 +71,8 @@ function SkuList() {
     deckle_size: null,
     minimum_order_level: null,
     sku_type: 'RSC box',
+    part_value:[],
+    part_count:null,
     sku_values: [
       {
         layer: null,
@@ -127,10 +131,18 @@ function SkuList() {
         //console.log("get sku datas",editedSkudata.sku_values)
         //console.log("edit sku datas",addNewSkuData.sku_values)
         //return null;
+     
         await apiMethods.updateSku(addNewSkuData)
         setEditTag(false)
         setRefresh((prev) => !prev)
       } else {
+        if (boardSizeError) {
+          console.warn("Blocked submission due to board size error:", boardSizeError);
+          setAlerts([{ severity: "error", message: boardSizeError}]);
+          return null; // 🔴 Stop submission
+        }
+        setAlerts([]);
+        console.log("boardsize",boardSizeError)
         await apiMethods.addSku(addNewSkuData)
         setDrawerOpen(false)
         setRefresh((prev) => !prev)
@@ -142,7 +154,7 @@ function SkuList() {
 
   const handleSkuEdit = (id) => {
     const selectedSku = skudata.find((sku) => sku.id === id)
-    console.log('selected sku', selectedSku)
+    console.log('selected sku', JSON.stringify(selectedSku))
     setEditTag(true)
     setEditedSkuData(selectedSku)
     setAddNewSkuData({
@@ -173,6 +185,8 @@ function SkuList() {
       deckle_size: selectedSku.deckle_size || '',
       minimum_order_level: selectedSku.minimum_order_level || '',
       sku_type: selectedSku.sku_type || '',
+      part_value: selectedSku.part_value || [],
+      part_count:selectedSku.part_count,
       sku_values: selectedSku.sku_values || [
         {
           layer: '',
@@ -245,9 +259,12 @@ function SkuList() {
       status: 'active',
     })
   }
-
+  const handleClose = () => {
+    setAlerts([]);
+  };
   return (
     <div>
+       <CustomAlert alerts={alerts} handleClose={handleClose} />
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-x-2 -my-2">
         <h1 className="sm:text-[32px] text-[#424242]">SKU</h1>
@@ -434,7 +451,9 @@ function SkuList() {
           setSkuType={setSkuType}
           locationvalue={location?.state?.client_id}
           closedrawer={setDrawerOpen}
+          setBoardSizeError={setBoardSizeError}
           //onUnitChange={handleUnitChange}
+          editedSkudata={editedSkudata}
         />
       </Drawer>
     </div>

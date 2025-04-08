@@ -25,7 +25,9 @@ function SkuAddEdit({
   refresh,
   locationvalue,
   onUnitChange,
-  closedrawer
+  closedrawer,
+  setBoardSizeError,
+  editedSkudata
 }) {
 
   console.log("location sku add",locationvalue)
@@ -36,6 +38,7 @@ function SkuAddEdit({
 
   const createInitialSkuData = () => ({
     sku_name: null,
+    composite_type:null,
     client_id: user.id,
     ply: null,
     client: null,
@@ -48,8 +51,8 @@ function SkuAddEdit({
     inner_outer_dimension: null,
     flap_width: null,
     flap_tolerance: null,
-    length_trimming_tolerance: null,
-    width_trimming_tolerance: null,
+    length_trimming_tolerance: 20,
+    width_trimming_tolerance: 20,
     width_board_size_cm2: null,
     length_board_size_cm2: null,
     strict_adherence: strictAdherence,
@@ -60,6 +63,8 @@ function SkuAddEdit({
     deckle_size: null,
     minimum_order_level: null,
     sku_type: 'RSC box',
+    part_value:[],
+    part_count:null,
     sku_values: [
       {
         layer: null,
@@ -208,6 +213,8 @@ function SkuAddEdit({
         updateSkuValues={updateSkuValues}
         locationvalue={locationvalue}
         //onUnitChange={handleUnitChange}
+        setBoardSizeError={setBoardSizeError}
+
       />
     ),
     //'Corrugated Sheet': (
@@ -241,7 +248,7 @@ function SkuAddEdit({
         updateSkuValues={updateSkuValues}
       />
     ),
-    'Composite\r\n': (
+    'Composite': (
       <Composite
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -254,6 +261,7 @@ function SkuAddEdit({
         skuType={skuType}
         setAddNewSkuData={setAddNewSkuData}
         updateSkuValues={updateSkuValues}
+        editedSkudata={editedSkudata}
       />
     ),
   }

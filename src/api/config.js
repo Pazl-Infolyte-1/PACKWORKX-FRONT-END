@@ -399,12 +399,8 @@ export const apiMethods = {
 
   updateSku: async (addNewSkuData) => {
     const { id,...dataWithoutId } = addNewSkuData
-    try {
       const response = await apiClient.put(`/sku-details/${addNewSkuData.id}`,dataWithoutId)
       return response
-    } catch (error) {
-      console.error(error)
-    }
   },
 
   deleteSku: async (id) => {

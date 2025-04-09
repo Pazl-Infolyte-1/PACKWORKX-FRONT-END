@@ -498,14 +498,13 @@ export const apiMethods = {
     }
   },
   createNewEmployee: async (employeeForm) => {
-    try {
+    // try {
       return await apiClient.post('/user/register',employeeForm)
-    } catch (error) {
-      console.error(error)
-    }
+    // } catch (error) {
+      // console.error(error)
+    // }
   },
   GetEmployeelist: async (params) => {
-    console.log(params)
     try {
       const response = await apiClient.get('/user/employees',{
         params: {
@@ -551,7 +550,7 @@ export const apiMethods = {
     try {
       return await apiClient.delete(`/user/employees/${id}`)
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   },
   editEmployee:async(id,body)=>{
@@ -560,14 +559,14 @@ export const apiMethods = {
       return await apiClient.put(`/user/employees/${id}`,body)
 
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   },
   getEmployeeData:async(id)=>{
     try {
       return await apiClient.get(`/user/employees/${id}`)
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   },
   getSkuListOptions: async () => {
@@ -626,6 +625,35 @@ export const apiMethods = {
       console.error(error)
     }
   },
+
+  getSalesOrderList: async (params = {}) => {
+    console.log(params,'fasdfa')
+    try {
+      return await apiClient.get('/sale-order', {
+        params: {
+          client: params.client || '',
+          sku: params.sku || '',
+          manufacture: params.manufacture || '',
+          sales_status: params.sales_status || '',
+          page: params.page || 1,
+          limit: params.limit || 25
+        }
+      })
+    } catch (error) {
+      console.error('Error fetching sales orders:', error.response?.data || error.message)
+      throw error
+    }
+  },
+
+  DeleteSalesOrder : async (id)=>{
+    const response = await apiClient.delete(`/sale-order/${id}`)
+    return response
+  },
+
+  getSaleOrderData: async (id) => {
+    const response = await apiClient.get(`/sale-order/${id}`)
+    return response
+  }
 
 }
 

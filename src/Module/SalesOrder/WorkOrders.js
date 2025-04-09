@@ -46,7 +46,6 @@ const WorkOrders = () => {
   const handleChange = (e) => {
     const selectedId = parseInt(e.target.value); // since option values are string
     const selectedSku = skuList.find((sku) => sku.id === selectedId);
-  
     console.log("Selected SKU ID:", selectedId);
     console.log("Selected SKU Data:", selectedSku);
   };
@@ -110,9 +109,9 @@ const WorkOrders = () => {
           + Create Workorders
         </button> */}
         <ActionButton
-        label={" + Create Workorders"}
-        onClick={addWorkOrder}
-        variant='minimal'
+          label={" + Create Workorders"}
+          onClick={addWorkOrder}
+          variant='add'
         />
       </div>
 
@@ -121,55 +120,57 @@ const WorkOrders = () => {
         {accordionCardSummary?.data?.map((item) => (
           <div
             key={item.id}
-            className="w-[1180px] bg-white rounded-[10px] shadow-[0px_5px_15px_rgba(0,0,0,0.25)] p-3 mb-5"
+            className="w-[1180px] rounded-[10px] border border-gray-700 p-3 mb-5"
           >
             {/* Accordion Header (Clickable) */}
             <div
-              className="h-[80px] w-full flex items-center cursor-pointer"
+              className="w-full   items-start flex flex-col justify-between cursor-pointer"
               onClick={() => toggleAccordion(item.id)}
             >
-              {/* Left Section - Work Order Details */}
-              <div>
-                <p className="text-[#030303] text-[15px] font-lato font-bold leading-[26px] text-justify">
-                  {item.title}
-                </p>
-                <table className="w-auto">
-                  <tbody>
-                    <tr>
-                      {item.details.map((detail, index) => (
-                        <td
-                          key={index}
-                          className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
-                        >
-                          {detail}
-                        </td>
-                      ))}
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              {/* Left Section - Title */}
+              <p className="text-[#030303] text-[15px] font-lato font-bold leading-[26px] text-justify">
+                {item.title}
+              </p>
 
-              {/* Right Section - Status Buttons (Pushed to Right) */}
-              <div className="ml-auto flex gap-3">
-                {item.buttons.map((button) => (
-                  <button
-                    key={button.id}
-                    className="cursor-pointer w-[120px] h-[22px] px-2 border-0 rounded-[6px] text-sm font-mulish font-bold leading-[22px] outline-none"
-                    style={{ backgroundColor: button.bgColor, color: button.textColor }}
-                  >
-                    {button.name}
-                  </button>
-                ))}
-                <svg
+              {/* Middle Section - Details aligned horizontally with buttons */}
+              <div className="flex items-center w-full flex-grow justify-between">
+                {/* Details */}
+                <div className="flex">
+                  {item.details.map((detail, index) => (
+                    <span
+                      key={index}
+                      className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
+                    >
+                      {detail}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Status Buttons */}
+                <div className="flex gap-3">
+                  {item.buttons.map((button) => (
+                    <button
+                      key={button.id}
+                      className="cursor-pointer w-[120px] h-[22px] px-2 border-0 rounded-[6px] text-sm font-mulish font-bold leading-[22px] outline-none"
+                      style={{ backgroundColor: button.bgColor, color: button.textColor }}
+                    >
+                      {button.name}
+                    </button>
+                  ))}
+                   <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
-                  className={`w-[40px] h-[30px] transition-transform duration-300 ${
-                    openAccordions[item.id] ? 'rotate-180' : ''
-                  } text-[#8167e5] fill-[#8167e5]`}
+                  className={`w-[40px] h-[30px] transition-transform duration-300 ${openAccordions[item.id] ? 'rotate-180' : ''
+                    } text-[#8167e5] fill-[#8167e5]`}
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
+                </div>
+               
               </div>
+
+              {/* Right Section - Arrow Icon */}
+
             </div>
 
             {/* Accordion Content (Visible when Open) */}
@@ -185,7 +186,7 @@ const WorkOrders = () => {
       {workOrders.length > 0 && (
         <div
           name="commonScrolldiv"
-          className="max-h-[600px] w-[1180px] overflow-y-auto rounded-md pb-4 shadow-[0px_5px_15px_rgba(0,0,0,0.25)]"
+          className="max-h-[600px] w-[1180px] overflow-y-auto rounded-md pb-4 border border-gray-700"
         >
           {workOrders.map((order, index) => (
             <div key={order.id} className="mt-4 rounded-md relative">
@@ -206,9 +207,9 @@ const WorkOrders = () => {
                     Download Work Order
                   </button> */}
                   <ActionButton
-                  label={"Download Work Order"} 
-                  variant='minimal'
-                />
+                    label={"Download Work Order"}
+                    variant='minimal'
+                  />
 
                   {workOrders.length > 0 && (
                     <TrashIcon
@@ -236,40 +237,36 @@ const WorkOrders = () => {
                 >
                   {/* Inhouse */}
                   <span
-                    className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${
-                      selectedOption === 'inhouse' ? 'text-white' : 'text-black'
-                    }`}
+                    className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${selectedOption === 'inhouse' ? 'text-white' : 'text-black'
+                      }`}
                   >
                     Inhouse
                   </span>
 
                   {/* Outsource */}
                   <span
-                    className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${
-                      selectedOption === 'outsource' ? 'text-white' : 'text-black'
-                    }`}
+                    className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${selectedOption === 'outsource' ? 'text-white' : 'text-black'
+                      }`}
                   >
                     OutSource
                   </span>
 
                   {/* Purchase Order */}
                   <span
-                    className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${
-                      selectedOption === 'purchaseOrder' ? 'text-white' : 'text-black'
-                    }`}
+                    className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${selectedOption === 'purchaseOrder' ? 'text-white' : 'text-black'
+                      }`}
                   >
                     Purchase Order
                   </span>
 
                   {/* Toggle Indicator */}
                   <div
-                    className={`absolute top-1/2 w-[33.33%] h-[80%] bg-[#8167E5] rounded-[10px] transform -translate-y-1/2 transition-all duration-300 ${
-                      selectedOption === 'inhouse'
+                    className={`absolute top-1/2 w-[33.33%] h-[80%] bg-[#8167E5] rounded-[10px] transform -translate-y-1/2 transition-all duration-300 ${selectedOption === 'inhouse'
                         ? 'left-0'
                         : selectedOption === 'outsource'
                           ? 'left-1/3'
                           : 'left-2/3'
-                    }`}
+                      }`}
                   ></div>
                 </div>
               </div>
@@ -279,23 +276,23 @@ const WorkOrders = () => {
               {openCreateAccordion.includes(order.id) && (
                 <div className="mt-2 p-3 border-t border-gray-300">
                   <div className="w-full p-1 flex flex-row gap-4">
-                  <div className="p-2">
-      <label className="block text-gray-800 font-medium mb-1 ml-2">SKU</label>
-      <select
-        className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] text-sm rounded-md bg-white text-[#030303] outline-none ml-2"
-        defaultValue=""
-        onChange={handleChange}
-      >
-        <option value="" disabled>
-          Select SKU
-        </option>
-        {skuList.map((sku) => (
-          <option key={sku.id} value={sku.id}>
-            {sku.sku_name}
-          </option>
-        ))}
-      </select>
-    </div>
+                    <div className="p-2">
+                      <label className="block text-gray-800 font-medium mb-1 ml-2">SKU</label>
+                      <select
+                        className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] text-sm rounded-md bg-white text-[#030303] outline-none ml-2"
+                        defaultValue=""
+                        onChange={handleChange}
+                      >
+                        <option value="" disabled>
+                          Select SKU
+                        </option>
+                        {skuList.map((sku) => (
+                          <option key={sku.id} value={sku.id}>
+                            {sku.sku_name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
                     <div className="p-2 relative w-full">
                       <label className="block text-gray-800 font-medium mb-1 ml-2">
@@ -316,10 +313,10 @@ const WorkOrders = () => {
                           Version History
                         </button> */}
                         <ActionButton
-                  label={" Version History"} 
-                  variant='minimal'
-                  onClick={() => setVersionDrawerOpen(true)}
-                />
+                          label={" Version History"}
+                          variant='minimal'
+                          onClick={() => setVersionDrawerOpen(true)}
+                        />
                       </div>
                     </div>
                   </div>
@@ -395,19 +392,19 @@ const WorkOrders = () => {
           ))}
         </div>
       )}
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-4">
         {/* <button className="cursor-pointer mt-3 w-[149px] h-[46px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
           Submit Work Order
         </button> */}
         <ActionButton
           label={"Submit Work Order"}
           variant='minimal'
-        />        
+        />
       </div>
       <VersionsPopup
-          visible={isVersionDrawerOpen}
-          setVisible={() => setVersionDrawerOpen(false)}
-        />
+        visible={isVersionDrawerOpen}
+        setVisible={() => setVersionDrawerOpen(false)}
+      />
     </div>
   )
 }

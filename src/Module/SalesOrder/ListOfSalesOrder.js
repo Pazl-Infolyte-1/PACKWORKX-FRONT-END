@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import Drawer from '../../components/Drawer/Drawer'
 import CommonPagination from '../../components/New/Pagination'
@@ -9,41 +9,129 @@ import { useSearch } from '../../components/New/SearchContext'
 import SalesOrderTable from './SalesOrderTable'
 import SearchBar from '../../components/New/SearchBar'
 import ActionButton from '../../components/New/ActionButton'
+import apiMethods from '../../api/config'
+import ConfirmationModale from '../../components/New/ConfirmationModale'
+import CustomAlert from '../../components/New/CustomAlert'
+import SalesOrderView from './viewSalesOrder'
 
 function ListOfSalesOrder() {
   const [data, setData] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
   const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [confirmationBy, setConfirmationBy] = useState('email')
-  const [manufactureType, setManufactureType] = useState('inhouse')
-  const [filteredData, setFilteredData] = useState([])
-  const rowsPerPage = 4
-  const { filteredSearchData } = useSearch()
+  const [ApiResponse, setApiResponse] = useState([])
+  const [paginationParams, setPaginationParams] = useState({ currentPage: 1, pageSize: 10 });
+  const [isConfirmationModaleOpen, setIsConfirmationModaleOpen] = useState(false)
+  const [selectedSalesOrder, setSelectedSalesOrder] = useState("")
+  const [status, setStatus] = useState('')
+  const [alerts, setAlerts] = useState([])
+  const [viewSalesOrder, SetviewSalesOrder] = useState(false)
+  const [selectedSalesOrderData, SetselectedSalesOrderData] = useState([])
+  const [isEditMode, setIsEditMode] = useState(false)
+  const { searchQuery, filteredSearchData } = useSearch() ///need to verify
+
+  const searchBarRef = useRef(null)
+
+
+  const fetchData = async () => {
+    try {
+      const response = await apiMethods.getSalesOrderList({
+        page: paginationParams.currentPage,
+        limit: paginationParams.pageSize,
+        client: searchQuery,
+        sales_status: status
+      })
+      setData(response.data.data)
+      setApiResponse(response.data)
+      // setFilteredData(response.data.data)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
+  useEffect(() => {
+    fetchData()
+  }, [paginationParams])
+
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get('https://mocki.io/v1/2e78510f-3ba3-46f2-8fa2-2276ac1b864a')
-        setData(response.data.data)
-        setFilteredData(response.data.data)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-    fetchData()
-  }, [])
+    setPaginationParams(prev => ({
+      ...prev,
+      currentPage: 1 // Reset to page 1 whenever search query changes
+    })
+    );
+  }, [searchQuery, status])
 
-  // Pagination Logic
-  const indexOfLastRow = currentPage * rowsPerPage
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage
-  const currentRows = filteredData.slice(indexOfFirstRow, indexOfLastRow)
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage)
+
+  const handleLimitChange = (value) => {
+    setPaginationParams({ ...paginationParams, pageSize: value })
+  }
+
+  const handlePageChange = (event, newPage) => {
+    setPaginationParams(prev => ({
+      ...prev,
+      currentPage: newPage
+    }));
+  };
+
+  const handleDelete = (id) => {
+    setSelectedSalesOrder(id)
+    setIsConfirmationModaleOpen(true)
+  }
+
+  const OnDeleteConfirmation = async () => {
+    try {
+      const response = await apiMethods.DeleteSalesOrder(selectedSalesOrder)
+      if (response?.status === 200) {
+        fetchData()
+        setAlerts([{ severity: "success", message: "Sales Order Deletes Successfully" }]);
+
+        setIsConfirmationModaleOpen(false)
+
+      }
+    } catch (error) {
+      console.error('Error deleting sales order:', error)
+      setAlerts([{ severity: "error", message: error?.response?.data?.message || "Error deleting sales order" }]);
+    } finally {
+      setIsConfirmationModaleOpen(false)
+      setSelectedSalesOrder(null)
+    }
+  }
+
+  const handleView = async (id) => {
+    try {
+      const response = await apiMethods.getSaleOrderData(id)
+      SetselectedSalesOrderData(response?.data)
+      SetviewSalesOrder(true)
+    } catch (error) {
+      console.error('Error viewing sales order:', error)
+      setAlerts([{ severity: "error", message: error?.response?.data?.message || "Error viewing sales order" }]);
+    }
+  }
+
+  const handleEdit = (id) => {
+    setSelectedSalesOrder(id)
+    setIsEditMode(true)
+    setDrawerOpen(true)
+  }
+
+  const handleStatus = (e) => {
+    setStatus(e.target.value);
+  };
+  const handleClose = () => {
+    setAlerts([])
+  }
+
+  const clearFilters = () => {
+    setStatus('');
+    if (searchBarRef.current) {
+      searchBarRef.current.clearSearch();
+    }
+
+  };
 
   return (
     <div>
+      <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className="h-full w-full flex flex-col">
         {/* Header */}
         <div className="w-full h-[40px]">
@@ -56,12 +144,36 @@ function ListOfSalesOrder() {
 
         <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
           <div className="flex justify-between items-center">
-            <SearchBar text="sales order" data={data} />
+            <div className='flex gap-1 '>
+              <SearchBar text="sales order" data={data} ref={searchBarRef} />
+              <select
+                id="status-filter"
+                className="border border-[#e7e5e4] p-[6px] h-[35px] rounded-md"
+                defaultValue=""
+                value={status}
+                onChange={handleStatus}
+              >
+                <option value="" disabled>
+                  status
+                </option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+              </select>
+              <button
+                className="border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition flex items-center gap-1"
+                onClick={clearFilters}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Clear Filters
+              </button>
+            </div>
             <div className="flex justify-center items-center gap-2">
               <ActionButton
-              label={"Add Sales Order"}
-              onClick={() => setDrawerOpen(true)}
-              variant='add'
+                label={"Add Sales Order"}
+                onClick={() => setDrawerOpen(true)}
+                variant='add'
               />
             </div>
           </div>
@@ -69,18 +181,40 @@ function ListOfSalesOrder() {
             data={filteredSearchData.length ? filteredSearchData : data}
             setActionDrawerOpen={setActionDrawerOpen}
             setVersionDrawerOpen={setVersionDrawerOpen}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+            handleView={handleView}
+          />
+          <SalesOrderView
+            viewSalesOrder={viewSalesOrder}
+            SetviewSalesOrder={SetviewSalesOrder}
+            salesOrderData={selectedSalesOrderData}
           />
 
           <div className="flex justify-end items-center gap-4 mt-4">
-            <CommonPagination count={3} page={1} onChange={''} />
+            {console.log(ApiResponse.totalPages)}
+            <CommonPagination
+              count={ApiResponse?.totalPages}
+              page={paginationParams?.currentPage}
+              onChange={handlePageChange}
+              onLimitChange={handleLimitChange}
+              limit={paginationParams.pageSize}
+            />
           </div>
         </div>
 
         <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth="1280px">
-          <AddSalesOrder currentTab={'salesOrder'}></AddSalesOrder>
+          <AddSalesOrder currentTab={'salesOrder'} isEdit={isEditMode} selectedSalesOrderID={selectedSalesOrder} ></AddSalesOrder>
         </Drawer>
       </div>
       <div>
+        <ConfirmationModale
+          isOpen={isConfirmationModaleOpen}
+          title='Confirm Deletion'
+          message='Are you sure you want to delete this item?'
+          onClose={() => { setIsConfirmationModaleOpen(false) }}
+          onConfirm={OnDeleteConfirmation}
+        />
         <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} />
       </div>
       <div>

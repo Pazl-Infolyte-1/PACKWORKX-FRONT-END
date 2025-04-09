@@ -623,6 +623,14 @@ export const apiMethods = {
     }
   },
 
+  getWorkOrders: async (params) => {
+    try {
+      return await apiClient.get('/work-order', {params})
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
 }
 
 export default apiMethods

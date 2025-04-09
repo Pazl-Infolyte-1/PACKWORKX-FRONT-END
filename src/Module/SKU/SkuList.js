@@ -18,6 +18,7 @@ import SearchBar from '../../components/New/SearchBar'
 import { AuthContext } from '../../Context/AuthContext'
 import { useSearch } from '../../components/New/SearchContext'
 import CustomAlert from '../../components/New/CustomAlert'
+import createInitialSkuData from './CreateInitialSkuData'
 
 function SkuList() {
   const [skuType, setSkuType] = useState([])
@@ -40,7 +41,7 @@ function SkuList() {
   const { searchQuery, setSearchQuery, filteredSearchData } = useSearch()
   const location = useLocation()
   const searchBarRef = useRef(null)
-  const [boardSizeError, setBoardSizeError] = useState("");
+  const [boardSizeError, setBoardSizeError] = useState('')
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
     client_id: user?.id,
@@ -70,8 +71,8 @@ function SkuList() {
     deckle_size: null,
     minimum_order_level: null,
     sku_type: 'RSC box',
-    part_value:[],
-    part_count:null,
+    part_value: [],
+    part_count: null,
     sku_values: [
       {
         layer: null,
@@ -132,29 +133,35 @@ function SkuList() {
         if (response?.status === 200) {
           setEditTag(false)
           setRefresh((prev) => !prev)
-          setAlerts([{ severity: 'success', message: response.data.message || 'Sku updated successfully!' }])
+          setAlerts([
+            { severity: 'success', message: response.data.message || 'Sku updated successfully!' },
+          ])
         } else {
-          setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong'}])
+          setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong' }])
         }
       } else {
         if (boardSizeError) {
-          console.warn("Blocked submission due to board size error:", boardSizeError);
-          setAlerts([{ severity: "error", message: boardSizeError}]);
-          return null; // 🔴 Stop submission
+          console.warn('Blocked submission due to board size error:', boardSizeError)
+          setAlerts([{ severity: 'error', message: boardSizeError }])
+          return null // 🔴 Stop submission
         }
-        setAlerts([]);
+        setAlerts([])
         const response = await apiMethods.addSku(addNewSkuData)
         if (response?.status === 201) {
           setDrawerOpen(false)
           setRefresh((prev) => !prev)
           setAlerts([{ severity: 'success', message: 'Sku Added successfully!' }])
         } else {
-          setAlerts([{ severity: 'error', message: response.data.message || 'Something went wrong' }])
+          setAlerts([
+            { severity: 'error', message: response.data.message || 'Something went wrong' },
+          ])
         }
       }
     } catch (error) {
       console.error(error)
-      setAlerts([{ severity: 'error', message: error?.response?.data?.message|| 'Something went wrong' }])
+      setAlerts([
+        { severity: 'error', message: error?.response?.data?.message || 'Something went wrong' },
+      ])
     }
   }
 
@@ -191,7 +198,7 @@ function SkuList() {
       minimum_order_level: selectedSku.minimum_order_level || null,
       sku_type: selectedSku.sku_type || null,
       part_value: selectedSku.part_value || [],
-      part_count:selectedSku.part_count,
+      part_count: selectedSku.part_count,
       sku_values: selectedSku.sku_values || [
         {
           layer: null,
@@ -395,7 +402,6 @@ function SkuList() {
           />
         </div>
       </div>
-
       <div className="-my-6">
         <div className="overflow-x-auto overflow-y-auto whitespace-nowrap ">
           <SkuTable
@@ -440,7 +446,12 @@ function SkuList() {
         maxWidth="1280px"
         isOpen={isDrawerOpen || editTag}
         title={editTag ? 'Edit SKU Details' : 'Add SKU Details'}
-        onClose={() => (setDrawerOpen(false), setEditTag(false), setClientDisable(false))}
+        onClose={() => {
+          setDrawerOpen(false)
+          setEditTag(false)
+          setClientDisable(false)
+          setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
+        }}
       >
         <SkuAddEdit
           handleChange={handleChange}
@@ -460,6 +471,12 @@ function SkuList() {
           setBoardSizeError={setBoardSizeError}
           //onUnitChange={handleUnitChange}
           editedSkudata={editedSkudata}
+          handleClose={() => {
+            setDrawerOpen(false)
+            setEditTag(false)
+            setClientDisable(false)
+            setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
+          }}
         />
       </Drawer>
     </div>

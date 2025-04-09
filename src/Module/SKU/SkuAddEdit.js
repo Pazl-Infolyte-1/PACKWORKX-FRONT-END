@@ -24,20 +24,18 @@ function SkuAddEdit({
   clientDiasble,
   refresh,
   locationvalue,
-  onUnitChange,
-  closedrawer,
   setBoardSizeError,
-  editedSkudata
+  editedSkudata,
+  handleClose,
 }) {
-
   const { user } = useContext(AuthContext)
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
-  const [isSingleViewPopup, setisSingleViewPopup] = useState(false);
+  const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
 
   const createInitialSkuData = () => ({
     sku_name: null,
-    composite_type:null,
+    composite_type: null,
     client_id: user.id,
     ply: null,
     client: null,
@@ -62,8 +60,8 @@ function SkuAddEdit({
     deckle_size: null,
     minimum_order_level: null,
     sku_type: 'RSC box',
-    part_value:[],
-    part_count:null,
+    part_value: [],
+    part_count: null,
     sku_values: [
       {
         layer: null,
@@ -112,7 +110,7 @@ function SkuAddEdit({
     setIsOpen(false)
 
     const baseSkuData = {
-      ...createInitialSkuData(), 
+      ...createInitialSkuData(),
       client: addNewSkuData.client,
       sku_type: option.sku_type || option.value,
     }
@@ -120,14 +118,6 @@ function SkuAddEdit({
     setAddNewSkuData(baseSkuData)
   }
 
-  // const handleDeleteSkuType = async (id) => {
-  //   try {
-  //     await apiMethods.deleteSkuType(id)
-  //     setSkuType((prevTypes) => prevTypes.filter((type) => type.id !== id))
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }
 
   const handleSkuValuesChange = (index, field, value) => {
     setAddNewSkuData((prevData) => {
@@ -213,7 +203,6 @@ function SkuAddEdit({
         locationvalue={locationvalue}
         //onUnitChange={handleUnitChange}
         setBoardSizeError={setBoardSizeError}
-
       />
     ),
     //'Corrugated Sheet': (
@@ -264,18 +253,21 @@ function SkuAddEdit({
       />
     ),
   }
-  const openViewCard =(data)=>{
+  const openViewCard = (data) => {
     setisSingleViewPopup(true)
     console.log(JSON.stringify(data))
     setSingleDataId(data.id)
-  
   }
-  
+
   const handleCloseSingleViewPopup = () => {
-    setisSingleViewPopup(false);
-    //setSelectedClientId(null); // Reset client ID
-  };
-  
+    setisSingleViewPopup(false)
+  }
+
+  const handleCancel = () => {
+    setAddNewSkuData(createInitialSkuData())
+    handleClose()
+  }
+
   return (
     <div className="p-6 bg-white rounded-lg">
 
@@ -359,46 +351,28 @@ function SkuAddEdit({
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
-  <div className="relative w-full flex items-center">
-    <select
-      className="p-1 border rounded w-full pr-8 appearance-none" // Removed dropdown arrow
-      value={item.flute_type || 'Select'}
-      onChange={(e) => handleSkuValuesChange(index, 'flute_type', e.target.value)}
-    >
-      <option hidden>Select</option>
-      <option value="A">A</option>
-      <option value="B">B</option>
-      <option value="C">C</option>
-      <option value="E">E</option>
-      <option value="F,G,N">F,G,N</option>
-    </select>
-    {/* Eye icon positioned absolutely to the right */}
-    <FaEye className="absolute right-2 text-gray-500 cursor-pointer" onClick={openViewCard} />
-  </div>
-</td>
-{/*<td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <input
-                        type="text"
-                        className="p-1 border rounded text-center w-full"
-                        value={item.flute_ratio || ''}
-                        placeholder="flute ratio"
-                        onChange={(e) =>
-                          handleSkuValuesChange(index, 'flute_ratio', e.target.value)
-                        }
-                      />
-                    </td>*/}
-
-                    {/*<td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <input
-                        type="text"
-                        className="p-1 border rounded text-center w-full"
-                        value={item.flute_ratio || ''}
-                        placeholder="flute ratio"
-                        onChange={(e) =>
-                          handleSkuValuesChange(index, 'flute_ratio', e.target.value)
-                        }
-                      />
-                    </td>*/}
+                      <div className="relative w-full flex items-center">
+                        <select
+                          className="p-1 border rounded w-full pr-8 appearance-none" // Removed dropdown arrow
+                          value={item.flute_type || 'Select'}
+                          onChange={(e) =>
+                            handleSkuValuesChange(index, 'flute_type', e.target.value)
+                          }
+                        >
+                          <option hidden>Select</option>
+                          <option value="A">A</option>
+                          <option value="B">B</option>
+                          <option value="C">C</option>
+                          <option value="E">E</option>
+                          <option value="F,G,N">F,G,N</option>
+                        </select>
+                        {/* Eye icon positioned absolutely to the right */}
+                        <FaEye
+                          className="absolute right-2 text-gray-500 cursor-pointer"
+                          onClick={openViewCard}
+                        />
+                      </div>
+                    </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
                       <input
                         type="text"
@@ -423,16 +397,9 @@ function SkuAddEdit({
       )}
 
       <div className="flex justify-end space-x-4 mt-6">
-        {/*<ActionButton
-          label="Add Version"
-          variant="add"
-          className="bg-[#079b54] text-white px-4 py-2 rounded-md"
-        />*/}
-        {/*<ActionButton
-          label="Save As Draft"
-          className="bg-[#079b54] text-white px-4 py-2 rounded-md"
-        />*/}
-           <button className="p-2 border border-gray-300 rounded w-24" onClick={()=>closedrawer(false)}>Cancel</button>
+        <button className="p-2 border border-gray-300 rounded w-24" onClick={handleCancel}>
+          Cancel
+        </button>
         <ActionButton
           onClick={handleAddSkuSubmit}
           label={editTag ? 'Update' : 'Submit'}
@@ -441,13 +408,13 @@ function SkuAddEdit({
         />
       </div>
       <PopUp
-          visible={isSingleViewPopup}
-          setVisible={handleCloseSingleViewPopup} 
-          showCloseButton={true}
-          width={'70vw'}
-        >
+        visible={isSingleViewPopup}
+        setVisible={handleCloseSingleViewPopup}
+        showCloseButton={true}
+        width={'70vw'}
+      >
         <FluteTypeView></FluteTypeView>
-        </PopUp>
+      </PopUp>
     </div>
   )
 }

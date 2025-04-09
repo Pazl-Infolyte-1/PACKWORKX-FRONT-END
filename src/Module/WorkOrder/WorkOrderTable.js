@@ -10,8 +10,10 @@ import {
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
+import apiMethods from '../../api/config'
+import WorkOrderDetails from './WorkOrderDetails'
 
-const WorkOrderTable = ({ cellData }) => {
+const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp }) => {
   return (
     <div>
       <div className="h-[370px] overflow-y-auto border border-gray-200 custom-scrollbar">
@@ -20,6 +22,12 @@ const WorkOrderTable = ({ cellData }) => {
             <CTableRow>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Number
+              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+                SKU Name
+              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+                Manufacture
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Sales Order
@@ -34,16 +42,7 @@ const WorkOrderTable = ({ cellData }) => {
                 ETD
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Route(s)
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                SKU Name
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Qty
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Stage
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Status
@@ -62,20 +61,31 @@ const WorkOrderTable = ({ cellData }) => {
                     {cell.numbers}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.sku_name}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.manufacture}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.sales_order}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.client}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.created_date}
+                    {apiMethods.formatDate(cell.created_at)}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.etd}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.routes}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.sku_name}
-                  </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.qty}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.stage}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.status}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-sm font-medium ${
+                        cell.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {cell.status}
+                    </span>
+                  </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700 text-center">
                     <ThreeDotMenu
                       value={[
@@ -83,7 +93,7 @@ const WorkOrderTable = ({ cellData }) => {
                           label: 'View',
                           icon: cilHandPointRight,
                           onClick: () => {
-                            console.log('View')
+                            setShowPopUp(cell.id)
                           },
                         },
                         {
@@ -103,6 +113,7 @@ const WorkOrderTable = ({ cellData }) => {
                       ]}
                     />
                   </CTableDataCell>
+                  <WorkOrderDetails showPopUp={showPopUp} setShowPopUp={setShowPopUp} cell={cell} />
                 </CTableRow>
               ))
             ) : (

@@ -17,16 +17,22 @@ import CustomAlert from '../../components/New/CustomAlert'
 function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAlerts }) {
   const [showPopUp, setShowPopUp] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
 
-  const handleSkuDelete = async (id) => {
-    await apiMethods.deleteSku(id)
+  const handleSkuDelete = async () => {
+    await apiMethods.deleteSku(deleteId)
     setDeleteModal(false)
-    setSkuData((prevTypes) => prevTypes.filter((type) => type.id !== id))
+    setSkuData((prevTypes) => prevTypes.filter((type) => type.id !== deleteId))
     setAlerts([{ severity: 'success', message: 'Sku deleted successfully!' }])
   }
 
   const closeDeleteModal = () => {
     setDeleteModal(false)
+  }
+
+  const openDeleteModal = (id) => {
+    setDeleteId(id)
+    setDeleteModal(true)
   }
 
   const formatDate = (dateString) => {
@@ -139,7 +145,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
                           label: 'Delete',
                           icon: cilTrash,
                           onClick: () => {
-                            setDeleteModal(true)
+                            openDeleteModal(cell.id)
                           },
                         },
                       ]}
@@ -148,7 +154,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
                   <ConfirmationModale
                     isOpen={deleteModal}
                     onClose={closeDeleteModal}
-                    onConfirm={() => handleSkuDelete(cell.id)}
+                    onConfirm={handleSkuDelete}
                     title="Delete Confirmation"
                     message="Are you sure you want to delete this item?"
                   />

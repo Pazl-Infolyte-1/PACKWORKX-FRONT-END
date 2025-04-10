@@ -26,7 +26,7 @@ const CustomAlert = ({ alerts, handleClose }) => {
           }`}
         >
           <div className="flex justify-between items-center">
-            <span>{alert.message}</span>
+          <span className="break-words whitespace-normal">{alert.message}</span>
             <button onClick={handleClose} className="text-white font-bold ml-4">
               ×
             </button>

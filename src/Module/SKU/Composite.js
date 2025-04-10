@@ -7,6 +7,10 @@ import apiMethods from '../../api/config';
 import { IoTrash } from "react-icons/io5";
 import React from 'react';
 import ActionButton from '../../components/New/ActionButton';
+import PopUp from '../../components/New/PopUp';
+import CompositePopupTable from './CompositePopupTable';
+import { FaChevronDown } from 'react-icons/fa'
+
 const compositeTypes = [
 	{ id: "1", name: "Partition" },
 	{ id: "2", name: "Panel" },
@@ -19,11 +23,26 @@ const compositeTypes = [
   ];
 function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData,editedSkudata,
 	 updateSkuValues}) {
-
+    const [skuListTable, setSkuListTable] = useState([]);
 	const [skuFields, setSkuFields] = useState([]);
 	const [skuList, setSkuList] = useState([]);
   const [skuDropdown, setSkuDropdown] = useState([]);
-
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isSingleViewPopup, setisSingleViewPopup] = useState(false);
+    const [checkboxSelectedArray, setCheckboxSelectedArray] = useState([]);
+      const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+      const [selectedFilter, setSelectedFilter] = useState("");
+      const [skuTypes, setSkuTypes] = useState([]);
+      const [pagination, setPagination] = useState({
+        currentPage: 1,
+        pageSize: 10,
+        totalPages: 1,
+      });
+      const [limit, setLimit] = useState(10);
+      const [refresh, setRefresh] = useState(false);
+      const [searchQuery, setSearchQuery] = useState('');
+      const [selectedClient, setSelectedClient] = useState('');
+        const [selectedSkuType, setSelectedSkuType] = useState('')
   const handleCompositeTypeChange = (e) => {
     const selectedType = e.target.value;
     console.log("Selected Type:", selectedType);
@@ -34,11 +53,13 @@ function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
     }));
   };
   
+
+  //this is for add sku with ratio dropw=down
   const fetchSkuList = async () => {
     try {
       const response = await apiMethods.getSkuListOptions();
       setSkuList(response.data); // Assuming data is inside 'data'
-      console.log("composite datas",response.data)
+      console.log("composite datas",JSON.stringify(response.data))
     } catch (error) {
       console.error("Failed to fetch SKU list:", error);
     }
@@ -49,6 +70,32 @@ function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
 		  fetchSkuList();
 		}, []);
 
+
+    //this is for popup table summary
+    const fetchSkuListTablePopup = async () => {
+      try {
+        const response = await apiMethods.getSkuList({
+          page: pagination.currentPage,
+        limit: limit,
+        search: searchQuery || '',
+          client: selectedClient || '',
+          sku_type: selectedSkuType || '',
+        });
+        //setSkuList(response.data); // Assuming data is inside 'data'
+        setSkuListTable(response);
+        setPagination(response.pagination);
+        console.log("composite datas",JSON.stringify(response.data))
+      } catch (error) {
+        console.error("Failed to fetch SKU list:", error);
+      }
+      };
+    
+        useEffect(() => {
+  
+          fetchSkuListTablePopup();
+
+          
+      }, [pagination.currentPage, limit, refresh,searchQuery,selectedClient,selectedSkuType]);
 		const handleAddSkuField = () => {
 			setSkuFields((prev) => [...prev, { id: '', ratio: '', key: Date.now() }]);
 		  };
@@ -132,6 +179,49 @@ function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
         }
       }, []);
       
+
+      const closeDeleteModal = () => {
+        setIsDeleteModalOpen(false);
+        setSelectedClientDeleteId(null);
+      };
+
+
+    const tablepopup=()=>{
+      setisSingleViewPopup(true)
+    }
+
+    console.log("added sku fields",JSON.stringify(skuFields))
+
+    console.log("added array",JSON.stringify(checkboxSelectedArray))
+
+    useEffect(() => {
+      if (checkboxSelectedArray.length > 0) {
+        const addedFields = checkboxSelectedArray.map((sku) => ({
+          id: sku.id,
+          sku_name: sku.sku_name,
+          ratio: '',
+          key: Date.now() + Math.random(),
+          readonly: true,
+        }));
+    
+        setSkuFields((prev) => [...prev, ...addedFields]);
+        setCheckboxSelectedArray([])
+      }
+    }, [checkboxSelectedArray]);
+    
+
+    //useEffect(() => {
+    //  const fetchSkuTypes = async () => {
+    //    const data = await apiMethods.getSkuType();
+    //    if (data) {
+    //      setSkuTypes(data);
+    //    }
+    //  };
+  
+    //  fetchSkuTypes();
+    //}, []);
+
+    //console.log("suk",skuTypes)
   return (
 	<>
 	  <div className="grid grid-cols-3 gap-4">
@@ -242,13 +332,21 @@ function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
     className="w-full p-2 shadow-md border-l-2 rounded-md"
     onChange={handleCompositeTypeChange}
   >
-    <option value="" disabled>Select Type</option>
+    <option value="" >Select Type</option>
     <option value="Partition">Partition</option>
     <option value="Panel">Panel</option>
   </select>
 </div>
 
-
+<Input
+          skuName="Minimum Order Level"
+          id="minimum_order_level"
+          name="minimum_order_level"
+          type="number"
+          value={addNewSkuData.minimum_order_level}
+          onChange={handleChange}
+          placeholder="minimum order level"
+        />
 
 
 {/*
@@ -277,77 +375,126 @@ x
 </div>*/}
 
 </div>
-{addNewSkuData?.composite_type && (
+{/*{addNewSkuData?.composite_type && (*/}
+<div className="flex items-center gap-4">
 <ActionButton
 label={" + Add "}
 onClick={handleAddSkuField}
 variant='add'
 className='mt-4 mb-4'
 />
-)}
-  {skuFields.length > 0 && (
-<h2 className="text-sm font-medium text-gray-700 mb-1">Select SKU</h2>)}
-<div className="mt-2 w-full overflow-auto">
-    {skuFields.length > 0 && (
-      <div className="mt-4 flex flex-wrap gap-4 min-w-[900px]">
-        {skuFields.map((field, index) => (
-          <div
-            key={field.key}
-            className="relative p-2 w-[180px] border border-gray-200 rounded-md bg-white shadow-sm"
-          >
-            <button
-              type="button"
-              onClick={() => handleRemoveSkuField(field.key)}
-              className="absolute top-1 right-1 text-gray-500 hover:text-red-600"
-              title="Remove"
-            >
-              <IoTrash size={16} />
-            </button>
+<ActionButton
+                  label={" Add Options"} 
+                  variant='minimal'
+                  onClick={tablepopup}
+                />
 
-            <label className="block text-gray-800 font-medium text-sm mb-1">
-              SKU {index + 1}
-            </label>
+<div className="relative inline-block text-left w-[150px]">
+      <button
+        type="button"
+        className="inline-flex w-full justify-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50"
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+      >
+        {selectedFilter || "Create New"}
+        <FaChevronDown className="size-4 text-gray-400" />
+      </button>
+
+      {isDropdownOpen && (
+        <div className="absolute right-0 z-20 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5">
+          <div className="py-1 max-h-60 overflow-y-auto">
+            {skuType.map((option) => (
+              <div
+                key={option.id}
+                className="flex justify-between mx-2 hover:bg-gray-100"
+              >
+                <li
+                  className="p-2 cursor-pointer w-full list-none text-sm text-left"
+                  onClick={() => handleSelect(option)}
+                >
+                  {option.sku_type}
+                </li>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+                </div>
+{/*)}*/}
+{/*{skuFields.length > 0 && (
+  <h2 className="text-sm font-medium text-gray-700 mb-1">Select SKU</h2>
+)}*/}
+
+<div className="mt-2 w-full overflow-auto">
+{skuFields.length > 0 && (
+  <h2 className="text-sm font-medium text-gray-700 mb-1">Select SKU</h2>
+)}
+
+<div className="mt-2 w-full overflow-auto">
+  {skuFields.length > 0 && (
+    <div className="mt-4 flex flex-wrap gap-4 min-w-[900px]">
+      {skuFields.map((field, index) => (
+        <div
+          key={field.key}
+          className="relative p-2 w-[180px] border border-gray-200 rounded-md bg-white shadow-sm"
+        >
+          <button
+            type="button"
+            onClick={() => handleRemoveSkuField(field.key)}
+            className="absolute top-1 right-1 text-gray-500 hover:text-red-600"
+            title="Remove"
+          >
+            <IoTrash size={16} />
+          </button>
+
+          <label className="block text-gray-800 font-medium text-sm mb-1">
+            SKU {index + 1}
+          </label>
+
+          {field.readonly ? (
+            // 🔒 Show read-only input for checkbox selected
+            <input
+              type="text"
+              value={field.sku_name}
+              readOnly
+              className="w-full px-1 py-[5px] text-sm bg-gray-100 border border-gray-300 rounded text-black"
+            />
+          ) : (
+            // 🔄 Show dropdown for user-added fields
             <select
               className="w-full h-[30px] px-1 border border-gray-300 text-sm rounded-md bg-white text-black outline-none"
-              value={field.id} // This will show the default selected SKU id
+              value={field.id}
               onChange={(e) => handleChangeSkuSelect(index, e.target.value)}
             >
-           {addNewSkuData.part_value.length === 0 &&( <option value="" disabled>
-                Select SKU
-              </option>)} 
+              {addNewSkuData.part_value.length === 0 && (
+                <option value="" disabled>
+                  Select SKU
+                </option>
+              )}
               {skuList.map((sku) => (
                 <option key={sku.id} value={sku.id}>
-                  {sku.sku_name} {/* Display SKU name */}
+                  {sku.sku_name}
                 </option>
               ))}
             </select>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-{skuFields.length > 0 && (
-<h2 className="text-sm font-medium text-gray-700 mt-4 mb-1">Ratio</h2>)}
+          )}
 
-{/* Ratio Input Fields at Bottom */}
-{skuFields.length > 0 && (
-  <div className="mt-6 flex flex-wrap items-center gap-2">
-    {skuFields.map((field, index) => (
-      <React.Fragment key={field.key}>
-        <input
-          type="number"
-          placeholder={`ratio${index + 1}`}
-          value={field.ratio ?? ''} // Ensure it doesn't break on undefined/null
-          onChange={(e) => handleChangeRatio(index, e.target.value)}
-          className="w-[80px] p-1 text-center focus:outline-none border border-gray-300 rounded"
-        />
-        {index < skuFields.length - 1 && (
-          <span className="mx-1 text-gray-600 text-sm">x</span>
-        )}
-      </React.Fragment>
-    ))}
-  </div>
-)}
+          {/* Ratio input for both types */}
+          <input
+            type="number"
+            placeholder="Ratio"
+            value={field.ratio ?? ''}
+            onChange={(e) => handleChangeRatio(index, e.target.value)}
+            className="mt-2 w-full p-1 text-center focus:outline-none border border-gray-300 rounded text-sm"
+          />
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+</div>
+
 
 
 
@@ -388,6 +535,19 @@ x
   className="w-1/4 p-1 text-center focus:outline-none"
 />
 </div>*/}
+  <PopUp header={"Select SKU"}
+          visible={isSingleViewPopup}
+          setVisible={setisSingleViewPopup} 
+          showCloseButton={true}
+          width={'80vw'}
+        >
+ <CompositePopupTable skuSelected={setSelectedSkuType}  onClientSelect={setSelectedClient}    pagination={pagination}
+ setSearchQuery={setSearchQuery}
+        setPagination={setPagination}
+        limit={limit}
+        setLimit={setLimit}
+        setRefresh={setRefresh} setVisible={setisSingleViewPopup}  checkedValue={setCheckboxSelectedArray}  skuListTable={skuListTable}></CompositePopupTable>
+        </PopUp>
 	</>
   )
 }

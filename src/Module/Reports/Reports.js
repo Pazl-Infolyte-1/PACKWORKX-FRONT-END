@@ -10,16 +10,22 @@ import SearchBar from '../../components/New/SearchBar'
 import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
 import CustomAlert from '../../components/New/CustomAlert'
+import FiledTable from './FiledTable'
+import AddProcessField from './AddProcessField'
 
 const Reports = () => {
   const [showAddProcessModal, setShowAddProcessModal] = useState(false)
+
   const [showAddFieldModal, setShowAddFieldModal] = useState(false)
   const [selectedProcess, setSelectedProcess] = useState(null)
   const [processInputs, setProcessInputs] = useState({})
   const [isFieldModaleOpen, setIsFieldModaleOpen] = useState(false)
   const [processData, setProcessData] = useState([])
+  const [fieldData, setFieldData] = useState([])
   const [isEdit, setIsEdit] = useState(false)
   const [alerts, setAlerts] = useState([])
+  const [showProcessFields, setShowProcessFields] = useState(false)
+  const [showFileds, setShowFileds] = useState(false)
   const [limit, setLimit] = useState(10)
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
   const { searchQuery } = useSearch()
@@ -47,6 +53,17 @@ const Reports = () => {
     process_name: '',
   })
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await apiMethods.getAllFileds()
+        setFieldData(response.data.data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    fetchData()
+  }, [])
   // const options = processData.map((process) => ({
   //   value: process.processName,
   //   label: process.processName,
@@ -143,34 +160,53 @@ const Reports = () => {
     setAlerts([])
   }
 
+  console.log(processData);
+  
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className="flex flex-col lg:flex-row item-center gap-5 relative my-3">
         <h3 className="text-xl font-semibold mb-3">Process Integration</h3>
         {/* Add Fields Button */}
-        <div className="flex-grow flex justify-end gap-3">
-          <ActionButton
-            variant="add"
-            label={'Add Process'}
-            onClick={() => setShowAddProcessModal(true)}
-          />
-          <AddButton
-            text="Fields"
-            onClick={() => setShowAddFieldModal(true)}
-            className="absolute top-3 right-3"
-          />
-        </div>
       </div>
 
       <div className="bg-white p-3 rounded-lg w-full h-full">
-        <SearchBar data={processData} text={'Process Integration'} ref={searchBarRef} />
+        <div className="flex items-center">
+          <SearchBar data={processData} text={'Process Integration'} ref={searchBarRef} />
+          <div className="flex-grow flex justify-end gap-3">
+            <ActionButton label={'Process Fields'} onClick={() => setShowProcessFields(true)} />
+            <ActionButton
+              label={showFileds ? 'Show Process' : 'Show Fields'}
+              onClick={() => setShowFileds(!showFileds)}
+            />
+            <ActionButton
+              variant="add"
+              label={showFileds ? 'Add Field' : 'Add Process Name'}
+              onClick={() => {
+                if (showFileds) {
+                  // When label is "Add Field"
+                  setShowAddFieldModal(true)
+                } else {
+                  // When label is "Add Process Name"
+                  setShowAddProcessModal(true)
+                }
+              }}
+            />
+          </div>
+        </div>
         <div className="overflow-x-auto overflow-y-auto whitespace-nowrap my-4">
-          <ProcessIntegrartionTable
-            processData={processData}
-            setProcessData={setProcessData}
-            handleEditProcess={handleEditProcess}
-          />
+          {showFileds ? (
+            <FiledTable fieldData={fieldData} />
+          ) : (
+            <ProcessIntegrartionTable
+              processData={processData}
+              setProcessData={setProcessData}
+              handleEditProcess={handleEditProcess}
+              handleClose={handleClose}
+              alerts={alerts}
+              setAlerts={setAlerts}
+            />
+          )}
         </div>
 
         <div>
@@ -257,6 +293,19 @@ const Reports = () => {
             setProcessData={setProcessData}
             closeModal={() => setIsFieldModaleOpen(false)}
           />
+        </PopUp>
+
+        <PopUp
+          visible={showProcessFields}
+          setVisible={setShowProcessFields}
+          width="80%"
+          height="80%"
+          header="Machine Process Integration"
+          showCloseButton={true}
+          overflowX="visible"
+          overflowY="visible"
+        >
+          <AddProcessField fieldData={fieldData} setShowProcessFields={setShowProcessFields} />
         </PopUp>
       </div>
     </>

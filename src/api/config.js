@@ -657,7 +657,41 @@ export const apiMethods = {
       console.error(error);
       
     }
-  }
+  },
+  getAllFileds : async () => {
+    try {
+      return await apiClient.get('/machines/process-fields')
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+  getProcessFields: async (id) => {
+    try {
+      return await apiClient.get(`/machines/process/${id}/fields` )
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+
+  saveProcessValues: async (payload) => {
+    try {
+      return await apiClient.post('/machines/process-values', payload)
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+
+  addFields: async (payload) => {
+    try {
+      return await apiClient.post('/machines/process-fields', payload)
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
 
 
 }

@@ -10,8 +10,16 @@ import React, { useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
+import CustomAlert from '../../components/New/CustomAlert'
 
-function ProcessIntegrartionTable({ processData, setProcessData, handleEditProcess }) {
+function ProcessIntegrartionTable({
+  processData,
+  setProcessData,
+  handleEditProcess,
+  alerts,
+  setAlerts,
+  handleClose
+}) {
   const [confirmModal, setConfirmModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
 
@@ -20,6 +28,7 @@ function ProcessIntegrartionTable({ processData, setProcessData, handleEditProce
       await apiMethods.deleteProcess(deleteId)
       setConfirmModal(false)
       setProcessData((prev) => prev.filter((item) => item.id !== deleteId))
+      setAlerts([{ severity: 'success', message: 'Process deleted successfully!' }])
     } catch (error) {
       console.error(error)
     }
@@ -86,8 +95,12 @@ function ProcessIntegrartionTable({ processData, setProcessData, handleEditProce
           )}
         </CTableBody>
       </CTable>
-
-      <ConfirmationModale isOpen={confirmModal} onClose={closeDeleteModal} onConfirm={handleDelete} />
+      <CustomAlert alerts={alerts} handleClose={handleClose} />
+      <ConfirmationModale
+        isOpen={confirmModal}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+      />
     </div>
   )
 }

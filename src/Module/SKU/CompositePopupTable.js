@@ -73,7 +73,6 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
 		  setLocalSelected((prev) => {
 			const alreadyExists = prev.find((obj) => obj.id === id);
 			if (!alreadyExists) {
-			  console.log('Added:', selectedObject);
 			  return [...prev, selectedObject];
 			}
 			return prev;
@@ -81,14 +80,12 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
 		} else {
 		  setLocalSelected((prev) => {
 			const updated = prev.filter((obj) => obj.id !== id);
-			console.log('Removed:', selectedObject);
 			return updated;
 		  });
 		}
 	  };
 	
 	  const addArray = () => {
-		console.log('✅ Add clicked. Final selected:', localSelected);
 		checkedValue((prev) => [...prev, ...localSelected]);
 		setLocalSelected([]); // optional: reset selection after add
 		setVisible(false);
@@ -100,14 +97,12 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
 		const clientId = e.target.value;
     onClientSelect(clientId); // pass to parent
     setSelectedClientId(clientId)
-    console.log("Selected client ID:", clientId);
 	  };
 
     const handleSkuTypeChange = (e) => {
       const selectedValue = e.target.value;
       skuSelected(selectedValue);
       setSelectedSkuType(selectedValue)
-      console.log("Selected SKU Type:", selectedValue);
     };
     const handleClear = () => {
       skuSelected("");         // clear selectedSkuType in parent
@@ -118,7 +113,6 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
       setSelectedClientId && setSelectedClientId("");
       setSelectedSkuType && setSelectedSkuType("");
     };
-  console.log("sku types",skuTypes)
 	return (
 		<>
 		<div className="p-4">

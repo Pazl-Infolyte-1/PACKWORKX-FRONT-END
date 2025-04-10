@@ -45,7 +45,6 @@ function Composite({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, cl
         const [selectedSkuType, setSelectedSkuType] = useState('')
   const handleCompositeTypeChange = (e) => {
     const selectedType = e.target.value;
-    console.log("Selected Type:", selectedType);
   
     setAddNewSkuData((prev) => ({
       ...prev,
@@ -59,7 +58,6 @@ function Composite({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, cl
     try {
       const response = await apiMethods.getSkuListOptions();
       setSkuList(response.data); // Assuming data is inside 'data'
-      console.log("composite datas",JSON.stringify(response.data))
     } catch (error) {
       console.error("Failed to fetch SKU list:", error);
     }
@@ -84,7 +82,6 @@ function Composite({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, cl
         //setSkuList(response.data); // Assuming data is inside 'data'
         setSkuListTable(response);
         setPagination(response.pagination);
-        console.log("composite datas",JSON.stringify(response.data))
       } catch (error) {
         console.error("Failed to fetch SKU list:", error);
       }
@@ -140,7 +137,6 @@ function Composite({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, cl
 				};
 			  });
 		  
-  console.log("part_value length:", part_value.length);
 			setAddNewSkuData((prev) => ({
 			  ...prev,
 			  part_value,
@@ -156,7 +152,6 @@ function Composite({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, cl
               const response = await apiMethods.getSkuListOptions();
               const skuData = response.data;
               setSkuDropdown(skuData);
-              console.log("edit filter datas", skuData);
       
               // Now process after data is fetched
               const newSkuFields = addNewSkuData.part_value.map((part) => {
@@ -190,11 +185,7 @@ function Composite({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, cl
       setisSingleViewPopup(true)
     }
 
-    console.log("added sku fields",JSON.stringify(skuFields))
-
-    console.log("added array",JSON.stringify(checkboxSelectedArray))
-
-    useEffect(() => {
+        useEffect(() => {
       if (checkboxSelectedArray.length > 0) {
         const addedFields = checkboxSelectedArray.map((sku) => ({
           id: sku.id,
@@ -221,8 +212,7 @@ function Composite({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, cl
     //  fetchSkuTypes();
     //}, []);
 
-    //console.log("suk",skuTypes)
-  return (
+      return (
 	<>
 	  <div className="grid grid-cols-3 gap-4">
 		<div className="">

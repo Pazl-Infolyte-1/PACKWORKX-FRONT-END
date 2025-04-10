@@ -19,6 +19,7 @@ import { AuthContext } from '../../Context/AuthContext'
 import { useSearch } from '../../components/New/SearchContext'
 import CustomAlert from '../../components/New/CustomAlert'
 import createInitialSkuData from './CreateInitialSkuData'
+import { bottom } from '@popperjs/core'
 
 function SkuList() {
   const [skuType, setSkuType] = useState([])
@@ -130,13 +131,13 @@ function SkuList() {
     try {
       if (editTag) {
         const response = await apiMethods.updateSku(addNewSkuData)
-
         if (response?.status === 200) {
           setEditTag(false)
           setRefresh((prev) => !prev)
           setAlerts([
-            { severity: 'success', message: response.data.message || 'Sku updated successfully!' },
+            { severity: 'success', message: response?.data?.message || 'Sku updated successfully!' },
           ])
+          
         } else {
           setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong' }])
         }
@@ -146,15 +147,11 @@ function SkuList() {
           setAlerts([{ severity: 'error', message: boardSizeError }])
           return null // 🔴 Stop submission
         }
-        setAlerts([])
         const response = await apiMethods.addSku(addNewSkuData)
         if (response?.status === 201) {
           setDrawerOpen(false)
           setRefresh((prev) => !prev)
           setAlerts([{ severity: 'success', message: 'Sku Added successfully!' }])
-          setTimeout(()=>{
-            setAlerts([])
-          },3000)
         } else {
           setAlerts([
             { severity: 'error', message: response.data.message || 'Something went wrong' },
@@ -299,6 +296,7 @@ function SkuList() {
               onClick={() => {
                 if (text === 'Add SKU') {
                   setDrawerOpen(true)
+                  setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
                 }
                 if (text === 'Bulk Upload') {
                   setVisible(true)

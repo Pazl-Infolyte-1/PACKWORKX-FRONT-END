@@ -9,16 +9,12 @@ const ProcessDropDown = ({
   placeholder = 'Select Process',
   dropdownHeight = '[100px]',
   showAddProcedure = true,
+  handleSelect,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedOption, setSelectedOption] = useState(null)
   const dropdownRef = useRef(null)
-
-  const handleSelect = (option) => {
-    setSelectedOption(option)
-    setIsOpen(false)
-    onChange(option)
-  }
+  
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -33,11 +29,12 @@ const ProcessDropDown = ({
 
   return (
     <div className="relative w-full z-20" ref={dropdownRef}>
+      <p>Process Fields</p>
       <div
-        className="p-2 my-2 h-10 border border-gray-300 rounded cursor-pointer flex justify-between items-center"
+        className="p-2 my-2 h-10 border border-gray-300 rounded cursor-pointer flex justify-between items-center "
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        <span>{selectedOption ? selectedOption.label : placeholder}</span>
+        <span>{selectedOption ? selectedOption?.process_name : placeholder}</span>
         <BsChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
 
@@ -47,9 +44,14 @@ const ProcessDropDown = ({
             <li
               key={index}
               className="p-2 flex justify-between hover:bg-gray-100 cursor-pointer "
-              onClick={() => handleSelect(option)}
+              onClick={() => {
+                setSelectedOption(option)
+                setIsOpen(false)
+                handleSelect(option.ProcessName.id)
+                onChange(option)
+              }}
             >
-              {option.label}
+              {option.process_name}
             </li>
           ))}
         </ul>

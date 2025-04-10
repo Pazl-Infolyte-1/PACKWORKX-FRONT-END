@@ -27,7 +27,6 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
   })
 
   const [workOrdersData, setWorkOrdersData] = useState([])
-  const [WorkorderForm, setWorkOrderForm] = useState([])
   const [workOrders, setWorkOrders] = useState([
     {
       id: 1,
@@ -217,11 +216,8 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       }
     } catch (error) {
       console.error("Error submitting sales order:", error);
-      // setDrawer(false)
-      alert('fasdfa')
     } finally {
       setLoading(false);
-      // isEdit(false)
     }
   };
 

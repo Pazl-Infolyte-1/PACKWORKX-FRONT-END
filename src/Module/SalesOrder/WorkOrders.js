@@ -29,25 +29,13 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders,setDra
   const [openCreateAccordion, setCreateOpenAccordion] = useState([1])
   const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
   const [skuList, setSkuList] = useState([])
-  
-  // Track form data for each work order
-  // const [workOrders, setWorkOrders] = useState([
-  //   { 
-  //     id: 1, 
-  //     sku: "", 
-  //     skuVersion: "", 
-  //     quantity: "", 
-  //     deliveryDate: "", 
-  //     description: "", 
-  //     startDate: "", 
-  //     excessUnits: "", 
-  //     endDate: "",
-  //     manufacturingType: "inhouse" // Track manufacturing type
-  //   }
-  // ])
+  const [skuVersionsMap, setSkuVersionsMap] = useState({});  // Map of work order ID to available versions
+  const [selectedWorkOrderForVersions, setSelectedWorkOrderForVersions] = useState(null);
 
+  
   // Update work order data
   const handleWorkOrderChange = (orderId, field, value) => {
+    // No alert here - we'll handle it separately for the SKU field
     setWorkOrders(prevOrders => 
       prevOrders.map(order => 
         order.id === orderId 
@@ -86,11 +74,25 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders,setDra
     fetchSkuList();
   }, []);
 
-  const handleChange = (e) => {
+  // Special handler just for SKU changes
+  const handleSkuChange = async (e, orderId) => {
     const selectedId = parseInt(e.target.value); // since option values are string
     const selectedSku = skuList.find((sku) => sku.id === selectedId);
-    console.log("Selected SKU ID:", selectedId);
-    console.log("Selected SKU Data:", selectedSku);
+    
+   const response = await apiMethods.getSkuVersions(selectedId)
+   console.log(response.data.data)
+
+
+   setSkuVersionsMap(prev => ({
+    ...prev,
+    [orderId]: response.data.data // Store the version data for this work order
+  }));
+
+  handleWorkOrderChange(orderId, 'sku_version', '');
+
+    
+    // Update the work order using the regular handler
+    handleWorkOrderChange(orderId, 'sku_name', selectedId);
   };
  
   const handleToggle = () => {
@@ -132,17 +134,17 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders,setDra
     )
   }
 
+  // Add this function to handle the version history button click
+const handleVersionHistoryClick = (orderId) => {
+  setSelectedWorkOrderForVersions(orderId);
+  setVersionDrawerOpen(true);
+};
+
   return (
     <div>
       {/* Header Section */}
       <div className="flex justify-between items-center mt-2 mb-4 w-[1180px]">
         <h2 className="text-lg font-semibold text-[20px]">Work Orders</h2>
-        {/* <button
-          onClick={addWorkOrder}
-          className="cursor-pointer w-[232px] h-[40px] px-2 border border-[#8167E5] rounded-lg bg-transparent text-[#8167E5] text-[14px] font-['Lato'] leading-[20px] outline-none"
-        >
-          + Create Workorders
-        </button> */}
         <ActionButton
           label={" + Create Workorders"}
           onClick={addWorkOrder}
@@ -252,9 +254,6 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders,setDra
                 {/* Button & Icon Container */}
                 <div className="flex items-center gap-2">
                   {/* Button */}
-                  {/* <button className="cursor-pointer w-[173px] h-[46px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
-                    Download Work Order
-                  </button> */}
                   <ActionButton
                     label={"Download Work Order"}
                     variant='minimal'
@@ -333,7 +332,7 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders,setDra
                       <select
                         className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] text-sm rounded-md bg-white text-[#030303] outline-none ml-2"
                         value={order.sku_name}
-                        onChange={(e) => handleWorkOrderChange(order.id, 'sku_name', e.target.value)}
+                        onChange={(e) => handleSkuChange(e, order.id)}
                       >
                         <option value="" disabled>
                           Select SKU
@@ -353,24 +352,33 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders,setDra
 
                       {/* Input & Button Wrapper */}
                       <div className="flex">
-                        {/* Input */}
-                        <input
-                          type="text"
-                          placeholder="Preview Of Sku Version"
-                          value={order.sku_version}
-                          onChange={(e) => handleWorkOrderChange(order.id, 'sku_version', e.target.value)}
-                          className="w-[260px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm"
-                        />
+                    {/* Dropdown for SKU Version */}
+<select
+  value={order.sku_version}
+  onChange={(e) => handleWorkOrderChange(order.id, 'sku_version', e.target.value)}
+  className="w-[260px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
+  disabled={!skuVersionsMap[order.id]}
+>
+  <option value="" disabled>Select Version</option>
+  {skuVersionsMap[order.id] ? (
+    // If we have version data for this work order, show the options
+    [skuVersionsMap[order.id]].flat().map((version) => (
+      <option key={version.id} value={version.id}>
+        {version.sku_version}
+      </option>
+    ))
+  ) : (
+    // If no version data available yet
+    <option value="" disabled>Select a SKU first</option>
+  )}
+</select>
 
                         {/* Button (Outside, Right End) */}
-                        {/* <button onClick={() => setVersionDrawerOpen(true)} className="ml-2 cursor-pointer w-[149px] h-[40px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
-                          Version History
-                        </button> */}
                         <ActionButton
                           label={" Version History"}
                           variant='minimal'
-                          onClick={() => setVersionDrawerOpen(true)}
-                        />
+                          onClick={() => handleVersionHistoryClick(order.id)}
+                          />
                       </div>
                     </div>
                   </div>
@@ -459,9 +467,6 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders,setDra
         </div>
       )}
       <div className="flex justify-end mt-4">
-        {/* <button className="cursor-pointer mt-3 w-[149px] h-[46px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
-          Submit Work Order
-        </button> */}
         <div className='flex gap-3'>
         <ActionButton
           onClick={()=>{
@@ -479,10 +484,12 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders,setDra
         </div>
 
       </div>
-      <VersionsPopup
-        visible={isVersionDrawerOpen}
-        setVisible={() => setVersionDrawerOpen(false)}
-      />
+<VersionsPopup
+  visible={isVersionDrawerOpen}
+  setVisible={() => setVersionDrawerOpen(false)}
+  versionData={selectedWorkOrderForVersions ? skuVersionsMap[selectedWorkOrderForVersions] : []}
+  skuName={selectedWorkOrderForVersions && workOrders.find(order => order.id === selectedWorkOrderForVersions)?.sku_name}
+/>
     </div>
   )
 }

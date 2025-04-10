@@ -663,6 +663,11 @@ export const apiMethods = {
   editSalesOrder:async(id,body)=>{
     const response = await apiClient.put(`/sale-order/${id}`,body)
     return response
+  },
+
+  getSkuVersions:async(id)=>{
+    const response = await apiClient.get(`/sku-details/sku-version/sku/${id}`)
+    return response
   }
 
 

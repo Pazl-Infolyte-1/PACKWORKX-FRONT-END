@@ -623,6 +623,43 @@ export const apiMethods = {
     }
   },
 
+  getWorkOrders: async (params) => {
+    try {
+      return await apiClient.get('/work-order', {params})
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getProcess: async (params) => {
+    try {
+      return await apiClient.get('/machines/process',{params})
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  AddProcess: async (formData) => {
+      return await apiClient.post('/machines/process', formData)
+  },
+  EditProcess : async (formData) => {
+    try {
+      return await apiClient.put(`/machines/process/${formData.id}`, formData)
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  deleteProcess : async (id) => {
+    try {
+      return await apiClient.delete(`/machines/process/${id}`)
+    } catch (error) {
+      console.error(error);
+      
+    }
+  }
+
+
 }
 
 export default apiMethods

@@ -81,6 +81,7 @@ function SkuList() {
         material: null,
         color: null,
         flute_type: null,
+        weight:null,
         flute_ratio: null,
       },
     ],
@@ -151,6 +152,9 @@ function SkuList() {
           setDrawerOpen(false)
           setRefresh((prev) => !prev)
           setAlerts([{ severity: 'success', message: 'Sku Added successfully!' }])
+          setTimeout(()=>{
+            setAlerts([])
+          },3000)
         } else {
           setAlerts([
             { severity: 'error', message: response.data.message || 'Something went wrong' },
@@ -163,6 +167,7 @@ function SkuList() {
         { severity: 'error', message: error?.response?.data?.message || 'Something went wrong' },
       ])
     }
+    setAlerts([])
   }
 
   const handleSkuEdit = (id) => {
@@ -207,6 +212,7 @@ function SkuList() {
           material: null,
           color: null,
           flute_type: null,
+          weight:null,
           flute_ratio: null,
         },
       ],

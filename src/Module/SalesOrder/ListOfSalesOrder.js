@@ -63,7 +63,7 @@ function ListOfSalesOrder() {
 
 
   const handleLimitChange = (value) => {
-    setPaginationParams({ ...paginationParams, pageSize: value })
+    setPaginationParams({ ...paginationParams, pageSize: value, currentPage:1 })
   }
 
   const handlePageChange = (event, newPage) => {
@@ -205,7 +205,7 @@ function ListOfSalesOrder() {
             />
           </div>
         </div>
-
+{isDrawerOpen&&(
   <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth="1280px">
     <AddSalesOrder 
       currentTab={'salesOrder'} 
@@ -213,8 +213,11 @@ function ListOfSalesOrder() {
       selectedSalesOrderID={selectedSalesOrder} 
       setDrawer={setDrawerOpen}
       setisEdit={setIsEditMode}
-    />
+      fetchData={fetchData}
+
+      />
   </Drawer>
+    )}
 
       </div>
       <div>

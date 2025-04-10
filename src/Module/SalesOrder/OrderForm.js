@@ -60,42 +60,56 @@ const OrderForm = ({ formData, setFormData, skuDetailsForm, handleSkuFormUpdate,
   }, [localFormData.confirmation]);
 
   // Handle input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+// 1. Update handleInputChange to sync with parent component
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+  
+  let updatedData;
+  
+  // For client selection, include both name and ID
+  if (name === "client") {
+    // Find the selected client object
+    const selectedClient = clients.find(client => client.company_name === value);
     
-    // For client selection, include both name and ID
-    if (name === "client") {
-      // Find the selected client object
-      const selectedClient = clients.find(client => client.company_name === value);
-      
-      setLocalFormData((prevFormData) => ({
-        ...prevFormData,
-        [name]: value,
-        client_id: selectedClient ? selectedClient.client_id : "",
-        company_name: selectedClient ? selectedClient.company_name : ""
-      }));
-    } else {
-      // Handle other form fields normally
-      setLocalFormData((prevFormData) => ({
-        ...prevFormData,
-        [name]: value,
-      }));
-    }
-  };
-
-  // Handle toggle change
-  const handleToggleChange = () => {
-    const newMethod = confirmationMethod === "Email" ? "Oral" : "Email";
-    setConfirmationMethod(newMethod);
-
-    setLocalFormData({
+    updatedData = {
       ...localFormData,
-      confirmation: newMethod,
-      // Clear the appropriate field based on the new method
-      confirmation_email: newMethod === "Email" ? localFormData.confirmation_email : "",
-      confirmation_oral: newMethod === "Oral" ? localFormData.confirmation_oral : ""
-    });
+      [name]: value,
+      client_id: selectedClient ? selectedClient.client_id : "",
+      company_name: selectedClient ? selectedClient.company_name : ""
+    };
+  } else {
+    // Handle other form fields normally
+    updatedData = {
+      ...localFormData,
+      [name]: value,
+    };
+  }
+  
+  setLocalFormData(updatedData);
+  
+  // Immediately update parent component's state
+  setFormData(updatedData);
+};
+
+// 2. Update handleToggleChange to sync with parent component
+const handleToggleChange = () => {
+  const newMethod = confirmationMethod === "Email" ? "Oral" : "Email";
+  setConfirmationMethod(newMethod);
+
+  const updatedData = {
+    ...localFormData,
+    confirmation: newMethod,
+    // Clear the appropriate field based on the new method
+    confirmation_email: newMethod === "Email" ? localFormData.confirmation_email : "",
+    confirmation_name: newMethod === "Oral" ? localFormData.confirmation_name : "",
+    confirmation_mobile: newMethod === "Oral" ? localFormData.confirmation_mobile : ""
   };
+  
+  setLocalFormData(updatedData);
+  
+  // Immediately update parent component's state
+  setFormData(updatedData);
+};
 
   // Handle form submission
   const handleSubmit = (e) => {
@@ -185,11 +199,11 @@ const OrderForm = ({ formData, setFormData, skuDetailsForm, handleSkuFormUpdate,
                 Client Period
               </label>
               <input
-                type="text"
+                type="number"
                 name="credit_period"
                 value={localFormData.credit_period || ""}
                 onChange={handleInputChange}
-                placeholder="Enter text..."
+                placeholder="Enter Client Period..."
                 className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
               />
             </div>
@@ -263,19 +277,32 @@ const OrderForm = ({ formData, setFormData, skuDetailsForm, handleSkuFormUpdate,
             )}
 
             {confirmationMethod === "Oral" && (
-              <div className="p-2 rounded-lg flex flex-col">
+              <div className="p-2 rounded-lg flex flex-col ">
                 <label className="text-black font-normal leading-6 mb-2 text-left">
                   Confirmation Oral
                 </label>
                 <input
                   type="text"
-                  name="confirmation_oral"
-                  value={localFormData.confirmation_oral || ""}
+                  name="confirmation_name"
+                  value={localFormData.confirmation_name|| ""}
                   onChange={handleInputChange}
-                  placeholder="Enter Confirmation Details"
+                  placeholder="Enter Confirmation name"
+                  className="w-[500px] h-[40px] px-2 border border-[#c2c2c2] rounded-md outline-none"
+                />
+                   <label className="text-black font-normal leading-6 mb-2 mt-2 text-left">
+                  Confirmation mobile
+                </label>
+                <input
+                  type="number"
+                  name="confirmation_mobile"
+                  value={localFormData.confirmation_mobile|| ""}
+                  onChange={handleInputChange}
+                  placeholder="Enter Confirmation mobile"
                   className="w-[500px] h-[40px] px-2 border border-[#c2c2c2] rounded-md outline-none"
                 />
               </div>
+              
+
             )}
           </div>
         </div>

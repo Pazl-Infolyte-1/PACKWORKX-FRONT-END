@@ -61,7 +61,7 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders}) => {
   const handleSubmit = () => {
     // Filter out empty work orders
     const filledWorkOrders = workOrders.filter(order => 
-      order.sku || order.quantity || order.description
+      order.sku_name || order.qty || order.description
     )
     
     console.log("Submitting work orders:", filledWorkOrders)
@@ -108,15 +108,15 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders}) => {
       ...workOrders,
       {
         id: newId,
-        sku: '',
-        skuVersion: '',
-        quantity: '',
-        deliveryDate: '',
+        sku_name: '',
+        sku_version: '',
+        qty: '',
+        edd: '',
         description: '',
-        startDate: '',
-        excessUnits: '',
-        endDate: '',
-        manufacturingType: 'inhouse'
+        planned_start_date: '',
+        acceptable_excess_units: '',
+        planned_end_date: '',
+        manufacture: 'inhouse'
       },
     ])
   }
@@ -332,8 +332,8 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders}) => {
                       <label className="block text-gray-800 font-medium mb-1 ml-2">SKU</label>
                       <select
                         className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] text-sm rounded-md bg-white text-[#030303] outline-none ml-2"
-                        value={order.sku}
-                        onChange={(e) => handleWorkOrderChange(order.id, 'sku', e.target.value)}
+                        value={order.sku_name}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'sku_name', e.target.value)}
                       >
                         <option value="" disabled>
                           Select SKU
@@ -357,8 +357,8 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders}) => {
                         <input
                           type="text"
                           placeholder="Preview Of Sku Version"
-                          value={order.skuVersion}
-                          onChange={(e) => handleWorkOrderChange(order.id, 'skuVersion', e.target.value)}
+                          value={order.sku_version}
+                          onChange={(e) => handleWorkOrderChange(order.id, 'sku_version', e.target.value)}
                           className="w-[260px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm"
                         />
 
@@ -382,8 +382,8 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders}) => {
                       <input
                         type="number"
                         placeholder="100"
-                        value={order.quantity}
-                        onChange={(e) => handleWorkOrderChange(order.id, 'quantity', e.target.value)}
+                        value={order.qty}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'qty', e.target.value)}
                         className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm"
                       />
                     </div>
@@ -393,8 +393,8 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders}) => {
                       </label>
                       <input
                         type="date"
-                        value={order.deliveryDate}
-                        onChange={(e) => handleWorkOrderChange(order.id, 'deliveryDate', e.target.value)}
+                        value={order.edd}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'edd', e.target.value)}
                         className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
                       />
                     </div>
@@ -419,8 +419,8 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders}) => {
                       </label>
                       <input
                         type="date"
-                        value={order.startDate}
-                        onChange={(e) => handleWorkOrderChange(order.id, 'startDate', e.target.value)}
+                        value={order.planned_start_date}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'planned_start_date', e.target.value)}
                         className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
                       />
                     </div>
@@ -435,8 +435,8 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders}) => {
                       <input
                         type="number"
                         placeholder="Enter units"
-                        value={order.excessUnits}
-                        onChange={(e) => handleWorkOrderChange(order.id, 'excessUnits', e.target. value)}
+                        value={order.acceptable_excess_units}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'acceptable_excess_units', e.target. value)}
                         className="w-[420px] h-[50px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm"
                       />
                     </div>
@@ -446,8 +446,8 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders}) => {
                       </label>
                       <input
                         type="date"
-                        value={order.endDate}
-                        onChange={(e) => handleWorkOrderChange(order.id, 'endDate', e.target.value)}
+                        value={order.planned_end_date}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'planned_end_date', e.target.value)}
                         className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
                       />
                     </div>

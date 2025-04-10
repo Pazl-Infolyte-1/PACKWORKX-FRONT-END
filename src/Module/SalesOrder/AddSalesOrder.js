@@ -6,40 +6,40 @@ import OrderForm from './OrderForm'
 import Loader from '../../components/New/Loader'
 import apiMethods from '../../api/config'
 
-const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID,setDrawer,setisEdit }) => {
+const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, setisEdit, fetchData }) => {
   const [activeTab, setActiveTab] = useState(currentTab)
   const [loading, setLoading] = useState(false)
   const [existingSalesOrderData, setExistingSalesOrderData] = useState('')
-  const [alerts, setAlerts] = useState([])
-  
+  const [alerts, setAlerts] = useState(false)
+
   // Main state for SKU details that will be shared across components
   const [skuDetailsForm, setSkuDetailsForm] = useState([])
-  
+
   // Additional state to capture complete SKU form data including totals
   const [skuFormComplete, setSkuFormComplete] = useState({
     skuDetails: [],
-    client_id:"",
+    client_id: "",
     totalQuantity: 0,
     totalAmount: 0,
     totalSGST: 0,
     totalCGST: 0,
     totalWithGST: 0
   })
-  
+
   const [workOrdersData, setWorkOrdersData] = useState([])
   const [WorkorderForm, setWorkOrderForm] = useState([])
   const [workOrders, setWorkOrders] = useState([
-    { 
-      id: 1, 
-      sku: "", 
-      skuVersion: "", 
-      quantity: "", 
-      deliveryDate: "", 
-      description: "", 
-      startDate: "", 
-      excessUnits: "", 
-      endDate: "",
-      manufacturingType: "inhouse"
+    {
+      id: 1,
+      sku_name: "",
+      sku_version: "",
+      qty: "",
+      edd: "",
+      description: "",
+      planned_start_date: "",
+      acceptable_excess_units: "",
+      planned_end_date: "",
+      manufacture: "inhouse"
     }
   ])
 
@@ -55,19 +55,28 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID,setDrawer,seti
     confirmation_oral: ""
   });
 
+  useEffect(() => {
+    console.log(salesDetailsForm)
+  }, [salesDetailsForm])
+
   // Handle SKU form data updates from the SkuDetails component
   const handleSkuFormUpdate = (data) => {
     setSkuFormComplete(data);
-    
+
     // Update skuDetailsForm with just the items array
     if (data && data.skuDetails) {
       setSkuDetailsForm(data.skuDetails);
     }
   };
 
-  // Track form changes without logging
+  // // Track form changes without logging
+  // const handleSalesDetailsUpdate = (data) => {
+  //   setSalesDetailsForm(data);
+  // };
+
   const handleSalesDetailsUpdate = (data) => {
-    setSalesDetailsForm(data);
+    // Use a new object to ensure state update is recognized
+    setSalesDetailsForm({ ...data });
   };
 
   // Handle form submission - this will only be called when the submit button is clicked
@@ -86,7 +95,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID,setDrawer,seti
         try {
           const response = await apiMethods.getSaleOrderData(selectedSalesOrderID);
           setExistingSalesOrderData(response.data);
-          
+
           setSalesDetailsForm((prev) => {
             const updatedDetails = {
               ...prev,
@@ -94,11 +103,11 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID,setDrawer,seti
             };
             return updatedDetails;
           });
-          
+
           // Set SKU details from API response
           if (response.data.SalesSkuDetails && response.data.SalesSkuDetails.length > 0) {
             setSkuDetailsForm(response.data.SalesSkuDetails);
-            
+
             // Also update the complete SKU form data if available
             setSkuFormComplete({
               skuDetails: response.data.SalesSkuDetails,
@@ -109,7 +118,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID,setDrawer,seti
               totalWithGST: response.data.totalWithGST || 0
             });
           }
-          
+
           setWorkOrdersData(response.data.workOrders || [])
         } catch (error) {
           console.error("Error fetching sales order:", error);
@@ -124,36 +133,41 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID,setDrawer,seti
   const handleFormSubmit = async (completeFormData) => {
     setSalesDetailsForm((prevState) => {
       const updatedForm = completeFormData;
-  
+
       const payload = {
         salesDetails: updatedForm, // Use updated data
         skuDetails: skuFormComplete.skuDetails,
         workDetails: [],
       };
-  
+
       submitSalesOrder(payload);
       return updatedForm;
     });
   };
-  
+
   const submitSalesOrder = async (payload) => {
     try {
       let response;
-      
+
       if (isEdit) {
-        response = await apiMethods.editSalesOrder(selectedSalesOrderID,payload);
+        response = await apiMethods.editSalesOrder(selectedSalesOrderID, payload);
+        setDrawer(false)
+        await fetchData()
       } else {
         response = await apiMethods.addSalesOrder(payload);
+        setDrawer(false)
+        await fetchData()
       }
-      setDrawer(false)
-      fetchSalesOrderData()
-      
+      // fetchSalesOrderData()
+
     } catch (error) {
+
       console.error(error);
-    }finally{
+    } finally {
+
     }
   };
-  
+
 
 
 
@@ -162,61 +176,49 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID,setDrawer,seti
     try {
       // Set loading state
       setLoading(true);
-          
+      let response;
+
       // Add client_id to each work order in formData
       const workDetailsWithClient = formData.map(workOrder => ({
         ...workOrder,
         client_id: salesDetailsForm.client_id
       }));
 
-      const skuWithClientId = skuFormComplete?.skuDetails?.map(sku=>({
+      const skuWithClientId = skuFormComplete?.skuDetails?.map(sku => ({
         ...sku,
         client_id: salesDetailsForm.client_id
       }));
 
       // const hasSkuDetails = skuDetailsForm && skuDetailsForm.length > 0;
-      const hasSkuDetails = 
-  skuDetailsForm && 
-  skuDetailsForm.length > 0 && 
-  skuDetailsForm[0].quantity_required;
+      const hasSkuDetails =
+        skuDetailsForm &&
+        skuDetailsForm?.length > 0 &&
+        skuDetailsForm[0]?.quantity_required;
 
 
       // Construct the final sales order object including SKU and Work Orders
       const finalSalesOrder = {
         salesDetails: {
-          ...salesDetailsForm.SalesSkuDetails, // Existing sales details
+          ...salesDetailsForm, // Existing sales details
         },
-        workDetails: workDetailsWithClient, // Include work order details
+        workDetails: [...workOrdersData, ...workDetailsWithClient], // Include work order details
         skuDetails: hasSkuDetails ? skuWithClientId : [], // Empty SKU details if none exist
       };
 
       // API call to add the complete sales order
       if (isEdit) {
-        response = await apiMethods.editSalesOrder(selectedSalesOrderID,finalSalesOrder);
+        response = await apiMethods.editSalesOrder(selectedSalesOrderID, finalSalesOrder);
+        setDrawer(false)
+        await fetchData()
       } else {
-        const response = await apiMethods.addSalesOrder(finalSalesOrder);
+         response = await apiMethods.addSalesOrder(finalSalesOrder);
+        setDrawer(false)
+        await fetchData()
       }
-
-      const response = await apiMethods.addSalesOrder(finalSalesOrder);
-
-      fetchSalesOrderData()
-
-      // Success alert
-      setAlerts((prev) => [
-        ...prev,
-        { type: 'success', message: 'Sales order submitted successfully' },
-      ]);
-
     } catch (error) {
       console.error("Error submitting sales order:", error);
-
-      // Error alert
-      setAlerts((prev) => [
-        ...prev,
-        { type: 'danger', message: 'Failed to submit sales order: ' + (error.message || 'Unknown error') },
-      ]);
-
-      setDrawer(false)
+      // setDrawer(false)
+      alert('fasdfa')
     } finally {
       setLoading(false);
       // isEdit(false)
@@ -228,18 +230,9 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID,setDrawer,seti
     return <Loader />;
   }
 
-  // Display any alerts
-  const renderAlerts = () => {
-    return alerts.map((alert, index) => (
-      <div key={index} className={`alert alert-${alert.type}`}>
-        {alert.message}
-      </div>
-    ));
-  };
 
   return (
     <div className="screen p-4">
-      {renderAlerts()}
       <CCol xs={12}>
         <CNav variant="tabs">
           <CNavItem key={'salesOrder'}>
@@ -280,9 +273,9 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID,setDrawer,seti
       {/* Content Sections */}
       <div className="bg-white">
         {activeTab === 'salesOrder' && (
-          <OrderForm 
-            formData={salesDetailsForm} 
-            setFormData={handleSalesDetailsUpdate} 
+          <OrderForm
+            formData={salesDetailsForm}
+            setFormData={handleSalesDetailsUpdate}
             skuDetailsForm={skuDetailsForm}
             handleSkuFormUpdate={handleSkuFormUpdate}
             handleFormSubmit={handleFormSubmit}

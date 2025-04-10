@@ -36,6 +36,10 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
     }
   })
 
+  useEffect(()=>{
+    console.log(skuDetailsForm)
+  },[skuDetailsForm])
+
   // Watch for changes to calculate totals
   const skusData = watch('skus');
 
@@ -229,6 +233,17 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
         totalWithGST
       })
     }
+    
+    console.log('SKU Form Submitted:', {
+      skus: formattedSkus,
+      totals: {
+        totalQuantity,
+        totalAmount,
+        totalSGST,
+        totalCGST,
+        totalWithGST
+      }
+    });
   }
 
   return (
@@ -281,7 +296,7 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
                             {isLoading ? "Loading SKUs..." : "Select SKU"}
                           </option>
                           {skuList.map((sku, i) => (
-                            <option key={i} value={sku.sku_name || sku.value}>
+                            <option key={i} value={sku.sku_name|| sku.value}>
                               {sku.sku_name}
                             </option>
                           ))}

@@ -22,7 +22,7 @@ const accordionCardSummary = {
   ],
 }
 
-const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders}) => {
+const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders,setDrawer}) => {
   const [selectedOption, setSelectedOption] = useState('inhouse')
   const [openIndices, setOpenIndices] = useState([])
   const [openAccordions, setOpenAccordions] = useState({})
@@ -462,11 +462,22 @@ const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders}) => {
         {/* <button className="cursor-pointer mt-3 w-[149px] h-[46px] px-2 border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] font-roboto leading-[20px] outline-none">
           Submit Work Order
         </button> */}
+        <div className='flex gap-3'>
+        <ActionButton
+          onClick={()=>{
+            setDrawer(false)
+          }}
+            variant="cancel"
+            label={"cancel"}
+            />
+
         <ActionButton
           label={"Submit Work Order"}
-          variant='minimal'
+          variant='save'
           onClick={handleSubmit}
         />
+        </div>
+
       </div>
       <VersionsPopup
         visible={isVersionDrawerOpen}

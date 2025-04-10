@@ -274,6 +274,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       <div className="bg-white">
         {activeTab === 'salesOrder' && (
           <OrderForm
+          setDrawer={setDrawer}
             formData={salesDetailsForm}
             setFormData={handleSalesDetailsUpdate}
             skuDetailsForm={skuDetailsForm}
@@ -284,6 +285,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
         {activeTab === 'skuDetails' && (
           <div className="p-1 bg-white rounded-lg w-[1100px] h-full">
             <WorkOrders
+              setDrawer={setDrawer}
               setWorkOrders={setWorkOrders}
               workOrders={workOrders}
               setFormData={handleWorkOrderFormUpdate}

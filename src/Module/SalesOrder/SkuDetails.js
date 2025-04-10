@@ -286,21 +286,22 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
                     <tr key={item.id} className="hover:bg-gray-50 border-t">
                       {/* SKU Dropdown */}
                       <td className="px-4 py-2">
-                        <select
-                          {...register(`skus[${index}].sku`, {
-                            onChange: () => updateParentFormData()
-                          })}
-                          className="w-[320px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
-                        >
-                          <option value="" disabled>
-                            {isLoading ? "Loading SKUs..." : "Select SKU"}
-                          </option>
-                          {skuList.map((sku, i) => (
-                            <option key={i} value={sku.sku_name|| sku.value}>
-                              {sku.sku_name}
-                            </option>
-                          ))}
-                        </select>
+                      <select
+  {...register(`skus[${index}].sku`, {
+    onChange: () => updateParentFormData()
+  })}
+  value={watch(`skus[${index}].sku`)}
+  className="w-[320px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+>
+  <option value="" disabled>
+    {isLoading ? "Loading SKUs..." : "Select SKU"}
+  </option>
+  {skuList.map((skuItem, i) => (
+    <option key={i} value={skuItem.sku_name}>
+      {skuItem.sku_name}
+    </option>
+  ))}
+</select>
                       </td>
 
                       {/* Quantity Input */}
@@ -417,6 +418,13 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                           readOnly
                         />
+                      </td>
+
+                      <td className="">
+                      <ActionButton
+            label={"invoice history"}
+            variant='minimal'
+          />
                       </td>
 
                       {/* Delete Icon */}

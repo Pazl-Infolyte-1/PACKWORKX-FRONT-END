@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import SkuDetails from './SkuDetails'
 import apiMethods from '../../api/config';
+import ActionButton from '../../components/New/ActionButton';
 
-const OrderForm = ({ formData, setFormData, skuDetailsForm, handleSkuFormUpdate, handleFormSubmit }) => {
+const OrderForm = ({ formData, setFormData, skuDetailsForm, handleSkuFormUpdate, handleFormSubmit,setDrawer }) => {
   const [clients, setClients] = useState([]); // State for client list
   const [skuFormData, setSkuFormData] = useState(null);
   const [localFormData, setLocalFormData] = useState(formData);
@@ -315,12 +316,23 @@ const handleToggleChange = () => {
 
         {/* Submit Button */}
         <div className="mt-4 flex justify-end">
+          <div className='flex gap-4'>
+          <ActionButton
+          onClick={()=>{
+            setDrawer(false)
+          }}
+            variant="cancel"
+            label={"cancel"}
+            />
+
           <button
             type="submit"
             className="px-4 py-2 bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
-          >
+            >
             Submit Order
           </button>
+
+            </div>
         </div>
       </div>
     </form>

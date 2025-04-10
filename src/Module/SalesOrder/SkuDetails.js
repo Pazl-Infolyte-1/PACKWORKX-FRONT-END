@@ -3,17 +3,21 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import ActionPopup from './ActionPopup'
 import { useEffect, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
+import apiMethods from '../../api/config'
 
-const SkuDetails = ({formData, setFormData, skuDetailsForm}) => {
+const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = true}) => {
   const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
   const [totalQuantity, setTotalQuantity] = useState(0)
   const [totalAmount, setTotalAmount] = useState(0)
   const [totalSGST, setTotalSGST] = useState(0)
   const [totalCGST, setTotalCGST] = useState(0)
   const [totalWithGST, setTotalWithGST] = useState(0)
+  const [skuList, setSkuList] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [previousValues, setPreviousValues] = useState(null)
 
   // Initialize form with skuDetailsForm data if it exists
-  const { register, control, handleSubmit, reset } = useForm({
+  const { register, control, handleSubmit, reset, watch, setValue, getValues } = useForm({
     defaultValues: {
       skus: skuDetailsForm && skuDetailsForm.length > 0 
         ? skuDetailsForm.map(item => ({
@@ -21,59 +25,209 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm}) => {
             quantity: item.quantity_required || '',
             rate: item.rate_per_sku || '',
             acceptableUnits: item.acceptable_sku_units || '',
-            totalAmount: item.total_amount || '',
             sgst: item.sgst || '',
             cgst: item.cgst || '',
+            totalAmount: item.total_amount || '',
+            sgstAmount: item.sgst_amount || '',
+            cgstAmount: item.cgst_amount || '',
             total: item.total_incl__gst || ''
           }))
-        : [{ sku: '', quantity: '', rate: '', acceptableUnits: '', totalAmount: '', sgst: '', cgst: '', total: '' }]
+        : [{ sku: '', quantity: '', rate: '', acceptableUnits: '', sgst: '', cgst: '', totalAmount: '', sgstAmount: '', cgstAmount: '', total: '' }]
     }
   })
 
-  // Update form when skuDetailsForm changes
-  useEffect(() => {
-    if (skuDetailsForm && skuDetailsForm.length > 0) {
-      const formattedData = skuDetailsForm.map(item => ({
-        sku: item.sku || '',
-        quantity: item.quantity_required || '',
-        rate: item.rate_per_sku || '',
-        acceptableUnits: item.acceptable_sku_units || '',
-        totalAmount: item.total_amount || '',
-        sgst: item.sgst || '',
-        cgst: item.cgst || '',
-        total: item.total_incl__gst || ''
-      }))
-      
-      reset({ skus: formattedData })
-      
-      // Calculate totals
-      const qty = formattedData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0)
-      const amount = formattedData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0)
-      const sgst = formattedData.reduce((sum, item) => sum + (parseFloat(item.sgst_amount) || 0), 0)
-      const cgst = formattedData.reduce((sum, item) => sum + (parseFloat(item.cgst_amount) || 0), 0)
-      const withGST = formattedData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0)
-      
-      setTotalQuantity(qty)
-      setTotalAmount(amount)
-      setTotalSGST(sgst)
-      setTotalCGST(cgst)
-      setTotalWithGST(withGST)
-    }
-  }, [skuDetailsForm, reset])
+  // Watch for changes to calculate totals
+  const skusData = watch('skus');
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'skus',
   })
 
-  const onSubmit = (data) => {
-    console.log('Submitted Data:', data)
-    // Here you would process the form data and update the parent component
-    if (setFormData) {
-      setFormData(prevData => ({
-        ...prevData,
-        skuDetails: data.skus
+  useEffect(() => {
+    // Fetch SKU list when component mounts
+    const fetchSkuList = async () => {
+      try {
+        setIsLoading(true)
+        const response = await apiMethods.getSkuList({
+          search: '',
+          client:'',
+          sku_type:'',
+          page:  1,
+          limit: 100,
+        })
+        setSkuList(response?.data || [])
+      } catch (error) {
+        console.error("Error fetching SKU list:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    fetchSkuList()
+  }, [])
+
+  // Update form when skuDetailsForm changes from parent component
+  useEffect(() => {
+    if (skuDetailsForm && skuDetailsForm.length > 0) {
+      // Only reset the form if the data has actually changed to avoid losing user input
+      const formattedData = skuDetailsForm.map(item => ({
+        sku: item.sku || '',
+        quantity: item.quantity_required || '',
+        rate: item.rate_per_sku || '', 
+        acceptableUnits: item.acceptable_sku_units || '',
+        sgst: item.sgst || '',
+        cgst: item.cgst || '',
+        totalAmount: item.total_amount || '',
+        sgstAmount: item.sgst_amount || '',
+        cgstAmount: item.cgst_amount || '',
+        total: item.total_incl__gst || ''
       }))
+      
+      // Check if the data is actually different from current form data
+      const currentFormData = JSON.stringify(getValues('skus'));
+      const newFormData = JSON.stringify(formattedData);
+      
+      // Always update the form if skuDetailsForm changes
+      if (currentFormData !== newFormData) {
+        reset({ skus: formattedData });
+        setPreviousValues(formattedData);
+        
+        // Also update totals based on the new data
+        const qty = formattedData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
+        const amount = formattedData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0);
+        const sgst = formattedData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0);
+        const cgst = formattedData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
+        const withGST = formattedData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+        
+        setTotalQuantity(qty);
+        setTotalAmount(amount);
+        setTotalSGST(sgst);
+        setTotalCGST(cgst);
+        setTotalWithGST(withGST);
+      }
+    }
+  }, [skuDetailsForm, reset, getValues])
+
+  // Calculate totals when form values change
+  useEffect(() => {
+    if (skusData) {
+      const qty = skusData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0)
+      const amount = skusData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0)
+      const sgst = skusData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0)
+      const cgst = skusData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0)
+      const withGST = skusData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0)
+      
+      setTotalQuantity(qty)
+      setTotalAmount(amount)
+      setTotalSGST(sgst)
+      setTotalCGST(cgst)
+      setTotalWithGST(withGST)
+      
+      // Update parent component whenever totals change
+      updateParentFormData();
+    }
+  }, [skusData])
+
+  // Function to update parent component with current SKU data
+  const updateParentFormData = () => {
+    const currentValues = getValues('skus');
+    if (!currentValues) return;
+    
+    // Format the data to match the expected schema
+    const formattedSkus = currentValues.map(sku => ({
+      sku: sku.sku,
+      quantity_required: sku.quantity,
+      rate_per_sku: sku.rate,
+      acceptable_sku_units: sku.acceptableUnits,
+      sgst: sku.sgst,
+      cgst: sku.cgst,
+      sgst_amount: sku.sgstAmount,
+      cgst_amount: sku.cgstAmount,
+      total_amount: sku.totalAmount,
+      total_incl__gst: sku.total
+    }))
+
+    // Update parent component with SKU details
+    if (setFormData) {
+      setFormData({
+        skuDetails: formattedSkus,
+        totalQuantity,
+        totalAmount,
+        totalSGST,
+        totalCGST,
+        totalWithGST
+      })
+    }
+  }
+
+  // Calculate row values automatically when quantity or rate changes
+  const calculateRowValues = (index) => {
+    const values = getValues(`skus[${index}]`);
+    const quantity = parseFloat(values.quantity) || 0;
+    const rate = parseFloat(values.rate) || 0;
+    
+    // Calculate total amount
+    const totalAmount = quantity * rate;
+    
+    // Get SGST and CGST percentages from user input
+    const sgstPercentage = parseFloat(values.sgst) || 0;
+    const cgstPercentage = parseFloat(values.cgst) || 0;
+    
+    // Calculate SGST and CGST amounts based on percentages
+    const sgstAmount = totalAmount * (sgstPercentage / 100);
+    const cgstAmount = totalAmount * (cgstPercentage / 100);
+    
+    // Calculate total with GST
+    const total = totalAmount + sgstAmount + cgstAmount;
+    
+    // Update form values
+    setValue(`skus[${index}].totalAmount`, totalAmount.toFixed(2));
+    setValue(`skus[${index}].sgstAmount`, sgstAmount.toFixed(2));
+    setValue(`skus[${index}].cgstAmount`, cgstAmount.toFixed(2));
+    setValue(`skus[${index}].total`, total.toFixed(2));
+  }
+
+  // Add a new SKU row
+  const addNewSku = () => {
+    append({ sku: '', quantity: '', rate: '', acceptableUnits: '', sgst: '', cgst: '', totalAmount: '', sgstAmount: '', cgstAmount: '', total: '' });
+    // Update parent immediately after adding a new row to preserve existing data
+    setTimeout(() => updateParentFormData(), 0);
+  }
+
+  // Remove a SKU row
+  const removeSku = (index) => {
+    remove(index);
+    // Update parent immediately after removing a row
+    setTimeout(() => updateParentFormData(), 0);
+  }
+
+  // Handle form submission
+  const onSubmit = (data) => {
+    // Format the data to match the expected schema
+    const formattedSkus = data.skus.map(sku => ({
+      sku: sku.sku,
+      quantity_required: sku.quantity,
+      rate_per_sku: sku.rate,
+      acceptable_sku_units: sku.acceptableUnits,
+      sgst: sku.sgst,
+      cgst: sku.cgst,
+      sgst_amount: sku.sgstAmount,
+      cgst_amount: sku.cgstAmount,
+      total_amount: sku.totalAmount,
+      total_incl__gst: sku.total
+    }))
+
+    // Update parent component with SKU details
+    if (setFormData) {
+      setFormData({
+        skuDetails: formattedSkus,
+        totalQuantity,
+        totalAmount,
+        totalSGST,
+        totalCGST,
+        totalWithGST
+      })
     }
   }
 
@@ -84,7 +238,7 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm}) => {
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Sku Details</h2>
           <ActionButton
-            onClick={() => append({ sku: '', quantity: '', rate: '', acceptableUnits: '', totalAmount: '', sgst: '', cgst: '', total: '' })}
+            onClick={addNewSku}
             variant='add'
             label={"+ Add Sku"}
           />
@@ -101,9 +255,11 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm}) => {
                     <th className="px-4 py-2 text-left">Quantity Required</th>
                     <th className="px-4 py-2 text-left">Rate Per Sku</th>
                     <th className="px-4 py-2 text-left">Acceptable Sku Units</th>
+                    <th className="px-4 py-2 text-left">SGST %</th>
+                    <th className="px-4 py-2 text-left">CGST %</th>
                     <th className="px-4 py-2 text-left">Total Amount</th>
-                    <th className="px-4 py-2 text-left">SGST</th>
-                    <th className="px-4 py-2 text-left">CGST</th>
+                    <th className="px-4 py-2 text-left">SGST Amount</th>
+                    <th className="px-4 py-2 text-left">CGST Amount</th>
                     <th className="px-4 py-2 text-left">Total</th>
                     <th className="px-4 py-2 text-left">Action</th>
                   </tr>
@@ -116,23 +272,31 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm}) => {
                       {/* SKU Dropdown */}
                       <td className="px-4 py-2">
                         <select
-                          {...register(`skus.${index}.sku`)}
-                          className="w-[320px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] outline-none"
-                          defaultValue=""
+                          {...register(`skus[${index}].sku`, {
+                            onChange: () => updateParentFormData()
+                          })}
+                          className="w-[320px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                         >
                           <option value="" disabled>
-                            Select SKU
+                            {isLoading ? "Loading SKUs..." : "Select SKU"}
                           </option>
-                          <option value="sterling">Sterling Labs</option>
-                          <option value="client1">Client 1</option>
-                          <option value="client2">Client 2</option>
+                          {skuList.map((sku, i) => (
+                            <option key={i} value={sku.sku_name || sku.value}>
+                              {sku.sku_name}
+                            </option>
+                          ))}
                         </select>
                       </td>
 
                       {/* Quantity Input */}
                       <td className="px-4 py-2">
                         <input
-                          {...register(`skus.${index}.quantity`)}
+                          {...register(`skus[${index}].quantity`, {
+                            onChange: () => {
+                              calculateRowValues(index);
+                              updateParentFormData();
+                            }
+                          })}
                           type="number"
                           placeholder="0"
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
@@ -142,7 +306,12 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm}) => {
                       {/* Rate Per SKU Input */}
                       <td className="px-4 py-2">
                         <input
-                          {...register(`skus.${index}.rate`)}
+                          {...register(`skus[${index}].rate`, {
+                            onChange: () => {
+                              calculateRowValues(index);
+                              updateParentFormData();
+                            }
+                          })}
                           type="number"
                           placeholder="0"
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
@@ -152,7 +321,39 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm}) => {
                       {/* Acceptable SKU Units Input */}
                       <td className="px-4 py-2">
                         <input
-                          {...register(`skus.${index}.acceptableUnits`)}
+                          {...register(`skus[${index}].acceptableUnits`, {
+                            onChange: () => updateParentFormData()
+                          })}
+                          type="number"
+                          placeholder="0"
+                          className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+                        />
+                      </td>
+
+                      {/* SGST Percentage Input */}
+                      <td className="px-4 py-2">
+                        <input
+                          {...register(`skus[${index}].sgst`, {
+                            onChange: () => {
+                              calculateRowValues(index);
+                              updateParentFormData();
+                            }
+                          })}
+                          type="number"
+                          placeholder="0"
+                          className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+                        />
+                      </td>
+
+                      {/* CGST Percentage Input */}
+                      <td className="px-4 py-2">
+                        <input
+                          {...register(`skus[${index}].cgst`, {
+                            onChange: () => {
+                              calculateRowValues(index);
+                              updateParentFormData();
+                            }
+                          })}
                           type="number"
                           placeholder="0"
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
@@ -162,47 +363,51 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm}) => {
                       {/* Total Amount */}
                       <td className="px-4 py-2">
                         <input
-                          {...register(`skus.${index}.totalAmount`)}
+                          {...register(`skus[${index}].totalAmount`)}
                           type="number"
                           placeholder="0"
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+                          readOnly
                         />
                       </td>
 
-                      {/* SGST */}
+                      {/* SGST Amount */}
                       <td className="px-4 py-2">
                         <input
-                          {...register(`skus.${index}.sgst`)}
+                          {...register(`skus[${index}].sgstAmount`)}
                           type="number"
                           placeholder="0"
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+                          readOnly
                         />
                       </td>
 
-                      {/* CGST */}
+                      {/* CGST Amount */}
                       <td className="px-4 py-2">
                         <input
-                          {...register(`skus.${index}.cgst`)}
+                          {...register(`skus[${index}].cgstAmount`)}
                           type="number"
                           placeholder="0"
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+                          readOnly
                         />
                       </td>
 
                       {/* Total */}
                       <td className="px-4 py-2">
                         <input
-                          {...register(`skus.${index}.total`)}
+                          {...register(`skus[${index}].total`)}
                           type="number"
                           placeholder="0"
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+                          readOnly
                         />
                       </td>
 
                       {/* Delete Icon */}
                       <td className="px-4 py-2">
-                        <button type="button" onClick={() => remove(index)}>
-                          <TrashIcon className="text-[#ff2d55] w-8 h-8 cursor-pointer" />
+                        <button type="button" onClick={() => removeSku(index)}>
+                          <TrashIcon className="text-[#ff2d55] w-6 h-6 cursor-pointer" />
                         </button>
                       </td>
                     </tr>
@@ -264,17 +469,20 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm}) => {
             variant='minimal'
           />
 
+          {/* Show the Save as Draft button but not the Submit button if showSubmitButton is false */}
           <div className="flex gap-4">
             <ActionButton
               label={"Save As Draft"}
               variant='minimal'
             />
-
-            <ActionButton
-              onClick={handleSubmit(onSubmit)}
-              label={"Submit"}
-              variant='minimal'
-            />
+            
+            {showSubmitButton && (
+              <ActionButton
+                onClick={handleSubmit(onSubmit)}
+                label={"Submit"}
+                variant='minimal'
+              />
+            )}
           </div>
         </div>
       </div>

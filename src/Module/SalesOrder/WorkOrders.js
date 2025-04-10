@@ -22,13 +22,56 @@ const accordionCardSummary = {
   ],
 }
 
-const WorkOrders = () => {
+const WorkOrders = ({setFormData, workOrdersData,workOrders,setWorkOrders}) => {
   const [selectedOption, setSelectedOption] = useState('inhouse')
-  const [openIndices, setOpenIndices] = useState([]) // Store multiple open indices
+  const [openIndices, setOpenIndices] = useState([])
   const [openAccordions, setOpenAccordions] = useState({})
   const [openCreateAccordion, setCreateOpenAccordion] = useState([1])
   const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
-  const [skuList, setSkuList] = useState([]);
+  const [skuList, setSkuList] = useState([])
+  
+  // Track form data for each work order
+  // const [workOrders, setWorkOrders] = useState([
+  //   { 
+  //     id: 1, 
+  //     sku: "", 
+  //     skuVersion: "", 
+  //     quantity: "", 
+  //     deliveryDate: "", 
+  //     description: "", 
+  //     startDate: "", 
+  //     excessUnits: "", 
+  //     endDate: "",
+  //     manufacturingType: "inhouse" // Track manufacturing type
+  //   }
+  // ])
+
+  // Update work order data
+  const handleWorkOrderChange = (orderId, field, value) => {
+    setWorkOrders(prevOrders => 
+      prevOrders.map(order => 
+        order.id === orderId 
+          ? { ...order, [field]: value }
+          : order
+      )
+    )
+  }
+
+  // Handle form submission
+  const handleSubmit = () => {
+    // Filter out empty work orders
+    const filledWorkOrders = workOrders.filter(order => 
+      order.sku || order.quantity || order.description
+    )
+    
+    console.log("Submitting work orders:", filledWorkOrders)
+    // You can also pass this to parent component if needed
+    setFormData?.(filledWorkOrders)
+  }
+
+  useEffect(()=>{
+    console.log(workOrdersData,"woooooooooooooooooooek")
+  },[workOrdersData])
 
   useEffect(() => {
     const fetchSkuList = async () => {
@@ -49,23 +92,14 @@ const WorkOrders = () => {
     console.log("Selected SKU ID:", selectedId);
     console.log("Selected SKU Data:", selectedSku);
   };
-  const toggleAccordion = (id) => {
-    setOpenAccordions((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }))
-  }
+ 
   const handleToggle = () => {
     setSelectedOption((prev) => {
-      if (prev === 'inhouse') return 'outsource'
-      if (prev === 'outsource') return 'purchaseOrder'
+      // if (prev === 'inhouse') return 'outsource'
+      // if (prev === 'outsource') return 'purchaseOrder'
       return 'inhouse'
     })
   }
-
-  const [workOrders, setWorkOrders] = useState([
-    { id: 1, sku: "", skuVersion: "", quantity: "", deliveryDate: "", description: "", startDate: "", excessUnits: "", endDate: "" }
-  ])
 
   // Function to add a new work order
   const addWorkOrder = () => {
@@ -82,6 +116,7 @@ const WorkOrders = () => {
         startDate: '',
         excessUnits: '',
         endDate: '',
+        manufacturingType: 'inhouse'
       },
     ])
   }
@@ -117,77 +152,91 @@ const WorkOrders = () => {
 
       {/* Work Order Card */}
       <div>
-        {accordionCardSummary?.data?.map((item) => (
+      {workOrdersData && workOrdersData.length > 0 ? (
+
+        workOrdersData?.map((item) => (
           <div
-            key={item.id}
-            className="w-[1180px] rounded-[10px] border border-gray-700 p-3 mb-5"
+            key={item?.id}
+            className="w-[1180px] rounded-[10px] border border-gray-700 p-3 mb-2"
           >
             {/* Accordion Header (Clickable) */}
             <div
               className="w-full   items-start flex flex-col justify-between cursor-pointer"
-              onClick={() => toggleAccordion(item.id)}
             >
               {/* Left Section - Title */}
               <p className="text-[#030303] text-[15px] font-lato font-bold leading-[26px] text-justify">
-                {item.title}
+                {item?.sku_name}
               </p>
 
               {/* Middle Section - Details aligned horizontally with buttons */}
               <div className="flex items-center w-full flex-grow justify-between">
                 {/* Details */}
                 <div className="flex">
-                  {item.details.map((detail, index) => (
                     <span
-                      key={index}
                       className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
+                      title="Quantity"
                     >
-                      {detail}
+                      {item?.qty}
                     </span>
-                  ))}
+                    <span
+                      className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
+                      title="SKU Version"
+                    >
+                      {item?.sku_version}
+                    </span>       <span
+                      className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
+                      title="Acceptable Excess Units"
+                    >
+                      {item?.acceptable_excess_units}
+                    </span>
+                           <span
+                      className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
+                      title="Planned Start Date"
+                    >
+                      {item?.planned_start_date && new Date(item.planned_start_date).toLocaleDateString('en-US', {
+                        year: '2-digit',
+                        month: 'long',
+                        day: '2-digit'
+                      })}
+                    </span>
+                    <span
+                      className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
+                      title="Planned End Date"
+                    >
+                      {item?.planned_start_date && new Date(item.planned_start_date).toLocaleDateString('en-US', {
+                        year: '2-digit',
+                        month: 'long',
+                        day: '2-digit'
+                      })}
+                    </span>
                 </div>
 
                 {/* Status Buttons */}
                 <div className="flex gap-3">
-                  {item.buttons.map((button) => (
+                  {accordionCardSummary.data[0]?.buttons?.map((button) => (
                     <button
-                      key={button.id}
+                      key={button?.id}
                       className="cursor-pointer w-[120px] h-[22px] px-2 border-0 rounded-[6px] text-sm font-mulish font-bold leading-[22px] outline-none"
-                      style={{ backgroundColor: button.bgColor, color: button.textColor }}
+                      style={{ backgroundColor: button?.bgColor, color: button?.textColor }}
                     >
-                      {button.name}
+                      {button?.name}
                     </button>
                   ))}
-                   <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  className={`w-[40px] h-[30px] transition-transform duration-300 ${openAccordions[item.id] ? 'rotate-180' : ''
-                    } text-[#8167e5] fill-[#8167e5]`}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
                 </div>
                
               </div>
-
-              {/* Right Section - Arrow Icon */}
-
             </div>
 
-            {/* Accordion Content (Visible when Open) */}
-            {openAccordions[item.id] && (
-              <div className="mt-2 p-3 border-t border-gray-300 text-black text-[14px]">
-                {item.content}
-              </div>
-            )}
           </div>
-        ))}
+        ))
+      ) : (
+        // Show a message when no work orders are available
+        <div></div>
+      )}
       </div>
 
       {workOrders.length > 0 && (
-        <div
-          name="commonScrolldiv"
-          className="max-h-[600px] w-[1180px] overflow-y-auto rounded-md pb-4 border border-gray-700"
-        >
+        <div className="max-h-[600px] w-[1180px] overflow-y-auto rounded-md pb-4 border border-gray-700">
           {workOrders.map((order, index) => (
             <div key={order.id} className="mt-4 rounded-md relative">
               {/* Work Order Number */}
@@ -233,7 +282,10 @@ const WorkOrders = () => {
 
                 <div
                   className="relative w-[400px] h-[30px] bg-white border border-[#8167E5] rounded-[10px] shadow-md cursor-pointer flex items-center justify-between px-2"
-                  onClick={handleToggle}
+                  onClick={() => {
+                    const newType = order.manufacturingType === 'inhouse' ? 'outsource' : 'inhouse'
+                    handleWorkOrderChange(order.id, 'manufacturingType', newType)
+                  }}
                 >
                   {/* Inhouse */}
                   <span
@@ -280,8 +332,8 @@ const WorkOrders = () => {
                       <label className="block text-gray-800 font-medium mb-1 ml-2">SKU</label>
                       <select
                         className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] text-sm rounded-md bg-white text-[#030303] outline-none ml-2"
-                        defaultValue=""
-                        onChange={handleChange}
+                        value={order.sku}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'sku', e.target.value)}
                       >
                         <option value="" disabled>
                           Select SKU
@@ -305,6 +357,8 @@ const WorkOrders = () => {
                         <input
                           type="text"
                           placeholder="Preview Of Sku Version"
+                          value={order.skuVersion}
+                          onChange={(e) => handleWorkOrderChange(order.id, 'skuVersion', e.target.value)}
                           className="w-[260px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm"
                         />
 
@@ -328,6 +382,8 @@ const WorkOrders = () => {
                       <input
                         type="number"
                         placeholder="100"
+                        value={order.quantity}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'quantity', e.target.value)}
                         className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm"
                       />
                     </div>
@@ -337,6 +393,8 @@ const WorkOrders = () => {
                       </label>
                       <input
                         type="date"
+                        value={order.deliveryDate}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'deliveryDate', e.target.value)}
                         className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
                       />
                     </div>
@@ -350,6 +408,8 @@ const WorkOrders = () => {
                       </label>
                       <textarea
                         placeholder="Description"
+                        value={order.description}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'description', e.target.value)}
                         className="w-[420px] h-[60px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm resize-none"
                       />
                     </div>
@@ -359,6 +419,8 @@ const WorkOrders = () => {
                       </label>
                       <input
                         type="date"
+                        value={order.startDate}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'startDate', e.target.value)}
                         className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
                       />
                     </div>
@@ -373,6 +435,8 @@ const WorkOrders = () => {
                       <input
                         type="number"
                         placeholder="Enter units"
+                        value={order.excessUnits}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'excessUnits', e.target. value)}
                         className="w-[420px] h-[50px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm"
                       />
                     </div>
@@ -382,6 +446,8 @@ const WorkOrders = () => {
                       </label>
                       <input
                         type="date"
+                        value={order.endDate}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'endDate', e.target.value)}
                         className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
                       />
                     </div>
@@ -399,6 +465,7 @@ const WorkOrders = () => {
         <ActionButton
           label={"Submit Work Order"}
           variant='minimal'
+          onClick={handleSubmit}
         />
       </div>
       <VersionsPopup

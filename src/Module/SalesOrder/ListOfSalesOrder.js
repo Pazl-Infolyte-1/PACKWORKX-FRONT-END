@@ -172,7 +172,10 @@ function ListOfSalesOrder() {
             <div className="flex justify-center items-center gap-2">
               <ActionButton
                 label={"Add Sales Order"}
-                onClick={() => setDrawerOpen(true)}
+                onClick={() => {
+                  setIsEditMode(false)
+                  setDrawerOpen(true)
+                }}
                 variant='add'
               />
             </div>
@@ -203,9 +206,16 @@ function ListOfSalesOrder() {
           </div>
         </div>
 
-        <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth="1280px">
-          <AddSalesOrder currentTab={'salesOrder'} isEdit={isEditMode} selectedSalesOrderID={selectedSalesOrder} ></AddSalesOrder>
-        </Drawer>
+  <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth="1280px">
+    <AddSalesOrder 
+      currentTab={'salesOrder'} 
+      isEdit={isEditMode} 
+      selectedSalesOrderID={selectedSalesOrder} 
+      setDrawer={setDrawerOpen}
+      setisEdit={setIsEditMode}
+    />
+  </Drawer>
+
       </div>
       <div>
         <ConfirmationModale

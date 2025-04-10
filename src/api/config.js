@@ -653,9 +653,22 @@ export const apiMethods = {
   getSaleOrderData: async (id) => {
     const response = await apiClient.get(`/sale-order/${id}`)
     return response
+  },
+
+  addSalesOrder: async (body) => {
+    const response = await apiClient.post(`/sale-order`,body)
+    return response
+  },
+
+  editSalesOrder:async(id,body)=>{
+    const response = await apiClient.put(`/sale-order/${id}`,body)
+    return response
   }
 
+
+
 }
+
 
 export default apiMethods
 

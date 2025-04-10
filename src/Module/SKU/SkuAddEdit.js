@@ -266,7 +266,6 @@ function SkuAddEdit({
   }
   const openViewCard = (data) => {
     setisSingleViewPopup(true)
-    console.log(JSON.stringify(data))
     setSingleDataId(data.id)
   }
 

@@ -24,9 +24,6 @@ function RSCBox({
   onMeterDataChange
 }) {
     const [alerts, setAlerts] = useState([]);
-  
-  console.log("show client obj",setAddNewSkuData)
-  console.log("show client if",client)
   const filteredClient = locationvalue 
   ? client.find(client => client.client_id === locationvalue) 
   : null;
@@ -34,7 +31,6 @@ function RSCBox({
   const [metricSign, setMetricsSign] = useState("mm");
   const [areaInM2, setAreaInM2] = useState(null);
 
-console.log("deckle size",setAddNewSkuData.deckle_size)
 const calculateBoardSize = (data) => {
   const length = parseFloat(data.length) || 0;
   const width = parseFloat(data.width) || 0;
@@ -42,7 +38,6 @@ const calculateBoardSize = (data) => {
   const lengthTrimmingTolerance = parseFloat(data.length_trimming_tolerance) || 0;
   const widthTrimmingTolerance = parseFloat(data.width_trimming_tolerance) || 0;
   const upsval = parseFloat(data.ups) || 0;
-console.log("upsval",data)
   const flapWidth = parseFloat(data.flap_width) || 0;
   const deckleSize = parseFloat(data.deckle_size) || 0;
 
@@ -52,12 +47,9 @@ console.log("upsval",data)
   const widthBoardSize =( width + height) + widthTrimmingTolerance
 //  7.1 Length of the board (across glue lines) = ((Box Length + Box Width) X 2 ) + Flap + Trimming Tolerance length (default 20)
 //7.2 Width of the board (along glue lines)= (Box Depth +Box Width) + Trimming Tolerance Width (default 20)
-console.log("board width",widthBoardSize)
   const totalBoardSize = lengthBoardSize * widthBoardSize;
-  console.log("into m square",totalBoardSize)
   const deckleSizeVal=widthBoardSize*upsval;
-  console.log("manually entered deckle size",deckleSize)
-  console.log("calculated deckle size", deckleSizeVal);
+
   if (deckleSize < deckleSizeVal) {
     return {
       length_board_size_cm2: lengthBoardSize.toFixed(2),
@@ -213,13 +205,10 @@ const modifiedHandleChange = (e) => {
   //  }));
   //};
 
-console.log("sku type",JSON.stringify(skuType))
 const handleClose = () => {
   setAlerts([]);
 };
 
-console.log("changing metrics",addNewSkuData.board_size_cm2)
-console.log("metrics sign",metricSign)
 //conversion for meter square
 useEffect(() => {
   //if (!addNewSkuData?.board_size_cm2 || !metricSign) return;
@@ -243,8 +232,7 @@ useEffect(() => {
       return;
   }
 
-  console.log("Original area:", area, metricSign);
-  console.log("Converted area in m²:", convertedArea);
+
 onMeterDataChange(convertedArea)
   setAreaInM2(convertedArea);
 }, [addNewSkuData?.board_size_cm2, metricSign]);

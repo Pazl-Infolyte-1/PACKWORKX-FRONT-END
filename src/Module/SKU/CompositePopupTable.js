@@ -94,7 +94,7 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
 		setVisible(false);
 	  };
 
-	  console.log("sku table data",JSON.stringify(skuListTable.pagination,setSearchQuery ))
+	  //console.log("sku table data",JSON.stringify(skuListTable.pagination,setSearchQuery ))
 
 	  const handleSelect = (e) => {
 		const clientId = e.target.value;
@@ -191,8 +191,8 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
         </CTableHead>
 
         <CTableBody>
-          {skuListTable.data.length > 0 ? (
-            skuListTable.data.map((item) => (
+          {skuListTable?.data?.length > 0 ? (
+            skuListTable?.data.map((item) => (
               <CTableRow key={item.id} className="hover:bg-gray-50">
                 <CTableDataCell className="py-3 px-2 text-center">
                   <input

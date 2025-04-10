@@ -21,7 +21,8 @@ function RSCBox({
   locationvalue,
   onUnitChange,
   setBoardSizeError,
-  onMeterDataChange
+  onMeterDataChange,
+  editTag
 }) {
     const [alerts, setAlerts] = useState([]);
   
@@ -33,7 +34,7 @@ function RSCBox({
   const [unitTooltip, setUnitTooltip] = useState("Enter Millimeter");
   const [metricSign, setMetricsSign] = useState("mm");
   const [areaInM2, setAreaInM2] = useState(null);
-
+const [boarderr,setBoardErr]=useState(null)
 console.log("deckle size",setAddNewSkuData.deckle_size)
 const calculateBoardSize = (data) => {
   const length = parseFloat(data.length) || 0;
@@ -58,7 +59,8 @@ console.log("board width",widthBoardSize)
   const deckleSizeVal=widthBoardSize*upsval;
   console.log("manually entered deckle size",deckleSize)
   console.log("calculated deckle size", deckleSizeVal);
-  if (deckleSize < deckleSizeVal) {
+  
+  if (deckleSize > deckleSizeVal) {
     return {
       length_board_size_cm2: lengthBoardSize.toFixed(2),
       width_board_size_cm2: widthBoardSize.toFixed(2),
@@ -127,6 +129,7 @@ const modifiedHandleChange = (e) => {
       if (boardSizeUpdates.error) {
         // Show error to user
         console.error(boardSizeUpdates.error);
+        setBoardErr(boardSizeUpdates)
         // Optionally: toast(boardSizeUpdates.error) or setError(boardSizeUpdates.error)
         setAlerts([{ severity: "error", message: boardSizeUpdates.error}]);
         if (setBoardSizeError) {
@@ -249,6 +252,16 @@ onMeterDataChange(convertedArea)
   setAreaInM2(convertedArea);
 }, [addNewSkuData?.board_size_cm2, metricSign]);
 
+//useEffect(() => {
+//  return () => {
+//    // Cleanup on unmount
+//    setUnitTooltip(null);
+//    setMetricsSign(null);
+//    setAreaInM2(null);
+//    setBoardErr(null);
+//  };
+//}, []);
+
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -270,7 +283,10 @@ onMeterDataChange(convertedArea)
               >
                 {skuType.map((option) => (
                   <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-100">
-                    <li className="p-2 cursor-pointer w-full" onClick={() => handleSelect(option)}>
+                       <li
+      className={`p-2 cursor-pointer w-full ${editTag ? 'text-gray-400 cursor-not-allowed' : ''}`}
+      onClick={!editTag ? () => handleSelect(option) : undefined}
+    >
                       {option.sku_type}
                     </li>
                     {/* {editTag && (

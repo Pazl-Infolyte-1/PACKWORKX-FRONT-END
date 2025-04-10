@@ -214,6 +214,7 @@ function SkuAddEdit({
         //onUnitChange={handleUnitChange}
         setBoardSizeError={setBoardSizeError}
         onMeterDataChange={handleMeterDataChange}
+        editTag={editTag}
       />
     ),
     //'Corrugated Sheet': (
@@ -230,6 +231,7 @@ function SkuAddEdit({
         skuType={skuType}
         setAddNewSkuData={setAddNewSkuData}
         updateSkuValues={updateSkuValues}
+        editTag={editTag}
       />
     ),
     'Die Cut box': (
@@ -245,6 +247,7 @@ function SkuAddEdit({
         skuType={skuType}
         setAddNewSkuData={setAddNewSkuData}
         updateSkuValues={updateSkuValues}
+        editTag={editTag}
       />
     ),
     'Composite': (
@@ -261,6 +264,7 @@ function SkuAddEdit({
         setAddNewSkuData={setAddNewSkuData}
         updateSkuValues={updateSkuValues}
         editedSkudata={editedSkudata}
+        editTag={editTag}
       />
     ),
   }

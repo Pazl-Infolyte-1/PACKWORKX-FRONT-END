@@ -3,7 +3,7 @@ import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
 import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash } from '@coreui/icons'
 
-function CorrugatedSheet({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData, updateSkuValues}) {
+function CorrugatedSheet({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData, updateSkuValues}) {
   return (
     <>
       <div className="grid grid-cols-3 gap-4">
@@ -24,7 +24,10 @@ function CorrugatedSheet({dropdownRef, addNewSkuData, isOpen, handleChange, clie
               >
                 {skuType.map((option) => (
                   <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-100">
-                    <li className="p-2 cursor-pointer w-full" onClick={() => handleSelect(option)}>
+                                                    <li
+      className={`p-2 cursor-pointer w-full ${editTag ? 'text-gray-400 cursor-not-allowed' : ''}`}
+      onClick={!editTag ? () => handleSelect(option) : undefined}
+    >
                       {option.sku_type}
                     </li>
                     {/* {editTag && (

@@ -2,9 +2,20 @@ import Input from '../../components/New/Input'
 import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
 import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash } from '@coreui/icons'
+import DiePopupTable from './DiePopupTable'
+import PopUp from '../../components/New/PopUp'
+import { useState } from 'react'
 
 
-function DieCutBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData, updateSkuValues}) {
+function DieCutBox({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData, updateSkuValues}) {
+      const [isSingleViewPopup, setisSingleViewPopup] = useState(false);
+  
+  
+  const handleBrowseClick=()=>{
+    setisSingleViewPopup(true)
+  }
+
+
   return (
     <>
       <div className="grid grid-cols-3 gap-4">
@@ -25,7 +36,10 @@ function DieCutBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
               >
                 {skuType.map((option) => (
                   <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-100">
-                    <li className="p-2 cursor-pointer w-full" onClick={() => handleSelect(option)}>
+                                    <li
+      className={`p-2 cursor-pointer w-full ${editTag ? 'text-gray-400 cursor-not-allowed' : ''}`}
+      onClick={!editTag ? () => handleSelect(option) : undefined}
+    >
                       {option.sku_type}
                     </li>
                     {/* {editTag && (
@@ -138,22 +152,27 @@ function DieCutBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
 
         <div>
         <div>
-          <label className="block text-[16px] font-medium mb-2">Select Dies</label>
-          <select
-            name="select_dies"
-            id="select_dies"
-            //disabled={clientDiasble}
-            value={addNewSkuData.select_dies || ''}
-            onChange={handleChange}
-            className="w-full p-2 shadow-md border-l-2 rounded-md"
-          >
-           {["Die 1", "Die 2"].map((die, index) => (
-      <option key={index} value={die}>
-        {die}
-      </option>
-    ))}
-          </select>
-        </div>
+  <label className="block text-[16px] font-medium mb-2">Select Dies</label>
+  <div className="flex items-center gap-2">
+    <input
+      type="text"
+      name="select_dies"
+      id="select_dies"
+      value={addNewSkuData.select_dies || ''}
+      onChange={handleChange}
+      className="w-full p-2 shadow-md border-l-2 rounded-md"
+      placeholder="Enter Die Name"
+    />
+    <button
+      type="button"
+      className="bg-gray-400 text-white px-4 py-2 rounded-md shadow-md hover:bg-gray-500"
+      onClick={handleBrowseClick}
+    >
+      Browse
+    </button>
+  </div>
+</div>
+
           {/*<Input
             skuName="Flap Width"
             id="flap_width"
@@ -259,6 +278,16 @@ function DieCutBox({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
           placeholder="minimum order level"
         />
       </div>
+
+      <PopUp header={"Select SKU"}
+          visible={isSingleViewPopup}
+          setVisible={setisSingleViewPopup} 
+          showCloseButton={true}
+          width={'80vw'}
+        >
+<DiePopupTable/>
+        </PopUp>
+	
     </>
   )
 }

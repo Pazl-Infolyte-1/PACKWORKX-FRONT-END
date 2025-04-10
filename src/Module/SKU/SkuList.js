@@ -168,6 +168,7 @@ function SkuList() {
       ])
     }
     setAlerts([])
+    setBoardSizeError("")
   }
 
   const handleSkuEdit = (id) => {
@@ -182,7 +183,7 @@ function SkuList() {
       ply: selectedSku.ply || null,
       length: selectedSku.length || null,
       width: selectedSku.width || null,
-      height: selectedSku.height || '',
+      height: selectedSku.height || null,
       unit: selectedSku.unit || null,
       joints: selectedSku.joints || null,
       ups: selectedSku.ups || null,

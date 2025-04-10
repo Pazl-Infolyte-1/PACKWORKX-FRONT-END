@@ -657,9 +657,16 @@ export const apiMethods = {
       console.error(error);
       
     }
-  }
+  },
 
 
+  getDies: async (params) => {
+    try {
+      return await apiClient.get('/common-service/die', {params})
+    } catch (error) {
+      console.error(error)
+    }
+  },
 }
 
 export default apiMethods

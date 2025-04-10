@@ -34,7 +34,7 @@ function SkuAddEdit({
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false);
-
+  const [meterSquareData, setMeterSquareData] = useState(null);
   const createInitialSkuData = () => ({
     sku_name: null,
     composite_type:null,
@@ -72,10 +72,14 @@ function SkuAddEdit({
         material: null,
         color: null,
         flute_type: null,
+        weight:null,
         //flute_ratio: null,
       },
     ],
   })
+  const handleMeterDataChange = (data) => {
+    setMeterSquareData(data);
+  };
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -132,7 +136,12 @@ function SkuAddEdit({
   const handleSkuValuesChange = (index, field, value) => {
     setAddNewSkuData((prevData) => {
       const updatedSkuValues = [...prevData.sku_values]
+      
       updatedSkuValues[index] = { ...updatedSkuValues[index], [field]: value }
+      if (field === 'gsm') {
+        updatedSkuValues[index].weight = value*meterSquareData; // Set weight to the GSM value
+      }
+  
       return { ...prevData, sku_values: updatedSkuValues }
     })
   }
@@ -186,6 +195,7 @@ function SkuAddEdit({
       material: '',
       color: '',
       flute_type: '',
+      weight:''
       //flute_ratio: '',
     }))
 
@@ -213,7 +223,7 @@ function SkuAddEdit({
         locationvalue={locationvalue}
         //onUnitChange={handleUnitChange}
         setBoardSizeError={setBoardSizeError}
-
+        onMeterDataChange={handleMeterDataChange}
       />
     ),
     //'Corrugated Sheet': (
@@ -275,7 +285,7 @@ function SkuAddEdit({
     setisSingleViewPopup(false);
     //setSelectedClientId(null); // Reset client ID
   };
-  
+  console.log("got square data",meterSquareData)
   return (
     <div className="p-6 bg-white rounded-lg">
 
@@ -333,11 +343,11 @@ function SkuAddEdit({
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
                       <input
-                        type="text"
+                        type="number"
                         className="p-1 border rounded text-center w-full"
                         value={item.gsm || ''}
                         placeholder="gsm"
-                        onChange={(e) => handleSkuValuesChange(index, 'gsm', e.target.value)}
+                        onChange={(e) => handleSkuValuesChange(index, 'gsm',  Number(e.target.value))}
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
@@ -409,7 +419,7 @@ function SkuAddEdit({
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <p>N/A</p>
+                    <p>{item.weight || 'N/A'}</p> 
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
                       <p>N/A</p>

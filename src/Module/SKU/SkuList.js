@@ -80,6 +80,7 @@ function SkuList() {
         material: null,
         color: null,
         flute_type: null,
+        weight:null,
         flute_ratio: null,
       },
     ],
@@ -133,8 +134,14 @@ function SkuList() {
           setEditTag(false)
           setRefresh((prev) => !prev)
           setAlerts([{ severity: 'success', message: response.data.message || 'Sku updated successfully!' }])
+          setTimeout(()=>{
+            setAlerts([])
+          },3000)
         } else {
           setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong'}])
+          setTimeout(()=>{
+            setAlerts([])
+          },3000)
         }
       } else {
         if (boardSizeError) {
@@ -142,20 +149,30 @@ function SkuList() {
           setAlerts([{ severity: "error", message: boardSizeError}]);
           return null; // 🔴 Stop submission
         }
-        setAlerts([]);
+        //setAlerts([]);
         const response = await apiMethods.addSku(addNewSkuData)
         if (response?.status === 201) {
           setDrawerOpen(false)
           setRefresh((prev) => !prev)
           setAlerts([{ severity: 'success', message: 'Sku Added successfully!' }])
+          setTimeout(()=>{
+            setAlerts([])
+          },3000)
         } else {
           setAlerts([{ severity: 'error', message: response.data.message || 'Something went wrong' }])
+          setTimeout(()=>{
+            setAlerts([])
+          },3000)
         }
       }
     } catch (error) {
       console.error(error)
       setAlerts([{ severity: 'error', message: error?.response?.data?.message|| 'Something went wrong' }])
+      setTimeout(()=>{
+        setAlerts([])
+      },3000)
     }
+    setAlerts([])
   }
 
   const handleSkuEdit = (id) => {
@@ -200,6 +217,7 @@ function SkuList() {
           material: null,
           color: null,
           flute_type: null,
+          weight:null,
           flute_ratio: null,
         },
       ],

@@ -21,7 +21,7 @@ const compositeTypes = [
 	{ id: 1, name: "Charger" },
 	{ id: 2, name: "Laptop" },
   ];
-function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData,editedSkudata,
+function Composite({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData,editedSkudata,
 	 updateSkuValues}) {
     const [skuListTable, setSkuListTable] = useState([]);
 	const [skuFields, setSkuFields] = useState([]);
@@ -91,7 +91,7 @@ function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
   
           fetchSkuListTablePopup();
 
-          
+
       }, [pagination.currentPage, limit, refresh,searchQuery,selectedClient,selectedSkuType]);
 		const handleAddSkuField = () => {
 			setSkuFields((prev) => [...prev, { id: '', ratio: '', key: Date.now() }]);
@@ -232,7 +232,10 @@ function Composite({dropdownRef, addNewSkuData, isOpen, handleChange, clientDias
 			  >
 				{skuType.map((option) => (
 				  <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-100">
-					<li className="p-2 cursor-pointer w-full" onClick={() => handleSelect(option)}>
+			       <li
+      className={`p-2 cursor-pointer w-full ${editTag ? 'text-gray-400 cursor-not-allowed' : ''}`}
+      onClick={!editTag ? () => handleSelect(option) : undefined}
+    >
 					  {option.sku_type}
 					</li>
 					{/* {editTag && (

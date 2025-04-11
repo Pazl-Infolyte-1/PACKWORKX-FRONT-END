@@ -164,6 +164,8 @@ function SkuList() {
         { severity: 'error', message: error?.response?.data?.message || 'Something went wrong' },
       ])
     }
+    setAlerts([])
+    setBoardSizeError("")
   }
 
   const handleSkuEdit = (id) => {

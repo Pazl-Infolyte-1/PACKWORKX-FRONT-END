@@ -32,8 +32,8 @@ function SkuAddEdit({
   const { user } = useContext(AuthContext)
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
-  const [isSingleViewPopup, setisSingleViewPopup] = useState(false);
-  const [meterSquareData, setMeterSquareData] = useState(null);
+  const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
+  const [meterSquareData, setMeterSquareData] = useState(null)
   const createInitialSkuData = () => ({
     sku_name: null,
     composite_type: null,
@@ -64,7 +64,7 @@ function SkuAddEdit({
     part_value: [],
     part_count: null,
     estimate_composite_item: null,
-    description:null,
+    description: null,
     default_sku_details: null,
     tags: [],
     sku_values: [
@@ -75,14 +75,14 @@ function SkuAddEdit({
         material: null,
         color: null,
         flute_type: null,
-        weight:null,
+        weight: null,
         //flute_ratio: null,
       },
     ],
   })
   const handleMeterDataChange = (data) => {
-    setMeterSquareData(data);
-  };
+    setMeterSquareData(data)
+  }
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -127,16 +127,15 @@ function SkuAddEdit({
     setAddNewSkuData(baseSkuData)
   }
 
-
   const handleSkuValuesChange = (index, field, value) => {
     setAddNewSkuData((prevData) => {
       const updatedSkuValues = [...prevData.sku_values]
-      
+
       updatedSkuValues[index] = { ...updatedSkuValues[index], [field]: value }
       if (field === 'gsm') {
-        updatedSkuValues[index].weight = value*meterSquareData; // Set weight to the GSM value
+        updatedSkuValues[index].weight = value * meterSquareData // Set weight to the GSM value
       }
-  
+
       return { ...prevData, sku_values: updatedSkuValues }
     })
   }
@@ -190,7 +189,7 @@ function SkuAddEdit({
       material: '',
       color: '',
       flute_type: '',
-      weight:''
+      weight: '',
       //flute_ratio: '',
     }))
 
@@ -203,7 +202,6 @@ function SkuAddEdit({
 
   const skuComponents = {
     'RSC box': (
-
       <RSCBox
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -224,7 +222,7 @@ function SkuAddEdit({
       />
     ),
     //'Corrugated Sheet': (
-    'Board': (
+    Board: (
       <CorrugatedSheet
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -256,7 +254,7 @@ function SkuAddEdit({
         editTag={editTag}
       />
     ),
-    'Composite': (
+    Composite: (
       <Composite
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -274,7 +272,6 @@ function SkuAddEdit({
       />
     ),
     'Custom Item': (
-   
       <CustomItem
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -307,25 +304,26 @@ function SkuAddEdit({
   }
   return (
     <div className="p-6 bg-white rounded-lg">
-
       {/* conditional rendring according to sku_type */}
       {skuComponents[addNewSkuData.sku_type] || null}
 
-      <div className="flex items-center my-3 space-x-2">
-        <span className="text-[16px] font-medium">Strict Adherence for All Layers</span>
-        <button
-          className={`w-11 h-[23px] flex items-center border border-blue-600 rounded-full p-1 cursor-pointer 
+      { addNewSkuData.sku_type !== 'Custom Item' && (
+        <div className="flex items-center my-3 space-x-2">
+          <span className="text-[16px] font-medium">Strict Adherence for All Layers</span>
+          <button
+            className={`w-11 h-[23px] flex items-center border border-blue-600 rounded-full p-1 cursor-pointer 
               ${strictAdherence ? 'bg-blue-600' : 'bg-gray-300'}`}
-          onClick={handleStrictAdherenceToggle}
-        >
-          <div
-            className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out 
+            onClick={handleStrictAdherenceToggle}
+          >
+            <div
+              className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out 
                 ${strictAdherence ? 'translate-x-5' : '-translate-x-[2px]'}`}
-          ></div>
-        </button>
-      </div>
+            ></div>
+          </button>
+        </div>
+      )}
 
-      {addNewSkuData.ply && (
+      {addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
         <div className="mt-6">
           <div className="border rounded-lg overflow-auto">
             <table className="w-full">
@@ -366,7 +364,9 @@ function SkuAddEdit({
                         className="p-1 border rounded text-center w-full"
                         value={item.gsm || ''}
                         placeholder="gsm"
-                        onChange={(e) => handleSkuValuesChange(index, 'gsm',  Number(e.target.value))}
+                        onChange={(e) =>
+                          handleSkuValuesChange(index, 'gsm', Number(e.target.value))
+                        }
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
@@ -420,7 +420,7 @@ function SkuAddEdit({
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                    <p>{item.weight || 'N/A'}</p> 
+                      <p>{item.weight || 'N/A'}</p>
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
                       <p>N/A</p>

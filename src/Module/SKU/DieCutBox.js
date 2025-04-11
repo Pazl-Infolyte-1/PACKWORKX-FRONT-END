@@ -4,18 +4,27 @@ import CIcon from '@coreui/icons-react'
 import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash } from '@coreui/icons'
 import DiePopupTable from './DiePopupTable'
 import PopUp from '../../components/New/PopUp'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 
 function DieCutBox({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData, updateSkuValues}) {
       const [isSingleViewPopup, setisSingleViewPopup] = useState(false);
-  
+      const [selectedDiePopup, setSelectedDiePopup] = useState(null);
+
   
   const handleBrowseClick=()=>{
     setisSingleViewPopup(true)
   }
-
-
+  useEffect(() => {
+    if (selectedDiePopup?.name) {
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        select_dies: selectedDiePopup.name,
+      }));
+    }
+  }, [selectedDiePopup]);
+  
+console.log("parent selected",selectedDiePopup)
   return (
     <>
       <div className="grid grid-cols-3 gap-4">
@@ -285,7 +294,8 @@ function DieCutBox({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, cl
           showCloseButton={true}
           width={'80vw'}
         >
-<DiePopupTable/>
+<DiePopupTable setSelectedDiePopup={setSelectedDiePopup} selectedDiePopup={selectedDiePopup}   setisSingleViewPopup={setisSingleViewPopup} // ✅ This line is important
+/>
         </PopUp>
 	
     </>

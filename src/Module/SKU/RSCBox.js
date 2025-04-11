@@ -51,28 +51,30 @@ const calculateBoardSize = (data) => {
 //7.2 Width of the board (along glue lines)= (Box Depth +Box Width) + Trimming Tolerance Width (default 20)
   const totalBoardSize = lengthBoardSize * widthBoardSize;
   const deckleSizeVal=widthBoardSize*upsval;
-  console.log("manually entered deckle size",deckleSize)
+  console.log("manually entered deckle size", deckleSize);
   console.log("calculated deckle size", deckleSizeVal);
   
-  if (deckleSize > deckleSizeVal) {
+  if (deckleSize <= deckleSizeVal) {
     return {
       length_board_size_cm2: lengthBoardSize.toFixed(2),
       width_board_size_cm2: widthBoardSize.toFixed(2),
       board_size_cm2: totalBoardSize.toFixed(2),
-      deckle_size: deckleSizeVal.toFixed(2),
+      deckle_size: deckleSizeVal,
       ups: upsval.toFixed(),
-      error: `Deckle size must be greater than or equal (${deckleSizeVal.toFixed(2)}).`,
+      error: `Deckle size must be greater than or equal to ${deckleSizeVal.toFixed(2)}.`,
     };
   }
-
+  
+  // If valid (manually entered deckleSize >= calculated deckleSizeVal)
   return {
     length_board_size_cm2: lengthBoardSize.toFixed(2),
     width_board_size_cm2: widthBoardSize.toFixed(2),
     board_size_cm2: totalBoardSize.toFixed(2),
-    deckle_size:deckleSizeVal.toFixed(2),
+    deckle_size: deckleSize, // use manually entered value
     ups: upsval.toFixed(),
     error: "", // No error
   };
+  
 };
 
 

@@ -369,18 +369,34 @@ x
 
 </div>
 {/*{addNewSkuData?.composite_type && (*/}
-<div className="flex items-center gap-4">
-<ActionButton
+<div className="flex items-center gap-4 mt-4">
+{/*<ActionButton
 label={" + Add "}
 onClick={handleAddSkuField}
 variant='add'
 className='mt-4 mb-4'
-/>
-<ActionButton
-                  label={" Add Options"} 
+height="12px"
+/>*/}
+<button
+      type="button"
+      className="bg-purple-400 text-white px-4 py-[5px] rounded-md shadow-md hover:bg-purple-500"
+      onClick={handleAddSkuField}
+    >
+   + Add 
+    </button>
+{/*<ActionButton
+                  label={"Browse"} 
                   variant='minimal'
                   onClick={tablepopup}
-                />
+                />*/}
+
+<button
+      type="button"
+      className="bg-gray-400 text-white px-4 py-[5px] rounded-md shadow-md hover:bg-gray-500"
+      onClick={tablepopup}
+    >
+      Browse
+    </button>
 
 <div className="relative inline-block text-left w-[150px]">
       <button

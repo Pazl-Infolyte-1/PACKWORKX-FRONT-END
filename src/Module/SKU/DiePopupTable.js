@@ -10,9 +10,10 @@ import {
 	CTableDataCell
   } from '@coreui/react'
 import CommonPagination from "../../components/New/Pagination";
+import ActionButton from "../../components/New/ActionButton";
 
 
-const DiePopupTable=()=>{
+const DiePopupTable=({setSelectedDiePopup,selectedDiePopup,setisSingleViewPopup})=>{
 	const [dies, setDies] = useState([]);
 	  const [pagination, setPagination] = useState({
 		currentPage: 1,
@@ -58,37 +59,35 @@ const DiePopupTable=()=>{
     <CTableBody>
       {dies?.length > 0 ? (
         dies.map((item) => (
-          <CTableRow key={item.id} className="hover:bg-gray-50">
-            <CTableDataCell className="py-3 px-2 text-center">
-              <input
-                type="checkbox"
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    console.log("Selected Die:", {
-                      die_id: item.die_id,
-                      name: item.name,
-                      client: item.client,
-                      status: item.status,
-                    });
-                  }
-                }}
-              />
-            </CTableDataCell>
-            <CTableDataCell className="py-3 px-2 text-gray-700">{item.die_id}</CTableDataCell>
-            <CTableDataCell className="py-3 px-2 text-gray-700">{item.name}</CTableDataCell>
-            <CTableDataCell className="py-3 px-2 text-gray-700">{item.client}</CTableDataCell>
-            <CTableDataCell className="py-3 px-2 text-gray-700">
-              <span
-                className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                  item.status === 'active'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
-                }`}
-              >
-                {item.status}
-              </span>
-            </CTableDataCell>
-          </CTableRow>
+          <CTableRow
+          key={item.id}
+          className="hover:bg-gray-50 cursor-pointer"
+          onClick={() => setSelectedDiePopup(item)} // row click sets selected item
+        >
+          <CTableDataCell className="py-3 px-2 text-center">
+            <input
+              type="radio"
+              name="selectedDie"
+              checked={selectedDiePopup?.id === item.id}
+              onChange={() => setSelectedDiePopup(item)}
+              onClick={(e) => e.stopPropagation()} // prevent row click from firing twice
+            />
+          </CTableDataCell>
+          <CTableDataCell className="py-3 px-2 text-gray-700">{item.die_id}</CTableDataCell>
+          <CTableDataCell className="py-3 px-2 text-gray-700">{item.name}</CTableDataCell>
+          <CTableDataCell className="py-3 px-2 text-gray-700">{item.client}</CTableDataCell>
+          <CTableDataCell className="py-3 px-2 text-gray-700">
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                item.status === 'active'
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-red-100 text-red-700'
+              }`}
+            >
+              {item.status}
+            </span>
+          </CTableDataCell>
+        </CTableRow>
         ))
       ) : (
         <CTableRow>
@@ -123,7 +122,13 @@ const DiePopupTable=()=>{
         limit={10}
       />
     </div>
-
+    <div className="flex justify-end mt-4">
+    <ActionButton
+        label="Done"
+        onClick={() => setisSingleViewPopup(false)} // ✅ This should close the popup
+        variant="add"
+      />
+  </div>
 
 		</>
 	)

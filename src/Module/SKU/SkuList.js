@@ -74,6 +74,10 @@ function SkuList() {
     sku_type: 'RSC box',
     part_value: [],
     part_count: null,
+    estimate_composite_item: null,
+    description: null,
+    default_sku_details:null,
+    tags: [],
     sku_values: [
       {
         layer: null,
@@ -202,6 +206,10 @@ function SkuList() {
       sku_type: selectedSku.sku_type || null,
       part_value: selectedSku.part_value || [],
       part_count: selectedSku.part_count,
+      estimate_composite_item:  selectedSku.estimate_composite_item || null,
+      description:  selectedSku.description || null,
+      default_sku_details:selectedSku.default_sku_details || null,
+      tags: selectedSku.tags || [],
       sku_values: selectedSku.sku_values || [
         {
           layer: null,

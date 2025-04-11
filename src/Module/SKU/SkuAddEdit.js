@@ -9,6 +9,7 @@ import { FaAngleDown, FaAngleUp, FaEllipsisV, FaRedoAlt, FaEye } from 'react-ico
 import PopUp from '../../components/New/PopUp'
 import FluteTypeView from './FluteTypeView'
 import Composite from './Composite'
+import CustomItem from './CustomItem'
 
 function SkuAddEdit({
   handleChange,
@@ -62,6 +63,10 @@ function SkuAddEdit({
     sku_type: 'RSC box',
     part_value: [],
     part_count: null,
+    estimate_composite_item: null,
+    description:null,
+    default_sku_details: null,
+    tags: [],
     sku_values: [
       {
         layer: null,
@@ -198,6 +203,7 @@ function SkuAddEdit({
 
   const skuComponents = {
     'RSC box': (
+
       <RSCBox
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -252,6 +258,24 @@ function SkuAddEdit({
     ),
     'Composite': (
       <Composite
+        dropdownRef={dropdownRef}
+        addNewSkuData={addNewSkuData}
+        setIsOpen={setIsOpen}
+        isOpen={isOpen}
+        handleChange={handleChange}
+        handleSelect={handleSelect}
+        clientDiasble={clientDiasble}
+        client={client}
+        skuType={skuType}
+        setAddNewSkuData={setAddNewSkuData}
+        updateSkuValues={updateSkuValues}
+        editedSkudata={editedSkudata}
+        editTag={editTag}
+      />
+    ),
+    'Custom Item': (
+   
+      <CustomItem
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
         setIsOpen={setIsOpen}

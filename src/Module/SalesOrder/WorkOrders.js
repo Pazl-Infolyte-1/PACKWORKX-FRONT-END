@@ -22,7 +22,7 @@ const accordionCardSummary = {
   ],
 }
 
-const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, setDrawer }) => {
+const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, setDrawer, }) => {
   const [selectedOption, setSelectedOption] = useState('inhouse')
   const [openIndices, setOpenIndices] = useState([])
   const [openAccordions, setOpenAccordions] = useState({})
@@ -31,6 +31,8 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
   const [skuList, setSkuList] = useState([])
   const [skuVersionsMap, setSkuVersionsMap] = useState({});  // Map of work order ID to available versions
   const [selectedWorkOrderForVersions, setSelectedWorkOrderForVersions] = useState(null);
+  const [selectedSkuID,SetselectedSkuID] = useState(null);
+  
 
 
   // Update work order data
@@ -76,13 +78,25 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
     fetchSkuList();
   }, []);
 
+
+  const getskuversions = async (selectedId) => {
+    try {
+      const response = await apiMethods.getSkuVersions(selectedId);
+      return response;
+    } catch (error) {
+      console.error("Error fetching SKU versions:", error);
+      return null; // or return a default error object like { error: true, message: error.message }
+    }
+  };
+
   // Special handler just for SKU changes
   const handleSkuChange = async (e, orderId) => {
     const selectedId = parseInt(e.target.value); // since option values are string
     const selectedSku = skuList.find((sku) => sku.id === selectedId);
-    console.log('selected sku------------------------', selectedSku)
 
-    const response = await apiMethods.getSkuVersions(selectedId)
+    SetselectedSkuID(selectedId)
+
+    const response = await getskuversions(selectedId)
     console.log(response.data.data)
 
 
@@ -136,6 +150,8 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     )
   }
+
+
 
   // Add this function to handle the version history button click
   const handleVersionHistoryClick = (orderId) => {
@@ -467,9 +483,13 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
               )}
             </div>
           ))}
-              {/* <div>
-            <SkuVersionAddEdit/>
-          </div> */}
+              <div>
+              <SkuVersionAddEdit 
+  skuID={selectedSkuID} 
+  setSkuVersionsMap={setSkuVersionsMap} 
+  orderId={selectedWorkOrderForVersions} // Pass the orderId of the work order being edited
+/>
+          </div>
         </div>
         
       )}
@@ -487,7 +507,7 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
 
           <ActionButton
             label={"Submit Work Order"}
-            variant='save'
+            variant=''
             onClick={handleSubmit}
           />
         </div>
@@ -498,6 +518,7 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
         setVisible={() => setVersionDrawerOpen(false)}
         versionData={selectedWorkOrderForVersions ? skuVersionsMap[selectedWorkOrderForVersions] : []}
         skuName={selectedWorkOrderForVersions && workOrders.find(order => order.id === selectedWorkOrderForVersions)?.sku_name}
+        getskuversions={getskuversions}
       />
     </div>
   )

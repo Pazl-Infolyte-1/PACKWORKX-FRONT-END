@@ -586,29 +586,28 @@ useEffect(() => {
           </table>
         </div>
 
-        <div className="flex justify-between items-center w-full mt-10">
+        {/* <div className="flex justify-between items-center w-full mt-10">
           <ActionButton
             onClick={() => setActionDrawerOpen(true)}
             label={"Previous Invoice Rates"}
             variant='minimal'
           />
 
-          {/* Show the Save as Draft button but not the Submit button if showSubmitButton is false */}
           <div className="flex gap-4">
             <ActionButton
               label={"Save As Draft"}
               variant='minimal'
             />
             
-            {/* {showSubmitButton && (
+            {showSubmitButton && (
               <ActionButton
                 onClick={handleSubmit(onSubmit)}
                 label={"Submit"}
                 variant='minimal'
               />
-            )} */}
+            )}
           </div>
-        </div>
+        </div> */}
       </div>
       <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} />
     </div>

@@ -742,6 +742,15 @@ export const apiMethods = {
   getSkuVersions:async(id)=>{
     const response = await apiClient.get(`/sku-details/sku-version/sku/${id}`)
     return response
+  },
+
+  getSingleSkuData:async(id)=>{
+    const response = await apiClient.get(`/sku-details/${id}`);
+    return response
+  },
+  addSkuVersion:async(body)=>{
+    const response = await apiClient.post(`/sku-details/sku-version`,body);
+    return response
   }
 
 

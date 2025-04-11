@@ -48,6 +48,12 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp }) => {
                 Status
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+              Priority
+              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+              progress
+              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Action
               </CTableHeaderCell>
             </CTableRow>
@@ -75,6 +81,7 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp }) => {
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.etd}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">{cell.qty}</CTableDataCell>
+                 
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     <span
                       className={`px-2.5 py-1 rounded-full text-sm font-medium ${
@@ -86,6 +93,20 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp }) => {
                       {cell.status}
                     </span>
                   </CTableDataCell>
+
+                  <CTableDataCell className="py-3 px-4">
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-sm font-medium ${cell.priority === "High"
+                          ? "bg-red-100 text-red-800"
+                          : cell.priority === "Medium"
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-green-100 text-green-800"
+                        }`}
+                    >
+                      {cell.priority}
+                    </span>
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.progress}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700 text-center">
                     <ThreeDotMenu
                       value={[

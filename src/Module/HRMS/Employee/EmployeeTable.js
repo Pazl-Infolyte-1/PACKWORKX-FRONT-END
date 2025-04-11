@@ -94,12 +94,12 @@ function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, hand
 
           <CTableBody>
 
-            {
-              loading ? (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Loading isLoading={loading} />
-                </div>
-              ) :
+              {
+                loading ? (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Loading isLoading={loading} />
+                  </div>
+                ) :
                 employeesdata.length > 0 ? (
                   employeesdata.map((cell, index) => (
                     <CTableRow key={index} className="border-b">

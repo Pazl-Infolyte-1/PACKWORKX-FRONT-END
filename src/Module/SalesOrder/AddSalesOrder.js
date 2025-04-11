@@ -5,12 +5,28 @@ import { CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
 import OrderForm from './OrderForm'
 import Loader from '../../components/New/Loader'
 import apiMethods from '../../api/config'
+import CustomAlert from '../../components/New/CustomAlert'
 
 const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, setisEdit, fetchData }) => {
   const [activeTab, setActiveTab] = useState(currentTab)
   const [loading, setLoading] = useState(false)
   const [existingSalesOrderData, setExistingSalesOrderData] = useState('')
-  const [alerts, setAlerts] = useState(false)
+  const [alerts, setAlerts] = useState([]);
+  const [totals, setTotals] = useState({
+    total_amount:0,
+    total_incl_gst:0,
+    sgst: 0,
+    cgst: 0,
+    total_qty:0,
+  });
+
+  useEffect(()=>{
+    console.log(totals,'yeyeyeyeyeyeyeyeyeyey')
+  },[totals])
+  
+  // Function to update specific values
+
+  
 
   // Main state for SKU details that will be shared across components
   const [skuDetailsForm, setSkuDetailsForm] = useState([])
@@ -25,6 +41,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     totalCGST: 0,
     totalWithGST: 0
   })
+
 
   const [workOrdersData, setWorkOrdersData] = useState([])
   const [workOrders, setWorkOrders] = useState([
@@ -134,9 +151,9 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       const updatedForm = completeFormData;
 
       const payload = {
-        salesDetails: updatedForm, // Use updated data
+        salesDetails: {...updatedForm,...totals}, // Use updated data
         skuDetails: skuFormComplete.skuDetails,
-        workDetails: [],
+        workDetails: workOrdersData,
       };
 
       submitSalesOrder(payload);
@@ -150,22 +167,39 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
 
       if (isEdit) {
         response = await apiMethods.editSalesOrder(selectedSalesOrderID, payload);
-        setDrawer(false)
-        await fetchData()
+        setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
+        setTimeout(() => {
+          setDrawer(false)
+        }, 1000);
       } else {
+
         response = await apiMethods.addSalesOrder(payload);
-        setDrawer(false)
+        setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
+        setTimeout(() => {
+          setDrawer(false)
+        }, 1000);
         await fetchData()
       }
+
+
       // fetchSalesOrderData()
 
     } catch (error) {
-
+      console.log(error)
+      setAlerts([{ severity: "error", message: error?.response?.data?.message ||"Failed To Update SalesOrder  " }]);
       console.error(error);
     } finally {
 
     }
   };
+
+  const handleClose = () => {
+    setTimeout(() => {
+      setAlerts([])
+    }, 3000);
+  };
+  
+
 
 
 
@@ -174,7 +208,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
   const handleWorkOrderFormUpdate = async (formData) => {
     try {
       // Set loading state
-      setLoading(true);
+      // setLoading(true);
       let response;
 
       // Add client_id to each work order in formData
@@ -198,7 +232,8 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       // Construct the final sales order object including SKU and Work Orders
       const finalSalesOrder = {
         salesDetails: {
-          ...salesDetailsForm, // Existing sales details
+          ...salesDetailsForm,
+          ...totals // Existing sales details
         },
         workDetails: [...workOrdersData, ...workDetailsWithClient], // Include work order details
         skuDetails: hasSkuDetails ? skuWithClientId : [], // Empty SKU details if none exist
@@ -207,24 +242,31 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       // API call to add the complete sales order
       if (isEdit) {
         response = await apiMethods.editSalesOrder(selectedSalesOrderID, finalSalesOrder);
-        setDrawer(false)
-        await fetchData()
+        setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
+        setTimeout(() => {
+          setDrawer(false)
+        }, 1000);        await fetchData()
       } else {
          response = await apiMethods.addSalesOrder(finalSalesOrder);
-        setDrawer(false)
-        await fetchData()
+         setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
+         setTimeout(() => {
+           setDrawer(false)
+         }, 1000);        
+         await fetchData()
       }
     } catch (error) {
       console.error("Error submitting sales order:", error);
+      setAlerts([{ severity: "error", message: error?.response?.data?.message ||"Failed To Update WorkOrder " }]);
+
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
   // Display loading indicator when necessary
-  if (loading) {
-    return <Loader />;
-  }
+  // if (loading) {
+  //   return <Loader />;
+  // }
 
 
   return (
@@ -267,15 +309,18 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       </CCol>
 
       {/* Content Sections */}
+      <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className="bg-white">
         {activeTab === 'salesOrder' && (
-          <OrderForm
-          setDrawer={setDrawer}
+            <OrderForm
+            setDrawer={setDrawer}
             formData={salesDetailsForm}
             setFormData={handleSalesDetailsUpdate}
             skuDetailsForm={skuDetailsForm}
             handleSkuFormUpdate={handleSkuFormUpdate}
             handleFormSubmit={handleFormSubmit}
+            totals={totals}
+            setTotals={setTotals}
           />
         )}
         {activeTab === 'skuDetails' && (

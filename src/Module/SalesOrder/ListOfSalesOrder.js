@@ -29,6 +29,7 @@ function ListOfSalesOrder() {
   const [selectedSalesOrderData, SetselectedSalesOrderData] = useState([])
   const [isEditMode, setIsEditMode] = useState(false)
   const { searchQuery, filteredSearchData } = useSearch() ///need to verify
+  const [loading,setLoading]= useState(true)
 
   const searchBarRef = useRef(null)
 
@@ -46,6 +47,8 @@ function ListOfSalesOrder() {
       // setFilteredData(response.data.data)
     } catch (error) {
       console.error('Error fetching data:', error)
+    }finally{
+      setLoading(false)
     }
   }
   useEffect(() => {
@@ -187,6 +190,8 @@ function ListOfSalesOrder() {
             handleEdit={handleEdit}
             handleDelete={handleDelete}
             handleView={handleView}
+            loading={loading}
+
           />
           <SalesOrderView
             viewSalesOrder={viewSalesOrder}
@@ -214,7 +219,6 @@ function ListOfSalesOrder() {
       setDrawer={setDrawerOpen}
       setisEdit={setIsEditMode}
       fetchData={fetchData}
-
       />
   </Drawer>
     )}

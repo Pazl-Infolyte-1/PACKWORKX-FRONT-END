@@ -13,8 +13,9 @@ import {
   CTableRow,
 } from '@coreui/react'
 import React from 'react'
+import Loading from '../../components/New/Loading'
 
-function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, handleDelete,handleEdit,handleView }) {
+function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, handleDelete,handleEdit,handleView,loading }) {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -62,6 +63,13 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
                 </CTableHeaderCell>
               </CTableRow>
             </CTableHead>
+            
+            {
+                loading ? (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Loading isLoading={loading} />
+                  </div>
+                ) :
             <CTableBody>
               {data.length > 0 ? (
                 data.map((row, index) => (
@@ -88,13 +96,12 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
                     </CTableDataCell>
 
 
-
                     <CTableDataCell className="py-3 px-4 text-gray-700">
                       <CBadge
                         color={
                           row.status === 'Pending'
                             ? 'warning'
-                            : row.status === 'Approved'
+                            : row.status === 'active'
                               ? 'success'
                               : 'danger'
                         }
@@ -140,6 +147,7 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
                 </CTableRow>
               )}
             </CTableBody>
+}
           </CTable>
         </div>
       </div>

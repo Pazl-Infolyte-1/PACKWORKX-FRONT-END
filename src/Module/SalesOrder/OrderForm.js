@@ -3,7 +3,7 @@ import SkuDetails from './SkuDetails'
 import apiMethods from '../../api/config';
 import ActionButton from '../../components/New/ActionButton';
 
-const OrderForm = ({ formData, setFormData, skuDetailsForm, handleSkuFormUpdate, handleFormSubmit,setDrawer }) => {
+const OrderForm = ({ formData, setFormData, skuDetailsForm, handleSkuFormUpdate, handleFormSubmit,setDrawer,totals,setTotals }) => {
   const [clients, setClients] = useState([]); // State for client list
   const [skuFormData, setSkuFormData] = useState(null);
   const [localFormData, setLocalFormData] = useState(formData);
@@ -280,7 +280,7 @@ const handleToggleChange = () => {
             {confirmationMethod === "Oral" && (
               <div className="p-2 rounded-lg flex flex-col ">
                 <label className="text-black font-normal leading-6 mb-2 text-left">
-                  Confirmation Oral
+                  Confirmation Name
                 </label>
                 <input
                   type="text"
@@ -312,6 +312,8 @@ const handleToggleChange = () => {
           skuDetailsForm={skuDetailsForm} 
           setFormData={handleSkuForm}
           showSubmitButton={false} // This prop tells SkuDetails not to show its submit button
+          totals={totals}
+          setTotals={setTotals}
         />
 
         {/* Submit Button */}

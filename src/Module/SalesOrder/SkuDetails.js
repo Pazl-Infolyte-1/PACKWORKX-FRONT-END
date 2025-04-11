@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
 
-const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = true}) => {
+const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = true,totals,setTotals}) => {
   const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
   const [totalQuantity, setTotalQuantity] = useState(0)
   const [totalAmount, setTotalAmount] = useState(0)
@@ -15,6 +15,13 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
   const [skuList, setSkuList] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [previousValues, setPreviousValues] = useState(null)
+
+  const updateTotals = (key, value) => {
+    setTotals((prevTotals) => ({
+      ...prevTotals,
+      [key]: value,
+    }));
+  };
 
   // Initialize form with skuDetailsForm data if it exists
   const { register, control, handleSubmit, reset, watch, setValue, getValues } = useForm({
@@ -109,29 +116,72 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
         setTotalSGST(sgst);
         setTotalCGST(cgst);
         setTotalWithGST(withGST);
-      }
+        setTotals((prev) => ({
+          ...prev,
+          total_qty: qty,
+          cgst: cgst,
+          sgst: sgst,
+          total_incl_gst: withGST,
+          total_amount: amount
+        }));
+          }
     }
   }, [skuDetailsForm, reset, getValues])
 
   // Calculate totals when form values change
-  useEffect(() => {
-    if (skusData) {
-      const qty = skusData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0)
-      const amount = skusData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0)
-      const sgst = skusData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0)
-      const cgst = skusData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0)
-      const withGST = skusData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0)
+  // useEffect(() => {
+  //   if (skusData) {
+  //     const qty = skusData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0)
+  //     const amount = skusData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0)
+  //     const sgst = skusData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0)
+  //     const cgst = skusData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0)
+  //     const withGST = skusData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0)
       
-      setTotalQuantity(qty)
-      setTotalAmount(amount)
-      setTotalSGST(sgst)
-      setTotalCGST(cgst)
-      setTotalWithGST(withGST)
+  //     setTotalQuantity(qty)
+  //     setTotalAmount(amount)
+  //     setTotalSGST(sgst)
+  //     setTotalCGST(cgst)
+  //     setTotalWithGST(withGST)
       
-      // Update parent component whenever totals change
-      updateParentFormData();
-    }
-  }, [skusData])
+  //     // Update parent component whenever totals change
+  //     updateParentFormData();
+  //   }
+  // }, [skusData])
+
+  // First, add a useEffect that forces a recalculation of the summary totals
+// whenever the skusData changes
+useEffect(() => {
+  const recalculateTotals = () => {
+    if (!skusData || skusData.length === 0) return;
+    
+    // Force parse all values to make sure we're using numbers
+    const qty = skusData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
+    const amount = skusData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0);
+    const sgst = skusData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0);
+    const cgst = skusData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
+    const withGST = skusData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+    
+    // Update all state values
+    setTotalQuantity(qty);
+    setTotalAmount(amount);
+    setTotalSGST(sgst);
+    setTotalCGST(cgst);
+    setTotalWithGST(withGST);
+    setTotals((prev) => ({
+      ...prev,
+      total_qty: qty,
+      cgst: cgst,
+      sgst: sgst,
+      total_incl_gst: withGST,
+      total_amount: amount
+    }));
+  };
+  
+  recalculateTotals();
+  
+  // Also update the parent form data
+  updateParentFormData();
+}, [skusData]);
 
   // Function to update parent component with current SKU data
   const updateParentFormData = () => {
@@ -166,6 +216,32 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
   }
 
   // Calculate row values automatically when quantity or rate changes
+  // const calculateRowValues = (index) => {
+  //   const values = getValues(`skus[${index}]`);
+  //   const quantity = parseFloat(values.quantity) || 0;
+  //   const rate = parseFloat(values.rate) || 0;
+    
+  //   // Calculate total amount
+  //   const totalAmount = quantity * rate;
+    
+  //   // Get SGST and CGST percentages from user input
+  //   const sgstPercentage = parseFloat(values.sgst) || 0;
+  //   const cgstPercentage = parseFloat(values.cgst) || 0;
+    
+  //   // Calculate SGST and CGST amounts based on percentages
+  //   const sgstAmount = totalAmount * (sgstPercentage / 100);
+  //   const cgstAmount = totalAmount * (cgstPercentage / 100);
+    
+  //   // Calculate total with GST
+  //   const total = totalAmount + sgstAmount + cgstAmount;
+    
+  //   // Update form values
+  //   setValue(`skus[${index}].totalAmount`, totalAmount.toFixed(2));
+  //   setValue(`skus[${index}].sgstAmount`, sgstAmount.toFixed(2));
+  //   setValue(`skus[${index}].cgstAmount`, cgstAmount.toFixed(2));
+  //   setValue(`skus[${index}].total`, total.toFixed(2));
+  // }
+
   const calculateRowValues = (index) => {
     const values = getValues(`skus[${index}]`);
     const quantity = parseFloat(values.quantity) || 0;
@@ -174,15 +250,12 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
     // Calculate total amount
     const totalAmount = quantity * rate;
     
-    // Get SGST and CGST percentages from user input
     const sgstPercentage = parseFloat(values.sgst) || 0;
     const cgstPercentage = parseFloat(values.cgst) || 0;
     
-    // Calculate SGST and CGST amounts based on percentages
     const sgstAmount = totalAmount * (sgstPercentage / 100);
     const cgstAmount = totalAmount * (cgstPercentage / 100);
     
-    // Calculate total with GST
     const total = totalAmount + sgstAmount + cgstAmount;
     
     // Update form values
@@ -190,6 +263,32 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
     setValue(`skus[${index}].sgstAmount`, sgstAmount.toFixed(2));
     setValue(`skus[${index}].cgstAmount`, cgstAmount.toFixed(2));
     setValue(`skus[${index}].total`, total.toFixed(2));
+    
+    // Force the form to update
+    // This line is key - it ensures React Hook Form knows values have changed
+    setValue(`skus[${index}]`, {...getValues(`skus[${index}`)});
+    
+    // Directly recalculate the totals
+    const allSkus = getValues('skus');
+    const qty = allSkus.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
+    const amount = allSkus.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0);
+    const sgst = allSkus.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0);
+    const cgst = allSkus.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
+    const withGST = allSkus.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+    
+    setTotalQuantity(qty);
+    setTotalAmount(amount);
+    setTotalSGST(sgst);
+    setTotalCGST(cgst);
+    setTotalWithGST(withGST);
+    setTotals((prev) => ({
+      ...prev,
+      total_qty: qty,
+      cgst: cgst,
+      sgst: sgst,
+      total_incl_gst: withGST,
+      total_amount: amount
+    }));
   }
 
   // Add a new SKU row
@@ -259,9 +358,9 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
           />
         </div>
 
-        <div className="w-[100%] max-h-[250px] mt-4 rounded-[10px] border border-[#c2c2c2]">
+        <div className="w-[100%] max-h-[350px] mt-4 rounded-[10px] border border-[#c2c2c2]">
           <div className="overflow-x-auto p-2">
-            <div className="max-h-[200px] overflow-y-auto custom-scrollbar rounded-lg">
+            <div className=" min-h-[200px] max-h-[300px] overflow-y-auto custom-scrollbar rounded-lg">
               <table className="min-w-full bg-white rounded-lg max-h-[1250px] border-collapse">
                 {/* Table Head */}
                 <thead className="sticky top-0 bg-white z-10">
@@ -288,7 +387,10 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
                       <td className="px-4 py-2">
                       <select
   {...register(`skus[${index}].sku`, {
-    onChange: () => updateParentFormData()
+    onChange: () => {
+      calculateRowValues(index);
+      updateParentFormData();
+    }
   })}
   value={watch(`skus[${index}].sku`)}
   className="w-[320px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
@@ -440,27 +542,27 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
             </div>
           </div>
         </div>
-        <div className="flex flex-row-reverse mt-4">
-          <table className="">
+        <div className="flex   mt-4">
+          <table className="flex-1">
             <tbody className='gap-4'>
               <tr>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  Total Qty: {totalQuantity}
+                  Total Qty: {totals.total_qty}
                 </td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                   Total:
                 </td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  {totalAmount.toFixed(2)}
+                  {totals.total_amount.toFixed(2)}
                 </td>
-              </tr>
-              <tr>
+              
+              
                 <td className="px-4 py-2"></td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                   SGST:
                 </td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  {totalSGST.toFixed(2)}
+                  {totals.sgst.toFixed(2)}
                 </td>
               </tr>
               <tr>
@@ -469,16 +571,15 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
                   CGST:
                 </td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  {totalCGST.toFixed(2)}
+                  {totals.cgst.toFixed(2)}
                 </td>
-              </tr>
-              <tr>
+                
                 <td className="px-4 py-2"></td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                   Total Incl of GST:
                 </td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  {totalWithGST.toFixed(2)}
+                  {totals.total_incl_gst.toFixed(2)}
                 </td>
               </tr>
             </tbody>
@@ -499,13 +600,13 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
               variant='minimal'
             />
             
-            {showSubmitButton && (
+            {/* {showSubmitButton && (
               <ActionButton
                 onClick={handleSubmit(onSubmit)}
                 label={"Submit"}
                 variant='minimal'
               />
-            )}
+            )} */}
           </div>
         </div>
       </div>

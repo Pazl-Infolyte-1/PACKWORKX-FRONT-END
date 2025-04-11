@@ -3,6 +3,7 @@ import React from "react";
 const CustomAlert = ({ alerts, handleClose }) => {
   return (
     <div className="fixed top-20 right-4 z-[9999] space-y-2">
+
       {alerts.map((alert, index) => (
         <div
           key={index}

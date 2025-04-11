@@ -3,7 +3,7 @@ import { TrashIcon } from '@heroicons/react/solid'
 import VersionsPopup from './VersionsPopup'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
-import SkuVersionAddEdit from './skuVersionAddEdit'
+// import SkuVersionAddEdit from './skuVersionAddEdit'
 const accordionCardSummary = {
   data: [
     {

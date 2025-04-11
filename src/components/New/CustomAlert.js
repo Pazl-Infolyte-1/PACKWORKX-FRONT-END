@@ -1,6 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const CustomAlert = ({ alerts, handleClose }) => {
+  
+  useEffect(() => {
+    if (alerts.length > 0) {
+      const timer = setTimeout(() => {
+        handleClose();
+      }, 2000);
+
+      return () => clearTimeout(timer); 
+    }
+  }, [alerts]);
+
   return (
     <div className="fixed top-20 right-4 z-[9999] space-y-2">
 
@@ -16,7 +27,7 @@ const CustomAlert = ({ alerts, handleClose }) => {
           }`}
         >
           <div className="flex justify-between items-center">
-            <span>{alert.message}</span>
+          <span className="break-words whitespace-normal">{alert.message}</span>
             <button onClick={handleClose} className="text-white font-bold ml-4">
               ×
             </button>

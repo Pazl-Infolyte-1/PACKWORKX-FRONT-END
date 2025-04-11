@@ -17,6 +17,9 @@ import ActionButton from '../../components/New/ActionButton'
 import SearchBar from '../../components/New/SearchBar'
 import { AuthContext } from '../../Context/AuthContext'
 import { useSearch } from '../../components/New/SearchContext'
+import CustomAlert from '../../components/New/CustomAlert'
+import createInitialSkuData from './CreateInitialSkuData'
+import { bottom } from '@popperjs/core'
 
 function SkuList() {
   const [skuType, setSkuType] = useState([])
@@ -34,12 +37,12 @@ function SkuList() {
   const [refresh, setRefresh] = useState(false)
   const [clientDiasble, setClientDisable] = useState(false)
   const [limit, setLimit] = useState(10)
+  const [alerts, setAlerts] = useState([])
   const { user } = useContext(AuthContext)
   const { searchQuery, setSearchQuery, filteredSearchData } = useSearch()
   const location = useLocation()
-  console.log('location///', location?.state?.client_id)
   const searchBarRef = useRef(null)
-
+  const [boardSizeError, setBoardSizeError] = useState('')
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
     client_id: user?.id,
@@ -51,16 +54,16 @@ function SkuList() {
     unit: 'mm',
     joints: null,
     ups: null,
-    select_dies:null,
-    no_of_parts:null,
-    composite_type:null,
+    select_dies: null,
+    no_of_parts: null,
+    composite_type: null,
     inner_outer_dimension: null,
     flap_width: null,
     flap_tolerance: null,
-    length_trimming_tolerance: null,
+    length_trimming_tolerance: 20,
     width_board_size_cm2: null,
     length_board_size_cm2: null,
-    width_trimming_tolerance: null,
+    width_trimming_tolerance: 20,
     strict_adherence: strictAdherence,
     customer_reference: null,
     reference_number: null,
@@ -69,6 +72,8 @@ function SkuList() {
     deckle_size: null,
     minimum_order_level: null,
     sku_type: 'RSC box',
+    part_value: [],
+    part_count: null,
     sku_values: [
       {
         layer: null,
@@ -77,6 +82,7 @@ function SkuList() {
         material: null,
         color: null,
         flute_type: null,
+        weight:null,
         flute_ratio: null,
       },
     ],
@@ -124,64 +130,88 @@ function SkuList() {
   const handleAddSkuSubmit = async () => {
     try {
       if (editTag) {
-        //console.log("get sku datas",editedSkudata.sku_values)
-        //console.log("edit sku datas",addNewSkuData.sku_values)
-        //return null;
-        await apiMethods.updateSku(addNewSkuData)
-        setEditTag(false)
-        setRefresh((prev) => !prev)
+        const response = await apiMethods.updateSku(addNewSkuData)
+        if (response?.status === 200) {
+          setEditTag(false)
+          setRefresh((prev) => !prev)
+          setAlerts([
+            { severity: 'success', message: response?.data?.message || 'Sku updated successfully!' },
+          ])
+          
+        } else {
+          setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong' }])
+        }
       } else {
-        await apiMethods.addSku(addNewSkuData)
-        setDrawerOpen(false)
-        setRefresh((prev) => !prev)
+        if (boardSizeError) {
+          console.warn('Blocked submission due to board size error:', boardSizeError)
+          setAlerts([{ severity: 'error', message: boardSizeError }])
+          return null // 🔴 Stop submission
+        }
+        const response = await apiMethods.addSku(addNewSkuData)
+        if (response?.status === 201) {
+          setDrawerOpen(false)
+          setRefresh((prev) => !prev)
+          setAlerts([{ severity: 'success', message: 'Sku Added successfully!' }])
+        } else {
+          setAlerts([
+            { severity: 'error', message: response.data.message || 'Something went wrong' },
+          ])
+        }
       }
     } catch (error) {
       console.error(error)
+      setAlerts([
+        { severity: 'error', message: error?.response?.data?.message || 'Something went wrong' },
+      ])
     }
+    setAlerts([])
+    setBoardSizeError("")
   }
 
   const handleSkuEdit = (id) => {
     const selectedSku = skudata.find((sku) => sku.id === id)
-    console.log('selected sku', selectedSku)
     setEditTag(true)
     setEditedSkuData(selectedSku)
     setAddNewSkuData({
-      id: selectedSku.id || '',
-      sku_name: selectedSku.sku_name || '',
+      id: selectedSku.id || null,
+      sku_name: selectedSku.sku_name || null,
       client_id: selectedSku.client_id || 1,
-      client: selectedSku.client || '',
-      ply: selectedSku.ply || '',
-      length: selectedSku.length || '',
-      width: selectedSku.width || '',
-      height: selectedSku.height || '',
-      unit: selectedSku.unit || '',
-      joints: selectedSku.joints || '',
-      ups: selectedSku.ups || '',
-      select_dies:selectedSku.select_dies || '',
-      no_of_parts:selectedSku?.no_of_parts || '',
-      composite_type:selectedSku?.composite_type || '',
-      inner_outer_dimension: selectedSku.inner_outer_dimension || '',
-      flap_width: selectedSku.flap_width || '',
-      flap_tolerance: selectedSku.flap_tolerance || '',
-      length_trimming_tolerance: selectedSku.length_trimming_tolerance || '',
-      width_trimming_tolerance: selectedSku.width_trimming_tolerance || '',
+      client: selectedSku.client || null,
+      ply: selectedSku.ply || null,
+      length: selectedSku.length || null,
+      width: selectedSku.width || null,
+      height: selectedSku.height || null,
+      unit: selectedSku.unit || null,
+      joints: selectedSku.joints || null,
+      ups: selectedSku.ups || null,
+      select_dies: selectedSku.select_dies || null,
+      no_of_parts: selectedSku?.no_of_parts || null,
+      composite_type: selectedSku?.composite_type || null,
+      inner_outer_dimension: selectedSku.inner_outer_dimension || null,
+      flap_width: selectedSku.flap_width || null,
+      flap_tolerance: selectedSku.flap_tolerance || null,
+      length_trimming_tolerance: selectedSku.length_trimming_tolerance || null,
+      width_trimming_tolerance: selectedSku.width_trimming_tolerance || null,
       strict_adherence: selectedSku.strict_adherence || false,
-      customer_reference: selectedSku.customer_reference || '',
-      reference_number: selectedSku.reference_number || '',
-      internal_id: selectedSku.internal_id || '',
-      board_size_cm2: selectedSku.board_size_cm2 || '',
-      deckle_size: selectedSku.deckle_size || '',
-      minimum_order_level: selectedSku.minimum_order_level || '',
-      sku_type: selectedSku.sku_type || '',
+      customer_reference: selectedSku.customer_reference || null,
+      reference_number: selectedSku.reference_number || null,
+      internal_id: selectedSku.internal_id || null,
+      board_size_cm2: selectedSku.board_size_cm2 || null,
+      deckle_size: selectedSku.deckle_size || null,
+      minimum_order_level: selectedSku.minimum_order_level || null,
+      sku_type: selectedSku.sku_type || null,
+      part_value: selectedSku.part_value || [],
+      part_count: selectedSku.part_count,
       sku_values: selectedSku.sku_values || [
         {
-          layer: '',
-          gsm: '',
-          bf: '',
-          material: '',
-          color: '',
-          flute_type: '',
-          flute_ratio: '',
+          layer: null,
+          gsm: null,
+          bf: null,
+          material: null,
+          color: null,
+          flute_type: null,
+          weight:null,
+          flute_ratio: null,
         },
       ],
     })
@@ -192,9 +222,6 @@ function SkuList() {
   useEffect(() => {
     const fetchData = async () => {
       // skip sku get call
-      console.log('check location', location.state?.skipInitialFetch)
-      console.log('refresh', refresh)
-
       if (location.state?.skipInitialFetch && !refresh) {
         return
       }
@@ -246,9 +273,14 @@ function SkuList() {
     })
   }
 
+  const handleClose = () => {
+    setAlerts([])
+  }
+
   return (
     <div>
       {/* Header */}
+      <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className="flex items-center justify-between flex-wrap gap-x-2 -my-2">
         <h1 className="sm:text-[32px] text-[#424242]">SKU</h1>
         {/* <span className="sm:text-[18px] font-semibold text-[#424242] ">
@@ -264,6 +296,7 @@ function SkuList() {
               onClick={() => {
                 if (text === 'Add SKU') {
                   setDrawerOpen(true)
+                  setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
                 }
                 if (text === 'Bulk Upload') {
                   setVisible(true)
@@ -374,7 +407,6 @@ function SkuList() {
           />
         </div>
       </div>
-
       <div className="-my-6">
         <div className="overflow-x-auto overflow-y-auto whitespace-nowrap ">
           <SkuTable
@@ -382,6 +414,8 @@ function SkuList() {
             setSkuData={setSkuData}
             handleSkuEdit={handleSkuEdit}
             editTag={editTag}
+            alerts={alerts}
+            setAlerts={setAlerts}
           />
         </div>
       </div>
@@ -414,10 +448,15 @@ function SkuList() {
         <SkuPopup visible={visible} setVisible={setVisible} />
       </div>
       <Drawer
-      maxWidth = "1280px"
+        maxWidth="1280px"
         isOpen={isDrawerOpen || editTag}
         title={editTag ? 'Edit SKU Details' : 'Add SKU Details'}
-        onClose={() => (setDrawerOpen(false), setEditTag(false), setClientDisable(false))}
+        onClose={() => {
+          setDrawerOpen(false)
+          setEditTag(false)
+          setClientDisable(false)
+          setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
+        }}
       >
         <SkuAddEdit
           handleChange={handleChange}
@@ -434,7 +473,15 @@ function SkuList() {
           setSkuType={setSkuType}
           locationvalue={location?.state?.client_id}
           closedrawer={setDrawerOpen}
+          setBoardSizeError={setBoardSizeError}
           //onUnitChange={handleUnitChange}
+          editedSkudata={editedSkudata}
+          handleClose={() => {
+            setDrawerOpen(false)
+            setEditTag(false)
+            setClientDisable(false)
+            setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
+          }}
         />
       </Drawer>
     </div>

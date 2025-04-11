@@ -12,19 +12,27 @@ import apiMethods from '../../api/config'
 import SkuDetails from './SkuDetails'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
+import CustomAlert from '../../components/New/CustomAlert'
 
-function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
+function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAlerts }) {
   const [showPopUp, setShowPopUp] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
 
-  const handleSkuDelete = async (id) => {
-    await apiMethods.deleteSku(id)
+  const handleSkuDelete = async () => {
+    await apiMethods.deleteSku(deleteId)
     setDeleteModal(false)
-    setSkuData((prevTypes) => prevTypes.filter((type) => type.id !== id))
+    setSkuData((prevTypes) => prevTypes.filter((type) => type.id !== deleteId))
+    setAlerts([{ severity: 'success', message: 'Sku deleted successfully!' }])
   }
 
   const closeDeleteModal = () => {
     setDeleteModal(false)
+  }
+
+  const openDeleteModal = (id) => {
+    setDeleteId(id)
+    setDeleteModal(true)
   }
 
   const formatDate = (dateString) => {
@@ -41,8 +49,13 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
     })
   }
 
+  const handleClose = () => {
+    setAlerts([]);
+  };
+
   return (
     <div className="h-[300px] overflow-y-auto border border-gray-200 custom-scrollbar">
+      <CustomAlert alerts={alerts} handleClose={handleClose}/>
       <CTable striped hover className="w-full m-0">
         <CTableHead className="bg-gray-100 sticky top-0 z-10">
           <CTableRow className="text-center">
@@ -132,7 +145,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
                           label: 'Delete',
                           icon: cilTrash,
                           onClick: () => {
-                            setDeleteModal(true)
+                            openDeleteModal(cell.id)
                           },
                         },
                       ]}
@@ -141,7 +154,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag }) {
                   <ConfirmationModale
                     isOpen={deleteModal}
                     onClose={closeDeleteModal}
-                    onConfirm={() => handleSkuDelete(cell.id)}
+                    onConfirm={handleSkuDelete}
                     title="Delete Confirmation"
                     message="Are you sure you want to delete this item?"
                   />

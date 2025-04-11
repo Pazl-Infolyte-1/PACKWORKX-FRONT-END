@@ -374,7 +374,7 @@ export const apiMethods = {
   addSku: async (addNewSkuData) => {
     try {
       const response = await apiClient.post('/sku-details',addNewSkuData,{})
-      return response.data
+      return response
     } catch (error) {
       console.error(error)
     }
@@ -399,12 +399,8 @@ export const apiMethods = {
 
   updateSku: async (addNewSkuData) => {
     const { id,...dataWithoutId } = addNewSkuData
-    try {
       const response = await apiClient.put(`/sku-details/${addNewSkuData.id}`,dataWithoutId)
-      return response.data
-    } catch (error) {
-      console.error(error)
-    }
+      return response
   },
 
   deleteSku: async (id) => {
@@ -626,6 +622,84 @@ export const apiMethods = {
     }
   },
 
+  getWorkOrders: async (params) => {
+    try {
+      return await apiClient.get('/work-order', {params})
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getProcess: async (params) => {
+    try {
+      return await apiClient.get('/machines/process',{params})
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  AddProcess: async (formData) => {
+      return await apiClient.post('/machines/process', formData)
+  },
+  EditProcess : async (formData) => {
+    try {
+      return await apiClient.put(`/machines/process/${formData.id}`, formData)
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  deleteProcess : async (id) => {
+    try {
+      return await apiClient.delete(`/machines/process/${id}`)
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+  getAllFileds : async () => {
+    try {
+      return await apiClient.get('/machines/process-fields')
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+  getProcessFields: async (id) => {
+    try {
+      return await apiClient.get(`/machines/process/${id}/fields` )
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+
+  saveProcessValues: async (payload) => {
+    try {
+      return await apiClient.post('/machines/process-values', payload)
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+
+  addFields: async (payload) => {
+    try {
+      return await apiClient.post('/machines/process-fields', payload)
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+
+
+  getDies: async (params) => {
+    try {
+      return await apiClient.get('/common-service/die', {params})
+    } catch (error) {
+      console.error(error)
+    }
+  },
   getSalesOrderList: async (params = {}) => {
     console.log(params,'fasdfa')
     try {

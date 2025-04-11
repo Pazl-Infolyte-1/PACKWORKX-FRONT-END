@@ -12,15 +12,21 @@ import ThreeDotMenu from '../../../components/ThreeDotMenu'
 import apiMethods from '../../../api/config'
 import Loading from '../../../components/New/Loading'
 import PackagesDetails from './PackagesDetails'
+import CustomAlert from '../../../components/New/CustomAlert'
+import Packages from './Packages'
 
-function PackagesTable({ packagedata = [], onEdit, setData, loading, showPopUp, setShowPopUp }) {
+function PackagesTable({ packagedata = [], onEdit, setData, loading, showPopUp, setShowPopUp, setAlerts, alerts }) {
   const handleDelete = async (id) => {
     await apiMethods.DeletePacakges(id)
-    setData((prev) => prev.filter((item) => item.id !== id))
+    setData((prev) => prev.filter((item) => item.package.id !== id))
+    setAlerts([{ severity: 'success', message: 'Package deleted successfully!' }])
   }
+
+  const handleClose = () => setAlerts([])
 
   return (
     <div className="relative h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
+      <CustomAlert alerts={alerts} handleClose={handleClose}/>
       <CTable striped hover className="w-full m-0">
         <CTableHead className="bg-gray-100 sticky top-0 z-10">
           <CTableRow>
@@ -57,25 +63,25 @@ function PackagesTable({ packagedata = [], onEdit, setData, loading, showPopUp, 
           ) : packagedata.length > 0 ? (
             packagedata.map((cell, index) => (
               <CTableRow key={index} className="border-b">
-                <CTableDataCell className="py-3 px-4 text-gray-700">{cell.name}</CTableDataCell>
+                <CTableDataCell className="py-3 px-4 text-gray-700">{cell.package.name}</CTableDataCell>
                 <CTableDataCell className="py-3 px-4 text-gray-700">
-                  {cell.monthly_price}
+                  {cell.package.monthly_price}
                 </CTableDataCell>
                 <CTableDataCell className="py-3 px-4 text-gray-700">
-                  {cell.annual_price}
+                  {cell.package.annual_price}
                 </CTableDataCell>
                 <CTableDataCell className="py-3 px-4 text-gray-700">
-                  {cell.max_employees}
+                  {cell.package.max_employees}
                 </CTableDataCell>
                 <CTableDataCell className="py-3 px-4 text-gray-700">
                   <span
                     className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      cell.status === 'active'
+                      cell.package.status === 'active'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}
                   >
-                    {cell.status}
+                    {cell.package.status}
                   </span>
                 </CTableDataCell>
                 <CTableDataCell className="py-3 px-4 text-gray-700">
@@ -84,24 +90,24 @@ function PackagesTable({ packagedata = [], onEdit, setData, loading, showPopUp, 
                       {
                         label: 'View',
                         icon: cilHandPointRight,
-                        onClick: () => setShowPopUp(cell.id),
+                        onClick: () => setShowPopUp(cell.package.id),
                       },
                       {
                         label: 'Edit',
                         icon: cilPencil,
-                        onClick: () => onEdit(cell),
+                        onClick: () => onEdit(cell.package),
                       },
                       {
                         label: 'Delete',
                         icon: cilTrash,
-                        onClick: () => handleDelete(cell.id),
+                        onClick: () => handleDelete(cell.package.id),
                       },
                     ]}
                   />
                 </CTableDataCell>
                 <PackagesDetails
                   showPopUp={showPopUp}
-                  cell={cell}
+                  cell={cell.package}
                   setShowPopUp={setShowPopUp}
                   onEdit={onEdit}
                 />

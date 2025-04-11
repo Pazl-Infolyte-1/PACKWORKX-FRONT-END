@@ -1,70 +1,73 @@
-import { useState } from "react";
-import ProcessDropDown from "./ProcessDropDown";
+import { useState } from 'react'
+import axios from 'axios'
+import ProcessDropDown from './ProcessDropDown'
+import ActionButton from '../../components/New/ActionButton'
+import apiMethods from '../../api/config'
 
 const AddFieldForm = ({ processData, setProcessData, closeModal }) => {
-  const [selectedProcess, setSelectedProcess] = useState('');
-  const [fieldLabel, setFieldLabel] = useState('');
-  const [isRequired, setIsRequired] = useState(true);
-  const [fieldType, setFieldType] = useState('text');
-  const [showInTable, setShowInTable] = useState(false);
-  const [exportInTable, setExportInTable] = useState(false);
+  const [selectedProcess, setSelectedProcess] = useState('')
+  const [fieldLabel, setFieldLabel] = useState('')
+  const [isRequired, setIsRequired] = useState(true)
+  const [fieldType, setFieldType] = useState('text')
 
-  const handleAddField = () => {
-    if (!selectedProcess || !fieldLabel) {
-      alert("Please select a process and enter a field label");
-      return;
+  const handleAddField = async () => {
+
+    const payload = {
+      process_name_id: selected.processId, // Make sure `processId` is the correct key
+      label: fieldLabel,
+      field_type: fieldType.charAt(0).toUpperCase() + fieldType.slice(1), // "text" → "Text"
+      required: isRequired,
     }
 
-    const newField = {
-      name: fieldLabel,
-      required: isRequired,
-      fieldtype: fieldType,
-      showInTable,
-      exportInTable,
-    };
+    try {
+      const res = await apiMethods.addFields(payload) // Replace with actual endpoint
+      console.log('Field added successfully:', res.data)
 
-    setProcessData(prevData =>
-      prevData.map(process =>
-        process.processName === selectedProcess
-          ? { ...process, parameters: [...process.parameters, newField] }
-          : process
+      // Optionally update local state
+      const newField = {
+        name: fieldLabel,
+        required: isRequired,
+        fieldtype: fieldType,
+      }
+
+      setProcessData((prevData) =>
+        prevData.map((process) =>
+          process.processName === selectedProcess
+            ? { ...process, parameters: [...process.parameters, newField] }
+            : process
+        )
       )
-    );
 
-    // Reset form fields
-    setFieldLabel('');
-    setIsRequired(true);
-    setFieldType('text');
-    setShowInTable(false);
-    setExportInTable(false);
-
-    closeModal();
-  };
+      // Reset form
+      setFieldLabel('')
+      setIsRequired(true)
+      setFieldType('text')
+      closeModal()
+    } catch (error) {
+      console.error('Error adding field:', error)
+      alert('Failed to add field. Please try again.')
+    }
+  }
 
   return (
-        
-    <div className="p-6 w-full bg-white rounded-lg ">
-
+    <div className="my-2 w-full rounded-lg border border-gray-50 p-3 ">
+      <p className="font-bold">Add Field Form</p>
       <div className="grid grid-cols-2 gap-40">
         {/* Left Column */}
         <div>
           {/* Module Dropdown */}
           <label className="block mb-2 text-gray-600">Module</label>
-<div className="relative z-10">
-  <ProcessDropDown
-    options={processData.map((process) => ({
-      label: process.processName,
-      value: process.processName,
-    }))}
-    onChange={(option) => setSelectedProcess(option.value)}
-    showAddProcedure={false}
-  />
-</div>
-   {/* </div> */}
+          <div className="relative z-10">
+            <ProcessDropDown
+              options={processData}
+              onChange={(option) => setSelectedProcess(option.value)}
+              showAddProcedure={false}
+            />
+          </div>
 
           {/* Is Required */}
           <div className="mt-6">
-            <label className="block mb-2 text-gray-600">is required</label>
+            <label className="block mb-2 text-gray-600">Is Required</label>
             <div className="flex items-center gap-6">
               <label className="flex items-center">
                 <input
@@ -91,7 +94,9 @@ const AddFieldForm = ({ processData, setProcessData, closeModal }) => {
         {/* Right Column */}
         <div>
           {/* Field Label */}
-          <label className="block mb-2 text-gray-600">Field Label <span className="text-red-500">*</span></label>
+          <label className="block mb-2 text-gray-600">
+            Field Label <span className="text-red-500">*</span>
+          </label>
           <input
             type="text"
             value={fieldLabel}
@@ -105,7 +110,7 @@ const AddFieldForm = ({ processData, setProcessData, closeModal }) => {
             <select
               value={fieldType}
               onChange={(e) => setFieldType(e.target.value)}
-              className="w-full p-1 border rounded  bg-white"
+              className="w-full p-1 border rounded bg-white"
             >
               <option value="text">Text</option>
               <option value="number">Number</option>
@@ -115,52 +120,12 @@ const AddFieldForm = ({ processData, setProcessData, closeModal }) => {
         </div>
       </div>
 
-      {/* Checkbox Row */}
-      <div className="flex justify-between mt-8">
-        <div>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={showInTable}
-              onChange={(e) => setShowInTable(e.target.checked)}
-              className="mr-2"
-            />
-            <span className="text-gray-600">Show in table view</span>
-          </label>
-        </div>
-        <div>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={exportInTable}
-              onChange={(e) => setExportInTable(e.target.checked)}
-              className="mr-2"
-            />
-            <span className="text-gray-600">Allow export in table view</span>
-          </label>
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="border-t my-8"></div>
-
       {/* Action Buttons */}
-      <div className="flex justify-end gap-4">
-        <button 
-          className="px-6 py-2 text-gray-600 hover:text-gray-800" 
-          onClick={closeModal}
-        >
-          Cancel
-        </button>
-        <button 
-          className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600" 
-          onClick={handleAddField}
-        >
-          Save
-        </button>
+      <div className="flex justify-end gap-4 my-2">
+        <ActionButton variant="save" label="Save" onClick={handleAddField} />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AddFieldForm;
+export default AddFieldForm

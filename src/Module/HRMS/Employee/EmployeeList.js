@@ -110,11 +110,11 @@ function EmployeeList() {
 
 
   useEffect(() => {
-    setPaginationParams(prev => ({
-      ...prev,
-      currentPage: 1 // Reset to page 1 whenever search query changes
-    })
-    );
+      setPaginationParams(prev => ({
+        ...prev,
+        currentPage: 1 // Reset to page 1 whenever search query changes
+      })
+      );
   }, [searchQuery, status]);
 
   // Initial data fetch on component mount
@@ -184,9 +184,8 @@ function EmployeeList() {
     e.preventDefault();
     console.log('Form Data:', formData);
 
-
+let response
     try {
-      let response;
       if (isEdit) {
 
         response = await apiMethods.editEmployee(CurrentEmployeeId, formData);
@@ -228,14 +227,16 @@ function EmployeeList() {
         })
         fetchEmployeeData()
 
-      } else {
-        console.log('Something went wrong. Please try again.');
-        setAlerts([{ severity: "error", message: "Failed To Update Employee " }]);
-      }
+      } 
 
-      console.log(response);
     } catch (error) {
       console.error('Error submitting form:', error);
+      setAlerts([{ severity: "error", message: error?.response?.data?.errors[0]?.message || "Failed To Update Employee " }]);
+
+      setTimeout(() => {
+        handleClose()
+      }, 3000)
+
       console.log('An error occurred. Please check your input and try again.');
     }
   };
@@ -284,15 +285,20 @@ function EmployeeList() {
         search: searchQuery,
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,
-        status: status, // Include the status parameter in the API call
-
+        status: status,
       })
       setEmployeesData(response.data.data)
       setEmployeeResponse(response.data)
     } catch (error) {
-      console.error('Error fetching data:', error)
+      console.error('Error fetching employee data:', error)
+      setAlerts([{ 
+        severity: "error", 
+        message: error?.response?.data?.message || "Failed to fetch employee data. Please try again." 
+      }])
+      setEmployeesData([])
+      setEmployeeResponse(null)
     }
-    finally{
+    finally {
       setLoading(false)
     }
   }

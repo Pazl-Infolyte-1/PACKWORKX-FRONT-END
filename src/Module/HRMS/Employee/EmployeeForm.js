@@ -7,7 +7,6 @@ import Drawer from '../../../components/Drawer/Drawer'
 import ActionButton from '../../../components/New/ActionButton'
 import axios from 'axios'
 import apiMethods from '../../../api/config'
-import { CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CFormInput } from '@coreui/react'
 
 // Placeholder data for dropdowns (would typically come from API)
 const DEPARTMENT_OPTIONS = [
@@ -76,9 +75,12 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
   
   // Add this at the top with your other useState/useEffect hooks
   const fileInputRef = useRef(null);
+  const dropdownRef = useRef(null);
   const [previewImage, setPreviewImage] = useState('');
   const [skills, setSkills] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const [countrySearchValue, setCountrySearchValue] = useState("");
 
   // This effect monitors drawer close events
   useEffect(() => {
@@ -88,24 +90,39 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
     }
   }, [isDrawerOpen]);
 
+  // Add click outside handler for the dropdown
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setCountryDropdownOpen(false);
+      }
+    }
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   // Function to reset the form to default state
   const resetForm = () => {
     setFormData(defaultFormState);
     setSkills([]);
     setInputValue("");
     setPreviewImage('');
+    setCountrySearchValue("");
   };
 
   const [selectedCountry, setSelectedCountry] = useState(null);
 
   const handleCountrySelect = (country) => {
     setSelectedCountry(country);
-    handleInputChange({ target: { name: "country_code", value: country.phonecode } });
+    handleInputChange({ target: { name: "country_phonecode", value: country.phonecode } });
+    setCountryDropdownOpen(false);
   };
   // Handle drawer close with form reset
   const handleCloseDrawer = () => {
     setDrawerOpen(false);
-
     // Form will be reset by the useEffect above when isDrawerOpen becomes false
   };
 
@@ -113,7 +130,6 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
 
   // If you want to log after state update, use useEffect
   useEffect(() => {
-    console.log('Dropdown Options Updated:', isEdit);
   }, [isEdit]);
 
   const handleInputChange = (e) => {
@@ -161,8 +177,6 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
         throw new Error("File URL not found in the response");
       }
 
-      console.log("Uploaded file URL:", fileUrl);
-
       setFormData((prev) => ({
         ...prev,
         image: fileUrl, // Corrected syntax for state update
@@ -203,9 +217,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
 
 useEffect(() => {
   if (isEdit && formData.skills) {  // Fix the typo: skill -> skills
-    console.log(formData, 'from skills effect')
     const skillsArray = formData.skills.split(",").map((s) => s.trim());
-    console.log(skillsArray, 'skills array')
     setSkills(skillsArray);
     setFormData((prev) => ({
       ...prev,
@@ -214,6 +226,20 @@ useEffect(() => {
   } else if (!isEdit) {
   }
 }, [isEdit, formData.skills]); // Add formData.skills to dependency array
+
+  const handleCountrySearchChange = (e) => {
+    setCountrySearchValue(e.target.value);
+  };
+
+  const filteredCountries = dropdownOptions.countries && dropdownOptions.countries.filter(country => {
+    try {
+      return country.nicename.toLowerCase().includes(countrySearchValue.toLowerCase()) ||
+             (country.phonecode && country.phonecode.toString().includes(countrySearchValue));
+    } catch (error) {
+      // Silently handle errors in filtering
+      return false;
+    }
+  });
 
   return (
     <>
@@ -288,106 +314,110 @@ useEffect(() => {
 
               {/* Mobile */}
               <div>
-  <h6 className="mb-2">Mobile Number</h6>
-  <div className="flex border border-stone-200 rounded-md">
-    {/* Country code dropdown using CoreUI components with fixed layout */}
-    <CDropdown className='max-h-2.5'>
-      <CDropdownToggle 
-        color="light" 
-        className="border-0 rounded-0 border-r border-stone-200 h-10"
-        style={{ 
-          paddingRight: "30px", // Extra padding for the dropdown caret
-          position: "relative"  // For proper caret positioning
-        }}
-      >
-        {formData.country_id ? (
-          <div className=" flex pr-4 align-items-center">
-            {(() => {
-              const selectedCountry = dropdownOptions.countries.find(
-                country => country.id === formData.country_id
-              );
-              
-              return selectedCountry ? (
-                <>
-                  <img
-                    src={`https://flagcdn.com/w40/${selectedCountry.iso.toLowerCase()}.png`}
-                    alt={selectedCountry.nicename}
-                    className="me-2"
-                    style={{ width: "24px", height: "16px" }}
-                  />
-                  <span>+{selectedCountry.phonecode}</span>
-                </>
-              ) : (
-                <span>Select</span>
-              );
-            })()}
-          </div>
-        ) : (
-          <span>Select</span>
-        )}
-        {/* Custom dropdown indicator - hides the default one */}
-        <style jsx>{`
-          .dropdown-toggle::after {
-            display: none !important;
-          }
-        `}</style>
-        {/* Custom dropdown caret positioned to the right */}
-        <span 
-          style={{ 
-            position: "absolute", 
-            right: "3px", 
-            top: "50%", 
-            transform: "translateY(-50%)"
-          }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
-          </svg>
-        </span>
-      </CDropdownToggle>
-      <CDropdownMenu className="py-1">
-        <div className="px-3 py-2 border-bottom">
-          <CFormInput
-            type="text"
-            placeholder="Search countries"
-            size="sm"
-            className="mb-0"
-          />
-        </div>
-        {dropdownOptions.countries &&
-          dropdownOptions.countries.map((country) => (
-            <CDropdownItem
-              key={country.id}
-              onClick={() => {
-                handleInputChange({ target: { name: "country_phonecode", value: country.phonecode } });
-                handleInputChange({ target: { name: "country_id", value: country.id } });
-              }}
-              className="d-flex align-items-center py-2"
-            >
-              <img
-                src={`https://flagcdn.com/w40/${country.iso.toLowerCase()}.png`}
-                alt={country.nicename}
-                className="me-2"
-                style={{ width: "24px", height: "16px" }}
-              />
-              <span className="me-auto">{country.nicename}</span>
-              <span className="text-primary">+{country.phonecode}</span>
-            </CDropdownItem>
-          ))}
-      </CDropdownMenu>
-    </CDropdown>
+                <h6 className="mb-2">Mobile Number</h6>
+                <div className="flex border border-stone-200 rounded-md">
+                  {/* Custom country code dropdown */}
+                  <div className="relative" ref={dropdownRef}>
+                    <button
+                      type="button"
+                      className="flex items-center justify-between border-0 rounded-0 border-r border-stone-200 h-10 px-3 bg-white"
+                      onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
+                      style={{ 
+                        paddingRight: "30px",
+                        position: "relative"
+                      }}
+                    >
+                      {formData.country_id ? (
+                        <div className="flex items-center pr-4">
+                          {(() => {
+                            const selectedCountry = dropdownOptions.countries.find(
+                              country => country.id === formData.country_id
+                            );
+                            
+                            return selectedCountry ? (
+                              <>
+                                <img
+                                  src={`https://flagcdn.com/w40/${selectedCountry.iso.toLowerCase()}.png`}
+                                  alt={selectedCountry.nicename}
+                                  className="mr-2"
+                                  style={{ width: "24px", height: "16px" }}
+                                />
+                                <span>+{selectedCountry.phonecode}</span>
+                              </>
+                            ) : (
+                              <span>Select</span>
+                            );
+                          })()}
+                        </div>
+                      ) : (
+                        <span>Select</span>
+                      )}
+                      <span 
+                        style={{ 
+                          position: "absolute", 
+                          right: "3px", 
+                          top: "50%", 
+                          transform: "translateY(-50%)"
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                        </svg>
+                      </span>
+                    </button>
+                    
+                    {countryDropdownOpen && (
+                      <div className="absolute z-10 mt-1 w-64 bg-white rounded-md shadow-lg">
+                        <div className="p-2 border-b">
+                          <input
+                            type="text"
+                            placeholder="Search countries"
+                            className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            value={countrySearchValue}
+                            onChange={handleCountrySearchChange}
+                          />
+                        </div>
+                        <div className="max-h-60 overflow-y-auto">
+                          {filteredCountries && filteredCountries.length > 0 ? (
+                            filteredCountries.map((country) => (
+                              <div
+                                key={country.id}
+                                className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => {
+                                  handleInputChange({ target: { name: "country_phonecode", value: country.phonecode } });
+                                  handleInputChange({ target: { name: "country_id", value: country.id } });
+                                  setCountryDropdownOpen(false);
+                                }}
+                              >
+                                <img
+                                  src={`https://flagcdn.com/w40/${country.iso.toLowerCase()}.png`}
+                                  alt={country.nicename}
+                                  className="mr-2"
+                                  style={{ width: "24px", height: "16px" }}
+                                />
+                                <span className="flex-grow">{country.nicename}</span>
+                                <span className="text-blue-600">+{country.phonecode}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="px-3 py-2 text-gray-500">No countries found</div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-    {/* Phone number input */}
-    <CFormInput
-      type="tel"
-      name="mobile"
-      placeholder="Enter Mobile Number"
-      value={formData.mobile || ""}
-      onChange={handleInputChange}
-      className="border-0 h-10"
-    />
-  </div>
-</div>
+                  {/* Phone number input */}
+                  <input
+                    type="tel"
+                    name="mobile"
+                    placeholder="Enter Mobile Number"
+                    value={formData.mobile || ""}
+                    onChange={handleInputChange}
+                    className="flex-grow border-0 h-10 px-3 outline-none"
+                  />
+                </div>
+              </div>
               {/* Password */}
               <div>
                 <h6 className="mb-2">Password</h6>

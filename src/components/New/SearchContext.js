@@ -17,7 +17,7 @@ export const SearchProvider = ({ children }) => {
       const filteredResults = data.filter((item) =>
         Object.values(item).some((value) =>
           String(value).toLowerCase().includes(query.toLowerCase()),
-        ),
+    ),
       )
       setFilteredSearchData(filteredResults)
     }

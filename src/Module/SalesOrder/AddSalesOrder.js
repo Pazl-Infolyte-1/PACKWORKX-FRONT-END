@@ -324,7 +324,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
           />
         )}
         {activeTab === 'skuDetails' && (
-          <div className="p-1 bg-white rounded-lg w-[1100px] h-full">
+          <div className="p-1 bg-white rounded-lg h-full">
             <WorkOrders
               setDrawer={setDrawer}
               setWorkOrders={setWorkOrders}

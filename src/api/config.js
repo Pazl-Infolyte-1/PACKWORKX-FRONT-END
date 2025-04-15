@@ -751,10 +751,19 @@ export const apiMethods = {
   addSkuVersion:async(body)=>{
     const response = await apiClient.post(`/sku-details/sku-version`,body);
     return response
+  },
+  deleteSkuVersion:async(id)=>{
+    const response = await apiClient.delete(`/sku-details/sku-version/${id}`);
+    return response
+  },
+  getSingleSkuVersion:async(id)=>{
+    const response = await apiClient.get(`/sku-details/sku-version/${id}`);
+    return response
+  },
+  updateSkuVersion:async(id,body)=>{
+    const response = await apiClient.put(`/sku-details/sku-version/${id}`,body);
+    return response
   }
-
-
-
 }
 
 

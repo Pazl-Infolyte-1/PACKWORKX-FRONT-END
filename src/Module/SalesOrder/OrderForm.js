@@ -142,7 +142,7 @@ const handleToggleChange = () => {
           <h2 className="text-lg font-semibold flex justify-start">Order Details</h2>
           <div className="grid grid-cols-2 grid-rows-2 gap-1 mt-4">
             {/* Item 1 - Split into Two Inputs */}
-            <div className="p-2 rounded-lg flex gap-4">
+            <div className="p-2 rounded-lg flex gap-4 ">
               {/* Sales Order Id */}
               <div className="flex flex-col">
                 <label className="text-black font-normal leading-6 mb-2 text-left">
@@ -183,7 +183,7 @@ const handleToggleChange = () => {
                 name="client"
                 value={localFormData.client || ""}
                 onChange={handleInputChange}
-                className="w-[521px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-black"
+                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-black"
               >
                 <option value="">Select Client</option>
                 {clients.map((client, index) => (
@@ -244,7 +244,7 @@ const handleToggleChange = () => {
 
                 {/* Toggle Indicator */}
                 <div
-                  className={`absolute top-1/2 w-[50%] h-[80%] bg-[#8167E5] rounded-[10px] transform -translate-y-1/2 transition-all duration-300 ${
+                  className={`absolute top-1/2 w-[50%] h-[100%] bg-[#8167E5] rounded-[10px] transform -translate-y-1/2 transition-all duration-300 ${
                     confirmationMethod === "Email" ? "left-0" : "left-1/2"
                   }`}
                 ></div>
@@ -278,30 +278,68 @@ const handleToggleChange = () => {
             )}
 
             {confirmationMethod === "Oral" && (
-              <div className="p-2 rounded-lg flex flex-col ">
+              // <div className="p-2 rounded-lg bg-yellow-600 flex flex-row ">
+              //   <span>
+
+              //   <label className="text-black font-normal leading-6 mb-2 text-left">
+              //     Confirmation Name
+              //   </label>
+              //   <input
+              //     type="text"
+              //     name="confirmation_name"
+              //     value={localFormData.confirmation_name|| ""}
+              //     onChange={handleInputChange}
+              //     placeholder="Enter Confirmation name"
+              //     className="w-[240px] h-[40px] px-2 border border-[#c2c2c2] rounded-md outline-none"
+              //     />
+              //     </span>
+              //     <span>
+
+              //      <label className="text-black font-normal leading-6 mb-2 mt-2 text-left">
+              //     Confirmation mobile
+              //   </label>
+              //   <input
+              //     type="number"
+              //     name="confirmation_mobile"
+              //     value={localFormData.confirmation_mobile|| ""}
+              //     onChange={handleInputChange}
+              //     placeholder="Enter Confirmation mobile"
+              //     className="w-[240px] h-[40px] px-2 border border-[#c2c2c2] rounded-md outline-none"
+              //     />
+              //     </span>
+              // </div>
+
+              <div className="p-2 rounded-lg flex gap-4 ">
+              {/* Sales Order Id */}
+              <div className="flex flex-col">
                 <label className="text-black font-normal leading-6 mb-2 text-left">
-                  Confirmation Name
+                   Confirmation Name
                 </label>
                 <input
                   type="text"
                   name="confirmation_name"
-                  value={localFormData.confirmation_name|| ""}
+                  value={localFormData.confirmation_name || ""}
                   onChange={handleInputChange}
-                  placeholder="Enter Confirmation name"
-                  className="w-[500px] h-[40px] px-2 border border-[#c2c2c2] rounded-md outline-none"
-                />
-                   <label className="text-black font-normal leading-6 mb-2 mt-2 text-left">
-                  Confirmation mobile
-                </label>
-                <input
-                  type="number"
-                  name="confirmation_mobile"
-                  value={localFormData.confirmation_mobile|| ""}
-                  onChange={handleInputChange}
-                  placeholder="Enter Confirmation mobile"
-                  className="w-[500px] h-[40px] px-2 border border-[#c2c2c2] rounded-md outline-none"
+                  placeholder="Enter Confirmation Name"
+                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
                 />
               </div>
+
+              {/* Estimated */}
+              <div className="flex flex-col">
+                <label className="text-black font-normal leading-6 mb-2 text-left">
+                Confirmation Mobile
+                </label>
+                <input
+                  type="text"
+                  name="confirmation_mobile"
+                  value={localFormData.confirmation_mobile || ""}
+                  onChange={handleInputChange}
+                  placeholder="Enter Confirmation Mobile"
+                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+                />
+              </div>
+            </div>
               
 
             )}

@@ -4,6 +4,7 @@ import VersionsPopup from './VersionsPopup'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
 import SkuVersionAddEdit from './skuVersionAddEdit'
+import PopUp from '../../components/New/PopUp'
 const accordionCardSummary = {
   data: [
     {
@@ -32,6 +33,9 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
   const [skuVersionsMap, setSkuVersionsMap] = useState({});  // Map of work order ID to available versions
   const [selectedWorkOrderForVersions, setSelectedWorkOrderForVersions] = useState(null);
   const [selectedSkuID,SetselectedSkuID] = useState(null);
+  const [IsEditVersion,setIsEditVersion] = useState(false)
+  const [selectedSkuVersionID,setSelectedSkuVersionID] = useState(null);
+  const [isFormVisible,setIsFormVisible]= useState(false)
   
 
 
@@ -151,6 +155,31 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
     )
   }
 
+  const handleDeleteVersion = async (versionId) => {
+    try {
+  
+      const response = await apiMethods.deleteSkuVersion(versionId);
+      console.log("Version deleted successfully:", response);
+  
+      // Show success alert (optional)
+      alert("Version deleted successfully");
+
+      const updatedVersionsResponse = await apiMethods.getSkuVersions(selectedSkuID);
+
+            // Update the skuVersionsMap with the refreshed data
+      if (updatedVersionsResponse?.data?.data) {
+        setSkuVersionsMap(prev => ({
+          ...prev,
+          [selectedWorkOrderForVersions]: updatedVersionsResponse.data.data
+        }))};
+
+  
+    } catch (error) {
+      console.error("Error deleting version:", error);
+      alert("Failed to delete the version. Please try again.");
+    }
+  };
+
 
 
   // Add this function to handle the version history button click
@@ -160,9 +189,9 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
   };
 
   return (
-    <div>
+    <div className=' w-full'>
       {/* Header Section */}
-      <div className="flex justify-between items-center mt-2 mb-4 w-[1180px]">
+      <div className="flex justify-between items-center mt-2 mb-4">
         <h2 className="text-lg font-semibold text-[20px]">Work Orders</h2>
         <ActionButton
           label={" + Create Workorders"}
@@ -178,7 +207,7 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
           workOrdersData?.map((item) => (
             <div
               key={item?.id}
-              className="w-[1180px] rounded-[10px] border border-gray-700 p-3 mb-2"
+              className=" rounded-[10px] border border-gray-700 p-3 mb-2"
             >
               {/* Accordion Header (Clickable) */}
               <div
@@ -257,7 +286,7 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
       </div>
 
       {workOrders.length > 0 && (
-        <div className="max-h-[600px] w-[1180px] overflow-y-auto rounded-md pb-4 border border-gray-700">
+        <div className="max-h-[600px]  overflow-y-auto rounded-md pb-4 border border-gray-700">
           {workOrders.map((order, index) => (
             <div key={order.id} className="mt-4 rounded-md relative">
               {/* Work Order Number */}
@@ -273,15 +302,15 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
                 {/* Button & Icon Container */}
                 <div className="flex items-center gap-2">
                   {/* Button */}
-                  <ActionButton
+                  {/* <ActionButton
                     label={"Download Work Order"}
                     variant='minimal'
-                  />
+                  /> */}
 
                   {workOrders.length > 0 && (
                     <TrashIcon
                       onClick={() => deleteWorkOrder(order.id)}
-                      className="text-[#ff2d55] w-8 h-8 cursor-pointer"
+                      className="text-[#ff2d55] w-7 h-7 cursor-pointer"
                     />
                   )}
                   {/* Icon */}
@@ -370,12 +399,12 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
                       </label>
 
                       {/* Input & Button Wrapper */}
-                      <div className="flex">
+                      <div className="flex gap-2">
                         {/* Dropdown for SKU Version */}
                         <select
                           value={order.sku_version}
                           onChange={(e) => handleWorkOrderChange(order.id, 'sku_version', e.target.value)}
-                          className="w-[260px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
+                          className="w-[285px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
                           disabled={!skuVersionsMap[order.id]}
                         >
                           <option value="" disabled>Select Version</option>
@@ -414,47 +443,8 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
                         className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm"
                       />
                     </div>
-                    <div className="p-2">
-                      <label className="block text-gray-800 font-medium mb-1 ml-2">
-                        Estimated Delivery Date
-                      </label>
-                      <input
-                        type="date"
-                        value={order.edd}
-                        onChange={(e) => handleWorkOrderChange(order.id, 'edd', e.target.value)}
-                        className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
-                      />
-                    </div>
-                  </div>
 
-                  {/* Fields Row 3 */}
-                  <div className="w-full p-1 flex flex-row gap-4">
-                    <div className="p-2">
-                      <label className="block text-gray-800 font-medium mb-1 ml-2">
-                        Description
-                      </label>
-                      <textarea
-                        placeholder="Description"
-                        value={order.description}
-                        onChange={(e) => handleWorkOrderChange(order.id, 'description', e.target.value)}
-                        className="w-[420px] h-[60px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm resize-none"
-                      />
-                    </div>
-                    <div className="p-2">
-                      <label className="block text-gray-800 font-medium mb-1 ml-2">
-                        Planned Start Date
-                      </label>
-                      <input
-                        type="date"
-                        value={order.planned_start_date}
-                        onChange={(e) => handleWorkOrderChange(order.id, 'planned_start_date', e.target.value)}
-                        className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
-                      />
-                    </div>
-                  </div>
 
-                  {/* Fields Row 4 */}
-                  <div className="w-full bg-white p-1 flex flex-row gap-4">
                     <div className="p-2">
                       <label className="block text-gray-800 font-medium mb-1 ml-2">
                         Acceptable Excess Units
@@ -464,7 +454,23 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
                         placeholder="Enter units"
                         value={order.acceptable_excess_units}
                         onChange={(e) => handleWorkOrderChange(order.id, 'acceptable_excess_units', e.target.value)}
-                        className="w-[420px] h-[50px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm"
+                        className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Fields Row 3 */}
+                  <div className="w-full p-1 flex flex-row gap-4">
+                   
+                    <div className="p-2">
+                      <label className="block text-gray-800 font-medium mb-1 ml-2">
+                        Planned Start Date
+                      </label>
+                      <input
+                        type="date"
+                        value={order.planned_start_date}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'planned_start_date', e.target.value)}
+                        className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
                       />
                     </div>
                     <div className="p-2">
@@ -479,24 +485,76 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
                       />
                     </div>
                   </div>
+
+                  {/* Fields Row 4 */}
+                  <div className="w-full bg-white p-1 flex flex-row gap-4">
+
+                       <div className="p-2">
+                      <label className="block text-gray-800 font-medium mb-1 ml-2">
+                        Estimated Delivery Date
+                      </label>
+                      <input
+                        type="date"
+                        value={order.edd}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'edd', e.target.value)}
+                        className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2"
+                      />
+                    </div>
+
+                    <div className="p-2">
+                      <label className="block text-gray-800 font-medium mb-1 ml-2">
+                        Description
+                      </label>
+                      <textarea
+                        placeholder="Description"
+                        value={order.description}
+                        onChange={(e) => handleWorkOrderChange(order.id, 'description', e.target.value)}
+                        className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none ml-2 placeholder:text-sm resize-none"
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
           ))}
               <div>
-              <SkuVersionAddEdit 
-  skuID={selectedSkuID} 
-  setSkuVersionsMap={setSkuVersionsMap} 
-  orderId={selectedWorkOrderForVersions} // Pass the orderId of the work order being edited
-/>
+              {isFormVisible && (
+                <PopUp
+                visible={isFormVisible}
+                setVisible={() => setIsFormVisible(false)}
+                width="1200px"
+                height="500px"
+                size="xl"
+                header=""
+                showCloseButton={true}
+                >
+                  <SkuVersionAddEdit
+                handleDeleteVersion={handleDeleteVersion}
+                skuID={selectedSkuID}
+                setSkuVersionsMap={setSkuVersionsMap}
+                orderId={selectedWorkOrderForVersions} // Pass the orderId of the work order being edited
+                IsEditVersion={IsEditVersion}
+                skuVersionID={selectedSkuVersionID}
+                visible={isFormVisible}
+                setVisible={() => setIsFormVisible(false)}
+              />
+                </PopUp>
+              
+            )}
+<SkuVersionAddEdit
+                handleDeleteVersion={handleDeleteVersion}
+                skuID={selectedSkuID}
+                setSkuVersionsMap={setSkuVersionsMap}
+                orderId={selectedWorkOrderForVersions} // Pass the orderId of the work order being edited
+              />
+
+
           </div>
         </div>
         
       )}
- 
-
-      <div className="flex justify-end mt-4">
-        <div className='flex gap-3'>
+        <div className="flex justify-end mt-4">
+      <div className='flex gap-3'>
           <ActionButton
             onClick={() => {
               setDrawer(false)
@@ -512,13 +570,20 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
           />
         </div>
 
-      </div>
+      </div> 
+ 
+
+    
       <VersionsPopup
         visible={isVersionDrawerOpen}
         setVisible={() => setVersionDrawerOpen(false)}
         versionData={selectedWorkOrderForVersions ? skuVersionsMap[selectedWorkOrderForVersions] : []}
         skuName={selectedWorkOrderForVersions && workOrders.find(order => order.id === selectedWorkOrderForVersions)?.sku_name}
         getskuversions={getskuversions}
+        handleDeleteVersion={handleDeleteVersion}
+        setSelectedSkuVersionID={setSelectedSkuVersionID}
+        setIsEdit={setIsEditVersion}
+        formVisibility={setIsFormVisible}
       />
     </div>
   )

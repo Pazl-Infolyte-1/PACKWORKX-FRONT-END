@@ -332,6 +332,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
               setFormData={handleWorkOrderFormUpdate}
               workOrdersData={workOrdersData}
               skuDetailsForm={skuDetailsForm} // Pass the SKU details to WorkOrders component
+              setWorkOrdersData={setWorkOrdersData}
             />
           </div>
         )}

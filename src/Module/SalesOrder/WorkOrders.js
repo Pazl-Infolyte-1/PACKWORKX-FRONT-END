@@ -5,6 +5,7 @@ import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
 import SkuVersionAddEdit from './skuVersionAddEdit'
 import PopUp from '../../components/New/PopUp'
+import { useLocation } from 'react-router-dom'
 const accordionCardSummary = {
   data: [
     {
@@ -23,7 +24,9 @@ const accordionCardSummary = {
   ],
 }
 
-const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, setDrawer, }) => {
+const salesOrder=[{id:2,name:"a"},{id:3,name:"a"}]
+
+  const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,workOrders, setWorkOrders, setDrawer }) => {
   const [selectedOption, setSelectedOption] = useState('inhouse')
   const [openIndices, setOpenIndices] = useState([])
   const [openAccordions, setOpenAccordions] = useState({})
@@ -36,6 +39,8 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
   const [IsEditVersion,setIsEditVersion] = useState(false)
   const [selectedSkuVersionID,setSelectedSkuVersionID] = useState(null);
   const [isFormVisible,setIsFormVisible]= useState(false)
+  const location = useLocation();
+  const isWorkOrderList = location.pathname.includes('workorderlist');
   
 
 
@@ -123,6 +128,12 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
       return 'inhouse'
     })
   }
+
+  const handleSalesOrderChange = (orderId, value) => {
+    handleWorkOrderChange(orderId, 'salesOrderId', value);
+  }
+
+  
 
   // Function to add a new work order
   const addWorkOrder = () => {
@@ -374,7 +385,30 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
               {/* Fields Row 1 */}
               {openCreateAccordion.includes(order.id) && (
                 <div className="mt-2 p-3 border-t border-gray-300">
+                                       {/* Add Sales Order Dropdown if on workorderlist page */}
+                                       {isWorkOrderList && (
+                    <div className="w-full p-1 flex flex-row gap-4">
+                      <div className="p-2">
+                        <label className="block text-gray-800 font-medium mb-1 ml-2">Sales Order</label>
+                        <select
+                          className="w-[420px] h-[40px] px-2 border border-[#c2c2c2] text-sm rounded-md bg-white text-[#030303] outline-none ml-2"
+                          value={order.salesOrderId || ''}
+                          onChange={(e) => handleSalesOrderChange(order.id, e.target.value)}
+                        >
+                          <option value="" disabled>
+                            Select Sales Order
+                          </option>
+                          {salesOrder.map((so) => (
+                            <option key={so.id} value={so.id}>
+                              {`SO-${so.id} - ${so.name}`}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
                   <div className="w-full p-1 flex flex-row gap-4">
+
                     <div className="p-2">
                       <label className="block text-gray-800 font-medium mb-1 ml-2">SKU</label>
                       <select
@@ -392,6 +426,8 @@ const WorkOrders = ({ setFormData, workOrdersData, workOrders, setWorkOrders, se
                         ))}
                       </select>
                     </div>
+
+                   
 
                     <div className="p-2 relative w-full">
                       <label className="block text-gray-800 font-medium mb-1 ml-2">

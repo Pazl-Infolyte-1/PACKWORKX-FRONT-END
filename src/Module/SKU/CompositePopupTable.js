@@ -115,7 +115,7 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
     };
 	return (
 		<>
-		<div className="p-4">
+		<div>
 		  {/*<h2 className="text-xl font-semibold mb-4">SKU List</h2>*/}
 		  <div className="flex items-center justify-between flex-wrap gap-2 my-4 p-3 w-full bg-white border border-gray-200 border-b-transparent">
      <div className="flex items-center h-[35px] w-[300px] gap-[2px] border border-gray-300 rounded-md">
@@ -173,14 +173,14 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
       <CTable striped hover className="w-full m-0">
         <CTableHead className="bg-gray-100 sticky top-0 z-10">
           <CTableRow className="text-center">
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+            <CTableHeaderCell className="py-2 py-1 text-gray-600 font-medium">
               Select SKU
             </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">ID</CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">SKU Name</CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">SKU Type</CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">Client</CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">Status</CTableHeaderCell>
+            <CTableHeaderCell className="py-2 py-1 text-gray-600 font-medium text-start">ID</CTableHeaderCell>
+            <CTableHeaderCell className="py-2 py-1 text-gray-600 font-medium text-start">SKU Name</CTableHeaderCell>
+            <CTableHeaderCell className="py-2 py-1 text-gray-600 font-medium text-start">SKU Type</CTableHeaderCell>
+            <CTableHeaderCell className="py-2 py-1 text-gray-600 font-medium text-start">Client</CTableHeaderCell>
+            <CTableHeaderCell className="py-2 py-1 text-gray-600 font-medium text-start">Status</CTableHeaderCell>
           </CTableRow>
         </CTableHead>
 
@@ -188,19 +188,19 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
           {skuListTable?.data?.length > 0 ? (
             skuListTable?.data.map((item) => (
               <CTableRow key={item.id} className="hover:bg-gray-50">
-                <CTableDataCell className="py-3 px-2 text-center">
+                <CTableDataCell className="py-2 py-1 text-center">
                   <input
                     type="checkbox"
                     onChange={(e) => handleCheckboxChange(item.id, e.target.checked)}
                   />
                 </CTableDataCell>
-                <CTableDataCell className="py-3 px-2 text-gray-700">{item.id}</CTableDataCell>
-                <CTableDataCell className="py-3 px-2 text-gray-700">{item.sku_name}</CTableDataCell>
-                <CTableDataCell className="py-3 px-2 text-gray-700">{item.sku_type}</CTableDataCell>
-                <CTableDataCell className="py-3 px-2 text-gray-700">{item.client}</CTableDataCell>
-                <CTableDataCell className="py-3 px-2 text-gray-700">
+                <CTableDataCell className="py-2 py-1 text-gray-700">{item.id}</CTableDataCell>
+                <CTableDataCell className="py-2 py-1 text-gray-700">{item.sku_name}</CTableDataCell>
+                <CTableDataCell className="py-2 py-1 text-gray-700">{item.sku_type}</CTableDataCell>
+                <CTableDataCell className="py-2 py-1 text-gray-700">{item.client}</CTableDataCell>
+                <CTableDataCell className="py-2 py-1 text-gray-700">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                    className={`py-1 py-1 rounded-full text-xs font-semibold ${
                       item.status === 'active'
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
@@ -244,14 +244,21 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
         limit={limit}
       />
     </div>
-
-	<div className="flex justify-end mt-4">
+    <div className="flex justify-end mt-4">
+  <div className="flex gap-2">
     <ActionButton
-      label={' + Add '}
+      label={'Cancel'}
+      onClick={() => setVisible(false)}
+      variant="cancel"
+    />
+    <ActionButton
+      label={'Submit'}
       onClick={addArray}
       variant="add"
     />
   </div>
+</div>
+
 		</div>
 	  </>
 	)

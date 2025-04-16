@@ -23,7 +23,8 @@ function RSCBox({
   setBoardSizeError,
   onMeterDataChange,
   editTag,
-  toThreeDecimalFixed
+  toThreeDecimalFixed,
+  isopenval
 }) {
   const [alerts, setAlerts] = useState([])
   const filteredClient = locationvalue
@@ -33,7 +34,8 @@ function RSCBox({
   const [metricSign, setMetricsSign] = useState('mm')
   const [areaInM2, setAreaInM2] = useState(null)
   const [boarderr, setBoardErr] = useState(null)
-  
+  const [isRscOpen, setIsRscOpen] = useState(true)
+
   const calculateBoardSize = (data) => {
     const length = parseFloat(data.length) || 0
     const width = parseFloat(data.width) || 0
@@ -42,14 +44,16 @@ function RSCBox({
     const widthTrimmingTolerance = parseFloat(data.width_trimming_tolerance) || 0
     const upsval = parseFloat(data.ups) || 0
     const flapWidth = parseFloat(data.flap_width) || 0
-    const deckleSize = parseFloat(data.deckle_size) || 0
 
     const lengthBoardSize = (length + width) * 2 + lengthTrimmingTolerance + flapWidth
     const widthBoardSize = width + height + widthTrimmingTolerance
     const totalBoardSize = lengthBoardSize * widthBoardSize
     const deckleSizeVal = widthBoardSize * upsval
+    const EPSILON = 0.001
+    const deckleSize = parseFloat(data.deckle_size) || deckleSizeVal
 
-    if (deckleSize <= deckleSizeVal) {
+    if (deckleSize + EPSILON <= deckleSizeVal) {
+      // throw error only if clearly smaller, allowing minor float diff
       return {
         length_board_size_cm2: lengthBoardSize.toFixed(2),
         width_board_size_cm2: widthBoardSize.toFixed(2),
@@ -59,6 +63,7 @@ function RSCBox({
         error: `Deckle size must be greater than or equal to ${deckleSizeVal.toFixed(2)}.`,
       }
     }
+    
 
     return {
       length_board_size_cm2: lengthBoardSize.toFixed(2),
@@ -217,6 +222,24 @@ function RSCBox({
     setAreaInM2(convertedArea)
   }, [addNewSkuData?.board_size_cm2, metricSign])
 
+console.log("is open",isopenval)
+useEffect(() => {
+  const handleBeforeUnload = (event) => {
+    if (isopenval) {
+      const message = "Don't refresh or else your data will be lost!";
+      event.preventDefault(); // For most browsers
+      event.returnValue = message; // For Chrome
+      return message; // For Firefox
+    }
+  };
+
+  window.addEventListener('beforeunload', handleBeforeUnload);
+
+  // Cleanup function to remove the event listener
+  return () => {
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+  };
+}, [isopenval]);
   return (
     <div className="rounded-lg ">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -311,8 +334,10 @@ function RSCBox({
 
         <Tooltip title={unitTooltip}>
           <div>
-            <p className="block text-[16px] font-medium text-gray-700 mb-2">Dimensions</p>
-            <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
+          <p className="block text-[16px] font-medium text-gray-700 mb-2">
+  Dimensions <span className="text-gray-500 text-sm">(L × W × H)</span>
+</p>          
+  <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
               <input
                 id="length"
                 name="length"
@@ -496,7 +521,7 @@ function RSCBox({
 
         <Tooltip title={unitTooltip}>
           <div>
-            <p className="block text-[16px] font-medium text-gray-700 mb-2">Board Size</p>
+            <p className="block text-[16px] font-medium text-gray-700 mb-2">Board Size<span className="text-gray-500 text-sm">(W × L)</span></p>
             <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
               <input
                 id="width_board_size_cm2"

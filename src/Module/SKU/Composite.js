@@ -36,6 +36,7 @@ function Composite({
   setAddNewSkuData,
   editedSkudata,
   updateSkuValues,
+  isopenval
 }) {
   const [skuListTable, setSkuListTable] = useState([])
   const [skuFields, setSkuFields] = useState([])
@@ -205,6 +206,25 @@ function Composite({
       setCheckboxSelectedArray([])
     }
   }, [checkboxSelectedArray])
+
+  console.log("is open",isopenval)
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (isopenval) {
+        const message = "Don't refresh or else your data will be lost!";
+        event.preventDefault(); // For most browsers
+        event.returnValue = message; // For Chrome
+        return message; // For Firefox
+      }
+    };
+  
+    window.addEventListener('beforeunload', handleBeforeUnload);
+  
+    // Cleanup function to remove the event listener
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isopenval]);
 
   return (
     <div className="rounded-lg">
@@ -450,7 +470,7 @@ function Composite({
         visible={isSingleViewPopup}
         setVisible={setisSingleViewPopup}
         showCloseButton={true}
-        width={'80vw'}
+        width={'60vw'}
       >
         <CompositePopupTable
           skuSelected={setSelectedSkuType}

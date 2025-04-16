@@ -54,13 +54,10 @@ export default function FluteParametersForm({ setOpenAddEditModal, fluteToEdit }
   }
 
   return (
-    <div className="max-w-lg mx-auto">
-      <h2 className="text-xl font-bold mb-6 text-gray-800">
-        {fluteToEdit ? 'Edit Flute Parameters' : 'Add Flute Parameters'}
-      </h2>
-
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
+    <div className="max-w-2xl mx-auto">
+      {/*<h2 className="text-xl font-bold mb-4">{fluteToEdit ? 'Edit Flute' : 'Add Flute'}</h2>*/}
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="mb-2">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
             Name
           </label>
@@ -76,7 +73,7 @@ export default function FluteParametersForm({ setOpenAddEditModal, fluteToEdit }
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="flute_height">
             Flute Height (mm)
           </label>
@@ -93,7 +90,7 @@ export default function FluteParametersForm({ setOpenAddEditModal, fluteToEdit }
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-2">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="number_of_flutes_per_meter"
@@ -112,42 +109,37 @@ export default function FluteParametersForm({ setOpenAddEditModal, fluteToEdit }
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-gray-700 text-sm font-bold mb-2">Take-up Factor</label>
-          <div className="flex space-x-2">
-            <input
-              id="take_up_factor"
-              name="take_up_factor"
-              type="number"
-              placeholder="take up factor"
-              step="0.001"
-              value={formData.take_up_factor}
-              onChange={handleChange}
-              className=" w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            
-          </div>
+          <input
+            id="take_up_factor"
+            name="take_up_factor"
+            type="number"
+            placeholder="take up factor"
+            step="0.001"
+            value={formData.take_up_factor}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
         </div>
 
-        <div className="mb-6">
+        <div className="mb-3">
           <label className="block text-gray-700 text-sm font-bold mb-2">Glue Consumption</label>
-          <div className="flex space-x-2">
-            <input
-              id="glue_consumption"
-              name="glue_consumption"
-              type="number"
-              placeholder="glue consumption"
-              step="0.1"
-              value={formData.glue_consumption}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
+          <input
+            id="glue_consumption"
+            name="glue_consumption"
+            type="number"
+            placeholder="glue consumption"
+            step="0.1"
+            value={formData.glue_consumption}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
         </div>
 
-        <div className="flex justify-end space-x-4">
+        <div className="flex justify-end col-span-1 md:col-span-2 space-x-4">
           <button
             type="button"
             onClick={handleCancel}

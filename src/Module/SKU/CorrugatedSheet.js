@@ -23,7 +23,8 @@ function CorrugatedSheet({
   onUnitChange,
   setBoardSizeError,
   onMeterDataChange,
-  toThreeDecimalFixed
+  toThreeDecimalFixed,
+  isopenval
 }) {
   const [alerts, setAlerts] = useState([])
   const filteredClient = locationvalue
@@ -116,6 +117,25 @@ function CorrugatedSheet({
     }
   }, [addNewSkuData?.board_size_cm2, metricSign])
 
+   console.log("is open",isopenval)
+    useEffect(() => {
+      const handleBeforeUnload = (event) => {
+        if (isopenval) {
+          const message = "Don't refresh or else your data will be lost!";
+          event.preventDefault(); // For most browsers
+          event.returnValue = message; // For Chrome
+          return message; // For Firefox
+        }
+      };
+    
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    
+      // Cleanup function to remove the event listener
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
+    }, [isopenval]);
+  
   return (
     <div className="rounded-lg">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -316,7 +336,7 @@ function CorrugatedSheet({
         </div>
 
         <Tooltip title={unitTooltip}>
-          <div>
+          {/*<div>
             <label className="block text-[16px] font-medium text-gray-700 mb-2">Board Size (cm²)</label>
             <div className="relative">
               <input
@@ -331,7 +351,48 @@ function CorrugatedSheet({
                 <span className="text-gray-500">{metricSign}²</span>
               </div>
             </div>
-          </div>
+          </div>*/}
+
+          <div>
+                      <p className="block text-[16px] font-medium text-gray-700 mb-2">Board Size<span className="text-gray-500 text-sm">(W × L)</span></p>
+                      <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
+                        <input
+                          id="width_board_size_cm2"
+                          name="width_board_size_cm2"
+                          value={addNewSkuData.width_board_size_cm2}
+                          onChange={handleChange}
+                          placeholder="Width"
+                          className="w-1/3 p-1 text-center focus:outline-none rounded-l-md bg-gray-50"
+                          //title={unitTooltip}
+                          //readOnly={true}
+                        />
+                        <span className="flex items-center justify-center text-gray-500">x</span>
+                        <input
+                          id="length_board_size_cm2"
+                          name="length_board_size_cm2"
+                          value={addNewSkuData.length_board_size_cm2}
+                          onChange={handleChange}
+                          placeholder="Length"
+                          className="w-1/3 p-1 text-center focus:outline-none bg-gray-50"
+                          //title={unitTooltip}
+                          //readOnly={true}
+                        />
+                        {/*<div className="w-1/3 flex justify-end relative">
+                          <select
+                            value={addNewSkuData.unit || 'mm'}
+                            onChange={handleUnitChange}
+                            className="w-full appearance-none bg-blue-600 text-white py-2 px-3 rounded-r-md hover:bg-blue-700 transition-colors focus:outline-none"
+                          >
+                            <option value="mm" className="bg-white text-gray-800">mm</option>
+                            <option value="cm" className="bg-white text-gray-800">cm</option>
+                            <option value="in" className="bg-white text-gray-800">in</option>
+                          </select>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                            <CIcon icon={cilChevronCircleDownAlt} size="sm" />
+                          </div>
+                        </div>*/}
+                      </div>
+                    </div>
         </Tooltip>
 
         <Tooltip title={unitTooltip}>

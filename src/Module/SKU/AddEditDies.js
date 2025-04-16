@@ -51,104 +51,105 @@ const DieForm = ({ dieToEdit, setRefresh, onClose, setisSingleViewPopup }) => {
   };
 
   return (
-    <div className="w-full bg-white p-6 rounded-2xl shadow-xl">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="w-full bg-white rounded-xl">
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div>
+        <label className="block font-medium text-gray-700">Die ID</label>
+        <input
+          type="text"
+          name="die_id"
+          value={formData.die_id}
+          onChange={handleChange}
+          className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Enter Die ID"
+          required
+        />
+      </div>
+  
+      <div>
+        <label className="block font-medium text-gray-700">Name</label>
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Enter Die Name"
+          required
+        />
+      </div>
+  
+      <div>
+        <label className="block font-medium text-gray-700">Client</label>
+        <input
+          type="text"
+          name="client"
+          value={formData.client}
+          onChange={handleChange}
+          className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Enter Client Name"
+          required
+        />
+      </div>
+  
+      <div>
+        <label className="block font-medium text-gray-700">Board Size</label>
+        <input
+          type="text"
+          name="board_size"
+          value={formData.board_size}
+          onChange={handleChange}
+          className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="e.g. 20x30 cm"
+          required
+        />
+      </div>
+  
+      <div>
+        <label className="block font-medium text-gray-700">UPS</label>
+        <input
+          type="number"
+          name="ups"
+          value={formData.ups}
+          onChange={handleChange}
+          className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Enter UPS"
+          required
+        />
+      </div>
+  
+      {isEditMode && (
         <div>
-          <label className="block text-sm font-medium text-gray-700">Die ID</label>
-          <input
-            type="text"
-            name="die_id"
-            value={formData.die_id}
+          <label className="block font-medium text-gray-700">Status</label>
+          <select
+            name="status"
+            value={formData.status}
             onChange={handleChange}
-            className="p-2 mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter Die ID"
+            className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 focus:ring-blue-500 focus:border-blue-500"
             required
-          />
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
         </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="p-2 mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter Die Name"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Client</label>
-          <input
-            type="text"
-            name="client"
-            value={formData.client}
-            onChange={handleChange}
-            className="p-2 mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter Client Name"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Board Size</label>
-          <input
-            type="text"
-            name="board_size"
-            value={formData.board_size}
-            onChange={handleChange}
-            className="p-2 mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="e.g. 20x30 cm"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">UPS</label>
-          <input
-            type="number"
-            name="ups"
-            value={formData.ups}
-            onChange={handleChange}
-            className="p-2 mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter UPS"
-            required
-          />
-        </div>
-
-        {isEditMode && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Status</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="p-2 mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              required
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-        )}
-
-        <div className="flex justify-end space-x-2">
-          <ActionButton 
-            label="Cancel" 
-            variant="cancel" 
-            type="button"
-            onClick={onClose}
-          />
-          <ActionButton 
-            label={isEditMode ? "Update" : "Save"} 
-            variant="add" 
-            type="submit"
-          />
-        </div>
-      </form>
-    </div>
+      )}
+  
+      <div className="md:col-span-2 flex justify-end gap-2 pt-2">
+        <ActionButton 
+          label="Cancel" 
+          variant="cancel" 
+          type="button"
+          onClick={onClose}
+        />
+        <ActionButton 
+          label={isEditMode ? "Update" : "Save"} 
+          variant="add" 
+          type="submit"
+        />
+      </div>
+    </form>
+  </div>
+  
   );
 };
 

@@ -200,6 +200,16 @@ function SkuAddEdit({
     }))
   }
 
+  const toThreeDecimalFixed = (value) => {
+    if (value === null || value === undefined || value === '') return '';
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) return '';
+    if (Number.isInteger(numValue)) {
+      return numValue.toString();
+    }
+    return parseFloat(numValue.toFixed(3)).toString();
+  };  
+
   const skuComponents = {
     'RSC box': (
       <RSCBox
@@ -219,6 +229,7 @@ function SkuAddEdit({
         setBoardSizeError={setBoardSizeError}
         onMeterDataChange={handleMeterDataChange}
         editTag={editTag}
+        toThreeDecimalFixed={toThreeDecimalFixed}
       />
     ),
     //'Corrugated Sheet': (
@@ -291,7 +302,6 @@ function SkuAddEdit({
   }
   const openViewCard = (data) => {
     setisSingleViewPopup(true)
-    setSingleDataId(data.id)
   }
 
   const handleCloseSingleViewPopup = () => {
@@ -302,6 +312,8 @@ function SkuAddEdit({
     setAddNewSkuData(createInitialSkuData())
     handleClose()
   }
+
+  
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
@@ -420,10 +432,10 @@ function SkuAddEdit({
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <p>{item.weight || 'N/A'}</p>
+                      <p>{toThreeDecimalFixed(item.weight) || 'N/A'}</p>
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <p>N/A</p>
+                      <p>{toThreeDecimalFixed(item.gsm*item.bf/1000)}</p>
                     </td>
                   </tr>
                 ))}

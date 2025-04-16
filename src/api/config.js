@@ -692,7 +692,6 @@ export const apiMethods = {
     }
   },
 
-
   getDies: async (params) => {
     try {
       return await apiClient.get('/common-service/die', {params})
@@ -700,6 +699,31 @@ export const apiMethods = {
       console.error(error)
     }
   },
+
+  addDie: async (formData) => {
+    try {
+      return await apiClient.post('/common-service/die/create', formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  updateDie: async (id, formData) => {
+    try {
+      return await apiClient.put(`/common-service/die/update/${id}`, formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  deleteDie: async (id) => {
+    try {
+      return await apiClient.delete(`/common-service/die/delete/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
   getSalesOrderList: async (params = {}) => {
     console.log(params,'fasdfa')
     try {
@@ -742,7 +766,38 @@ export const apiMethods = {
   getSkuVersions:async(id)=>{
     const response = await apiClient.get(`/sku-details/sku-version/sku/${id}`)
     return response
-  }
+  },
+
+  getFluteType: async () => {
+    try {
+      return await apiClient.get('/common-service/flute')
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  deleteFlute: async (id) => {
+    try {
+      return await apiClient.delete(`/common-service/flute/delete/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  addFlute: async (formData) => {
+    try {
+      return await apiClient.post('/common-service/flute/create', formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  updateFlute: async (id, formData) => {
+    try {
+      return await apiClient.put(`/common-service/flute/update/${id}`, formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
 
 

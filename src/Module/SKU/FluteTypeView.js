@@ -6,6 +6,14 @@ import { cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import PopUp from '../../components/New/PopUp'
 import FluteParametersForm from './AddEditFlute'
+import {
+  CTable,
+  CTableHead,
+  CTableBody,
+  CTableRow,
+  CTableHeaderCell,
+  CTableDataCell,
+} from '@coreui/react'
 
 const FluteTypeView = () => {
   const [flutesList, setFlutesList] = useState([])
@@ -59,49 +67,61 @@ const FluteTypeView = () => {
   }
 
   return (
-    <div className="overflow-x-auto p-4">
+    <div className="overflow-x-auto">
       <div className="flex justify-end my-2">
-        <ActionButton variant="add" label="Add Flute" onClick={handleAddNew} />
+        <ActionButton height={6} variant="add" label="Add Flute" onClick={handleAddNew} />
       </div>
-      <table className="w-full border-collapse border border-gray-300">
-        <thead className="bg-gray-100 text-gray-700">
-          <tr>
-            <th className="p-3 border border-gray-300">Flute</th>
-            <th className="p-3 border border-gray-300">Flute height (mm)</th>
-            <th className="p-3 border border-gray-300">flutes per m</th>
-            <th className="p-3 border border-gray-300">Take-up factor</th>
-            <th className="p-3 border border-gray-300">Glue consumption g/m²</th>
-            <th className="p-3 border border-gray-300">Action</th>
-          </tr>
-        </thead>
-        <tbody className="text-gray-900">
-          {flutesList.map((flute) => (
-            <tr key={flute.id} className="bg-white border border-gray-300">
-              <td className="p-3 border border-gray-300">{flute.name}</td>
-              <td className="p-3 border border-gray-300">{flute.flute_height}</td>
-              <td className="p-3 border border-gray-300">{flute.number_of_flutes_per_meter}</td>
-              <td className="p-3 border border-gray-300">{flute.take_up_factor}</td>
-              <td className="p-3 border border-gray-300">{flute.glue_consumption}</td>
-              <td className="p-3 border border-gray-300">
-                <ThreeDotMenu
-                  value={[
-                    {
-                      label: 'Edit',
-                      icon: cilPencil,
-                      onClick: () => handleEdit(flute),
-                    },
-                    {
-                      label: 'Delete',
-                      icon: cilTrash,
-                      onClick: () => handleOpenDeleteModal(flute),
-                    },
-                  ]}
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="h-[200px] overflow-y-auto border border-gray-200 rounded custom-scrollbar">
+  <CTable striped hover className="w-full m-0 text-sm">
+    <CTableHead className="bg-gray-100 sticky top-0 z-10">
+      <CTableRow className="text-center">
+        <CTableHeaderCell className="py-2 px-1 font-medium text-gray-600">Flute</CTableHeaderCell>
+        <CTableHeaderCell className="py-2 px-1 font-medium text-gray-600">Flute height (mm)</CTableHeaderCell>
+        <CTableHeaderCell className="py-2 px-1 font-medium text-gray-600">Flutes per m</CTableHeaderCell>
+        <CTableHeaderCell className="py-2 px-1 font-medium text-gray-600">Take-up factor</CTableHeaderCell>
+        <CTableHeaderCell className="py-2 px-1 font-medium text-gray-600">Glue consumption g/m²</CTableHeaderCell>
+        <CTableHeaderCell className="py-2 px-1 font-medium text-gray-600">Action</CTableHeaderCell>
+      </CTableRow>
+    </CTableHead>
+
+    <CTableBody>
+      {flutesList.length > 0 ? (
+        flutesList.map((flute) => (
+          <CTableRow key={flute.id} className="hover:bg-gray-50 text-center">
+            <CTableDataCell className="py-2 px-1 text-gray-700">{flute.name}</CTableDataCell>
+            <CTableDataCell className="py-2 px-1 text-gray-700">{flute.flute_height}</CTableDataCell>
+            <CTableDataCell className="py-2 px-1 text-gray-700">{flute.number_of_flutes_per_meter}</CTableDataCell>
+            <CTableDataCell className="py-2 px-1 text-gray-700">{flute.take_up_factor}</CTableDataCell>
+            <CTableDataCell className="py-2 px-1 text-gray-700">{flute.glue_consumption}</CTableDataCell>
+            <CTableDataCell className="py-2 px-1 text-gray-700">
+              <ThreeDotMenu
+                value={[
+                  {
+                    label: 'Edit',
+                    icon: cilPencil,
+                    onClick: () => handleEdit(flute),
+                  },
+                  {
+                    label: 'Delete',
+                    icon: cilTrash,
+                    onClick: () => handleOpenDeleteModal(flute),
+                  },
+                ]}
+              />
+            </CTableDataCell>
+          </CTableRow>
+        ))
+      ) : (
+        <CTableRow>
+          <CTableDataCell colSpan={6} className="px-4 py-4 text-center text-gray-500 text-sm">
+            No Flute data found.
+          </CTableDataCell>
+        </CTableRow>
+      )}
+    </CTableBody>
+  </CTable>
+</div>
+
       
       {/* Delete confirmation modal */}
       <ConfirmationModale
@@ -116,6 +136,7 @@ const FluteTypeView = () => {
         setVisible={handleCloseModal}
         showCloseButton={true}
         width={'50vw'}
+        header={selectedFlute ? 'Edit Flute' : 'Add Flute'}
       >
         <FluteParametersForm 
           setOpenAddEditModal={handleCloseModal} 

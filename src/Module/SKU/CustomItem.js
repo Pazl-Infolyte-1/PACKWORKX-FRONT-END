@@ -17,6 +17,7 @@ function CustomItem({
   skuType,
   setAddNewSkuData,
   updateSkuValues,
+  isopenval
 }) {
   const [tagInput, setTagInput] = useState('')
   const inputRef = useRef(null)
@@ -47,6 +48,24 @@ function CustomItem({
     setTagInput(updatedTags.join('')) // keep input in sync
   }
 
+  console.log("is open",isopenval)
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (isopenval) {
+        const message = "Don't refresh or else your data will be lost!";
+        event.preventDefault(); // For most browsers
+        event.returnValue = message; // For Chrome
+        return message; // For Firefox
+      }
+    };
+  
+    window.addEventListener('beforeunload', handleBeforeUnload);
+  
+    // Cleanup function to remove the event listener
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isopenval]);
   return (
     <div className="rounded-lg">
       {/* Top header fields */}

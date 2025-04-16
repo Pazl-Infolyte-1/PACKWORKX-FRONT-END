@@ -91,7 +91,6 @@ function SkuList() {
       },
     ],
   })
-
   useEffect(() => {
     if (location.state?.initialRender) {
       setDrawerOpen(true)
@@ -469,6 +468,7 @@ function SkuList() {
         }}
       >
         <SkuAddEdit
+        isopenval={isDrawerOpen || editTag}
           handleChange={handleChange}
           strictAdherence={strictAdherence}
           handleStrictAdherenceToggle={handleStrictAdherenceToggle}

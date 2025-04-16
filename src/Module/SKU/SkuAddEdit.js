@@ -12,6 +12,7 @@ import Composite from './Composite'
 import CustomItem from './CustomItem'
 
 function SkuAddEdit({
+  isopenval,
   handleChange,
   strictAdherence,
   handleStrictAdherenceToggle,
@@ -127,18 +128,38 @@ function SkuAddEdit({
     setAddNewSkuData(baseSkuData)
   }
 
+  //const handleSkuValuesChange = (index, field, value) => {
+  //  setAddNewSkuData((prevData) => {
+  //    const updatedSkuValues = [...prevData.sku_values]
+
+  //    updatedSkuValues[index] = { ...updatedSkuValues[index], [field]: value }
+  //    if (field === 'gsm') {
+  //      updatedSkuValues[index].weight = value * meterSquareData // Set weight to the GSM value
+  //    }
+
+  //    return { ...prevData, sku_values: updatedSkuValues }
+  //  })
+  //}
+
   const handleSkuValuesChange = (index, field, value) => {
     setAddNewSkuData((prevData) => {
-      const updatedSkuValues = [...prevData.sku_values]
-
-      updatedSkuValues[index] = { ...updatedSkuValues[index], [field]: value }
+      const updatedSkuValues = [...prevData.sku_values];
+      const updatedItem = { ...updatedSkuValues[index], [field]: value };
+  
       if (field === 'gsm') {
-        updatedSkuValues[index].weight = value * meterSquareData // Set weight to the GSM value
+        updatedItem.weight = value * meterSquareData;
       }
-
-      return { ...prevData, sku_values: updatedSkuValues }
-    })
+  
+      // Auto-set flute_type when layer name is changed
+      if (field === 'layer') {
+        updatedItem.flute_type = value.toLowerCase().includes('corrugated') ? '' : 'N/A';
+      }
+  
+      updatedSkuValues[index] = updatedItem;
+      return { ...prevData, sku_values: updatedSkuValues };
+    });
   }
+  
 
   const plyLayerConfigurations = {
     2: [
@@ -188,7 +209,7 @@ function SkuAddEdit({
       bf: '',
       material: '',
       color: '',
-      flute_type: '',
+      flute_type: layer.layer.toLowerCase().includes('corrugated') ? '' : 'N/A',
       weight: '',
       //flute_ratio: '',
     }))
@@ -213,6 +234,7 @@ function SkuAddEdit({
   const skuComponents = {
     'RSC box': (
       <RSCBox
+      isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
         setIsOpen={setIsOpen}
@@ -235,6 +257,7 @@ function SkuAddEdit({
     //'Corrugated Sheet': (
     Board: (
       <CorrugatedSheet
+      isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
         setIsOpen={setIsOpen}
@@ -251,6 +274,7 @@ function SkuAddEdit({
     ),
     'Die Cut box': (
       <DieCutBox
+      isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
         setIsOpen={setIsOpen}
@@ -267,6 +291,7 @@ function SkuAddEdit({
     ),
     Composite: (
       <Composite
+      isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
         setIsOpen={setIsOpen}
@@ -284,6 +309,7 @@ function SkuAddEdit({
     ),
     'Custom Item': (
       <CustomItem
+      isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
         setIsOpen={setIsOpen}
@@ -400,28 +426,33 @@ function SkuAddEdit({
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
-                      <div className="relative w-full flex items-center">
-                        <select
-                          className="p-1 border rounded w-full pr-8 appearance-none" // Removed dropdown arrow
-                          value={item.flute_type || 'Select'}
-                          onChange={(e) =>
-                            handleSkuValuesChange(index, 'flute_type', e.target.value)
-                          }
-                        >
-                          <option hidden>Select</option>
-                          <option value="A">A</option>
-                          <option value="B">B</option>
-                          <option value="C">C</option>
-                          <option value="E">E</option>
-                          <option value="F,G,N">F,G,N</option>
-                        </select>
-                        {/* Eye icon positioned absolutely to the right */}
-                        <FaEye
-                          className="absolute right-2 text-gray-500 cursor-pointer"
-                          onClick={openViewCard}
-                        />
-                      </div>
-                    </td>
+  {item.layer.toLowerCase().includes('corrugated') ? (
+    <div className="relative w-full flex items-center">
+      <select
+        className="p-1 border rounded w-full pr-8 appearance-none"
+        value={item.flute_type}
+        onChange={(e) =>
+          handleSkuValuesChange(index, 'flute_type', e.target.value)
+        }
+      >
+        <option hidden>Select</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="E">E</option>
+        <option value="F,G,N">F,G,N</option>
+      </select>
+      <FaEye
+        className="absolute right-2 text-gray-500 cursor-pointer"
+        onClick={openViewCard}
+      />
+    </div>
+  ) : (
+    <p className="text-gray-500">N/A</p>
+  )}
+</td>
+
+
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
                       <input
                         type="text"
@@ -460,7 +491,8 @@ function SkuAddEdit({
         visible={isSingleViewPopup}
         setVisible={handleCloseSingleViewPopup}
         showCloseButton={true}
-        width={'70vw'}
+        width={'50vw'}
+        header={"Add Flute"}
       >
         <FluteTypeView></FluteTypeView>
       </PopUp>

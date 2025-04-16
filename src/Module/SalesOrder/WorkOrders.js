@@ -386,7 +386,7 @@ const salesOrder=[{id:2,name:"a"},{id:3,name:"a"}]
               {openCreateAccordion.includes(order.id) && (
                 <div className="mt-2 p-3 border-t border-gray-300">
                                        {/* Add Sales Order Dropdown if on workorderlist page */}
-                                       {isWorkOrderList && (
+                      {isWorkOrderList && (
                     <div className="w-full p-1 flex flex-row gap-4">
                       <div className="p-2">
                         <label className="block text-gray-800 font-medium mb-1 ml-2">Sales Order</label>

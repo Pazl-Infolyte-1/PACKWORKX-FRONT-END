@@ -683,9 +683,33 @@ export const apiMethods = {
     }
   },
 
+  updateProcessValues: async (payload) => {
+    try {
+      return await apiClient.put(`/machines/process-values/${payload.id}`, payload)
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+
   addFields: async (payload) => {
     try {
       return await apiClient.post('/machines/process-fields', payload)
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+  updateField: async (payload) => {
+    try {
+      return await apiClient.put(`/machines/process-fields/${payload.id}`, payload)
+    } catch (error) {
+      console.error(error); 
+    }
+  },
+  deleteField: async (id) => {
+    try {
+      return await apiClient.delete(`/machines/process-fields/${id}`)
     } catch (error) {
       console.error(error);
       
@@ -794,6 +818,14 @@ export const apiMethods = {
   updateFlute: async (id, formData) => {
     try {
       return await apiClient.put(`/common-service/flute/update/${id}`, formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getProcessValues: async () => {
+    try {
+      return await apiClient.get('/machines/process-values')
     } catch (error) {
       console.error(error)
     }

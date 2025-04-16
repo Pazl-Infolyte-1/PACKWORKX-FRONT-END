@@ -1,56 +1,63 @@
-import { useState } from 'react'
-import axios from 'axios'
-import ProcessDropDown from './ProcessDropDown'
-import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
+import { useEffect, useState } from "react";
+import ProcessDropDown from "./ProcessDropDown";
+import ActionButton from "../../components/New/ActionButton";
+import apiMethods from "../../api/config";
 
-const AddFieldForm = ({ processData, setProcessData, closeModal }) => {
-  const [selectedProcess, setSelectedProcess] = useState('')
-  const [fieldLabel, setFieldLabel] = useState('')
-  const [isRequired, setIsRequired] = useState(true)
-  const [fieldType, setFieldType] = useState('text')
+const AddFieldForm = ({ 
+  processData, 
+  setRefresh, 
+  setIsFieldModaleOpen,
+  isEdit,
+  formData,
+  selectedProcess,
+  setSelectedProcess
+}) => {
+  const [fieldLabel, setFieldLabel] = useState(formData?.label || '');
+  const [isRequired, setIsRequired] = useState(formData?.required || true);
+  const [fieldType, setFieldType] = useState(formData?.field_type?.toLowerCase() || 'text');
+
+  useEffect(() => {
+    if (isEdit && formData) {
+      setFieldLabel(formData.label);
+      setIsRequired(formData.required);
+      setFieldType(formData.field_type.toLowerCase());
+    }
+  }, [isEdit, formData]);
 
   const handleAddField = async () => {
-
     const payload = {
-      process_name_id: selected.processId, // Make sure `processId` is the correct key
+      process_name_id: selectedProcess.processId,
       label: fieldLabel,
-      field_type: fieldType.charAt(0).toUpperCase() + fieldType.slice(1), // "text" → "Text"
+      field_type: fieldType.charAt(0).toUpperCase() + fieldType.slice(1),
       required: isRequired,
+    };
+
+    if (isEdit) {
+      payload.id = formData.id;
     }
 
     try {
-      const res = await apiMethods.addFields(payload) // Replace with actual endpoint
+      const res = isEdit 
+        ? await apiMethods.updateField(payload) 
+        : await apiMethods.addFields(payload);
 
-      // Optionally update local state
-      const newField = {
-        name: fieldLabel,
-        required: isRequired,
-        fieldtype: fieldType,
-      }
-
-      setProcessData((prevData) =>
-        prevData.map((process) =>
-          process.processName === selectedProcess
-            ? { ...process, parameters: [...process.parameters, newField] }
-            : process
-        )
-      )
-
-      // Reset form
-      setFieldLabel('')
-      setIsRequired(true)
-      setFieldType('text')
-      closeModal()
+      // Reset form and close modal
+      setFieldLabel('');
+      setIsRequired(true);
+      setFieldType('text');
+      setIsFieldModaleOpen(false);  
+      
+      setRefresh((prev) => !prev);
+      // Refresh data or update local state as needed
     } catch (error) {
-      console.error('Error adding field:', error)
-      alert('Failed to add field. Please try again.')
+      console.error('Error saving field:', error);
+      alert('Failed to save field. Please try again.');
     }
-  }
+  };
 
   return (
     <div className="my-2 w-full rounded-lg border border-gray-50 p-3 ">
-      <p className="font-bold">Add Field Form</p>
+      <p className="font-bold">{isEdit ? 'Edit Field' : 'Add Field Form'}</p>
       <div className="grid grid-cols-2 gap-40">
         {/* Left Column */}
         <div>
@@ -59,7 +66,11 @@ const AddFieldForm = ({ processData, setProcessData, closeModal }) => {
           <div className="relative z-10">
             <ProcessDropDown
               options={processData}
-              onChange={(option) => setSelectedProcess(option.value)}
+              onChange={(option) => setSelectedProcess({
+                value: option.value,
+                processId: option.processId
+              })}
+              value={selectedProcess}
               showAddProcedure={false}
             />
           </div>
@@ -121,10 +132,14 @@ const AddFieldForm = ({ processData, setProcessData, closeModal }) => {
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-4 my-2">
-        <ActionButton variant="save" label="Save" onClick={handleAddField} />
+        <ActionButton
+          variant="save" 
+          label={isEdit ? 'Update' : 'Save'} 
+          onClick={handleAddField} 
+        />
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default AddFieldForm

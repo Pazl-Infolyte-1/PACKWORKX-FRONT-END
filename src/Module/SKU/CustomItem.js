@@ -20,6 +20,7 @@ function CustomItem({
 }) {
   const [tagInput, setTagInput] = useState('')
   const inputRef = useRef(null)
+  
   const handleTagChange = (e) => {
     const input = e.target.value
     setTagInput(input)
@@ -29,12 +30,11 @@ function CustomItem({
     setAddNewSkuData((prev) => ({ ...prev, tags }))
   }
 
-  console.log('sku datas', addNewSkuData)
-
   useEffect(() => {
     const ply = 2
     setAddNewSkuData((prev) => ({ ...prev, ply }))
   }, [])
+  
   useEffect(() => {
     if (editTag && Array.isArray(addNewSkuData?.tags)) {
       setTagInput(addNewSkuData.tags.join(''))
@@ -47,56 +47,35 @@ function CustomItem({
     setTagInput(updatedTags.join('')) // keep input in sync
   }
 
-  console.log('edittag', editTag)
-  console.log('edit data', addNewSkuData)
-
   return (
-    <>
-      <div className="grid grid-cols-3 gap-4">
-        <div className="">
-          <label className="block text-[16px] font-medium">SKU Type</label>
+    <div className="rounded-lg">
+      {/* Top header fields */}
+      <div className="grid grid-cols-3 gap-6 p-6 border border-gray-200 rounded-lg">
+        <div>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Type</label>
           <div className="relative w-full" ref={dropdownRef}>
             <div
-              className="p-2 my-2 h-10 border border-gray-300 rounded cursor-pointer flex justify-between items-center"
+              className="p-2 h-10 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
               onClick={() => setIsOpen((prev) => !prev)}
             >
-              <span>{addNewSkuData?.sku_type || 'Select Type'}</span>
-              <BsChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+              <span className="text-gray-800">{addNewSkuData?.sku_type || 'Select Type'}</span>
+              <BsChevronDown className={`transition-transform text-gray-600 ${isOpen ? 'rotate-180' : ''}`} />
             </div>
 
             {isOpen && (
               <ul
-                className={`absolute left-0 right-0 mt-1 overflow-y-auto bg-white border border-gray-300 rounded z-10 h-30`}
+                className="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-gray-300 rounded-md z-20 shadow-lg"
               >
                 {skuType.map((option) => (
-                  <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-100">
+                  <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-50">
                     <li
-                      className={`p-2 cursor-pointer w-full ${editTag ? 'text-gray-400 cursor-not-allowed' : ''}`}
+                      className={`p-2 cursor-pointer w-full ${editTag ? 'text-gray-400 cursor-not-allowed' : 'text-gray-800'}`}
                       onClick={!editTag ? () => handleSelect(option) : undefined}
                     >
                       {option.sku_type}
                     </li>
-                    {/* {editTag && (
-					  <div className="flex items-center gap-2">
-						<CIcon icon={cilPencil} className="cursor-pointer" />
-						<CIcon
-						  icon={cilTrash}
-						  style={{ color: 'red' }}
-						  className="cursor-pointer"
-						  onClick={() => handleDeleteSkuType(option.id)}
-						/>
-					  </div>
-					)} */}
                   </div>
                 ))}
-
-                {/* Add more Procedure */}
-                {/* <li
-				  className="p-2 font-semibold text-blue-600 hover:bg-gray-100 cursor-pointer"
-				  onClick={() => handleSelect({ value: 'addMore', label: 'Add More Procedure' })}
-				>
-				  Add More Procedure
-				</li> */}
               </ul>
             )}
           </div>
@@ -106,20 +85,20 @@ function CustomItem({
           skuName="SKU Name"
           id="sku_name"
           name="sku_name"
-          value={addNewSkuData.sku_name}
+          value={addNewSkuData?.sku_name}
           onChange={handleChange}
           placeholder="SKU Name"
         />
 
         <div>
-          <label className="block text-[16px] font-medium mb-2">Client Name</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">Client Name</label>
           <select
             name="client"
             id="client"
             disabled={clientDiasble}
             value={addNewSkuData?.client || ''}
             onChange={handleChange}
-            className="w-full p-2 shadow-md border-l-2 rounded-md"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="" hidden>
               Select Client
@@ -131,7 +110,10 @@ function CustomItem({
             ))}
           </select>
         </div>
-
+      </div>
+      
+      {/* Main content */}
+      <div className="grid grid-cols-3 gap-6 p-6 mt-6 border border-gray-200 rounded-lg">
         <Input
           skuName="Estimate"
           id="estimate_composite_item"
@@ -150,20 +132,6 @@ function CustomItem({
           placeholder="Default SKU Details"
         />
 
-        {/* <div className="mb-4">
-		  <label className="block text-[16px] font-medium mb-2">Width Trimming Tolerance</label>
-		  <select
-			name="width_trimming_tolerance"
-			id="width_trimming_tolerance"
-			value={addNewSkuData.width_trimming_tolerance}
-			onChange={handleChange}
-			className="w-full p-2 shadow-md border-l-2 rounded-md"
-		  >
-			<option>0.2</option>
-			<option>0.1</option>
-		  </select>
-		</div> */}
-
         <Input
           skuName="Description"
           id="description"
@@ -174,12 +142,12 @@ function CustomItem({
         />
 
         <div>
-          <label className="text-[16px] font-medium">Tags</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">Tags</label>
           <div
-            className="min-h-[42px] shadow-md border-l-2 rounded-md p-2 mt-2"
+            className=" border border-gray-300 rounded-md p-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors"
             onClick={() => inputRef.current?.focus()}
           >
-            {/* Chips Row */}
+            {/* Tags/Chips Row */}
             <div className="flex flex-wrap gap-2 mb-2">
               {addNewSkuData?.tags?.map((tag, index) => (
                 <div
@@ -203,13 +171,13 @@ function CustomItem({
               ref={inputRef}
               value={tagInput}
               onChange={handleTagChange}
-              className="w-full outline-none px-2 py-1 text-sm rounded"
+              className="w-full outline-none px-2 py-1 text-sm"
               placeholder="Type tags like #fun#vibe"
             />
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

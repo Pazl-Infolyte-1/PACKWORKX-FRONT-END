@@ -21,7 +21,6 @@ const AddFieldForm = ({ processData, setProcessData, closeModal }) => {
 
     try {
       const res = await apiMethods.addFields(payload) // Replace with actual endpoint
-      console.log('Field added successfully:', res.data)
 
       // Optionally update local state
       const newField = {

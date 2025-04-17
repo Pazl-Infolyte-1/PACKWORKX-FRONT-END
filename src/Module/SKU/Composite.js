@@ -11,6 +11,7 @@ import PopUp from '../../components/New/PopUp'
 import CompositePopupTable from './CompositePopupTable'
 import { FaChevronDown } from 'react-icons/fa'
 import Tooltip from '@mui/material/Tooltip'
+import PlyToggle from '../../components/New/PlyToggle'
 
 const compositeTypes = [
   { id: '1', name: 'Partition' },
@@ -260,14 +261,16 @@ function Composite({
           </div>
         </div>
 
-        <Input
-          skuName="SKU Name"
-          id="sku_name"
-          name="sku_name"
-          value={addNewSkuData?.sku_name}
-          onChange={handleChange}
-          placeholder="SKU Name"
-        />
+        <div>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Name</label>
+            <input
+              id="sku_name"
+              name="sku_name"
+              value={addNewSkuData.sku_name}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
 
         <div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2">Client Name</label>
@@ -280,20 +283,22 @@ function Composite({
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="" hidden>
-              Select Client
+              Select
             </option>
             {client?.map((item, index) => (
               <option key={index} value={item.display_name}>
                 {item.display_name}
               </option>
             ))}
+                                        <option value="add_client">➕ Add Client</option>
+
           </select>
         </div>
       </div>
 
       {/* Main content */}
       <div className="grid grid-cols-3 gap-6 p-6 mt-6 border border-gray-200 rounded-lg">
-        <div>
+        {/*<div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2">Ply</label>
           <select
             name="ply"
@@ -314,7 +319,12 @@ function Composite({
             <option value={7}>7 Ply</option>
             <option value={9}>9 Ply</option>
           </select>
-        </div>
+        </div>*/}
+           <PlyToggle
+  value={addNewSkuData.ply}
+  onChange={(selectedPly) => updateSkuValues(selectedPly)}
+/>
+
 
         <div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2">
@@ -327,7 +337,7 @@ function Composite({
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             onChange={handleCompositeTypeChange}
           >
-            <option value="">Select Type</option>
+            <option value="">Select</option>
             <option value="Partition">Partition</option>
             <option value="Panel">Panel</option>
           </select>
@@ -341,7 +351,7 @@ function Composite({
             type="number"
             value={addNewSkuData.minimum_order_level}
             onChange={handleChange}
-            placeholder="Minimum Order Level"
+            //placeholder="Minimum Order Level"
           />
         </div>
 

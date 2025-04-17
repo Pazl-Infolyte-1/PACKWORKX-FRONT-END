@@ -5,6 +5,7 @@ import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash } fr
 import { useEffect, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import CustomAlert from '../../components/New/CustomAlert'
+import PlyToggle from '../../components/New/PlyToggle'
 
 function RSCBox({
   dropdownRef,
@@ -223,6 +224,7 @@ function RSCBox({
   }, [addNewSkuData?.board_size_cm2, metricSign])
 
 console.log("is open",isopenval)
+console.log("area in m2",areaInM2)
 useEffect(() => {
   const handleBeforeUnload = (event) => {
     if (isopenval) {
@@ -240,6 +242,8 @@ useEffect(() => {
     window.removeEventListener('beforeunload', handleBeforeUnload);
   };
 }, [isopenval]);
+
+
   return (
     <div className="rounded-lg ">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -276,15 +280,16 @@ useEffect(() => {
           </div>
         </div>
 
-        <Input
-          skuName="SKU Name"
-          id="sku_name"
-          name="sku_name"
-          value={addNewSkuData.sku_name}
-          onChange={handleChange}
-          placeholder="SKU Name"
-        />
-
+ <div>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Name</label>
+            <input
+              id="sku_name"
+              name="sku_name"
+              value={addNewSkuData.sku_name}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
         <div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2">Client Name</label>
           <select
@@ -296,41 +301,28 @@ useEffect(() => {
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="" hidden>
-              Select Client
+              Select
             </option>
             {client?.map((item, index) => (
               <option key={index} value={item.client_id}>
                 {item.display_name}
               </option>
             ))}
+                            <option value="add_client">➕ Add Client</option>
+
           </select>
         </div>
       </div>
       
       {/* Main content */}
       <div className="grid grid-cols-3 gap-6 p-6 mt-6 border border-gray-200 rounded-lg">
-        <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">Ply</label>
-          <select
-            name="ply"
-            id="ply"
-            value={addNewSkuData.ply}
-            onChange={(e) => {
-              const selectedPly = Number(e.target.value)
-              updateSkuValues(selectedPly)
-            }}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          >
-            <option value="" hidden>
-              Select Number of Layers
-            </option>
-            <option value={2}>2 Ply</option>
-            <option value={3}>3 Ply</option>
-            <option value={5}>5 Ply</option>
-            <option value={7}>7 Ply</option>
-            <option value={9}>9 Ply</option>
-          </select>
-        </div>
+      <div>
+  <PlyToggle
+  value={addNewSkuData.ply}
+  onChange={(selectedPly) => updateSkuValues(selectedPly)}
+/>
+</div>
+
 
         <Tooltip title={unitTooltip}>
           <div>
@@ -344,7 +336,7 @@ useEffect(() => {
                 type="number"
                 value={addNewSkuData.length}
                 onChange={modifiedHandleChange}
-                placeholder="Length"
+                //placeholder="Length"
                 className="w-1/4 p-1 text-center focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-l-md"
               />
               <span className="flex items-center justify-center text-gray-500">x</span>
@@ -354,7 +346,7 @@ useEffect(() => {
                 type="number"
                 value={addNewSkuData.width}
                 onChange={modifiedHandleChange}
-                placeholder="Width"
+                //placeholder="Width"
                 className="w-1/4 p-1 text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <span className="flex items-center justify-center text-gray-500">x</span>
@@ -364,7 +356,7 @@ useEffect(() => {
                 type="number"
                 value={addNewSkuData.height}
                 onChange={modifiedHandleChange}
-                placeholder="Depth"
+                //placeholder="Depth"
                 className="w-1/4 p-1 text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <div className="w-1/4 flex justify-end relative">
@@ -395,7 +387,7 @@ useEffect(() => {
                 name="joints"
                 value={addNewSkuData.joints}
                 onChange={handleChange}
-                placeholder="Joints"
+                //placeholder="Joints"
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
             </div>
@@ -406,7 +398,7 @@ useEffect(() => {
                 name="deckle_size"
                 value={toThreeDecimalFixed(addNewSkuData.deckle_size)}
                 onChange={modifiedHandleChange}
-                placeholder="Deckle Size"
+                //placeholder="Deckle Size"
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
             </div>
@@ -449,7 +441,7 @@ useEffect(() => {
               name="flap_width"
               value={addNewSkuData.flap_width}
               onChange={modifiedHandleChange}
-              placeholder="Flap Width"
+              //placeholder="Flap Width"
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
@@ -463,7 +455,7 @@ useEffect(() => {
               name="length_trimming_tolerance"
               value={addNewSkuData.length_trimming_tolerance}
               onChange={modifiedHandleChange}
-              placeholder="Length Trimming Tolerance"
+              //placeholder="Length Trimming Tolerance"
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
@@ -477,7 +469,7 @@ useEffect(() => {
               name="width_trimming_tolerance"
               value={addNewSkuData.width_trimming_tolerance}
               onChange={modifiedHandleChange}
-              placeholder="Width Trimming Tolerance"
+              //placeholder="Width Trimming Tolerance"
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
@@ -490,7 +482,7 @@ useEffect(() => {
             name="customer_reference"
             value={addNewSkuData.customer_reference}
             onChange={handleChange}
-            placeholder="Customer Reference"
+            //placeholder="Customer Reference"
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
         </div>
@@ -502,7 +494,7 @@ useEffect(() => {
             name="reference_number"
             value={addNewSkuData.reference_number}
             onChange={handleChange}
-            placeholder="Reference Number"
+            //placeholder="Reference Number"
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
         </div>
@@ -514,7 +506,7 @@ useEffect(() => {
             name="internal_id"
             value={addNewSkuData.internal_id}
             onChange={handleChange}
-            placeholder="Internal ID"
+            //placeholder="Internal ID"
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
         </div>
@@ -528,7 +520,7 @@ useEffect(() => {
                 name="width_board_size_cm2"
                 value={toThreeDecimalFixed(addNewSkuData.width_board_size_cm2)}
                 onChange={modifiedHandleChange}
-                placeholder="Width"
+                //placeholder="Width"
                 className="w-1/3 p-1 text-center focus:outline-none rounded-l-md bg-gray-50"
                 title={unitTooltip}
                 readOnly={true}
@@ -539,7 +531,7 @@ useEffect(() => {
                 name="length_board_size_cm2"
                 value={toThreeDecimalFixed(addNewSkuData.length_board_size_cm2)}
                 onChange={modifiedHandleChange}
-                placeholder="Length"
+                //placeholder="Length"
                 className="w-1/3 p-1 text-center focus:outline-none bg-gray-50"
                 title={unitTooltip}
                 readOnly={true}
@@ -569,7 +561,7 @@ useEffect(() => {
             name="ups"
             value={addNewSkuData?.ups}
             onChange={modifiedHandleChange}
-            placeholder="UPS"
+            //placeholder="UPS"
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
         </div>
@@ -582,7 +574,7 @@ useEffect(() => {
             type="number"
             value={addNewSkuData.minimum_order_level}
             onChange={handleChange}
-            placeholder="Minimum Order Level"
+            //placeholder="Minimum Order Level"
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
         </div>

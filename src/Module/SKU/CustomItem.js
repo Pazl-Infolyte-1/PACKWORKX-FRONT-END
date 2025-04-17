@@ -99,15 +99,16 @@ function CustomItem({
             )}
           </div>
         </div>
-
-        <Input
-          skuName="SKU Name"
-          id="sku_name"
-          name="sku_name"
-          value={addNewSkuData?.sku_name}
-          onChange={handleChange}
-          placeholder="SKU Name"
-        />
+        <div>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Name</label>
+            <input
+              id="sku_name"
+              name="sku_name"
+              value={addNewSkuData.sku_name}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
 
         <div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2">Client Name</label>
@@ -120,13 +121,15 @@ function CustomItem({
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="" hidden>
-              Select Client
+              Select
             </option>
             {client?.map((item, index) => (
               <option key={index} value={item.display_name}>
                 {item.display_name}
               </option>
             ))}
+                                        <option value="add_client">➕ Add Client</option>
+
           </select>
         </div>
       </div>
@@ -139,7 +142,7 @@ function CustomItem({
           name="estimate_composite_item"
           value={addNewSkuData?.estimate_composite_item}
           onChange={handleChange}
-          placeholder="Estimate"
+          //placeholder="Estimate"
         />
 
         <Input
@@ -148,7 +151,7 @@ function CustomItem({
           name="default_sku_details"
           value={addNewSkuData?.default_sku_details}
           onChange={handleChange}
-          placeholder="Default SKU Details"
+          //placeholder="Default SKU Details"
         />
 
         <Input
@@ -157,7 +160,7 @@ function CustomItem({
           name="description"
           value={addNewSkuData.description}
           onChange={handleChange}
-          placeholder="Description"
+          //placeholder="Description"
         />
 
         <div>
@@ -191,7 +194,7 @@ function CustomItem({
               value={tagInput}
               onChange={handleTagChange}
               className="w-full outline-none px-2 py-1 text-sm"
-              placeholder="Type tags like #fun#vibe"
+              //placeholder="Type tags like #fun#vibe"
             />
           </div>
         </div>

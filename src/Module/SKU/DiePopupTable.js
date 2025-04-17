@@ -273,6 +273,12 @@ const DiePopupTable = ({ setSelectedDiePopup, selectedDiePopup, setisSingleViewP
           }}
           limit={10}
         />*/}
+          <ActionButton 
+    height={7}
+    variant="secondary" 
+    label="Submit" 
+    onClick={()=>setisSingleViewPopup(false)}
+  />
               <div>
               <Stack spacing={2} alignItems="center">
   <Pagination

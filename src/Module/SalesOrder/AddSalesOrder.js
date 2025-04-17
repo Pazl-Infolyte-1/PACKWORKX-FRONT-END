@@ -20,6 +20,9 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     total_qty:0,
   });
 
+  const [skuVersionsMap, setSkuVersionsMap] = useState({})
+
+
   useEffect(()=>{
     console.log(totals,'yeyeyeyeyeyeyeyeyeyey')
   },[totals])
@@ -44,6 +47,16 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
 
 
   const [workOrdersData, setWorkOrdersData] = useState([])
+  const [workOrdersDummy, setWorkOrdersDummy] = useState([])
+
+
+  // useEffect(()=>{
+  //   if(workOrdersDummy==[]){
+  //     setWorkOrdersDummy([...workOrdersData])
+  //   }
+  // },[workOrdersData])
+
+
   const [workOrders, setWorkOrders] = useState([
     {
       id: 1,
@@ -55,7 +68,9 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       planned_start_date: "",
       acceptable_excess_units: "",
       planned_end_date: "",
-      manufacture: "inhouse"
+      manufacture: "inhouse",
+      priority:"Low",
+      progress:"Pending"
     }
   ])
 
@@ -211,8 +226,11 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       // setLoading(true);
       let response;
 
+
+      
+
       // Add client_id to each work order in formData
-      const workDetailsWithClient = formData.map(workOrder => ({
+      const workDetailsWithClient = workOrdersData.map(workOrder => ({
         ...workOrder,
         client_id: salesDetailsForm.client_id
       }));
@@ -235,7 +253,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
           ...salesDetailsForm,
           ...totals // Existing sales details
         },
-        workDetails: [...workOrdersData, ...workDetailsWithClient], // Include work order details
+        workDetails: [...workDetailsWithClient], // Include work order details
         skuDetails: hasSkuDetails ? skuWithClientId : [], // Empty SKU details if none exist
       };
 
@@ -332,7 +350,11 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
               setFormData={handleWorkOrderFormUpdate}
               workOrdersData={workOrdersData}
               skuDetailsForm={skuDetailsForm} // Pass the SKU details to WorkOrders component
-              setWorkOrdersData={setWorkOrdersData}
+              setworkOrdersData={setWorkOrdersData}
+              setWorkOrdersDummy={setWorkOrdersDummy}
+              workOrdersDummy={workOrdersDummy}
+              skuVersionsMap={skuVersionsMap}
+              setSkuVersionsMap={setSkuVersionsMap}
             />
           </div>
         )}

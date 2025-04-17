@@ -9,6 +9,8 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   const [clientID, setClientID] = useState("");
   const [skuVersion, setSkuVersion] = useState("");
   const [alerts, setAlerts] = useState([]);
+  const [skuversionLimit,setSkuversionLimit] = useState()
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,19 +26,21 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
               setSkuVersion(versionResponse?.data?.sku_version || "");
           }
         } else {
-          // Regular flow for new version
           // Fetch SKU Data
           const response = await apiMethods.getSingleSkuData(skuID);
+
     
           if (response?.data?.sku_values && Array.isArray(response.data.sku_values)) {
             setSkuValues(response.data.sku_values);
             setClientID(response.data.client_id);
+            setSkuversionLimit(response.data.sku_version_limit)
           }
     
           // Fetch SKU Versions
           const versionsResponse = await apiMethods.getSkuVersions(skuID);
-          const skuversionID = `V${versionsResponse.data.data.length + 1}.0`; // Convert to "V1.0", "V2.0", etc.
-          setSkuVersion(skuversionID);
+          console.log(versionsResponse,'joooookerjooookerjoooker')
+          const skuversionID = `V${versionsResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+                    setSkuVersion(skuversionID);
         }
       } catch (error) {
         console.error("Error fetching SKU data or versions:", error);
@@ -46,7 +50,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     if (skuID) {
       fetchData();
     }
-  }, [skuID, IsEditVersion, skuVersionID]);
+  }, [skuID, IsEditVersion, skuVersionID,setSkuVersionsMap]);
   
   useEffect(() => {
     console.log(skuValues, 'skuValues updated');
@@ -67,20 +71,16 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     };
   
     if (IsEditVersion && skuVersionID) {
-      // Edit mode: Call updateSkuVersion API
+      // Edit mode
       try {
         const response = await apiMethods.updateSkuVersion(skuVersionID, requestBody);
-        console.log("Update successful:", response);
         setAlerts([{ severity: "success", message: response?.data?.message || "SKU Version updated successfully" }]);
   
-        // After successful update, fetch the updated list of versions
         const updatedVersionsResponse = await apiMethods.getSkuVersions(skuID);
-        console.log(updatedVersionsResponse.data.data, 'Updated versions data');
-  
         if (updatedVersionsResponse?.data?.data) {
           setSkuVersionsMap(prev => ({
             ...prev,
-            [orderId]: updatedVersionsResponse?.data?.data
+            [orderId]: updatedVersionsResponse.data.data
           }));
         }
       } catch (error) {
@@ -90,13 +90,19 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     } else {
       // Create mode
       try {
+        // Get the current versions before submitting
+        const versionsResponse = await apiMethods.getSkuVersions(skuID);
+        const currentVersionCount = versionsResponse?.data?.data?.length || 0;
+  
+        if (skuversionLimit && currentVersionCount >= skuversionLimit) {
+          setAlerts([{ severity: "error", message: `Maximum SKU version limit of ${skuversionLimit} reached.` }]);
+          return; // Exit early, do not proceed
+        }
+  
         const response = await apiMethods.addSkuVersion(requestBody);
-        console.log("Submission successful:", response);
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
   
         const updatedVersionsResponse = await apiMethods.getSkuVersions(skuID);
-        console.log(updatedVersionsResponse.data.data, 'Updated versions data');
-  
         if (updatedVersionsResponse?.data?.data) {
           setSkuVersionsMap(prev => ({
             ...prev,
@@ -109,6 +115,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
       }
     }
   };
+  
   
 
   const handleClose = () => {

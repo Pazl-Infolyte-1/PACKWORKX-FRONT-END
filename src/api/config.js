@@ -683,9 +683,33 @@ export const apiMethods = {
     }
   },
 
+  updateProcessValues: async (payload) => {
+    try {
+      return await apiClient.put(`/machines/process-values/${payload.id}`, payload)
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+
   addFields: async (payload) => {
     try {
       return await apiClient.post('/machines/process-fields', payload)
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
+  updateField: async (payload) => {
+    try {
+      return await apiClient.put(`/machines/process-fields/${payload.id}`, payload)
+    } catch (error) {
+      console.error(error); 
+    }
+  },
+  deleteField: async (id) => {
+    try {
+      return await apiClient.delete(`/machines/process-fields/${id}`)
     } catch (error) {
       console.error(error);
       
@@ -799,8 +823,33 @@ export const apiMethods = {
     }
   },
 
-
-
+  getProcessValues: async () => {
+    try {
+      return await apiClient.get('/machines/process-values')
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getSingleSkuData:async(id)=>{
+    const response = await apiClient.get(`/sku-details/${id}`);
+    return response
+  },
+  addSkuVersion:async(body)=>{
+    const response = await apiClient.post(`/sku-details/sku-version`,body);
+    return response
+  },
+  deleteSkuVersion:async(id)=>{
+    const response = await apiClient.delete(`/sku-details/sku-version/${id}`);
+    return response
+  },
+  getSingleSkuVersion:async(id)=>{
+    const response = await apiClient.get(`/sku-details/sku-version/${id}`);
+    return response
+  },
+  updateSkuVersion:async(id,body)=>{
+    const response = await apiClient.put(`/sku-details/sku-version/${id}`,body);
+    return response
+  }
 }
 
 

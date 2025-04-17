@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import ProcessDropDown from '../Machine/ProcessDropDown'
 import AddButton from '../../components/New/AddButton'
 import PopUp from '../../components/New/PopUp'
-import AddFieldForm from '../Machine/AddFieldForm'
 import ActionButton from '../../components/New/ActionButton'
 import ProcessIntegrartionTable from './ProcessIntegrartionTable'
 import CommonPagination from '../../components/New/Pagination'
@@ -12,10 +11,12 @@ import { useSearch } from '../../components/New/SearchContext'
 import CustomAlert from '../../components/New/CustomAlert'
 import FiledTable from './FiledTable'
 import AddProcessField from './AddProcessField'
+import AddFieldForm from '../Machine/AddFieldForm'
+import ShowProcessValues from './ShowProcessValues'
 
 const Reports = () => {
   const [showAddProcessModal, setShowAddProcessModal] = useState(false)
-
+  const [refresh, setRefresh] = useState(false)
   const [showAddFieldModal, setShowAddFieldModal] = useState(false)
   const [selectedProcess, setSelectedProcess] = useState(null)
   const [processInputs, setProcessInputs] = useState({})
@@ -25,6 +26,7 @@ const Reports = () => {
   const [isEdit, setIsEdit] = useState(false)
   const [alerts, setAlerts] = useState([])
   const [showProcessFields, setShowProcessFields] = useState(false)
+  const [showprocessValues, setShowprocessValues] = useState(false)
   const [showFileds, setShowFileds] = useState(false)
   const [limit, setLimit] = useState(10)
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
@@ -63,33 +65,7 @@ const Reports = () => {
       }
     }
     fetchData()
-  }, [])
-  // const options = processData.map((process) => ({
-  //   value: process.processName,
-  //   label: process.processName,
-  // }))
-
-  const handleProcessChange = (selectedOption) => {
-    if (selectedOption.value === 'addMore') {
-      setSelectedProcess('')
-    } else {
-      const process = processData.find((p) => p.processName === selectedOption.value)
-      setSelectedProcess(process)
-    }
-  }
-
-  const handleInputChange = (e, param) => {
-    setProcessInputs((prev) => ({ ...prev, [param]: e.target.value }))
-  }
-
-  const toggleModal = () => {
-    setIsFieldModaleOpen(!isFieldModaleOpen)
-  }
-
-  const handleBack = () => {
-    setIsViewMode(false)
-    setViewData(null)
-  }
+  }, [refresh])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -130,23 +106,6 @@ const Reports = () => {
     await fetchData()
   }
 
-  const addParameter = () => {
-    setFormData((prev) => ({ ...prev, parameters: [...prev.parameters, ''] }))
-  }
-
-  const handleParameterChange = (e, index) => {
-    const newParameters = [...formData.parameters]
-    newParameters[index] = e.target.value
-    setFormData((prev) => ({ ...prev, parameters: newParameters }))
-  }
-
-  const removeParameter = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      parameters: prev.parameters.filter((_, i) => i !== index),
-    }))
-  }
-
   const handleEditProcess = (process) => {
     setFormData({
       id: process.id,
@@ -160,8 +119,23 @@ const Reports = () => {
     setAlerts([])
   }
 
-  console.log(processData);
-  
+  const handleEditField = (field) => {
+    setFormData({
+      id: field.id,
+      process_name_id: field.process_name_id,
+      label: field.label,
+      field_type: field.field_type.toLowerCase(),
+      required: field.required,
+      status: field.status,
+    })
+    setSelectedProcess({
+      value: field.ProcessName.process_name,
+      processId: field.process_name_id,
+    })
+    setShowAddFieldModal(true)
+    setIsEdit(true)
+  }
+
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -174,29 +148,36 @@ const Reports = () => {
         <div className="flex items-center">
           <SearchBar data={processData} text={'Process Integration'} ref={searchBarRef} />
           <div className="flex-grow flex justify-end gap-3">
-            <ActionButton label={'Process Fields'} onClick={() => setShowProcessFields(true)} />
             <ActionButton
-              label={showFileds ? 'Show Process' : 'Show Fields'}
-              onClick={() => setShowFileds(!showFileds)}
+              label={'Show Process values'}
+              onClick={() => setShowprocessValues(true)}
             />
+            <ActionButton label={'Process Fields'} onClick={() => setShowProcessFields(true)} />
             <ActionButton
               variant="add"
               label={showFileds ? 'Add Field' : 'Add Process Name'}
               onClick={() => {
                 if (showFileds) {
-                  // When label is "Add Field"
                   setShowAddFieldModal(true)
                 } else {
-                  // When label is "Add Process Name"
                   setShowAddProcessModal(true)
                 }
               }}
+            />
+            <ActionButton
+              variant="minimal"
+              label={showFileds ? 'Show Process' : 'Show Fields'}
+              onClick={() => setShowFileds(!showFileds)}
             />
           </div>
         </div>
         <div className="overflow-x-auto overflow-y-auto whitespace-nowrap my-4">
           {showFileds ? (
-            <FiledTable fieldData={fieldData} />
+            <FiledTable
+              fieldData={fieldData}
+              handleEditField={handleEditField}
+              setRefresh={setRefresh}
+            />
           ) : (
             <ProcessIntegrartionTable
               processData={processData}
@@ -291,21 +272,39 @@ const Reports = () => {
           <AddFieldForm
             processData={processData}
             setProcessData={setProcessData}
-            closeModal={() => setIsFieldModaleOpen(false)}
+            setIsFieldModaleOpen={setShowAddFieldModal}
+            isEdit={isEdit}
+            formData={formData}
+            setFormData={setFormData}
+            selectedProcess={selectedProcess}
+            setSelectedProcess={setSelectedProcess}
+            setRefresh={setRefresh}
           />
         </PopUp>
 
         <PopUp
           visible={showProcessFields}
           setVisible={setShowProcessFields}
-          width="80%"
-          height="80%"
+          width="40%"
           header="Machine Process Integration"
           showCloseButton={true}
           overflowX="visible"
           overflowY="visible"
         >
           <AddProcessField fieldData={fieldData} setShowProcessFields={setShowProcessFields} />
+        </PopUp>
+
+        <PopUp
+          visible={showprocessValues}
+          setVisible={setShowprocessValues}
+          width="60%"
+          height="80%"
+          header="Process Values"
+          showCloseButton={true}
+          overflowX="visible"
+          overflowY="visible"
+        >
+          <ShowProcessValues />
         </PopUp>
       </div>
     </>

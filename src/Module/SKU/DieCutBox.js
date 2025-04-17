@@ -6,6 +6,7 @@ import DiePopupTable from './DiePopupTable'
 import PopUp from '../../components/New/PopUp'
 import { useEffect, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
+import PlyToggle from '../../components/New/PlyToggle'
 
 function DieCutBox({
   editTag,
@@ -88,15 +89,16 @@ function DieCutBox({
             )}
           </div>
         </div>
-
-        <Input
-          skuName="SKU Name"
-          id="sku_name"
-          name="sku_name"
-          value={addNewSkuData.sku_name}
-          onChange={handleChange}
-          placeholder="SKU Name"
-        />
+        <div>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Name</label>
+            <input
+              id="sku_name"
+              name="sku_name"
+              value={addNewSkuData.sku_name}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
 
         <div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2">Client Name</label>
@@ -109,20 +111,22 @@ function DieCutBox({
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="" hidden>
-              Select Client
+              Select
             </option>
             {client?.map((item, index) => (
               <option key={index} value={item.display_name}>
                 {item.display_name}
               </option>
             ))}
+                                        <option value="add_client">➕ Add Client</option>
+
           </select>
         </div>
       </div>
       
       {/* Main content */}
       <div className="grid grid-cols-3 gap-6 p-6 mt-6 border border-gray-200 rounded-lg">
-        <div>
+        {/*<div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2">Ply</label>
           <select
             name="ply"
@@ -143,7 +147,11 @@ function DieCutBox({
             <option value={7}>7 Ply</option>
             <option value={9}>9 Ply</option>
           </select>
-        </div>
+        </div>*/}
+          <PlyToggle
+  value={addNewSkuData.ply}
+  onChange={(selectedPly) => updateSkuValues(selectedPly)}
+/>
 
         <div>
           <Input
@@ -152,7 +160,7 @@ function DieCutBox({
             name="ups"
             value={addNewSkuData.ups}
             onChange={handleChange}
-            placeholder="UPS"
+            //placeholder="UPS"
           />
         </div>
 
@@ -166,7 +174,7 @@ function DieCutBox({
               value={addNewSkuData.select_dies || ''}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              placeholder="Enter Die Name"
+              //placeholder="Enter Die Name"
             />
             <button
               type="button"
@@ -185,7 +193,7 @@ function DieCutBox({
             name="customer_reference"
             value={addNewSkuData.customer_reference}
             onChange={handleChange}
-            placeholder="Customer Reference"
+            //placeholder="Customer Reference"
           />
         </div>
 
@@ -196,7 +204,7 @@ function DieCutBox({
             name="reference_number"
             value={addNewSkuData.reference_number}
             onChange={handleChange}
-            placeholder="Reference Number"
+            //placeholder="Reference Number"
           />
         </div>
 
@@ -207,7 +215,7 @@ function DieCutBox({
             name="internal_id"
             value={addNewSkuData.internal_id}
             onChange={handleChange}
-            placeholder="Internal ID"
+            //placeholder="Internal ID"
           />
         </div>
 
@@ -218,7 +226,7 @@ function DieCutBox({
             name="board_size_cm2"
             value={addNewSkuData.board_size_cm2}
             onChange={handleChange}
-            placeholder="Board Size"
+            //placeholder="Board Size"
           />
         </div>
 
@@ -229,7 +237,7 @@ function DieCutBox({
             name="deckle_size"
             value={addNewSkuData.deckle_size}
             onChange={handleChange}
-            placeholder="Deckle Size"
+            //placeholder="Deckle Size"
           />
         </div>
 
@@ -241,7 +249,7 @@ function DieCutBox({
             type="number"
             value={addNewSkuData.minimum_order_level}
             onChange={handleChange}
-            placeholder="Minimum Order Level"
+            //placeholder="Minimum Order Level"
           />
         </div>
       </div>

@@ -5,7 +5,10 @@ import {
   MdOutlineSettingsInputComposite,
   MdCheckroom,
   MdClearAll,
+  MdFavorite
 } from 'react-icons/md'
+import { AiFillCarryOut, AiFillCodeSandboxCircle } from "react-icons/ai";
+
 import Drawer from '../../components/Drawer/Drawer'
 import apiMethods from '../../api/config'
 import CommonPagination from '../../components/New/Pagination'
@@ -20,6 +23,7 @@ import { useSearch } from '../../components/New/SearchContext'
 import CustomAlert from '../../components/New/CustomAlert'
 import createInitialSkuData from './CreateInitialSkuData'
 import { bottom } from '@popperjs/core'
+import { useNavigate } from 'react-router-dom';
 
 function SkuList() {
   const [skuType, setSkuType] = useState([])
@@ -43,6 +47,8 @@ function SkuList() {
   const location = useLocation()
   const searchBarRef = useRef(null)
   const [boardSizeError, setBoardSizeError] = useState('')
+  const navigate = useNavigate();
+
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
     client_id: user?.id,
@@ -114,6 +120,12 @@ function SkuList() {
 
   const handleChange = (event) => {
     const { name, value } = event.target
+    if (name === 'client' && value === 'add_client') {
+      navigate('/clients');
+      return;
+    }
+
+
     setAddNewSkuData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -285,7 +297,8 @@ function SkuList() {
   const handleClose = () => {
     setAlerts([])
   }
-
+console.log("client data",client)
+console.log("dashboard",dashboard)
   return (
     <div>
       {/* Header */}
@@ -295,6 +308,7 @@ function SkuList() {
         {/* <span className="sm:text-[18px] font-semibold text-[#424242] ">
           Total SKU Count: {pagination?.totalCount}
         </span> */}
+        <h3>Total Count:{pagination?.totalCount || 0}</h3>
         <div className="flex gap-2 items-center justify-between w-full sm:w-auto">
           {['Add SKU', 'Bulk Upload', 'Export to Excel'].map((text, index) => (
             <ActionButton
@@ -344,16 +358,30 @@ function SkuList() {
             icon: <MdOutlineSettingsInputComposite className="text-white text-2xl" />,
           },
           {
-            name: 'Total SKU',
-            count: pagination?.totalCount || 0,
-            color: '#c3f2cb',
-            bgColor: '#4cd964',
-            icon: <MdCheckroom className="text-white text-2xl" />,
+            name: 'Composite',
+            count: dashboard?.composite || 0,
+            color: '#87e880',
+            bgColor: '#bfbfbb',
+            icon: <AiFillCarryOut className="text-white text-2xl" />,
           },
+          {
+            name: 'Custom Item',
+            count: dashboard?.customitem || 0,
+            color: '#af76f5',
+            bgColor: '#10b3aa',
+            icon: <AiFillCodeSandboxCircle  className="text-white text-2xl" />,
+          },
+          //{
+          //  name: 'Total SKU',
+          //  count: pagination?.totalCount || 0,
+          //  color: '#c3f2cb',
+          //  bgColor: '#4cd964',
+          //  icon: <MdCheckroom className="text-white text-2xl" />,
+          //},
         ].map((item, index) => (
           <div
             key={index}
-            className={`w-full sm:w-[280px] flex items-center justify-between  font-bold rounded-lg shadow-md text-white border p-2`}
+            className={`w-full sm:w-[240px] flex items-center justify-between  font-bold rounded-lg shadow-md text-white border p-2`}
             style={{ backgroundColor: item.color }}
           >
             <div className=" ">

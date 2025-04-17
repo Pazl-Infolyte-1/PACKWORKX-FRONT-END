@@ -74,6 +74,10 @@ function SkuList() {
     sku_type: 'RSC box',
     part_value: [],
     part_count: null,
+    estimate_composite_item: null,
+    description: null,
+    default_sku_details: null,
+    tags: [],
     sku_values: [
       {
         layer: null,
@@ -82,12 +86,11 @@ function SkuList() {
         material: null,
         color: null,
         flute_type: null,
-        weight:null,
+        weight: null,
         flute_ratio: null,
       },
     ],
   })
-
   useEffect(() => {
     if (location.state?.initialRender) {
       setDrawerOpen(true)
@@ -135,9 +138,11 @@ function SkuList() {
           setEditTag(false)
           setRefresh((prev) => !prev)
           setAlerts([
-            { severity: 'success', message: response?.data?.message || 'Sku updated successfully!' },
+            {
+              severity: 'success',
+              message: response?.data?.message || 'Sku updated successfully!',
+            },
           ])
-          
         } else {
           setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong' }])
         }
@@ -165,7 +170,7 @@ function SkuList() {
       ])
     }
     setAlerts([])
-    setBoardSizeError("")
+    setBoardSizeError('')
   }
 
   const handleSkuEdit = (id) => {
@@ -202,6 +207,10 @@ function SkuList() {
       sku_type: selectedSku.sku_type || null,
       part_value: selectedSku.part_value || [],
       part_count: selectedSku.part_count,
+      estimate_composite_item: selectedSku.estimate_composite_item || null,
+      description: selectedSku.description || null,
+      default_sku_details: selectedSku.default_sku_details || null,
+      tags: selectedSku.tags || [],
       sku_values: selectedSku.sku_values || [
         {
           layer: null,
@@ -210,7 +219,7 @@ function SkuList() {
           material: null,
           color: null,
           flute_type: null,
-          weight:null,
+          weight: null,
           flute_ratio: null,
         },
       ],
@@ -459,6 +468,7 @@ function SkuList() {
         }}
       >
         <SkuAddEdit
+        isopenval={isDrawerOpen || editTag}
           handleChange={handleChange}
           strictAdherence={strictAdherence}
           handleStrictAdherenceToggle={handleStrictAdherenceToggle}

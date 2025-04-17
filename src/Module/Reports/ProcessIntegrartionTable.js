@@ -18,7 +18,7 @@ function ProcessIntegrartionTable({
   handleEditProcess,
   alerts,
   setAlerts,
-  handleClose
+  handleClose,
 }) {
   const [confirmModal, setConfirmModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -55,6 +55,12 @@ function ProcessIntegrartionTable({
               Process Name
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+              Created Date
+            </CTableHeaderCell>
+            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+              Status
+            </CTableHeaderCell>
+            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Action
             </CTableHeaderCell>
           </CTableRow>
@@ -68,6 +74,20 @@ function ProcessIntegrartionTable({
                 </CTableDataCell>
                 <CTableDataCell className="py-3 px-2  font-semibold">
                   {item.process_name}
+                </CTableDataCell>
+                <CTableDataCell className="py-3 px-2  font-semibold">
+                  {apiMethods.formatDate(item.created_at)}
+                </CTableDataCell>
+                <CTableDataCell className="py-3 px-2  font-semibold">
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      item.status === 'active'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {item.status}
+                  </span>
                 </CTableDataCell>
                 <CTableDataCell className="py-3 px-2">
                   <div className="flex gap-3 justify-end text-end">

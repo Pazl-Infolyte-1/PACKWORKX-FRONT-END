@@ -2,55 +2,171 @@ import Input from '../../components/New/Input'
 import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
 import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash } from '@coreui/icons'
+import { useEffect, useState } from 'react'
+import Tooltip from '@mui/material/Tooltip'
+import CustomAlert from '../../components/New/CustomAlert'
 
-function CorrugatedSheet({editTag,dropdownRef, addNewSkuData, isOpen, handleChange, clientDiasble, client, setIsOpen, handleSelect, skuType, setAddNewSkuData, updateSkuValues}) {
+function CorrugatedSheet({
+  editTag,
+  dropdownRef,
+  addNewSkuData,
+  isOpen,
+  handleChange,
+  clientDiasble,
+  client,
+  setIsOpen,
+  handleSelect,
+  skuType,
+  setAddNewSkuData,
+  updateSkuValues,
+  locationvalue,
+  onUnitChange,
+  setBoardSizeError,
+  onMeterDataChange,
+  toThreeDecimalFixed,
+  isopenval
+}) {
+  const [alerts, setAlerts] = useState([])
+  const filteredClient = locationvalue
+    ? client.find((client) => client.client_id === locationvalue)
+    : null
+  const [unitTooltip, setUnitTooltip] = useState('Enter Millimeter')
+  const [metricSign, setMetricsSign] = useState('mm')
+  const [areaInM2, setAreaInM2] = useState(null)
+  const [boarderr, setBoardErr] = useState(null)
+
+  const MM_TO_INCH = 0.0393701
+  const INCH_TO_MM = 25.4
+  const MM_TO_CM = 0.1
+  const CM_TO_MM = 10
+  const INCH_TO_CM = 2.54
+  const CM_TO_INCH = 1 / INCH_TO_CM
+
+  const handleUnitChange = (e) => {
+    const newUnit = e.target.value
+    setUnitTooltip(
+      newUnit === 'mm'
+        ? 'Enter Millimeter'
+        : newUnit === 'in'
+          ? 'Enter Inches'
+          : 'Enter Centimeter',
+    )
+    setMetricsSign(newUnit === 'mm' ? 'mm' : newUnit === 'in' ? 'in' : 'cm')
+
+    setAddNewSkuData((prev) => {
+      const convertValue = (val) => {
+        if (val === '' || val === null || typeof val === 'undefined') return ''
+
+        const parsed = parseFloat(val)
+        if (isNaN(parsed)) return ''
+
+        let valueInMM = parsed
+
+        if (prev.unit === 'in') valueInMM = parsed * INCH_TO_MM
+        else if (prev.unit === 'cm') valueInMM = parsed * CM_TO_MM
+
+        if (newUnit === 'in') return parseFloat((valueInMM * MM_TO_INCH).toFixed(2))
+        if (newUnit === 'cm') return parseFloat((valueInMM * MM_TO_CM).toFixed(2))
+
+        return parseFloat(valueInMM.toFixed(2))
+      }
+
+      return {
+        ...prev,
+        unit: newUnit,
+        joints: convertValue(prev.joints),
+        flap_width: convertValue(prev.flap_width),
+        flap_tolerance: convertValue(prev.flap_tolerance),
+        deckle_size: convertValue(prev.deckle_size),
+        ups: convertValue(prev.ups),
+      }
+    })
+
+    if (onUnitChange) {
+      onUnitChange(e)
+    }
+  }
+
+  const handleClose = () => {
+    setAlerts([])
+  }
+
+  useEffect(() => {
+    if (addNewSkuData?.board_size_cm2 && onMeterDataChange) {
+      let area = addNewSkuData.board_size_cm2
+      let convertedArea
+
+      switch (metricSign) {
+        case 'mm':
+          convertedArea = area / 1_000_000
+          break
+        case 'cm':
+          convertedArea = area / 10_000
+          break
+        case 'in':
+          convertedArea = area * 0.00064516
+          break
+        default:
+          console.warn('Unknown metric sign:', metricSign)
+          setAreaInM2(null)
+          return
+      }
+
+      onMeterDataChange(convertedArea)
+      setAreaInM2(convertedArea)
+    }
+  }, [addNewSkuData?.board_size_cm2, metricSign])
+
+   console.log("is open",isopenval)
+    useEffect(() => {
+      const handleBeforeUnload = (event) => {
+        if (isopenval) {
+          const message = "Don't refresh or else your data will be lost!";
+          event.preventDefault(); // For most browsers
+          event.returnValue = message; // For Chrome
+          return message; // For Firefox
+        }
+      };
+    
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    
+      // Cleanup function to remove the event listener
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
+    }, [isopenval]);
+  
   return (
-    <>
-      <div className="grid grid-cols-3 gap-4">
-        <div className="">
-          <label className="block text-[16px] font-medium">SKU Type</label>
+    <div className="rounded-lg">
+      <CustomAlert alerts={alerts} handleClose={handleClose} />
+      
+      {/* Top header fields */}
+      <div className="grid grid-cols-3 gap-6 p-6 border border-gray-200 rounded-lg">
+        <div>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Type</label>
           <div className="relative w-full" ref={dropdownRef}>
             <div
-              className="p-2 my-2 h-10 border border-gray-300 rounded cursor-pointer flex justify-between items-center"
+              className="p-2 h-10 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
               onClick={() => setIsOpen((prev) => !prev)}
             >
-              <span>{addNewSkuData.sku_type || 'Select Type'}</span>
-              <BsChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+              <span className="text-gray-800">{addNewSkuData.sku_type || 'Select Type'}</span>
+              <BsChevronDown className={`transition-transform text-gray-600 ${isOpen ? 'rotate-180' : ''}`} />
             </div>
 
             {isOpen && (
               <ul
-                className={`absolute left-0 right-0 mt-1 overflow-y-auto bg-white border border-gray-300 rounded z-10 h-30`}
+                className="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-gray-300 rounded-md z-20 shadow-lg"
               >
                 {skuType.map((option) => (
-                  <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-100">
-                                                    <li
-      className={`p-2 cursor-pointer w-full ${editTag ? 'text-gray-400 cursor-not-allowed' : ''}`}
-      onClick={!editTag ? () => handleSelect(option) : undefined}
-    >
+                  <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-50">
+                    <li
+                      className={`p-2 cursor-pointer w-full ${editTag ? 'text-gray-400 cursor-not-allowed' : 'text-gray-800'}`}
+                      onClick={!editTag ? () => handleSelect(option) : undefined}
+                    >
                       {option.sku_type}
                     </li>
-                    {/* {editTag && (
-                      <div className="flex items-center gap-2">
-                        <CIcon icon={cilPencil} className="cursor-pointer" />
-                        <CIcon
-                          icon={cilTrash}
-                          style={{ color: 'red' }}
-                          className="cursor-pointer"
-                          onClick={() => handleDeleteSkuType(option.id)}
-                        />
-                      </div>
-                    )} */}
                   </div>
                 ))}
-
-                {/* Add more Procedure */}
-                {/* <li
-                  className="p-2 font-semibold text-blue-600 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => handleSelect({ value: 'addMore', label: 'Add More Procedure' })}
-                >
-                  Add More Procedure
-                </li> */}
               </ul>
             )}
           </div>
@@ -66,7 +182,31 @@ function CorrugatedSheet({editTag,dropdownRef, addNewSkuData, isOpen, handleChan
         />
 
         <div>
-          <label className="block text-[16px] font-medium mb-2">Ply</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">Client Name</label>
+          <select
+            name="client"
+            id="client"
+            disabled={clientDiasble}
+            value={filteredClient ? filteredClient.client_id : addNewSkuData.client || ''}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          >
+            <option value="" hidden>
+              Select Client
+            </option>
+            {client?.map((item, index) => (
+              <option key={index} value={item.client_id}>
+                {item.display_name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      
+      {/* Main content */}
+      <div className="grid grid-cols-3 gap-6 p-6 mt-6 border border-gray-200 rounded-lg">
+        <div>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">Ply</label>
           <select
             name="ply"
             id="ply"
@@ -75,7 +215,7 @@ function CorrugatedSheet({editTag,dropdownRef, addNewSkuData, isOpen, handleChan
               const selectedPly = Number(e.target.value)
               updateSkuValues(selectedPly)
             }}
-            className="w-full p-2 shadow-md border-l-2 rounded-md"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="" hidden>
               Select Number of Layers
@@ -88,154 +228,203 @@ function CorrugatedSheet({editTag,dropdownRef, addNewSkuData, isOpen, handleChan
           </select>
         </div>
 
-        <div>
-          <label className="block text-[16px] font-medium mb-2">Client Name</label>
-          <select
-            name="client"
-            id="client"
-            disabled={clientDiasble}
-            value={addNewSkuData.client || ''}
-            onChange={handleChange}
-            className="w-full p-2 shadow-md border-l-2 rounded-md"
-          >
-            <option value="" hidden>
-              Select Client
-            </option>
-            {client?.map((item, index) => (
-              <option key={index} value={item.display_name}>
-                {item.display_name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Tooltip title={unitTooltip}>
+          <div>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2">Joints</label>
+            <input
+              id="joints"
+              name="joints"
+              value={addNewSkuData.joints}
+              onChange={handleChange}
+              placeholder="Joints"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+        </Tooltip>
 
-        <div className="flex gap-3">
-          <Input
-            skuName="Joints"
-            id="joints"
-            name="joints"
-            value={addNewSkuData.joints}
-            onChange={handleChange}
-            placeholder="joints"
-          />
+        <Tooltip title={unitTooltip}>
+          <div>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2">UPS</label>
+            <input
+              id="ups"
+              name="ups"
+              value={addNewSkuData.ups}
+              onChange={handleChange}
+              placeholder="UPS"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+        </Tooltip>
 
-          <Input
-            skuName="UPS"
-            id="ups"
-            name="ups"
-            value={addNewSkuData.ups}
-            onChange={handleChange}
-            placeholder="ups"
-          />
-        </div>
+        <Tooltip title={unitTooltip}>
+          <div>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2">Flap Width</label>
+            <input
+              id="flap_width"
+              name="flap_width"
+              value={addNewSkuData.flap_width}
+              onChange={handleChange}
+              placeholder="Flap Width"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+        </Tooltip>
 
-        <div className="flex gap-3">
-          <Input
-            skuName="Flap Width"
-            id="flap_width"
-            name="flap_width"
-            value={addNewSkuData.flap_width}
-            onChange={handleChange}
-            placeholder="flap width"
-          />
-
-          <Input
-            skuName="Flap Tolerance"
-            id="flap_tolerance"
-            name="flap_tolerance"
-            value={addNewSkuData.flap_tolerance}
-            onChange={handleChange}
-            placeholder="flap tolerance"
-          />
-        </div>
+        <Tooltip title={unitTooltip}>
+          <div>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2">Flap Tolerance</label>
+            <input
+              id="flap_tolerance"
+              name="flap_tolerance"
+              value={addNewSkuData.flap_tolerance}
+              onChange={handleChange}
+              placeholder="Flap Tolerance"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+        </Tooltip>
 
         <div>
-          <label className="block text-[16px] font-medium mb-2">Trimming Tolerance</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">Trimming Tolerance</label>
           <select
             name="length_trimming_tolerance"
             id="length_trimming_tolerance"
             value={addNewSkuData.length_trimming_tolerance}
             onChange={handleChange}
-            className="w-full p-2 shadow-md border-l-2 rounded-md"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
-            <option hidden>Select</option>
-            <option>0.2</option>
-            <option>0.1</option>
+            <option value="" hidden>Select</option>
+            <option value="0.2">0.2</option>
+            <option value="0.1">0.1</option>
           </select>
         </div>
 
-        {/* <div className="mb-4">
-          <label className="block text-[16px] font-medium mb-2">Width Trimming Tolerance</label>
-          <select
-            name="width_trimming_tolerance"
-            id="width_trimming_tolerance"
-            value={addNewSkuData.width_trimming_tolerance}
+        <div>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">Customer Reference</label>
+          <input
+            id="customer_reference"
+            name="customer_reference"
+            value={addNewSkuData.customer_reference}
             onChange={handleChange}
-            className="w-full p-2 shadow-md border-l-2 rounded-md"
-          >
-            <option>0.2</option>
-            <option>0.1</option>
-          </select>
-        </div> */}
+            placeholder="Customer Reference"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">Reference #</label>
+          <input
+            id="reference_number"
+            name="reference_number"
+            value={addNewSkuData.reference_number}
+            onChange={handleChange}
+            placeholder="Reference Number"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">Internal ID</label>
+          <input
+            id="internal_id"
+            name="internal_id"
+            value={addNewSkuData.internal_id}
+            onChange={handleChange}
+            placeholder="Internal ID"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+        </div>
+
+        <Tooltip title={unitTooltip}>
+          {/*<div>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2">Board Size (cm²)</label>
+            <div className="relative">
+              <input
+                id="board_size_cm2"
+                name="board_size_cm2"
+                value={toThreeDecimalFixed ? toThreeDecimalFixed(addNewSkuData.board_size_cm2) : addNewSkuData.board_size_cm2}
+                onChange={handleChange}
+                placeholder="Board Size"
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <span className="text-gray-500">{metricSign}²</span>
+              </div>
+            </div>
+          </div>*/}
+
+          <div>
+                      <p className="block text-[16px] font-medium text-gray-700 mb-2">Board Size<span className="text-gray-500 text-sm">(W × L)</span></p>
+                      <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
+                        <input
+                          id="width_board_size_cm2"
+                          name="width_board_size_cm2"
+                          value={addNewSkuData.width_board_size_cm2}
+                          onChange={handleChange}
+                          placeholder="Width"
+                          className="w-1/3 p-1 text-center focus:outline-none rounded-l-md bg-gray-50"
+                          //title={unitTooltip}
+                          //readOnly={true}
+                        />
+                        <span className="flex items-center justify-center text-gray-500">x</span>
+                        <input
+                          id="length_board_size_cm2"
+                          name="length_board_size_cm2"
+                          value={addNewSkuData.length_board_size_cm2}
+                          onChange={handleChange}
+                          placeholder="Length"
+                          className="w-1/3 p-1 text-center focus:outline-none bg-gray-50"
+                          //title={unitTooltip}
+                          //readOnly={true}
+                        />
+                        {/*<div className="w-1/3 flex justify-end relative">
+                          <select
+                            value={addNewSkuData.unit || 'mm'}
+                            onChange={handleUnitChange}
+                            className="w-full appearance-none bg-blue-600 text-white py-2 px-3 rounded-r-md hover:bg-blue-700 transition-colors focus:outline-none"
+                          >
+                            <option value="mm" className="bg-white text-gray-800">mm</option>
+                            <option value="cm" className="bg-white text-gray-800">cm</option>
+                            <option value="in" className="bg-white text-gray-800">in</option>
+                          </select>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                            <CIcon icon={cilChevronCircleDownAlt} size="sm" />
+                          </div>
+                        </div>*/}
+                      </div>
+                    </div>
+        </Tooltip>
+
+        <Tooltip title={unitTooltip}>
+          <div>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2">Deckle Size</label>
+            <input
+              id="deckle_size"
+              name="deckle_size"
+              value={toThreeDecimalFixed ? toThreeDecimalFixed(addNewSkuData.deckle_size) : addNewSkuData.deckle_size}
+              onChange={handleChange}
+              placeholder="Deckle Size"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+        </Tooltip>
+
+        <div>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">Minimum Order Level</label>
+          <input
+            id="minimum_order_level"
+            name="minimum_order_level"
+            type="number"
+            value={addNewSkuData.minimum_order_level}
+            onChange={handleChange}
+            placeholder="Minimum Order Level"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+        </div>
+
+
       </div>
-
-      <div className="grid grid-cols-3 gap-4">
-        <Input
-          skuName="Customer Reference"
-          id="customer_reference"
-          name="customer_reference"
-          value={addNewSkuData.customer_reference}
-          onChange={handleChange}
-          placeholder="customer reference"
-        />
-
-        <Input
-          skuName="Reference #"
-          id="reference_number"
-          name="reference_number"
-          value={addNewSkuData.reference_number}
-          onChange={handleChange}
-          placeholder="reference number"
-        />
-
-        <Input
-          skuName="Internal ID"
-          id="internal_id"
-          name="internal_id"
-          value={addNewSkuData.internal_id}
-          onChange={handleChange}
-          placeholder="internal id"
-        />
-
-        <Input
-          skuName="Board Size (cm²)"
-          id="board_size_cm2"
-          name="board_size_cm2"
-          value={addNewSkuData.board_size_cm2}
-          onChange={handleChange}
-          placeholder="board size"
-        />
-
-        <Input
-          skuName="Deckle Size"
-          id="deckle_size"
-          name="deckle_size"
-          value={addNewSkuData.deckle_size}
-          onChange={handleChange}
-          placeholder="deckle size"
-        />
-
-        <Input
-          skuName="Minimum Order Level"
-          id="minimum_order_level"
-          name="minimum_order_level"
-          type="number"
-          value={addNewSkuData.minimum_order_level}
-          onChange={handleChange}
-          placeholder="minimum order level"
-        />
-      </div>
-    </>
+    </div>
   )
 }
 

@@ -9,8 +9,10 @@ import { FaAngleDown, FaAngleUp, FaEllipsisV, FaRedoAlt, FaEye } from 'react-ico
 import PopUp from '../../components/New/PopUp'
 import FluteTypeView from './FluteTypeView'
 import Composite from './Composite'
+import CustomItem from './CustomItem'
 
 function SkuAddEdit({
+  isopenval,
   handleChange,
   strictAdherence,
   handleStrictAdherenceToggle,
@@ -31,8 +33,8 @@ function SkuAddEdit({
   const { user } = useContext(AuthContext)
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
-  const [isSingleViewPopup, setisSingleViewPopup] = useState(false);
-  const [meterSquareData, setMeterSquareData] = useState(null);
+  const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
+  const [meterSquareData, setMeterSquareData] = useState(null)
   const createInitialSkuData = () => ({
     sku_name: null,
     composite_type: null,
@@ -62,6 +64,10 @@ function SkuAddEdit({
     sku_type: 'RSC box',
     part_value: [],
     part_count: null,
+    estimate_composite_item: null,
+    description: null,
+    default_sku_details: null,
+    tags: [],
     sku_values: [
       {
         layer: null,
@@ -70,14 +76,14 @@ function SkuAddEdit({
         material: null,
         color: null,
         flute_type: null,
-        weight:null,
+        weight: null,
         //flute_ratio: null,
       },
     ],
   })
   const handleMeterDataChange = (data) => {
-    setMeterSquareData(data);
-  };
+    setMeterSquareData(data)
+  }
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -122,19 +128,38 @@ function SkuAddEdit({
     setAddNewSkuData(baseSkuData)
   }
 
+  //const handleSkuValuesChange = (index, field, value) => {
+  //  setAddNewSkuData((prevData) => {
+  //    const updatedSkuValues = [...prevData.sku_values]
+
+  //    updatedSkuValues[index] = { ...updatedSkuValues[index], [field]: value }
+  //    if (field === 'gsm') {
+  //      updatedSkuValues[index].weight = value * meterSquareData // Set weight to the GSM value
+  //    }
+
+  //    return { ...prevData, sku_values: updatedSkuValues }
+  //  })
+  //}
 
   const handleSkuValuesChange = (index, field, value) => {
     setAddNewSkuData((prevData) => {
-      const updatedSkuValues = [...prevData.sku_values]
-      
-      updatedSkuValues[index] = { ...updatedSkuValues[index], [field]: value }
+      const updatedSkuValues = [...prevData.sku_values];
+      const updatedItem = { ...updatedSkuValues[index], [field]: value };
+  
       if (field === 'gsm') {
-        updatedSkuValues[index].weight = value*meterSquareData; // Set weight to the GSM value
+        updatedItem.weight = value * meterSquareData;
       }
   
-      return { ...prevData, sku_values: updatedSkuValues }
-    })
+      // Auto-set flute_type when layer name is changed
+      if (field === 'layer') {
+        updatedItem.flute_type = value.toLowerCase().includes('corrugated') ? '' : 'N/A';
+      }
+  
+      updatedSkuValues[index] = updatedItem;
+      return { ...prevData, sku_values: updatedSkuValues };
+    });
   }
+  
 
   const plyLayerConfigurations = {
     2: [
@@ -184,8 +209,8 @@ function SkuAddEdit({
       bf: '',
       material: '',
       color: '',
-      flute_type: '',
-      weight:''
+      flute_type: layer.layer.toLowerCase().includes('corrugated') ? '' : 'N/A',
+      weight: '',
       //flute_ratio: '',
     }))
 
@@ -196,9 +221,20 @@ function SkuAddEdit({
     }))
   }
 
+  const toThreeDecimalFixed = (value) => {
+    if (value === null || value === undefined || value === '') return '';
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) return '';
+    if (Number.isInteger(numValue)) {
+      return numValue.toString();
+    }
+    return parseFloat(numValue.toFixed(3)).toString();
+  };  
+
   const skuComponents = {
     'RSC box': (
       <RSCBox
+      isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
         setIsOpen={setIsOpen}
@@ -215,11 +251,13 @@ function SkuAddEdit({
         setBoardSizeError={setBoardSizeError}
         onMeterDataChange={handleMeterDataChange}
         editTag={editTag}
+        toThreeDecimalFixed={toThreeDecimalFixed}
       />
     ),
     //'Corrugated Sheet': (
-    'Board': (
+    Board: (
       <CorrugatedSheet
+      isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
         setIsOpen={setIsOpen}
@@ -236,6 +274,7 @@ function SkuAddEdit({
     ),
     'Die Cut box': (
       <DieCutBox
+      isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
         setIsOpen={setIsOpen}
@@ -250,8 +289,27 @@ function SkuAddEdit({
         editTag={editTag}
       />
     ),
-    'Composite': (
+    Composite: (
       <Composite
+      isopenval={isopenval}
+        dropdownRef={dropdownRef}
+        addNewSkuData={addNewSkuData}
+        setIsOpen={setIsOpen}
+        isOpen={isOpen}
+        handleChange={handleChange}
+        handleSelect={handleSelect}
+        clientDiasble={clientDiasble}
+        client={client}
+        skuType={skuType}
+        setAddNewSkuData={setAddNewSkuData}
+        updateSkuValues={updateSkuValues}
+        editedSkudata={editedSkudata}
+        editTag={editTag}
+      />
+    ),
+    'Custom Item': (
+      <CustomItem
+      isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
         setIsOpen={setIsOpen}
@@ -270,7 +328,6 @@ function SkuAddEdit({
   }
   const openViewCard = (data) => {
     setisSingleViewPopup(true)
-    setSingleDataId(data.id)
   }
 
   const handleCloseSingleViewPopup = () => {
@@ -281,27 +338,30 @@ function SkuAddEdit({
     setAddNewSkuData(createInitialSkuData())
     handleClose()
   }
+
+  
   return (
     <div className="p-6 bg-white rounded-lg">
-
       {/* conditional rendring according to sku_type */}
       {skuComponents[addNewSkuData.sku_type] || null}
 
-      <div className="flex items-center my-3 space-x-2">
-        <span className="text-[16px] font-medium">Strict Adherence for All Layers</span>
-        <button
-          className={`w-11 h-[23px] flex items-center border border-blue-600 rounded-full p-1 cursor-pointer 
+      { addNewSkuData.sku_type !== 'Custom Item' && (
+        <div className="flex items-center my-3 space-x-2">
+          <span className="text-[16px] font-medium">Strict Adherence for All Layers</span>
+          <button
+            className={`w-11 h-[23px] flex items-center border border-blue-600 rounded-full p-1 cursor-pointer 
               ${strictAdherence ? 'bg-blue-600' : 'bg-gray-300'}`}
-          onClick={handleStrictAdherenceToggle}
-        >
-          <div
-            className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out 
+            onClick={handleStrictAdherenceToggle}
+          >
+            <div
+              className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out 
                 ${strictAdherence ? 'translate-x-5' : '-translate-x-[2px]'}`}
-          ></div>
-        </button>
-      </div>
+            ></div>
+          </button>
+        </div>
+      )}
 
-      {addNewSkuData.ply && (
+      {addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
         <div className="mt-6">
           <div className="border rounded-lg overflow-auto">
             <table className="w-full">
@@ -342,7 +402,9 @@ function SkuAddEdit({
                         className="p-1 border rounded text-center w-full"
                         value={item.gsm || ''}
                         placeholder="gsm"
-                        onChange={(e) => handleSkuValuesChange(index, 'gsm',  Number(e.target.value))}
+                        onChange={(e) =>
+                          handleSkuValuesChange(index, 'gsm', Number(e.target.value))
+                        }
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
@@ -364,28 +426,33 @@ function SkuAddEdit({
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
-                      <div className="relative w-full flex items-center">
-                        <select
-                          className="p-1 border rounded w-full pr-8 appearance-none" // Removed dropdown arrow
-                          value={item.flute_type || 'Select'}
-                          onChange={(e) =>
-                            handleSkuValuesChange(index, 'flute_type', e.target.value)
-                          }
-                        >
-                          <option hidden>Select</option>
-                          <option value="A">A</option>
-                          <option value="B">B</option>
-                          <option value="C">C</option>
-                          <option value="E">E</option>
-                          <option value="F,G,N">F,G,N</option>
-                        </select>
-                        {/* Eye icon positioned absolutely to the right */}
-                        <FaEye
-                          className="absolute right-2 text-gray-500 cursor-pointer"
-                          onClick={openViewCard}
-                        />
-                      </div>
-                    </td>
+  {item.layer.toLowerCase().includes('corrugated') ? (
+    <div className="relative w-full flex items-center">
+      <select
+        className="p-1 border rounded w-full pr-8 appearance-none"
+        value={item.flute_type}
+        onChange={(e) =>
+          handleSkuValuesChange(index, 'flute_type', e.target.value)
+        }
+      >
+        <option hidden>Select</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="E">E</option>
+        <option value="F,G,N">F,G,N</option>
+      </select>
+      <FaEye
+        className="absolute right-2 text-gray-500 cursor-pointer"
+        onClick={openViewCard}
+      />
+    </div>
+  ) : (
+    <p className="text-gray-500">N/A</p>
+  )}
+</td>
+
+
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
                       <input
                         type="text"
@@ -396,10 +463,10 @@ function SkuAddEdit({
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                    <p>{item.weight || 'N/A'}</p> 
+                      <p>{toThreeDecimalFixed(item.weight) || 'N/A'}</p>
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <p>N/A</p>
+                      <p>{toThreeDecimalFixed(item.gsm*item.bf/1000)}</p>
                     </td>
                   </tr>
                 ))}
@@ -424,7 +491,8 @@ function SkuAddEdit({
         visible={isSingleViewPopup}
         setVisible={handleCloseSingleViewPopup}
         showCloseButton={true}
-        width={'70vw'}
+        width={'50vw'}
+        header={"Add Flute"}
       >
         <FluteTypeView></FluteTypeView>
       </PopUp>

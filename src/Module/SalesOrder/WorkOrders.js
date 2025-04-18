@@ -139,7 +139,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
       workOrderListSubmit(workOrders[0])
     }else{
           // console.log("Submitting work orders:", filledWorkOrders)
-             const filledWorkOrders = workOrders.filter(order =>
+      const filledWorkOrders = workOrders.filter(order =>
       order.sku_name || order.qty || order.description
     )
       setFormData?.([...workOrdersData])
@@ -189,6 +189,39 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     const selectedWorkOrder = workOrders.find(order => order.id === id);
   
     if (selectedWorkOrder) {
+      // Destructure the fields you want to validate
+      const {
+        sku_name,
+        sku_version,
+        qty,
+        edd,
+        description,
+        planned_start_date,
+        acceptable_excess_units,
+        planned_end_date,
+      } = selectedWorkOrder;
+  
+      // Check if any of the fields are empty
+      if (
+        !sku_name ||
+        !sku_version ||
+        !qty ||
+        !edd ||
+        !description ||
+        !planned_start_date ||
+        !acceptable_excess_units ||
+        !planned_end_date
+      ) {
+        setAlerts([
+          {
+            severity: "error",
+            message: "Please complete all required fields before submitting the work order.",
+          },
+        ]);
+        
+                return;
+      }
+  
       // Add it to workOrdersData
       setworkOrdersData(prev => [...prev, selectedWorkOrder]);
   
@@ -196,6 +229,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
       setWorkOrders(prev => prev.filter(order => order.id !== id));
     }
   };
+  
   
 
   useEffect(() => {
@@ -324,6 +358,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     )
 
+    SetselectedSkuID(skuId)
     const response = await getskuversions(skuId)
     // console.log(response.data.data)
 
@@ -445,7 +480,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                       className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
                       title="Planned End Date"
                     >
-                      {item?.planned_start_date && new Date(item.planned_start_date).toLocaleDateString('en-US', {
+                      {item?.planned_end_date && new Date(item.planned_end_date).toLocaleDateString('en-US', {
                         year: '2-digit',
                         month: 'long',
                         day: '2-digit'
@@ -790,6 +825,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
               disabled={!skuVersionsMap[order.id]}
             >
               <option value="" disabled>Select Version</option>
+              <option value="0" >Default Master</option>
               {skuVersionsMap[order.id] ? (
                 [skuVersionsMap[order.id]].flat().map((version) => (
                   <option key={version.id} value={version.id}>
@@ -918,7 +954,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                 IsEditVersion={IsEditVersion}
                 skuVersionID={selectedSkuVersionID}
                 visible={isFormVisible}
-                setVisible={() => setIsFormVisible(false)}
+                setVisible={setIsFormVisible}
               />
                 </PopUp>
               
@@ -953,9 +989,6 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
         </div>
 
       </div> 
- 
-
-    
       <VersionsPopup
         visible={isVersionDrawerOpen}
         setVisible={() => setVersionDrawerOpen(false)}

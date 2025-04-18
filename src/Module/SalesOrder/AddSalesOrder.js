@@ -221,10 +221,12 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     try {
       const response = await apiMethods.createWorkOrder(formData);
       console.log('Response:', response);
-      setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
       setTimeout(() => {
         setDrawer(false)
       }, 1000);
+      await(fetchData)
+      setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
+
     } catch (error) {
       console.error('Error:', error);
     }

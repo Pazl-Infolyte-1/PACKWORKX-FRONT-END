@@ -60,6 +60,11 @@ const OrderForm = ({ formData, setFormData, skuDetailsForm, handleSkuFormUpdate,
     setConfirmationMethod(localFormData.confirmation);
   }, [localFormData.confirmation]);
 
+
+  const formatDate = (dateStr) => {
+    return dateStr ? new Date(dateStr).toISOString().split('T')[0] : ''
+  }
+
   // Handle input changes
 // 1. Update handleInputChange to sync with parent component
 const handleInputChange = (e) => {
@@ -154,7 +159,7 @@ const handleToggleChange = () => {
                   value={localFormData.sales_ui_id || ""}
                   onChange={handleInputChange}
                   placeholder="Enter Sales Order Id"
-                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white  text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
                 />
               </div>
 
@@ -166,7 +171,7 @@ const handleToggleChange = () => {
   <input
     type="date"
     name="estimated"
-    value={localFormData.estimated || ""}
+    value={ formatDate(localFormData.estimated) || ""}
     onChange={handleInputChange}
     className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#333] text-[16px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
   />
@@ -205,7 +210,7 @@ const handleToggleChange = () => {
                 value={localFormData.credit_period || ""}
                 onChange={handleInputChange}
                 placeholder="Enter Client Period..."
-                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
               />
             </div>
 
@@ -220,7 +225,7 @@ const handleToggleChange = () => {
                 value={localFormData.freight_paid || ""}
                 onChange={handleInputChange}
                 placeholder="Enter text..."
-                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white  text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
               />
             </div>
 
@@ -321,7 +326,7 @@ const handleToggleChange = () => {
                   value={localFormData.confirmation_name || ""}
                   onChange={handleInputChange}
                   placeholder="Enter Confirmation Name"
-                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white  text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
                 />
               </div>
 
@@ -331,12 +336,12 @@ const handleToggleChange = () => {
                 Confirmation Mobile
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   name="confirmation_mobile"
                   value={localFormData.confirmation_mobile || ""}
                   onChange={handleInputChange}
                   placeholder="Enter Confirmation Mobile"
-                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white  text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
                 />
               </div>
             </div>

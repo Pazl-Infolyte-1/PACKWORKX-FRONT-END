@@ -34,6 +34,20 @@ function ListOfSalesOrder() {
   const searchBarRef = useRef(null)
 
 
+
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      await apiMethods.updateSalesOrderStatus(orderId, { sales_status: newStatus });
+      // Optionally refresh the list or update the local state here
+      console.log('Status updated successfully');
+      fetchData()
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
+  };
+
+
   const fetchData = async () => {
     try {
       const response = await apiMethods.getSalesOrderList({
@@ -159,8 +173,10 @@ function ListOfSalesOrder() {
                 <option value="" disabled>
                   status
                 </option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
+                <option value="Pending">Pending</option>
+                <option value="Completed">Completed</option>
+                <option value="Rejected">Rejected</option>
+                <option value="In-progress">In-progress</option>
               </select>
               <button
                 className="border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition flex items-center gap-1"
@@ -191,6 +207,7 @@ function ListOfSalesOrder() {
             handleDelete={handleDelete}
             handleView={handleView}
             loading={loading}
+            handleStatusChange={handleStatusChange}
 
           />
           <SalesOrderView

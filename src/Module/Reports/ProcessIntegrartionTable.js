@@ -11,6 +11,10 @@ import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
+import PopUp from '../../components/New/PopUp'
+import ProcessDetails from './ProcessDetails'
+import ThreeDotMenu from '../../components/ThreeDotMenu'
+import { cilFlipToBack, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 
 function ProcessIntegrartionTable({
   processData,
@@ -19,18 +23,25 @@ function ProcessIntegrartionTable({
   alerts,
   setAlerts,
   handleClose,
+  setShowAddFieldModal,
+  handleEditProcessValues,
+  handleAddField
 }) {
   const [confirmModal, setConfirmModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
+  const [openProcessModal, setOpenProcessModal] = useState({ open: false, id: null })
 
   const handleDelete = async () => {
     try {
-      await apiMethods.deleteProcess(deleteId)
-      setConfirmModal(false)
-      setProcessData((prev) => prev.filter((item) => item.id !== deleteId))
-      setAlerts([{ severity: 'success', message: 'Process deleted successfully!' }])
+     const response = await apiMethods.deleteProcess(deleteId)
+     if(response.status === 200 ){
+       setConfirmModal(false)
+       setProcessData((prev) => prev.filter((item) => item.id !== deleteId))
+       setAlerts([{ severity: 'success', message: 'Process deleted successfully!' }])
+      }
     } catch (error) {
       console.error(error)
+      setAlerts([{ severity: 'error', message:  error?.response?.data?.message ||'Failed to delete process' }])
     }
   }
 
@@ -44,7 +55,7 @@ function ProcessIntegrartionTable({
   }
 
   return (
-    <div className="h-[300px] overflow-y-auto border border-gray-200 custom-scrollbar rounded-lg p-2">
+    <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar rounded-lg p-2">
       <CTable striped hover className="w-full m-0 table-fixed">
         <CTableHead className="bg-gray-100 sticky -top-2 z-10">
           <CTableRow className="text-center">
@@ -58,9 +69,6 @@ function ProcessIntegrartionTable({
               Created Date
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Status
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Action
             </CTableHeaderCell>
           </CTableRow>
@@ -69,7 +77,10 @@ function ProcessIntegrartionTable({
           {processData && processData.length > 0 ? (
             processData.map((item) => (
               <CTableRow key={item.id} className="border-b text-center">
-                <CTableDataCell className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start">
+                <CTableDataCell
+                  onClick={() => setOpenProcessModal({ open: true, id: item.id })}
+                  className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start"
+                >
                   {item.id}
                 </CTableDataCell>
                 <CTableDataCell className="py-3 px-2  font-semibold">
@@ -78,37 +89,59 @@ function ProcessIntegrartionTable({
                 <CTableDataCell className="py-3 px-2  font-semibold">
                   {apiMethods.formatDate(item.created_at)}
                 </CTableDataCell>
-                <CTableDataCell className="py-3 px-2  font-semibold">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      item.status === 'active'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {item.status}
-                  </span>
-                </CTableDataCell>
                 <CTableDataCell className="py-3 px-2">
-                  <div className="flex gap-3 justify-end text-end">
-                    <ActionButton
-                      variant="minimal"
-                      label={'Edit'}
-                      onClick={() => handleEditProcess(item)}
+                   <ThreeDotMenu
+                      value={[
+                        {
+                          label: 'View',
+                          icon: cilHandPointRight,
+                          onClick: () => {
+                            setOpenProcessModal({ open: true, id: item.id })
+                          },
+                        },
+                        {
+                          label: 'Process Field',
+                          icon: cilFlipToBack,
+                          onClick: () => {
+                            handleAddField(item.id) 
+                          },
+                        },
+                        {
+                          label: 'Add Field',
+                          icon: cilPlus,
+                          onClick: () => {
+                            setShowAddFieldModal({ show: true, processId: item.id });
+                          },
+                        },
+                        {
+                          label: 'Edit Field',
+                          icon: cilPencil,
+                          onClick: () => {
+                            handleEditProcessValues(item)
+                          },
+                        },
+                        {
+                          label: 'Edit Process',
+                          icon: cilPencil,
+                          onClick: () => {
+                            handleEditProcess(item)
+                          },
+                        },
+                        {
+                          label: 'Delete',
+                          icon: cilTrash,
+                          onClick: () => {
+                            openDeleteModal(item.id)
+                          },
+                        },
+                      ]}
                     />
-                    <ActionButton
-                      variant="minimal"
-                      label={'Delete'}
-                      customColor="text-red-500"
-                      onClick={() => openDeleteModal(item.id)}
-                    />
-                  </div>
                 </CTableDataCell>
               </CTableRow>
             ))
           ) : (
             <CTableRow>
-              <CTableDataCell colSpan={3} className="py-3 px-2 text-center !text-red-500">
+              <CTableDataCell colSpan={4} className="py-3 px-2 text-center !text-red-500 ">
                 No Records Found
               </CTableDataCell>
             </CTableRow>
@@ -121,6 +154,16 @@ function ProcessIntegrartionTable({
         onClose={closeDeleteModal}
         onConfirm={handleDelete}
       />
+      <PopUp
+        visible={openProcessModal.open}
+        setVisible={(isVisible) => {
+          if (!isVisible) setOpenProcessModal({ open: false, id: null })
+        }}
+        showCloseButton={true}
+        width={'70vw'}
+      >
+        <ProcessDetails id={openProcessModal.id} handleEditProcess={handleEditProcess}/>
+      </PopUp>
     </div>
   )
 }

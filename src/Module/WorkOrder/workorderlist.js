@@ -10,6 +10,9 @@ import { cilFilter } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import apiMethods from '../../api/config'
 import WorkOrderDetails from './WorkOrderDetails'
+import WorkOrderEditForm from './WorkOrderEditForm'
+import ConfirmationModale from '../../components/New/ConfirmationModale'
+import CustomAlert from '../../components/New/CustomAlert'
 
 const WorkOrders = () => {
   const [data, setData] = useState([])
@@ -18,10 +21,34 @@ const WorkOrders = () => {
   const { filteredSearchData, searchQuery, searchBarRef } = useSearch()
   const [showPopUp, setShowPopUp] = useState(null)
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1 })
+  const [isEditFormVisible,setIsFormVisible] = useState(false);
+  const [selectedWorkOrderId,setSelectedWorkOrderId] = useState("")
+  const [isConfirmationModaleOpen,setIsConfirmationModaleOpen]=useState(false)
+  const [deleteId, setDeleteId] = useState(null); // holds id to delete
+  const [alerts,setAlerts] = useState([])
 
+
+  const  fetchData = async () => {
+    try {
+      const response = await apiMethods.getWorkOrders({
+        manufacture: '',
+        sku_name: searchQuery,
+        page: pagination?.page,
+        limit: limit,
+      })
+
+      setData(response.data?.workOrders || [])
+      setPagination(prev => ({
+        ...prev,
+        totalPages: response.data.pagination.totalPages
+      }))
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
   // Fetch Data
   useEffect(() => {
-    async function fetchData() {
+    const  fetchData = async () => {
       try {
         const response = await apiMethods.getWorkOrders({
           manufacture: '',
@@ -29,7 +56,7 @@ const WorkOrders = () => {
           page: pagination?.page,
           limit: limit,
         })
-
+  
         setData(response.data?.workOrders || [])
         setPagination(prev => ({
           ...prev,
@@ -39,9 +66,15 @@ const WorkOrders = () => {
         console.error('Error fetching data:', error)
       }
     }
+
+   
+
     fetchData()
   }, [pagination?.page, limit, searchQuery])
 
+  const handleClose = ()=>{
+    setAlerts([])
+  }
   // Reset to page 1 when search query changes
   useEffect(() => {
     setPagination((prev) => ({
@@ -49,6 +82,37 @@ const WorkOrders = () => {
       page: 1,
     }))
   }, [searchQuery])
+
+
+  const handleEdit = (id)=>{
+    setSelectedWorkOrderId(id)
+    setIsFormVisible(true)
+  }
+  const ConfirmDelete = async () => {
+    if (deleteId !== null) {
+      try {
+        const response = await apiMethods.deleteWorkOrder(deleteId); // correct usage
+        if (response?.status === 200 || response?.success) {
+          fetchData()
+        } else {
+          alert('Failed to delete.');
+        }
+      } catch (error) {
+        console.error('Delete error:', error);
+        alert('An error occurred while deleting.');
+      } finally {
+        setIsConfirmationModaleOpen(false);
+        setDeleteId(null);
+      }
+    }
+  };
+  
+  
+
+  const handleDelete = (id) => {
+    setDeleteId(id);                     // Save the id
+    setIsConfirmationModaleOpen(true);   // Open the modal
+  }
 
   return (
     <div className="w-full mb-3">
@@ -72,9 +136,13 @@ const WorkOrders = () => {
       <div className="border h-[80%] mt-4">
         <div className="overflow-x-auto overflow-y-auto whitespace-nowrap p-3">
           <WorkOrderTable
-            cellData={filteredSearchData.length ? filteredSearchData : data}
+            // cellData={filteredSearchData.length ? filteredSearchData :data}
+            cellData={data}
+            setCellData = {setData}
             showPopUp={showPopUp}
             setShowPopUp={setShowPopUp}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
           />
         </div>
 
@@ -104,6 +172,30 @@ const WorkOrders = () => {
       <Drawer isOpen={drawerOpen} maxWidth="1280px" onClose={() => setDrawerOpen(false)}>
         <AddSalesOrder currentTab={'skuDetails'} />
       </Drawer>
+
+      {isEditFormVisible && (
+  <WorkOrderEditForm
+    isEditFormVisible={isEditFormVisible}
+    selectedWorkOrderId={selectedWorkOrderId}
+    setIsEditFormVisible={setIsFormVisible}
+    // fetchData={fetch}
+    
+  />
+
+  
+)}
+<ConfirmationModale
+  isOpen={isConfirmationModaleOpen}
+  onClose={() => setIsConfirmationModaleOpen(false)}
+  onConfirm={ConfirmDelete}
+/>
+
+<CustomAlert
+alerts={alerts}
+handleClose={handleClose}
+/>
+
+
     </div>
   )
 }

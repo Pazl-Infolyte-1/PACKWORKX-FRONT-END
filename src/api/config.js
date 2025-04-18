@@ -749,7 +749,6 @@ export const apiMethods = {
   },
 
   getSalesOrderList: async (params = {}) => {
-    console.log(params,'fasdfa')
     try {
       return await apiClient.get('/sale-order', {
         params: {
@@ -849,7 +848,29 @@ export const apiMethods = {
   updateSkuVersion:async(id,body)=>{
     const response = await apiClient.put(`/sku-details/sku-version/${id}`,body);
     return response
+  },
+  createWorkOrder:async(body)=>{
+    const response = await apiClient.post(`/work-order`,body);
+    return response
+  },
+  getWorkOrderById:async(id)=>{
+    const response = await apiClient.get(`/work-order/${id}`);
+    return response
+  },
+  workOrderStatusUpdate:async(id,body)=>{
+    const response = await apiClient.put(`/work-order/status/${id}`,body);
+    return response
+  },
+  editWorkOrder:async(id,body)=>{
+    const response = await apiClient.put(`/work-order/${id}`,body);
+    return response
+  },
+
+  deleteWorkOrder:async(id)=>{
+    const response = await apiClient.delete(`/work-order/${id}`);
+    return response
   }
+  
 }
 
 

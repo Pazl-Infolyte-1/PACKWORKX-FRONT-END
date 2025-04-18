@@ -24,7 +24,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
 
 
   useEffect(()=>{
-    console.log(totals,'yeyeyeyeyeyeyeyeyeyey')
+    // console.log(totals,'yeyeyeyeyeyeyeyeyeyey')
   },[totals])
   
   // Function to update specific values
@@ -87,7 +87,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
   });
 
   useEffect(() => {
-    console.log(salesDetailsForm)
+    // console.log(salesDetailsForm)
   }, [salesDetailsForm])
 
   // Handle SKU form data updates from the SkuDetails component
@@ -200,7 +200,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       // fetchSalesOrderData()
 
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       setAlerts([{ severity: "error", message: error?.response?.data?.message ||"Failed To Update SalesOrder  " }]);
       console.error(error);
     } finally {
@@ -217,7 +217,19 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
 
 
 
-
+  const workOrderListSubmit = async (formData) => {
+    try {
+      const response = await apiMethods.createWorkOrder(formData);
+      console.log('Response:', response);
+      setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
+      setTimeout(() => {
+        setDrawer(false)
+      }, 1000);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
 
   // Function to handle final form submission from WorkOrders component
   const handleWorkOrderFormUpdate = async (formData) => {
@@ -263,7 +275,8 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
         setTimeout(() => {
           setDrawer(false)
-        }, 1000);        await fetchData()
+        }, 1000);
+        await fetchData()
       } else {
          response = await apiMethods.addSalesOrder(finalSalesOrder);
          setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
@@ -355,6 +368,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
               workOrdersDummy={workOrdersDummy}
               skuVersionsMap={skuVersionsMap}
               setSkuVersionsMap={setSkuVersionsMap}
+              workOrderListSubmit={workOrderListSubmit}
             />
           </div>
         )}

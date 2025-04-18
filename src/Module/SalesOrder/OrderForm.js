@@ -160,18 +160,18 @@ const handleToggleChange = () => {
 
               {/* Estimated */}
               <div className="flex flex-col">
-                <label className="text-black font-normal leading-6 mb-2 text-left">
-                  Estimated
-                </label>
-                <input
-                  type="text"
-                  name="estimated"
-                  value={localFormData.estimated || ""}
-                  onChange={handleInputChange}
-                  placeholder="Enter Estimated"
-                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
-                />
-              </div>
+  <label className="text-black font-normal leading-6 mb-2 text-left">
+    Estimated
+  </label>
+  <input
+    type="date"
+    name="estimated"
+    value={localFormData.estimated || ""}
+    onChange={handleInputChange}
+    className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#333] text-[16px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+  />
+</div>
+
             </div>
 
             {/* Client */}

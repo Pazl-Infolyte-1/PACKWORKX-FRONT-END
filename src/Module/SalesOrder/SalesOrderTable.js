@@ -36,7 +36,7 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
             <CTableHead className="bg-gray-100 sticky top-0 z-10">
               <CTableRow>
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                  Number
+                  Sales ID
                 </CTableHeaderCell>
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                   Client
@@ -52,9 +52,9 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                   Created Date
                 </CTableHeaderCell>
-                <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+                {/* <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                   Due Date
-                </CTableHeaderCell>
+                </CTableHeaderCell> */}
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                   Status
                 </CTableHeaderCell>
@@ -74,9 +74,14 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
               {data.length > 0 ? (
                 data.map((row, index) => (
                   <CTableRow key={index} className="border-b">
-                    <CTableDataCell className="py-3 px-4 text-gray-700">
-                      {row.id}
+                    <CTableDataCell
+                      onClick={() =>handleView(row.id)  
+                      }
+                      className="py-3 px-2 !text-[#8761e5] font-semibold cursor-pointer underline text-start "
+                    >SO-{row.id}
                     </CTableDataCell>
+
+                    
                     <CTableDataCell className="py-3 px-4 text-gray-700">
                       {row.client}
                     </CTableDataCell>
@@ -91,9 +96,9 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
                       {formatDate(row.created_at)}
                     </CTableDataCell>
 
-                    <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {/* <CTableDataCell className="py-3 px-4 text-gray-700">
                       {row.due_date}
-                    </CTableDataCell>
+                    </CTableDataCell> */}
 
 
                     <CTableDataCell className="py-3 px-4 text-gray-700">

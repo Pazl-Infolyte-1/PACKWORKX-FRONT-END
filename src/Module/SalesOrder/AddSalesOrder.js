@@ -20,8 +20,11 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     total_qty:0,
   });
 
+  const [skuVersionsMap, setSkuVersionsMap] = useState({})
+
+
   useEffect(()=>{
-    console.log(totals,'yeyeyeyeyeyeyeyeyeyey')
+    // console.log(totals,'yeyeyeyeyeyeyeyeyeyey')
   },[totals])
   
   // Function to update specific values
@@ -44,6 +47,16 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
 
 
   const [workOrdersData, setWorkOrdersData] = useState([])
+  const [workOrdersDummy, setWorkOrdersDummy] = useState([])
+
+
+  // useEffect(()=>{
+  //   if(workOrdersDummy==[]){
+  //     setWorkOrdersDummy([...workOrdersData])
+  //   }
+  // },[workOrdersData])
+
+
   const [workOrders, setWorkOrders] = useState([
     {
       id: 1,
@@ -55,7 +68,9 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       planned_start_date: "",
       acceptable_excess_units: "",
       planned_end_date: "",
-      manufacture: "inhouse"
+      manufacture: "inhouse",
+      priority:"Low",
+      progress:"Pending"
     }
   ])
 
@@ -72,7 +87,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
   });
 
   useEffect(() => {
-    console.log(salesDetailsForm)
+    // console.log(salesDetailsForm)
   }, [salesDetailsForm])
 
   // Handle SKU form data updates from the SkuDetails component
@@ -185,7 +200,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       // fetchSalesOrderData()
 
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       setAlerts([{ severity: "error", message: error?.response?.data?.message ||"Failed To Update SalesOrder  " }]);
       console.error(error);
     } finally {
@@ -202,7 +217,19 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
 
 
 
-
+  const workOrderListSubmit = async (formData) => {
+    try {
+      const response = await apiMethods.createWorkOrder(formData);
+      console.log('Response:', response);
+      setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
+      setTimeout(() => {
+        setDrawer(false)
+      }, 1000);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
 
   // Function to handle final form submission from WorkOrders component
   const handleWorkOrderFormUpdate = async (formData) => {
@@ -211,8 +238,11 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       // setLoading(true);
       let response;
 
+
+      
+
       // Add client_id to each work order in formData
-      const workDetailsWithClient = formData.map(workOrder => ({
+      const workDetailsWithClient = workOrdersData.map(workOrder => ({
         ...workOrder,
         client_id: salesDetailsForm.client_id
       }));
@@ -235,7 +265,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
           ...salesDetailsForm,
           ...totals // Existing sales details
         },
-        workDetails: [...workOrdersData, ...workDetailsWithClient], // Include work order details
+        workDetails: [...workDetailsWithClient], // Include work order details
         skuDetails: hasSkuDetails ? skuWithClientId : [], // Empty SKU details if none exist
       };
 
@@ -245,7 +275,8 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
         setTimeout(() => {
           setDrawer(false)
-        }, 1000);        await fetchData()
+        }, 1000);
+        await fetchData()
       } else {
          response = await apiMethods.addSalesOrder(finalSalesOrder);
          setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
@@ -324,7 +355,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
           />
         )}
         {activeTab === 'skuDetails' && (
-          <div className="p-1 bg-white rounded-lg w-[1100px] h-full">
+          <div className="p-1 bg-white rounded-lg h-full">
             <WorkOrders
               setDrawer={setDrawer}
               setWorkOrders={setWorkOrders}
@@ -332,6 +363,12 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
               setFormData={handleWorkOrderFormUpdate}
               workOrdersData={workOrdersData}
               skuDetailsForm={skuDetailsForm} // Pass the SKU details to WorkOrders component
+              setworkOrdersData={setWorkOrdersData}
+              setWorkOrdersDummy={setWorkOrdersDummy}
+              workOrdersDummy={workOrdersDummy}
+              skuVersionsMap={skuVersionsMap}
+              setSkuVersionsMap={setSkuVersionsMap}
+              workOrderListSubmit={workOrderListSubmit}
             />
           </div>
         )}

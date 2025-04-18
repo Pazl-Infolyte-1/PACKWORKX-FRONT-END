@@ -43,9 +43,9 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
     }
   })
 
-  useEffect(()=>{
-    console.log(skuDetailsForm)
-  },[skuDetailsForm])
+  // useEffect(()=>{
+  //   // console.log(skuDetailsForm)
+  // },[skuDetailsForm])
 
   // Watch for changes to calculate totals
   const skusData = watch('skus');
@@ -363,19 +363,19 @@ useEffect(() => {
             <div className=" min-h-[200px] max-h-[300px] overflow-y-auto custom-scrollbar rounded-lg">
               <table className="min-w-full bg-white rounded-lg max-h-[1250px] border-collapse">
                 {/* Table Head */}
-                <thead className="sticky top-0 bg-white z-10">
+                <thead className="sticky top-0 bg-white z-10 text-center">
                   <tr className='border-b-2'>
-                    <th className="px-4 py-2 text-left">Sku</th>
-                    <th className="px-4 py-2 text-left">Quantity Required</th>
-                    <th className="px-4 py-2 text-left">Rate Per Sku</th>
-                    <th className="px-4 py-2 text-left">Acceptable Sku Units</th>
-                    <th className="px-4 py-2 text-left">SGST %</th>
-                    <th className="px-4 py-2 text-left">CGST %</th>
-                    <th className="px-4 py-2 text-left">Total Amount</th>
-                    <th className="px-4 py-2 text-left">SGST Amount</th>
-                    <th className="px-4 py-2 text-left">CGST Amount</th>
-                    <th className="px-4 py-2 text-left">Total</th>
-                    <th className="px-4 py-2 text-left">Action</th>
+                    <th className="px-4 py-2 text-center">Sku</th>
+                    <th className="px-4 py-2 text-center">Quantity Required</th>
+                    <th className="px-4 py-2 text-center">Rate Per Sku</th>
+                    <th className="px-4 py-2 text-center">Acceptable Sku Units</th>
+                    <th className="px-4 py-2 text-center">Total Amount</th>
+                    <th className="px-4 py-2 text-center">SGST %</th>
+                    <th className="px-4 py-2 text-center">SGST Amount</th>
+                    <th className="px-4 py-2 text-center">CGST %</th>
+                    <th className="px-4 py-2 text-center">CGST Amount</th>
+                    <th className="px-4 py-2 text-center">Total Inc GST</th>
+                    <th className="px-4 py-2 text-center">History</th>
                   </tr>
                 </thead>
 
@@ -448,6 +448,17 @@ useEffect(() => {
                         />
                       </td>
 
+                            {/* Total Amount */}
+                         <td className="px-4 py-2">
+                        <input
+                          {...register(`skus[${index}].totalAmount`)}
+                          type="number"
+                          placeholder="0"
+                          className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+                          readOnly
+                        />
+                      </td>
+
                       {/* SGST Percentage Input */}
                       <td className="px-4 py-2">
                         <input
@@ -460,6 +471,17 @@ useEffect(() => {
                           type="number"
                           placeholder="0"
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+                        />
+                      </td>
+
+                                            {/* SGST Amount */}
+                                            <td className="px-4 py-2">
+                        <input
+                          {...register(`skus[${index}].sgstAmount`)}
+                          type="number"
+                          placeholder="0"
+                          className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+                          readOnly
                         />
                       </td>
 
@@ -478,27 +500,9 @@ useEffect(() => {
                         />
                       </td>
 
-                      {/* Total Amount */}
-                      <td className="px-4 py-2">
-                        <input
-                          {...register(`skus[${index}].totalAmount`)}
-                          type="number"
-                          placeholder="0"
-                          className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
-                          readOnly
-                        />
-                      </td>
 
-                      {/* SGST Amount */}
-                      <td className="px-4 py-2">
-                        <input
-                          {...register(`skus[${index}].sgstAmount`)}
-                          type="number"
-                          placeholder="0"
-                          className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
-                          readOnly
-                        />
-                      </td>
+
+
 
                       {/* CGST Amount */}
                       <td className="px-4 py-2">
@@ -512,7 +516,7 @@ useEffect(() => {
                       </td>
 
                       {/* Total */}
-                      <td className="px-4 py-2">
+                      <td className="">
                         <input
                           {...register(`skus[${index}].total`)}
                           type="number"
@@ -522,9 +526,9 @@ useEffect(() => {
                         />
                       </td>
 
-                      <td className="">
+                      <td className="px-4 py-2">
                       <ActionButton
-            label={"invoice history"}
+            label={"invoice"}
             variant='minimal'
           />
                       </td>
@@ -575,10 +579,10 @@ useEffect(() => {
                 </td>
                 
                 <td className="px-4 py-2"></td>
-                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                <td className="px-4 py-2 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
                   Total Incl of GST:
                 </td>
-                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                <td className="px-4 py-2 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
                   {totals.total_incl_gst.toFixed(2)}
                 </td>
               </tr>
@@ -586,29 +590,28 @@ useEffect(() => {
           </table>
         </div>
 
-        <div className="flex justify-between items-center w-full mt-10">
+        {/* <div className="flex justify-between items-center w-full mt-10">
           <ActionButton
             onClick={() => setActionDrawerOpen(true)}
             label={"Previous Invoice Rates"}
             variant='minimal'
           />
 
-          {/* Show the Save as Draft button but not the Submit button if showSubmitButton is false */}
           <div className="flex gap-4">
             <ActionButton
               label={"Save As Draft"}
               variant='minimal'
             />
             
-            {/* {showSubmitButton && (
+            {showSubmitButton && (
               <ActionButton
                 onClick={handleSubmit(onSubmit)}
                 label={"Submit"}
                 variant='minimal'
               />
-            )} */}
+            )}
           </div>
-        </div>
+        </div> */}
       </div>
       <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} />
     </div>

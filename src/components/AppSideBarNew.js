@@ -88,6 +88,8 @@ export const AppSideBarNew = ({ giveAccess }) => {
     (module) => module.modules_description?.trim() !== '',
   )
 
+  
+
   return (
     <CSidebarNav as={SimpleBar}>
       {/*<CNavTitle>Static Menu</CNavTitle>
@@ -219,7 +221,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === 'Process Flow') {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/">
+                  <CNavLink as={NavLink} to="/process">
                     {navLink('Process', 'cilFile')}
                   </CNavLink>
                 </CNavItem>

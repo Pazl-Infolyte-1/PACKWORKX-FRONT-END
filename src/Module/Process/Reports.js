@@ -12,7 +12,7 @@ import AddProcessField from './AddProcessField'
 import AddFieldForm from '../Machine/AddFieldForm'
 import ProcessForm from './AddProcessNameForm'
 
-const Reports = () => {
+const Process = () => {
   const [showAddProcessModal, setShowAddProcessModal] = useState(false)
   const [refresh, setRefresh] = useState(false)
   const [showAddFieldModal, setShowAddFieldModal] = useState({ show: false, processId: null })
@@ -287,4 +287,4 @@ const Reports = () => {
   )
 }
 
-export default Reports
+export default Process

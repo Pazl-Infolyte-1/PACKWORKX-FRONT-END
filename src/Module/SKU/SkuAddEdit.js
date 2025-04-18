@@ -147,6 +147,9 @@ function SkuAddEdit({
       const updatedItem = { ...updatedSkuValues[index], [field]: value };
   
       if (field === 'gsm') {
+        console.log("entered value",value)
+        console.log("updated meterSquareData",meterSquareData)
+
         updatedItem.weight = value * meterSquareData;
       }
   
@@ -160,7 +163,22 @@ function SkuAddEdit({
     });
   }
   
-
+  //for updating the gsm calculations when dimension changes
+  useEffect(() => {
+    setAddNewSkuData((prevData) => {
+      const updatedSkuValues = prevData.sku_values.map((item) => {
+        if (item.gsm) {
+          return {
+            ...item,
+            weight: item.gsm * meterSquareData,
+          };
+        }
+        return item;
+      });
+      return { ...prevData, sku_values: updatedSkuValues };
+    });
+  }, [meterSquareData]);
+  
   const plyLayerConfigurations = {
     2: [
       { layer: 'Top Layer', type: 'Top Layer' },
@@ -448,7 +466,7 @@ function SkuAddEdit({
       />
     </div>
   ) : (
-    <p className="text-gray-500">N/A</p>
+    <p className="text-gray-500">--</p>
   )}
 </td>
 

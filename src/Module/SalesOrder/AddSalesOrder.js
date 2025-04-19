@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import SkuDetails from './SkuDetails'
 import WorkOrders from './WorkOrders'
-import { CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
+import { CButton, CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
 import OrderForm from './OrderForm'
 import Loader from '../../components/New/Loader'
 import apiMethods from '../../api/config'
@@ -12,6 +12,8 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
   const [loading, setLoading] = useState(false)
   const [existingSalesOrderData, setExistingSalesOrderData] = useState('')
   const [alerts, setAlerts] = useState([]);
+  const [workOrdersData, setWorkOrdersData] = useState([])
+  const [workOrdersDummy, setWorkOrdersDummy] = useState([])
   const [totals, setTotals] = useState({
     total_amount:0,
     total_incl_gst:0,
@@ -46,8 +48,6 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
   })
 
 
-  const [workOrdersData, setWorkOrdersData] = useState([])
-  const [workOrdersDummy, setWorkOrdersDummy] = useState([])
 
 
   // useEffect(()=>{
@@ -86,9 +86,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     confirmation_oral: ""
   });
 
-  useEffect(() => {
-    // console.log(salesDetailsForm)
-  }, [salesDetailsForm])
+
 
   // Handle SKU form data updates from the SkuDetails component
   const handleSkuFormUpdate = (data) => {
@@ -100,17 +98,13 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     }
   };
 
-  // // Track form changes without logging
-  // const handleSalesDetailsUpdate = (data) => {
-  //   setSalesDetailsForm(data);
-  // };
+
 
   const handleSalesDetailsUpdate = (data) => {
     // Use a new object to ensure state update is recognized
     setSalesDetailsForm({ ...data });
   };
 
-  // Handle form submission - this will only be called when the submit button is clicked
 
   useEffect(() => {
     // If skuDetails was added to salesDetailsForm directly, update skuDetailsForm 
@@ -305,41 +299,152 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
   return (
     <div className="screen p-4">
       <CCol xs={12}>
-        <CNav variant="tabs">
-          <CNavItem key={'salesOrder'}>
-            <CNavLink
-              active={activeTab === 'salesOrder'}
-              onClick={(e) => {
-                e.preventDefault()
-                setActiveTab('salesOrder')
-              }}
-              style={{
-                backgroundColor: activeTab === 'salesOrder' ? '#8761e5' : 'transparent',
-                color: activeTab === 'salesOrder' ? '#ffffff' : '#8761e5',
-                cursor: 'pointer',
-              }}
-            >
-              {'Add Sales Order'}
-            </CNavLink>
-          </CNavItem>
-          <CNavItem key={'skuDetails'}>
-            <CNavLink
-              active={activeTab === 'skuDetails'}
-              onClick={(e) => {
-                e.preventDefault()
-                setActiveTab('skuDetails')
-              }}
-              style={{
-                backgroundColor: activeTab === 'skuDetails' ? '#8761e5' : 'transparent',
-                color: activeTab === 'skuDetails' ? '#ffffff' : '#8761e5',
-                cursor: 'pointer',
-              }}
-            >
-              {'Work Order'}
-            </CNavLink>
-          </CNavItem>
-        </CNav>
-      </CCol>
+  <div className="d-flex justify-content-between align-items-center">
+    <CNav variant="tabs" className="flex-grow-1">
+      <CNavItem key={'salesOrder'}>
+        <CNavLink
+          active={activeTab === 'salesOrder'}
+          onClick={(e) => {
+            e.preventDefault()
+            setActiveTab('salesOrder')
+          }}
+          style={{
+            backgroundColor: activeTab === 'salesOrder' ? '#8761e5' : 'transparent',
+            color: activeTab === 'salesOrder' ? '#ffffff' : '#8761e5',
+            cursor: 'pointer',
+          }}
+        >
+          {'Add Sales Order'}
+        </CNavLink>
+      </CNavItem>
+      <CNavItem key={'skuDetails'}>
+        <CNavLink
+          active={activeTab === 'skuDetails'}
+          onClick={(e) => {
+            e.preventDefault()
+            setActiveTab('skuDetails')
+          }}
+          style={{
+            backgroundColor: activeTab === 'skuDetails' ? '#8761e5' : 'transparent',
+            color: activeTab === 'skuDetails' ? '#ffffff' : '#8761e5',
+            cursor: 'pointer',
+          }}
+        >
+          {'Work Order'}
+        </CNavLink>
+      </CNavItem>
+    </CNav>
+    
+    {activeTab === 'salesOrder' && (
+  <CButton 
+    color="primary" 
+    style={{
+      backgroundColor: '#8761e5',
+      border: 'none',
+      marginLeft: '16px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px',
+      paddingRight: '16px',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 4px 6px rgba(135, 97, 229, 0.25)'
+    }}
+    className="next-button-hover"
+    onClick={() => {
+      setActiveTab('skuDetails')
+    }}
+  >
+    <span>Next</span>
+    <svg 
+      width="16" 
+      height="16" 
+      fill="none" 
+      viewBox="0 0 24 24" 
+      stroke="currentColor" 
+      xmlns="http://www.w3.org/2000/svg"
+      style={{
+        transition: 'transform 0.3s ease'
+      }}
+      className="arrow-icon"
+    >
+      <path 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth={2} 
+        d="M9 5l7 7-7 7" 
+      />
+    </svg>
+    <style jsx>{`
+      .next-button-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 10px rgba(135, 97, 229, 0.35);
+      }
+      .next-button-hover:hover .arrow-icon {
+        transform: translateX(3px);
+      }
+      .next-button-hover:active {
+        transform: translateY(1px);
+      }
+    `}</style>
+  </CButton>
+)}
+    
+{activeTab === 'skuDetails' && (
+  <CButton 
+    color="primary" 
+    style={{
+      backgroundColor: '#8761e5',
+      border: 'none',
+      marginLeft: '16px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px',
+      paddingRight: '16px',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 4px 6px rgba(135, 97, 229, 0.25)'
+    }}
+    className="back-button-hover"
+    onClick={() => {
+      setActiveTab('salesOrder')
+    }}
+  >
+    <svg 
+      width="16" 
+      height="16" 
+      fill="none" 
+      viewBox="0 0 24 24" 
+      stroke="currentColor" 
+      xmlns="http://www.w3.org/2000/svg"
+      style={{
+        transition: 'transform 0.3s ease',
+        transform: 'rotate(180deg)'
+      }}
+      className="arrow-icon"
+    >
+      <path 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth={2} 
+        d="M9 5l7 7-7 7" 
+      />
+    </svg>
+    <span>Back</span>
+    <style jsx>{`
+      .back-button-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 10px rgba(135, 97, 229, 0.35);
+      }
+      .back-button-hover:hover .arrow-icon {
+        transform: rotate(180deg) translateX(3px);
+      }
+      .back-button-hover:active {
+        transform: translateY(1px);
+      }
+    `}</style>
+  </CButton>
+)}
+  </div>
+</CCol>
 
       {/* Content Sections */}
       <CustomAlert alerts={alerts} handleClose={handleClose} />

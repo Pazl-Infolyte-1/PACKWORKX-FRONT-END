@@ -147,9 +147,9 @@ function ListOfSalesOrder() {
   };
 
   return (
-    <div>
+    <div className=''>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <div className="h-full w-full flex flex-col">
+      <div className="h-full  w-full flex flex-col">
         {/* Header */}
         <div className="w-full h-[40px]">
           <div className="flex justify-between items-center">
@@ -159,7 +159,7 @@ function ListOfSalesOrder() {
 
         {/* Table */}
 
-        <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
+        <div className="overflow-x-auto border border-gray-200 h-full p-3 rounded-md">
           <div className="flex justify-between items-center">
             <div className='flex gap-1 '>
               <SearchBar text="sales order" data={data} ref={searchBarRef} />
@@ -171,7 +171,7 @@ function ListOfSalesOrder() {
                 onChange={handleStatus}
               >
                 <option value="" disabled>
-                  status
+                  Filter
                 </option>
                 <option value="Pending">Pending</option>
                 <option value="Completed">Completed</option>

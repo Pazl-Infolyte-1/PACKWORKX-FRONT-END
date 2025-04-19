@@ -409,7 +409,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
   }
 
   return (
-    <div className=' w-full'>
+    <div className=' w-full mt-6'>
       {/* Header Section */}
       <CustomAlert alerts={alerts} handleClose={handleClose} />
 
@@ -489,7 +489,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                   </div>
 
                   {/* Status Buttons */}
-                  <div className="flex gap-3">
+                  <div className="flex justify-end flex-1 gap-3 ">
                     {accordionCardSummary.data[0]?.buttons?.map((button) => (
                       <button
                         key={button?.id}
@@ -589,7 +589,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
           <label className="block text-gray-800 font-medium mb-1">Quantity</label>
           <input
             type="number"
-            placeholder="100"
+            // placeholder="100"
             value={item.qty || ''}
             onChange={(e) => handleWorkOrderChange1(item.id, 'qty', e.target.value)}
             className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
@@ -600,7 +600,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
           <label className="block text-gray-800 font-medium mb-1">Acceptable Excess Units</label>
           <input
             type="number"
-            placeholder="Enter units"
+            // placeholder="Enter units"
             value={item.acceptable_excess_units || ''}
             onChange={(e) => handleWorkOrderChange1(item.id, 'acceptable_excess_units', e.target.value)}
             className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
@@ -646,7 +646,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
         <div className="flex-1 min-w-0">
           <label className="block text-gray-800 font-medium mb-1">Description</label>
           <textarea
-            placeholder="Description"
+            // placeholder="Description"
             value={item.description || ''}
             onChange={(e) => handleWorkOrderChange1(item.id, 'description', e.target.value)}
             className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm resize-none"
@@ -676,13 +676,14 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
       </div>
 
       {workOrders.length > 0 && (
-        <div className="max-h-[600px]  overflow-y-auto rounded-md pb-4 border border-gray-700">
+        <div className="max-h-[600px]  overflow-y-auto rounded-md pb-4 border  min-h-[400px] border-gray-700">
           {workOrders.map((order, index) => (
-            <div key={order.id} className="mt-4 rounded-md relative">
+            <div 
+            key={order.id}
+             className="mt-4 rounded-md border-b-2 relative">
               {/* Work Order Number */}
               <div
                 className="flex justify-between items-center px-3 w-full"
-                onClick={() => toggleCreateAccordion(order.id)}
               >
                 {/* Work Order Number */}
                 <p className="text-[#030303] text-[15px] font-lato font-bold leading-[26px]">
@@ -690,17 +691,17 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                 </p>
 
                 {/* Button & Icon Container */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center  gap-2">
                   {/* Button */}
                   {/* <ActionButton
                     label={"Download Work Order"}
                     variant='minimal'
                   /> */}
 
-                  {workOrders.length > 0 && (
+                  {workOrders.length > 1 && (
                     <TrashIcon
                       onClick={() => deleteWorkOrder(order.id)}
-                      className="text-[#ff2d55] w-7 h-7 cursor-pointer"
+                      className="text-[#ff2d55] w-6 h-6 cursor-pointer"
                     />
                   )}
                   {/* Icon */}
@@ -708,7 +709,9 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
-                    className={`w-[40px] h-[full] text-[#8167e5] fill-[#8167e5] transition-transform duration-300 ${openCreateAccordion.includes(order.id) ? 'rotate-180' : ''}`}
+                    className={`w-[35px] h-[full] text-[#8167e5] fill-[#8167e5] transition-transform duration-300 ${openCreateAccordion.includes(order.id) ? 'rotate-180' : ''}`}
+            onClick={() => toggleCreateAccordion(order.id)}
+
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
@@ -854,7 +857,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
           <label className="block text-gray-800 font-medium mb-1">Quantity</label>
           <input
             type="number"
-            placeholder="100"
+            // placeholder="100"
             value={order.qty}
             onChange={(e) => handleWorkOrderChange(order.id, 'qty', e.target.value)}
             className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
@@ -865,7 +868,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
           <label className="block text-gray-800 font-medium mb-1">Acceptable Excess Units</label>
           <input
             type="number"
-            placeholder="Enter units"
+            // placeholder="Enter units"
             value={order.acceptable_excess_units}
             onChange={(e) => handleWorkOrderChange(order.id, 'acceptable_excess_units', e.target.value)}
             className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
@@ -911,7 +914,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
         <div className="flex-1 min-w-0">
           <label className="block text-gray-800 font-medium mb-1">Description</label>
           <textarea
-            placeholder="Description"
+            // placeholder="Description"
             value={order.description}
             onChange={(e) => handleWorkOrderChange(order.id, 'description', e.target.value)}
             className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm resize-none"
@@ -923,7 +926,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
       <div className="w-full flex justify-end mt-2">
       {!isWorkOrderList && (
         <ActionButton
-          label={"Submit"}
+          label={"Add"}
           variant=''
           onClick={() => {handleSubmitWorkOrderForm(order.id)}}
         />
@@ -982,7 +985,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
           />
 
           <ActionButton
-            label={"Submit Work Order"}
+            label={"Submit"}
             variant=''
             onClick={handleSubmit}
           />

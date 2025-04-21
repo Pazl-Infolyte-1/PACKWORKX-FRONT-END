@@ -869,8 +869,12 @@ export const apiMethods = {
   deleteWorkOrder:async(id)=>{
     const response = await apiClient.delete(`/work-order/${id}`);
     return response
+  },
+  updateSalesOrderStatus:async(id,body)=>{
+    const response = await apiClient.patch(`/sale-order/${id}/status`,body);
+    return response
   }
-  
+
 }
 
 

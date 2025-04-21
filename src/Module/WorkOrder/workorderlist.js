@@ -66,9 +66,6 @@ const WorkOrders = () => {
         console.error('Error fetching data:', error)
       }
     }
-
-   
-
     fetchData()
   }, [pagination?.page, limit, searchQuery])
 
@@ -170,16 +167,19 @@ const WorkOrders = () => {
         </div>
       </div>
       <Drawer isOpen={drawerOpen} maxWidth="1280px" onClose={() => setDrawerOpen(false)}>
-        <AddSalesOrder currentTab={'skuDetails'} />
+      {drawerOpen && (
+        <AddSalesOrder currentTab={'skuDetails'} setDrawer={setDrawerOpen} fetchData={fetchData} />
+      )}
       </Drawer>
+
+
 
       {isEditFormVisible && (
   <WorkOrderEditForm
     isEditFormVisible={isEditFormVisible}
     selectedWorkOrderId={selectedWorkOrderId}
     setIsEditFormVisible={setIsFormVisible}
-    // fetchData={fetch}
-    
+    fetchData={fetchData}
   />
 
   

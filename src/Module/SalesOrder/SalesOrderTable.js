@@ -15,7 +15,7 @@ import {
 import React from 'react'
 import Loading from '../../components/New/Loading'
 
-function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, handleDelete,handleEdit,handleView,loading }) {
+function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, handleDelete,handleEdit,handleView,loading,handleStatusChange }) {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -26,6 +26,12 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
       // minute: '2-digit'
     });
   };
+
+  const statusOptions = ['Pending', 'In-progress', 'Completed', 'Rejected'];
+
+ 
+  
+
 
   return (
     <>
@@ -56,7 +62,7 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
                   Due Date
                 </CTableHeaderCell> */}
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                  Status
+                  Sales Status
                 </CTableHeaderCell>
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                   Action
@@ -101,20 +107,20 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
                     </CTableDataCell> */}
 
 
-                    <CTableDataCell className="py-3 px-4 text-gray-700">
-                      <CBadge
-                        color={
-                          row.status === 'Pending'
-                            ? 'warning'
-                            : row.status === 'active'
-                              ? 'success'
-                              : 'danger'
-                        }
-                        className="w-20 flex items-center justify-center text-sm font-semibold"
-                      >
-                        {row.status}
-                      </CBadge>
-                    </CTableDataCell>
+<CTableDataCell className="py-3 px-4 text-gray-700">
+  <select
+    value={row.sales_status}
+    onChange={(e) => handleStatusChange(row.id, e.target.value)}
+    className="w-28 px-2 py-1 rounded border text-sm font-medium text-gray-700 bg-white"
+  >
+    {statusOptions.map((status) => (
+      <option key={status} value={status}>
+        {status}
+      </option>
+    ))}
+  </select>
+</CTableDataCell>
+
                     <CTableDataCell>
                     <ThreeDotMenu
                           value={[

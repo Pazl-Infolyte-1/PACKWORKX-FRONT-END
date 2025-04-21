@@ -69,7 +69,7 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
     >
       <div>
         {/* Header Section */}
-        <div className="flex justify-between pb-2 mb-3">
+        <div className="flex justify-between pb-2 mb-3 ">
           <span className="text-lg font-semibold text-gray-800">
             SKU Name: <span>{skuName || "60ml"}</span>
           </span>
@@ -82,8 +82,8 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
         </div>
 
         {/* Scrollable Table */}
-        <div className="max-h-[300px] overflow-auto">
-          <CTable striped hover responsive className="table-fixed border-none">
+        <div className="max-h-[300px]   overflow-auto">
+          <CTable striped hover responsive className="table-fixed border-none min-h-[150px]">
             {/* Main Table Header */}
             <CTableHead className="sticky top-0 !border-none">
               <CTableRow className="!border-y-2">
@@ -144,9 +144,8 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
                           label: 'Edit',
                           icon: cilPencil,
                           onClick: () => {
-
-                            setIsEdit(true)
                             setSelectedSkuVersionID(version.id)
+                            setIsEdit(true)
                             formVisibility(true)
                           },
                         },

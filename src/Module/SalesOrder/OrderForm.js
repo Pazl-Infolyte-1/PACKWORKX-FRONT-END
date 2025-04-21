@@ -151,7 +151,7 @@ const handleToggleChange = () => {
               {/* Sales Order Id */}
               <div className="flex flex-col">
                 <label className="text-black font-normal leading-6 mb-2 text-left">
-                  Sales Order Id
+                  Sales Order Id*
                 </label>
                 <input
                   type="text"
@@ -166,7 +166,7 @@ const handleToggleChange = () => {
               {/* Estimated */}
               <div className="flex flex-col">
   <label className="text-black font-normal leading-6 mb-2 text-left">
-    Estimated
+    Estimated*
   </label>
   <input
     type="date"
@@ -182,7 +182,7 @@ const handleToggleChange = () => {
             {/* Client */}
             <div className="p-2 rounded-lg flex flex-col">
               <label className="text-black font-normal leading-6 mb-2 text-left">
-                Client
+                Client*
               </label>
               <select
                 name="client"
@@ -202,7 +202,7 @@ const handleToggleChange = () => {
             {/* Client Period */}
             <div className="p-2 rounded-lg flex flex-col">
               <label className="text-black font-normal leading-6 mb-2 text-left">
-                Client Period
+                Client Period*
               </label>
               <input
                 type="number"
@@ -232,7 +232,7 @@ const handleToggleChange = () => {
             {/* Confirmation By */}
             <div className="p-2 rounded-lg flex flex-col">
               <label className="text-black font-normal leading-6 mb-2 text-left">
-                Confirmation By
+                Confirmation By*
               </label>
               <div
                 className="relative w-[160px] h-[34px] bg-white border border-[#8167E5] rounded-[10px] shadow-md cursor-pointer flex items-center justify-between px-2"
@@ -269,7 +269,7 @@ const handleToggleChange = () => {
             {confirmationMethod === "Email" && (
               <div className="p-2 rounded-lg flex flex-col">
                 <label className="text-black font-normal leading-6 mb-2 text-left">
-                  Confirmation Email
+                  Confirmation Email*
                 </label>
                 <input
                   type="email"
@@ -318,7 +318,7 @@ const handleToggleChange = () => {
               {/* Sales Order Id */}
               <div className="flex flex-col">
                 <label className="text-black font-normal leading-6 mb-2 text-left">
-                   Confirmation Name
+                   Confirmation Name*
                 </label>
                 <input
                   type="text"
@@ -333,7 +333,7 @@ const handleToggleChange = () => {
               {/* Estimated */}
               <div className="flex flex-col">
                 <label className="text-black font-normal leading-6 mb-2 text-left">
-                Confirmation Mobile
+                Confirmation Mobile*
                 </label>
                 <input
                   type="number"

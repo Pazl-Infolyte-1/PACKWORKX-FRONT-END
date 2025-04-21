@@ -36,8 +36,7 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
   return (
     <>
       <div className=" h-[80%] ">
-        {console.log(data)}
-        <div className="overflow-x-auto  h-[350px]  border whitespace-nowrap  mt-3">
+        <div className="overflow-x-auto   h-[380px]    border whitespace-nowrap  mt-3">
           <CTable striped hover className="border border-gray-200">
             <CTableHead className="bg-gray-100 sticky top-0 z-10">
               <CTableRow>

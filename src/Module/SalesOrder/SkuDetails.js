@@ -43,11 +43,6 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
     }
   })
 
-  // useEffect(()=>{
-  //   // console.log(skuDetailsForm)
-  // },[skuDetailsForm])
-
-  // Watch for changes to calculate totals
   const skusData = watch('skus');
 
   const { fields, append, remove } = useFieldArray({
@@ -215,32 +210,6 @@ useEffect(() => {
     }
   }
 
-  // Calculate row values automatically when quantity or rate changes
-  // const calculateRowValues = (index) => {
-  //   const values = getValues(`skus[${index}]`);
-  //   const quantity = parseFloat(values.quantity) || 0;
-  //   const rate = parseFloat(values.rate) || 0;
-    
-  //   // Calculate total amount
-  //   const totalAmount = quantity * rate;
-    
-  //   // Get SGST and CGST percentages from user input
-  //   const sgstPercentage = parseFloat(values.sgst) || 0;
-  //   const cgstPercentage = parseFloat(values.cgst) || 0;
-    
-  //   // Calculate SGST and CGST amounts based on percentages
-  //   const sgstAmount = totalAmount * (sgstPercentage / 100);
-  //   const cgstAmount = totalAmount * (cgstPercentage / 100);
-    
-  //   // Calculate total with GST
-  //   const total = totalAmount + sgstAmount + cgstAmount;
-    
-  //   // Update form values
-  //   setValue(`skus[${index}].totalAmount`, totalAmount.toFixed(2));
-  //   setValue(`skus[${index}].sgstAmount`, sgstAmount.toFixed(2));
-  //   setValue(`skus[${index}].cgstAmount`, cgstAmount.toFixed(2));
-  //   setValue(`skus[${index}].total`, total.toFixed(2));
-  // }
 
   const calculateRowValues = (index) => {
     const values = getValues(`skus[${index}]`);
@@ -530,6 +499,8 @@ useEffect(() => {
                       <ActionButton
             label={"invoice"}
             variant='minimal'
+            onClick={() => setActionDrawerOpen(true)}
+
           />
                       </td>
 
@@ -577,10 +548,21 @@ useEffect(() => {
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                   {totals.cgst.toFixed(2)}
                 </td>
-                
+
                 <td className="px-4 py-2"></td>
+                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                  Total GST:
+                </td>
+                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                  {totals.cgst.toFixed(2)}
+                </td>
+                
+
+              </tr>
+              <tr>
+                                <td className="px-4 py-2"></td>
                 <td className="px-4 py-2 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
-                  Total Incl of GST:
+                  Total Incl GST:
                 </td>
                 <td className="px-4 py-2 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
                   {totals.total_incl_gst.toFixed(2)}
@@ -590,12 +572,27 @@ useEffect(() => {
           </table>
         </div>
 
+
+      </div>
+      <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} />
+      </div>
+  )
+}
+
+export default SkuDetails
+
+
+
+
+
+
         {/* <div className="flex justify-between items-center w-full mt-10">
           <ActionButton
             onClick={() => setActionDrawerOpen(true)}
             label={"Previous Invoice Rates"}
             variant='minimal'
           />
+          
 
           <div className="flex gap-4">
             <ActionButton
@@ -612,10 +609,3 @@ useEffect(() => {
             )}
           </div>
         </div> */}
-      </div>
-      <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} />
-    </div>
-  )
-}
-
-export default SkuDetails

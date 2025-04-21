@@ -218,7 +218,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       setTimeout(() => {
         setDrawer(false)
       }, 1000);
-      await(fetchData)
+      await fetchData(fetchData)
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
 
     } catch (error) {

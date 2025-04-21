@@ -12,6 +12,10 @@ import CompositePopupTable from './CompositePopupTable'
 import { FaChevronDown } from 'react-icons/fa'
 import Tooltip from '@mui/material/Tooltip'
 import PlyToggle from '../../components/New/PlyToggle'
+import RSCBox from './RSCBox'
+import CorrugatedSheet from './CorrugatedSheet'
+import DieCutBox from './DieCutBox'
+import CustomItem from './CustomItem'
 
 const compositeTypes = [
   { id: '1', name: 'Partition' },
@@ -37,7 +41,8 @@ function Composite({
   setAddNewSkuData,
   editedSkudata,
   updateSkuValues,
-  isopenval
+  isopenval,
+  setCompositeSelect
 }) {
   const [skuListTable, setSkuListTable] = useState([])
   const [skuFields, setSkuFields] = useState([])
@@ -45,6 +50,8 @@ function Composite({
   const [skuDropdown, setSkuDropdown] = useState([])
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
+  const [isSingleViewPopupForType, setisSingleViewPopupForType] = useState(false)
+
   const [checkboxSelectedArray, setCheckboxSelectedArray] = useState([])
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState('')
@@ -59,6 +66,7 @@ function Composite({
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedClient, setSelectedClient] = useState('')
   const [selectedSkuType, setSelectedSkuType] = useState('')
+  const [selectedSkuTypePopup, setSelectedSkuTypePopup] = useState(null);
 
   const handleCompositeTypeChange = (e) => {
     const selectedType = e.target.value
@@ -227,6 +235,24 @@ function Composite({
     };
   }, [isopenval]);
 
+
+
+  const handleSelectPopup = (data) => {
+    console.log("selected data", data.sku_type);
+    setCompositeSelect(data.sku_type)
+    //setSelectedSkuTypePopup(data.sku_type);
+    //setisSingleViewPopupForType(true);
+  };
+  
+  const skuComponents = {
+    'RSC box': <RSCBox />,
+    Board: <CorrugatedSheet />,
+    'Die Cut box': <DieCutBox />,
+    Composite: <Composite />,
+    'Custom Item': <CustomItem />
+  };
+
+  console.log("popup selectr",isSingleViewPopupForType)
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
@@ -373,33 +399,27 @@ function Composite({
               Browse
             </button>
 
-            <div className="relative inline-block text-left w-[150px]">
-              <button
-                type="button"
-                className="inline-flex w-full justify-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50 transition-colors"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              >
-                {selectedFilter || 'Create New'}
-                <FaChevronDown className="size-4 text-gray-400" />
-              </button>
+            <div className="w-[150px]">
+  <select
+    id="sku_type"
+    name="sku_type"
+    value={selectedFilter || ''}
+    onChange={(e) => {
+      const selectedOption = skuType.find(opt => opt.sku_type === e.target.value);
+      //handleSelect(selectedOption);
+      handleSelectPopup(selectedOption)
+    }}
+    className="block w-full rounded-md border-gray-300 py-2 px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+  >
+    <option value="">Create New</option>
+    {skuType.map((option) => (
+      <option key={option.id} value={option.sku_type}>
+        {option.sku_type}
+      </option>
+    ))}
+  </select>
+</div>
 
-              {isDropdownOpen && (
-                <div className="absolute right-0 z-20 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5">
-                  <div className="py-1 max-h-60 overflow-y-auto">
-                    {skuType.map((option) => (
-                      <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-100">
-                        <li
-                          className="p-2 cursor-pointer w-full list-none text-sm text-left"
-                          onClick={() => handleSelect(option)}
-                        >
-                          {option.sku_type}
-                        </li>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
@@ -496,6 +516,18 @@ function Composite({
           skuListTable={skuListTable}
         />
       </PopUp>
+
+      <PopUp
+  header="Selected SKU"
+  visible={isSingleViewPopupForType}
+  setVisible={setisSingleViewPopupForType}
+  showCloseButton={true}
+  width="60vw"
+>
+  {skuComponents[selectedSkuTypePopup] || (
+    <div className="text-gray-500">No view available for this SKU type</div>
+  )}
+</PopUp>
     </div>
   )
 }

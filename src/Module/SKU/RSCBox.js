@@ -257,7 +257,7 @@ useEffect(() => {
               className="p-2 h-10 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
               onClick={() => setIsOpen((prev) => !prev)}
             >
-              <span className="text-gray-800">{addNewSkuData.sku_type || 'Select Type'}</span>
+              <span className="text-gray-800">{addNewSkuData?.sku_type || 'Select Type'}</span>
               <BsChevronDown className={`transition-transform text-gray-600 ${isOpen ? 'rotate-180' : ''}`} />
             </div>
 
@@ -285,7 +285,7 @@ useEffect(() => {
             <input
               id="sku_name"
               name="sku_name"
-              value={addNewSkuData.sku_name}
+              value={addNewSkuData?.sku_name}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
@@ -296,7 +296,7 @@ useEffect(() => {
             name="client"
             id="client"
             disabled={clientDiasble}
-            value={filteredClient ? filteredClient.client_id : addNewSkuData.client || ''}
+            value={filteredClient ? filteredClient.client_id : addNewSkuData?.client || ''}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
@@ -318,7 +318,7 @@ useEffect(() => {
       <div className="grid grid-cols-3 gap-6 p-6 mt-6 border border-gray-200 rounded-lg">
       <div>
   <PlyToggle
-  value={addNewSkuData.ply}
+  value={addNewSkuData?.ply}
   onChange={(selectedPly) => updateSkuValues(selectedPly)}
 />
 </div>

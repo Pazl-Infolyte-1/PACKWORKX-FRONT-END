@@ -67,7 +67,7 @@ function DieCutBox({
               className="p-2 h-10 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
               onClick={() => setIsOpen((prev) => !prev)}
             >
-              <span className="text-gray-800">{addNewSkuData.sku_type || 'Select Type'}</span>
+              <span className="text-gray-800">{addNewSkuData?.sku_type || 'Select Type'}</span>
               <BsChevronDown className={`transition-transform text-gray-600 ${isOpen ? 'rotate-180' : ''}`} />
             </div>
 

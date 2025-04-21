@@ -35,6 +35,9 @@ function SkuAddEdit({
   const dropdownRef = useRef(null)
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
   const [meterSquareData, setMeterSquareData] = useState(null)
+  const [compositeSelect, setCompositeSelect] = useState(null)
+const [isSingleViewPopupForType,setisSingleViewPopupForType]=useState(false)
+const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
   const createInitialSkuData = () => ({
     sku_name: null,
     composite_type: null,
@@ -67,7 +70,7 @@ function SkuAddEdit({
     estimate_composite_item: null,
     description: null,
     default_sku_details: null,
-    tags: [],
+    tags: {},
     sku_values: [
       {
         layer: null,
@@ -323,6 +326,7 @@ function SkuAddEdit({
         updateSkuValues={updateSkuValues}
         editedSkudata={editedSkudata}
         editTag={editTag}
+        setCompositeSelect={setCompositeSelect}
       />
     ),
     'Custom Item': (
@@ -356,14 +360,29 @@ function SkuAddEdit({
     setAddNewSkuData(createInitialSkuData())
     handleClose()
   }
-
+  const handleCancelPopup = () => {
+    //setAddNewSkuData(createInitialSkuData())
+    //handleClose()
+    setisSingleViewPopup(false)
+  }
+  console.log("got key value",compositeSelect)
+  useEffect(() => {
+    if (compositeSelect) {
+      console.log("got key value", compositeSelect);
+      setisSingleViewPopupForType(true);
+      setIsCompositePopupCreate(true)
+    }else{
+      setIsCompositePopupCreate(false)
+    }
+  }, [compositeSelect]);
   
+  console.log("composite create",isCompositePopupCreate)
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
       {skuComponents[addNewSkuData.sku_type] || null}
 
-      { addNewSkuData.sku_type !== 'Custom Item' && (
+      {addNewSkuData.sku_type !== 'Custom Item' && (
         <div className="flex items-center my-3 space-x-2">
           <span className="text-[16px] font-medium">Strict Adherence for All Layers</span>
           <button
@@ -514,6 +533,163 @@ function SkuAddEdit({
       >
         <FluteTypeView></FluteTypeView>
       </PopUp>
+
+      <PopUp
+  header="Selected SKU"
+  visible={isSingleViewPopupForType}
+  setVisible={setisSingleViewPopupForType}
+  showCloseButton={true}
+  width="70vw"
+>
+  <div className="max-h-[70vh] overflow-y-auto pr-2">
+    {skuComponents[compositeSelect] || (
+      <div className="text-gray-500">No view available for this SKU type</div>
+    )}
+
+    {/* Strict Adherence Toggle */}
+    {compositeSelect !== 'Custom Item' && (
+      <div className="flex items-center my-3 space-x-2">
+        <span className="text-[16px] font-medium">Strict Adherence for All Layers</span>
+        <button
+          className={`w-11 h-[23px] flex items-center border border-blue-600 rounded-full p-1 cursor-pointer 
+            ${strictAdherence ? 'bg-blue-600' : 'bg-gray-300'}`}
+          onClick={handleStrictAdherenceToggle}
+        >
+          <div
+            className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out 
+              ${strictAdherence ? 'translate-x-5' : '-translate-x-[2px]'}`}
+          ></div>
+        </button>
+      </div>
+    )}
+
+    {/* SKU Values Table */}
+    {addNewSkuData.ply && compositeSelect !== 'Custom Item' && (
+      <div className="mt-6">
+        <div className="border rounded-lg overflow-auto">
+          <table className="w-full">
+            <thead className="bg-gray-100">
+              <tr className="text-gray-500 text-center">
+                <th className="p-2">Layer</th>
+                <th className="p-2">GSM</th>
+                <th className="p-2">BF</th>
+                <th className="p-2">Color</th>
+                <th className="p-2">Flute Type</th>
+                <th className="p-2">Material</th>
+                <th className="p-2">Weight (Kg)</th>
+                <th className="p-2">
+                  Bursting Strength <br />
+                  <span className="text-xs">(Kg Per Cm<sup>2</sup>)</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {addNewSkuData?.sku_values?.map((item, index) => (
+                <tr key={index} className="flex-wrap">
+                  <td className="p-2 text-center w-full sm:w-2/12">
+                    <input
+                      type="text"
+                      placeholder="Layers"
+                      className="p-1 border rounded w-full"
+                      value={item.layer}
+                      onChange={(e) => handleSkuValuesChange(index, 'layer', e.target.value)}
+                    />
+                  </td>
+                  <td className="p-2 text-center w-full sm:w-1/12">
+                    <input
+                      type="number"
+                      className="p-1 border rounded text-center w-full"
+                      value={item.gsm || ''}
+                      placeholder="gsm"
+                      onChange={(e) =>
+                        handleSkuValuesChange(index, 'gsm', Number(e.target.value))
+                      }
+                    />
+                  </td>
+                  <td className="p-2 text-center w-full sm:w-1/12">
+                    <input
+                      type="number"
+                      className="p-1 border rounded text-center w-full"
+                      value={item.bf || ''}
+                      placeholder="bf"
+                      onChange={(e) => handleSkuValuesChange(index, 'bf', Number(e.target.value))}
+                    />
+                  </td>
+                  <td className="p-2 text-center w-full sm:w-1/12">
+                    <input
+                      type="text"
+                      placeholder="Color"
+                      className="p-1 border rounded w-full"
+                      value={item.color}
+                      onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
+                    />
+                  </td>
+                  <td className="p-2 text-center w-full sm:w-1/12 relative">
+                    {item?.layer?.toLowerCase().includes('corrugated') ? (
+                      <div className="relative w-full flex items-center">
+                        <select
+                          className="p-1 border rounded w-full pr-8 appearance-none"
+                          value={item.flute_type}
+                          onChange={(e) =>
+                            handleSkuValuesChange(index, 'flute_type', e.target.value)
+                          }
+                        >
+                          <option hidden>Select</option>
+                          <option value="A">A</option>
+                          <option value="B">B</option>
+                          <option value="C">C</option>
+                          <option value="E">E</option>
+                          <option value="F,G,N">F,G,N</option>
+                        </select>
+                        <FaEye
+                          className="absolute right-2 text-gray-500 cursor-pointer"
+                          onClick={openViewCard}
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">--</p>
+                    )}
+                  </td>
+                  <td className="p-2 text-center w-full sm:w-1/12">
+                    <input
+                      type="text"
+                      placeholder="Material"
+                      className="p-1 border rounded w-full"
+                      value={item.material}
+                      onChange={(e) => handleSkuValuesChange(index, 'material', e.target.value)}
+                    />
+                  </td>
+                  <td className="p-2 text-center w-full sm:w-1/12">
+                    <p>{toThreeDecimalFixed(item.weight) || 'N/A'}</p>
+                  </td>
+                  <td className="p-2 text-center w-full sm:w-1/12">
+                    <p>{toThreeDecimalFixed(item.gsm * item.bf / 1000)}</p>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )}
+
+<div className="flex justify-end space-x-4 mt-6">
+        <button className="p-2 border border-gray-300 rounded w-24" onClick={()=>{setisSingleViewPopupForType(false)
+             setIsCompositePopupCreate(false)
+        }}>
+          Cancel
+        </button>
+        <ActionButton
+          onClick={handleAddSkuSubmit}
+          label={editTag ? 'Update' : 'Submit'}
+          variant="save"
+          className="bg-[#079b54] text-white px-4 py-2 rounded-md"
+        />
+      </div>
+  </div>
+</PopUp>
+
+
     </div>
   )
 }

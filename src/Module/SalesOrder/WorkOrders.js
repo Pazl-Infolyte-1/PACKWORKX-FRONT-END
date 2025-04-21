@@ -238,14 +238,19 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
 
 
 
-  useEffect(() => {
-    // console.log(workOrdersData, "woooooooooooooooooooek")
-  }, [workOrdersData])
+ 
 
   useEffect(() => {
     const fetchSkuList = async () => {
       try {
-        const response = await apiMethods.getSkuListOptions()
+        // const response = await apiMethods.getSkuListOptions()
+        const response = await apiMethods.getSkuList({
+          search: '',
+          client:'',
+          sku_type:'',
+          page:  1,
+          limit: 100,
+        })
         setSkuList(response.data) // Assuming data is inside 'data'
       } catch (error) {
         console.error("Failed to fetch SKU list:", error)
@@ -890,11 +895,16 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
                           <option value="" disabled>
                             Select SKU
                           </option>
-                          {skuList.map((sku) => (
-                            <option key={sku.id} value={sku.id}>
-                              {sku.sku_name}
-                            </option>
-                          ))}
+                          {skuList
+  .filter((skuItem) =>
+    skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
+  )
+  .map((skuItem) => (
+    <option key={skuItem.id} value={skuItem.id}>
+      {skuItem.sku_name}
+    </option>
+  ))}
+
                         </select>
                       </div>
 

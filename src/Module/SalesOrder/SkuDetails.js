@@ -62,6 +62,8 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
           page:  1,
           limit: 100,
         })
+                // const response = await apiMethods.getSkuListOptions()
+
         setSkuList(response?.data || [])
       } catch (error) {
         console.error("Error fetching SKU list:", error)

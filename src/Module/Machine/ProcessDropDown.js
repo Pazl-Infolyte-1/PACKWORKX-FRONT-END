@@ -1,29 +1,43 @@
-import { cilPencil } from '@coreui/icons'
-import CIcon from '@coreui/icons-react'
 import React, { useState, useEffect, useRef } from 'react'
 import { BsChevronDown } from 'react-icons/bs'
+import CIcon from '@coreui/icons-react'
+import { cilPencil } from '@coreui/icons'
+
 const ProcessDropDown = ({
   options,
   onChange,
-  onSelect,  // Add onSelect prop
+  onSelect, 
   placeholder = 'Select Process',
   dropdownHeight = '100px',
-  showAddProcedure = true,
   value,
   isEdit,
+  readOnly = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedOption, setSelectedOption] = useState(null)
   const dropdownRef = useRef(null)
-
+  
+  // Improved useEffect to handle various option structures
   useEffect(() => {
     if (value && options.length > 0) {
-      const selected = options.find(opt => 
-        opt.ProcessName?.process_name === value.value || 
-        opt.process_name === value.value
+      // Try to find the option by matching ID first (more reliable)
+      let selected = options.find(opt => 
+        (opt.id === value.processId) || 
+        (opt.ProcessName?.id === value.processId)
       )
+
+      // If not found by ID, try matching by process name
+      if (!selected) {
+        selected = options.find(opt => 
+          (opt.process_name === value.value) || 
+          (opt.ProcessName?.process_name === value.value)
+        )
+      }
+      
       if (selected) {
         setSelectedOption(selected)
+      } else {
+        console.log("No matching option found for value:", value)
       }
     }
   }, [value, options])
@@ -39,45 +53,56 @@ const ProcessDropDown = ({
   }, [])
 
   const handleOptionSelect = (option) => {
+    if (readOnly) return
     setSelectedOption(option)
     setIsOpen(false)
     
-    // Call both onChange and onSelect
-    onChange({
+    // Consistent value object structure regardless of option structure
+    const valueObj = {
       value: option.ProcessName?.process_name || option.process_name,
-      processId: option.ProcessName?.id || option.id
-    });
+      processId: option.ProcessName?.id || option.id,
+      id: option.id
+    }
+    
+    onChange(valueObj)
     
     if (onSelect) {
-      onSelect(option.ProcessName?.id || option.id);
+      onSelect(valueObj.processId)
     }
+  }
+
+  // Helper function to display the correct process name
+  const getDisplayName = () => {
+    if (!selectedOption) return placeholder
+    
+    return selectedOption.ProcessName?.process_name || 
+           selectedOption.process_name || 
+           placeholder
   }
 
   return (
     <div className="relative w-full z-20" ref={dropdownRef}>
       <p className="text-sm font-medium text-gray-700 mb-1">Process Fields</p>
       <div
-        className="p-2 my-2 h-10 border border-gray-300 rounded cursor-pointer flex justify-between items-center"
-        onClick={() => setIsOpen((prev) => !prev)}
+        className={`p-2 my-2 h-10 border border-gray-300 rounded flex justify-between items-center ${!readOnly ? 'cursor-pointer' : ''}`}
+        onClick={() => !readOnly && setIsOpen((prev) => !prev)}
       >
-        <span className="truncate">
-          {selectedOption 
-            ? selectedOption.ProcessName?.process_name || selectedOption.process_name 
-            : placeholder}
-        </span>
-        <BsChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <span className="truncate">{getDisplayName()}</span>
+        {!readOnly && <BsChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />}
       </div>
 
-      {isOpen && (
+      {isOpen && !readOnly && (
         <ul 
-          className={`absolute mt-1 w-full overflow-y-auto bg-white border border-gray-300 rounded shadow-lg z-10`}
+          className="absolute mt-1 w-full overflow-y-auto bg-white border border-gray-300 rounded shadow-lg z-10"
           style={{ maxHeight: dropdownHeight }}
         >
           {options.length > 0 ? (
             options.map((option, index) => (
               <li
                 key={index}
-                className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                className={`p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center ${
+                  (selectedOption?.id === option.id) ? 'bg-blue-50' : ''
+                }`}
                 onClick={() => handleOptionSelect(option)}
               >
                 <span className="truncate">

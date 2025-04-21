@@ -26,9 +26,8 @@ const accordionCardSummary = {
   ],
 }
 
-const salesOrder=[{id:2,name:"a"},{id:3,name:"a"}]
 
-const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders, setWorkOrders, setDrawer,skuVersionsMap,setSkuVersionsMap }) => {
+const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders, setWorkOrders, setDrawer,skuVersionsMap,setSkuVersionsMap , workOrderListSubmit}) => {
   const [selectedOption, setSelectedOption] = useState('inhouse')
   const [openIndices, setOpenIndices] = useState([])
   const [openAccordions, setOpenAccordions] = useState({})
@@ -45,6 +44,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
   const location = useLocation()
   const isWorkOrderList = location.pathname.includes('workorderlist')
   const [alerts,setAlerts] = useState([])
+  const [salesOrder,setSalesOrder]=useState([])
 
   
   
@@ -65,6 +65,21 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
   //   }
   //   )
   // },[])
+
+  useEffect(() => {
+    const fetchSalesOrders = async () => {
+      try {
+        const response = await apiMethods.getSalesOrderList();
+        // console.log(response,'looooooooooooooooooooooooooooooooooooooooooooooooooooooooooo')
+        setSalesOrder(response.data.data);
+      } catch (error) {
+        console.error("Error fetching sales order list:", error);
+      }
+    };
+  
+    fetchSalesOrders();
+  }, []);
+  
 
   useEffect(() => {
     const fetchSkuVersions = async () => {
@@ -114,14 +129,21 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
 
   // Handle form submission for all work orders
   const handleSubmit = (e) => {
+
     e.preventDefault() // Prevent default form submission
     
-    const filledWorkOrders = workOrders.filter(order =>
+ 
+
+
+    if(isWorkOrderList){
+      workOrderListSubmit(workOrders[0])
+    }else{
+          // console.log("Submitting work orders:", filledWorkOrders)
+      const filledWorkOrders = workOrders.filter(order =>
       order.sku_name || order.qty || order.description
     )
-
-    console.log("Submitting work orders:", filledWorkOrders)
-    setFormData?.([...filledWorkOrders,...workOrdersData])
+      setFormData?.([...workOrdersData])
+    }
   }
 
   // NEW FUNCTION: Handle existing work order update
@@ -145,8 +167,8 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     // Show confirmation to user
     alert("Work order saved successfully!")
     
-    console.log("Updated work order:", workOrderToUpdate)
-    console.log("Updated work orders data:", updatedWorkOrdersData)
+    // console.log("Updated work order:", workOrderToUpdate)
+    // console.log("Updated work orders data:", updatedWorkOrdersData)
   }
 
   // Handle start date change with validation
@@ -167,6 +189,39 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     const selectedWorkOrder = workOrders.find(order => order.id === id);
   
     if (selectedWorkOrder) {
+      // Destructure the fields you want to validate
+      const {
+        sku_name,
+        sku_version,
+        qty,
+        edd,
+        description,
+        planned_start_date,
+        acceptable_excess_units,
+        planned_end_date,
+      } = selectedWorkOrder;
+  
+      // Check if any of the fields are empty
+      if (
+        !sku_name ||
+        !sku_version ||
+        !qty ||
+        !edd ||
+        !description ||
+        !planned_start_date ||
+        !acceptable_excess_units ||
+        !planned_end_date
+      ) {
+        setAlerts([
+          {
+            severity: "error",
+            message: "Please complete all required fields before submitting the work order.",
+          },
+        ]);
+        
+                return;
+      }
+  
       // Add it to workOrdersData
       setworkOrdersData(prev => [...prev, selectedWorkOrder]);
   
@@ -175,9 +230,10 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     }
   };
   
+  
 
   useEffect(() => {
-    console.log(workOrdersData, "woooooooooooooooooooek")
+    // console.log(workOrdersData, "woooooooooooooooooooek")
   }, [workOrdersData])
 
   useEffect(() => {
@@ -217,7 +273,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     SetselectedSkuID(selectedId)
 
     const response = await getskuversions(selectedId)
-    console.log(response.data.data)
+    // console.log(response.data.data)
 
     setSelectedWorkOrderForVersions(orderId)
     setSkuVersionsMap(prev => ({
@@ -240,7 +296,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     SetselectedSkuID(selectedId)
 
     const response = await getskuversions(selectedId)
-    console.log(response.data.data)
+    // console.log(response.data.data)
 
 
     setSkuVersionsMap(prev => ({
@@ -252,15 +308,21 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     handleWorkOrderChange1(orderId, 'sku_name', selectedId)
   }
 
-  
   const handleToggle = () => {
     setSelectedOption((prev) => {
+      if (prev === 'inhouse') return 'outsource'
+      if (prev === 'outsource') return 'purchaseOrder'
       return 'inhouse'
     })
   }
 
-  const handleSalesOrderChange = (orderId, value) => {
-    handleWorkOrderChange(orderId, 'salesOrderId', value)
+  const handleSalesOrderChange = (orderId, value,clientID) => {
+
+
+    handleWorkOrderChange(orderId, 'sales_order_id', value)
+    handleWorkOrderChange(orderId, 'client_id', clientID)
+
+
   }
 
   // Function to add a new work order
@@ -296,8 +358,9 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     )
 
+    SetselectedSkuID(skuId)
     const response = await getskuversions(skuId)
-    console.log(response.data.data)
+    // console.log(response.data.data)
 
 
     setSkuVersionsMap(prev => ({
@@ -315,7 +378,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
   const handleDeleteVersion = async (versionId) => {
     try {
       const response = await apiMethods.deleteSkuVersion(versionId)
-      console.log("Version deleted successfully:", response)
+      // console.log("Version deleted successfully:", response)
       setAlerts([{ severity: "success", message: "Version deleted successfully" }]);
   
       // Show success alert (optional)
@@ -346,17 +409,21 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
   }
 
   return (
-    <div className=' w-full'>
+    <div className=' w-full mt-6'>
       {/* Header Section */}
       <CustomAlert alerts={alerts} handleClose={handleClose} />
 
       <div className="flex justify-between items-center mt-2 mb-4">
         <h2 className="text-lg font-semibold text-[20px]">Work Orders</h2>
-        <ActionButton
-          label={" + Create Workorders"}
-          onClick={addWorkOrder}
-          variant='add'
-        />
+
+        {!isWorkOrderList && (
+  <ActionButton
+    label={" + Create Workorders"}
+    onClick={addWorkOrder}
+    variant='add'
+  />
+)}
+
       </div>
 
       {/* Work Order Card */}
@@ -413,7 +480,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                       className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
                       title="Planned End Date"
                     >
-                      {item?.planned_start_date && new Date(item.planned_start_date).toLocaleDateString('en-US', {
+                      {item?.planned_end_date && new Date(item.planned_end_date).toLocaleDateString('en-US', {
                         year: '2-digit',
                         month: 'long',
                         day: '2-digit'
@@ -422,7 +489,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                   </div>
 
                   {/* Status Buttons */}
-                  <div className="flex gap-3">
+                  <div className="flex justify-end flex-1 gap-3 ">
                     {accordionCardSummary.data[0]?.buttons?.map((button) => (
                       <button
                         key={button?.id}
@@ -436,7 +503,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
-                    className={`w-[40px] h-[30px] text-[#8167e5] fill-[#8167e5] transition-transform duration-300 ${openCreateAccordion.includes(item.id) ? 'rotate-180' : ''}`}
+                    className={`w-[40px] h-[30px] text-[#8167e5] fill-[#8167e5] transition-transform duration-300 ${openCreateAccordion1.includes(item.id) ? 'rotate-180' : ''}`}
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
@@ -445,6 +512,26 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
               {openCreateAccordion1.includes(item.id) && (
   <div className="mt-2 p-3 border-t border-gray-300">
     <div className="w-full flex flex-col gap-12 py-4 px-24">
+    {/* <div className="flex flex-col md:flex-row gap-8"> */}
+    {/* <div className="flex-1 min-w-0">
+          <label className="block text-gray-800 font-medium mb-1">Sales Order</label>
+          <select
+            className=" h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
+            value={item.sales_order_id || ''}
+            onChange={(e) => handleSalesOrderChange(order.id, e.target.value)}
+          >
+            <option value="" disabled>
+              Select Sales Order
+            </option>
+            {salesOrder?.map((so) => (
+              <option key={so.id} value={so.id}>
+                {`SO-${so.id}`}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div></div>
+      </div> */}
       {/* First row */}
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-1 min-w-0">
@@ -502,7 +589,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
           <label className="block text-gray-800 font-medium mb-1">Quantity</label>
           <input
             type="number"
-            placeholder="100"
+            // placeholder="100"
             value={item.qty || ''}
             onChange={(e) => handleWorkOrderChange1(item.id, 'qty', e.target.value)}
             className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
@@ -513,7 +600,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
           <label className="block text-gray-800 font-medium mb-1">Acceptable Excess Units</label>
           <input
             type="number"
-            placeholder="Enter units"
+            // placeholder="Enter units"
             value={item.acceptable_excess_units || ''}
             onChange={(e) => handleWorkOrderChange1(item.id, 'acceptable_excess_units', e.target.value)}
             className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
@@ -559,7 +646,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
         <div className="flex-1 min-w-0">
           <label className="block text-gray-800 font-medium mb-1">Description</label>
           <textarea
-            placeholder="Description"
+            // placeholder="Description"
             value={item.description || ''}
             onChange={(e) => handleWorkOrderChange1(item.id, 'description', e.target.value)}
             className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm resize-none"
@@ -589,13 +676,14 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
       </div>
 
       {workOrders.length > 0 && (
-        <div className="max-h-[600px]  overflow-y-auto rounded-md pb-4 border border-gray-700">
+        <div className="max-h-[600px]  overflow-y-auto rounded-md pb-4 border  min-h-[400px] border-gray-700">
           {workOrders.map((order, index) => (
-            <div key={order.id} className="mt-4 rounded-md relative">
+            <div 
+            key={order.id}
+             className="mt-4 rounded-md border-b-2 relative">
               {/* Work Order Number */}
               <div
                 className="flex justify-between items-center px-3 w-full"
-                onClick={() => toggleCreateAccordion(order.id)}
               >
                 {/* Work Order Number */}
                 <p className="text-[#030303] text-[15px] font-lato font-bold leading-[26px]">
@@ -603,17 +691,17 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                 </p>
 
                 {/* Button & Icon Container */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center  gap-2">
                   {/* Button */}
                   {/* <ActionButton
                     label={"Download Work Order"}
                     variant='minimal'
                   /> */}
 
-                  {workOrders.length > 0 && (
+                  {workOrders.length > 1 && (
                     <TrashIcon
                       onClick={() => deleteWorkOrder(order.id)}
-                      className="text-[#ff2d55] w-7 h-7 cursor-pointer"
+                      className="text-[#ff2d55] w-6 h-6 cursor-pointer"
                     />
                   )}
                   {/* Icon */}
@@ -621,7 +709,9 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
-                    className={`w-[40px] h-[full] text-[#8167e5] fill-[#8167e5] transition-transform duration-300 ${openCreateAccordion.includes(order.id) ? 'rotate-180' : ''}`}
+                    className={`w-[35px] h-[full] text-[#8167e5] fill-[#8167e5] transition-transform duration-300 ${openCreateAccordion.includes(order.id) ? 'rotate-180' : ''}`}
+            onClick={() => toggleCreateAccordion(order.id)}
+
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
@@ -633,6 +723,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                 <div
                   className="relative w-[400px] h-[30px] bg-white border border-[#8167E5] rounded-[10px] shadow-md cursor-pointer flex items-center justify-between "
                   onClick={() => {
+                    handleToggle()
                     const newType = order.manufacturingType === 'inhouse' ? 'outsource' : 'inhouse'
                     handleWorkOrderChange(order.id, 'manufacturingType', newType)
                   }}
@@ -679,23 +770,29 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
   <div className="  px-24 border-t border-gray-300  ">
     {/* Add Sales Order Dropdown if on workorderlist page */}
     {isWorkOrderList && (
-      <div className="w-full mb-4">
+      <div className="w-full mt-4 mb-2">
         <div className="flex-1 min-w-0">
           <label className="block text-gray-800 font-medium mb-1">Sales Order</label>
           <select
-            className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-            value={order.salesOrderId || ''}
-            onChange={(e) => handleSalesOrderChange(order.id, e.target.value)}
-          >
-            <option value="" disabled>
-              Select Sales Order
-            </option>
-            {salesOrder.map((so) => (
-              <option key={so.id} value={so.id}>
-                {`SO-${so.id} - ${so.name}`}
-              </option>
-            ))}
-          </select>
+  className="w-1/2 h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
+  value={order.sales_order_id || ''}
+  onChange={(e) => {
+    const selectedSalesOrderId = e.target.value;
+    const selectedSalesOrder = salesOrder.find((so) => so.id.toString() === selectedSalesOrderId);
+    const clientId = selectedSalesOrder?.client_id;
+    handleSalesOrderChange(order.id, selectedSalesOrderId, clientId);
+  }}
+>
+  <option value="" disabled>
+    Select Sales Order
+  </option>
+  {salesOrder?.map((so) => (
+    <option key={so.id} value={so.id}>
+      {`SO-${so.id}`}
+    </option>
+  ))}
+</select>
+
         </div>
       </div>
     )}
@@ -731,6 +828,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
               disabled={!skuVersionsMap[order.id]}
             >
               <option value="" disabled>Select Version</option>
+              <option value="0" >Default Master</option>
               {skuVersionsMap[order.id] ? (
                 [skuVersionsMap[order.id]].flat().map((version) => (
                   <option key={version.id} value={version.id}>
@@ -759,7 +857,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
           <label className="block text-gray-800 font-medium mb-1">Quantity</label>
           <input
             type="number"
-            placeholder="100"
+            // placeholder="100"
             value={order.qty}
             onChange={(e) => handleWorkOrderChange(order.id, 'qty', e.target.value)}
             className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
@@ -770,7 +868,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
           <label className="block text-gray-800 font-medium mb-1">Acceptable Excess Units</label>
           <input
             type="number"
-            placeholder="Enter units"
+            // placeholder="Enter units"
             value={order.acceptable_excess_units}
             onChange={(e) => handleWorkOrderChange(order.id, 'acceptable_excess_units', e.target.value)}
             className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
@@ -816,7 +914,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
         <div className="flex-1 min-w-0">
           <label className="block text-gray-800 font-medium mb-1">Description</label>
           <textarea
-            placeholder="Description"
+            // placeholder="Description"
             value={order.description}
             onChange={(e) => handleWorkOrderChange(order.id, 'description', e.target.value)}
             className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm resize-none"
@@ -826,11 +924,14 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
 
       {/* Submit Button */}
       <div className="w-full flex justify-end mt-2">
+      {!isWorkOrderList && (
         <ActionButton
-          label={"Submit"}
+          label={"Add"}
           variant=''
           onClick={() => {handleSubmitWorkOrderForm(order.id)}}
         />
+)}
+
       </div>
     </div>
   </div>
@@ -856,7 +957,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                 IsEditVersion={IsEditVersion}
                 skuVersionID={selectedSkuVersionID}
                 visible={isFormVisible}
-                setVisible={() => setIsFormVisible(false)}
+                setVisible={setIsFormVisible}
               />
                 </PopUp>
               
@@ -884,16 +985,13 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
           />
 
           <ActionButton
-            label={"Submit Work Order"}
+            label={"Submit"}
             variant=''
             onClick={handleSubmit}
           />
         </div>
 
       </div> 
- 
-
-    
       <VersionsPopup
         visible={isVersionDrawerOpen}
         setVisible={() => setVersionDrawerOpen(false)}

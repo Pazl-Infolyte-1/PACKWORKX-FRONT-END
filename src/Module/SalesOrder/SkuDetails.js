@@ -43,9 +43,9 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
     }
   })
 
-  useEffect(()=>{
-    console.log(skuDetailsForm)
-  },[skuDetailsForm])
+  // useEffect(()=>{
+  //   // console.log(skuDetailsForm)
+  // },[skuDetailsForm])
 
   // Watch for changes to calculate totals
   const skusData = watch('skus');

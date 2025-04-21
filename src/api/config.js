@@ -650,12 +650,7 @@ export const apiMethods = {
   },
 
   deleteProcess : async (id) => {
-    try {
-      return await apiClient.delete(`/machines/process/${id}`)
-    } catch (error) {
-      console.error(error);
-      
-    }
+    return await apiClient.delete(`/machines/process/${id}`)
   },
   getAllFileds : async () => {
     try {
@@ -749,7 +744,6 @@ export const apiMethods = {
   },
 
   getSalesOrderList: async (params = {}) => {
-    console.log(params,'fasdfa')
     try {
       return await apiClient.get('/sale-order', {
         params: {
@@ -830,6 +824,13 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  getProcessDetails: async (id) => {
+    try {
+      return await apiClient.get(`/machines/process-values/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
   getSingleSkuData:async(id)=>{
     const response = await apiClient.get(`/sku-details/${id}`);
     return response
@@ -849,7 +850,33 @@ export const apiMethods = {
   updateSkuVersion:async(id,body)=>{
     const response = await apiClient.put(`/sku-details/sku-version/${id}`,body);
     return response
+  },
+  createWorkOrder:async(body)=>{
+    const response = await apiClient.post(`/work-order`,body);
+    return response
+  },
+  getWorkOrderById:async(id)=>{
+    const response = await apiClient.get(`/work-order/${id}`);
+    return response
+  },
+  workOrderStatusUpdate:async(id,body)=>{
+    const response = await apiClient.put(`/work-order/status/${id}`,body);
+    return response
+  },
+  editWorkOrder:async(id,body)=>{
+    const response = await apiClient.put(`/work-order/${id}`,body);
+    return response
+  },
+
+  deleteWorkOrder:async(id)=>{
+    const response = await apiClient.delete(`/work-order/${id}`);
+    return response
+  },
+  updateSalesOrderStatus:async(id,body)=>{
+    const response = await apiClient.patch(`/sale-order/${id}/status`,body);
+    return response
   }
+
 }
 
 

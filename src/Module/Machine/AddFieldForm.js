@@ -10,7 +10,8 @@ const AddFieldForm = ({
   isEdit,
   formData,
   selectedProcess,
-  setSelectedProcess
+  setSelectedProcess,
+  setShowProcessFields
 }) => {
   const [fieldLabel, setFieldLabel] = useState(formData?.label || '');
   const [isRequired, setIsRequired] = useState(formData?.required || true);
@@ -46,23 +47,19 @@ const AddFieldForm = ({
       setIsRequired(true);
       setFieldType('text');
       setIsFieldModaleOpen(false);  
-      
+      setShowProcessFields(false);
       setRefresh((prev) => !prev);
       // Refresh data or update local state as needed
     } catch (error) {
       console.error('Error saving field:', error);
-      alert('Failed to save field. Please try again.');
     }
   };
 
   return (
     <div className="my-2 w-full rounded-lg border border-gray-50 p-3 ">
-      <p className="font-bold">{isEdit ? 'Edit Field' : 'Add Field Form'}</p>
       <div className="grid grid-cols-2 gap-40">
         {/* Left Column */}
         <div>
-          {/* Module Dropdown */}
-          <label className="block mb-2 text-gray-600">Module</label>
           <div className="relative z-10">
             <ProcessDropDown
               options={processData}
@@ -72,6 +69,7 @@ const AddFieldForm = ({
               })}
               value={selectedProcess}
               showAddProcedure={false}
+              readOnly={true}
             />
           </div>
 

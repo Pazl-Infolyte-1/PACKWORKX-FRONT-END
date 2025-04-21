@@ -107,11 +107,11 @@ function SalesOrderView({ viewSalesOrder, SetviewSalesOrder, salesOrderData }) {
               <div className="grid grid-cols-2 gap-4 mb-4 md:mb-0">
                 <div className="bg-blue-50 p-3 rounded-lg">
                   <p className="text-sm text-gray-500">SGST</p>
-                  <p className="font-medium">{salesOrderData?.sgst}%</p>
+                  <p className="font-medium">{salesOrderData?.sgst}</p>
                 </div>
                 <div className="bg-blue-50 p-3 rounded-lg">
                   <p className="text-sm text-gray-500">CGST</p>
-                  <p className="font-medium">{salesOrderData?.cgst}%</p>
+                  <p className="font-medium">{salesOrderData?.cgst}</p>
                 </div>
                 <div className="bg-blue-50 p-3 rounded-lg">
                   <p className="text-sm text-gray-500">Subtotal</p>
@@ -138,16 +138,18 @@ function SalesOrderView({ viewSalesOrder, SetviewSalesOrder, salesOrderData }) {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Manufacture</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sku</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {salesOrderData?.workOrders.map((order, index) => (
                       <tr key={index}>
                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">#{order?.id}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">Work Order Details</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">Status</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{order.manufacture}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{order.progress}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{order.sku_name}</td>
                       </tr>
                     ))}
                   </tbody>

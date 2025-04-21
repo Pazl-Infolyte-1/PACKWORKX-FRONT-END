@@ -650,12 +650,7 @@ export const apiMethods = {
   },
 
   deleteProcess : async (id) => {
-    try {
-      return await apiClient.delete(`/machines/process/${id}`)
-    } catch (error) {
-      console.error(error);
-      
-    }
+    return await apiClient.delete(`/machines/process/${id}`)
   },
   getAllFileds : async () => {
     try {
@@ -829,6 +824,13 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  getProcessDetails: async (id) => {
+    try {
+      return await apiClient.get(`/machines/process-values/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
   getSingleSkuData:async(id)=>{
     const response = await apiClient.get(`/sku-details/${id}`);
     return response
@@ -869,8 +871,12 @@ export const apiMethods = {
   deleteWorkOrder:async(id)=>{
     const response = await apiClient.delete(`/work-order/${id}`);
     return response
+  },
+  updateSalesOrderStatus:async(id,body)=>{
+    const response = await apiClient.patch(`/sale-order/${id}/status`,body);
+    return response
   }
-  
+
 }
 
 

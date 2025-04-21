@@ -27,8 +27,12 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
     });
   };
 
-  const statusOptions = ['Pending', 'In-progress', 'Completed', 'Rejected'];
-
+  const statusOptions = [
+    { value: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
+    { value: 'In-progress', color: 'bg-blue-100 text-blue-800' },
+    { value: 'Completed', color: 'bg-green-100 text-green-800' },
+    { value: 'Rejected', color: 'bg-red-100 text-red-800' }
+  ];
  
   
 
@@ -107,17 +111,26 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
 
 
 <CTableDataCell className="py-3 px-4 text-gray-700">
-  <select
-    value={row.sales_status}
-    onChange={(e) => handleStatusChange(row.id, e.target.value)}
-    className="w-28 px-2 py-1 rounded border text-sm font-medium text-gray-700 bg-white"
-  >
-    {statusOptions.map((status) => (
-      <option key={status} value={status}>
-        {status}
-      </option>
-    ))}
-  </select>
+<select
+  value={row.sales_status}
+  onChange={(e) => handleStatusChange(row.id, e.target.value)}
+  className={`px-2.5 py-1 rounded-full text-sm font-medium outline-none border border-gray-300
+    ${row.sales_status === "Pending"
+      ? "bg-yellow-100 text-yellow-800"
+      : row.sales_status === "In-progress"
+      ? "bg-blue-100 text-blue-800"
+      : row.sales_status === "Completed"
+      ? "bg-green-100 text-green-800"
+      : row.sales_status === "Rejected"
+      ? "bg-red-100 text-red-800"
+      : "bg-gray-100 text-gray-800"
+    }`}
+>
+    <option className="text-gray-700 bg-white" value="Pending">Pending</option>
+    <option className="text-gray-700 bg-white" value="In-progress">In-progress</option>
+    <option className="text-gray-700 bg-white" value="Completed">Completed</option>
+    <option className="text-gray-700 bg-white" value="Rejected">Rejected</option>
+</select>
 </CTableDataCell>
 
                     <CTableDataCell>

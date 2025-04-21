@@ -3,35 +3,55 @@ import ProcessDropDown from '../Machine/ProcessDropDown'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
 
-function AddProcessField({ fieldData, setShowProcessFields, isEditing = false, editData = null }) {
+function AddProcessField({ fieldData, setShowProcessFields, isEditing, editData = null, selectedProcessValue, setSelectedProcessValue }) {
   const [selectedProcess, setSelectedProcess] = useState([])
   const [processInputs, setProcessInputs] = useState({})
   const [selectedProcessId, setSelectedProcessId] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  // const [selectedProcessValue, setSelectedProcessValue] = useState(null)
 
   useEffect(() => {
-    if (isEditing && editData?.process_value) {
-      setProcessInputs({...editData.process_value});
+    // Run this effect only once when component mounts with edit data
+    if (isEditing && editData && !selectedProcessId) {
+      setSelectedProcessId(editData.processId || editData.id)
+      
+      // Set process inputs from editData only once
+      if (editData.process_value) {
+        setProcessInputs({...editData.process_value})
+      }
+      
+      // Fetch fields for this process
+      fetchProcessFields(editData.processId || editData.id)
+    } else if (selectedProcessValue && selectedProcessValue.processId && !selectedProcessId) {
+      // Handle case when adding new field for a specific process
+      setSelectedProcessId(selectedProcessValue.processId)
+      fetchProcessFields(selectedProcessValue.processId)
     }
-  }, [isEditing, editData]);
+  }, [])
 
-  const fetchProcessFields = async (processId) => {
-    try {
-      const response = await apiMethods.getProcessFields(processId)
-      setSelectedProcess(response.data.data)
-    } catch (error) {
-      console.error('Error fetching process fields:', error)
-    }
+const fetchProcessFields = async (processId) => {
+  if (!processId) return
+  
+  try {
+    const response = await apiMethods.getProcessFields(processId)
+    setSelectedProcess(response.data.data)
+  } catch (error) {
+    console.error('Error fetching process fields:', error)
   }
-  console.log(selectedProcess, 'sp')
-  console.log(processInputs, 'piii')
+}
 
-  const handleProcessChange = (selected) => {
-    if (!isEditing) {
-      setProcessInputs({})
-    }
-    setSelectedProcessId(selected.processId)
+const handleProcessChange = (selected) => {
+  if (!selected) return
+  
+  setSelectedProcessValue(selected)
+  setSelectedProcessId(selected.processId)
+  
+  // Clear inputs and fetch fields for the selected process
+  if (!isEditing) {
+    setProcessInputs({})
+    fetchProcessFields(selected.processId)
   }
+}
 
   const handleInputChange = (e, param) => {
     setProcessInputs({
@@ -61,7 +81,6 @@ function AddProcessField({ fieldData, setShowProcessFields, isEditing = false, e
           process_value: { ...processInputs },
         }
         await apiMethods.updateProcessValues(payload)
-        setShowProcessFields(false)
       } else {
         // Create new process values
         const payload = {
@@ -82,25 +101,15 @@ function AddProcessField({ fieldData, setShowProcessFields, isEditing = false, e
     <>
       <div className="flex flex-col lg:flex-row p-3 rounded-lg w-full item-center gap-5 relative border-gray-50 border">
         <div className="w-full flex flex-col">
-          {!isEditing && (
-            <ProcessDropDown
-              options={fieldData}
-              onChange={handleProcessChange}
-              onSelect={handleSelect}
-              dropdownHeight={'[200px]'}
-              overflowX={'none'}
-              overflowY={'none'}
-              defaultValue={isEditing ? editData?.ProcessName?.process_name : null}
-            />
-          )}
-
-          {isEditing && (
-            <div className="mb-4">
-              <h3 className="font-medium">
-                Process: <span className="font-bold">{editData?.ProcessName?.process_name}</span>
-              </h3>
-            </div>
-          )}
+          <ProcessDropDown
+            options={fieldData}
+            onChange={handleProcessChange}
+            onSelect={handleSelect}
+            placeholder="Select Process"
+            value={selectedProcessValue}
+            readOnly={isEditing} // Make it read-only in edit mode
+            isEdit={isEditing}
+          />
 
           {selectedProcess?.length > 0 ? (
             <>
@@ -123,7 +132,6 @@ function AddProcessField({ fieldData, setShowProcessFields, isEditing = false, e
               </div>
             </>
           ) : isEditing && editData?.process_value ? (
-            // Fallback if no selectedProcess but we have process_value data in edit mode
             <>
               <h6 className="font-semibold col-span-2 mb-2">Values</h6>
               <div className="grid grid-cols-2 gap-4">

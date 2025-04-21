@@ -650,12 +650,7 @@ export const apiMethods = {
   },
 
   deleteProcess : async (id) => {
-    try {
-      return await apiClient.delete(`/machines/process/${id}`)
-    } catch (error) {
-      console.error(error);
-      
-    }
+    return await apiClient.delete(`/machines/process/${id}`)
   },
   getAllFileds : async () => {
     try {
@@ -825,6 +820,13 @@ export const apiMethods = {
   getProcessValues: async () => {
     try {
       return await apiClient.get('/machines/process-values')
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getProcessDetails: async (id) => {
+    try {
+      return await apiClient.get(`/machines/process-values/${id}`)
     } catch (error) {
       console.error(error)
     }

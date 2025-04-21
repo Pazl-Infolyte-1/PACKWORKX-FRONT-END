@@ -1,13 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import SkuDetails from './SkuDetails'
 import apiMethods from '../../api/config';
 import ActionButton from '../../components/New/ActionButton';
 
-const OrderForm = ({ formData, setFormData, skuDetailsForm, handleSkuFormUpdate, handleFormSubmit,setDrawer,totals,setTotals }) => {
+const OrderForm = forwardRef(({
+  formData,
+  setFormData,
+  skuDetailsForm,
+  handleSkuFormUpdate,
+  handleFormSubmit,
+  setDrawer,
+  totals,
+  setTotals
+}, ref) => {
+
+
+
+  
   const [clients, setClients] = useState([]); // State for client list
   const [skuFormData, setSkuFormData] = useState(null);
   const [localFormData, setLocalFormData] = useState(formData);
-
+  
+  useImperativeHandle(ref, () => ({
+    getCompleteFormData: {
+      ...localFormData,
+      skuDetails: skuFormData ? skuFormData.skuDetails : [],
+      totalQuantity: skuFormData ? skuFormData.totalQuantity : 0,
+      totalAmount: skuFormData ? skuFormData.totalAmount : 0,
+      totalSGST: skuFormData ? skuFormData.totalSGST : 0,
+      totalCGST: skuFormData ? skuFormData.totalCGST : 0,
+      totalWithGST: skuFormData ? skuFormData.totalWithGST : 0
+    }
+  }));
+  
   const [confirmationMethod, setConfirmationMethod] = useState(
     formData.confirmation || "Email"
   );
@@ -391,6 +416,6 @@ const handleToggleChange = () => {
       </div>
     </form>
   );
-};
+});
 
 export default OrderForm;

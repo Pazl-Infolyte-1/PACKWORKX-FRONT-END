@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import SkuDetails from './SkuDetails'
 import WorkOrders from './WorkOrders'
 import { CButton, CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
@@ -6,6 +6,7 @@ import OrderForm from './OrderForm'
 import Loader from '../../components/New/Loader'
 import apiMethods from '../../api/config'
 import CustomAlert from '../../components/New/CustomAlert'
+import ActionButton from '../../components/New/ActionButton'
 
 const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, setisEdit, fetchData }) => {
   const [activeTab, setActiveTab] = useState(currentTab)
@@ -23,6 +24,18 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
   });
 
   const [skuVersionsMap, setSkuVersionsMap] = useState({})
+
+  const childRef = useRef();
+
+  const handleParentSubmit = () => {
+    if (childRef.current) {
+      handleFormSubmit(childRef.current.getCompleteFormData)
+       // Call child method
+    }
+  };
+
+
+
 
 
   useEffect(()=>{
@@ -159,10 +172,21 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     setSalesDetailsForm((prevState) => {
       const updatedForm = completeFormData;
 
+
+      const workDetailsWithClient = workOrdersData.map(workOrder => ({
+        ...workOrder,
+        client_id: updatedForm.client_id
+      }));
+
+      const skuWithClientId = skuFormComplete?.skuDetails?.map(sku => ({
+        ...sku,
+        client_id: updatedForm.client_id
+      }));
+
       const payload = {
         salesDetails: {...updatedForm,...totals}, // Use updated data
-        skuDetails: skuFormComplete.skuDetails,
-        workDetails: workOrdersData,
+        skuDetails: skuWithClientId,
+        workDetails: workDetailsWithClient,
       };
 
       submitSalesOrder(payload);
@@ -233,9 +257,6 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       // Set loading state
       // setLoading(true);
       let response;
-
-
-      
 
       // Add client_id to each work order in formData
       const workDetailsWithClient = workOrdersData.map(workOrder => ({
@@ -333,121 +354,139 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
           {'Work Order'}
         </CNavLink>
       </CNavItem>
+
+{/* Next/Back Navigation */}
+<div className="ml-4 flex items-center space-x-2">
+  {activeTab === 'salesOrder' && (
+    <button
+      onClick={() => setActiveTab('skuDetails')}
+      className="
+        flex items-center space-x-2
+        text-purple-600 hover:text-purple-800
+        transition-all duration-300
+        group relative
+        overflow-hidden
+        px-2 py-1
+        rounded-lg
+      "
+    >
+      {/* Animated background (appears on hover) */}
+      <span className="absolute inset-0 bg-purple-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg -z-10"></span>
+      
+      {/* Text with slide effect */}
+      <span className="font-medium inline-block group-hover:translate-x-0.5 transition-transform duration-300">
+        Next
+      </span>
+      
+      {/* Animated arrow */}
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        className="
+          text-purple-600 group-hover:text-purple-800
+          transition-all duration-500
+          group-hover:translate-x-1
+        "
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <path 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          d="M9 5l7 7-7 7" 
+          className="opacity-100 group-hover:opacity-0 transition-opacity duration-300 absolute"
+        />
+        <path 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          d="M13 5l7 7-7 7m-7-7h14" 
+          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        />
+      </svg>
+      
+      {/* Pulse dot animation */}
+      <span className="absolute -right-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-purple-600 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping delay-100 duration-1000"></span>
+    </button>
+  )}
+
+  {activeTab === 'skuDetails' && (
+    <button
+      onClick={() => setActiveTab('salesOrder')}
+      className="
+        flex items-center space-x-2
+        text-purple-600 hover:text-purple-800
+        transition-all duration-300
+        group relative
+        overflow-hidden
+        px-2 py-1
+        rounded-lg
+      "
+    >
+      {/* Animated background (appears on hover) */}
+      <span className="absolute inset-0 bg-purple-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg -z-10"></span>
+      
+      {/* Animated arrow */}
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        className="
+          text-purple-600 group-hover:text-purple-800
+          transition-all duration-500
+          group-hover:-translate-x-1
+          rotate-180
+        "
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <path 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          d="M9 5l7 7-7 7" 
+          className="opacity-100 group-hover:opacity-0 transition-opacity duration-300 absolute"
+        />
+        <path 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          d="M13 5l7 7-7 7m-7-7h14" 
+          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        />
+      </svg>
+      
+      {/* Text with slide effect */}
+      <span className="font-medium inline-block group-hover:-translate-x-0.5 transition-transform duration-300">
+        Back
+      </span>
+      
+      {/* Pulse dot animation */}
+      <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-purple-600 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping delay-100 duration-1000"></span>
+    </button>
+  )}
+</div>
+
     </CNav>
     
+
     {activeTab === 'salesOrder' && (
-  <CButton 
-    color="primary" 
-    style={{
-      backgroundColor: '#8761e5',
-      border: 'none',
-      marginLeft: '16px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '6px',
-      paddingRight: '16px',
-      transition: 'all 0.3s ease',
-      boxShadow: '0 4px 6px rgba(135, 97, 229, 0.25)'
-    }}
-    className="next-button-hover"
-    onClick={() => {
-      setActiveTab('skuDetails')
-    }}
-  >
-    <span>Next</span>
-    <svg 
-      width="16" 
-      height="16" 
-      fill="none" 
-      viewBox="0 0 24 24" 
-      stroke="currentColor" 
-      xmlns="http://www.w3.org/2000/svg"
-      style={{
-        transition: 'transform 0.3s ease'
-      }}
-      className="arrow-icon"
-    >
-      <path 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        strokeWidth={2} 
-        d="M9 5l7 7-7 7" 
-      />
-    </svg>
-    <style jsx>{`
-      .next-button-hover:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 10px rgba(135, 97, 229, 0.35);
-      }
-      .next-button-hover:hover .arrow-icon {
-        transform: translateX(3px);
-      }
-      .next-button-hover:active {
-        transform: translateY(1px);
-      }
-    `}</style>
-  </CButton>
-)}
+
+<ActionButton
+ onClick={handleParentSubmit}
+ label={"Submit Sales Order"}
+ variant='submit'
+ />
+    )}
+
     
-{activeTab === 'skuDetails' && (
-  <CButton 
-    color="primary" 
-    style={{
-      backgroundColor: '#8761e5',
-      border: 'none',
-      marginLeft: '16px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '6px',
-      paddingRight: '16px',
-      transition: 'all 0.3s ease',
-      boxShadow: '0 4px 6px rgba(135, 97, 229, 0.25)'
-    }}
-    className="back-button-hover"
-    onClick={() => {
-      setActiveTab('salesOrder')
-    }}
-  >
-    <svg 
-      width="16" 
-      height="16" 
-      fill="none" 
-      viewBox="0 0 24 24" 
-      stroke="currentColor" 
-      xmlns="http://www.w3.org/2000/svg"
-      style={{
-        transition: 'transform 0.3s ease',
-        transform: 'rotate(180deg)'
-      }}
-      className="arrow-icon"
-    >
-      <path 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        strokeWidth={2} 
-        d="M9 5l7 7-7 7" 
-      />
-    </svg>
-    <span>Back</span>
-    <style jsx>{`
-      .back-button-hover:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 10px rgba(135, 97, 229, 0.35);
-      }
-      .back-button-hover:hover .arrow-icon {
-        transform: rotate(180deg) translateX(3px);
-      }
-      .back-button-hover:active {
-        transform: translateY(1px);
-      }
-    `}</style>
-  </CButton>
-)}
+
   </div>
 </CCol>
 
       {/* Content Sections */}
       <CustomAlert alerts={alerts} handleClose={handleClose} />
+
       <div className="bg-white">
         {activeTab === 'salesOrder' && (
             <OrderForm
@@ -459,6 +498,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
             handleFormSubmit={handleFormSubmit}
             totals={totals}
             setTotals={setTotals}
+            ref={childRef}
           />
         )}
         {activeTab === 'skuDetails' && (

@@ -27,7 +27,7 @@ const accordionCardSummary = {
 }
 
 
-const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders, setWorkOrders, setDrawer, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit }) => {
+const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrders, setWorkOrders, setDrawer, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit }) => {
   const [selectedOption, setSelectedOption] = useState('inhouse')
   const [openIndices, setOpenIndices] = useState([])
   const [openAccordions, setOpenAccordions] = useState({})

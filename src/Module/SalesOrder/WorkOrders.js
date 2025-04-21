@@ -755,11 +755,11 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
 
                 <div
                   className="relative w-[400px] h-[30px] bg-white border border-[#8167E5] rounded-[10px] shadow-md cursor-pointer flex items-center justify-between "
-                  onClick={() => {
+                  // onClick={() => {
                     // handleToggle(order.id, order.manufacture)                     
                     // const newType = order.manufacture === 'inhouse' ? 'outsource' : 'inhouse'
                     // handleWorkOrderChange(order.id, 'manufacture', newType)
-                  }}
+                  // }}
                 >
                   {/* Inhouse */}
                   {/* Inhouse */}
@@ -995,7 +995,9 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
                           className="w-full h-10 flex justify-center px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
                         />
                       </div>
+                      
                     </div>
+ 
 
                     {/* Submit Button */}
                     <div className="w-full flex justify-end mt-2">
@@ -1007,7 +1009,15 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
                         />
                       )}
 
+                      
+
                     </div>
+                    <SkuVersionAddEdit
+              handleDeleteVersion={handleDeleteVersion}
+              skuID={order.sku_name}
+              setSkuVersionsMap={setSkuVersionsMap}
+              orderId={order.id} // Pass the orderId of the work order being edited
+            /> 
                   </div>
                 </div>
               )}
@@ -1037,12 +1047,12 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
               </PopUp>
 
             )}
-            <SkuVersionAddEdit
-              handleDeleteVersion={handleDeleteVersion}
-              skuID={selectedSkuID}
-              setSkuVersionsMap={setSkuVersionsMap}
-              orderId={selectedWorkOrderForVersions} // Pass the orderId of the work order being edited
-            />
+              {/* <SkuVersionAddEdit
+                handleDeleteVersion={handleDeleteVersion}
+                skuID={selectedSkuID}
+                setSkuVersionsMap={setSkuVersionsMap}
+                orderId={selectedWorkOrderForVersions} // Pass the orderId of the work order being edited
+              /> */}
 
 
           </div>

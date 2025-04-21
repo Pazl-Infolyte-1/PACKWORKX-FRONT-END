@@ -38,7 +38,6 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     
           // Fetch SKU Versions
           const versionsResponse = await apiMethods.getSkuVersions(skuID);
-          console.log(versionsResponse,'joooookerjooookerjoooker')
           const skuversionID = `V${versionsResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`
           setSkuVersion(skuversionID);
         }

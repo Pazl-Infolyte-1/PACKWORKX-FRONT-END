@@ -1,7 +1,7 @@
 import Input from '../../components/New/Input'
 import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
-import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash } from '@coreui/icons'
+import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash, cilX } from '@coreui/icons'
 import { useEffect, useRef, useState } from 'react'
 
 function CustomItem({
@@ -19,17 +19,9 @@ function CustomItem({
   updateSkuValues,
   isopenval
 }) {
-  const [tagInput, setTagInput] = useState('')
-  const inputRef = useRef(null)
-  
-  const handleTagChange = (e) => {
-    const input = e.target.value
-    setTagInput(input)
+  const [tagFields, setTagFields] = useState([]);
+  const [editingLabelIndex, setEditingLabelIndex] = useState(null);
 
-    // Optional: only parse when input ends with space or some delimiter
-    const tags = input.match(/#\w+/g) || []
-    setAddNewSkuData((prev) => ({ ...prev, tags }))
-  }
 
   useEffect(() => {
     const ply = 2
@@ -42,11 +34,7 @@ function CustomItem({
     }
   }, [editTag]) // only run when editTag toggles
 
-  const handleRemoveTag = (tagToRemove) => {
-    const updatedTags = addNewSkuData.tags.filter((tag) => tag !== tagToRemove)
-    setAddNewSkuData((prev) => ({ ...prev, tags: updatedTags }))
-    setTagInput(updatedTags.join('')) // keep input in sync
-  }
+
 
   console.log("is open",isopenval)
   useEffect(() => {
@@ -66,6 +54,51 @@ function CustomItem({
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [isopenval]);
+  const handleAddField = () => {
+    const newIndex = tagFields.length + 1;
+    const newLabel = `label${newIndex}`;
+    setTagFields((prev) => [...prev, { label: newLabel, value: '' }]);
+    updateTags([...tagFields, { label: newLabel, value: '' }]);
+  };
+
+  const handleTagChange = (index, key, newValue) => {
+    const updatedFields = [...tagFields];
+    updatedFields[index][key] = newValue;
+    setTagFields(updatedFields);
+    updateTags(updatedFields);
+  };
+
+  const handleLabelEdit = (index, newLabel) => {
+    const updatedFields = [...tagFields];
+    updatedFields[index].label = newLabel;
+    setTagFields(updatedFields);
+    updateTags(updatedFields);
+  };
+
+  const handleRemoveField = (index) => {
+    const updatedFields = [...tagFields];
+    updatedFields.splice(index, 1);
+    setTagFields(updatedFields);
+    updateTags(updatedFields);
+  };
+
+  const updateTags = (fields) => {
+    const tagsObj = fields.reduce((acc, curr) => {
+      if (curr.label) acc[curr.label] = curr.value;
+      return acc;
+    }, {});
+    setAddNewSkuData((prev) => ({ ...prev, tags: tagsObj }));
+  };
+  useEffect(() => {
+    if (editTag && addNewSkuData.tags) {
+      const initialFields = Object.entries(addNewSkuData.tags).map(([label, value]) => ({
+        label,
+        value,
+      }));
+      setTagFields(initialFields);
+    }
+  }, [editTag, addNewSkuData.tags]);
+
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
@@ -162,43 +195,64 @@ function CustomItem({
           onChange={handleChange}
           //placeholder="Description"
         />
+ <div className="col-span-3">
+    <button
+      type="button"
+      onClick={handleAddField}
+      className="bg-purple-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-purple-400 transition-colors"
+    >
+      + Add Fields
+    </button>
+  </div>
 
-        <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">Tags</label>
-          <div
-            className=" border border-gray-300 rounded-md p-1 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors"
-            onClick={() => inputRef.current?.focus()}
+  {/* Render Dynamic Tag Fields */}
+  {tagFields.map((field, index) => (
+    <div
+      key={index}
+      className="relative flex flex-col gap-1"
+    >
+      {/* Label title */}
+      <label className="text-sm font-medium text-gray-700">
+        {editingLabelIndex === index ? (
+          <input
+            type="text"
+            value={field.label}
+            onChange={(e) => handleLabelEdit(index, e.target.value)}
+            onBlur={() => setEditingLabelIndex(null)}
+            className="border rounded px-2 py-1 text-sm w-28"
+            autoFocus
+          />
+        ) : (
+          <span
+            className="cursor-pointer break-words w-28 inline-block text-[16px] font-medium"
+            onClick={() => setEditingLabelIndex(index)}
           >
-            {/* Tags/Chips Row */}
-            <div className="flex flex-wrap gap-2 mb-2">
-              {addNewSkuData?.tags?.map((tag, index) => (
-                <div
-                  key={index}
-                  className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center"
-                >
-                  {tag}
-                  <button
-                    onClick={() => handleRemoveTag(tag)}
-                    className="ml-1 text-blue-500 hover:text-red-500"
-                    type="button"
-                  >
-                    &times;
-                  </button>
-                </div>
-              ))}
-            </div>
+            {field.label}
+          </span>
+        )}
+      </label>
 
-            {/* Input Row */}
-            <input
-              ref={inputRef}
-              value={tagInput}
-              onChange={handleTagChange}
-              className="w-full outline-none px-2 py-1 text-sm"
-              //placeholder="Type tags like #fun#vibe"
-            />
-          </div>
-        </div>
+      {/* Input field */}
+      <input
+        type="text"
+        placeholder="Value"
+        value={field.value}
+        onChange={(e) => handleTagChange(index, 'value', e.target.value)}
+        className="w-full p-2 mt-2 shadow-md border-l-2 rounded-md"
+      />
+
+      {/* Remove icon */}
+      <CIcon
+        onClick={() => handleRemoveField(index)}
+        icon={cilX}
+        size="sm"
+        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 cursor-pointer"
+      />
+    </div>
+  ))}
+
       </div>
+   
     </div>
   )
 }

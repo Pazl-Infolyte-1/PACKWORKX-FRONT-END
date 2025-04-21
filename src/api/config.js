@@ -874,7 +874,6 @@ export const apiMethods = {
     const response = await apiClient.patch(`/sale-order/${id}/status`,body);
     return response
   }
-
 }
 
 

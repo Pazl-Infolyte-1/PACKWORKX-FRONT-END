@@ -356,6 +356,8 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
     handleWorkOrderChange(orderId, 'sales_order_id', value)
     handleWorkOrderChange(orderId, 'client_id', clientID)
 
+    const response = apiMethods.getSaleOrderData(value)
+
 
   }
 
@@ -885,28 +887,31 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
                   <div className="w-full flex flex-col  mt-2 gap-12 py-4">
                     {/* First row */}
                     <div className="flex flex-col md:flex-row gap-8">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-800 font-medium mb-1">SKU*</label>
-                        <select
-                          className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-                          value={order.sku_name}
-                          onChange={(e) => handleSkuChange(e, order.id)}
-                        >
-                          <option value="" disabled>
-                            Select SKU
-                          </option>
-                          {skuList
-  .filter((skuItem) =>
-    skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
-  )
-  .map((skuItem) => (
-    <option key={skuItem.id} value={skuItem.id}>
-      {skuItem.sku_name}
-    </option>
-  ))}
+                    <div className="flex-1 min-w-0">
+  <label className="block text-gray-800 font-medium mb-1">SKU*</label>
 
-                        </select>
-                      </div>
+  {!isWorkOrderList && (
+    <select
+      className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
+      value={order.sku_name}
+      onChange={(e) => handleSkuChange(e, order.id)}
+    >
+      <option value="" disabled>
+        Select SKU
+      </option>
+      {skuList
+        .filter((skuItem) =>
+          skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
+        )
+        .map((skuItem) => (
+          <option key={skuItem.id} value={skuItem.id}>
+            {skuItem.sku_name}
+          </option>
+        ))}
+    </select>
+  )}
+</div>
+
 
                       <div className="flex-1 min-w-0">
                         <label className="block text-gray-800 font-medium mb-1">SKU Version</label>

@@ -9,6 +9,8 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
     const [salesOrderList, setSalesOrderList] = useState([]);
     const [skuList, setSkuList] = useState([]);
     const [skuVersion, setSkuVersion] = useState([])
+    const [fullSkuList, setFullSkuList] = useState([]);
+
 
 
 
@@ -54,48 +56,103 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
     //     fetchWorkOrder();
     //   }, [selectedWorkOrderId]);
 
+    // useEffect(() => {
+    //     // const fetchSalesOrders = async () => {
+    //     //     try {
+    //     //         const response = await apiMethods.getSalesOrderList();
+    //     //         setSalesOrderList(response.data.data);
+    //     //     } catch (error) {
+    //     //         console.error("Error fetching sales order list:", error);
+    //     //     }
+    //     // };
+
+
+    //    const  fetchSalesOrderData = async(id)=>{
+    //     apiMethods.getSaleOrderData(id)
+    //    }
+    
+
+
+    //     const fetchWorkOrder = async () => {
+    //         if (selectedWorkOrderId) {
+    //             try {
+    //                 const response = await apiMethods.getWorkOrderById(selectedWorkOrderId);
+    //                 const data = response.data;
+
+    //                 setWorkOrderData(data);
+    //                 setFormValues({ ...data });
+    //             } catch (error) {
+    //                 console.error('Error fetching work order:', error);
+    //             }
+    //         }
+    //     };
+
+
+
+    //     const fetchSkuList = async () => {
+    //         try {
+    //             const response = await apiMethods.getSkuListOptions();
+    //             setSkuList(response.data); // Make sure data is an array of SKUs
+    //         } catch (error) {
+    //             console.error("Failed to fetch SKU list:", error);
+    //         }
+    //     };
+
+
+
+    //     // Execute both functions
+    //     fetchSkuList()
+    //     // fetchSalesOrders();
+    //     fetchWorkOrder();
+    //     fetchSalesOrderData();
+    // }, [selectedWorkOrderId]); // Only selectedWorkOrderId is needed as dependency
+
+
     useEffect(() => {
-        const fetchSalesOrders = async () => {
-            try {
-                const response = await apiMethods.getSalesOrderList();
-                setSalesOrderList(response.data.data);
-            } catch (error) {
-                console.error("Error fetching sales order list:", error);
-            }
+        const fetchData = async () => {
+          try {
+            // 1. Fetch full SKU list
+            // const skuResponse = await apiMethods.getSkuListOptions();
+            const skuResponse = await apiMethods.getSkuList({
+                search: '',
+                client:'',
+                sku_type:'',
+                page:  1,
+                limit: 100,
+              })
+            const allSkus = skuResponse.data;
+            setFullSkuList(allSkus); // Store full list for filtering
+      
+            // 2. Fetch work order by ID
+            if (!selectedWorkOrderId) return;
+      
+            const workOrderResponse = await apiMethods.getWorkOrderById(selectedWorkOrderId);
+            const workOrder = workOrderResponse.data;
+            setWorkOrderData(workOrder);
+            setFormValues({ ...workOrder });
+      
+            // 3. Fetch Sales Order data using sales_order_id
+            const salesOrderResponse = await apiMethods.getSaleOrderData(workOrder.sales_order_id);
+            const salesSkuDetails = salesOrderResponse.data.SalesSkuDetails;
+      
+            // 4. Extract allowed SKU names from sales order
+            const allowedSkuNames = salesSkuDetails.map(item => item.sku);
+      
+            // 5. Filter full SKU list to only include allowed SKUs
+            const filteredSkus = allSkus.filter(skuItem =>
+              allowedSkuNames.includes(skuItem.sku_name)
+            );
+      
+            // 6. Set final filtered SKU list for dropdown
+            setSkuList(filteredSkus);
+      
+          } catch (error) {
+            console.error("Error fetching data:", error);
+          }
         };
-
-        const fetchWorkOrder = async () => {
-            if (selectedWorkOrderId) {
-                try {
-                    const response = await apiMethods.getWorkOrderById(selectedWorkOrderId);
-                    const data = response.data;
-
-                    setWorkOrderData(data);
-                    setFormValues({ ...data });
-                } catch (error) {
-                    console.error('Error fetching work order:', error);
-                }
-            }
-        };
-
-
-
-        const fetchSkuList = async () => {
-            try {
-                const response = await apiMethods.getSkuListOptions();
-                setSkuList(response.data); // Make sure data is an array of SKUs
-            } catch (error) {
-                console.error("Failed to fetch SKU list:", error);
-            }
-        };
-
-
-
-        // Execute both functions
-        fetchSkuList()
-        fetchSalesOrders();
-        fetchWorkOrder();
-    }, [selectedWorkOrderId]); // Only selectedWorkOrderId is needed as dependency
+      
+        fetchData();
+      }, [selectedWorkOrderId]);
 
     const formatDate = (dateStr) => {
         return dateStr ? new Date(dateStr).toISOString().split('T')[0] : ''

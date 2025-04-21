@@ -286,7 +286,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/SKU">
-                    {navLink('Sku Details', 'cilList')}
+                    {navLink('SKU Details', 'cilList')}
                   </CNavLink>
                 </CNavItem>
               )

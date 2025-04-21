@@ -359,7 +359,7 @@ useEffect(() => {
     onChange: () => {
       calculateRowValues(index);
       updateParentFormData();
-    }
+    },
   })}
   value={watch(`skus[${index}].sku`)}
   className="w-[320px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
@@ -367,12 +367,19 @@ useEffect(() => {
   <option value="" disabled>
     {isLoading ? "Loading SKUs..." : "Select SKU"}
   </option>
-  {skuList.map((skuItem, i) => (
-    <option key={i} value={skuItem.sku_name}>
-      {skuItem.sku_name}
-    </option>
-  ))}
+
+  {skuList.map((skuItem, i) => {
+    const selectedSkus = watch("skus").map((s, idx) => idx !== index && s.sku).filter(Boolean);
+    const isDisabled = selectedSkus.includes(skuItem.sku_name);
+
+    return (
+      <option key={i} value={skuItem.sku_name} disabled={isDisabled}>
+        {skuItem.sku_name}
+      </option>
+    );
+  })}
 </select>
+
                       </td>
 
                       {/* Quantity Input */}

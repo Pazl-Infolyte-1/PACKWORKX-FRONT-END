@@ -27,7 +27,7 @@ const accordionCardSummary = {
 }
 
 
-const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrders, setWorkOrders, setDrawer, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit }) => {
+const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrders, setWorkOrders, setDrawer, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit,skuDetailsForm }) => {
   const [selectedOption, setSelectedOption] = useState('inhouse')
   const [openIndices, setOpenIndices] = useState([])
   const [openAccordions, setOpenAccordions] = useState({})
@@ -46,6 +46,11 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
   const [alerts, setAlerts] = useState([])
   const [salesOrder, setSalesOrder] = useState([])
   const [versionAlerts,setVersionAlerts] = useState([])
+
+
+  useEffect(()=>{
+    console.log(skuDetailsForm,'skudetailsform in workorderform')
+  },[skuDetailsForm])
 
 
 

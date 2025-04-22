@@ -4,6 +4,8 @@ import ActionPopup from './ActionPopup'
 import { useEffect, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
+import Select from "react-select";
+import { Controller } from "react-hook-form";
 
 const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = true, totals, setTotals }) => {
   const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
@@ -347,7 +349,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
 
         <div className="w-[100%] max-h-[350px] mt-4 rounded-[10px] border border-[#c2c2c2]">
           <div className="overflow-x-auto p-2">
-            <div className=" min-h-[200px] max-h-[300px] overflow-y-auto custom-scrollbar rounded-lg">
+            <div className=" min-h-[300px] max-h-[300px] overflow-y-auto custom-scrollbar rounded-lg">
               <table className="min-w-full bg-white rounded-lg max-h-[1250px] border-collapse">
                 {/* Table Head */}
                 <thead className="sticky top-0 bg-white z-10 text-center">
@@ -368,39 +370,76 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                 </thead>
 
                 {/* Table Body */}
-                <tbody className="h-[60px]">
+                <tbody className="h-[40px]">
                   {fields.map((item, index) => (
                     <tr key={item.id} className="hover:bg-gray-50 border-t">
                       {/* SKU Dropdown */}
-<td className="px-4 py-2">
-  <select
-    {...register(`skus[${index}].sku`, {
-      onChange: () => {
-        calculateRowValues(index);
-        updateParentFormData();
-      },
-    })}
-    value={watch(`skus[${index}].sku`)}
-    className="w-[320px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
-  >
-    <option value="" disabled>
-      {isLoading ? "Loading SKUs..." : skuList.length === 0 ? "No SKU Available" : "Select SKU"}
-    </option>
+                      <td className="px-4 py-2">
+  <Controller
+    control={control}
+    name={`skus[${index}].sku`}
+    render={({ field }) => {
+      const selectedSkus = watch("skus")
+        .map((s, idx) => idx !== index && s.sku)
+        .filter(Boolean);
 
-    {skuList.length > 0 &&
-      skuList.map((skuItem, i) => {
-        const selectedSkus = watch("skus")
-          .map((s, idx) => idx !== index && s.sku)
-          .filter(Boolean);
-        const isDisabled = selectedSkus.includes(skuItem.sku_name);
+      // Options for dropdown
+      const options = skuList.map((skuItem) => ({
+        label: skuItem.sku_name,
+        value: skuItem.sku_name,
+        isDisabled: selectedSkus.includes(skuItem.sku_name),
+      }));
 
-        return (
-          <option key={i} value={skuItem.sku_name} disabled={isDisabled}>
-            {skuItem.sku_name}
-          </option>
-        );
-      })}
-  </select>
+      // Current value (so react-select shows selected option correctly)
+      const selectedValue = options.find(
+        (option) => option.value === field.value
+      );
+
+      return (
+        <div className="w-[280px] z-[80]">
+          <Select
+            {...field}
+            value={selectedValue || null}
+            options={options}
+            isLoading={isLoading}
+            isClearable
+            isSearchable
+            menuPortalTarget={document.body}
+            onChange={(selectedOption) => {
+              field.onChange(selectedOption?.value || "");
+              calculateRowValues(index);
+              updateParentFormData();
+            }}
+            styles={{
+              control: (base) => ({
+                ...base,
+                minHeight: 32,
+                height: 32,
+                fontSize: 14,
+              }),
+              valueContainer: (base) => ({
+                ...base,
+                padding: "0 6px",
+              }),
+              indicatorsContainer: (base) => ({
+                ...base,
+                height: 32,
+              }),
+              dropdownIndicator: (base) => ({
+                ...base,
+                padding: 4,
+              }),
+              clearIndicator: (base) => ({
+                ...base,
+                padding: 4,
+              }),
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+            }}
+          />
+        </div>
+      );
+    }}
+  />
 </td>
 
 
@@ -415,6 +454,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           })}
                           type="number"
                           placeholder="0"
+                          onWheel={(e) => e.target.blur()} // 💡 Prevent scroll value change
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                         />
                       </td>
@@ -430,6 +470,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           })}
                           type="number"
                           placeholder="0"
+                          onWheel={(e) => e.target.blur()} // 💡 Prevent scroll value change
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                         />
                       </td>
@@ -442,6 +483,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           })}
                           type="number"
                           placeholder="0"
+                          onWheel={(e) => e.target.blur()} // 💡 Prevent scroll value change
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                         />
                       </td>
@@ -452,6 +494,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           {...register(`skus[${index}].totalAmount`)}
                           type="number"
                           placeholder="0"
+                          
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                           readOnly
                         />
@@ -468,6 +511,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           })}
                           type="number"
                           placeholder="0"
+                          onWheel={(e) => e.target.blur()} // 💡 Prevent scroll value change
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                         />
                       </td>
@@ -494,6 +538,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           })}
                           type="number"
                           placeholder="0"
+                          onWheel={(e) => e.target.blur()} // 💡 Prevent scroll value change
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                         />
                       </td>
@@ -624,7 +669,6 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
 }
 
 export default SkuDetails
-
 
 
 

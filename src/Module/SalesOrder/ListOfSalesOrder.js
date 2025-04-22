@@ -52,6 +52,7 @@ function ListOfSalesOrder() {
 
   const fetchData = async () => {
     try {
+        setLoading(true)
       const response = await apiMethods.getSalesOrderList({
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,

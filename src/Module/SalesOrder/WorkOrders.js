@@ -49,9 +49,9 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
   const [salesOrderSkus, setSalesOrderSkus] = useState([])
 
 
-  useEffect(() => {
-    console.log(skuDetailsForm, 'skudetailsform in workorderform')
-  }, [skuDetailsForm])
+  // useEffect(() => {
+  //   console.log(skuDetailsForm, 'skudetailsform in workorderform')
+  // }, [skuDetailsForm])
 
 
 
@@ -808,7 +808,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                 </div>
               </div>
               <div className="p-2 rounded-lg flex flex-row gap-4">
-                <p className="px-3 text-[14px] font-['Lato']">How do you want to manufacture</p>
+                <p className="px-3 text-[14px]']">How do you want to manufacture</p>
 
                 <div
                   className="relative w-[400px] h-[30px] bg-white border border-[#8167E5] rounded-[10px] shadow-md cursor-pointer flex items-center justify-between "
@@ -821,7 +821,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                   {/* Inhouse */}
                   {/* Inhouse */}
                   <span
-                    className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${(order.manufacture || 'inhouse') === 'inhouse' ? 'text-white' : 'text-black'
+                    className={`text-[13px]  leading-[18px] text-center w-1/3 z-10 transition-all ${(order.manufacture || 'inhouse') === 'inhouse' ? 'text-white' : 'text-black'
                       }`}
                     onClick={() => { handleToggle(order.id, "inhouse") }}
                   >
@@ -830,7 +830,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
 
                   {/* Outsource */}
                   <span
-                    className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${(order.manufacture || 'inhouse') === 'outsource' ? 'text-white' : 'text-black'
+                    className={`text-[13px]  leading-[18px] text-center w-1/3 z-10 transition-all ${(order.manufacture || 'inhouse') === 'outsource' ? 'text-white' : 'text-black'
                       }`}
                     onClick={() => { handleToggle(order.id, "outsource") }}
 
@@ -840,7 +840,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
 
                   {/* Purchase Order */}
                   <span
-                    className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${(order.manufacture || 'inhouse') === 'purchaseOrder' ? 'text-white' : 'text-black'
+                    className={`text-[13px]  leading-[18px] text-center w-1/3 z-10 transition-all ${(order.manufacture || 'inhouse') === 'purchaseOrder' ? 'text-white' : 'text-black'
                       }`}
                     onClick={() => { handleToggle(order.id, "purchaseOrder") }}
 

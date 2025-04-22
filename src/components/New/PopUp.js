@@ -3,7 +3,7 @@ import { Modal, Box } from '@mui/material'
 import CIcon from '@coreui/icons-react'
 import { cilX } from '@coreui/icons' // CoreUI Close Icon
 
-const PopUp = ({ visible, setVisible, width, height, header, showCloseButton, children, overflowX="auto" , overflowY="auto"}) => {
+const ModifiedPopup = ({ visible, setVisible, width, height, header, showCloseButton, children, overflowX="auto" , overflowY="auto"}) => {
   return (
     <Modal open={visible} onClose={() => setVisible(false)}>
       <Box
@@ -43,4 +43,4 @@ const PopUp = ({ visible, setVisible, width, height, header, showCloseButton, ch
   )
 }
 
-export default PopUp
+export default ModifiedPopup

@@ -29,6 +29,8 @@ function SkuAddEdit({
   setBoardSizeError,
   editedSkudata,
   handleClose,
+  isSingleViewPopupForType,
+  setisSingleViewPopupForType
 }) {
   const { user } = useContext(AuthContext)
   const [isOpen, setIsOpen] = useState(false)
@@ -36,8 +38,11 @@ function SkuAddEdit({
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
   const [meterSquareData, setMeterSquareData] = useState(null)
   const [compositeSelect, setCompositeSelect] = useState(null)
-const [isSingleViewPopupForType,setisSingleViewPopupForType]=useState(false)
+//const [isSingleViewPopupForType,setisSingleViewPopupForType]=useState(false)
 const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
+const [isactivateRender,setIsActivateRender]=useState(false)
+
+const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
   const createInitialSkuData = () => ({
     sku_name: null,
     composite_type: null,
@@ -273,6 +278,7 @@ const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
         onMeterDataChange={handleMeterDataChange}
         editTag={editTag}
         toThreeDecimalFixed={toThreeDecimalFixed}
+        compositeSelect={compositeSelect}
       />
     ),
     //'Corrugated Sheet': (
@@ -291,6 +297,7 @@ const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
         setAddNewSkuData={setAddNewSkuData}
         updateSkuValues={updateSkuValues}
         editTag={editTag}
+        compositeSelect={compositeSelect}
       />
     ),
     'Die Cut box': (
@@ -308,6 +315,7 @@ const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
         setAddNewSkuData={setAddNewSkuData}
         updateSkuValues={updateSkuValues}
         editTag={editTag}
+        compositeSelect={compositeSelect}
       />
     ),
     Composite: (
@@ -327,6 +335,8 @@ const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
         editedSkudata={editedSkudata}
         editTag={editTag}
         setCompositeSelect={setCompositeSelect}
+        isSingleViewPopupForType={isSingleViewPopupForType}
+        isactivateRender={isactivateRender}
       />
     ),
     'Custom Item': (
@@ -345,6 +355,7 @@ const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
         updateSkuValues={updateSkuValues}
         editedSkudata={editedSkudata}
         editTag={editTag}
+        compositeSelect={compositeSelect}
       />
     ),
   }
@@ -370,13 +381,36 @@ const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
     if (compositeSelect) {
       console.log("got key value", compositeSelect);
       setisSingleViewPopupForType(true);
-      setIsCompositePopupCreate(true)
-    }else{
-      setIsCompositePopupCreate(false)
+      //setIsCompositePopupCreate(true)
+    }else {
+      //setIsCompositePopupCreate(false)
+      setisSingleViewPopupForType(false);
+      setCompositeSelect(null)
     }
   }, [compositeSelect]);
   
-  console.log("composite create",isCompositePopupCreate)
+  console.log("composite create",compositeSelect)
+  console.log("single view",isSingleViewPopupForType)
+  useEffect(() => {
+    if (!isSingleViewPopupForType) {
+      setAddNewSkuData(createInitialSkuData());
+      setCompositeSelect(null);
+    }
+  }, [isSingleViewPopupForType]);
+  
+  useEffect(() => {
+    if (prevIsSingleViewRef.current && !isSingleViewPopupForType) {
+      // transitioned from true to false
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        sku_type: "Composite",
+      }));
+    }
+    setIsActivateRender(true)
+    // Update the ref after checking
+    prevIsSingleViewRef.current = isSingleViewPopupForType;
+  }, [isSingleViewPopupForType]);
+  
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
@@ -463,7 +497,7 @@ const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
-  {item.layer.toLowerCase().includes('corrugated') ? (
+  {item?.layer?.toLowerCase().includes('corrugated') ? (
     <div className="relative w-full flex items-center">
       <select
         className="p-1 border rounded w-full pr-8 appearance-none"
@@ -675,7 +709,10 @@ const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
 
 <div className="flex justify-end space-x-4 mt-6">
         <button className="p-2 border border-gray-300 rounded w-24" onClick={()=>{setisSingleViewPopupForType(false)
-             setIsCompositePopupCreate(false)
+            // setIsCompositePopupCreate(false)
+             setCompositeSelect(null)
+             setAddNewSkuData(createInitialSkuData());
+
         }}>
           Cancel
         </button>

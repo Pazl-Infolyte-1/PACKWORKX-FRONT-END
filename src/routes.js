@@ -24,6 +24,10 @@ const Reports = React.lazy(() => import('./Module/Process/Reports.js'))
 const OfflineRequest = React.lazy(() => import('./Module/OfflineRequest/OfflineRequest.js'))
 const AdminFaq = React.lazy(() => import('./Module/AdminFaq/AdminFaq.js'))
 const Process = React.lazy(() => import('./Module/Process/Reports.js'))
+const Designation = React.lazy(() => import('./Module/Designation/Designation.js'))
+const Department = React.lazy(() => import('./Module/Department/Department.js'))
+
+
 
 
 
@@ -53,6 +57,9 @@ const routes = [
   { path: '/reports', name: 'Reports', element: Reports, key: '' },
   { path: '/offlineRequest', name: 'Offline Request', element: OfflineRequest, key: '' },
   { path: '/adminFaq', name: 'Admin Faq', element: AdminFaq, key: '' },
+  { path: '/designation', name: 'Designation', element: Designation, key: '' },
+  { path: '/department', name: 'Department', element: Department, key: '' },
+
   { path: '/users', name: 'user', element: DropDownController, key: 6000 },
   {
     path: '/settings',

@@ -21,7 +21,8 @@ function DieCutBox({
   skuType,
   setAddNewSkuData,
   updateSkuValues,
-  isopenval
+  isopenval,
+  compositeSelect
 }) {
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
   const [selectedDiePopup, setSelectedDiePopup] = useState(null)
@@ -56,11 +57,23 @@ function DieCutBox({
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [isopenval]);
+
+  
+useEffect(() => {
+  if (compositeSelect) {
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      sku_type: compositeSelect,
+    }));
+  }
+}, [compositeSelect]);
+
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
       <div className="grid grid-cols-3 gap-6 p-6 border border-gray-200 rounded-lg">
-        <div>
+      <div> 
+          {/*<div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Type</label>
           <div className="relative w-full" ref={dropdownRef}>
             <div
@@ -87,7 +100,48 @@ function DieCutBox({
                 ))}
               </ul>
             )}
+              
+          </div>*/}
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Type</label>
+          <div className="relative w-full" ref={dropdownRef}>
+            <div
+              className="p-2 h-10 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
+              onClick={() => setIsOpen((prev) => !prev)}
+            >
+              <span className="text-gray-800">{addNewSkuData?.sku_type || 'Select Type'}</span>
+              <BsChevronDown className={`transition-transform text-gray-600 ${isOpen ? 'rotate-180' : ''}`} />
+            </div>
+
+            {isOpen && (
+              <ul
+                className="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-gray-300 rounded-md z-20 shadow-lg"
+              >
+          {skuType.map((option) => (
+  <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-50">
+    <li
+      className={`p-2 w-full cursor-pointer
+        ${
+          compositeSelect || editTag
+            ? 'text-gray-400 cursor-not-allowed'
+            : 'text-gray-800'
+        }
+        ${compositeSelect === option.sku_type ? 'bg-gray-200 font-semibold' : ''}`
+      }
+      onClick={
+        !compositeSelect && !editTag ? () => handleSelect(option) : undefined
+      }
+    >
+      {option.sku_type}
+    </li>
+  </div>
+))}
+
+
+
+              </ul>
+            )}
           </div>
+        
         </div>
         <div>
             <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Name</label>
@@ -175,6 +229,7 @@ function DieCutBox({
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               //placeholder="Enter Die Name"
+              readOnly={true}
             />
             <button
               type="button"

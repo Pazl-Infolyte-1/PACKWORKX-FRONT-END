@@ -48,6 +48,8 @@ function ListOfSalesOrder() {
   };
 
 
+  
+
   const fetchData = async () => {
     try {
       const response = await apiMethods.getSalesOrderList({
@@ -249,7 +251,7 @@ function ListOfSalesOrder() {
           onClose={() => { setIsConfirmationModaleOpen(false) }}
           onConfirm={OnDeleteConfirmation}
         />
-        <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} />
+        {/* <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} /> */}
       </div>
       <div>
         <VersionsPopup

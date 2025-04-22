@@ -80,8 +80,8 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
                   </div>
                 ) :
             <CTableBody>
-              {data.length > 0 ? (
-                data.map((row, index) => (
+              {data?.length > 0 ? (
+                data?.map((row, index) => (
                   <CTableRow key={index} className="border-b">
                     <CTableDataCell
                       onClick={() =>handleView(row.id)  

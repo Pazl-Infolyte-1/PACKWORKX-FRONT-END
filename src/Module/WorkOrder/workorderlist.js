@@ -48,24 +48,24 @@ const WorkOrders = () => {
   }
   // Fetch Data
   useEffect(() => {
-    const  fetchData = async () => {
-      try {
-        const response = await apiMethods.getWorkOrders({
-          manufacture: '',
-          sku_name: searchQuery,
-          page: pagination?.page,
-          limit: limit,
-        })
+    // const  fetchData = async () => {
+    //   try {
+    //     const response = await apiMethods.getWorkOrders({
+    //       manufacture: '',
+    //       sku_name: searchQuery,
+    //       page: pagination?.page,
+    //       limit: limit,
+    //     })
   
-        setData(response.data?.workOrders || [])
-        setPagination(prev => ({
-          ...prev,
-          totalPages: response.data.pagination.totalPages
-        }))
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
+    //     setData(response.data?.workOrders || [])
+    //     setPagination(prev => ({
+    //       ...prev,
+    //       totalPages: response.data.pagination.totalPages
+    //     }))
+    //   } catch (error) {
+    //     console.error('Error fetching data:', error)
+    //   }
+    // }
     fetchData()
   }, [pagination?.page, limit, searchQuery])
 

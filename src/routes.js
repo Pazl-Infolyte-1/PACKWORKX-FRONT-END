@@ -20,10 +20,10 @@ const DropDownController = React.lazy(() => import('./Module/User/DropDownContro
 const Attendance = React.lazy(() => import('./Module/Attendance/Attendance.js'))
 const SalesReturn = React.lazy(() => import('./Module/SalesReturn/SalesReturn.js'))
 const PurchaseReturn = React.lazy(() => import('./Module/PurchaseReturn/PurchaseReturn.js'))
-const Reports = React.lazy(() => import('./Module/Process/Reports.js'))
+const Reports = React.lazy(() => import('./Module/Reports/Report.js'))
 const OfflineRequest = React.lazy(() => import('./Module/OfflineRequest/OfflineRequest.js'))
 const AdminFaq = React.lazy(() => import('./Module/AdminFaq/AdminFaq.js'))
-const Process = React.lazy(() => import('./Module/Process/Reports.js'))
+const Process = React.lazy(() => import('./Module/Process/Process.js'))
 const Designation = React.lazy(() => import('./Module/Designation/Designation.js'))
 const Department = React.lazy(() => import('./Module/Department/Department.js'))
 

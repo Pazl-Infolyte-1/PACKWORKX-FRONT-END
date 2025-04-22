@@ -6,7 +6,7 @@ import { cilPencil } from '@coreui/icons'
 const ProcessDropDown = ({
   options,
   onChange,
-  onSelect, 
+  onSelect,
   placeholder = 'Select Process',
   dropdownHeight = '100px',
   value,
@@ -16,28 +16,22 @@ const ProcessDropDown = ({
   const [isOpen, setIsOpen] = useState(false)
   const [selectedOption, setSelectedOption] = useState(null)
   const dropdownRef = useRef(null)
-  
-  // Improved useEffect to handle various option structures
+
   useEffect(() => {
     if (value && options.length > 0) {
-      // Try to find the option by matching ID first (more reliable)
-      let selected = options.find(opt => 
-        (opt.id === value.processId) || 
-        (opt.ProcessName?.id === value.processId)
+      let selected = options.find(
+        (opt) => opt.id === value.processId || opt.ProcessName?.id === value.processId,
       )
 
-      // If not found by ID, try matching by process name
       if (!selected) {
-        selected = options.find(opt => 
-          (opt.process_name === value.value) || 
-          (opt.ProcessName?.process_name === value.value)
+        selected = options.find(
+          (opt) =>
+            opt.process_name === value.value || opt.ProcessName?.process_name === value.value,
         )
       }
-      
+
       if (selected) {
         setSelectedOption(selected)
-      } else {
-        console.log("No matching option found for value:", value)
       }
     }
   }, [value, options])
@@ -56,28 +50,30 @@ const ProcessDropDown = ({
     if (readOnly) return
     setSelectedOption(option)
     setIsOpen(false)
-    
+
     // Consistent value object structure regardless of option structure
     const valueObj = {
       value: option.ProcessName?.process_name || option.process_name,
       processId: option.ProcessName?.id || option.id,
-      id: option.id
+      id: option.id,
     }
-    
+
     onChange(valueObj)
-    
+
     if (onSelect) {
       onSelect(valueObj.processId)
     }
   }
 
-  // Helper function to display the correct process name
   const getDisplayName = () => {
-    if (!selectedOption) return placeholder
-    
-    return selectedOption.ProcessName?.process_name || 
-           selectedOption.process_name || 
-           placeholder
+    if (!selectedOption) {
+      if (value && value.value) {
+        return value.value
+      }
+      return placeholder
+    }
+
+    return selectedOption.ProcessName?.process_name || selectedOption.process_name || placeholder
   }
 
   return (
@@ -88,11 +84,13 @@ const ProcessDropDown = ({
         onClick={() => !readOnly && setIsOpen((prev) => !prev)}
       >
         <span className="truncate">{getDisplayName()}</span>
-        {!readOnly && <BsChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />}
+        {!readOnly && (
+          <BsChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        )}
       </div>
 
       {isOpen && !readOnly && (
-        <ul 
+        <ul
           className="absolute mt-1 w-full overflow-y-auto bg-white border border-gray-300 rounded shadow-lg z-10"
           style={{ maxHeight: dropdownHeight }}
         >
@@ -101,7 +99,7 @@ const ProcessDropDown = ({
               <li
                 key={index}
                 className={`p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center ${
-                  (selectedOption?.id === option.id) ? 'bg-blue-50' : ''
+                  selectedOption?.id === option.id ? 'bg-blue-50' : ''
                 }`}
                 onClick={() => handleOptionSelect(option)}
               >

@@ -48,6 +48,7 @@ function SkuList() {
   const searchBarRef = useRef(null)
   const [boardSizeError, setBoardSizeError] = useState('')
   const navigate = useNavigate();
+  const [isSingleViewPopupForType, setisSingleViewPopupForType] = useState(false);
 
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
@@ -166,9 +167,14 @@ function SkuList() {
         }
         const response = await apiMethods.addSku(addNewSkuData)
         if (response?.status === 201) {
-          setDrawerOpen(false)
+          //setDrawerOpen(false)
           setRefresh((prev) => !prev)
           setAlerts([{ severity: 'success', message: 'Sku Added successfully!' }])
+          if(isSingleViewPopupForType){
+            setisSingleViewPopupForType(false)
+          }else{
+            setDrawerOpen(false)
+          }
         } else {
           setAlerts([
             { severity: 'error', message: response.data.message || 'Something went wrong' },
@@ -520,6 +526,8 @@ console.log("dashboard",dashboard)
             setClientDisable(false)
             setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
           }}
+          setisSingleViewPopupForType={setisSingleViewPopupForType}
+          isSingleViewPopupForType={isSingleViewPopupForType}
         />
       </Drawer>
     </div>

@@ -17,7 +17,8 @@ function CustomItem({
   skuType,
   setAddNewSkuData,
   updateSkuValues,
-  isopenval
+  isopenval,
+  compositeSelect
 }) {
   const [tagFields, setTagFields] = useState([]);
   const [editingLabelIndex, setEditingLabelIndex] = useState(null);
@@ -99,12 +100,21 @@ function CustomItem({
     }
   }, [editTag, addNewSkuData.tags]);
 
+  useEffect(() => {
+    if (compositeSelect) {
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        sku_type: compositeSelect,
+      }));
+    }
+  }, [compositeSelect]);
+  
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
       <div className="grid grid-cols-3 gap-6 p-6 border border-gray-200 rounded-lg">
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Type</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Type</label>
           <div className="relative w-full" ref={dropdownRef}>
             <div
               className="p-2 h-10 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
@@ -118,16 +128,28 @@ function CustomItem({
               <ul
                 className="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-gray-300 rounded-md z-20 shadow-lg"
               >
-                {skuType.map((option) => (
-                  <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-50">
-                    <li
-                      className={`p-2 cursor-pointer w-full ${editTag ? 'text-gray-400 cursor-not-allowed' : 'text-gray-800'}`}
-                      onClick={!editTag ? () => handleSelect(option) : undefined}
-                    >
-                      {option.sku_type}
-                    </li>
-                  </div>
-                ))}
+          {skuType.map((option) => (
+  <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-50">
+    <li
+      className={`p-2 w-full cursor-pointer
+        ${
+          compositeSelect || editTag
+            ? 'text-gray-400 cursor-not-allowed'
+            : 'text-gray-800'
+        }
+        ${compositeSelect === option.sku_type ? 'bg-gray-200 font-semibold' : ''}`
+      }
+      onClick={
+        !compositeSelect && !editTag ? () => handleSelect(option) : undefined
+      }
+    >
+      {option.sku_type}
+    </li>
+  </div>
+))}
+
+
+
               </ul>
             )}
           </div>

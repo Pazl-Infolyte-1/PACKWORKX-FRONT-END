@@ -83,7 +83,7 @@ function SkuList() {
     estimate_composite_item: null,
     description: null,
     default_sku_details: null,
-    tags: [],
+    tags: {},
     sku_values: [
       {
         layer: null,
@@ -222,7 +222,7 @@ function SkuList() {
       estimate_composite_item: selectedSku.estimate_composite_item || null,
       description: selectedSku.description || null,
       default_sku_details: selectedSku.default_sku_details || null,
-      tags: selectedSku.tags || [],
+      tags: selectedSku.tags || {},
       sku_values: selectedSku.sku_values || [
         {
           layer: null,
@@ -367,7 +367,7 @@ console.log("dashboard",dashboard)
           {
             name: 'Custom Item',
             count: dashboard?.customitem || 0,
-            color: '#af76f5',
+            color: '#e2cbf7',
             bgColor: '#10b3aa',
             icon: <AiFillCodeSandboxCircle  className="text-white text-2xl" />,
           },
@@ -381,7 +381,7 @@ console.log("dashboard",dashboard)
         ].map((item, index) => (
           <div
             key={index}
-            className={`w-full sm:w-[240px] flex items-center justify-between  font-bold rounded-lg shadow-md text-white border p-2`}
+            className={`w-full sm:w-[235px] flex items-center justify-between  font-bold rounded-lg shadow-md text-white border p-2`}
             style={{ backgroundColor: item.color }}
           >
             <div className=" ">

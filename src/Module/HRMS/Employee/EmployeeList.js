@@ -369,7 +369,7 @@ let response
           <div className="flex gap-8 ml-5">
             <div className="flex gap-1.5 items-center">
               <TbSmartHome className="text-teal-500" />
-              <span>All Datas</span>
+              <span>Total Employees</span>
               <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
                 {EmployeeResponse?.totalRecords}
               </span>

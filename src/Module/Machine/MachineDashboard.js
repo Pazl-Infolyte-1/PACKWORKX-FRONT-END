@@ -14,7 +14,7 @@ import PopUp from '../../components/New/PopUp'
 import ProcessDropDown from './ProcessDropDown'
 import ViewMachineData from './ViewMachineData'
 import AddButton from '../../components/New/AddButton'
-import AddFieldForm from './AddFieldForm'
+
 import ActionButton from '../../components/New/ActionButton'
 import SearchBar from '../../components/New/SearchBar'
 

@@ -27,7 +27,7 @@ const accordionCardSummary = {
 }
 
 
-const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrders, setWorkOrders, setDrawer, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit,skuDetailsForm }) => {
+const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders, setWorkOrders, setDrawer, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit, skuDetailsForm }) => {
   const [selectedOption, setSelectedOption] = useState('inhouse')
   const [openIndices, setOpenIndices] = useState([])
   const [openAccordions, setOpenAccordions] = useState({})
@@ -45,12 +45,13 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
   const isWorkOrderList = location.pathname.includes('workorderlist')
   const [alerts, setAlerts] = useState([])
   const [salesOrder, setSalesOrder] = useState([])
-  const [versionAlerts,setVersionAlerts] = useState([])
+  const [versionAlerts, setVersionAlerts] = useState([])
+  const [salesOrderSkus, setSalesOrderSkus] = useState([])
 
 
-  useEffect(()=>{
-    console.log(skuDetailsForm,'skudetailsform in workorderform')
-  },[skuDetailsForm])
+  useEffect(() => {
+    console.log(skuDetailsForm, 'skudetailsform in workorderform')
+  }, [skuDetailsForm])
 
 
 
@@ -238,7 +239,7 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
 
 
 
- 
+
 
   useEffect(() => {
     const fetchSkuList = async () => {
@@ -246,9 +247,9 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
         // const response = await apiMethods.getSkuListOptions()
         const response = await apiMethods.getSkuList({
           search: '',
-          client:'',
-          sku_type:'',
-          page:  1,
+          client: '',
+          sku_type: '',
+          page: 1,
           limit: 100,
         })
         setSkuList(response.data) // Assuming data is inside 'data'
@@ -264,7 +265,7 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
 
   const getskuversions = async (selectedId) => {
     try {
-      if(selectedId){
+      if (selectedId) {
         const response = await apiMethods.getSkuVersions(selectedId)
         return response
       }
@@ -303,7 +304,7 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
     handleWorkOrderChange(orderId, 'sku_name', selectedId)
 
 
-    if(isWorkOrderList){
+    if (isWorkOrderList) {
       handleWorkOrderChange(orderId, 'sku_id', selectedId)
     }
 
@@ -312,7 +313,7 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
   const handleSkuChange1 = async (e, orderId) => {
     const selectedId = parseInt(e.target.value); // since option values are string
     const selectedSku = skuList.find((sku) => sku.id === selectedId);
-    
+
 
     SetselectedSkuID(selectedId)
 
@@ -326,7 +327,7 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
     }))
     //
     handleWorkOrderChange1(orderId, 'sku_version', '')
-    if(isWorkOrderList){
+    if (isWorkOrderList) {
       handleWorkOrderChange1(orderId, 'sku_id', selectedId)
     }
     handleWorkOrderChange1(orderId, 'sku_name', selectedId)
@@ -347,19 +348,38 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
     // else next = 'inhouse';
     handleWorkOrderChange(orderId, 'manufacture', currentValue);
   };
-  
-  
-
-  const handleSalesOrderChange = (orderId, value, clientID) => {
 
 
-    handleWorkOrderChange(orderId, 'sales_order_id', value)
-    handleWorkOrderChange(orderId, 'client_id', clientID)
 
-    const response = apiMethods.getSaleOrderData(value)
+  // const handleSalesOrderChange = (orderId, value, clientID) => {
 
 
-  }
+  //   handleWorkOrderChange(orderId, 'sales_order_id', value)
+  //   handleWorkOrderChange(orderId, 'client_id', clientID)
+
+  //   const response = apiMethods.getSaleOrderData(value)
+
+
+  // }
+
+  const handleSalesOrderChange = async (orderId, value, clientID) => {
+    handleWorkOrderChange(orderId, 'sales_order_id', value);
+    handleWorkOrderChange(orderId, 'client_id', clientID);
+
+    try {
+      const response = await apiMethods.getSaleOrderData(value);
+      const skuDetails = response.data?.SalesSkuDetails || [];
+
+      // Attach to order row (maybe in a workOrders state?)
+      // handleWorkOrderChange(orderId, 'sales_order_skus', skuDetails)
+      //;
+
+      setSalesOrderSkus(skuDetails)
+    } catch (err) {
+      console.error('Error fetching Sales Order SKU data:', err);
+    }
+  };
+
 
   // Function to add a new work order
   const addWorkOrder = () => {
@@ -441,7 +461,7 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
     setAlerts([])
   }
 
- const handleCloseFromVersion = ()=>{
+  const handleCloseFromVersion = () => {
     setVersionAlerts([])
   }
 
@@ -580,19 +600,35 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
                       <div className="flex-1 min-w-0">
                         <label className="block text-gray-800 font-medium mb-1">SKU*</label>
                         <select
-                          className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-                          value={item.sku_name}
-                          onChange={(e) => handleSkuChange1(e, item.id)}
-                        >
-                          <option value="" disabled>
-                            Select SKU
-                          </option>
-                          {skuList.map((sku) => (
-                            <option key={sku.id} value={sku.id}>
-                              {sku.sku_name}
+      className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
+      value={item.sku_name}
+      onChange={(e) => handleSkuChange1(e, item.id)}
+    >
+      <option value="" disabled>Select SKU</option>
+      {skuList
+        .filter((skuItem) =>
+          skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
+        )
+        .map((skuItem) => (
+          <option key={skuItem.id} value={skuItem.id}>
+            {skuItem.sku_name}
+          </option>
+        ))}
+    </select>
+                          {/* <select
+                            className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
+                            value={item.sku_name}
+                            onChange={(e) => handleSkuChange1(e, item.id)}
+                          >
+                            <option value="" disabled>
+                              Select SKU
                             </option>
-                          ))}
-                        </select>
+                            {skuList.map((sku) => (
+                              <option key={sku.id} value={sku.id}>
+                                {sku.sku_name}
+                              </option>
+                            ))}
+                          </select> */}
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -604,7 +640,7 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
                             className="flex-1 min-w-0 h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none"
                           >
                             <option value="" disabled>Select Version</option>
-                              <option value="0">Default Master</option>
+                            <option value="0">Default Master</option>
 
                             {skuVersionsMap[item.id] ? (
                               [skuVersionsMap[item.id]].flat().map((version) => (
@@ -767,55 +803,51 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
 
                 <div
                   className="relative w-[400px] h-[30px] bg-white border border-[#8167E5] rounded-[10px] shadow-md cursor-pointer flex items-center justify-between "
-                  // onClick={() => {
-                    // handleToggle(order.id, order.manufacture)                     
-                    // const newType = order.manufacture === 'inhouse' ? 'outsource' : 'inhouse'
-                    // handleWorkOrderChange(order.id, 'manufacture', newType)
-                  // }}
+                // onClick={() => {
+                // handleToggle(order.id, order.manufacture)                     
+                // const newType = order.manufacture === 'inhouse' ? 'outsource' : 'inhouse'
+                // handleWorkOrderChange(order.id, 'manufacture', newType)
+                // }}
                 >
                   {/* Inhouse */}
                   {/* Inhouse */}
-<span
-  className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${
-    (order.manufacture || 'inhouse') === 'inhouse' ? 'text-white' : 'text-black'
-  }`}
-  onClick={()=>{handleToggle(order.id, "inhouse")}}
->
-  Inhouse
-</span>
+                  <span
+                    className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${(order.manufacture || 'inhouse') === 'inhouse' ? 'text-white' : 'text-black'
+                      }`}
+                    onClick={() => { handleToggle(order.id, "inhouse") }}
+                  >
+                    Inhouse
+                  </span>
 
-{/* Outsource */}
-<span
-  className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${
-    (order.manufacture || 'inhouse') === 'outsource' ? 'text-white' : 'text-black'
-  }`}
-  onClick={()=>{handleToggle(order.id, "outsource")}}
+                  {/* Outsource */}
+                  <span
+                    className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${(order.manufacture || 'inhouse') === 'outsource' ? 'text-white' : 'text-black'
+                      }`}
+                    onClick={() => { handleToggle(order.id, "outsource") }}
 
->
-  OutSource
-</span>
+                  >
+                    OutSource
+                  </span>
 
-{/* Purchase Order */}
-<span
-  className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${
-    (order.manufacture || 'inhouse') === 'purchaseOrder' ? 'text-white' : 'text-black'
-  }`}
-  onClick={()=>{handleToggle(order.id, "purchaseOrder")}}
+                  {/* Purchase Order */}
+                  <span
+                    className={`text-[13px] font-['Lato'] leading-[18px] text-center w-1/3 z-10 transition-all ${(order.manufacture || 'inhouse') === 'purchaseOrder' ? 'text-white' : 'text-black'
+                      }`}
+                    onClick={() => { handleToggle(order.id, "purchaseOrder") }}
 
->
-  Purchase Order
-</span>
+                  >
+                    Purchase Order
+                  </span>
 
-{/* Toggle Indicator */}
-<div
-  className={`absolute top-1/2 w-[33.33%] h-[100%] bg-[#8167E5] rounded-[10px] transform -translate-y-1/2 transition-all duration-300 ${
-    (order.manufacture || 'inhouse') === 'inhouse'
-      ? 'left-0'
-      : (order.manufacture || 'inhouse') === 'outsource'
-      ? 'left-1/3'
-      : 'left-2/3'
-  }`}
-/>
+                  {/* Toggle Indicator */}
+                  <div
+                    className={`absolute top-1/2 w-[33.33%] h-[100%] bg-[#8167E5] rounded-[10px] transform -translate-y-1/2 transition-all duration-300 ${(order.manufacture || 'inhouse') === 'inhouse'
+                        ? 'left-0'
+                        : (order.manufacture || 'inhouse') === 'outsource'
+                          ? 'left-1/3'
+                          : 'left-2/3'
+                      }`}
+                  />
 
 
                   {/* </div> */}
@@ -876,12 +908,12 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
                           ))}
                         </select>
                       </div>
-  
-  {/* Empty column to maintain consistent layout */}
-  <div className="flex-1 min-w-0" />
-</div>
 
-                    
+                      {/* Empty column to maintain consistent layout */}
+                      <div className="flex-1 min-w-0" />
+                    </div>
+
+
                   )}
 
                   <div className="w-full flex flex-col  mt-2 gap-12 py-4">
@@ -890,15 +922,34 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
                     <div className="flex-1 min-w-0">
   <label className="block text-gray-800 font-medium mb-1">SKU*</label>
 
-  {!isWorkOrderList && (
+  {isWorkOrderList ? (
+    // SKU Dropdown shown only in workorderlist
+    <select
+      className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
+      value={order.sku_name || ''}
+      onChange={(e) => handleSkuChange(e, order.id)}
+    >
+      <option value="" disabled>Select SKU</option>
+      {skuList
+        .filter((skuItem) =>
+          (salesOrderSkus || []).some(
+            (soSku) => soSku.sku === skuItem.sku_name
+          )
+        )
+        .map((skuItem) => (
+          <option key={skuItem.id} value={skuItem.id}>
+            {skuItem.sku_name}
+          </option>
+        ))}
+    </select>
+  ) : (
+    // Original SKU dropdown
     <select
       className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
       value={order.sku_name}
       onChange={(e) => handleSkuChange(e, order.id)}
     >
-      <option value="" disabled>
-        Select SKU
-      </option>
+      <option value="" disabled>Select SKU</option>
       {skuList
         .filter((skuItem) =>
           skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
@@ -911,6 +962,7 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
     </select>
   )}
 </div>
+
 
 
                       <div className="flex-1 min-w-0">
@@ -1015,9 +1067,9 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
                           className="w-full h-10 flex justify-center px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
                         />
                       </div>
-                      
+
                     </div>
- 
+
 
                     {/* Submit Button */}
                     <div className="w-full flex justify-end mt-2">
@@ -1029,15 +1081,15 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
                         />
                       )}
 
-                      
+
 
                     </div>
                     <SkuVersionAddEdit
-              handleDeleteVersion={handleDeleteVersion}
-              skuID={order.sku_name}
-              setSkuVersionsMap={setSkuVersionsMap}
-              orderId={order.id} // Pass the orderId of the work order being edited
-            /> 
+                      handleDeleteVersion={handleDeleteVersion}
+                      skuID={order.sku_name}
+                      setSkuVersionsMap={setSkuVersionsMap}
+                      orderId={order.id} // Pass the orderId of the work order being edited
+                    />
                   </div>
                 </div>
               )}
@@ -1067,7 +1119,7 @@ const WorkOrders =  ({ setFormData, workOrdersData, setworkOrdersData, workOrder
               </PopUp>
 
             )}
-              {/* <SkuVersionAddEdit
+            {/* <SkuVersionAddEdit
                 handleDeleteVersion={handleDeleteVersion}
                 skuID={selectedSkuID}
                 setSkuVersionsMap={setSkuVersionsMap}

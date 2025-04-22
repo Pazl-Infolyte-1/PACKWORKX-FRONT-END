@@ -660,6 +660,14 @@ export const apiMethods = {
       
     }
   },
+  getAllFiledsById : async (id) => {
+    try {
+      return await apiClient.get(`/machines/process/${id}/fields`)
+    } catch (error) {
+      console.error(error);
+      
+    }
+  },
   getProcessFields: async (id) => {
     try {
       return await apiClient.get(`/machines/process/${id}/fields` )

@@ -7,10 +7,12 @@ import SearchBar from '../../components/New/SearchBar'
 import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
 import CustomAlert from '../../components/New/CustomAlert'
-import FiledTable from './FiledTable'
 import AddProcessField from './AddProcessField'
-import AddFieldForm from '../Machine/AddFieldForm'
+import AddFieldForm from './AddFieldForm'
 import ProcessForm from './AddProcessNameForm'
+import Field from './Field'
+import ProcessDetails from './ProcessDetails'
+import Values from './Values'
 
 const Process = () => {
   const [showAddProcessModal, setShowAddProcessModal] = useState(false)
@@ -22,10 +24,14 @@ const Process = () => {
   const [isEdit, setIsEdit] = useState(false)
   const [alerts, setAlerts] = useState([])
   const [showProcessFields, setShowProcessFields] = useState(false)
-  const [showFileds, setShowFileds] = useState(false)
   const [limit, setLimit] = useState(10)
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
   const [selectedProcessValue, setSelectedProcessValue] = useState(null)
+  const [openFieldModal, setOpenFieldModal] = useState({ open: false, id: null })
+  const [openProcessModal, setOpenProcessModal] = useState({ open: false, id: null })
+  const [openValuesModal, setOpenValuesModal] = useState({ open: false, id: null })
+  const [allprocessValue, setAllprocessValue] = useState([])
+  const [showEditModal, setShowEditModal] = useState(false)
   const { searchQuery } = useSearch()
   const searchBarRef = useRef(null)
 
@@ -63,6 +69,18 @@ const Process = () => {
     fetchData()
   }, [refresh])
 
+  const fetchAllProcessValue = async () => {
+    try {
+      const response = await apiMethods.getProcessValues()
+      setAllprocessValue(response.data.data)
+    } catch (error) {
+      console.error('Fetch error:', error)
+    }
+  }
+  useEffect(() => {
+    fetchAllProcessValue()
+  }, [openValuesModal.id])
+
   const handleEditProcess = (process) => {
     setFormData({
       id: process.id,
@@ -70,7 +88,6 @@ const Process = () => {
     })
     setShowAddProcessModal(true)
     setIsEdit(true)
-
   }
 
   const handleClose = () => {
@@ -102,44 +119,29 @@ const Process = () => {
     })
     setRefresh((prev) => !prev)
   }
+
   const handleAddField = (id) => {
-    // Find the process if ID is provided
-    const process = id ? processData.find(p => p.id === id) : null;
-    
+    const process = id ? processData.find((p) => p.id === id) : null
+
     if (process) {
-      const processValue = {
+      const processValueRecord = allprocessValue.find((pv) => pv.ProcessName.id === id)
+
+      const processData = {
         value: process.process_name || process.ProcessName?.process_name || '',
         processId: id,
         id: id,
-        process_value: process.process_value || {}
-      };
-      
-      setSelectedProcessValue(processValue);
-      setIsEdit(false);
-      setShowProcessFields(true);
-    } else {
-      // Handle case when no ID is provided (general "Process Fields" button)
-      setSelectedProcessValue(null);
-      setIsEdit(false);
-      setShowProcessFields(true);
-    }
-  }
+        process_value: processValueRecord?.process_value || {},
+      }
 
-  const handleEditProcessValues = (process) => {
-    if (!process) return;
-    
-    const processFieldValues = process.process_value || {};
-    
-    const selectedProcess = {
-      value: process.process_name || process.ProcessName?.process_name || '',
-      processId: process.id,
-      id: process.id,
-      process_value: processFieldValues
-    };
-    
-    setSelectedProcess(selectedProcess);
-    setShowProcessFields(true);
-    setIsEdit(true);
+      setSelectedProcess(processData)
+      setSelectedProcessValue(processData)
+      setShowProcessFields(true)
+    } else {
+      setSelectedProcessValue(null)
+      setSelectedProcess(null)
+      setIsEdit(false)
+      setShowProcessFields(true)
+    }
   }
 
   return (
@@ -161,32 +163,27 @@ const Process = () => {
                 setShowAddProcessModal(true)
               }}
             />
-            <ActionButton
-              variant="minimal"
-              label={showFileds ? 'Show Process' : 'Show Fields'}
-              onClick={() => setShowFileds(!showFileds)}
-            />
           </div>
         </div>
         <div className="overflow-x-auto overflow-y-auto whitespace-nowrap my-4">
-          {showFileds ? (
-            <FiledTable
-              processData={processData}
-              setRefresh={setRefresh}
-            />
-          ) : (
-            <ProcessIntegrartionTable
-              processData={processData}
-              setProcessData={setProcessData}
-              handleEditProcess={handleEditProcess}
-              handleClose={handleClose}
-              alerts={alerts}
-              setAlerts={setAlerts}
-              setShowAddFieldModal={setShowAddFieldModal}
-              handleEditProcessValues={handleEditProcessValues}
-              handleAddField={handleAddField}
-            />
-          )}
+          <ProcessIntegrartionTable
+            processData={processData}
+            setProcessData={setProcessData}
+            handleEditProcess={handleEditProcess}
+            handleClose={handleClose}
+            alerts={alerts}
+            setAlerts={setAlerts}
+            setShowAddFieldModal={setShowAddFieldModal}
+            handleAddField={handleAddField}
+            fieldData={fieldData}
+            showAddFieldModal={showAddFieldModal}
+            setShowProcessFields={setShowProcessFields}
+            openFieldModal={openFieldModal}
+            setOpenFieldModal={setOpenFieldModal}
+            setOpenProcessModal={setOpenProcessModal}
+            setOpenValuesModal={setOpenValuesModal}
+            processValues={allprocessValue}
+          />
         </div>
 
         <div>
@@ -243,10 +240,11 @@ const Process = () => {
         >
           <AddFieldForm
             processData={processData}
-            setProcessData={setProcessData}
-            setIsFieldModaleOpen={() => setShowAddFieldModal({ show: false, processId: null })}
+            setRefresh={setRefresh}
+            setIsFieldModaleOpen={() => setShowEditModal(false)}
             isEdit={isEdit}
             formData={formData}
+            setProcessData={setProcessData}
             setFormData={setFormData}
             selectedProcess={
               showAddFieldModal.processId
@@ -258,8 +256,9 @@ const Process = () => {
                 : selectedProcess
             }
             setSelectedProcess={setSelectedProcess}
-            setRefresh={setRefresh}
             setShowProcessFields={setShowProcessFields}
+            showAddFieldModal={showAddFieldModal}
+            setShowAddFieldModal={setShowAddFieldModal}
           />
         </PopUp>
 
@@ -280,7 +279,61 @@ const Process = () => {
             editData={selectedProcess}
             selectedProcessValue={selectedProcessValue}
             setSelectedProcessValue={setSelectedProcess}
+            setRefresh={setRefresh}
+            refresh={refresh}
+            setAllprocessValue={setAllprocessValue}
           />
+        </PopUp>
+
+        <PopUp
+          visible={openFieldModal.open}
+          setVisible={(isVisible) => {
+            if (!isVisible) setOpenFieldModal({ open: false, id: null })
+          }}
+          showCloseButton={true}
+          width={'70vw'}
+          header={'Fields'}
+        >
+          <Field
+            AllfieldData={fieldData}
+            setShowAddFieldModal={setShowAddFieldModal}
+            openFieldModal={openFieldModal}
+            showAddFieldModal={showAddFieldModal}
+            setIsEdit={setIsEdit}
+            showEditModal={showEditModal}
+            setShowEditModal={setShowEditModal}
+            refresh={refresh}
+            setRefresh={setRefresh}
+          />
+        </PopUp>
+        <PopUp
+          visible={openValuesModal.open}
+          setVisible={(isVisible) => {
+            if (!isVisible) setOpenValuesModal({ open: false, id: null })
+          }}
+          showCloseButton={true}
+          width={'60vw'}
+          header={'Values'}
+        >
+          <Values
+            handleAddField={handleAddField}
+            openValuesModal={openValuesModal}
+            allprocessValue={allprocessValue}
+            setIsEdit={setIsEdit}
+            refresh={refresh}
+            setRefresh={setRefresh}
+            setAllprocessValue={setAllprocessValue}
+          />
+        </PopUp>
+        <PopUp
+          visible={openProcessModal.open}
+          setVisible={(isVisible) => {
+            if (!isVisible) setOpenProcessModal({ open: false, id: null })
+          }}
+          showCloseButton={true}
+          width={'70vw'}
+        >
+          <ProcessDetails id={openProcessModal.id} />
         </PopUp>
       </div>
     </>

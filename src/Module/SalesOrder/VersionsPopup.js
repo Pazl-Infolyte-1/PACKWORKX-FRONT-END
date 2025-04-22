@@ -14,13 +14,16 @@ import { BiSolidDownArrow, BiSolidUpArrow, BiTrash } from 'react-icons/bi';
 import { cilPencil, cilTrash } from '@coreui/icons';
 import ThreeDotMenu from '../../components/ThreeDotMenu';
 import apiMethods from '../../api/config';
+import CustomAlert from '../../components/New/CustomAlert';
 
-function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversions,handleDeleteVersion,setIsEdit,setSelectedSkuVersionID,formVisibility }) {
+function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversions,handleDeleteVersion,setIsEdit,setSelectedSkuVersionID,formVisibility,alerts,setAlerts }) {
   const [expandedVersions, setExpandedVersions] = useState({});
 
-  useEffect(() => {
-    console.log(versionData, "----------------------------");
-  }, [versionData]);
+  // useEffect(() => {
+  //   console.log(versionData, "----------------------------");
+  // }, [versionData]);
+
+
 
   const toggleVersionCollapse = (versionId) => {
     setExpandedVersions(prev => ({
@@ -28,6 +31,10 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
       [versionId]: !prev[versionId]
     }));
   };
+
+  const handleClose = ()=>{
+  setAlerts([]) 
+  }
 
 //  const handleDeleteVersion = async (versionId,) => {
 //   try {
@@ -69,7 +76,7 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
     >
       <div>
         {/* Header Section */}
-        <div className="flex justify-between pb-2 mb-3">
+        <div className="flex justify-between pb-2 mb-3 ">
           <span className="text-lg font-semibold text-gray-800">
             SKU Name: <span>{skuName || "60ml"}</span>
           </span>
@@ -82,8 +89,8 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
         </div>
 
         {/* Scrollable Table */}
-        <div className="max-h-[300px] overflow-auto">
-          <CTable striped hover responsive className="table-fixed border-none">
+        <div className="max-h-[300px]   overflow-auto">
+          <CTable striped hover responsive className="table-fixed border-none min-h-[150px]">
             {/* Main Table Header */}
             <CTableHead className="sticky top-0 !border-none">
               <CTableRow className="!border-y-2">
@@ -144,9 +151,8 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
                           label: 'Edit',
                           icon: cilPencil,
                           onClick: () => {
-
-                            setIsEdit(true)
                             setSelectedSkuVersionID(version.id)
+                            setIsEdit(true)
                             formVisibility(true)
                           },
                         },
@@ -218,6 +224,11 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
           </CTable>
         </div>
       </div>
+      <CustomAlert
+      className="absolute"
+      alerts={alerts}
+      handleClose={handleClose}
+      />
     </PopUp>
   );
 }

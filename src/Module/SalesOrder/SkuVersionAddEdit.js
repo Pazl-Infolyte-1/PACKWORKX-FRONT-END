@@ -17,7 +17,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
       try {
         if (IsEditVersion && skuVersionID) {
           // Fetch specific SKU version data when in edit mode
-          const versionResponse = await apiMethods.getSingleSkuVersion(skuID);
+          const versionResponse = await apiMethods.getSingleSkuVersion(skuVersionID);
           
           if (versionResponse?.data) {
             
@@ -38,9 +38,8 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     
           // Fetch SKU Versions
           const versionsResponse = await apiMethods.getSkuVersions(skuID);
-          console.log(versionsResponse,'joooookerjooookerjoooker')
           const skuversionID = `V${versionsResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`
-                    setSkuVersion(skuversionID);
+          setSkuVersion(skuversionID);
         }
       } catch (error) {
         console.error("Error fetching SKU data or versions:", error);
@@ -75,6 +74,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
       try {
         const response = await apiMethods.updateSkuVersion(skuVersionID, requestBody);
         setAlerts([{ severity: "success", message: response?.data?.message || "SKU Version updated successfully" }]);
+        setVisible(false)
   
         const updatedVersionsResponse = await apiMethods.getSkuVersions(skuID);
         if (updatedVersionsResponse?.data?.data) {
@@ -98,6 +98,8 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
           setAlerts([{ severity: "error", message: `Maximum SKU version limit of ${skuversionLimit} reached.` }]);
           return; // Exit early, do not proceed
         }
+
+        requestBody.sku_version = `v${currentVersionCount + 1}_${Date.now()}`;
   
         const response = await apiMethods.addSkuVersion(requestBody);
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
@@ -226,18 +228,22 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
                       </td>
                     </tr>
                   ))}
+          
                 </tbody>
+
+                
               </table>
-            </div>
-            
-            <div className="mt-4 flex justify-end">
+              <div className="p-2 flex w-[100%]  justify-end">
               <button 
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
                 onClick={handleSubmit}
               >
                 {IsEditVersion ? "Update Version" : "Add As Version"}
               </button>
             </div>
+            </div>
+            
+ 
           </div>
         </div>
       )}

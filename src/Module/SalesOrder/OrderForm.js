@@ -1,13 +1,39 @@
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import SkuDetails from './SkuDetails'
 import apiMethods from '../../api/config';
 import ActionButton from '../../components/New/ActionButton';
 
-const OrderForm = ({ formData, setFormData, skuDetailsForm, handleSkuFormUpdate, handleFormSubmit,setDrawer,totals,setTotals }) => {
+const OrderForm = forwardRef(({
+  formData,
+  setFormData,
+  skuDetailsForm,
+  handleSkuFormUpdate,
+  handleFormSubmit,
+  setDrawer,
+  totals,
+  setTotals
+}, ref) => {
+
+
+
+  
   const [clients, setClients] = useState([]); // State for client list
   const [skuFormData, setSkuFormData] = useState(null);
   const [localFormData, setLocalFormData] = useState(formData);
-
+  
+  useImperativeHandle(ref, () => ({
+    getCompleteFormData: {
+      ...localFormData,
+      skuDetails: skuFormData ? skuFormData.skuDetails : [],
+      totalQuantity: skuFormData ? skuFormData.totalQuantity : 0,
+      totalAmount: skuFormData ? skuFormData.totalAmount : 0,
+      totalSGST: skuFormData ? skuFormData.totalSGST : 0,
+      totalCGST: skuFormData ? skuFormData.totalCGST : 0,
+      totalGst:skuFormData ? skuFormData.totalGst : 0,
+      totalWithGST: skuFormData ? skuFormData.totalWithGST : 0
+    }
+  }));
+  
   const [confirmationMethod, setConfirmationMethod] = useState(
     formData.confirmation || "Email"
   );
@@ -28,6 +54,7 @@ const OrderForm = ({ formData, setFormData, skuDetailsForm, handleSkuFormUpdate,
         totalAmount: 0,
         totalSGST: 0,
         totalCGST: 0,
+        totalGst: 0,
         totalWithGST: 0
       });
     }
@@ -59,6 +86,11 @@ const OrderForm = ({ formData, setFormData, skuDetailsForm, handleSkuFormUpdate,
   useEffect(() => {
     setConfirmationMethod(localFormData.confirmation);
   }, [localFormData.confirmation]);
+
+
+  const formatDate = (dateStr) => {
+    return dateStr ? new Date(dateStr).toISOString().split('T')[0] : ''
+  }
 
   // Handle input changes
 // 1. Update handleInputChange to sync with parent component
@@ -124,6 +156,7 @@ const handleToggleChange = () => {
       totalAmount: skuFormData ? skuFormData.totalAmount : 0,
       totalSGST: skuFormData ? skuFormData.totalSGST : 0,
       totalCGST: skuFormData ? skuFormData.totalCGST : 0,
+      totalGst:skuFormData ? skuFormData.totalGst : 0,
       totalWithGST: skuFormData ? skuFormData.totalWithGST : 0
     };
     
@@ -137,7 +170,7 @@ const handleToggleChange = () => {
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <div className="p-2 mt-2 bg-white rounded-lg border border-[#c2c2c2] w-[100%] h-[50%]">
+        <div className="p-2 mt-2 bg-white rounded-lg border border-[#c2c2c2] w-[100%] h-[50%] ">
           {/* Title */}
           <h2 className="text-lg font-semibold flex justify-start">Order Details</h2>
           <div className="grid grid-cols-2 grid-rows-2 gap-1 mt-4">
@@ -146,29 +179,29 @@ const handleToggleChange = () => {
               {/* Sales Order Id */}
               <div className="flex flex-col">
                 <label className="text-black font-normal leading-6 mb-2 text-left">
-                  Sales Order Id
+                  Sales Order Id*
                 </label>
                 <input
                   type="text"
                   name="sales_ui_id"
                   value={localFormData.sales_ui_id || ""}
                   onChange={handleInputChange}
-                  placeholder="Enter Sales Order Id"
-                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+                  // placeholder="Enter Sales Order Id"
+                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white    leading-[26px] outline-none placeholder:text-sm"
                 />
               </div>
 
               {/* Estimated */}
               <div className="flex flex-col">
   <label className="text-black font-normal leading-6 mb-2 text-left">
-    Estimated
+    Estimated*
   </label>
   <input
     type="date"
     name="estimated"
-    value={localFormData.estimated || ""}
+    value={ formatDate(localFormData.estimated) || ""}
     onChange={handleInputChange}
-    className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#333] text-[16px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+    className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#333] text-[16px]  leading-[26px] outline-none placeholder:text-sm"
   />
 </div>
 
@@ -177,7 +210,7 @@ const handleToggleChange = () => {
             {/* Client */}
             <div className="p-2 rounded-lg flex flex-col">
               <label className="text-black font-normal leading-6 mb-2 text-left">
-                Client
+                Client*
               </label>
               <select
                 name="client"
@@ -197,15 +230,15 @@ const handleToggleChange = () => {
             {/* Client Period */}
             <div className="p-2 rounded-lg flex flex-col">
               <label className="text-black font-normal leading-6 mb-2 text-left">
-                Client Period
+                Client Period*
               </label>
               <input
                 type="number"
                 name="credit_period"
                 value={localFormData.credit_period || ""}
                 onChange={handleInputChange}
-                placeholder="Enter Client Period..."
-                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+                // placeholder="Enter Client Period..."
+                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white   leading-[26px] outline-none placeholder:text-sm"
               />
             </div>
 
@@ -219,15 +252,15 @@ const handleToggleChange = () => {
                 name="freight_paid"
                 value={localFormData.freight_paid || ""}
                 onChange={handleInputChange}
-                placeholder="Enter text..."
-                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+                // placeholder="Enter text..."
+                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white    leading-[26px] outline-none placeholder:text-sm"
               />
             </div>
 
             {/* Confirmation By */}
             <div className="p-2 rounded-lg flex flex-col">
               <label className="text-black font-normal leading-6 mb-2 text-left">
-                Confirmation By
+                Confirmation By*
               </label>
               <div
                 className="relative w-[160px] h-[34px] bg-white border border-[#8167E5] rounded-[10px] shadow-md cursor-pointer flex items-center justify-between px-2"
@@ -264,14 +297,14 @@ const handleToggleChange = () => {
             {confirmationMethod === "Email" && (
               <div className="p-2 rounded-lg flex flex-col">
                 <label className="text-black font-normal leading-6 mb-2 text-left">
-                  Confirmation Email
+                  Confirmation Email*
                 </label>
                 <input
                   type="email"
                   name="confirmation_email"
                   value={localFormData.confirmation_email || ""}
                   onChange={handleInputChange}
-                  placeholder="Enter Confirmation Email"
+                  // placeholder="Enter Confirmation Email"
                   className="w-[500px] h-[40px] px-2 border border-[#c2c2c2] rounded-md outline-none"
                 />
               </div>
@@ -313,30 +346,30 @@ const handleToggleChange = () => {
               {/* Sales Order Id */}
               <div className="flex flex-col">
                 <label className="text-black font-normal leading-6 mb-2 text-left">
-                   Confirmation Name
+                   Confirmation Name*
                 </label>
                 <input
                   type="text"
                   name="confirmation_name"
                   value={localFormData.confirmation_name || ""}
                   onChange={handleInputChange}
-                  placeholder="Enter Confirmation Name"
-                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+                  // placeholder="Enter Confirmation Name"
+                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white    leading-[26px] outline-none placeholder:text-sm"
                 />
               </div>
 
               {/* Estimated */}
               <div className="flex flex-col">
                 <label className="text-black font-normal leading-6 mb-2 text-left">
-                Confirmation Mobile
+                Confirmation Mobile*
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   name="confirmation_mobile"
                   value={localFormData.confirmation_mobile || ""}
                   onChange={handleInputChange}
-                  placeholder="Enter Confirmation Mobile"
-                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#c2c2c2] text-[20px] font-['Mulish'] leading-[26px] outline-none placeholder:text-sm"
+                  // placeholder="Enter Confirmation Mobile"
+                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white    leading-[26px] outline-none placeholder:text-sm"
                 />
               </div>
             </div>
@@ -374,9 +407,18 @@ const handleToggleChange = () => {
 
             </div>
         </div> */}
+
+{/* <button
+            type="submit"
+            className="px-4 py-2 bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
+            >
+            Submit Order
+          </button> */}
+
+        
       </div>
     </form>
   );
-};
+});
 
 export default OrderForm;

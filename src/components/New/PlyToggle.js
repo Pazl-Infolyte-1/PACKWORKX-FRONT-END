@@ -10,7 +10,7 @@ const PlyToggle = ({ value, onChange }) => {
 
   return (
     <div>
-      <label className="block text-[16px] font-medium text-gray-700 mb-2">Ply</label>
+      <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Ply</label>
       <div className="relative w-full h-[40px] bg-white border border-blue-500 rounded-md shadow-sm flex items-center justify-between px-1 overflow-hidden">
         {/* Toggle Background */}
         <div

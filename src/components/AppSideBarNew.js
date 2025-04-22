@@ -12,10 +12,11 @@ import CIcon from '@coreui/icons-react'
 import * as iconSet from '@coreui/icons'
 import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
-import { cilCloudDownload, cilLayers, cilPuzzle, cilSpeedometer } from '@coreui/icons'
+import { cilCloudDownload, cilLayers, cilPuzzle, cilSpeedometer,cilUser } from '@coreui/icons'
 
 export const AppSideBarNew = ({ giveAccess }) => {
   const [expandedModules, setExpandedModules] = useState({})
+  const [isOpen, setIsOpen] = useState(false);
 
   const toggleGroup = (moduleId) => {
     setExpandedModules((prevState) => ({
@@ -236,15 +237,59 @@ export const AppSideBarNew = ({ giveAccess }) => {
         <>
           <CNavTitle>HRMS</CNavTitle>
           {hrmsModules.map((module, index) => {
+            //if (module.modules_description === 'Employee') {
+            //  return (
+            //    <CNavItem key={index}>
+            //      <CNavLink as={NavLink} to="/employeelist">
+            //        {navLink('Employee', 'cilUser')}
+            //      </CNavLink>
+            //    </CNavItem>
+            //  )
+            //}
             if (module.modules_description === 'Employee') {
               return (
-                <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/employeelist">
-                    {navLink('Employee', 'cilUser')}
-                  </CNavLink>
-                </CNavItem>
-              )
+                <li key={index} className={`nav-item nav-group ${isOpen ? 'show' : ''}`}>
+                  <a
+                    className="nav-link nav-group-toggle"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsOpen((prev) => !prev);
+                    }}
+                  >
+                    <CIcon icon={cilUser} className="nav-icon" />
+                    Employee
+                  </a>
+                  <ul className="nav-group-items" style={{ display: isOpen ? 'block' : 'none' }}>
+                    <li className="nav-item">
+                      <NavLink className="nav-link" to="/employeelist">
+                        <span className="nav-icon">
+                          <span className="nav-icon-bullet" />
+                        </span>
+                        Employee List
+                      </NavLink>
+                    </li>
+                    <li className="nav-item">
+                      <NavLink className="nav-link" to="/department">
+                        <span className="nav-icon">
+                          <span className="nav-icon-bullet" />
+                        </span>
+                        Department
+                      </NavLink>
+                    </li>
+                    <li className="nav-item">
+                      <NavLink className="nav-link" to="/designation">
+                        <span className="nav-icon">
+                          <span className="nav-icon-bullet" />
+                        </span>
+                        Designation
+                      </NavLink>
+                    </li>
+                  </ul>
+                </li>
+              );
             }
+            
             if (module.modules_description === 'Attendance') {
               return (
                 <CNavItem key={index}>
@@ -286,7 +331,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/SKU">
-                    {navLink('Sku Details', 'cilList')}
+                    {navLink('SKU Details', 'cilList')}
                   </CNavLink>
                 </CNavItem>
               )

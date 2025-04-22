@@ -25,7 +25,8 @@ function RSCBox({
   onMeterDataChange,
   editTag,
   toThreeDecimalFixed,
-  isopenval
+  isopenval,
+  compositeSelect
 }) {
   const [alerts, setAlerts] = useState([])
   const filteredClient = locationvalue
@@ -36,6 +37,7 @@ function RSCBox({
   const [areaInM2, setAreaInM2] = useState(null)
   const [boarderr, setBoardErr] = useState(null)
   const [isRscOpen, setIsRscOpen] = useState(true)
+const [previousSkuType, setPreviousSkuType] = useState(null);
 
   const calculateBoardSize = (data) => {
     const length = parseFloat(data.length) || 0
@@ -243,6 +245,14 @@ useEffect(() => {
   };
 }, [isopenval]);
 
+useEffect(() => {
+  if (compositeSelect) {
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      sku_type: compositeSelect,
+    }));
+  }
+}, [compositeSelect]);
 
   return (
     <div className="rounded-lg ">
@@ -251,13 +261,13 @@ useEffect(() => {
       {/* Top header fields */}
       <div className="grid grid-cols-3 gap-6 p-6 border border-gray-200 rounded-lg">
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Type</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Type</label>
           <div className="relative w-full" ref={dropdownRef}>
             <div
               className="p-2 h-10 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
               onClick={() => setIsOpen((prev) => !prev)}
             >
-              <span className="text-gray-800">{addNewSkuData.sku_type || 'Select Type'}</span>
+              <span className="text-gray-800">{addNewSkuData?.sku_type || 'Select Type'}</span>
               <BsChevronDown className={`transition-transform text-gray-600 ${isOpen ? 'rotate-180' : ''}`} />
             </div>
 
@@ -265,7 +275,7 @@ useEffect(() => {
               <ul
                 className="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-gray-300 rounded-md z-20 shadow-lg"
               >
-                {skuType.map((option) => (
+                {/*{skuType.map((option) => (
                   <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-50">
                     <li
                       className={`p-2 cursor-pointer w-full ${editTag ? 'text-gray-400 cursor-not-allowed' : 'text-gray-800'}`}
@@ -274,29 +284,51 @@ useEffect(() => {
                       {option.sku_type}
                     </li>
                   </div>
-                ))}
+                ))}*/}
+          {skuType.map((option) => (
+  <div key={option.id} className="flex justify-between mx-2 hover:bg-gray-50">
+    <li
+      className={`p-2 w-full cursor-pointer
+        ${
+          compositeSelect || editTag
+            ? 'text-gray-400 cursor-not-allowed'
+            : 'text-gray-800'
+        }
+        ${compositeSelect === option.sku_type ? 'bg-gray-200 font-semibold' : ''}`
+      }
+      onClick={
+        !compositeSelect && !editTag ? () => handleSelect(option) : undefined
+      }
+    >
+      {option.sku_type}
+    </li>
+  </div>
+))}
+
+
+
               </ul>
             )}
           </div>
         </div>
 
  <div>
-            <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Name</label>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Name</label>
             <input
               id="sku_name"
               name="sku_name"
-              value={addNewSkuData.sku_name}
+              value={addNewSkuData?.sku_name}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">Client Name</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Client Name</label>
           <select
             name="client"
             id="client"
             disabled={clientDiasble}
-            value={filteredClient ? filteredClient.client_id : addNewSkuData.client || ''}
+            value={filteredClient ? filteredClient.client_id : addNewSkuData?.client || ''}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
@@ -318,7 +350,7 @@ useEffect(() => {
       <div className="grid grid-cols-3 gap-6 p-6 mt-6 border border-gray-200 rounded-lg">
       <div>
   <PlyToggle
-  value={addNewSkuData.ply}
+  value={addNewSkuData?.ply}
   onChange={(selectedPly) => updateSkuValues(selectedPly)}
 />
 </div>
@@ -327,7 +359,7 @@ useEffect(() => {
         <Tooltip title={unitTooltip}>
           <div>
           <p className="block text-[16px] font-medium text-gray-700 mb-2">
-  Dimensions <span className="text-gray-500 text-sm">(L × W × H)</span>
+  Dimensions <span className="text-gray-500 text-sm after:content-['*'] after:text-red-500 after:ml-1">(L × W × H)</span>
 </p>          
   <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
               <input
@@ -381,7 +413,7 @@ useEffect(() => {
         <Tooltip title={unitTooltip}>
           <div className="flex gap-3">
             <div className="w-1/2">
-              <label className="block text-[16px] font-medium text-gray-700 mb-2">Joints</label>
+              <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Joints</label>
               <input
                 id="joints"
                 name="joints"
@@ -392,7 +424,7 @@ useEffect(() => {
               />
             </div>
             <div className="w-1/2">
-              <label className="block text-[16px] font-medium text-gray-700 mb-2">Deckle Size</label>
+              <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Deckle Size</label>
               <input
                 id="deckle_size"
                 name="deckle_size"
@@ -406,7 +438,7 @@ useEffect(() => {
         </Tooltip>
         
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">Inner/Outer Dimension</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Inner/Outer Dimension</label>
           <div className="flex space-x-4 p-2 border border-gray-300 rounded-md h-10 items-center">
             <label className="flex items-center cursor-pointer">
               <input
@@ -435,7 +467,7 @@ useEffect(() => {
 
         <Tooltip title={unitTooltip}>
           <div>
-            <label className="block text-[16px] font-medium text-gray-700 mb-2">Flap Width</label>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Flap Width</label>
             <input
               id="flap_width"
               name="flap_width"
@@ -449,7 +481,7 @@ useEffect(() => {
 
         <Tooltip title={unitTooltip}>
           <div>
-            <label className="block text-[16px] font-medium text-gray-700 mb-2">Length Trimming Tolerance</label>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Length Trimming Tolerance</label>
             <input
               id="length_trimming_tolerance"
               name="length_trimming_tolerance"
@@ -463,7 +495,7 @@ useEffect(() => {
 
         <Tooltip title={unitTooltip}>
           <div>
-            <label className="block text-[16px] font-medium text-gray-700 mb-2">Width Trimming Tolerance</label>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Width Trimming Tolerance</label>
             <input
               id="width_trimming_tolerance"
               name="width_trimming_tolerance"
@@ -476,7 +508,7 @@ useEffect(() => {
         </Tooltip>
         
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">Customer Reference</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Customer Reference</label>
           <input
             id="customer_reference"
             name="customer_reference"
@@ -488,7 +520,7 @@ useEffect(() => {
         </div>
         
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">Reference #</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Reference #</label>
           <input
             id="reference_number"
             name="reference_number"
@@ -500,7 +532,7 @@ useEffect(() => {
         </div>
         
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">Internal ID</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Internal ID</label>
           <input
             id="internal_id"
             name="internal_id"
@@ -513,7 +545,7 @@ useEffect(() => {
 
         <Tooltip title={unitTooltip}>
           <div>
-            <p className="block text-[16px] font-medium text-gray-700 mb-2">Board Size<span className="text-gray-500 text-sm">(W × L)</span></p>
+            <p className="block text-[16px] font-medium text-gray-700 mb-2">Board Size<span className="text-gray-500 text-sm after:content-['*'] after:text-red-500 after:ml-1">(W × L)</span></p>
             <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
               <input
                 id="width_board_size_cm2"
@@ -555,7 +587,7 @@ useEffect(() => {
         </Tooltip>
 
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">UPS</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">UPS</label>
           <input
             id="ups"
             name="ups"
@@ -567,7 +599,7 @@ useEffect(() => {
         </div>
 
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">Minimum Order Level</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Minimum Order Level</label>
           <input
             id="minimum_order_level"
             name="minimum_order_level"

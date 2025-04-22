@@ -20,24 +20,7 @@ function WorkOrderDetails({ showPopUp, setShowPopUp, cell }) {
               <div>
                 <h1 className="text-3xl font-bold text-gray-800">Work Order Details</h1>
               </div>
-              <div className="flex items-center space-x-3">
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    cell.status === 'active'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  {cell.status}
-                </span>
-                <ActionButton
-                  label={'Edit'}
-                  variant="edit"
-                  height={8}
-                  width={24}
-                  onClick={() => onEdit(cell)}
-                />
-              </div>
+              
             </div>
           </header>
         </div>

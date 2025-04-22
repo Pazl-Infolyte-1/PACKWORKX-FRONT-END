@@ -3,55 +3,78 @@ import ProcessDropDown from '../Machine/ProcessDropDown'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
 
-function AddProcessField({ fieldData, setShowProcessFields, isEditing, editData = null, selectedProcessValue, setSelectedProcessValue }) {
+function AddProcessField({
+  fieldData,
+  setShowProcessFields,
+  isEditing,
+  editData,
+  selectedProcessValue,
+  setSelectedProcessValue,
+  setRefresh,
+  setAllprocessValue,
+}) {
   const [selectedProcess, setSelectedProcess] = useState([])
   const [processInputs, setProcessInputs] = useState({})
   const [selectedProcessId, setSelectedProcessId] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
-  // const [selectedProcessValue, setSelectedProcessValue] = useState(null)
 
   useEffect(() => {
-    // Run this effect only once when component mounts with edit data
-    if (isEditing && editData && !selectedProcessId) {
-      setSelectedProcessId(editData.processId || editData.id)
-      
-      // Set process inputs from editData only once
-      if (editData.process_value) {
-        setProcessInputs({...editData.process_value})
-      }
-      
-      // Fetch fields for this process
-      fetchProcessFields(editData.processId || editData.id)
-    } else if (selectedProcessValue && selectedProcessValue.processId && !selectedProcessId) {
-      // Handle case when adding new field for a specific process
-      setSelectedProcessId(selectedProcessValue.processId)
-      fetchProcessFields(selectedProcessValue.processId)
+    if (!isEditing) {
+      setProcessInputs({})
+    }
+
+    // Clean up function
+    return () => {
+      setProcessInputs({})
     }
   }, [])
 
-const fetchProcessFields = async (processId) => {
-  if (!processId) return
-  
-  try {
-    const response = await apiMethods.getProcessFields(processId)
-    setSelectedProcess(response.data.data)
-  } catch (error) {
-    console.error('Error fetching process fields:', error)
-  }
-}
+  useEffect(() => {
+    if (isEditing && (editData || selectedProcessValue)) {
+      const dataToUse = editData || selectedProcessValue
+      setSelectedProcessId(dataToUse.processId || dataToUse.id)
+      if (dataToUse.process_value) {
+        setProcessInputs({ ...dataToUse.process_value })
+      } else {
+        setProcessInputs({})
+      }
 
-const handleProcessChange = (selected) => {
-  if (!selected) return
-  
-  setSelectedProcessValue(selected)
-  setSelectedProcessId(selected.processId)
-  
-  // Clear inputs and fetch fields for the selected process
-  if (!isEditing) {
-    setProcessInputs({})
-    fetchProcessFields(selected.processId)
+      fetchProcessFields(dataToUse.processId || dataToUse.id)
+    } else if (selectedProcessValue && selectedProcessValue.processId && !selectedProcessId) {
+      setSelectedProcessId(selectedProcessValue.processId)
+
+      if (selectedProcessValue.process_value) {
+        setProcessInputs({ ...selectedProcessValue.process_value })
+      } else {
+        setProcessInputs({})
+      }
+
+      fetchProcessFields(selectedProcessValue.processId)
+    }
+  }, [isEditing, editData, selectedProcessValue])
+
+  const fetchProcessFields = async (processId) => {
+    if (!processId) return
+
+    try {
+      const response = await apiMethods.getProcessFields(processId)
+      setSelectedProcess(response.data.data)
+    } catch (error) {
+      console.error('Error fetching process fields:', error)
+    }
   }
-}
+
+  const handleProcessChange = (selected) => {
+    if (!selected) return
+
+    setSelectedProcessValue(selected)
+    setSelectedProcessId(selected.processId)
+
+    if (!isEditing) {
+      setProcessInputs({})
+      fetchProcessFields(selected.processId)
+    }
+  }
 
   const handleInputChange = (e, param) => {
     setProcessInputs({
@@ -74,27 +97,38 @@ const handleProcessChange = (selected) => {
       setIsLoading(true)
 
       if (isEditing) {
-        // Update existing process values
         const payload = {
-          id: editData.id,
+          id: editData?.id || selectedProcessValue?.id,
           process_name_id: selectedProcessId,
           process_value: { ...processInputs },
         }
-        await apiMethods.updateProcessValues(payload)
+        const response = await apiMethods.updateProcessValues(payload)
+
+        const refreshResult = await apiMethods.getProcessValues()
+        setAllprocessValue(refreshResult.data.data)
       } else {
-        // Create new process values
         const payload = {
           process_name_id: selectedProcessId,
           process_value: { ...processInputs },
         }
         await apiMethods.saveProcessValues(payload)
       }
+
+      // Trigger parent refresh
+      setRefresh && setRefresh((prev) => !prev)
       setShowProcessFields(false)
     } catch (error) {
       console.error('Error saving process values:', error)
     } finally {
       setIsLoading(false)
     }
+  }
+  const handleCancel = () => {
+    // Reset all state when canceling
+    setProcessInputs({})
+    setSelectedProcessId(null)
+    setSelectedProcess([])
+    setShowProcessFields(false)
   }
 
   return (
@@ -107,7 +141,7 @@ const handleProcessChange = (selected) => {
             onSelect={handleSelect}
             placeholder="Select Process"
             value={selectedProcessValue}
-            readOnly={isEditing} // Make it read-only in edit mode
+            readOnly={isEditing}
             isEdit={isEditing}
           />
 
@@ -155,11 +189,7 @@ const handleProcessChange = (selected) => {
         </div>
       </div>
       <div className="flex justify-end my-2 gap-3">
-        <ActionButton
-          label="Cancel"
-          variant="minimal"
-          onClick={() => setShowProcessFields(false)}
-        />
+        <ActionButton label="Cancel" variant="minimal" onClick={handleCancel} />
         <ActionButton
           label={isLoading ? 'Saving...' : isEditing ? 'Update' : 'Save'}
           onClick={handleSave}

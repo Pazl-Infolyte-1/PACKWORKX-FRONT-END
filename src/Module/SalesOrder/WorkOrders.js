@@ -733,7 +733,16 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                           className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
                         />
                       </div>
+                      
                     </div>
+
+                    <SkuVersionAddEdit
+                      handleDeleteVersion={handleDeleteVersion}
+                      skuID={item.sku_name}
+                      setSkuVersionsMap={setSkuVersionsMap}
+                      orderId={item.id} // Pass the orderId of the work order being edited
+                    />
+
 
                     {/* Submit Button */}
                     {/* <div className="w-full flex justify-end"> */}
@@ -1072,17 +1081,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
 
 
                     {/* Submit Button */}
-                    <div className="w-full flex justify-end mt-2">
-                      {!isWorkOrderList && (
-                        <ActionButton
-                          label={"Add"}
-                          variant=''
-                          onClick={() => { handleSubmitWorkOrderForm(order.id) }}
-                        />
-                      )}
-
-
-
+    
                     </div>
                     <SkuVersionAddEdit
                       handleDeleteVersion={handleDeleteVersion}
@@ -1090,6 +1089,16 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                       setSkuVersionsMap={setSkuVersionsMap}
                       orderId={order.id} // Pass the orderId of the work order being edited
                     />
+                    <div className="w-full flex justify-end pb-3">
+
+`{!isWorkOrderList && (
+                        <ActionButton
+                          label={"Add Work Order"}
+                          
+                          variant=''
+                          onClick={() => { handleSubmitWorkOrderForm(order.id) }}
+                        />
+                      )}
                   </div>
                 </div>
               )}

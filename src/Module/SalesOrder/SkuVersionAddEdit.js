@@ -228,18 +228,22 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
                       </td>
                     </tr>
                   ))}
+          
                 </tbody>
+
+                
               </table>
-            </div>
-            
-            <div className="mt-4 flex justify-end">
+              <div className="p-2 flex w-[100%]  justify-end">
               <button 
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
                 onClick={handleSubmit}
               >
                 {IsEditVersion ? "Update Version" : "Add As Version"}
               </button>
             </div>
+            </div>
+            
+ 
           </div>
         </div>
       )}

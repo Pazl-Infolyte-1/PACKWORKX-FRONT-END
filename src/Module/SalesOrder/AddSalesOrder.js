@@ -20,6 +20,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     total_incl_gst:0,
     sgst: 0,
     cgst: 0,
+    totalGst:0,
     total_qty:0,
   });
 
@@ -57,6 +58,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     totalAmount: 0,
     totalSGST: 0,
     totalCGST: 0,
+    totalGst:0,
     totalWithGST: 0
   })
 
@@ -153,6 +155,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
               totalAmount: response.data.totalAmount || 0,
               totalSGST: response.data.totalSGST || 0,
               totalCGST: response.data.totalCGST || 0,
+              totalGst: response.data.totalGst || 0,
               totalWithGST: response.data.totalWithGST || 0
             });
           }
@@ -356,13 +359,28 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       </CNavItem>
 
 {/* Next/Back Navigation */}
-<div className="ml-4 flex items-center space-x-2">
+
+
+    </CNav>
+    
+
+    {activeTab === 'salesOrder' && (
+
+<ActionButton
+ onClick={handleParentSubmit}
+ label={"Submit Sales Order"}
+ variant='submit'
+ />
+    )}
+
+
+<div className="ml-2 flex items-center space-x-2">
   {activeTab === 'salesOrder' && (
     <button
       onClick={() => setActiveTab('skuDetails')}
       className="
         flex items-center space-x-2
-        text-purple-600 hover:text-purple-800
+         text-[#8761e5] hover:text-[#512fa9]
         transition-all duration-300
         group relative
         overflow-hidden
@@ -384,7 +402,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
         height="18"
         viewBox="0 0 24 24"
         className="
-          text-purple-600 group-hover:text-purple-800
+          text-[#8761e5] group-hover:text-[#794ee6]
           transition-all duration-500
           group-hover:translate-x-1
         "
@@ -416,7 +434,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       onClick={() => setActiveTab('salesOrder')}
       className="
         flex items-center space-x-2
-        text-purple-600 hover:text-purple-800
+        text-[#8761e5] hover:text-[#683fd0]
         transition-all duration-300
         group relative
         overflow-hidden
@@ -433,7 +451,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
         height="18"
         viewBox="0 0 24 24"
         className="
-          text-purple-600 group-hover:text-purple-800
+          text-[#8761e5] group-hover:text-purple-900
           transition-all duration-500
           group-hover:-translate-x-1
           rotate-180
@@ -466,18 +484,6 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     </button>
   )}
 </div>
-
-    </CNav>
-    
-
-    {activeTab === 'salesOrder' && (
-
-<ActionButton
- onClick={handleParentSubmit}
- label={"Submit Sales Order"}
- variant='submit'
- />
-    )}
 
     
 

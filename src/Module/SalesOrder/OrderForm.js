@@ -29,6 +29,7 @@ const OrderForm = forwardRef(({
       totalAmount: skuFormData ? skuFormData.totalAmount : 0,
       totalSGST: skuFormData ? skuFormData.totalSGST : 0,
       totalCGST: skuFormData ? skuFormData.totalCGST : 0,
+      totalGst:skuFormData ? skuFormData.totalGst : 0,
       totalWithGST: skuFormData ? skuFormData.totalWithGST : 0
     }
   }));
@@ -53,6 +54,7 @@ const OrderForm = forwardRef(({
         totalAmount: 0,
         totalSGST: 0,
         totalCGST: 0,
+        totalGst: 0,
         totalWithGST: 0
       });
     }
@@ -154,6 +156,7 @@ const handleToggleChange = () => {
       totalAmount: skuFormData ? skuFormData.totalAmount : 0,
       totalSGST: skuFormData ? skuFormData.totalSGST : 0,
       totalCGST: skuFormData ? skuFormData.totalCGST : 0,
+      totalGst:skuFormData ? skuFormData.totalGst : 0,
       totalWithGST: skuFormData ? skuFormData.totalWithGST : 0
     };
     
@@ -184,7 +187,7 @@ const handleToggleChange = () => {
                   value={localFormData.sales_ui_id || ""}
                   onChange={handleInputChange}
                   // placeholder="Enter Sales Order Id"
-                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white  text-[20px]  leading-[26px] outline-none placeholder:text-sm"
+                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white    leading-[26px] outline-none placeholder:text-sm"
                 />
               </div>
 
@@ -235,7 +238,7 @@ const handleToggleChange = () => {
                 value={localFormData.credit_period || ""}
                 onChange={handleInputChange}
                 // placeholder="Enter Client Period..."
-                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[20px]  leading-[26px] outline-none placeholder:text-sm"
+                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white   leading-[26px] outline-none placeholder:text-sm"
               />
             </div>
 
@@ -250,7 +253,7 @@ const handleToggleChange = () => {
                 value={localFormData.freight_paid || ""}
                 onChange={handleInputChange}
                 // placeholder="Enter text..."
-                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white  text-[20px]  leading-[26px] outline-none placeholder:text-sm"
+                className="w-[500px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white    leading-[26px] outline-none placeholder:text-sm"
               />
             </div>
 
@@ -351,7 +354,7 @@ const handleToggleChange = () => {
                   value={localFormData.confirmation_name || ""}
                   onChange={handleInputChange}
                   // placeholder="Enter Confirmation Name"
-                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white  text-[20px]  leading-[26px] outline-none placeholder:text-sm"
+                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white    leading-[26px] outline-none placeholder:text-sm"
                 />
               </div>
 
@@ -366,7 +369,7 @@ const handleToggleChange = () => {
                   value={localFormData.confirmation_mobile || ""}
                   onChange={handleInputChange}
                   // placeholder="Enter Confirmation Mobile"
-                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white  text-[20px]  leading-[26px] outline-none placeholder:text-sm"
+                  className="w-[240px] h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white    leading-[26px] outline-none placeholder:text-sm"
                 />
               </div>
             </div>

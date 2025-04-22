@@ -15,6 +15,7 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
   const [skuList, setSkuList] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [previousValues, setPreviousValues] = useState(null)
+  const [totalGst,setTotalGst]=useState(0)
 
   const updateTotals = (key, value) => {
     setTotals((prevTotals) => ({
@@ -37,9 +38,10 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
             totalAmount: item.total_amount || '',
             sgstAmount: item.sgst_amount || '',
             cgstAmount: item.cgst_amount || '',
+            totalGst: item.totalGst || '',
             total: item.total_incl__gst || ''
           }))
-        : [{ sku: '', quantity: '', rate: '', acceptableUnits: '', sgst: '', cgst: '', totalAmount: '', sgstAmount: '', cgstAmount: '', total: '' }]
+        : [{ sku: '', quantity: '', rate: '', acceptableUnits: '', sgst: '', cgst: '', totalAmount: '', sgstAmount: '', cgstAmount: '',totalGst:'', total: '' }]
     }
   })
 
@@ -89,6 +91,7 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
         totalAmount: item.total_amount || '',
         sgstAmount: item.sgst_amount || '',
         cgstAmount: item.cgst_amount || '',
+        totalGst:item.totalGst || '',
         total: item.total_incl__gst || ''
       }))
       
@@ -107,12 +110,14 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
         const sgst = formattedData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0);
         const cgst = formattedData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
         const withGST = formattedData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+        const totalGst = formattedData.reduce((sum, item) => sum + (parseFloat(item.totalGst) || 0), 0);
         
         setTotalQuantity(qty);
         setTotalAmount(amount);
         setTotalSGST(sgst);
         setTotalCGST(cgst);
         setTotalWithGST(withGST);
+        setTotalGst(totalGst)
         setTotals((prev) => ({
           ...prev,
           total_qty: qty,
@@ -170,7 +175,8 @@ useEffect(() => {
       cgst: cgst,
       sgst: sgst,
       total_incl_gst: withGST,
-      total_amount: amount
+      total_amount: amount,
+      totalGst:totalGst,
     }));
   };
   
@@ -196,6 +202,7 @@ useEffect(() => {
       sgst_amount: sku.sgstAmount,
       cgst_amount: sku.cgstAmount,
       total_amount: sku.totalAmount,
+      totalGst:sku.totalGst,
       total_incl__gst: sku.total
     }))
 
@@ -207,7 +214,8 @@ useEffect(() => {
         totalAmount,
         totalSGST,
         totalCGST,
-        totalWithGST
+        totalWithGST,
+        totalGst
       })
     }
   }
@@ -226,6 +234,7 @@ useEffect(() => {
     
     const sgstAmount = totalAmount * (sgstPercentage / 100);
     const cgstAmount = totalAmount * (cgstPercentage / 100);
+    const totalGst = sgstAmount+cgstAmount
     
     const total = totalAmount + sgstAmount + cgstAmount;
     
@@ -234,6 +243,7 @@ useEffect(() => {
     setValue(`skus[${index}].sgstAmount`, sgstAmount.toFixed(2));
     setValue(`skus[${index}].cgstAmount`, cgstAmount.toFixed(2));
     setValue(`skus[${index}].total`, total.toFixed(2));
+    setValue(`skus[${index}].totalGst`, totalGst.toFixed(2));
     
     // Force the form to update
     // This line is key - it ensures React Hook Form knows values have changed
@@ -246,25 +256,28 @@ useEffect(() => {
     const sgst = allSkus.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0);
     const cgst = allSkus.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
     const withGST = allSkus.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+    const totalGstAmount = allSkus.reduce((sum, item) => sum + (parseFloat(item.totalGst) || 0), 0);
     
     setTotalQuantity(qty);
     setTotalAmount(amount);
     setTotalSGST(sgst);
     setTotalCGST(cgst);
     setTotalWithGST(withGST);
+    setTotalGst(totalGstAmount)
     setTotals((prev) => ({
       ...prev,
       total_qty: qty,
       cgst: cgst,
       sgst: sgst,
       total_incl_gst: withGST,
-      total_amount: amount
+      total_amount: amount,
+      totalGst:totalGstAmount
     }));
   }
 
   // Add a new SKU row
   const addNewSku = () => {
-    append({ sku: '', quantity: '', rate: '', acceptableUnits: '', sgst: '', cgst: '', totalAmount: '', sgstAmount: '', cgstAmount: '', total: '' });
+    append({ sku: '', quantity: '', rate: '', acceptableUnits: '', sgst: '', cgst: '', totalAmount: '', sgstAmount: '', cgstAmount: '',totalGst:'', total: '' });
     // Update parent immediately after adding a new row to preserve existing data
     setTimeout(() => updateParentFormData(), 0);
   }
@@ -289,7 +302,8 @@ useEffect(() => {
       sgst_amount: sku.sgstAmount,
       cgst_amount: sku.cgstAmount,
       total_amount: sku.totalAmount,
-      total_incl__gst: sku.total
+      total_incl__gst: sku.total,
+      totalGst:sku.totalGst
     }))
 
     // Update parent component with SKU details
@@ -300,7 +314,8 @@ useEffect(() => {
         totalAmount,
         totalSGST,
         totalCGST,
-        totalWithGST
+        totalWithGST,
+        totalGst
       })
     }
     
@@ -311,7 +326,8 @@ useEffect(() => {
         totalAmount,
         totalSGST,
         totalCGST,
-        totalWithGST
+        totalWithGST,
+        totalGst
       }
     });
   }
@@ -345,6 +361,7 @@ useEffect(() => {
                     <th className="px-4 py-2 text-center">SGST Amount</th>
                     <th className="px-4 py-2 text-center">CGST %</th>
                     <th className="px-4 py-2 text-center">CGST Amount</th>
+                    <th className="px-4 py-2 text-center">Total GST</th>
                     <th className="px-4 py-2 text-center">Total Inc GST</th>
                     <th className="px-4 py-2 text-center">History</th>
                   </tr>
@@ -453,7 +470,7 @@ useEffect(() => {
                       </td>
 
                                             {/* SGST Amount */}
-                                            <td className="px-4 py-2">
+                        <td className="px-4 py-2">
                         <input
                           {...register(`skus[${index}].sgstAmount`)}
                           type="number"
@@ -486,6 +503,17 @@ useEffect(() => {
                       <td className="px-4 py-2">
                         <input
                           {...register(`skus[${index}].cgstAmount`)}
+                          type="number"
+                          placeholder="0"
+                          className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+                          readOnly
+                        />
+                      </td>
+
+                                            {/* Total GST */}
+                        <td className="px-4 py-2">
+                        <input
+                          {...register(`skus[${index}].totalGst`)}
                           type="number"
                           placeholder="0"
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
@@ -533,20 +561,20 @@ useEffect(() => {
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                   Total Qty: {totals.total_qty}
                 </td>
-                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  Total:
-                </td>
-                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  {totals.total_amount.toFixed(2)}
-                </td>
               
-              
-                <td className="px-4 py-2"></td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                   SGST:
                 </td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                   {totals.sgst.toFixed(2)}
+                </td>
+              
+                <td className="px-4 py-2"></td>
+                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                  Total:
+                </td>
+                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                  {totals.total_amount.toFixed(2)}
                 </td>
               </tr>
               <tr>
@@ -563,13 +591,17 @@ useEffect(() => {
                   Total GST:
                 </td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  {totals.cgst.toFixed(2)}
+                  {totals.totalGst.toFixed(2)}
                 </td>
                 
 
               </tr>
               <tr>
                                 <td className="px-4 py-2"></td>
+                                <td className="px-4 py-2"></td>
+                                <td className="px-4 py-2"></td>
+                                <td className="px-4 py-2"></td>
+
                 <td className="px-4 py-2 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
                   Total Incl GST:
                 </td>

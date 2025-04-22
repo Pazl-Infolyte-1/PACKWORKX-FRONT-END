@@ -34,6 +34,8 @@ const Process = () => {
   const [showEditModal, setShowEditModal] = useState(false)
   const { searchQuery } = useSearch()
   const searchBarRef = useRef(null)
+  console.log(pagination);
+  
 
   const fetchData = async () => {
     try {
@@ -51,7 +53,7 @@ const Process = () => {
 
   useEffect(() => {
     fetchData()
-  }, [searchQuery, limit, refresh])
+  }, [searchQuery, limit, refresh, pagination.page])
 
   const [formData, setFormData] = useState({
     process_name: '',
@@ -189,22 +191,20 @@ const Process = () => {
         <div>
           <CommonPagination
             count={pagination?.totalPages || 1}
-            page={pagination?.currentPage || 1}
+            page={pagination?.page || 1}
             onChange={(event, value) => {
               setPagination((prev) => ({
                 ...prev,
-                currentPage: value,
+                page: value,
               }))
-              fetchData()
             }}
             onLimitChange={(newLimit) => {
               setLimit(newLimit)
               // Reset to first page when changing limit
               setPagination((prev) => ({
                 ...prev,
-                currentPage: 1,
+                page: 1,
               }))
-              fetchData()
             }}
             limit={limit}
           />

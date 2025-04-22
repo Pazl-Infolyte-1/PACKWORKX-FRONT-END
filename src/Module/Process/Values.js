@@ -85,9 +85,9 @@ function Values({
               className="p-4 cursor-pointer flex justify-between items-center"
               onClick={toggleExpand}
             >
-              <div className="flex-1">
+              <div className="flex-1 items-center">
                 <p className="text-sm text-gray-500">
-                  <span className="font-medium">{processValue.ProcessName?.process_name}</span>
+                  <span className="font-bold text-lg">{processValue.ProcessName?.process_name}</span>
                 </p>
               </div>
               <div className="flex items-center gap-4">
@@ -97,9 +97,6 @@ function Values({
                 >
                   <FiEdit size={18} />
                 </button>
-                <div className="text-gray-400">
-                  {expanded ? <FiChevronUp size={20} /> : <FiChevronDown size={20} />}
-                </div>
               </div>
             </div>
 

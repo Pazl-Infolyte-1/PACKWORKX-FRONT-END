@@ -16,6 +16,7 @@ import RSCBox from './RSCBox'
 import CorrugatedSheet from './CorrugatedSheet'
 import DieCutBox from './DieCutBox'
 import CustomItem from './CustomItem'
+import ModifiedPopup from '../../components/New/ModifiedPopup'
 
 const compositeTypes = [
   { id: '1', name: 'Partition' },
@@ -42,7 +43,8 @@ function Composite({
   editedSkudata,
   updateSkuValues,
   isopenval,
-  setCompositeSelect
+  setCompositeSelect,
+  isactivateRender
 }) {
   const [skuListTable, setSkuListTable] = useState([])
   const [skuFields, setSkuFields] = useState([])
@@ -68,6 +70,7 @@ function Composite({
   const [selectedSkuType, setSelectedSkuType] = useState('')
   const [selectedSkuTypePopup, setSelectedSkuTypePopup] = useState(null);
 
+
   const handleCompositeTypeChange = (e) => {
     const selectedType = e.target.value
 
@@ -89,7 +92,7 @@ function Composite({
 
   useEffect(() => {
     fetchSkuList()
-  }, [])
+  }, [isactivateRender])
 
   //this is for popup table summary
   const fetchSkuListTablePopup = async () => {
@@ -240,9 +243,11 @@ function Composite({
   const handleSelectPopup = (data) => {
     console.log("selected data", data.sku_type);
     setCompositeSelect(data.sku_type)
-    //setSelectedSkuTypePopup(data.sku_type);
-    //setisSingleViewPopupForType(true);
+
   };
+
+      //setSelectedSkuTypePopup(data.sku_type);
+    //setisSingleViewPopupForType(true);
   
   const skuComponents = {
     'RSC box': <RSCBox />,
@@ -253,6 +258,14 @@ function Composite({
   };
 
   console.log("popup selectr",isSingleViewPopupForType)
+  //const handleClosePopup = () => {
+  //  console.log("popup closed")
+  //  setisSingleViewPopupForType(false);
+  //  setCompositeSelect(null); // reset when popup is closed
+  //};
+  
+  //console.log("pop///",isSingleViewPopupForType)
+  console.log("rebder activate",isactivateRender)
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
@@ -413,7 +426,7 @@ function Composite({
   >
     <option value="">Create New</option>
     {skuType.map((option) => (
-      <option key={option.id} value={option.sku_type}>
+      <option key={option.id} value={option.sku_type}    disabled={option.sku_type === 'Composite'}>
         {option.sku_type}
       </option>
     ))}
@@ -517,17 +530,17 @@ function Composite({
         />
       </PopUp>
 
-      <PopUp
+     {/*<ModifiedPopup
   header="Selected SKU"
   visible={isSingleViewPopupForType}
-  setVisible={setisSingleViewPopupForType}
+  setVisible={handleClosePopup}
   showCloseButton={true}
   width="60vw"
 >
   {skuComponents[selectedSkuTypePopup] || (
     <div className="text-gray-500">No view available for this SKU type</div>
   )}
-</PopUp>
+</ModifiedPopup>*/}
     </div>
   )
 }

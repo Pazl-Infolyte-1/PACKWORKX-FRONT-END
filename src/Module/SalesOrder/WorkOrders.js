@@ -600,22 +600,22 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                       <div className="flex-1 min-w-0">
                         <label className="block text-gray-800 font-medium mb-1">SKU*</label>
                         <select
-      className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-      value={item.sku_name}
-      onChange={(e) => handleSkuChange1(e, item.id)}
-    >
-      <option value="" disabled>Select SKU</option>
-      {skuList
-        .filter((skuItem) =>
-          skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
-        )
-        .map((skuItem) => (
-          <option key={skuItem.id} value={skuItem.id}>
-            {skuItem.sku_name}
-          </option>
-        ))}
-    </select>
-                          {/* <select
+                          className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
+                          value={item.sku_name}
+                          onChange={(e) => handleSkuChange1(e, item.id)}
+                        >
+                          <option value="" disabled>Select SKU</option>
+                          {skuList
+                            .filter((skuItem) =>
+                              skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
+                            )
+                            .map((skuItem) => (
+                              <option key={skuItem.id} value={skuItem.id}>
+                                {skuItem.sku_name}
+                              </option>
+                            ))}
+                        </select>
+                        {/* <select
                             className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
                             value={item.sku_name}
                             onChange={(e) => handleSkuChange1(e, item.id)}
@@ -733,7 +733,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                           className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
                         />
                       </div>
-                      
+
                     </div>
 
                     <SkuVersionAddEdit
@@ -851,10 +851,10 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                   {/* Toggle Indicator */}
                   <div
                     className={`absolute top-1/2 w-[33.33%] h-[100%] bg-[#8167E5] rounded-[10px] transform -translate-y-1/2 transition-all duration-300 ${(order.manufacture || 'inhouse') === 'inhouse'
-                        ? 'left-0'
-                        : (order.manufacture || 'inhouse') === 'outsource'
-                          ? 'left-1/3'
-                          : 'left-2/3'
+                      ? 'left-0'
+                      : (order.manufacture || 'inhouse') === 'outsource'
+                        ? 'left-1/3'
+                        : 'left-2/3'
                       }`}
                   />
 
@@ -938,12 +938,15 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
       value={order.sku_name || ''}
       onChange={(e) => handleSkuChange(e, order.id)}
     >
-      <option value="" disabled>Select SKU</option>
+      <option value="" disabled>
+        {skuList.filter((skuItem) =>
+          (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
+        ).length === 0 ? "No SKU Available" : "Select SKU"}
+      </option>
+
       {skuList
         .filter((skuItem) =>
-          (salesOrderSkus || []).some(
-            (soSku) => soSku.sku === skuItem.sku_name
-          )
+          (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
         )
         .map((skuItem) => (
           <option key={skuItem.id} value={skuItem.id}>
@@ -958,7 +961,12 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
       value={order.sku_name}
       onChange={(e) => handleSkuChange(e, order.id)}
     >
-      <option value="" disabled>Select SKU</option>
+      <option value="" disabled>
+        {skuList.filter((skuItem) =>
+          skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
+        ).length === 0 ? "No SKU Available" : "Select SKU"}
+      </option>
+
       {skuList
         .filter((skuItem) =>
           skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
@@ -1081,24 +1089,24 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
 
 
                     {/* Submit Button */}
-    
-                    </div>
-                    <SkuVersionAddEdit
-                      handleDeleteVersion={handleDeleteVersion}
-                      skuID={order.sku_name}
-                      setSkuVersionsMap={setSkuVersionsMap}
-                      orderId={order.id} // Pass the orderId of the work order being edited
-                    />
-                    <div className="w-full flex justify-end pb-3">
 
-`{!isWorkOrderList && (
-                        <ActionButton
-                          label={"Add Work Order"}
-                          
-                          variant=''
-                          onClick={() => { handleSubmitWorkOrderForm(order.id) }}
-                        />
-                      )}
+                  </div>
+                  <SkuVersionAddEdit
+                    handleDeleteVersion={handleDeleteVersion}
+                    skuID={order.sku_name}
+                    setSkuVersionsMap={setSkuVersionsMap}
+                    orderId={order.id} // Pass the orderId of the work order being edited
+                  />
+                  <div className="w-full flex justify-end pb-3">
+
+                    {!isWorkOrderList && (
+                      <ActionButton
+                        label={"Add Work Order"}
+
+                        variant=''
+                        onClick={() => { handleSubmitWorkOrderForm(order.id) }}
+                      />
+                    )}
                   </div>
                 </div>
               )}

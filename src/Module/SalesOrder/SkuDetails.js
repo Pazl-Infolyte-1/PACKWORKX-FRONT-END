@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
 
-const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = true,totals,setTotals}) => {
+const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = true, totals, setTotals }) => {
   const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
   const [totalQuantity, setTotalQuantity] = useState(0)
   const [totalAmount, setTotalAmount] = useState(0)
@@ -15,7 +15,7 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
   const [skuList, setSkuList] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [previousValues, setPreviousValues] = useState(null)
-  const [totalGst,setTotalGst]=useState(0)
+  const [totalGst, setTotalGst] = useState(0)
 
   const updateTotals = (key, value) => {
     setTotals((prevTotals) => ({
@@ -27,21 +27,21 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
   // Initialize form with skuDetailsForm data if it exists
   const { register, control, handleSubmit, reset, watch, setValue, getValues } = useForm({
     defaultValues: {
-      skus: skuDetailsForm && skuDetailsForm.length > 0 
+      skus: skuDetailsForm && skuDetailsForm.length > 0
         ? skuDetailsForm.map(item => ({
-            sku: item.sku || '',
-            quantity: item.quantity_required || '',
-            rate: item.rate_per_sku || '',
-            acceptableUnits: item.acceptable_sku_units || '',
-            sgst: item.sgst || '',
-            cgst: item.cgst || '',
-            totalAmount: item.total_amount || '',
-            sgstAmount: item.sgst_amount || '',
-            cgstAmount: item.cgst_amount || '',
-            totalGst: item.totalGst || '',
-            total: item.total_incl__gst || ''
-          }))
-        : [{ sku: '', quantity: '', rate: '', acceptableUnits: '', sgst: '', cgst: '', totalAmount: '', sgstAmount: '', cgstAmount: '',totalGst:'', total: '' }]
+          sku: item.sku || '',
+          quantity: item.quantity_required || '',
+          rate: item.rate_per_sku || '',
+          acceptableUnits: item.acceptable_sku_units || '',
+          sgst: item.sgst || '',
+          cgst: item.cgst || '',
+          totalAmount: item.total_amount || '',
+          sgstAmount: item.sgst_amount || '',
+          cgstAmount: item.cgst_amount || '',
+          totalGst: item.totalGst || '',
+          total: item.total_incl__gst || ''
+        }))
+        : [{ sku: '', quantity: '', rate: '', acceptableUnits: '', sgst: '', cgst: '', totalAmount: '', sgstAmount: '', cgstAmount: '', totalGst: '', total: '' }]
     }
   })
 
@@ -59,12 +59,12 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
         setIsLoading(true)
         const response = await apiMethods.getSkuList({
           search: '',
-          client:'',
-          sku_type:'',
-          page:  1,
+          client: '',
+          sku_type: '',
+          page: 1,
           limit: 100,
         })
-                // const response = await apiMethods.getSkuListOptions()
+        // const response = await apiMethods.getSkuListOptions()
 
         setSkuList(response?.data || [])
       } catch (error) {
@@ -73,7 +73,7 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
         setIsLoading(false)
       }
     }
-    
+
     fetchSkuList()
   }, [])
 
@@ -84,26 +84,26 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
       const formattedData = skuDetailsForm.map(item => ({
         sku: item.sku || '',
         quantity: item.quantity_required || '',
-        rate: item.rate_per_sku || '', 
+        rate: item.rate_per_sku || '',
         acceptableUnits: item.acceptable_sku_units || '',
         sgst: item.sgst || '',
         cgst: item.cgst || '',
         totalAmount: item.total_amount || '',
         sgstAmount: item.sgst_amount || '',
         cgstAmount: item.cgst_amount || '',
-        totalGst:item.totalGst || '',
+        totalGst: item.totalGst || '',
         total: item.total_incl__gst || ''
       }))
-      
+
       // Check if the data is actually different from current form data
       const currentFormData = JSON.stringify(getValues('skus'));
       const newFormData = JSON.stringify(formattedData);
-      
+
       // Always update the form if skuDetailsForm changes
       if (currentFormData !== newFormData) {
         reset({ skus: formattedData });
         setPreviousValues(formattedData);
-        
+
         // Also update totals based on the new data
         const qty = formattedData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
         const amount = formattedData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0);
@@ -111,7 +111,7 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
         const cgst = formattedData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
         const withGST = formattedData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
         const totalGst = formattedData.reduce((sum, item) => sum + (parseFloat(item.totalGst) || 0), 0);
-        
+
         setTotalQuantity(qty);
         setTotalAmount(amount);
         setTotalSGST(sgst);
@@ -126,7 +126,7 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
           total_incl_gst: withGST,
           total_amount: amount
         }));
-          }
+      }
     }
   }, [skuDetailsForm, reset, getValues])
 
@@ -138,59 +138,59 @@ const SkuDetails = ({formData, setFormData, skuDetailsForm, showSubmitButton = t
   //     const sgst = skusData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0)
   //     const cgst = skusData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0)
   //     const withGST = skusData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0)
-      
+
   //     setTotalQuantity(qty)
   //     setTotalAmount(amount)
   //     setTotalSGST(sgst)
   //     setTotalCGST(cgst)
   //     setTotalWithGST(withGST)
-      
+
   //     // Update parent component whenever totals change
   //     updateParentFormData();
   //   }
   // }, [skusData])
 
   // First, add a useEffect that forces a recalculation of the summary totals
-// whenever the skusData changes
-useEffect(() => {
-  const recalculateTotals = () => {
-    if (!skusData || skusData.length === 0) return;
-    
-    // Force parse all values to make sure we're using numbers
-    const qty = skusData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
-    const amount = skusData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0);
-    const sgst = skusData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0);
-    const cgst = skusData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
-    const withGST = skusData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
-    
-    // Update all state values
-    setTotalQuantity(qty);
-    setTotalAmount(amount);
-    setTotalSGST(sgst);
-    setTotalCGST(cgst);
-    setTotalWithGST(withGST);
-    setTotals((prev) => ({
-      ...prev,
-      total_qty: qty,
-      cgst: cgst,
-      sgst: sgst,
-      total_incl_gst: withGST,
-      total_amount: amount,
-      totalGst:totalGst,
-    }));
-  };
-  
-  recalculateTotals();
-  
-  // Also update the parent form data
-  updateParentFormData();
-}, [skusData]);
+  // whenever the skusData changes
+  useEffect(() => {
+    const recalculateTotals = () => {
+      if (!skusData || skusData.length === 0) return;
+
+      // Force parse all values to make sure we're using numbers
+      const qty = skusData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
+      const amount = skusData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0);
+      const sgst = skusData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0);
+      const cgst = skusData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
+      const withGST = skusData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+
+      // Update all state values
+      setTotalQuantity(qty);
+      setTotalAmount(amount);
+      setTotalSGST(sgst);
+      setTotalCGST(cgst);
+      setTotalWithGST(withGST);
+      setTotals((prev) => ({
+        ...prev,
+        total_qty: qty,
+        cgst: cgst,
+        sgst: sgst,
+        total_incl_gst: withGST,
+        total_amount: amount,
+        totalGst: totalGst,
+      }));
+    };
+
+    recalculateTotals();
+
+    // Also update the parent form data
+    updateParentFormData();
+  }, [skusData]);
 
   // Function to update parent component with current SKU data
   const updateParentFormData = () => {
     const currentValues = getValues('skus');
     if (!currentValues) return;
-    
+
     // Format the data to match the expected schema
     const formattedSkus = currentValues.map(sku => ({
       sku: sku.sku,
@@ -202,7 +202,7 @@ useEffect(() => {
       sgst_amount: sku.sgstAmount,
       cgst_amount: sku.cgstAmount,
       total_amount: sku.totalAmount,
-      totalGst:sku.totalGst,
+      totalGst: sku.totalGst,
       total_incl__gst: sku.total
     }))
 
@@ -225,30 +225,30 @@ useEffect(() => {
     const values = getValues(`skus[${index}]`);
     const quantity = parseFloat(values.quantity) || 0;
     const rate = parseFloat(values.rate) || 0;
-    
+
     // Calculate total amount
     const totalAmount = quantity * rate;
-    
+
     const sgstPercentage = parseFloat(values.sgst) || 0;
     const cgstPercentage = parseFloat(values.cgst) || 0;
-    
+
     const sgstAmount = totalAmount * (sgstPercentage / 100);
     const cgstAmount = totalAmount * (cgstPercentage / 100);
-    const totalGst = sgstAmount+cgstAmount
-    
+    const totalGst = sgstAmount + cgstAmount
+
     const total = totalAmount + sgstAmount + cgstAmount;
-    
+
     // Update form values
     setValue(`skus[${index}].totalAmount`, totalAmount.toFixed(2));
     setValue(`skus[${index}].sgstAmount`, sgstAmount.toFixed(2));
     setValue(`skus[${index}].cgstAmount`, cgstAmount.toFixed(2));
     setValue(`skus[${index}].total`, total.toFixed(2));
     setValue(`skus[${index}].totalGst`, totalGst.toFixed(2));
-    
+
     // Force the form to update
     // This line is key - it ensures React Hook Form knows values have changed
-    setValue(`skus[${index}]`, {...getValues(`skus[${index}`)});
-    
+    setValue(`skus[${index}]`, { ...getValues(`skus[${index}`) });
+
     // Directly recalculate the totals
     const allSkus = getValues('skus');
     const qty = allSkus.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
@@ -257,7 +257,7 @@ useEffect(() => {
     const cgst = allSkus.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
     const withGST = allSkus.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
     const totalGstAmount = allSkus.reduce((sum, item) => sum + (parseFloat(item.totalGst) || 0), 0);
-    
+
     setTotalQuantity(qty);
     setTotalAmount(amount);
     setTotalSGST(sgst);
@@ -271,13 +271,13 @@ useEffect(() => {
       sgst: sgst,
       total_incl_gst: withGST,
       total_amount: amount,
-      totalGst:totalGstAmount
+      totalGst: totalGstAmount
     }));
   }
 
   // Add a new SKU row
   const addNewSku = () => {
-    append({ sku: '', quantity: '', rate: '', acceptableUnits: '', sgst: '', cgst: '', totalAmount: '', sgstAmount: '', cgstAmount: '',totalGst:'', total: '' });
+    append({ sku: '', quantity: '', rate: '', acceptableUnits: '', sgst: '', cgst: '', totalAmount: '', sgstAmount: '', cgstAmount: '', totalGst: '', total: '' });
     // Update parent immediately after adding a new row to preserve existing data
     setTimeout(() => updateParentFormData(), 0);
   }
@@ -303,7 +303,7 @@ useEffect(() => {
       cgst_amount: sku.cgstAmount,
       total_amount: sku.totalAmount,
       total_incl__gst: sku.total,
-      totalGst:sku.totalGst
+      totalGst: sku.totalGst
     }))
 
     // Update parent component with SKU details
@@ -318,7 +318,7 @@ useEffect(() => {
         totalGst
       })
     }
-    
+
     console.log('SKU Form Submitted:', {
       skus: formattedSkus,
       totals: {
@@ -372,34 +372,37 @@ useEffect(() => {
                   {fields.map((item, index) => (
                     <tr key={item.id} className="hover:bg-gray-50 border-t">
                       {/* SKU Dropdown */}
-                      <td className="px-4 py-2">
-                      <select
-  {...register(`skus[${index}].sku`, {
-    onChange: () => {
-      calculateRowValues(index);
-      updateParentFormData();
-    },
-  })}
-  value={watch(`skus[${index}].sku`)}
-  className="w-[320px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
->
-  <option value="" disabled>
-    {isLoading ? "Loading SKUs..." : "Select SKU"}
-  </option>
+<td className="px-4 py-2">
+  <select
+    {...register(`skus[${index}].sku`, {
+      onChange: () => {
+        calculateRowValues(index);
+        updateParentFormData();
+      },
+    })}
+    value={watch(`skus[${index}].sku`)}
+    className="w-[320px] h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+  >
+    <option value="" disabled>
+      {isLoading ? "Loading SKUs..." : skuList.length === 0 ? "No SKU Available" : "Select SKU"}
+    </option>
 
-  {skuList.map((skuItem, i) => {
-    const selectedSkus = watch("skus").map((s, idx) => idx !== index && s.sku).filter(Boolean);
-    const isDisabled = selectedSkus.includes(skuItem.sku_name);
+    {skuList.length > 0 &&
+      skuList.map((skuItem, i) => {
+        const selectedSkus = watch("skus")
+          .map((s, idx) => idx !== index && s.sku)
+          .filter(Boolean);
+        const isDisabled = selectedSkus.includes(skuItem.sku_name);
 
-    return (
-      <option key={i} value={skuItem.sku_name} disabled={isDisabled}>
-        {skuItem.sku_name}
-      </option>
-    );
-  })}
-</select>
+        return (
+          <option key={i} value={skuItem.sku_name} disabled={isDisabled}>
+            {skuItem.sku_name}
+          </option>
+        );
+      })}
+  </select>
+</td>
 
-                      </td>
 
                       {/* Quantity Input */}
                       <td className="px-4 py-2">
@@ -443,8 +446,8 @@ useEffect(() => {
                         />
                       </td>
 
-                            {/* Total Amount */}
-                         <td className="px-4 py-2">
+                      {/* Total Amount */}
+                      <td className="px-4 py-2">
                         <input
                           {...register(`skus[${index}].totalAmount`)}
                           type="number"
@@ -469,8 +472,8 @@ useEffect(() => {
                         />
                       </td>
 
-                                            {/* SGST Amount */}
-                        <td className="px-4 py-2">
+                      {/* SGST Amount */}
+                      <td className="px-4 py-2">
                         <input
                           {...register(`skus[${index}].sgstAmount`)}
                           type="number"
@@ -510,8 +513,8 @@ useEffect(() => {
                         />
                       </td>
 
-                                            {/* Total GST */}
-                        <td className="px-4 py-2">
+                      {/* Total GST */}
+                      <td className="px-4 py-2">
                         <input
                           {...register(`skus[${index}].totalGst`)}
                           type="number"
@@ -533,12 +536,12 @@ useEffect(() => {
                       </td>
 
                       <td className="px-4 py-2">
-                      <ActionButton
-            label={"invoice"}
-            variant='minimal'
-            onClick={() => setActionDrawerOpen(true)}
+                        <ActionButton
+                          label={"invoice"}
+                          variant='minimal'
+                          onClick={() => setActionDrawerOpen(true)}
 
-          />
+                        />
                       </td>
 
                       {/* Delete Icon */}
@@ -561,14 +564,14 @@ useEffect(() => {
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                   Total Qty: {totals.total_qty}
                 </td>
-              
+
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                   SGST:
                 </td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                   {totals.sgst.toFixed(2)}
                 </td>
-              
+
                 <td className="px-4 py-2"></td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                   Total:
@@ -593,14 +596,14 @@ useEffect(() => {
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                   {totals.totalGst.toFixed(2)}
                 </td>
-                
+
 
               </tr>
               <tr>
-                                <td className="px-4 py-2"></td>
-                                <td className="px-4 py-2"></td>
-                                <td className="px-4 py-2"></td>
-                                <td className="px-4 py-2"></td>
+                <td className="px-4 py-2"></td>
+                <td className="px-4 py-2"></td>
+                <td className="px-4 py-2"></td>
+                <td className="px-4 py-2"></td>
 
                 <td className="px-4 py-2 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
                   Total Incl GST:
@@ -616,7 +619,7 @@ useEffect(() => {
 
       </div>
       <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} />
-      </div>
+    </div>
   )
 }
 
@@ -627,7 +630,7 @@ export default SkuDetails
 
 
 
-        {/* <div className="flex justify-between items-center w-full mt-10">
+{/* <div className="flex justify-between items-center w-full mt-10">
           <ActionButton
             onClick={() => setActionDrawerOpen(true)}
             label={"Previous Invoice Rates"}

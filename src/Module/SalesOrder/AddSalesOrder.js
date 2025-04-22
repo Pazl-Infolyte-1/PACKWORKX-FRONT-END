@@ -368,7 +368,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
 
 <ActionButton
  onClick={handleParentSubmit}
- label={"Submit Sales Order"}
+ label={"Submit"}
  variant='submit'
  />
     )}

@@ -408,12 +408,12 @@ const handleToggleChange = () => {
             </div>
         </div> */}
 
-<button
+{/* <button
             type="submit"
             className="px-4 py-2 bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
             >
             Submit Order
-          </button>
+          </button> */}
 
         
       </div>

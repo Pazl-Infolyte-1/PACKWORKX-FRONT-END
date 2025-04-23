@@ -87,7 +87,8 @@ function ProcessIntegrartionTable({
                   {item.process_name}
                 </CTableDataCell>
                 <CTableDataCell className="py-3 px-2  font-semibold">
-                  {apiMethods.formatDate(item.created_at)}
+                  {/*{apiMethods.formatDate(item.created_at)}*/}
+                  {new Date(item.created_at).toLocaleString()}
                 </CTableDataCell>
                 <CTableDataCell className="py-3 px-2">
                    <ThreeDotMenu

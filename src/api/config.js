@@ -568,6 +568,7 @@ export const apiMethods = {
   getSkuListOptions: async () => {
     try {
       const response = await apiClient.get('/sku-details',{
+        params: { limit: 10000 }
       })
       return response.data
     } catch (error) {
@@ -875,7 +876,23 @@ export const apiMethods = {
   updateSalesOrderStatus:async(id,body)=>{
     const response = await apiClient.patch(`/sale-order/${id}/status`,body);
     return response
-  }
+  },
+
+  getRouteList: async (params) => {
+    try {
+      const response = await apiClient.get('/mapping/route', {
+        params: {
+          search: params.search || '',
+          page: params.page || 1,
+          limit: params.limit || 10
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  
 
 }
 

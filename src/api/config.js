@@ -939,8 +939,65 @@ export const apiMethods = {
       console.error(error);
     }
   },
-  
+getDesignationList:async()=>{
+  const response = await apiClient.get(`/designations`);
+  return response
+},
+deleteDesignation:async(id)=>{
+  const response = await apiClient.delete(`/designations/${id}`)
+  return response
+},
+editDesignation:async(id,body)=>{
+  const response = await apiClient.put(`/designations/${id}`,body)
+  return response
+},
+postDesignation: async (body) => {
+  const response = await apiClient.post(`/designations`, body)
+  return response
+},
+deleteDepartment: async (id) => {
+  const response = await apiClient.delete(`/departments/${id}`)
+  return response
+},
+getDepartmentById: async (id) => {
+  const response = await apiClient.get(`/departments/${id}`);
+  return response;
+},
 
+updateDepartment: async (id, body) => {
+  const response = await apiClient.put(`/departments/${id}`, body);
+  return response;
+},
+postDepartment:async(body)=>{
+  const response = await apiClient.post(`/departments`, body);
+  return response;
+},
+postRole: async (body) => {
+  const response = await apiClient.post('/role', body);
+  return response;
+},
+
+getRoleById: async (id) => {
+  const response = await apiClient.get(`/role/${id}`);
+  return response;
+},
+
+updateRole: async (id, body) => {
+  const response = await apiClient.put(`/role/${id}`, body);
+  return response;
+},
+
+deleteRole: async (id) => {
+  const response = await apiClient.delete(`/role/${id}`);
+  return response;
+},
+getRoles: async () => {
+  try {
+    return await apiClient.get(`/role`)
+  } catch (error) {
+    console.error(error)
+  }
+}
 }
 
 

@@ -125,7 +125,8 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellDa
           </CTableDataCell> */}
           {/* <CTableDataCell className="py-3 px-4 text-gray-700">{cell.client}</CTableDataCell> */}
           <CTableDataCell className="py-3 px-4 text-gray-700">
-            {apiMethods.formatDate(cell.created_at)}
+            {/*{apiMethods.formatDate(cell.created_at)}*/}
+            {new Date(cell.created_at).toLocaleString()}
           </CTableDataCell>
           {/* <CTableDataCell className="py-3 px-4 text-gray-700">{cell.etd}</CTableDataCell> */}
           <CTableDataCell className="py-3 px-4 text-gray-700">{cell.qty}</CTableDataCell>

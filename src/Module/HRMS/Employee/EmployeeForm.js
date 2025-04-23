@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { RiCheckLine, RiCloseLine, RiUserLine } from 'react-icons/ri'
+import { RiCheckLine, RiCloseLine, RiEye2Line, RiEyeLine, RiEyeOffLine, RiUserLine } from 'react-icons/ri'
 import { IoIosAt } from 'react-icons/io'
 import Switch from '@mui/material/Switch'
 import profile from '../../../assets/images/profile.png'
@@ -81,6 +81,8 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
   const [inputValue, setInputValue] = useState("");
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
   const [countrySearchValue, setCountrySearchValue] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
 
   // This effect monitors drawer close events
   useEffect(() => {
@@ -241,6 +243,12 @@ useEffect(() => {
     }
   });
 
+  
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+
   return (
     <>
       <Drawer className="w-1/2" isOpen={isDrawerOpen} onClose={handleCloseDrawer}title={isEdit?"Edit Employee":"Add Employee"}>
@@ -308,7 +316,6 @@ useEffect(() => {
                     value={formData.employee_id}
                     onChange={handleInputChange}
                   />
-                  <RiUserLine className="pr-2 h-10 w-10" />
                 </div>
               </div>
 
@@ -420,19 +427,28 @@ useEffect(() => {
               </div>
               {/* Password */}
               <div>
-                <h6 className="mb-2">Password</h6>
-                <div className="flex items-center border border-stone-200 rounded-md">
-                  <input
-                    type="password"
-                    name="password"
-                    className="w-full outline-none text-zinc-500 px-3 py-2"
-                    placeholder="Enter Password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                  />
-                  <RiUserLine className="pr-2 h-10 w-10" />
-                </div>
-              </div>
+      <h6 className="mb-2">Password</h6>
+      <div className="flex items-center border border-stone-200 rounded-md">
+        <input
+          type={showPassword ? "text" : "password"}
+          name="password"
+          className="w-full outline-none text-zinc-500 px-3 py-2"
+          placeholder="Enter Password"
+          value={formData.password}
+          onChange={handleInputChange}
+        />
+        <button 
+          type="button"
+          onClick={togglePasswordVisibility}
+          className="pr-2 flex items-center justify-center"
+        >
+          {showPassword ? 
+            <RiEyeOffLine className=" h-7 w-7" /> : 
+            <RiEyeLine className=" h-7 w-7" />
+          }
+        </button>
+      </div>
+    </div>
 
               {/* Company Address */}
               <div>
@@ -600,18 +616,20 @@ useEffect(() => {
               </div>
 
               {/* Contract End Date */}
-              <div>
-                <h6 className="mb-2">Contract End Date</h6>
-                <div className="border border-stone-200 rounded-md">
-                  <input
-                    type="date"
-                    name="contract_end_date"
-                    className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.contract_end_date}
-                    onChange={handleInputChange}
-                  />
+              {formData.employment_type === 'Contract' && (
+                <div>
+                  <h6 className="mb-2">Contract End Date</h6>
+                  <div className="border border-stone-200 rounded-md">
+                    <input
+                      type="date"
+                      name="contract_end_date"
+                      className="h-10 w-full outline-none text-zinc-500 px-3"
+                      value={formData.contract_end_date}
+                      onChange={handleInputChange}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Address */}
               <div>

@@ -26,6 +26,7 @@ const AdminFaq = React.lazy(() => import('./Module/AdminFaq/AdminFaq.js'))
 const Process = React.lazy(() => import('./Module/Process/Process.js'))
 const Designation = React.lazy(() => import('./Module/Designation/Designation.js'))
 const Department = React.lazy(() => import('./Module/Department/Department.js'))
+const Role = React.lazy(() => import('./Module/Role/Role.js'))
 
 
 
@@ -59,6 +60,7 @@ const routes = [
   { path: '/adminFaq', name: 'Admin Faq', element: AdminFaq, key: '' },
   { path: '/designation', name: 'Designation', element: Designation, key: '' },
   { path: '/department', name: 'Department', element: Department, key: '' },
+  { path: '/role', name: 'role', element: Role, key: '' },
 
   { path: '/users', name: 'user', element: DropDownController, key: 6000 },
   {

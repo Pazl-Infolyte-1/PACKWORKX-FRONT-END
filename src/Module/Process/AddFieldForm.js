@@ -173,11 +173,12 @@ const AddFieldForm = ({
 
           {/* Field Type */}
           <div className="mt-6">
-            <label className="block mb-2 text-gray-600">Field Type</label>
+            <label className="block mb-2 text-gray-600">Field Type <span className="text-red-500 text-xs">{isEdit && '(Not Editable)'}</span></label>
             <select
               value={fieldType}
               onChange={(e) => setFieldType(e.target.value)}
               className="w-full p-2 border rounded bg-white"
+              disabled={isEdit}
             >
               <option value="text">Text</option>
               <option value="number">Number</option>

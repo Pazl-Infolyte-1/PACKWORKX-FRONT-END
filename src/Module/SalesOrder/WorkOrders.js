@@ -481,7 +481,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
 
         {!isWorkOrderList && (
           <ActionButton
-            label={" + Create Workorders"}
+            label={" + Create Work Order"}
             onClick={addWorkOrder}
             variant='add'
           />
@@ -667,7 +667,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                     {/* Second row */}
                     <div className="flex flex-col md:flex-row gap-8">
                       <div className="flex-1 min-w-0">
-                        <label className="block text-gray-800 font-medium mb-1">Quantity*</label>
+                        <label className="block text-gray-800 font-medium mb-1">Quantity <span className='text-red-500'>*</span></label>
                         <input
                           type="number"
                           // placeholder="100"
@@ -692,7 +692,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                     {/* Third row */}
                     <div className="flex flex-col md:flex-row gap-8">
                       <div className="flex-1 min-w-0">
-                        <label className="block text-gray-800 font-medium mb-1">Planned Start Date*</label>
+                        <label className="block text-gray-800 font-medium mb-1">Planned Start Date <span className='text-red-500'>*</span></label>
                         <input
                           type="date"
                           className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
@@ -702,7 +702,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <label className="block text-gray-800 font-medium mb-1">Planned End Date*</label>
+                        <label className="block text-gray-800 font-medium mb-1">Planned End Date <span className='text-red-500'>*</span></label>
                         <input
                           type="date"
                           className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
@@ -715,7 +715,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                     {/* Fourth row */}
                     <div className="flex flex-col md:flex-row gap-8">
                       <div className="flex-1 min-w-0">
-                        <label className="block text-gray-800 font-medium mb-1">Estimated Delivery Date*</label>
+                        <label className="block text-gray-800 font-medium mb-1">Estimated Delivery Date <span className='text-red-500'>*</span></label>
                         <input
                           type="date"
                           value={formatDate(item.edd)}
@@ -928,57 +928,57 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                   <div className="w-full flex flex-col  mt-2 gap-12 py-4">
                     {/* First row */}
                     <div className="flex flex-col md:flex-row gap-8">
-                    <div className="flex-1 min-w-0">
-  <label className="block text-gray-800 font-medium mb-1">SKU*</label>
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-800 font-medium mb-1">SKU <span className='text-red-500'>*</span></label>
 
-  {isWorkOrderList ? (
-    // SKU Dropdown shown only in workorderlist
-    <select
-      className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-      value={order.sku_name || ''}
-      onChange={(e) => handleSkuChange(e, order.id)}
-    >
-      <option value="" disabled>
-        {skuList.filter((skuItem) =>
-          (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
-        ).length === 0 ? "No SKU Available" : "Select SKU"}
-      </option>
+                        {isWorkOrderList ? (
+                          // SKU Dropdown shown only in workorderlist
+                          <select
+                            className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
+                            value={order.sku_name || ''}
+                            onChange={(e) => handleSkuChange(e, order.id)}
+                          >
+                            <option value="" disabled>
+                              {skuList.filter((skuItem) =>
+                                (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
+                              ).length === 0 ? "No SKU Available" : "Select SKU"}
+                            </option>
 
-      {skuList
-        .filter((skuItem) =>
-          (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
-        )
-        .map((skuItem) => (
-          <option key={skuItem.id} value={skuItem.id}>
-            {skuItem.sku_name}
-          </option>
-        ))}
-    </select>
-  ) : (
-    // Original SKU dropdown
-    <select
-      className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-      value={order.sku_name}
-      onChange={(e) => handleSkuChange(e, order.id)}
-    >
-      <option value="" disabled>
-        {skuList.filter((skuItem) =>
-          skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
-        ).length === 0 ? "No SKU Available" : "Select SKU"}
-      </option>
+                            {skuList
+                              .filter((skuItem) =>
+                                (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
+                              )
+                              .map((skuItem) => (
+                                <option key={skuItem.id} value={skuItem.id}>
+                                  {skuItem.sku_name}
+                                </option>
+                              ))}
+                          </select>
+                        ) : (
+                          // Original SKU dropdown
+                          <select
+                            className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
+                            value={order.sku_name}
+                            onChange={(e) => handleSkuChange(e, order.id)}
+                          >
+                            <option value="" disabled>
+                              {skuList.filter((skuItem) =>
+                                skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
+                              ).length === 0 ? "No SKU Available" : "Select SKU"}
+                            </option>
 
-      {skuList
-        .filter((skuItem) =>
-          skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
-        )
-        .map((skuItem) => (
-          <option key={skuItem.id} value={skuItem.id}>
-            {skuItem.sku_name}
-          </option>
-        ))}
-    </select>
-  )}
-</div>
+                            {skuList
+                              .filter((skuItem) =>
+                                skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
+                              )
+                              .map((skuItem) => (
+                                <option key={skuItem.id} value={skuItem.id}>
+                                  {skuItem.sku_name}
+                                </option>
+                              ))}
+                          </select>
+                        )}
+                      </div>
 
 
 
@@ -1018,7 +1018,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                     {/* Second row */}
                     <div className="flex flex-col md:flex-row gap-8">
                       <div className="flex-1 min-w-0">
-                        <label className="block text-gray-800 font-medium mb-1">Quantity*</label>
+                        <label className="block text-gray-800 font-medium mb-1">Quantity <span className='text-red-500'>*</span></label>
                         <input
                           type="number"
                           // placeholder="100"
@@ -1043,7 +1043,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                     {/* Third row */}
                     <div className="flex flex-col md:flex-row gap-8">
                       <div className="flex-1 min-w-0">
-                        <label className="block text-gray-800 font-medium mb-1">Planned Start Date*</label>
+                        <label className="block text-gray-800 font-medium mb-1">Planned Start Date <span className='text-red-500'>*</span></label>
                         <input
                           type="date"
                           value={order.planned_start_date}
@@ -1053,7 +1053,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <label className="block text-gray-800 font-medium mb-1">Planned End Date*</label>
+                        <label className="block text-gray-800 font-medium mb-1">Planned End Date <span className='text-red-500'>*</span></label>
                         <input
                           type="date"
                           value={order.planned_end_date}
@@ -1066,7 +1066,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                     {/* Fourth row */}
                     <div className="flex flex-col md:flex-row gap-8">
                       <div className="flex-1 min-w-0">
-                        <label className="block text-gray-800 font-medium mb-1">Estimated Delivery Date*</label>
+                        <label className="block text-gray-800 font-medium mb-1">Estimated Delivery Date <span className='text-red-500'>*</span></label>
                         <input
                           type="date"
                           value={order.edd}

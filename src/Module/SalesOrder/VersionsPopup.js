@@ -14,13 +14,16 @@ import { BiSolidDownArrow, BiSolidUpArrow, BiTrash } from 'react-icons/bi';
 import { cilPencil, cilTrash } from '@coreui/icons';
 import ThreeDotMenu from '../../components/ThreeDotMenu';
 import apiMethods from '../../api/config';
+import CustomAlert from '../../components/New/CustomAlert';
 
-function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversions,handleDeleteVersion,setIsEdit,setSelectedSkuVersionID,formVisibility }) {
+function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversions,handleDeleteVersion,setIsEdit,setSelectedSkuVersionID,formVisibility,alerts,setAlerts }) {
   const [expandedVersions, setExpandedVersions] = useState({});
 
-  useEffect(() => {
-    console.log(versionData, "----------------------------");
-  }, [versionData]);
+  // useEffect(() => {
+  //   console.log(versionData, "----------------------------");
+  // }, [versionData]);
+
+
 
   const toggleVersionCollapse = (versionId) => {
     setExpandedVersions(prev => ({
@@ -28,6 +31,10 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
       [versionId]: !prev[versionId]
     }));
   };
+
+  const handleClose = ()=>{
+  setAlerts([]) 
+  }
 
 //  const handleDeleteVersion = async (versionId,) => {
 //   try {
@@ -217,6 +224,11 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
           </CTable>
         </div>
       </div>
+      <CustomAlert
+      className="absolute"
+      alerts={alerts}
+      handleClose={handleClose}
+      />
     </PopUp>
   );
 }

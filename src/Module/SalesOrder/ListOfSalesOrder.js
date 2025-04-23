@@ -48,8 +48,11 @@ function ListOfSalesOrder() {
   };
 
 
+  
+
   const fetchData = async () => {
     try {
+        setLoading(true)
       const response = await apiMethods.getSalesOrderList({
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,
@@ -249,7 +252,7 @@ function ListOfSalesOrder() {
           onClose={() => { setIsConfirmationModaleOpen(false) }}
           onConfirm={OnDeleteConfirmation}
         />
-        <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} />
+        {/* <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} /> */}
       </div>
       <div>
         <VersionsPopup

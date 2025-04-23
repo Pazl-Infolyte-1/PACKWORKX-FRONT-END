@@ -20,12 +20,13 @@ const DropDownController = React.lazy(() => import('./Module/User/DropDownContro
 const Attendance = React.lazy(() => import('./Module/Attendance/Attendance.js'))
 const SalesReturn = React.lazy(() => import('./Module/SalesReturn/SalesReturn.js'))
 const PurchaseReturn = React.lazy(() => import('./Module/PurchaseReturn/PurchaseReturn.js'))
-const Reports = React.lazy(() => import('./Module/Process/Reports.js'))
+const Reports = React.lazy(() => import('./Module/Reports/Report.js'))
 const OfflineRequest = React.lazy(() => import('./Module/OfflineRequest/OfflineRequest.js'))
 const AdminFaq = React.lazy(() => import('./Module/AdminFaq/AdminFaq.js'))
-const Process = React.lazy(() => import('./Module/Process/Reports.js'))
+const Process = React.lazy(() => import('./Module/Process/Process.js'))
 const Designation = React.lazy(() => import('./Module/Designation/Designation.js'))
 const Department = React.lazy(() => import('./Module/Department/Department.js'))
+const RouteProcess = React.lazy(() => import('./Module/RouteProcess/RouteProcess.js'))
 
 
 
@@ -44,6 +45,8 @@ const routes = [
   { path: '/production', name: 'Production', element: Production, key: 26 },
   { path: '/packages', name: 'Packages', element: Packages, key: 5001 },
   { path: '/process', name: 'Process', element: Process, key: 5007 },
+  { path: '/routeprocess', name: 'Route Process', element: RouteProcess, key: 5008 },
+
 
   { path: '/billing', name: 'Billing', element: Billing, key: 5003 },
   { path: '/companies', name: 'Companies', element: Companies, key: 5002 },

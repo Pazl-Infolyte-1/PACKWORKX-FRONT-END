@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import apiMethods from '../../api/config'
-import ActionButton from '../../components/New/ActionButton'
 import Loading from '../../components/New/Loading'
 
-function ProcessDetails({ id, handleEditProcess }) {
+function ProcessDetails({ id }) {
   const [processDetails, setProcessDetails] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -11,7 +10,7 @@ function ProcessDetails({ id, handleEditProcess }) {
     const fetchData = async () => {
       try {
         const response = await apiMethods.getProcessDetails(id)
-        setProcessDetails(response.data.data)
+        setProcessDetails(response?.data?.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
@@ -53,13 +52,6 @@ function ProcessDetails({ id, handleEditProcess }) {
               >
                 {processDetails.status || 'unknown'}
               </span>
-              <ActionButton
-                label={'Edit'}
-                variant="edit"
-                height={8}
-                width={24}
-                onClick={() => handleEditProcess(processDetails)}
-              />
             </div>
           </div>
         </header>
@@ -76,7 +68,7 @@ function ProcessDetails({ id, handleEditProcess }) {
                     <thead>
                       <tr>
                         <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Parameter
+                          Field
                         </th>
                         <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Value

@@ -16,7 +16,7 @@ import { cilCloudDownload, cilLayers, cilPuzzle, cilSpeedometer,cilUser } from '
 
 export const AppSideBarNew = ({ giveAccess }) => {
   const [expandedModules, setExpandedModules] = useState({})
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const toggleGroup = (moduleId) => {
     setExpandedModules((prevState) => ({

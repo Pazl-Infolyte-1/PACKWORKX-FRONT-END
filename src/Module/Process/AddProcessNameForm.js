@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-const ProcessForm = ({ isEdit, onSubmit, initialData, onCancel }) => {
+const ProcessForm = ({ onSubmit, initialData, onCancel }) => {
   const [formData, setFormData] = useState(
     initialData || {
       process_name: '',

@@ -88,9 +88,9 @@ const deleteClient = async () => {
 
   try {
     console.log("Attempting to delete client:", selectedClientDeleteId);
-    const clientId = selectedClientDeleteId.replace(/\D/g, ""); 
+    //const clientId = selectedClientDeleteId.replace(/\D/g, ""); 
 
-    const response = await apiMethods.deleteClient(clientId);
+    const response = await apiMethods.deleteClient(selectedClientDeleteId);
 
     if (!response?.status) {
       // If API responds with { "status": false }, treat it as an error

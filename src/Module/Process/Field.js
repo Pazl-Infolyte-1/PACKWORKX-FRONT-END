@@ -160,7 +160,7 @@ function Field({
         />
       </div>
       <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar rounded-lg p-4 bg-gray-50">
-        {fieldData ? (
+        {fieldData && fieldData.length > 0 ? (
           <>
             <div className="overflow-x-auto">
               <CTable hover responsive>

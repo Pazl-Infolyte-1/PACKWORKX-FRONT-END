@@ -228,6 +228,15 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
+            if (module.modules_description === 'Routes') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/routeprocess">
+                    {navLink('Routes', 'cilBriefcase')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
             return null
           })}
         </>

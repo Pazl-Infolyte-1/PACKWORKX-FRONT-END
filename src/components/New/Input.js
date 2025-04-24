@@ -11,11 +11,12 @@ function Input({
   id,
   type = 'text',
   readOnly = false,
-  title
+  title,
+  requiredSymbol = false, 
 }) {
   return (
     <div className={`font-sans text-black ${className}`}>
-      {skuName && <label htmlFor={id} className="text-[16px] font-medium">{skuName}</label>}
+      {skuName && <label htmlFor={id}           className={`text-[16px] font-medium ${requiredSymbol ? "after:content-['*'] after:text-red-500 after:ml-1" : ""}`}>{skuName}</label>}
       <input
         type={type}
         id={id}

@@ -18,7 +18,18 @@ const initialState = {
     isAuthenticated: false,
     user: null,
     token: null,
+    selectedRouteIds: [],
   },
+  routeprocess: {
+    selectedRouteIds: [],
+  },
+  clientId: {
+    clientIdVal: null,
+  },
+  boardCalculations:{
+    deckle_size: '',
+    deckleError: '',
+  }
 }
 
 const changeState = (state = initialState, { type, payload, ...rest }) => {
@@ -52,6 +63,34 @@ const changeState = (state = initialState, { type, payload, ...rest }) => {
           token: null,
         },
       }
+
+      case 'SET_SELECTED_ROUTE_IDS':
+        return {
+          ...state,
+          routeprocess: {
+            ...state.routeprocess,
+            selectedRouteIds: payload,
+          },
+        };
+      
+        case 'SET_CLIENT_ID':
+          return {
+            ...state,
+            clientId: {
+              ...state.clientId,
+              clientIdVal: payload,
+            },
+          };
+
+          case 'SET_DECKLE_SIZE':
+  return {
+    ...state,
+    boardCalculations: {
+      ...state.boardCalculations,
+      deckle_size: payload.deckle_size,
+      deckleError: payload.deckleError || '',
+    },
+  };
 
     default:
       return state

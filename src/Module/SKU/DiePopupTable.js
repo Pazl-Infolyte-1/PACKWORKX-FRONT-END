@@ -18,7 +18,9 @@ import DieForm from './AddEditDies'
 import { Pagination, Stack } from '@mui/material'
 import { IoSearch } from 'react-icons/io5'
 
-const DiePopupTable = ({ setSelectedDiePopup, selectedDiePopup, setisSingleViewPopup }) => {
+const DiePopupTable = ({ setSelectedDiePopup, selectedDiePopup, setisSingleViewPopup,client }) => {
+
+  console.log("coienty val",client)
   const [dies, setDies] = useState([])
   const [openDelModal, setOpenDelModal] = useState(false)
   const [dieToDelete, setDieToDelete] = useState(null)
@@ -313,6 +315,7 @@ const DiePopupTable = ({ setSelectedDiePopup, selectedDiePopup, setisSingleViewP
           setRefresh={setRefresh}
           onClose={handleCloseModal}
           setisSingleViewPopup={setisSingleViewPopup} 
+          client={client}
         />
       </PopUp>
     </>

@@ -3,6 +3,15 @@ import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
 import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash, cilX } from '@coreui/icons'
 import { useEffect, useRef, useState } from 'react'
+import SelectionCards from '../../components/New/SelectionCards'
+import ClientForm from '../Client/ClientForm'
+import vendorImg from '../../assets/images/vendor.png'
+import clientImg from '../../assets/images/client.jpg'
+import PopUp from '../../components/New/PopUp'
+import { useDispatch, useSelector } from 'react-redux'
+import RoutePopup from './RoutePopup'
+import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
+import apiMethods from '../../api/config'
 
 function CustomItem({
   editTag,
@@ -18,11 +27,37 @@ function CustomItem({
   setAddNewSkuData,
   updateSkuValues,
   isopenval,
-  compositeSelect
+  compositeSelect,
+  setPopupOpen,
+  isPopupOpen,
+  message,
+  setMessage
 }) {
   const [tagFields, setTagFields] = useState([]);
   const [editingLabelIndex, setEditingLabelIndex] = useState(null);
+const [selected, setSelected] = useState('vendor')
+  const [triggerSelection, setTriggerSelection] = useState(false)
+  const [isDrawerOpen, setDrawerOpen] = useState(false)
+  const [entityType, setEntityType] = useState('') // State to hold entity_type
+  const [submitFromRsc, setSubmitFromRsc] = useState(true)
+  const dispatch = useDispatch()
+  const [displayAsChips,setDisplayAsChips] = useState([])
+  const [isSingleViewPopupRoute, setisSingleViewPopupRoute] = useState(false)
+  const [fullRouteResponse, setFullRouteResponse] = useState(null);
 
+
+  const selectionFrame = {
+    vendor: {
+      id: 1,
+      name: 'vendor',
+      image: vendorImg,
+    },
+    client: {
+      id: 2,
+      name: 'client',
+      image: clientImg,
+    },
+  }
 
   useEffect(() => {
     const ply = 2
@@ -109,12 +144,177 @@ function CustomItem({
     }
   }, [compositeSelect]);
   
+
+
+      //these are the fonctionalities for client create dropdown
+      
+      const handleSelectAction = (selection) => {
+        setSelected(selection)
+        setTriggerSelection(true) // Ensures it runs handleSelection
+      }
+      
+      const handleCloseDrawer = () => {
+        setDrawerOpen(false)
+      }
+      const refreshClients = () => {
+        setReloadData((prev) => !prev) //  Toggle state to trigger `useEffect`
+      }
+      
+       useEffect(() => {
+          if (triggerSelection) {
+            handleSelection(selected)
+            setTriggerSelection(false) // Reset trigger
+          }
+        }, [selected, triggerSelection]) 
+      
+        const handleSelection = (selection) => {
+          const optionValue = selectionFrame[selection].id
+          console.log(`Selected ID: ${optionValue}`)
+      
+          if (optionValue === 2) {
+            setEntityType('Client')
+            setPopupOpen(false)
+            setDrawerOpen(true)
+          } else if (optionValue === 1) {
+            setEntityType('Vendor')
+            setPopupOpen(false)
+            setDrawerOpen(true)
+          } else {
+            console.log('option not selected')
+          }
+        }
+      
+          useEffect(() => {
+            document.addEventListener('keydown', handleKeyDown)
+            return () => document.removeEventListener('keydown', handleKeyDown)
+          }, []) // Runs once on mount
+      
+          const handleKeyDown = (event) => {
+            if (event.key === 'ArrowRight') {
+              handleSelectAction('client')
+              setEntityType('Client') // Update state
+            } else if (event.key === 'ArrowLeft') {
+              handleSelectAction('vendor')
+              setEntityType('Vendor') // Update state
+            } else if (event.key === 'Enter') {
+              console.log('Enter Pressed: Executing Selection')
+              setTriggerSelection(true) // Mark that Enter was pressed
+            }
+          }
+        
+          console.log("jjjj",message)
+      
+          useEffect(() => {
+            if (message) {
+              setAlerts([{ severity: 'success', message }]);
+          
+              const timer = setTimeout(() => {
+                setAlerts([]); // Clear alerts after 3 seconds
+              }, 3000);
+          
+              return () => clearTimeout(timer); // Cleanup on unmount or message change
+            }
+          }, [message]);
+
+
+                
+                  //functionality for route chip
+                   useEffect(() => {
+                        const fetchRoutes = async () => {
+                          const params = {
+                            search: '',
+                            page: 1,
+                            limit: 10000,
+                          };
+                      
+                          try {
+                            const response = await apiMethods.getRouteList(params);
+                            console.log('Full API Response:', response);
+                            setFullRouteResponse(response); // ✅ Save full response here
+                            setDisplayAsChips(response.data.routes)
+                          } catch (err) {
+                            console.error('Error fetching routes:', err);
+                          }
+                        };
+                      
+                        fetchRoutes();
+                      }, []);
+                      
+                  
+                  const selectedRouteIds1 = useSelector((state) => state.routeprocess.selectedRouteIds || []);
+                  
+                  useEffect(() => {
+                    if (editTag && typeof addNewSkuData?.route === 'string') {
+                      try {
+                        const parsedRoutes = JSON.parse(addNewSkuData.route);
+                        if (Array.isArray(parsedRoutes) && parsedRoutes.length > 0) {
+                          dispatch({
+                            type: 'SET_SELECTED_ROUTE_IDS',
+                            payload: parsedRoutes,
+                          });
+                  
+                          setAddNewSkuData((prevData) => ({
+                            ...prevData,
+                            route: parsedRoutes, // ✅ use parsedRoutes instead of selectedRouteIds1
+                          }));
+                        }
+                      } catch (err) {
+                        console.error('Invalid route format:', addNewSkuData.route);
+                      }
+                    }
+                  }, [editTag, addNewSkuData?.route, dispatch]);
+                  
+                  
+                  
+                  // Optional: track Redux changes
+                  useEffect(() => {
+                    console.log("Redux -> routeprocess.selectedRouteIds:", selectedRouteIds1);
+                  }, [selectedRouteIds1]);
+                  
+                  const selectedChips = displayAsChips.filter((item) =>
+                    selectedRouteIds1.includes(item.id)
+                  );
+                  
+                  const chipNames = selectedChips.map((chip) => chip.route_name).join(', ');
+                  
+                  useEffect(() => {
+                    if (!editTag) {
+                      setAddNewSkuData((prevData) => ({
+                        ...prevData,
+                        route: selectedRouteIds1,
+                      }));
+                    }
+                  }, [selectedRouteIds1, editTag]);
+                  
+                  
+                  const handleRemoveChip = (idToRemove) => {
+                    console.log("Removing chip with id:", idToRemove);
+                  
+                    const updated = selectedRouteIds1.filter((id) => id !== idToRemove);
+                    console.log("update", updated);
+                  
+                    dispatch({
+                      type: 'SET_SELECTED_ROUTE_IDS',
+                      payload: updated,
+                    });
+                  };
+                  useEffect(() => {
+                    setAddNewSkuData((prevData) => ({
+                      ...prevData,
+                      route: selectedRouteIds1,
+                    }));
+                  }, [selectedRouteIds1]);
+                  const handleBrowseClickRoute = () => {
+                    setisSingleViewPopupRoute(true)
+                  }
+              
+          
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
       <div className="grid grid-cols-3 gap-6 p-6 border border-gray-200 rounded-lg">
         <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Type</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Type</label>
           <div className="relative w-full" ref={dropdownRef}>
             <div
               className="p-2 h-10 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
@@ -155,7 +355,7 @@ function CustomItem({
           </div>
         </div>
         <div>
-            <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Name</label>
+            <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Name</label>
             <input
               id="sku_name"
               name="sku_name"
@@ -166,7 +366,7 @@ function CustomItem({
           </div>
 
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">Client Name</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Client Name</label>
           <select
             name="client"
             id="client"
@@ -198,6 +398,7 @@ function CustomItem({
           value={addNewSkuData?.estimate_composite_item}
           onChange={handleChange}
           //placeholder="Estimate"
+          requiredSymbol={true}
         />
 
         <Input
@@ -207,6 +408,7 @@ function CustomItem({
           value={addNewSkuData?.default_sku_details}
           onChange={handleChange}
           //placeholder="Default SKU Details"
+          requiredSymbol={true}
         />
 
         <Input
@@ -216,7 +418,18 @@ function CustomItem({
           value={addNewSkuData.description}
           onChange={handleChange}
           //placeholder="Description"
+          requiredSymbol={true}
         />
+
+         <ChipSelectorWithBrowse
+                  label="Route"
+                  required={true}
+                  selectedIds={selectedRouteIds1}
+                  allOptions={displayAsChips}
+                  onRemoveChip={handleRemoveChip}
+                  onBrowseClick={handleBrowseClickRoute}
+                />
+                
  <div className="col-span-3">
     <button
       type="button"
@@ -275,6 +488,54 @@ function CustomItem({
 
       </div>
    
+      {/*popup for client create*/}
+      {!isDrawerOpen && (
+                 <PopUp
+                        header={'Select Client/Vendor'}
+                        visible={isPopupOpen}
+                        setVisible={setPopupOpen}
+                        showCloseButton={true}
+                        width={'35vw'}
+                      >
+                <SelectionCards
+      selectionFrame={selectionFrame}
+      selected={selected}
+      onSelect={handleSelectAction}
+    />
+                </PopUp>
+            )}
+
+<PopUp
+                        header={'Select Client/Vendor'}
+                        visible={isDrawerOpen}
+                        setVisible={setDrawerOpen}
+                        showCloseButton={true}
+                        width={'1200px'}
+                        height={"700px"}
+                      >
+              {/* Pass handleCloseDrawer as a prop to ClientForm */}
+              <ClientForm
+                entity_type={entityType}
+                refreshClients={refreshClients}
+                closeDrawerDuringAdd={() => handleCloseDrawer(false)}
+                resetForm={isDrawerOpen}
+                submitFromRsc={submitFromRsc}
+                setDrawerOpen={setDrawerOpen}
+                isDrawerOpen={isDrawerOpen}
+                setMessage={setMessage}
+              />
+          </PopUp>
+
+          <PopUp
+        header={'Select Route'}
+        visible={isSingleViewPopupRoute}
+        setVisible={setisSingleViewPopupRoute}
+        showCloseButton={true}
+        width={'60vw'}
+      >
+        <RoutePopup  editTag={editTag} addNewSkuData={addNewSkuData}   fullRouteResponse={fullRouteResponse} setisSingleViewPopupRoute={setisSingleViewPopupRoute} />
+      </PopUp>
+
     </div>
   )
 }

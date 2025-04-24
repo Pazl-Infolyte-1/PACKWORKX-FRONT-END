@@ -512,6 +512,10 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  updateEmployeeStatus:async(id,body)=>{
+    const response = await apiClient.patch(`/user/employees/${id}/status`,body);
+    return response
+  },
   getSkuExcelExport: async (params) => {
     try {
       const response = await apiClient.get('/sku-details/download/excel',{

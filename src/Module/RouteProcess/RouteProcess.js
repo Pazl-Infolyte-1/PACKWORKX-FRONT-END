@@ -27,23 +27,23 @@ const RouteProcess = () => {
     route_process: [],
   })
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await apiMethods.getRoute({
-          search: searchQuery,
-          page: pagination.page,
-          limit: limit,
-        })
-        console.log('Route Process:', response.data.routes)
-        setRouteProcessData(response.data.routes)
-        setPagination(response.data.pagination)
-      } catch (error) {
-        console.error(error)
-      }
+  const fetchData = async () => {
+    try {
+      const response = await apiMethods.getRoute({
+        search: searchQuery,
+        page: pagination.page,
+        limit: limit,
+      })
+      setRouteProcessData(response.data.routes)
+      setPagination(response.data.pagination)
+    } catch (error) {
+      console.error(error)
     }
+  }
+
+  useEffect(() => {
     fetchData()
-  }, [refresh, limit, searchQuery])
+  }, [refresh, limit, searchQuery, pagination.page])
 
   useEffect(() => {
     const fetchProcessData = async () => {
@@ -62,7 +62,6 @@ const RouteProcess = () => {
   }, [refresh])
 
   const handleProcessSubmit = async (data) => {
-    console.log('Form Data:', data)
     try {
       if (isEdit) {
         const response = await apiMethods.EditRoute(data)
@@ -92,7 +91,6 @@ const RouteProcess = () => {
   }
 
   const handleEdit = (route) => {
-    console.log('Edit Route:', route)
     setFormData({
       id: route.id,
       route_name: route.route_name,
@@ -141,21 +139,19 @@ const RouteProcess = () => {
         <div>
           <CommonPagination
             count={pagination?.totalPages || 1}
-            page={pagination?.currentPage || 1}
+            page={pagination?.page || 1}
             onChange={(event, value) => {
               setPagination((prev) => ({
                 ...prev,
-                currentPage: value,
+                page: value,
               }))
-              fetchData()
             }}
             onLimitChange={(newLimit) => {
               setLimit(newLimit)
               setPagination((prev) => ({
                 ...prev,
-                currentPage: 1,
+                page: 1,
               }))
-              fetchData()
             }}
             limit={limit}
           />

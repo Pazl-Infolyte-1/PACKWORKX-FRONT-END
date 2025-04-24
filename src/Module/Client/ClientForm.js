@@ -44,7 +44,7 @@ import {
 import { useFormContext, useFieldArray } from "react-hook-form";
 
  
-const ClientForm = ({editData, closeDrawer,refreshClients,closeDrawerDuringAdd,refreshClientsEdit,entity_type,resetForm}) => {
+const ClientForm = ({editData, closeDrawer,refreshClients,closeDrawerDuringAdd,refreshClientsEdit,entity_type,resetForm,submitFromRsc,setDrawerOpen,isDrawerOpen,setMessage}) => {
   const [activeTab, setActiveTab] = useState('Other Details')
   const [alerts, setAlerts] = useState([]);
   //const [hasGst, setHasGst] = useState(null); // Set null to avoid pre-selection
@@ -303,9 +303,16 @@ const onSubmit = async (data) => {
     let successMessage;
 
     if (editData) {
-      const clientId = editData.client_id.replace(/\D/g, "");
-response = await apiMethods.editClient(clientId, filteredData);
-      response = await apiMethods.editClient(editData.client_id, filteredData);
+      console.log("editttt",JSON.stringify(editData))
+      const clientId = editData.client_id;
+      const filteredData1 = {
+        ...data,
+        addresses: data.addresses.map(({ type, ...rest }, index) => ({
+          ...rest,
+          id: editData.addresses?.[index]?.id, // keep the original address ID
+        })),
+      };
+      response = await apiMethods.editClient(clientId, filteredData1);
       successMessage = "Client Edited successfully!";
     } else {
       response = await apiMethods.postClient(filteredData);
@@ -323,6 +330,12 @@ response = await apiMethods.editClient(clientId, filteredData);
       }, 3000);
     }
 
+
+    if (isDrawerOpen) {
+      setDrawerOpen(false);
+      console.log("respon mess",response.message)
+      setMessage(response.message)
+    }
     setTimeout(() => {
       setAlerts([]);
       refreshClients();
@@ -370,6 +383,8 @@ const handleCancel = () => {
   reset();
 };
 
+
+console.log("hhjhh",isDrawerOpen,setDrawerOpen)
   return (
     <>
     <Loader isLoading={loading} />

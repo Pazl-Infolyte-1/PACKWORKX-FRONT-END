@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-import { FaArrowDown, FaExternalLinkAlt } from 'react-icons/fa'
+import { FaArrowDown, FaGripVertical } from 'react-icons/fa'
 
 export const RouteProcessForm = ({
   isEdit,
@@ -12,7 +12,6 @@ export const RouteProcessForm = ({
   processOrder,
   setProcessOrder,
 }) => {
-  console.log('processOrder', processOrder)
   const ItemType = 'CARD'
   const ReorderType = 'REORDER'
   const [formData, setFormData] = useState(
@@ -52,7 +51,7 @@ export const RouteProcessForm = ({
       <div className="card mt-2" ref={drag}>
         <div className="card-body d-flex justify-content-between align-items-center">
           <span>{process.process_name}</span>
-          <FaExternalLinkAlt className="text-muted" />
+          <FaGripVertical className="text-muted" />
         </div>
       </div>
     )
@@ -93,7 +92,6 @@ export const RouteProcessForm = ({
     const [, drop] = useDrop(() => ({
       accept: ItemType,
       drop: (process) => {
-        console.log('Process:', process.process)
         if (!processOrder.find((p) => p.id === process.process.id)) {
           setProcessOrder((prev) => [...prev, process.process])
           setProcessData((prev) => prev.filter((item) => item.id !== process.process.id))

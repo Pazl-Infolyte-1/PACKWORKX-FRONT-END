@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-import { FaArrowDown, FaGripVertical } from 'react-icons/fa'
+import { FaArrowDown, FaTimes, FaCrosshairs, FaGripVertical } from 'react-icons/fa'
 
 export const RouteProcessForm = ({
   isEdit,
@@ -41,6 +41,18 @@ export const RouteProcessForm = ({
     setProcessOrder([])
   }
 
+  const handleRouteRemove = (process) => () => {
+    setProcessOrder((prev) => prev.filter((item) => item.id !== process.id))
+    setProcessData((prev) => {
+      const updated = [...prev, process]
+      return updated.sort((a, b) => a.id - b.id)
+    })
+    setFormData((prev) => ({
+      ...prev,
+      route_process: prev.route_process.filter((item) => item !== process.id),
+    }))
+  }
+
   function ProcessDraggable({ process }) {
     const [, drag] = useDrag(() => ({
       type: ItemType,
@@ -48,8 +60,11 @@ export const RouteProcessForm = ({
     }))
 
     return (
-      <div className="card mt-2" ref={drag}>
-        <div className="card-body d-flex justify-content-between align-items-center">
+      <div className="card mt-2 cursor-move" style={{ height: '40px' }} ref={drag}>
+        <div
+          className="card-body d-flex justify-content-between align-items-center"
+          style={{ height: '100%' }}
+        >
           <span>{process.process_name}</span>
           <FaGripVertical className="text-muted" />
         </div>
@@ -78,9 +93,13 @@ export const RouteProcessForm = ({
 
     return (
       <>
-        <div ref={ref} className="card mt-2" style={{ width: '100%' }}>
-          <div className="card-body d-flex justify-content-center align-items-center">
-            {process.process_name}
+        <div ref={ref} className="card mt-2" style={{ width: '100%', height: '40px' }}>
+          <div className="card-body flex justify-between items-center" style={{ height: '100%' }}>
+            <span className="text-gray-800">{process.process_name}</span>
+            <FaTimes
+              className="text-gray-400 hover:text-red-500 cursor-pointer"
+              onClick={handleRouteRemove(process)}
+            />
           </div>
         </div>
         {!isLast && <FaArrowDown className="text-muted my-1" />}
@@ -116,7 +135,7 @@ export const RouteProcessForm = ({
     }
 
     return (
-      <div className="card mt-2" ref={drop}>
+      <div className="card mt-2 cursor-move" ref={drop}>
         {processOrder.length > 0 ? (
           <div className="card-body d-flex flex-column align-items-center">
             {processOrder.map((process, index) => (
@@ -140,8 +159,8 @@ export const RouteProcessForm = ({
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-4 my-3 border border-gray-50 rounded-md p-3">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
           <div className="col-span-1 sm:col-span-2">
             <label htmlFor="processName" className="block text-sm font-medium text-gray-700">
               Route Process Name
@@ -151,34 +170,38 @@ export const RouteProcessForm = ({
               id="route_name"
               name="route_name"
               value={formData.route_name}
-              placeholder="Route Process Name"
+              placeholder=""
               onChange={handleChange}
               className="w-full p-2 my-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#8167e5] focus:border-transparent"
               required
             />
           </div>
         </div>
+        <div
+          className="space-y-4 my-3 border border-gray-50 rounded-md p-3"
+          style={{ height: '400px', overflowY: 'auto' }}
+        >
+          <div className="row">
+            <div className="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+              <h5 className="text-center mb-3">Process</h5>
+              {processData.map((process) => (
+                <ProcessDraggable key={process.id} process={process} />
+              ))}
+            </div>
 
-        <div className="row">
-          <div className="col-lg-5 col-md-5 col-sm-6 col-xs-12">
-            <h5 className="text-center mb-3">Process</h5>
-            {processData.map((process) => (
-              <ProcessDraggable key={process.id} process={process} />
-            ))}
-          </div>
+            <div className="d-none d-md-flex justify-content-center align-items-start col-md-1">
+              <div style={{ borderLeft: '1px solid #ccc', height: '100%' }}></div>
+            </div>
 
-          <div className="d-none d-md-flex justify-content-center align-items-start col-md-1">
-            <div style={{ borderLeft: '1px solid #ccc', height: '100%' }}></div>
-          </div>
-
-          <div className="col-lg-5 col-md-5 col-sm-6 col-xs-12">
-            <h5 className="text-center mb-3">Route Process</h5>
-            <ProcessDrop
-              processOrder={processOrder}
-              setProcessOrder={setProcessOrder}
-              setProcessData={setProcessData}
-              setFormData={setFormData}
-            />
+            <div className="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+              <h5 className="text-center mb-3">Route Process</h5>
+              <ProcessDrop
+                processOrder={processOrder}
+                setProcessOrder={setProcessOrder}
+                setProcessData={setProcessData}
+                setFormData={setFormData}
+              />
+            </div>
           </div>
         </div>
 

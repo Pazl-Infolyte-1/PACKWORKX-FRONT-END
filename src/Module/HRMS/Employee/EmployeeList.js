@@ -503,7 +503,17 @@ function EmployeeList() {
           </div>
         </div>
         <div>
-          <EmployeeForm isDrawerOpen={isDrawerOpen} setDrawerOpen={setDrawerOpen} formData={formData} setFormData={setFormData} isEdit={isEdit} handleSubmit={handleSubmit} dropdownOptions={dropdownOptions} />
+          <EmployeeForm
+           isDrawerOpen={isDrawerOpen}
+            setDrawerOpen={setDrawerOpen}
+             formData={formData}
+              setFormData={setFormData}
+               isEdit={isEdit}
+                handleSubmit={handleSubmit}
+                 dropdownOptions={dropdownOptions}
+                 setDropdownOptions={setDropdownOptions}
+                 setAlerts={setAlerts}
+                  />
         </div>
       </div>
     </>

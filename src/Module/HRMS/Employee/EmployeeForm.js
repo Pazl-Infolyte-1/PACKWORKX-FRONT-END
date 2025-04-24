@@ -7,6 +7,9 @@ import Drawer from '../../../components/Drawer/Drawer'
 import ActionButton from '../../../components/New/ActionButton'
 import axios from 'axios'
 import apiMethods from '../../../api/config'
+import AddEditDepartmentForm from '../../Department/AddEditDepartmentForm'
+import AddEditDesignation from '../../Designation/AddEditDesignation'
+import AddEditRoleForm from '../../Role/AddEditRoleForm'
 
 // Placeholder data for dropdowns (would typically come from API)
 const DEPARTMENT_OPTIONS = [
@@ -70,7 +73,7 @@ const defaultFormState = {
   country_id:null
 };
 
-function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, handleSubmit, isEdit, dropdownOptions }) {
+function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, handleSubmit, isEdit, dropdownOptions,setDropdownOptions,setAlerts, }) {
   const label = { inputProps: { 'aria-label': 'Switch demo' } }
   
   // Add this at the top with your other useState/useEffect hooks
@@ -82,6 +85,8 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
   const [countrySearchValue, setCountrySearchValue] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [activeModal, setActiveModal] = useState(null); // 'department', 'role', etc.
+
 
 
   // This effect monitors drawer close events
@@ -246,6 +251,60 @@ useEffect(() => {
   
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const openModal = (type) => {
+    setActiveModal(type);
+  };
+  
+  const closeModal = () => {
+    setActiveModal(null);
+  };
+
+  const handleDepartmentFormSuccess = async () => {
+    // Refresh the data
+    const response = await apiMethods.getDepartmentsList();
+    const data = response?.data?.data
+    setDropdownOptions((prev) => ({
+      ...prev,
+      departments: data
+    }));
+    
+    // Show success message
+    setAlerts([{ 
+      severity: "success",
+      message: isEdit ? "Department updated successfully." : "Department created successfully." 
+    }]);
+  };
+  const handleRoleFormSuccess = async () => {
+    // Refresh the data
+    const response = await apiMethods.getRoles();
+    const data = response?.data?.data
+    setDropdownOptions((prev) => ({
+      ...prev,
+      roles: data
+    }));
+    
+    // Show success message
+    setAlerts([{ 
+      severity: "success",
+      message: isEdit ? "Role updated successfully." : "Role created successfully." 
+    }]);
+  };
+  const handleDesignationFormSuccess = async () => {
+    // Refresh the data
+    const response = await apiMethods.getDesignationList();
+    const data = response?.data?.data
+    setDropdownOptions((prev) => ({
+      ...prev,
+      designations: data
+    }));
+    
+    // Show success message
+    setAlerts([{ 
+      severity: "success",
+      message: isEdit ? "Designation updated successfully." : "Designation created successfully." 
+    }]);
   };
 
 
@@ -473,60 +532,98 @@ useEffect(() => {
               {/* Department */}
               <div>
                 <h6 className="mb-2">Department</h6>
-                <div className="border border-stone-200 rounded-md">
-                  <select
-                    name="department_id"
-                    className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.department_id || ""}
-                    onChange={handleInputChange}
+                <div className="flex gap-2">
+                  <div className="border border-stone-200 rounded-md flex-grow">
+                    <select
+                      name="department_id"
+                      className="h-10 w-full outline-none text-zinc-500 px-3"
+                      value={formData.department_id || ""}
+                      onChange={handleInputChange}
+                    >
+                      <option value="" disabled>Select Department</option>
+                      {dropdownOptions.departments.map(dept => (
+                        <option key={dept.id} value={dept.id}>
+                          {dept.department_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <ActionButton
+                    type="button"
+                    label={"Add Department"}
+                    variant='minimal'
+                    className="rounded-md"
+                    onClick={() => openModal('department')}
+                  />
+                                    {/* <button
+                    type="button"
+                    className="h-10 px-4 border border-stone-200 rounded-md text-zinc-500 hover:bg-gray-50 transition-colors"
                   >
-                    <option value="" disabled>Select Department</option>
-                    {dropdownOptions.departments.map(dept => (
-                      <option key={dept.id} value={dept.id}>
-                        {dept.department_name}
-                      </option>
-                    ))}
-                  </select>
+                    Add Department
+                  </button> */}
+                    
                 </div>
               </div>
 
               {/* Designation */}
               <div>
                 <h6 className="mb-2">Designation</h6>
-                <div className="border border-stone-200 rounded-md">
-                  <select
-                    name="designation_id"
-                    className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.designation_id || ""}
-                    onChange={handleInputChange}
-                  >
-                    <option value="" disabled>Select Designation</option>
-                    {dropdownOptions.designations.map(desig => (
-                      <option key={desig.id} value={desig.id}>
-                        {desig.name}
-                      </option>
-                    ))}
-                  </select>
+                <div className="flex gap-2">
+                  <div className="border border-stone-200 rounded-md flex-grow">
+                    <select
+                      name="designation_id"
+                      className="h-10 w-full outline-none text-zinc-500 px-3"
+                      value={formData.designation_id || ""}
+                      onChange={handleInputChange}
+                    >
+                      <option value="" disabled>Select Designation</option>
+                      {dropdownOptions.designations.map(desig => (
+                        <option key={desig.id} value={desig.id}>
+                          {desig.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <ActionButton
+                    type="button"
+                    label={"Add Designation"}
+                    variant='minimal'
+                    className="rounded-md"
+                    onClick={() => openModal('designation')}
+                  />
                 </div>
               </div>
 
               {/* Role */}
               <div>
                 <h6 className="mb-2">Role</h6>
-                <div className="border border-stone-200 rounded-md">
-                  <select
-                    name="role_id"
-                    className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.role_id || ""}
-                    onChange={handleInputChange}
-                  >
-                    <option value="" disabled>Select Role</option>
-                    {dropdownOptions.roles.map(desig => (
-                      <option key={desig.id} value={desig.id}>
-                        {desig.name}
-                      </option>
-                    ))}
-                  </select>
+                <div className="flex gap-2">
+                  <div className="border border-stone-200 rounded-md flex-grow">
+                    <select
+                      name="role_id"
+                      className="h-10 w-full outline-none text-zinc-500 px-3"
+                      value={formData.role_id || ""}
+                      onChange={handleInputChange}
+                    >
+                      <option value="" disabled>Select Role</option>
+                      {dropdownOptions.roles.map(desig => (
+                        <option key={desig.id} value={desig.id}>
+                          {desig.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+
+                  <ActionButton
+                    type="button"
+                    label={"Add Role"}
+                    variant='minimal'
+                    className="rounded-md"
+                    onClick={() => openModal('role')}
+
+                    />
+                    </div>
                 </div>
               </div>
 
@@ -700,6 +797,31 @@ useEffect(() => {
             </div>
           </div>
         </form>
+
+        {activeModal === 'department' &&
+         <AddEditDepartmentForm
+         showForm={activeModal === 'department'}
+         setShowForm={closeModal}
+         isEdit={false}
+         onSuccess={handleDepartmentFormSuccess}
+         />}
+
+{activeModal === 'designation' &&
+         <AddEditDesignation
+         showForm={activeModal === 'designation'}
+         setShowForm={closeModal}
+         isEdit={false}
+         onSuccess={handleDesignationFormSuccess}
+         />}
+
+         {activeModal === 'role' &&
+         <AddEditRoleForm
+         showForm={activeModal === 'role'}
+         setShowForm={closeModal}
+         isEdit={false}
+         onSuccess={handleRoleFormSuccess}
+         />}
+
       </Drawer>
     </>
   )

@@ -1,29 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import ActionButton from '../../components/New/ActionButton';
-import DesignationTable from './DesignationTable';
+import RoleTable from './RoleTable';
 import apiMethods from '../../api/config';
 import ConfirmationModale from '../../components/New/ConfirmationModale';
 import CustomAlert from '../../components/New/CustomAlert';
-import AddEditDesignation from './AddEditDesignation';
+import AddEditRoleForm from './AddEditRoleForm';
 
-const Designation = () => {
-  const [designations, setDesignations] = useState([]);
+function Role() {
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isConfirmationModaleOpen, setIsConfirmationModaleOpen] = useState(false);
-  const [selectedDesignationId, setSelectedDesignationId] = useState('');
+  const [selectedRoleId, setSelectedRoleId] = useState('');
   const [alerts, setAlerts] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
-  const [selectedDesignation, setSelectedDesignation] = useState(null);
+  const [selectedRole, setSelectedRole] = useState(null);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
-      const response = await apiMethods.getDesignationList();
+      const response = await apiMethods.getRoles();
+    
       if (response.data.success) {
-        setDesignations(response.data.data);
+        setRoles(response?.data?.data);
       }
     } catch (error) {
-      console.error("Error fetching designations:", error);
+      console.error("Error fetching roles:", error);
+      setAlerts([{ 
+        severity: "error", 
+        message: "Failed to load roles. Please try again." 
+      }]);
     } finally {
       setLoading(false);
     }
@@ -33,46 +39,62 @@ const Designation = () => {
     fetchData();
   }, []);
 
-  const handleAddDesignation = () => {
+  const handleAddRole = () => {
     setIsEdit(false);
-    setSelectedDesignation(null);
+    setSelectedRole(null);
     setShowForm(true);
   };
 
-  const handleEdit = (id) => {
-    const designationToEdit = designations.find(designation => designation.id === id);
-    if (designationToEdit) {
-      setSelectedDesignation(designationToEdit);
+  const handleEdit = async (id) => {
+    console.log(`Edit role with ID: ${id}`);
+    // Find the role in the existing data
+    const roleToEdit = roles.find(role => role.id === id);
+    
+    if (roleToEdit) {
+      setSelectedRole(roleToEdit);
       setIsEdit(true);
       setShowForm(true);
+    } else {
+      // If needed, fetch the specific role data from API
+      try {
+        const response = await apiMethods.getRoleById(id);
+        if (response.data.success) {
+          setSelectedRole(response.data.data);
+          setIsEdit(true);
+          setShowForm(true);
+        }
+      } catch (error) {
+        console.error("Error fetching role details:", error);
+        setAlerts([{ 
+          severity: "error", 
+          message: "Failed to load role details for editing." 
+        }]);
+      }
     }
   };
 
   const handleDelete = (id) => {
-    setSelectedDesignationId(id);
+    console.log(`Delete role with ID: ${id}`);
+    setSelectedRoleId(id);
     setIsConfirmationModaleOpen(true);
   };
 
-  const OnDeleteConfirmation = async () => {
+  const onDeleteConfirmation = async () => {
     try {
-      const response = await apiMethods.deleteDesignation(selectedDesignationId);
+      const response = await apiMethods.deleteRole(selectedRoleId);
       await fetchData();
       setIsConfirmationModaleOpen(false);
       setAlerts([{ 
         severity: "success", 
-        message: "Designation has been deleted successfully." 
+        message: "Role has been successfully deleted." 
       }]);
     } catch (error) {
-      console.error("Failed to delete designation:", error);
+      console.error("Failed to delete role:", error);
       setAlerts([{ 
         severity: "error", 
-        message: error?.data?.message || "Failed to delete designation" 
+        message: error?.data?.message || "Failed to delete role" 
       }]);
     }
-  };
-
-  const handleClose = () => {
-    setAlerts([]);
   };
 
   const handleFormSuccess = async (data) => {
@@ -81,27 +103,31 @@ const Designation = () => {
     // Show success message
     setAlerts([{ 
       severity: "success", 
-      message: isEdit ? "Designation updated successfully." : "Designation created successfully." 
+      message: isEdit ? "Role updated successfully." : "Role created successfully." 
     }]);
+  };
+
+  const handleClose = () => {
+    setAlerts([]);
   };
 
   return (
     <div className="">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Designation</h2>
+        <h2 className="text-2xl font-bold">Role</h2>
         <div className="flex gap-2">
           <ActionButton
             label="+ Add"
-            onClick={handleAddDesignation}
+            onClick={handleAddRole}
             variant="add"
             className="text-white"
           />
         </div>
       </div>
       
-      <DesignationTable 
-        designations={designations} 
+      <RoleTable 
+        roles={roles} 
         loading={loading} 
         onEdit={handleEdit} 
         onDelete={handleDelete} 
@@ -110,22 +136,22 @@ const Designation = () => {
       <ConfirmationModale
         isOpen={isConfirmationModaleOpen}
         title='Confirm Deletion'
-        message='Are you sure you want to delete this designation?'
+        message='Are you sure you want to delete this role?'
         onClose={() => { setIsConfirmationModaleOpen(false) }}
-        onConfirm={OnDeleteConfirmation}
+        onConfirm={onDeleteConfirmation}
       />
 
       {showForm && (
-        <AddEditDesignation
+        <AddEditRoleForm
           showForm={showForm}
           isEdit={isEdit}
           setShowForm={setShowForm}
-          designationData={selectedDesignation}
+          roleData={selectedRole}
           onSuccess={handleFormSuccess}
         />
       )}
     </div>
   );
-};
+}
 
-export default Designation;
+export default Role;

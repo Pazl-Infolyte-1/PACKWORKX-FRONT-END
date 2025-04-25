@@ -68,7 +68,7 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
     <PopUp
       visible={visible}
       setVisible={setVisible}
-      width="1200px"
+      width="70%"
       height="500px"
       size="xl"
       header=""

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import WorkOrderTable from './WorkOrderTable'
 import CommonPagination from '../../components/New/Pagination'
 import SearchBar from '../../components/New/SearchBar'
@@ -18,7 +18,7 @@ const WorkOrders = () => {
   const [data, setData] = useState([])
   const [limit, setLimit] = useState(10)
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const { filteredSearchData, searchQuery, searchBarRef } = useSearch()
+  const { filteredSearchData, searchQuery, } = useSearch()
   const [showPopUp, setShowPopUp] = useState(null)
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1 })
   const [isEditFormVisible,setIsFormVisible] = useState(false);
@@ -26,12 +26,15 @@ const WorkOrders = () => {
   const [isConfirmationModaleOpen,setIsConfirmationModaleOpen]=useState(false)
   const [deleteId, setDeleteId] = useState(null); // holds id to delete
   const [alerts,setAlerts] = useState([])
+  const [manufactureFilter,setManufactureFilter] = useState([])
+  const searchBarRef = useRef(null)
+
 
 
   const  fetchData = async () => {
     try {
       const response = await apiMethods.getWorkOrders({
-        manufacture: '',
+        manufacture:manufactureFilter ,
         sku_name: searchQuery,
         page: pagination?.page,
         limit: limit,
@@ -48,26 +51,8 @@ const WorkOrders = () => {
   }
   // Fetch Data
   useEffect(() => {
-    // const  fetchData = async () => {
-    //   try {
-    //     const response = await apiMethods.getWorkOrders({
-    //       manufacture: '',
-    //       sku_name: searchQuery,
-    //       page: pagination?.page,
-    //       limit: limit,
-    //     })
-  
-    //     setData(response.data?.workOrders || [])
-    //     setPagination(prev => ({
-    //       ...prev,
-    //       totalPages: response.data.pagination.totalPages
-    //     }))
-    //   } catch (error) {
-    //     console.error('Error fetching data:', error)
-    //   }
-    // }
     fetchData()
-  }, [pagination?.page, limit, searchQuery])
+  }, [pagination?.page, limit, searchQuery ,manufactureFilter])
 
   const handleClose = ()=>{
     setAlerts([])
@@ -78,13 +63,25 @@ const WorkOrders = () => {
       ...prev,
       page: 1,
     }))
-  }, [searchQuery])
+  }, [searchQuery,manufactureFilter])
 
 
   const handleEdit = (id)=>{
     setSelectedWorkOrderId(id)
     setIsFormVisible(true)
+  } 
+
+  const clearFilters = ()=>{
+    setManufactureFilter("")
+    searchBarRef?.current?.clearSearch(); // Assuming searchBarRef has a clearSearch method
   }
+
+  const handleManufactureFilter = (e)=>{
+
+    setManufactureFilter(e.target.value)
+
+    }
+
   const ConfirmDelete = async () => {
     if (deleteId !== null) {
       try {
@@ -120,10 +117,35 @@ const WorkOrders = () => {
 
       {/* Button section with Search */}
       <div className="flex justify-between items-center gap-2 h-10">
+        <div className='flex  gap-1'>
         <SearchBar text="workorder" data={data} ref={searchBarRef} />
+        <select
+                id="manufacture-filter"
+                className="border border-[#e7e5e4] py-[2px] px-[6px] h-[35px] rounded-md"
+                defaultValue=""
+                value={manufactureFilter}
+                onChange={handleManufactureFilter}
+              >
+                <option value="" disabled>
+                  Filter
+                </option>
+                <option value="inhouse">inhouse</option>
+                <option value="outsource">outsource</option>
+                <option value="purchase">purchase</option>
+              </select>
+              <button
+                className="border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition flex items-center gap-1"
+                onClick={clearFilters}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Clear
+              </button>
+        </div>
+
         <div className="flex gap-2">
           {/* <FilterButton  /> */}
-          <ActionButton label={'Filter'} variant="" icon={() => <CIcon icon={cilFilter} />} />
           {/* <AddButton text="Work Order" onClick={() => setDrawerOpen(true)} /> */}
           <ActionButton label={'Work Order'} variant="add" onClick={() => setDrawerOpen(true)} />
         </div>

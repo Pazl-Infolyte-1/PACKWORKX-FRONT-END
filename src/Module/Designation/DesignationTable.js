@@ -36,9 +36,9 @@ function DesignationTable({ designations, loading, onEdit, onDelete }) {
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Designation Name
               </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+              {/* <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Parent Designation
-              </CTableHeaderCell>
+              </CTableHeaderCell> */}
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Created Date
               </CTableHeaderCell>
@@ -64,9 +64,9 @@ function DesignationTable({ designations, loading, onEdit, onDelete }) {
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {designation.name}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                  {/* <CTableDataCell className="py-3 px-4 text-gray-700">
                     {designation.parent_id ? `ID: ${designation.parent_id}` : 'None'}
-                  </CTableDataCell>
+                  </CTableDataCell> */}
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {formatDate(designation.created_at)}
                   </CTableDataCell>

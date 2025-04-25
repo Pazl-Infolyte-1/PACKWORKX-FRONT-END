@@ -36,9 +36,9 @@ function DepartmentTable({ departments, loading, onEdit, onDelete }) {
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Department Name
               </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+              {/* <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Parent Department
-              </CTableHeaderCell>
+              </CTableHeaderCell> */}
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Created Date
               </CTableHeaderCell>
@@ -64,9 +64,9 @@ function DepartmentTable({ departments, loading, onEdit, onDelete }) {
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {department.department_name}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                  {/* <CTableDataCell className="py-3 px-4 text-gray-700">
                     {department.parent_id ? `ID: ${department.parent_id}` : 'None'}
-                  </CTableDataCell>
+                  </CTableDataCell> */}
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {formatDate(department.created_at)}
                   </CTableDataCell>

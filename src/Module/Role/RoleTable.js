@@ -36,9 +36,9 @@ function RoleTable({ roles, loading, onEdit, onDelete }) {
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Role Name
               </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+              {/* <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Parent Role
-              </CTableHeaderCell>
+              </CTableHeaderCell> */}
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Created Date
               </CTableHeaderCell>
@@ -64,9 +64,9 @@ function RoleTable({ roles, loading, onEdit, onDelete }) {
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {role.name}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                  {/* <CTableDataCell className="py-3 px-4 text-gray-700">
                     {role.parent_id ? `ID: ${role.parent_id}` : 'None'}
-                  </CTableDataCell>
+                  </CTableDataCell> */}
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {formatDate(role.created_at)}
                   </CTableDataCell>

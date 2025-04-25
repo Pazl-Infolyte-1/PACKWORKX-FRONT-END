@@ -100,7 +100,7 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
             value={formData.name}
             onChange={handleChange}
             className={`w-full px-3 py-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-            placeholder="Enter role name"
+            // placeholder="Enter role name"
           />
           {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
         </div>
@@ -116,7 +116,7 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
             value={formData.display_name}
             onChange={handleChange}
             className={`w-full px-3 py-2 border ${errors.display_name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-            placeholder="Enter display name"
+            // placeholder="Enter display name"
           />
           {errors.display_name && <p className="mt-1 text-sm text-red-500">{errors.display_name}</p>}
         </div>
@@ -132,7 +132,7 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
             onChange={handleChange}
             rows="3"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter role description"
+            // placeholder="Enter role description"
           ></textarea>
         </div>
         

@@ -106,7 +106,7 @@ function AddEditDepartmentForm({ showForm, setShowForm, isEdit, departmentData, 
                 value={formData.department_name}
                 onChange={handleChange}
                 className="border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Enter department name"
+                // placeholder="Enter department name"
                 required
               />
             </div>

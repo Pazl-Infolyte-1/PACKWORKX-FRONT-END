@@ -59,7 +59,6 @@ function AddAssign({
       if (selectedMachine) {
         setLoading(true)
         try {
-          // Fetch processes already assigned to this machine
           const response = await apiMethods.getByMachineId(selectedMachine.value)
           setMachineProcesses(response.data.data || [])
         } catch (error) {
@@ -78,7 +77,6 @@ function AddAssign({
   // Set default values when in edit mode and after data is fetched
   useEffect(() => {
     if (isEdit && isAddModalOpen && machine.length > 0 && assignedProcesses.length > 0) {
-      // Find the machine using machine_id
       const machineId = assignedProcesses[0].machine_id
       const defaultMachine = machine.find((item) => item.id === machineId)
 
@@ -92,9 +90,9 @@ function AddAssign({
       // Find the specific process if processId is provided
       if (isAddModalOpen.processId) {
         const specificProcess = assignedProcesses.find(
-          (item) => item.process_id === isAddModalOpen.processId
+          (item) => item.process_id === isAddModalOpen.processId,
         )
-        
+
         if (specificProcess) {
           setSelectedProcess({
             label: specificProcess.process_name,
@@ -130,31 +128,32 @@ function AddAssign({
   // Handle machine selection change to clear process selection
   const handleMachineChange = (selected) => {
     setSelectedMachine(selected)
-    // Clear the process selection when machine changes
     setSelectedProcess(null)
   }
 
-  // Create process options, filtering out already assigned processes
+  // Create process options, filtering out processes already assigned to the current machine
   const processOptions = React.useMemo(() => {
     if (!process.length) return []
-    
+
     // If no machine is selected, show all processes (for new assignments)
-    if (!selectedMachine) return process.map(item => ({
-      label: item.process_name,
-      value: item.id,
-    }))
-    
-    // Get the IDs of already assigned processes
-    const assignedProcessIds = machineProcesses.map(item => item.process_id)
-    
+    if (!selectedMachine)
+      return process.map((item) => ({
+        label: item.process_name,
+        value: item.id,
+      }))
+
+    // Get the IDs of processes already assigned to THIS SPECIFIC machine
+    const currentMachineProcessIds = machineProcesses.map((item) => item.process_id)
+
     // When editing, include currently selected process in options
     const currentProcessId = selectedProcess?.value
-    
-    // Filter out processes that are already assigned to this machine
-    // (except for the currently selected one when editing)
+
     return process
-      .filter(item => !assignedProcessIds.includes(item.id) || (isEdit && item.id === currentProcessId))
-      .map(item => ({
+      .filter(
+        (item) =>
+          !currentMachineProcessIds.includes(item.id) || (isEdit && item.id === currentProcessId),
+      )
+      .map((item) => ({
         label: item.process_name,
         value: item.id,
       }))
@@ -182,7 +181,7 @@ function AddAssign({
       // For edit, use the simplified payload structure
       payload = {
         machine_id: selectedMachine.value,
-        process_id: selectedProcess.value
+        process_id: selectedProcess.value,
       }
     } else {
       // For new assignments
@@ -191,8 +190,8 @@ function AddAssign({
           {
             machine_id: selectedMachine.value,
             process_id: selectedProcess.value,
-          }
-        ]
+          },
+        ],
       }
     }
 
@@ -227,7 +226,7 @@ function AddAssign({
           <Select
             options={machineOptions}
             value={selectedMachine}
-            onChange={handleMachineChange} // Use the custom handler
+            onChange={handleMachineChange}
             menuPortalTarget={document.body}
             isClearable={!isEdit && !disableMachineSelection}
             isSearchable={!isEdit && !disableMachineSelection}
@@ -249,33 +248,33 @@ function AddAssign({
             styles={selectStyles}
             isMulti={false}
             placeholder={
-              loading 
-                ? "Loading processes..." 
-                : processOptions.length > 0 
-                  ? "Select process..." 
-                  : selectedMachine 
-                    ? "No available processes for this machine" 
-                    : "Please select a machine first"
+              loading
+                ? 'Loading processes...'
+                : processOptions.length > 0
+                  ? 'Select process...'
+                  : selectedMachine
+                    ? 'No available processes for this machine'
+                    : 'Please select a machine first'
             }
-            noOptionsMessage={() => 
-              selectedMachine 
-                ? "All processes already assigned to this machine" 
-                : "Please select a machine first"
+            noOptionsMessage={() =>
+              selectedMachine
+                ? 'All processes already assigned to this machine'
+                : 'Please select a machine first'
             }
           />
         </div>
       </div>
       <div className="flex justify-end gap-3 my-4">
-        <ActionButton 
-          label={'Cancel'} 
-          variant="minimal" 
-          onClick={() => setIsAddModalOpen({ show: false })} 
+        <ActionButton
+          label={'Cancel'}
+          variant="minimal"
+          onClick={() => setIsAddModalOpen({ show: false })}
         />
-        <ActionButton 
-          label={isEdit ? 'Update' : 'Save'} 
-          variant="save" 
+        <ActionButton
+          label={isEdit ? 'Update' : 'Save'}
+          variant="save"
           onClick={handleSave}
-          disabled={!selectedMachine || !selectedProcess || processOptions.length === 0} 
+          disabled={!selectedMachine || !selectedProcess || processOptions.length === 0}
         />
       </div>
     </>

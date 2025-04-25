@@ -11,7 +11,6 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 import apiMethods from '../../api/config'
-import Loading from '../../components/New/Loading'
 
 const MachineDashboardTable = ({
   cellData,
@@ -20,7 +19,7 @@ const MachineDashboardTable = ({
   setRefresh,
   isLoading,
   setIsLoading,
-  onAddProcess
+  onAddProcess,
 }) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -81,15 +80,7 @@ const MachineDashboardTable = ({
           </CTableHead>
 
           <CTableBody>
-            {isLoading ? (
-              <CTableRow>
-                <CTableDataCell colSpan={8} className="text-center py-3 h-[250px]">
-                  <div className="flex justify-center items-center h-full">
-                    <Loading isLoading={isLoading} />
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-            ) : cellData.length > 0 ? (
+            {cellData.length > 0 ? (
               cellData.map((cell, index) => (
                 <CTableRow key={index} className="border-b">
                   <CTableDataCell
@@ -153,7 +144,7 @@ const MachineDashboardTable = ({
                           label: 'Add Process',
                           icon: cilPlus,
                           onClick: () => {
-                            onAddProcess && onAddProcess(cell.id, cell.machine_name);
+                            onAddProcess && onAddProcess(cell.id, cell.machine_name)
                           },
                         },
                         {

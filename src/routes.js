@@ -30,6 +30,7 @@ const RouteProcess = React.lazy(() => import('./Module/RouteProcess/RouteProcess
 const Role = React.lazy(() => import('./Module/Role/Role.js'))
 
 
+const Items = React.lazy(() => import('./Module/Inventory/Items/items.js'))
 
 
 
@@ -73,6 +74,7 @@ const routes = [
     key: 5462,
     children: settingsRoutes,
   },
+  {path:'/inventory/items',name:'inventory',element:Items,key:''},
 ]
 
 export default routes

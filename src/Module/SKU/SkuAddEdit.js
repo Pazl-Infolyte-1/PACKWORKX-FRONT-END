@@ -10,6 +10,7 @@ import PopUp from '../../components/New/PopUp'
 import FluteTypeView from './FluteTypeView'
 import Composite from './Composite'
 import CustomItem from './CustomItem'
+import { useDispatch } from 'react-redux'
 
 function SkuAddEdit({
   isopenval,
@@ -30,7 +31,11 @@ function SkuAddEdit({
   editedSkudata,
   handleClose,
   isSingleViewPopupForType,
-  setisSingleViewPopupForType
+  setisSingleViewPopupForType,
+  setPopupOpen,
+  isPopupOpen,
+  message,
+  setMessage
 }) {
   const { user } = useContext(AuthContext)
   const [isOpen, setIsOpen] = useState(false)
@@ -41,12 +46,12 @@ function SkuAddEdit({
 //const [isSingleViewPopupForType,setisSingleViewPopupForType]=useState(false)
 const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
 const [isactivateRender,setIsActivateRender]=useState(false)
-
+const dispatch = useDispatch()
 const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
   const createInitialSkuData = () => ({
+    client_id: null,
     sku_name: null,
     composite_type: null,
-    client_id: user.id,
     ply: null,
     client: null,
     length: null,
@@ -71,6 +76,7 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
     minimum_order_level: null,
     sku_type: 'RSC box',
     part_value: [],
+    route:[],
     part_count: null,
     estimate_composite_item: null,
     description: null,
@@ -120,6 +126,18 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
     fetchData()
   }, [])
   const handleSelect = (option) => {
+    dispatch({
+      type: 'SET_SELECTED_ROUTE_IDS',
+      payload: [],
+    });
+    dispatch({
+      type: 'SET_DECKLE_SIZE',
+      payload: {
+        deckle_size: "",
+        deckleError: "",
+      },
+    });
+    
     if (option.value === 'addMore') {
       // Handle add more procedure logic if needed
       setIsOpen(false)
@@ -279,6 +297,11 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
         editTag={editTag}
         toThreeDecimalFixed={toThreeDecimalFixed}
         compositeSelect={compositeSelect}
+        //for client fropdown create popup
+        setPopupOpen={setPopupOpen}
+        isPopupOpen={isPopupOpen}
+        message={message}
+        setMessage={setMessage}
       />
     ),
     //'Corrugated Sheet': (
@@ -298,6 +321,11 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
         updateSkuValues={updateSkuValues}
         editTag={editTag}
         compositeSelect={compositeSelect}
+               //for client fropdown create popup
+               setPopupOpen={setPopupOpen}
+               isPopupOpen={isPopupOpen}
+               message={message}
+               setMessage={setMessage}
       />
     ),
     'Die Cut box': (
@@ -316,6 +344,11 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
         updateSkuValues={updateSkuValues}
         editTag={editTag}
         compositeSelect={compositeSelect}
+                //for client fropdown create popup
+                setPopupOpen={setPopupOpen}
+                isPopupOpen={isPopupOpen}
+                message={message}
+                setMessage={setMessage}
       />
     ),
     Composite: (
@@ -337,6 +370,11 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
         setCompositeSelect={setCompositeSelect}
         isSingleViewPopupForType={isSingleViewPopupForType}
         isactivateRender={isactivateRender}
+                    //for client fropdown create popup
+                    setPopupOpen={setPopupOpen}
+                    isPopupOpen={isPopupOpen}
+                    message={message}
+                    setMessage={setMessage}
       />
     ),
     'Custom Item': (
@@ -356,6 +394,11 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
         editedSkudata={editedSkudata}
         editTag={editTag}
         compositeSelect={compositeSelect}
+          //for client fropdown create popup
+          setPopupOpen={setPopupOpen}
+          isPopupOpen={isPopupOpen}
+          message={message}
+          setMessage={setMessage}
       />
     ),
   }
@@ -416,7 +459,7 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
       {/* conditional rendring according to sku_type */}
       {skuComponents[addNewSkuData.sku_type] || null}
 
-      {addNewSkuData.sku_type !== 'Custom Item' && (
+      {addNewSkuData.sku_type !== 'Custom Item' || addNewSkuData.sku_type !== 'Composite' && (
         <div className="flex items-center my-3 space-x-2">
           <span className="text-[16px] font-medium">Strict Adherence for All Layers</span>
           <button

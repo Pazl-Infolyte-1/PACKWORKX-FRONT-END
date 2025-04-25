@@ -9,7 +9,7 @@ import {
 } from '@coreui/react'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
+import { cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 import apiMethods from '../../api/config'
 import Loading from '../../components/New/Loading'
 
@@ -20,6 +20,7 @@ const MachineDashboardTable = ({
   setRefresh,
   isLoading,
   setIsLoading,
+  onAddProcess
 }) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -43,6 +44,14 @@ const MachineDashboardTable = ({
       setRefresh((prev) => !prev)
     }
   }
+  const handleStatusChange = async (Id, newStatus) => {
+    try {
+      await apiMethods.updateMachineStatus(Id, { machine_status: newStatus })
+      setRefresh((prev) => !prev)
+    } catch (error) {
+      console.error('Failed to update status:', error)
+    }
+  }
 
   return (
     <div>
@@ -63,6 +72,9 @@ const MachineDashboardTable = ({
                 Warranty Exp.
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
+                Status
+              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Action
               </CTableHeaderCell>
             </CTableRow>
@@ -71,7 +83,7 @@ const MachineDashboardTable = ({
           <CTableBody>
             {isLoading ? (
               <CTableRow>
-                <CTableDataCell colSpan={7} className="text-center py-3 h-[250px]">
+                <CTableDataCell colSpan={8} className="text-center py-3 h-[250px]">
                   <div className="flex justify-center items-center h-full">
                     <Loading isLoading={isLoading} />
                   </div>
@@ -101,6 +113,32 @@ const MachineDashboardTable = ({
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.warranty_expiry}
                   </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    <select
+                      value={cell.status}
+                      onChange={(e) => handleStatusChange(cell.id, e.target.value)}
+                      className={`px-2.5 py-1 rounded-full text-sm font-medium outline-none border border-gray-300
+                      ${
+                        cell.status === 'Inactive'
+                          ? 'bg-blue-100 text-blue-800'
+                          : cell.status === 'Active'
+                            ? 'bg-green-100 text-green-800'
+                            : cell.status === 'Under Maintenance'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      <option className="text-gray-700 bg-white" value="Active">
+                        Active
+                      </option>
+                      <option className="text-gray-700 bg-white" value="Inactive">
+                        Inactive
+                      </option>
+                      <option className="text-gray-700 bg-white" value="Under Maintenance">
+                        Under Maintance
+                      </option>
+                    </select>
+                  </CTableDataCell>
                   <CTableDataCell className="px-2 sm:px-4 text-gray-700 relative">
                     <ThreeDotMenu
                       value={[
@@ -109,6 +147,13 @@ const MachineDashboardTable = ({
                           icon: cilHandPointRight,
                           onClick: () => {
                             onView(cell.id)
+                          },
+                        },
+                        {
+                          label: 'Add Process',
+                          icon: cilPlus,
+                          onClick: () => {
+                            onAddProcess && onAddProcess(cell.id, cell.machine_name);
                           },
                         },
                         {

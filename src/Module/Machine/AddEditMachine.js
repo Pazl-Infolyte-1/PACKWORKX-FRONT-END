@@ -3,7 +3,15 @@ import { useForm } from 'react-hook-form'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
 
-function AddEditMachine({ setdrawopen, isOpen, isEdit, setIsEdit, setRefresh }) {
+function AddEditMachine({
+  setdrawopen,
+  isOpen,
+  isEdit,
+  setIsEdit,
+  setRefresh,
+  isLoading,
+  setIsLoading,
+}) {
   useEffect(() => {
     if (!isOpen.id) return
     const fetchData = async () => {
@@ -55,6 +63,7 @@ function AddEditMachine({ setdrawopen, isOpen, isEdit, setIsEdit, setRefresh }) 
 
   const onSubmit = async (data) => {
     try {
+      setIsLoading(true)
       const apiCall = isEdit ? apiMethods.editMachine(isOpen.id, data) : apiMethods.AddMachine(data)
 
       const response = await apiCall
@@ -67,6 +76,8 @@ function AddEditMachine({ setdrawopen, isOpen, isEdit, setIsEdit, setRefresh }) 
       }
     } catch (error) {
       console.error('Submit Error:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -362,7 +373,13 @@ function AddEditMachine({ setdrawopen, isOpen, isEdit, setIsEdit, setRefresh }) 
         {/* Action Buttons */}
         <div className="flex flex-wrap justify-end gap-3 mt-6">
           <ActionButton type="button" label="Cancel" variant="cancel" onClick={handleCancel} />
-          <ActionButton type="submit" label={isEdit ? 'Update' : 'Save'} variant="add" />
+          <ActionButton
+            type="submit"
+            label={
+              isEdit ? (isLoading ? 'Updating...' : 'Update') : isLoading ? 'Saving...' : 'Save'
+            }
+            variant="add"
+          />
         </div>
       </form>
     </div>

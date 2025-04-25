@@ -637,6 +637,19 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  getByMachineId: async (id) => {
+    return await apiClient.get(`machines/assign/machine/${id}`)
+  },
+  assignMachineProcess: async (payload) => {
+    return await apiClient.post('/machines/assign', payload)
+  },
+  updateAssignMachine: async (payload, Id) => {
+    return await apiClient.put(`/machines/assign/${Id}`, payload)
+  },
+
+  deleteAssignMachine: async (id) => {
+    return await apiClient.delete(`/machines/assign/${id}`)
+  },
 
   AddProcess: async (formData) => {
     return await apiClient.post('/machines/process', formData)
@@ -960,6 +973,14 @@ export const apiMethods = {
 
   deleteMachine: async (id) => {
     return await apiClient.delete(`/machines/master/delete/${id}`)
+  },
+
+  updateMachineStatus: async (id, data) => {
+    return await apiClient.patch(`/machines/master/${id}/status`, data)
+  },
+
+  getAllAssign: async () => {
+    return await apiClient.get('/machines/assign')
   },
 }
 

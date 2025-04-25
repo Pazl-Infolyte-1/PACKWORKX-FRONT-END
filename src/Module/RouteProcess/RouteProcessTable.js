@@ -9,10 +9,16 @@ import {
   CTableRow,
 } from '@coreui/react'
 import { cilPencil, cilTrash } from '@coreui/icons'
-import ThreeDotMenu from '../../components/ThreeDotMenu'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
+import CIcon from '@coreui/icons-react'
 
-const RouteProcessTable = ({ routeProcessData, setRouteProcessData, handleEdit, setAlerts }) => {
+const RouteProcessTable = ({
+  routeProcessData,
+  setRouteProcessData,
+  handleEdit,
+  setAlerts,
+  setOpenRouteModal,
+}) => {
   const [confirmModal, setConfirmModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
 
@@ -68,7 +74,7 @@ const RouteProcessTable = ({ routeProcessData, setRouteProcessData, handleEdit, 
               routeProcessData.map((item) => (
                 <CTableRow key={item.id} className="border-b text-center">
                   <CTableDataCell
-                    onClick={() => setOpenProcessModal({ open: true, id: item.id })}
+                    onClick={() => setOpenRouteModal({ open: true, id: item.id })}
                     className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start"
                   >
                     {item.id}
@@ -77,27 +83,23 @@ const RouteProcessTable = ({ routeProcessData, setRouteProcessData, handleEdit, 
                     {item.route_name}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2  font-semibold">
-                    {apiMethods.formatDate(item.created_at)}
+                    {new Date(item.created_at).toLocaleString()}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2">
-                    <ThreeDotMenu
-                      value={[
-                        {
-                          label: 'Edit Route',
-                          icon: cilPencil,
-                          onClick: () => {
-                            handleEdit(item)
-                          },
-                        },
-                        {
-                          label: 'Delete',
-                          icon: cilTrash,
-                          onClick: () => {
-                            openDeleteModal(item.id)
-                          },
-                        },
-                      ]}
-                    />
+                    <div className="flex justify-center items-center space-x-4">
+                      <CIcon
+                        icon={cilPencil}
+                        className="cursor-pointer"
+                        style={{ color: '#2563EB' }}
+                        onClick={() => handleEdit(item)}
+                      />
+                      <CIcon
+                        icon={cilTrash}
+                        className="cursor-pointer"
+                        style={{ color: '#DC2626' }}
+                        onClick={() => openDeleteModal(item.id)}
+                      />
+                    </div>
                   </CTableDataCell>
                 </CTableRow>
               ))

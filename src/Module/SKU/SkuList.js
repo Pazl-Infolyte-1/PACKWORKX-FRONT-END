@@ -24,6 +24,8 @@ import CustomAlert from '../../components/New/CustomAlert'
 import createInitialSkuData from './CreateInitialSkuData'
 import { bottom } from '@popperjs/core'
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux'
+
 
 function SkuList() {
   const [skuType, setSkuType] = useState([])
@@ -49,10 +51,14 @@ function SkuList() {
   const [boardSizeError, setBoardSizeError] = useState('')
   const navigate = useNavigate();
   const [isSingleViewPopupForType, setisSingleViewPopupForType] = useState(false);
+  const [isPopupOpen, setPopupOpen] = useState(false)
+  const [message, setMessage] = useState("")
+  const dispatch = useDispatch()
 
+console.log("suuuuu",user)
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
-    client_id: user?.id,
+    client_id: null,
     client: null,
     ply: null,
     length: null,
@@ -80,6 +86,7 @@ function SkuList() {
     minimum_order_level: null,
     sku_type: 'RSC box',
     part_value: [],
+    route:[],
     part_count: null,
     estimate_composite_item: null,
     description: null,
@@ -120,18 +127,45 @@ function SkuList() {
   }, [location.state])
 
   const handleChange = (event) => {
-    const { name, value } = event.target
+    const { name, value } = event.target;
+  
     if (name === 'client' && value === 'add_client') {
-      navigate('/clients');
+      setPopupOpen(true);
+  
+      // Don't set 'add_client' as the selected value
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        client: null,
+      }));
       return;
     }
-
-
-    setAddNewSkuData((prevData) => ({
-      ...prevData,
+   
+    setAddNewSkuData((prev) => ({
+      ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  
+    // Find the selected client based on the client_id
+    const selectedClient = client.find(item => item.client_id === parseInt(value)); // Ensure value is an integer
+  
+    if (selectedClient) {
+      console.log("company_name", selectedClient.company_name);
+      console.log("client_id", selectedClient.client_id);
+      console.log("client_ui_id", selectedClient.client_ui_id);
+      console.log("client_ref_id", selectedClient.client_ref_id);
+      console.log("gst_status", selectedClient.gst_status);
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        client_id: selectedClient.client_id, // Set client_id
+        client: selectedClient.company_name,   // Set company_name as client
+      }));
+    } else {
+      console.log("No client found for the selected client_id");
+    }
+ 
+    console.log("name", name);
+    console.log("val", value);
+  };
 
   const handleStrictAdherenceToggle = () => {
     const newStrictAdherence = !strictAdherence
@@ -142,6 +176,16 @@ function SkuList() {
       strict_adherence: newStrictAdherence,
     }))
   }
+
+  //useEffect(() => {
+  //  if (user?.id) {
+  //    setAddNewSkuData((prevData) => ({
+  //      ...prevData,
+  //      client_id: user.id,
+  //    }));
+  //  }
+  //}, [user?.id]);
+  const deckleError = useSelector((state) => state.boardCalculations.deckleError);
 
   const handleAddSkuSubmit = async () => {
     try {
@@ -160,11 +204,16 @@ function SkuList() {
           setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong' }])
         }
       } else {
+        if(deckleError){
+          setAlerts([{ severity: 'error', message: deckleError }])
+          return  null
+        }
         if (boardSizeError) {
           console.warn('Blocked submission due to board size error:', boardSizeError)
           setAlerts([{ severity: 'error', message: boardSizeError }])
           return null // 🔴 Stop submission
         }
+        console.log("addskkkk",addNewSkuData)
         const response = await apiMethods.addSku(addNewSkuData)
         if (response?.status === 201) {
           //setDrawerOpen(false)
@@ -198,8 +247,8 @@ function SkuList() {
     setAddNewSkuData({
       id: selectedSku.id || null,
       sku_name: selectedSku.sku_name || null,
-      client_id: selectedSku.client_id || 1,
-      client: selectedSku.client || null,
+      client_id: selectedSku.client_id || null,
+      client: selectedSku.company_name || null,
       ply: selectedSku.ply || null,
       length: selectedSku.length || null,
       width: selectedSku.width || null,
@@ -224,6 +273,7 @@ function SkuList() {
       minimum_order_level: selectedSku.minimum_order_level || null,
       sku_type: selectedSku.sku_type || null,
       part_value: selectedSku.part_value || [],
+      route: selectedSku.route || [],
       part_count: selectedSku.part_count,
       estimate_composite_item: selectedSku.estimate_composite_item || null,
       description: selectedSku.description || null,
@@ -258,7 +308,7 @@ function SkuList() {
           client: selectedClient || '',
           sku_type: selectedSkuType || '',
           page: pagination?.currentPage || 1,
-          limit: limit,
+          limit: message ? 10000 : limit,
         })
         const clientResponse = await apiMethods.getClients()
 
@@ -279,6 +329,7 @@ function SkuList() {
     selectedSkuType,
     limit,
     location.state?.skipInitialFetch,
+    message
   ])
 
   // Clear all filters
@@ -305,6 +356,8 @@ function SkuList() {
   }
 console.log("client data",client)
 console.log("dashboard",dashboard)
+console.log("mess",message)
+
   return (
     <div>
       {/* Header */}
@@ -324,8 +377,20 @@ console.log("dashboard",dashboard)
               className="sm:h-8 flex items-center font-bold text-white px-2 rounded-lg shadow-md border-none cursor-pointer"
               onClick={() => {
                 if (text === 'Add SKU') {
+                                dispatch({
+                    type: 'SET_SELECTED_ROUTE_IDS',
+                    payload: [], // 👈 empty array
+                  });
+                  dispatch({
+                    type: 'SET_DECKLE_SIZE',
+                    payload: {
+                      deckle_size: "",
+                      deckleError: "",
+                    },
+                  });
                   setDrawerOpen(true)
                   setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
+    
                 }
                 if (text === 'Bulk Upload') {
                   setVisible(true)
@@ -528,6 +593,10 @@ console.log("dashboard",dashboard)
           }}
           setisSingleViewPopupForType={setisSingleViewPopupForType}
           isSingleViewPopupForType={isSingleViewPopupForType}
+          isPopupOpen={isPopupOpen}
+          setPopupOpen={setPopupOpen}
+          message={message}
+          setMessage={setMessage}
         />
       </Drawer>
     </div>

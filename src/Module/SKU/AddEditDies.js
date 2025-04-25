@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import ActionButton from "../../components/New/ActionButton";
 import apiMethods from "../../api/config";
 
-const DieForm = ({ dieToEdit, setRefresh, onClose, setisSingleViewPopup }) => {
+const DieForm = ({ dieToEdit, setRefresh, onClose, setisSingleViewPopup,client }) => {
+
+  console.log("client val",JSON.stringify(client))
   const [formData, setFormData] = useState({
     die_id: "",
     name: "",
@@ -80,18 +82,25 @@ const DieForm = ({ dieToEdit, setRefresh, onClose, setisSingleViewPopup }) => {
       </div>
   
       <div>
-        <label className="block font-medium text-gray-700">Client</label>
-        <input
-          type="text"
-          name="client"
-          value={formData.client}
-          onChange={handleChange}
-          className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="Enter Client Name"
-          required
-        />
-      </div>
-  
+  <label className="block font-medium text-gray-700">Client</label>
+  <select
+    name="client"
+    value={formData.client}
+    onChange={handleChange}
+    className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 focus:ring-blue-500 focus:border-blue-500"
+    required
+  >
+    <option value="" hidden>
+      Select
+    </option>
+    {client?.map((item) => (
+      <option key={item.client_id} value={item.display_name}>
+        {item.display_name}
+      </option>
+    ))}
+  </select>
+</div>
+
       <div>
         <label className="block font-medium text-gray-700">Board Size</label>
         <input

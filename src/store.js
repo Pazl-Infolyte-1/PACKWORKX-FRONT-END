@@ -29,7 +29,15 @@ const initialState = {
   boardCalculations:{
     deckle_size: '',
     deckleError: '',
+  },
+  diecutCalculations: {
+    lengthBoard: null,
+    widthBoard: null,
+    ups: null,
+    deckle_size: null,
+    deckleError: '',
   }
+  
 }
 
 const changeState = (state = initialState, { type, payload, ...rest }) => {
@@ -91,7 +99,39 @@ const changeState = (state = initialState, { type, payload, ...rest }) => {
       deckleError: payload.deckleError || '',
     },
   };
+  case 'SET_DIECUT_DECKLE_SIZE':
+    const { lengthBoard, widthBoard, ups, deckle_size } = payload;
+    const isValid = !isNaN(widthBoard) && !isNaN(ups);
+    const calculatedMin = widthBoard * ups;
+  
+    const errorMessage =
+      !isValid
+        ? 'Invalid input for deckle size calculation'
+        : deckle_size < calculatedMin
+          ? `Deckle size must be greater than or equal to ${calculatedMin}`
+          : '';
+  
+    return {
+      ...state,
+      diecutCalculations: {
+        ...state.diecutCalculations,
+        lengthBoard,
+        widthBoard,
+        ups,
+        deckle_size,
+        calculatedMin, 
+        deckleError: errorMessage,
+      },
+    };
+    case 'RESET_DIECUT_CALCULATIONS':
+  return {
+    ...state,
+    diecutCalculations: {
+      ...initialState.diecutCalculations,
+    },
+  };
 
+  
     default:
       return state
   }

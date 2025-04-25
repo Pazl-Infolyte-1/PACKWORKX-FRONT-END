@@ -342,46 +342,110 @@ useEffect(() => {
 const handleBrowseClickRoute = () => {
   setisSingleViewPopupRoute(true)
 }
-useEffect(() => {
-  const boardWidth = Number(addNewSkuData.width_board_size_cm2);
-  const ups = Number(addNewSkuData.ups);
-  const deckleSize = Number(addNewSkuData.deckle_size);
-  const minDeckleSize = boardWidth * ups;
+//useEffect(() => {
+//  const boardWidth = Number(addNewSkuData.width_board_size_cm2);
+//  const ups = Number(addNewSkuData.ups);
+//  const deckleSize = Number(addNewSkuData.deckle_size);
+//  const minDeckleSize = boardWidth * ups;
 
-  if (!isNaN(deckleSize) && !isNaN(minDeckleSize)) {
-    if (deckleSize < minDeckleSize) {
-      dispatch({
-        type: 'SET_DECKLE_SIZE',
-        payload: {
-          deckle_size: minDeckleSize,
-          deckleError: `Deckle size must be greater than or equal to ${minDeckleSize}`,
-        },
-      });
-    } else {
-      dispatch({
-        type: 'SET_DECKLE_SIZE',
-        payload: {
-          deckle_size: deckleSize,
-          deckleError: '',
-        },
-      });
-    }
-  }
-}, [
-  addNewSkuData.width_board_size_cm2,
-  addNewSkuData.ups,
-  addNewSkuData.deckle_size,
-  dispatch,
-]);
-const boardCalculations = useSelector(state => state.boardCalculations);
+//  if (!isNaN(deckleSize) && !isNaN(minDeckleSize)) {
+//    if (deckleSize < minDeckleSize) {
+//      dispatch({
+//        type: 'SET_DECKLE_SIZE',
+//        payload: {
+//          deckle_size: minDeckleSize,
+//          deckleError: `Deckle size must be greater than or equal to ${minDeckleSize}`,
+//        },
+//      });
+//    } else {
+//      dispatch({
+//        type: 'SET_DECKLE_SIZE',
+//        payload: {
+//          deckle_size: deckleSize,
+//          deckleError: '',
+//        },
+//      });
+//    }
+//  }
+//}, [
+//  addNewSkuData.width_board_size_cm2,
+//  addNewSkuData.ups,
+//  addNewSkuData.deckle_size,
+//  dispatch,
+//]);
+//const boardCalculations = useSelector(state => state.boardCalculations);
+//useEffect(() => {
+//  if (boardCalculations.deckle_size) {
+//    setAddNewSkuData((prev) => ({
+//      ...prev,
+//      deckle_size: boardCalculations.deckle_size,
+//    }));
+//  }
+//}, [boardCalculations.deckle_size]);
+
+
+//useEffect(()=>{
+//  if(editTag && addNewSkuData )
+//  setAddNewSkuData((prev) => ({
+//    ...prev,
+//    width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+//    length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+
+//  }));
+//},[editTag,addNewSkuData.width_board_size_cm2,addNewSkuData.length_board_size_cm2])
 useEffect(() => {
-  if (boardCalculations.deckle_size) {
+  const { length_board_size_cm2, width_board_size_cm2, ups } = addNewSkuData || {};
+
+  if (length_board_size_cm2 && width_board_size_cm2 && ups) {
+    dispatch({
+      type: 'SET_DIECUT_DECKLE_SIZE',
+      payload: {
+        lengthBoard: length_board_size_cm2,
+        widthBoard: width_board_size_cm2,
+        ups: ups,
+      },
+    });
+  }
+}, [addNewSkuData, dispatch]);
+
+const diecutCalculations = useSelector((state) => state.diecutCalculations);
+
+useEffect(() => {
+  console.log('diecutCalculations:', diecutCalculations);
+}, [diecutCalculations]);
+
+useEffect(() => {
+  console.log('Width Board:', diecutCalculations.widthBoard);
+  console.log('Length Board:', diecutCalculations.lengthBoard);
+  console.log('UPS:', diecutCalculations.ups);
+  console.log('Deckle Size:', diecutCalculations.deckle_size);
+  console.log('calculatedMin Size:', diecutCalculations.calculatedMin);
+}, [diecutCalculations.widthBoard, diecutCalculations.lengthBoard, diecutCalculations.ups, diecutCalculations.deckle_size]);
+
+useEffect(() => {
+  // Ensure all the required values exist
+  if (addNewSkuData) {
+    dispatch({
+      type: 'SET_DIECUT_DECKLE_SIZE',
+      payload: {
+        lengthBoard: addNewSkuData.length_board_size_cm2,
+        widthBoard: addNewSkuData.width_board_size_cm2,
+        ups: addNewSkuData.ups,
+        deckle_size: addNewSkuData.deckle_size, // passed from form or calculated elsewhere
+      },
+    });
+  }
+}, [addNewSkuData, dispatch]); // This runs when `addNewSkuData` changes
+
+useEffect(() => {
+  if (diecutCalculations.calculatedMin) {
     setAddNewSkuData((prev) => ({
       ...prev,
-      deckle_size: boardCalculations.deckle_size,
+      deckle_size: diecutCalculations.calculatedMin,
     }));
   }
-}, [boardCalculations.deckle_size]);
+}, [diecutCalculations.calculatedMin]);
+
 
   return (
     <div className="rounded-lg">
@@ -657,7 +721,7 @@ useEffect(() => {
                         <input
                           id="width_board_size_cm2"
                           name="width_board_size_cm2"
-                          value={addNewSkuData.width_board_size_cm2}
+                          value={addNewSkuData.width_board_size_cm2 ||null}
                           onChange={handleChange}
                           type='number'
                           //placeholder="Width"
@@ -670,7 +734,7 @@ useEffect(() => {
                         <input
                           id="length_board_size_cm2"
                           name="length_board_size_cm2"
-                          value={addNewSkuData.length_board_size_cm2}
+                          value={addNewSkuData.length_board_size_cm2 ||null}
                           onChange={handleChange}
                           type='number'
                           //placeholder="Length"
@@ -707,11 +771,11 @@ useEffect(() => {
          min="0"
   onChange={handleChange}
   className={`w-full p-2 border rounded-md focus:ring-2 transition-colors ${
-    boardCalculations.deckleError ? 'border-red-500 ring-red-400' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+    diecutCalculations.deckleError ? 'border-red-500 ring-red-400' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
   }`}
 />
-{boardCalculations.deckleError && (
-  <p className="mt-1 text-sm text-red-600">{boardCalculations.deckleError}</p>
+{diecutCalculations.deckleError && (
+  <p className="mt-1 text-sm text-red-600">{diecutCalculations.deckleError}</p>
 )}
 </div>
 

@@ -186,11 +186,23 @@ console.log("suuuuu",user)
   //  }
   //}, [user?.id]);
   const deckleError = useSelector((state) => state.boardCalculations.deckleError);
+  const dieError = useSelector((state) => state.diecutCalculations.deckleError);
+
 
   const handleAddSkuSubmit = async () => {
     try {
       if (editTag) {
-        const response = await apiMethods.updateSku(addNewSkuData)
+        if(dieError){
+          setAlerts([{ severity: 'error', message: dieError }])
+          return  null
+        }
+        const numberSkuData={
+          ...addNewSkuData,
+          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+          deckle_size: Number(addNewSkuData.deckle_size),
+        }
+        const response = await apiMethods.updateSku(numberSkuData)
         if (response?.status === 200) {
           setEditTag(false)
           setRefresh((prev) => !prev)
@@ -204,6 +216,10 @@ console.log("suuuuu",user)
           setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong' }])
         }
       } else {
+        if(dieError){
+          setAlerts([{ severity: 'error', message: dieError }])
+          return  null
+        }
         if(deckleError){
           setAlerts([{ severity: 'error', message: deckleError }])
           return  null
@@ -214,7 +230,13 @@ console.log("suuuuu",user)
           return null // 🔴 Stop submission
         }
         console.log("addskkkk",addNewSkuData)
-        const response = await apiMethods.addSku(addNewSkuData)
+        const numberSkuData={
+          ...addNewSkuData,
+          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+          deckle_size: Number(addNewSkuData.deckle_size),
+        }
+        const response = await apiMethods.addSku(numberSkuData)
         if (response?.status === 201) {
           //setDrawerOpen(false)
           setRefresh((prev) => !prev)
@@ -275,6 +297,8 @@ console.log("suuuuu",user)
       part_value: selectedSku.part_value || [],
       route: selectedSku.route || [],
       part_count: selectedSku.part_count,
+      width_board_size_cm2:selectedSku.width_board_size_cm2 || null,
+      length_board_size_cm2:selectedSku.length_board_size_cm2 || null,
       estimate_composite_item: selectedSku.estimate_composite_item || null,
       description: selectedSku.description || null,
       default_sku_details: selectedSku.default_sku_details || null,
@@ -388,6 +412,8 @@ console.log("mess",message)
                       deckleError: "",
                     },
                   });
+                  dispatch({ type: 'RESET_DIECUT_CALCULATIONS' });
+
                   setDrawerOpen(true)
                   setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
     

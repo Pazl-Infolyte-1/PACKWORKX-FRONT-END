@@ -23,6 +23,7 @@ const PurchaseReturn = React.lazy(() => import('./Module/PurchaseReturn/Purchase
 const Reports = React.lazy(() => import('./Module/Reports/Reports.js'))
 const OfflineRequest = React.lazy(() => import('./Module/OfflineRequest/OfflineRequest.js'))
 const AdminFaq = React.lazy(() => import('./Module/AdminFaq/AdminFaq.js'))
+const Items = React.lazy(() => import('./Module/Inventory/Items/items.js'))
 
 
 
@@ -59,6 +60,7 @@ const routes = [
     key: 5462,
     children: settingsRoutes,
   },
+  {path:'/inventory/items',name:'inventory',element:Items,key:''},
 ]
 
 export default routes

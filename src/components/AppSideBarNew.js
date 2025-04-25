@@ -294,6 +294,14 @@ export const AppSideBarNew = ({ giveAccess }) => {
                         Designation
                       </NavLink>
                     </li>
+                    <li className="nav-item">
+                      <NavLink className="nav-link" to="/role">
+                        <span className="nav-icon">
+                          <span className="nav-icon-bullet" />
+                        </span>
+                        Role
+                      </NavLink>
+                    </li>
                   </ul>
                 </li>
               );
@@ -350,6 +358,16 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/production">
                     {navLink('Production', 'cilTruck')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
+
+            if (module.modules_description === 'Product') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/production">
+                    {navLink('Product', 'cilIndustry')}
                   </CNavLink>
                 </CNavItem>
               )

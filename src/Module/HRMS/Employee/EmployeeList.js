@@ -32,7 +32,7 @@ function EmployeeList() {
   const [status, setFilterStatus] = useState('');
   const [alerts, setAlerts] = useState([]);
   const searchBarRef = useRef(null)
-  const [loading,setLoading]=useState(true)
+  const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('')
   const [paginationParams, setPaginationParams] = useState({
     currentPage: 1,
@@ -110,11 +110,11 @@ function EmployeeList() {
 
 
   useEffect(() => {
-      setPaginationParams(prev => ({
-        ...prev,
-        currentPage: 1 // Reset to page 1 whenever search query changes
-      })
-      );
+    setPaginationParams(prev => ({
+      ...prev,
+      currentPage: 1 // Reset to page 1 whenever search query changes
+    })
+    );
   }, [searchQuery, status]);
 
   // Initial data fetch on component mount
@@ -184,7 +184,7 @@ function EmployeeList() {
     e.preventDefault();
     console.log('Form Data:', formData);
 
-let response
+    let response
     try {
       if (isEdit) {
 
@@ -227,7 +227,7 @@ let response
         })
         fetchEmployeeData()
 
-      } 
+      }
 
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -291,9 +291,9 @@ let response
       setEmployeeResponse(response.data)
     } catch (error) {
       console.error('Error fetching employee data:', error)
-      setAlerts([{ 
-        severity: "error", 
-        message: error?.response?.data?.message || "Failed to fetch employee data. Please try again." 
+      setAlerts([{
+        severity: "error",
+        message: error?.response?.data?.message || "Failed to fetch employee data. Please try again."
       }])
       setEmployeesData([])
       setEmployeeResponse(null)
@@ -393,43 +393,43 @@ let response
         <div className="overflow-x-auto border border-gray-200 px-3 py-1 mt-1 rounded-md">
           <div className="max-w-[1280px] mx-auto mt-1 flex justify-between gap-2">
             {/* <div className='flex gap-3'> */}
-              <SearchBar text="Employees" data={employeesData} ref={searchBarRef} />
-              <div className='flex justify-end gap-3'>
-                <select
-                  id="department-filter"
-                  className="bg-white border border-[#e7e5e4] p-[6px] h-[35px] rounded-md filter-dropdown"
-                  defaultValue=""
-                  onChange={HandleFilter}
-                >
-                  <option value="" disabled>
-                    Select Department
+            <SearchBar text="Employees" data={employeesData} ref={searchBarRef} />
+            <div className='flex justify-end gap-3'>
+              <select
+                id="department-filter"
+                className="bg-white border border-[#e7e5e4] p-[6px] h-[35px] rounded-md filter-dropdown"
+                defaultValue=""
+                onChange={HandleFilter}
+              >
+                <option value="" disabled>
+                  Select Department
+                </option>
+                {dropdownOptions.departments.map((department) => (
+                  <option key={department.id} value={department.department_name}>
+                    {department.department_name}
                   </option>
-                  {dropdownOptions.departments.map((department) => (
-                    <option key={department.id} value={department.department_name}>
-                      {department.department_name}
+                ))}
+              </select>
+
+              <select
+                className="border border-[#e7e5e4] p-[6px] h-[35px] rounded-md filter-dropdown"
+                defaultValue=""
+                onChange={HandleFilter}
+              >
+                <option value="" disabled>
+                  Select Role
+                </option>
+                {
+                  dropdownOptions.roles.map((role) => (
+                    <option key={role.id} value={role.name}>
+                      {role.name}
                     </option>
-                  ))}
-                </select>
+                  ))
+                }
 
-                <select
-                  className="border border-[#e7e5e4] p-[6px] h-[35px] rounded-md filter-dropdown"
-                  defaultValue=""
-                  onChange={HandleFilter}
-                >
-                  <option value="" disabled>
-                    Select Role
-                  </option>
-                  {
-                    dropdownOptions.roles.map((role) => (
-                      <option key={role.id} value={role.name}>
-                        {role.name}
-                      </option>
-                    ))
-                  }
+              </select>
 
-                </select>
-
-                {/* <select
+              {/* <select
               className="border border-[#e7e5e4] p-[6px] h-[35px] rounded-md"
               defaultValue=""
               onChange={HandleFilter}
@@ -446,29 +446,29 @@ let response
               }
               </select> */}
 
-                <select
-                  id="status-filter"
-                  className="border border-[#e7e5e4] p-[6px] h-[35px] rounded-md"
-                  defaultValue=""
-                  value={status}
-                  onChange={handleStatus}
-                >
-                  <option value="" disabled>
-                    status
-                  </option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
-                    <button
-    className="border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition flex items-center gap-1"
-    onClick={clearFilters}
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-    </svg>
-    Clear Filters
-  </button>
-              </div>
+              <select
+                id="status-filter"
+                className="border border-[#e7e5e4] p-[6px] h-[35px] rounded-md"
+                defaultValue=""
+                value={status}
+                onChange={handleStatus}
+              >
+                <option value="" disabled>
+                  status
+                </option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+              <button
+                className="border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition flex items-center gap-1"
+                onClick={clearFilters}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Clear Filters
+              </button>
+            </div>
             {/* </div> */}
 
 
@@ -503,7 +503,17 @@ let response
           </div>
         </div>
         <div>
-          <EmployeeForm isDrawerOpen={isDrawerOpen} setDrawerOpen={setDrawerOpen} formData={formData} setFormData={setFormData} isEdit={isEdit} handleSubmit={handleSubmit} dropdownOptions={dropdownOptions} />
+          <EmployeeForm
+           isDrawerOpen={isDrawerOpen}
+            setDrawerOpen={setDrawerOpen}
+             formData={formData}
+              setFormData={setFormData}
+               isEdit={isEdit}
+                handleSubmit={handleSubmit}
+                 dropdownOptions={dropdownOptions}
+                 setDropdownOptions={setDropdownOptions}
+                 setAlerts={setAlerts}
+                  />
         </div>
       </div>
     </>

@@ -144,10 +144,12 @@ function EmployeeView({ employeeData, showEmployeeData, setVisible }) {
                       <span className="text-sm font-medium text-gray-500">Joining Date</span>
                       <span className="text-gray-800 mt-1">{formatDate(employeeData.joining_date)}</span>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-500">Contract End Date</span>
-                      <span className="text-gray-800 mt-1">{formatDate(employeeData.contract_end_date)}</span>
-                    </div>
+                    {employeeData.contract_end_date && (
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium text-gray-500">Contract End Date</span>
+                        <span className="text-gray-800 mt-1">{formatDate(employeeData.contract_end_date)}</span>
+                      </div>
+                    )}
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-500">Last Date</span>
                       <span className="text-gray-800 mt-1">{formatDate(employeeData.last_date)}</span>
@@ -179,7 +181,7 @@ function EmployeeView({ employeeData, showEmployeeData, setVisible }) {
             </div>
 
             {/* Notice Period Card */}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+            {/* <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
               <div className="p-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Notice Period</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -193,7 +195,7 @@ function EmployeeView({ employeeData, showEmployeeData, setVisible }) {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Timestamps Card */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">

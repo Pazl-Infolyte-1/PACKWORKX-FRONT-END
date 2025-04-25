@@ -199,8 +199,8 @@ function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, hand
       </div>
       <ConfirmationModale
         isOpen={isConfirmationModaleOpen}
-        title='Confirm Deletion'
-        message='Are you sure you want to delete this item?'
+        title='Confirm Change'
+        message='Are you sure you want to change the status?'
         onClose={() => { setIsConfirmationModaleOpen(false) }}
         onConfirm={handleDeleteEmployee}
       />

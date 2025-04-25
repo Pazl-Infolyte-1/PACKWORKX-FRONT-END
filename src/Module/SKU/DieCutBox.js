@@ -47,6 +47,7 @@ function DieCutBox({
   const [displayAsChips,setDisplayAsChips] = useState([])
   const [isSingleViewPopupRoute, setisSingleViewPopupRoute] = useState(false)
   const [fullRouteResponse, setFullRouteResponse] = useState(null);
+  const [unitTooltip, setUnitTooltip] = useState('Enter Millimeter')
 
 
   const selectionFrame = {
@@ -66,10 +67,14 @@ function DieCutBox({
   }
   
   useEffect(() => {
-    if (selectedDiePopup?.name) {
+    if (selectedDiePopup) {
+      
       setAddNewSkuData((prev) => ({
         ...prev,
         select_dies: selectedDiePopup.name,
+        width_board_size_cm2:selectedDiePopup.board_width,
+        length_board_size_cm2:selectedDiePopup.board_length
+
       }))
     }
   }, [selectedDiePopup])
@@ -263,6 +268,135 @@ route: selectedRouteIds1,
 const handleBrowseClickRoute = () => {
 setisSingleViewPopupRoute(true)
 }
+
+const handleUnitChange = (e) => {
+  const newUnit = e.target.value;
+  let tooltipMessage = '';
+  switch (newUnit) {
+    case 'cm':
+      tooltipMessage = 'Enter Centimeter';
+      break;
+    case 'in':
+      tooltipMessage = 'Enter Inches';
+      break;
+    case 'mm':
+    default:
+      tooltipMessage = 'Enter Millimeter';
+      break;
+  }
+  setAddNewSkuData((prevData) => {
+    const currentUnit = prevData.unit || 'mm';
+
+    const widthConverted = convertValue(prevData.width_board_size_cm2, currentUnit, newUnit);
+    const lengthConverted = convertValue(prevData.length_board_size_cm2, currentUnit, newUnit);
+    const jointsConverted = convertValue(prevData.joints, currentUnit, newUnit);
+    const upsConverted = convertValue(prevData.ups, currentUnit, newUnit);
+    const flapwidthConverted = convertValue(prevData.flap_width, currentUnit, newUnit);
+    const flapToleranceConverted = convertValue(prevData.flap_tolerance, currentUnit, newUnit);
+    const lengthTrimmingToleranceConverted = convertValue(prevData.length_trimming_tolerance, currentUnit, newUnit);
+    const decklesizeConverted = convertValue(prevData.deckle_size, currentUnit, newUnit);
+
+
+    return {
+      ...prevData,
+      unit: newUnit,
+      width_board_size_cm2: parseFloat(widthConverted.toFixed(2)),
+      length_board_size_cm2: parseFloat(lengthConverted.toFixed(2)),
+      //joints:parseFloat(jointsConverted.toFixed(2)),
+      ups:parseFloat(upsConverted.toFixed(2)),
+      //flap_width:parseFloat(flapwidthConverted.toFixed(2)),
+      //flap_tolerance:parseFloat(flapToleranceConverted.toFixed(2)),
+      //length_trimming_tolerance:parseFloat(lengthTrimmingToleranceConverted.toFixed(2)),
+      deckle_size:parseFloat(decklesizeConverted.toFixed(2)),
+    };
+  });
+
+  setUnitTooltip(tooltipMessage);
+
+};
+    
+const convertValue = (value, fromUnit, toUnit) => {
+  if (fromUnit === toUnit) return value;
+
+  // Convert input value to mm first
+  let valueInMm = value;
+  switch (fromUnit) {
+    case 'cm':
+      valueInMm = value * 10;
+      break;
+    case 'in':
+      valueInMm = value * 25.4;
+      break;
+    case 'mm':
+    default:
+      break;
+  }
+
+  // Convert from mm to desired unit
+  switch (toUnit) {
+    case 'cm':
+      return valueInMm / 10;
+    case 'in':
+      return valueInMm / 25.4;
+    case 'mm':
+    default:
+      return valueInMm;
+  }
+};
+useEffect(() => {
+  const { length_board_size_cm2, width_board_size_cm2, ups } = addNewSkuData || {};
+
+  if (length_board_size_cm2 && width_board_size_cm2 && ups) {
+    dispatch({
+      type: 'SET_DIECUT_DECKLE_SIZE',
+      payload: {
+        lengthBoard: length_board_size_cm2,
+        widthBoard: width_board_size_cm2,
+        ups: ups,
+      },
+    });
+  }
+}, [addNewSkuData, dispatch]);
+
+const diecutCalculations = useSelector((state) => state.diecutCalculations);
+
+useEffect(() => {
+  console.log('diecutCalculations:', diecutCalculations);
+}, [diecutCalculations]);
+
+useEffect(() => {
+  console.log('Width Board:', diecutCalculations.widthBoard);
+  console.log('Length Board:', diecutCalculations.lengthBoard);
+  console.log('UPS:', diecutCalculations.ups);
+  console.log('Deckle Size:', diecutCalculations.deckle_size);
+  console.log('calculatedMin Size:', diecutCalculations.calculatedMin);
+}, [diecutCalculations.widthBoard, diecutCalculations.lengthBoard, diecutCalculations.ups, diecutCalculations.deckle_size]);
+
+useEffect(() => {
+  // Ensure all the required values exist
+  if (addNewSkuData) {
+    dispatch({
+      type: 'SET_DIECUT_DECKLE_SIZE',
+      payload: {
+        lengthBoard: addNewSkuData.length_board_size_cm2,
+        widthBoard: addNewSkuData.width_board_size_cm2,
+        ups: addNewSkuData.ups,
+        deckle_size: addNewSkuData.deckle_size, // passed from form or calculated elsewhere
+      },
+    });
+  }
+}, [addNewSkuData,addNewSkuData.deckle_size,dispatch]); // This runs when `addNewSkuData` changes
+
+useEffect(() => {
+  if (diecutCalculations.calculatedMin) {
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      deckle_size: diecutCalculations.calculatedMin,
+    }));
+  }
+}, [diecutCalculations.calculatedMin]);
+
+
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
@@ -355,7 +489,8 @@ setisSingleViewPopupRoute(true)
             name="client"
             id="client"
             disabled={clientDiasble}
-            value={addNewSkuData.client || ''}
+            //value={filteredClient ? filteredClient.client_id : addNewSkuData?.client || ''}
+            value={addNewSkuData.client_id}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
@@ -363,16 +498,34 @@ setisSingleViewPopupRoute(true)
               Select
             </option>
             {client?.map((item, index) => (
-              <option key={index} value={item.display_name}>
+              <option key={index} value={item.client_id}>
                 {item.display_name}
               </option>
             ))}
-                                        <option value="add_client">➕ Add Client</option>
+                            <option value="add_client">➕ Add Client</option>
 
           </select>
         </div>
       </div>
-      
+        <div className="w-full flex justify-end mt-4">
+        <div className="flex items-center space-x-2">
+          <label className="text-sm text-gray-700 font-medium">Select Units:</label>
+          <div className="relative w-28">
+            <select
+              value={addNewSkuData.unit || 'mm'}
+              onChange={handleUnitChange}
+              className="w-full appearance-none bg-gray-700 text-white py-1.5 px-2 pr-7 rounded-md text-sm hover:bg-gray-400 transition-colors focus:outline-none"
+            >
+              <option value="mm" className="bg-white text-gray-800">mm</option>
+              <option value="cm" className="bg-white text-gray-800">cm</option>
+              <option value="in" className="bg-white text-gray-800">in</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-1.5 flex items-center text-white">
+              <CIcon icon={cilChevronCircleDownAlt} size="sm" />
+            </div>
+          </div>
+        </div>
+      </div>
       {/* Main content */}
       <div className="grid grid-cols-3 gap-6 p-6 mt-6 border border-gray-200 rounded-lg">
         {/*<div>
@@ -401,7 +554,7 @@ setisSingleViewPopupRoute(true)
   value={addNewSkuData.ply}
   onChange={(selectedPly) => updateSkuValues(selectedPly)}
 />
-
+<Tooltip title={unitTooltip}>
         <div>
           <Input
             skuName="UPS"
@@ -413,7 +566,7 @@ setisSingleViewPopupRoute(true)
             //placeholder="UPS"
           />
         </div>
-
+</Tooltip>
         <div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Die</label>
           <div className="flex items-center gap-2">
@@ -472,29 +625,55 @@ setisSingleViewPopupRoute(true)
             requiredSymbol={true}
           />
         </div>
+ <Tooltip title={unitTooltip}>
+        <div>
+                      <p className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Board Size<span className="text-gray-500 text-sm">(W × L)</span></p>
+                      <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
+                      <input
+      id="width_board_size_cm2"
+      name="width_board_size_cm2"
+      value={addNewSkuData.width_board_size_cm2 ||null}
+      onChange={handleChange}
+      readOnly
+      type="number"
+      className="w-1/2 p-1 text-center focus:outline-none rounded-l-md bg-gray-50"
+      min="0"
+    />
+                        <span className="flex items-center justify-center text-gray-500">x</span>
+                        <input
+      id="length_board_size_cm2"
+      name="length_board_size_cm2"
+      value={addNewSkuData.length_board_size_cm2 || null}
+      onChange={handleChange}
+      readOnly
+      type="number"
+      className="w-1/2 p-1 text-center focus:outline-none bg-gray-50"
+      min="0"
+    />
+                      </div>
+                    </div>
+                    </Tooltip>
 
         <div>
-          <Input
-            skuName="Board Size (cm²)"
-            id="board_size_cm2"
-            name="board_size_cm2"
-            value={addNewSkuData.board_size_cm2}
-            onChange={handleChange}
-            //placeholder="Board Size"
-            requiredSymbol={true}
-          />
-        </div>
-
+        <Tooltip title={unitTooltip}>
         <div>
-          <Input
-            skuName="Deckle Size"
-            id="deckle_size"
-            name="deckle_size"
-            value={addNewSkuData.deckle_size}
-            onChange={handleChange}
-            //placeholder="Deckle Size"
-            requiredSymbol={true}
-          />
+  <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Deckle Size</label>
+  <input
+  id="deckle_size"
+  name="deckle_size"
+  type="number"
+  value={addNewSkuData.deckle_size}
+         min="0"
+  onChange={handleChange}
+  className={`w-full p-2 border rounded-md focus:ring-2 transition-colors ${
+    diecutCalculations.deckleError ? 'border-red-500 ring-red-400' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+  }`}
+/>
+{diecutCalculations.deckleError && (
+  <p className="mt-1 text-sm text-red-600">{diecutCalculations.deckleError}</p>
+)}
+</div>
+</Tooltip>
         </div>
 
         <div>

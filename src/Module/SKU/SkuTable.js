@@ -142,6 +142,8 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
                           label: 'Edit',
                           icon: cilPencil,
                           onClick: () => {
+                            dispatch({ type: 'RESET_DIECUT_CALCULATIONS' });
+
                             dispatch({
                               type: 'SET_SELECTED_ROUTE_IDS',
                               payload: [], // 👈 empty array

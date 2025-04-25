@@ -507,13 +507,14 @@ function Composite({
             />
           </div>
 
-        <div>
+          <div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Client Name</label>
           <select
             name="client"
             id="client"
             disabled={clientDiasble}
-            value={addNewSkuData?.client || ''}
+            //value={filteredClient ? filteredClient.client_id : addNewSkuData?.client || ''}
+            value={addNewSkuData.client_id}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
@@ -521,11 +522,11 @@ function Composite({
               Select
             </option>
             {client?.map((item, index) => (
-              <option key={index} value={item.display_name}>
+              <option key={index} value={item.client_id}>
                 {item.display_name}
               </option>
             ))}
-                                        <option value="add_client">➕ Add Client</option>
+                            <option value="add_client">➕ Add Client</option>
 
           </select>
         </div>

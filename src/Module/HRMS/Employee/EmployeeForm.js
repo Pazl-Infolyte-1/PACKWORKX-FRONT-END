@@ -362,9 +362,10 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
 
   return (
     <>
-      <Drawer className="w-1/2" isOpen={isDrawerOpen} onClose={handleCloseDrawer} title={isEdit ? "Edit Employee" : "Add Employee"}>
+      <Drawer  isOpen={isDrawerOpen} onClose={handleCloseDrawer} title={isEdit ? "Edit Employee" : "Add Employee"}>
         <form onSubmit={handleSubmit} className=''>
-          <div className="max-w-7xl mx-auto h-[90vh] px-3 py-3 mt-6 ">
+          {/* <div className="max-w-7xl mx-auto h-[90vh] px-3 py-3 mt-6 "> */}
+          <div className=" mx-auto h-[90vh] px-3 py-3 mt-6 ">
 
             <div className="flex flex-col items-center justify-center">
               <input

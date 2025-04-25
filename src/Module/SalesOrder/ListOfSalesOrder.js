@@ -68,6 +68,7 @@ function ListOfSalesOrder() {
       setLoading(false)
     }
   }
+  
   useEffect(() => {
     fetchData()
   }, [paginationParams])

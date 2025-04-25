@@ -216,8 +216,6 @@ const WorkOrders = () => {
 alerts={alerts}
 handleClose={handleClose}
 />
-
-
     </div>
   )
 }

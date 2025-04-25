@@ -354,6 +354,16 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
+
+            if (module.modules_description === 'Product') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/production">
+                    {navLink('Product', 'cilIndustry')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
             if (module.modules_description === 'Purchase Order') {
               return (
                 <CNavItem key={index}>

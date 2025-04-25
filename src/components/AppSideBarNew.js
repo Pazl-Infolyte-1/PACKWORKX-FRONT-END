@@ -228,6 +228,15 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
+            if (module.modules_description === 'Routes') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/routeprocess">
+                    {navLink('Routes', 'cilBriefcase')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
             return null
           })}
         </>
@@ -285,20 +294,28 @@ export const AppSideBarNew = ({ giveAccess }) => {
                         Designation
                       </NavLink>
                     </li>
+                    <li className="nav-item">
+                      <NavLink className="nav-link" to="/role">
+                        <span className="nav-icon">
+                          <span className="nav-icon-bullet" />
+                        </span>
+                        Role
+                      </NavLink>
+                    </li>
                   </ul>
                 </li>
               );
             }
             
-            if (module.modules_description === 'Attendance') {
-              return (
-                <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/attendance">
-                    {navLink('Attendance', 'cilUser')}
-                  </CNavLink>
-                </CNavItem>
-              )
-            }
+            // if (module.modules_description === 'Attendance') {
+            //   return (
+            //     <CNavItem key={index}>
+            //       <CNavLink as={NavLink} to="/attendance">
+            //         {navLink('Attendance', 'cilUser')}
+            //       </CNavLink>
+            //     </CNavItem>
+            //   )
+            // }
             return null
           })}
         </>
@@ -336,11 +353,21 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
-            if (module.modules_description === 'Production') {
+            // if (module.modules_description === 'Production') {
+            //   return (
+            //     <CNavItem key={index}>
+            //       <CNavLink as={NavLink} to="/production">
+            //         {navLink('Production', 'cilTruck')}
+            //       </CNavLink>
+            //     </CNavItem>
+            //   )
+            // }
+
+            if (module.modules_description === 'Product') {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/production">
-                    {navLink('Production', 'cilTruck')}
+                  <CNavLink as={NavLink} to="/inventory/items">
+                    {navLink('Product', 'cilIndustry')}
                   </CNavLink>
                 </CNavItem>
               )
@@ -363,24 +390,24 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
-            if (module.modules_description === 'Sales Return') {
-              return (
-                <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/salesReturn">
-                    {navLink('Sales Return', 'cilAt')}
-                  </CNavLink>
-                </CNavItem>
-              )
-            }
-            if (module.modules_description === 'Purchase Return') {
-              return (
-                <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/purchaseReturn">
-                    {navLink('Purchase Return', 'cibHighly')}
-                  </CNavLink>
-                </CNavItem>
-              )
-            }
+            // if (module.modules_description === 'Sales Return') {
+            //   return (
+            //     <CNavItem key={index}>
+            //       <CNavLink as={NavLink} to="/salesReturn">
+            //         {navLink('Sales Return', 'cilAt')}
+            //       </CNavLink>
+            //     </CNavItem>
+            //   )
+            // }
+            // if (module.modules_description === 'Purchase Return') {
+            //   return (
+            //     <CNavItem key={index}>
+            //       <CNavLink as={NavLink} to="/purchaseReturn">
+            //         {navLink('Purchase Return', 'cibHighly')}
+            //       </CNavLink>
+            //     </CNavItem>
+            //   )
+            // }
             return null
           })}
         </>
@@ -391,15 +418,15 @@ export const AppSideBarNew = ({ giveAccess }) => {
         <>
           <CNavTitle>Reports</CNavTitle>
           {reportModules.map((module, index) => {
-            if (module.modules_description === 'Reports') {
-              return (
-                <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/reports">
-                    {navLink('Reports', 'cilFile')}
-                  </CNavLink>
-                </CNavItem>
-              )
-            }
+            // if (module.modules_description === 'Reports') {
+            //   return (
+            //     <CNavItem key={index}>
+            //       <CNavLink as={NavLink} to="/reports">
+            //         {navLink('Reports', 'cilFile')}
+            //       </CNavLink>
+            //     </CNavItem>
+            //   )
+            // }
             return null
           })}
         </>

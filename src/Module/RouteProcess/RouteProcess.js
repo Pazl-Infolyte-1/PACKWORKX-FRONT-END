@@ -8,6 +8,7 @@ import PopUp from '../../components/New/PopUp'
 import { RouteProcessForm } from './RouteProcessForm'
 import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
+import RouteProcessDetails from './RouteProcessDetails'
 
 const RouteProcess = () => {
   const [showAddRouteProcessModal, setShowAddRouteProcessModal] = useState(false)
@@ -21,6 +22,7 @@ const RouteProcess = () => {
   const { searchQuery } = useSearch()
   const [refresh, setRefresh] = useState(false)
   const [processOrder, setProcessOrder] = useState([])
+  const [openRouteModal, setOpenRouteModal] = useState(false)
 
   const [formData, setFormData] = useState({
     route_name: '',
@@ -124,6 +126,8 @@ const RouteProcess = () => {
               onClick={() => {
                 setIsEdit(false)
                 setShowAddRouteProcessModal(true)
+                setProcessOrder([])
+                setRefresh(!refresh)
               }}
             />
           </div>
@@ -134,6 +138,7 @@ const RouteProcess = () => {
             setRouteProcessData={setRouteProcessData}
             handleEdit={handleEdit}
             setAlerts={setAlerts}
+            setOpenRouteModal={setOpenRouteModal}
           />
         </div>
         <div>
@@ -160,6 +165,7 @@ const RouteProcess = () => {
           visible={showAddRouteProcessModal}
           setVisible={setShowAddRouteProcessModal}
           width="900px"
+          height="660px"
           header={isEdit ? 'Edit Route Process' : 'Add Route Process'}
           showCloseButton={true}
         >
@@ -177,6 +183,20 @@ const RouteProcess = () => {
             refresh={refresh}
             processOrder={processOrder}
             setProcessOrder={setProcessOrder}
+          />
+        </PopUp>
+        <PopUp
+          visible={openRouteModal.open}
+          setVisible={(isVisible) => {
+            if (!isVisible) setOpenRouteModal({ open: false, id: null })
+          }}
+          showCloseButton={true}
+          width={'40vw'}
+        >
+          <RouteProcessDetails
+            id={openRouteModal.id}
+            handleEdit={handleEdit}
+            setOpenRouteModal={setOpenRouteModal}
           />
         </PopUp>
       </div>

@@ -180,7 +180,7 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
             <CTableHeaderCell className="py-2 py-1 text-gray-600 font-medium text-start">SKU Name</CTableHeaderCell>
             <CTableHeaderCell className="py-2 py-1 text-gray-600 font-medium text-start">SKU Type</CTableHeaderCell>
             <CTableHeaderCell className="py-2 py-1 text-gray-600 font-medium text-start">Client</CTableHeaderCell>
-            <CTableHeaderCell className="py-2 py-1 text-gray-600 font-medium text-start">Status</CTableHeaderCell>
+            {/*<CTableHeaderCell className="py-2 py-1 text-gray-600 font-medium text-start">Status</CTableHeaderCell>*/}
           </CTableRow>
         </CTableHead>
 
@@ -198,7 +198,7 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
                 <CTableDataCell className="py-2 py-1 text-gray-700">{item.sku_name}</CTableDataCell>
                 <CTableDataCell className="py-2 py-1 text-gray-700">{item.sku_type}</CTableDataCell>
                 <CTableDataCell className="py-2 py-1 text-gray-700">{item.client}</CTableDataCell>
-                <CTableDataCell className="py-2 py-1 text-gray-700">
+                {/*<CTableDataCell className="py-2 py-1 text-gray-700">
                   <span
                     className={`py-1 py-1 rounded-full text-xs font-semibold ${
                       item.status === 'active'
@@ -208,7 +208,7 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
                   >
                     {item.status}
                   </span>
-                </CTableDataCell>
+                </CTableDataCell>*/}
               </CTableRow>
             ))
           ) : (

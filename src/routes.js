@@ -27,8 +27,10 @@ const Process = React.lazy(() => import('./Module/Process/Process.js'))
 const Designation = React.lazy(() => import('./Module/Designation/Designation.js'))
 const Department = React.lazy(() => import('./Module/Department/Department.js'))
 const RouteProcess = React.lazy(() => import('./Module/RouteProcess/RouteProcess.js'))
+const Role = React.lazy(() => import('./Module/Role/Role.js'))
 
 
+const Items = React.lazy(() => import('./Module/Inventory/Items/items.js'))
 
 
 
@@ -62,6 +64,7 @@ const routes = [
   { path: '/adminFaq', name: 'Admin Faq', element: AdminFaq, key: '' },
   { path: '/designation', name: 'Designation', element: Designation, key: '' },
   { path: '/department', name: 'Department', element: Department, key: '' },
+  { path: '/role', name: 'role', element: Role, key: '' },
 
   { path: '/users', name: 'user', element: DropDownController, key: 6000 },
   {
@@ -71,6 +74,7 @@ const routes = [
     key: 5462,
     children: settingsRoutes,
   },
+  {path:'/inventory/items',name:'inventory',element:Items,key:''},
 ]
 
 export default routes

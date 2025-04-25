@@ -4,10 +4,10 @@ const ConfirmationModale = ({ isOpen, onClose, onConfirm, title, message, confir
   if (!isOpen) return null; 
   
   return ( 
-    <div className="absolute inset-0 top-0  flex items-center justify-center bg-black bg-opacity-50 z-50 p-4"> 
+    <div className="absolute inset-0 top-0  flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)' }}> 
       <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full border border-gray-200 transform transition-all">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">{title || 'Are you sure?'}</h2>
+          <h2 className="text-xl font-bold text-gray-800">{title || 'Are you sure?'}</h2> 
           <button 
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 transition-colors"

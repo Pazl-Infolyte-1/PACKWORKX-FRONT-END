@@ -6,7 +6,18 @@ import { useEffect, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import CustomAlert from '../../components/New/CustomAlert'
 import PlyToggle from '../../components/New/PlyToggle'
-
+import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'
+import { Drawer } from '@mui/material'
+import ClientForm from '../Client/ClientForm'
+import vendorImg from '../../assets/images/vendor.png'
+import clientImg from '../../assets/images/client.jpg'
+import PopUp from '../../components/New/PopUp'
+import ContactPersonsForm from '../Client/ContactPersonsForm'
+import SelectionCards from '../../components/New/SelectionCards'
+import RoutePopup from './RoutePopup'
+import apiMethods from '../../api/config'
+import { useDispatch, useSelector } from 'react-redux'
+import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
 function RSCBox({
   dropdownRef,
   addNewSkuData,
@@ -26,18 +37,49 @@ function RSCBox({
   editTag,
   toThreeDecimalFixed,
   isopenval,
-  compositeSelect
+  compositeSelect,
+  setPopupOpen,
+  isPopupOpen,
+  message,
+  setMessage
 }) {
   const [alerts, setAlerts] = useState([])
-  const filteredClient = locationvalue
-    ? client.find((client) => client.client_id === locationvalue)
-    : null
+  //const filteredClient = locationvalue
+  //  ? client.find((client) => client.client_id === locationvalue)
+  //  : null
   const [unitTooltip, setUnitTooltip] = useState('Enter Millimeter')
   const [metricSign, setMetricsSign] = useState('mm')
   const [areaInM2, setAreaInM2] = useState(null)
   const [boarderr, setBoardErr] = useState(null)
   const [isRscOpen, setIsRscOpen] = useState(true)
 const [previousSkuType, setPreviousSkuType] = useState(null);
+  const [isDrawerOpen, setDrawerOpen] = useState(false)
+  //const [isPopupOpen, setPopupOpen] = useState(false)
+  const [triggerSelection, setTriggerSelection] = useState(false)
+    const [entityType, setEntityType] = useState('') // State to hold entity_type
+      const [selected, setSelected] = useState('vendor')
+      const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
+      const [submitFromRsc, setSubmitFromRsc] = useState(true)
+      const [isSingleViewPopupRoute, setisSingleViewPopupRoute] = useState(false)
+      const [routeListData, setRouteListData] = useState({})
+      const [selectedRoutes, setSelectedRoutes] = useState([])
+      const [selectedRoutesVal, setSelectedRoutesVal] = useState([])
+      const [fullRouteResponse, setFullRouteResponse] = useState(null);
+      const [displayAsChips,setDisplayAsChips] = useState([])
+      const dispatch = useDispatch()
+   
+  const selectionFrame = {
+    vendor: {
+      id: 1,
+      name: 'vendor',
+      image: vendorImg,
+    },
+    client: {
+      id: 2,
+      name: 'client',
+      image: clientImg,
+    },
+  }
 
   const calculateBoardSize = (data) => {
     const length = parseFloat(data.length) || 0
@@ -46,7 +88,7 @@ const [previousSkuType, setPreviousSkuType] = useState(null);
     const lengthTrimmingTolerance = parseFloat(data.length_trimming_tolerance) || 0
     const widthTrimmingTolerance = parseFloat(data.width_trimming_tolerance) || 0
     const upsval = parseFloat(data.ups) || 0
-    const flapWidth = parseFloat(data.flap_width) || 0
+    const flapWidth = Number(parseFloat(data.flap_width)) || 0
 
     const lengthBoardSize = (length + width) * 2 + lengthTrimmingTolerance + flapWidth
     const widthBoardSize = width + height + widthTrimmingTolerance
@@ -55,25 +97,26 @@ const [previousSkuType, setPreviousSkuType] = useState(null);
     const EPSILON = 0.001
     const deckleSize = parseFloat(data.deckle_size) || deckleSizeVal
 
+
     if (deckleSize + EPSILON <= deckleSizeVal) {
       // throw error only if clearly smaller, allowing minor float diff
       return {
-        length_board_size_cm2: lengthBoardSize.toFixed(2),
-        width_board_size_cm2: widthBoardSize.toFixed(2),
-        board_size_cm2: totalBoardSize.toFixed(2),
-        deckle_size: deckleSizeVal,
-        ups: upsval.toFixed(),
+        length_board_size_cm2: Number(lengthBoardSize.toFixed(2)),
+        width_board_size_cm2: Number(widthBoardSize.toFixed(2)),
+        board_size_cm2: Number(totalBoardSize.toFixed(2)),
+        deckle_size: Number(deckleSizeVal),
+        ups: Number(upsval.toFixed()),
         error: `Deckle size must be greater than or equal to ${deckleSizeVal.toFixed(2)}.`,
       }
     }
     
 
     return {
-      length_board_size_cm2: lengthBoardSize.toFixed(2),
-      width_board_size_cm2: widthBoardSize.toFixed(2),
-      board_size_cm2: totalBoardSize.toFixed(2),
-      deckle_size: deckleSize,
-      ups: upsval.toFixed(),
+      length_board_size_cm2: Number(lengthBoardSize.toFixed(2)),
+      width_board_size_cm2: Number(widthBoardSize.toFixed(2)),
+      board_size_cm2: Number(totalBoardSize.toFixed(2)),
+      deckle_size: Number(deckleSize),
+      ups:Number(upsval.toFixed()),
       error: '',
     }
   }
@@ -181,18 +224,18 @@ const [previousSkuType, setPreviousSkuType] = useState(null);
       return {
         ...prev,
         unit: newUnit,
-        length: convertValue(prev.length),
-        width: convertValue(prev.width),
-        height: convertValue(prev.height),
-        flap_width: convertValue(prev.flap_width),
-        length_trimming_tolerance: convertValue(prev.length_trimming_tolerance),
-        width_trimming_tolerance: convertValue(prev.width_trimming_tolerance),
-        joints: convertValue(prev.joints),
-        deckle_size: convertValue(prev.deckle_size),
+        length: Number(convertValue(prev.length)),
+        width: Number(convertValue(prev.width)),
+        height: Number(convertValue(prev.height)),
+        flap_width: Number(convertValue(prev.flap_width)),
+        length_trimming_tolerance: Number(convertValue(prev.length_trimming_tolerance)),
+        width_trimming_tolerance: Number(convertValue(prev.width_trimming_tolerance)),
+        joints: Number(convertValue(prev.joints)),
+        deckle_size: Number(convertValue(prev.deckle_size)),
         length_board_size_cm2,
         width_board_size_cm2,
-        board_size_cm2: parseFloat((length_board_size_cm2 * width_board_size_cm2).toFixed(2)),
-        ups: convertValue(prev.ups),
+        board_size_cm2: Number(parseFloat((length_board_size_cm2 * width_board_size_cm2).toFixed(2))),
+        ups: Number(convertValue(prev.ups)),
       }
     })
   }
@@ -254,6 +297,178 @@ useEffect(() => {
   }
 }, [compositeSelect]);
 
+const handleSelectAction = (selection) => {
+  setSelected(selection)
+  setTriggerSelection(true) // Ensures it runs handleSelection
+}
+
+const handleCloseDrawer = () => {
+  setDrawerOpen(false)
+}
+const refreshClients = () => {
+  setReloadData((prev) => !prev) //  Toggle state to trigger `useEffect`
+}
+
+ useEffect(() => {
+    if (triggerSelection) {
+      handleSelection(selected)
+      setTriggerSelection(false) // Reset trigger
+    }
+  }, [selected, triggerSelection]) 
+
+  const handleSelection = (selection) => {
+    const optionValue = selectionFrame[selection].id
+    console.log(`Selected ID: ${optionValue}`)
+
+    if (optionValue === 2) {
+      setEntityType('Client')
+      setPopupOpen(false)
+      setDrawerOpen(true)
+    } else if (optionValue === 1) {
+      setEntityType('Vendor')
+      setPopupOpen(false)
+      setDrawerOpen(true)
+    } else {
+      console.log('option not selected')
+    }
+  }
+
+    useEffect(() => {
+      document.addEventListener('keydown', handleKeyDown)
+      return () => document.removeEventListener('keydown', handleKeyDown)
+    }, []) // Runs once on mount
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'ArrowRight') {
+        handleSelectAction('client')
+        setEntityType('Client') // Update state
+      } else if (event.key === 'ArrowLeft') {
+        handleSelectAction('vendor')
+        setEntityType('Vendor') // Update state
+      } else if (event.key === 'Enter') {
+        console.log('Enter Pressed: Executing Selection')
+        setTriggerSelection(true) // Mark that Enter was pressed
+      }
+    }
+  
+    console.log("jjjj",message)
+
+    useEffect(() => {
+      if (message) {
+        setAlerts([{ severity: 'success', message }]);
+    
+        const timer = setTimeout(() => {
+          setAlerts([]); // Clear alerts after 3 seconds
+        }, 3000);
+    
+        return () => clearTimeout(timer); // Cleanup on unmount or message change
+      }
+    }, [message]);
+    
+//functionality for route popup
+    const handleBrowseClickRoute = () => {
+      setisSingleViewPopupRoute(true)
+    }
+
+
+
+    console.log("route edit val",editTag)
+    console.log("route edit val",addNewSkuData.route)
+
+
+
+    
+    useEffect(() => {
+      const fetchRoutes = async () => {
+        const params = {
+          search: '',
+          page: 1,
+          limit: 10000,
+        };
+    
+        try {
+          const response = await apiMethods.getRouteList(params);
+          console.log('Full API Response:', response);
+          setFullRouteResponse(response); // ✅ Save full response here
+          setDisplayAsChips(response.data.routes)
+        } catch (err) {
+          console.error('Error fetching routes:', err);
+        }
+      };
+    
+      fetchRoutes();
+    }, []);
+    
+
+
+    console.log("route edit val",editTag)
+    console.log("route edit val",addNewSkuData.route)
+    const selectedRouteIds1 = useSelector((state) => state.routeprocess.selectedRouteIds || []);
+
+    useEffect(() => {
+      if (editTag && typeof addNewSkuData?.route === 'string') {
+        try {
+          const parsedRoutes = JSON.parse(addNewSkuData.route);
+          if (Array.isArray(parsedRoutes) && parsedRoutes.length > 0) {
+            dispatch({
+              type: 'SET_SELECTED_ROUTE_IDS',
+              payload: parsedRoutes,
+            });
+    
+            setAddNewSkuData((prevData) => ({
+              ...prevData,
+              route: parsedRoutes, // ✅ use parsedRoutes instead of selectedRouteIds1
+            }));
+          }
+        } catch (err) {
+          console.error('Invalid route format:', addNewSkuData.route);
+        }
+      }
+    }, [editTag, addNewSkuData?.route, dispatch]);
+    
+    
+    
+    // Optional: track Redux changes
+    useEffect(() => {
+      console.log("Redux -> routeprocess.selectedRouteIds:", selectedRouteIds1);
+    }, [selectedRouteIds1]);
+    
+    const selectedChips = displayAsChips.filter((item) =>
+      selectedRouteIds1.includes(item.id)
+    );
+
+    const chipNames = selectedChips.map((chip) => chip.route_name).join(', ');
+
+    useEffect(() => {
+      if (!editTag) {
+        setAddNewSkuData((prevData) => ({
+          ...prevData,
+          route: selectedRouteIds1,
+        }));
+      }
+    }, [selectedRouteIds1, editTag]);
+
+    
+    const handleRemoveChip = (idToRemove) => {
+      console.log("Removing chip with id:", idToRemove);
+    
+      const updated = selectedRouteIds1.filter((id) => id !== idToRemove);
+      console.log("update", updated);
+    
+      dispatch({
+        type: 'SET_SELECTED_ROUTE_IDS',
+        payload: updated,
+      });
+    };
+    useEffect(() => {
+      setAddNewSkuData((prevData) => ({
+        ...prevData,
+        route: selectedRouteIds1,
+      }));
+    }, [selectedRouteIds1]);
+
+    
+        
   return (
     <div className="rounded-lg ">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -328,7 +543,8 @@ useEffect(() => {
             name="client"
             id="client"
             disabled={clientDiasble}
-            value={filteredClient ? filteredClient.client_id : addNewSkuData?.client || ''}
+            //value={filteredClient ? filteredClient.client_id : addNewSkuData?.client || ''}
+            value={addNewSkuData.client_id}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
@@ -366,7 +582,7 @@ useEffect(() => {
                 id="length"
                 name="length"
                 type="number"
-                value={addNewSkuData.length}
+                value={Number(addNewSkuData.length) || null}
                 onChange={modifiedHandleChange}
                 //placeholder="Length"
                 className="w-1/4 p-1 text-center focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-l-md"
@@ -376,7 +592,8 @@ useEffect(() => {
                 id="width"
                 name="width"
                 type="number"
-                value={addNewSkuData.width}
+                value={Number(addNewSkuData.width) || null}
+                //value={addNewSkuData.width}
                 onChange={modifiedHandleChange}
                 //placeholder="Width"
                 className="w-1/4 p-1 text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -386,7 +603,8 @@ useEffect(() => {
                 id="height"
                 name="height"
                 type="number"
-                value={addNewSkuData.height}
+                value={Number(addNewSkuData.height) || null}
+                //value={addNewSkuData.height}
                 onChange={modifiedHandleChange}
                 //placeholder="Depth"
                 className="w-1/4 p-1 text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -417,7 +635,8 @@ useEffect(() => {
               <input
                 id="joints"
                 name="joints"
-                value={addNewSkuData.joints}
+                value={Number(addNewSkuData.joints) || null}
+                //value={addNewSkuData.joints}
                 onChange={handleChange}
                 //placeholder="Joints"
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -428,7 +647,8 @@ useEffect(() => {
               <input
                 id="deckle_size"
                 name="deckle_size"
-                value={toThreeDecimalFixed(addNewSkuData.deckle_size)}
+                //value={Number(addNewSkuData.joints) || null}
+                value={Number(toThreeDecimalFixed(addNewSkuData.deckle_size)) || null}
                 onChange={modifiedHandleChange}
                 //placeholder="Deckle Size"
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -471,7 +691,7 @@ useEffect(() => {
             <input
               id="flap_width"
               name="flap_width"
-              value={addNewSkuData.flap_width}
+              value={Number(addNewSkuData.flap_width) || null}
               onChange={modifiedHandleChange}
               //placeholder="Flap Width"
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -485,7 +705,7 @@ useEffect(() => {
             <input
               id="length_trimming_tolerance"
               name="length_trimming_tolerance"
-              value={addNewSkuData.length_trimming_tolerance}
+              value={Number(addNewSkuData.length_trimming_tolerance) || null}
               onChange={modifiedHandleChange}
               //placeholder="Length Trimming Tolerance"
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -499,7 +719,7 @@ useEffect(() => {
             <input
               id="width_trimming_tolerance"
               name="width_trimming_tolerance"
-              value={addNewSkuData.width_trimming_tolerance}
+              value={Number(addNewSkuData.width_trimming_tolerance) || null}
               onChange={modifiedHandleChange}
               //placeholder="Width Trimming Tolerance"
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -524,7 +744,7 @@ useEffect(() => {
           <input
             id="reference_number"
             name="reference_number"
-            value={addNewSkuData.reference_number}
+            value={Number(addNewSkuData.reference_number) || null}
             onChange={handleChange}
             //placeholder="Reference Number"
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -536,7 +756,7 @@ useEffect(() => {
           <input
             id="internal_id"
             name="internal_id"
-            value={addNewSkuData.internal_id}
+            value={Number(addNewSkuData.internal_id) || null}
             onChange={handleChange}
             //placeholder="Internal ID"
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -550,7 +770,7 @@ useEffect(() => {
               <input
                 id="width_board_size_cm2"
                 name="width_board_size_cm2"
-                value={toThreeDecimalFixed(addNewSkuData.width_board_size_cm2)}
+                value={Number(toThreeDecimalFixed(addNewSkuData.width_board_size_cm2)) || null}
                 onChange={modifiedHandleChange}
                 //placeholder="Width"
                 className="w-1/3 p-1 text-center focus:outline-none rounded-l-md bg-gray-50"
@@ -561,7 +781,7 @@ useEffect(() => {
               <input
                 id="length_board_size_cm2"
                 name="length_board_size_cm2"
-                value={toThreeDecimalFixed(addNewSkuData.length_board_size_cm2)}
+                value={Number(toThreeDecimalFixed(addNewSkuData.length_board_size_cm2)) || null}
                 onChange={modifiedHandleChange}
                 //placeholder="Length"
                 className="w-1/3 p-1 text-center focus:outline-none bg-gray-50"
@@ -591,7 +811,7 @@ useEffect(() => {
           <input
             id="ups"
             name="ups"
-            value={addNewSkuData?.ups}
+            value={Number(addNewSkuData?.ups) || null}
             onChange={modifiedHandleChange}
             //placeholder="UPS"
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -604,13 +824,108 @@ useEffect(() => {
             id="minimum_order_level"
             name="minimum_order_level"
             type="number"
-            value={addNewSkuData.minimum_order_level}
+            value={Number(addNewSkuData.minimum_order_level) || null}
             onChange={handleChange}
             //placeholder="Minimum Order Level"
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
         </div>
+        {/*<div className="flex flex-col">
+  <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Route</label>
+  <div className="flex items-center gap-2">
+  <div className="flex flex-nowrap gap-2 mt-2 border rounded h-[60px] w-[300px] overflow-x-auto">
+  {selectedChips.map((chip) => (
+    <span
+      key={chip.id}
+      className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm h-[30px] whitespace-nowrap"
+    >
+      {chip.route_name}
+      <button
+        onClick={() => handleRemoveChip(chip.id)}
+        className="ml-1 text-blue-500 hover:text-blue-700 focus:outline-none"
+        title="Remove"
+      >
+        ×
+      </button>
+    </span>
+  ))}
+</div>
+    <button
+      type="button"
+      className="bg-gray-400 text-white px-4 py-2 rounded-md shadow-md hover:bg-gray-500 transition-colors"
+      onClick={handleBrowseClickRoute}
+    >
+      Browse
+    </button>
+  </div>
+</div>*/}
+
+<ChipSelectorWithBrowse
+  label="Route"
+  required={true}
+  selectedIds={selectedRouteIds1}
+  allOptions={displayAsChips}
+  onRemoveChip={handleRemoveChip}
+  onBrowseClick={handleBrowseClickRoute}
+/>
+
+        
       </div>
+
+{/*client create drop down option popup*/}
+      {!isDrawerOpen && (
+                 <PopUp
+                        header={'Select Client/Vendor'}
+                        visible={isPopupOpen}
+                        setVisible={setPopupOpen}
+                        showCloseButton={true}
+                        width={'35vw'}
+                      >
+                <SelectionCards
+      selectionFrame={selectionFrame}
+      selected={selected}
+      onSelect={handleSelectAction}
+    />
+                </PopUp>
+            )}
+
+
+
+
+  <PopUp
+                        header={'Select Client/Vendor'}
+                        visible={isDrawerOpen}
+                        setVisible={setDrawerOpen}
+                        showCloseButton={true}
+                        width={'1200px'}
+                        height={"700px"}
+                      >
+              {/* Pass handleCloseDrawer as a prop to ClientForm */}
+              <ClientForm
+                entity_type={entityType}
+                refreshClients={refreshClients}
+                closeDrawerDuringAdd={() => handleCloseDrawer(false)}
+                resetForm={isDrawerOpen}
+                submitFromRsc={submitFromRsc}
+                setDrawerOpen={setDrawerOpen}
+                isDrawerOpen={isDrawerOpen}
+                setMessage={setMessage}
+              />
+          </PopUp>
+
+
+        {/*common popup for routes*/}
+        <PopUp
+        header={'Select SKU'}
+        visible={isSingleViewPopupRoute}
+        setVisible={setisSingleViewPopupRoute}
+        showCloseButton={true}
+        width={'60vw'}
+      >
+        <RoutePopup  editTag={editTag} addNewSkuData={addNewSkuData}   fullRouteResponse={fullRouteResponse}setisSingleViewPopupRoute={setisSingleViewPopupRoute} />
+      </PopUp>
+
+
     </div>
   )
 }

@@ -18,7 +18,26 @@ const initialState = {
     isAuthenticated: false,
     user: null,
     token: null,
+    selectedRouteIds: [],
   },
+  routeprocess: {
+    selectedRouteIds: [],
+  },
+  clientId: {
+    clientIdVal: null,
+  },
+  boardCalculations:{
+    deckle_size: '',
+    deckleError: '',
+  },
+  diecutCalculations: {
+    lengthBoard: null,
+    widthBoard: null,
+    ups: null,
+    deckle_size: null,
+    deckleError: '',
+  }
+  
 }
 
 const changeState = (state = initialState, { type, payload, ...rest }) => {
@@ -53,6 +72,66 @@ const changeState = (state = initialState, { type, payload, ...rest }) => {
         },
       }
 
+      case 'SET_SELECTED_ROUTE_IDS':
+        return {
+          ...state,
+          routeprocess: {
+            ...state.routeprocess,
+            selectedRouteIds: payload,
+          },
+        };
+      
+        case 'SET_CLIENT_ID':
+          return {
+            ...state,
+            clientId: {
+              ...state.clientId,
+              clientIdVal: payload,
+            },
+          };
+
+          case 'SET_DECKLE_SIZE':
+  return {
+    ...state,
+    boardCalculations: {
+      ...state.boardCalculations,
+      deckle_size: payload.deckle_size,
+      deckleError: payload.deckleError || '',
+    },
+  };
+  case 'SET_DIECUT_DECKLE_SIZE':
+    const { lengthBoard, widthBoard, ups, deckle_size } = payload;
+    const isValid = !isNaN(widthBoard) && !isNaN(ups);
+    const calculatedMin = widthBoard * ups;
+  
+    const errorMessage =
+      !isValid
+        ? 'Invalid input for deckle size calculation'
+        : deckle_size < calculatedMin
+          ? `Deckle size must be greater than or equal to ${calculatedMin}`
+          : '';
+  
+    return {
+      ...state,
+      diecutCalculations: {
+        ...state.diecutCalculations,
+        lengthBoard,
+        widthBoard,
+        ups,
+        deckle_size,
+        calculatedMin, 
+        deckleError: errorMessage,
+      },
+    };
+    case 'RESET_DIECUT_CALCULATIONS':
+  return {
+    ...state,
+    diecutCalculations: {
+      ...initialState.diecutCalculations,
+    },
+  };
+
+  
     default:
       return state
   }

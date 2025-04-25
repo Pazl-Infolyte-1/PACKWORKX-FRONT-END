@@ -9,7 +9,7 @@ import {
   CButton,
 } from '@coreui/react'
 import ThreeDotMenu from '../../../components/ThreeDotMenu'
-import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
+import { cilActionRedo, cilActionUndo, cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../../components/New/ConfirmationModale'
 import apiMethods from '../../../api/config'
 import CustomAlert from '../../../components/New/CustomAlert'
@@ -23,35 +23,45 @@ function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, hand
     setAlerts([])
   }
 
-  const deleteEmployee = (id) => {
-    setSelectedEmployee(id)
+  const deleteEmployee = (id,user_status) => {
+    setSelectedEmployee({ id, user_status });
     setIsConfirmationModaleOpen(true)
   }
 
   const handleDeleteEmployee = async () => {
     try {
-      const response = await apiMethods.DeleteEmployee(selectedEmployee);
-
+      const toggledStatus =
+        selectedEmployee.user_status === "Active" ? "inactive" : "active";
+  
+      const response = await apiMethods.updateEmployeeStatus(selectedEmployee.id, {
+        status: toggledStatus,
+      });
+  
       if (!response || response.error) {
-        throw new Error(response?.message || "Failed to delete employee.");
+        throw new Error(response?.message || "Failed to update employee status.");
       }
-
-      console.log("Employee deleted successfully:", response);
-      setAlerts([{ severity: "success", message: response.data.message || "User Deleted Successfully" }]);
-
-
+  
+      console.log("Employee status updated successfully:", response);
+      setAlerts([
+        {
+          severity: "success",
+          message: response.data.message || "User status updated successfully",
+        },
+      ]);
+  
       setIsConfirmationModaleOpen(false);
-
+  
       if (fetchEmployeeData) {
         fetchEmployeeData();
       }
     } catch (error) {
-      console.error("Error deleting employee:", error.message);
-
-      setAlerts([{ severity: "error", message: "Failed To Delete Employee " }]);
-
+      console.error("Error updating employee status:", error.message);
+      setAlerts([
+        { severity: "error", message: "Failed to update employee status" },
+      ]);
     }
   };
+  
 
 
 
@@ -166,10 +176,10 @@ function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, hand
                               },
                             },
                             {
-                              label: 'Delete',
-                              icon: cilTrash,
+                              label: 'Change Status',
+                              icon: cilActionRedo,
                               onClick: () => {
-                                deleteEmployee(cell.id)
+                                deleteEmployee(cell.id,cell.user_status)
                               },
                             },
                           ]}
@@ -189,8 +199,8 @@ function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, hand
       </div>
       <ConfirmationModale
         isOpen={isConfirmationModaleOpen}
-        title='Confirm Deletion'
-        message='Are you sure you want to delete this item?'
+        title='Confirm Change'
+        message='Are you sure you want to change the status?'
         onClose={() => { setIsConfirmationModaleOpen(false) }}
         onConfirm={handleDeleteEmployee}
       />

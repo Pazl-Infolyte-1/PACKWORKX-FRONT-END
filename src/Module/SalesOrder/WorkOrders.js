@@ -706,6 +706,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                         <input
                           type="date"
                           className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
+                          min={formatDate(item.planned_start_date)} // ⬅️ This prevents invalid selection
                           value={formatDate(item.planned_end_date)}
                           onChange={(e) => handleWorkOrderChange1(item.id, 'planned_end_date', e.target.value)}
                         />
@@ -1056,6 +1057,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                         <label className="block text-gray-800 font-medium mb-1">Planned End Date <span className='text-red-500'>*</span></label>
                         <input
                           type="date"
+                          min={formatDate(order.planned_start_date)} // ⬅️ This prevents invalid selection
                           value={order.planned_end_date}
                           onChange={(e) => handleWorkOrderChange(order.id, 'planned_end_date', e.target.value)}
                           className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
@@ -1117,7 +1119,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
               <PopUp
                 visible={isFormVisible}
                 setVisible={() => setIsFormVisible(false)}
-                width="1200px"
+                width="70%"
                 height="500px"
                 size="xl"
                 header=""

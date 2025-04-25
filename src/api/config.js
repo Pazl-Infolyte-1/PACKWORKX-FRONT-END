@@ -511,8 +511,8 @@ export const apiMethods = {
       console.error(error)
     }
   },
-  updateEmployeeStatus:async(id,body)=>{
-    const response = await apiClient.patch(`/user/employees/${id}/status`,body);
+  updateEmployeeStatus: async (id, body) => {
+    const response = await apiClient.patch(`/user/employees/${id}/status`, body)
     return response
   },
   getSkuExcelExport: async (params) => {
@@ -563,8 +563,8 @@ export const apiMethods = {
   },
   getSkuListOptions: async () => {
     try {
-      const response = await apiClient.get('/sku-details',{
-        params: { limit: 10000 }
+      const response = await apiClient.get('/sku-details', {
+        params: { limit: 10000 },
       })
       return response.data
     } catch (error) {
@@ -922,12 +922,12 @@ export const apiMethods = {
         params: {
           search: params.search || '',
           page: params.page || 1,
-          limit: params.limit || 10
+          limit: params.limit || 10,
         },
-      });
-      return response;
+      })
+      return response
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
   },
 
@@ -959,66 +959,246 @@ export const apiMethods = {
     return await apiClient.delete(`/machines/master/delete/${id}`)
   },
 
-getDesignationList:async()=>{
-  const response = await apiClient.get(`/designations`);
-  return response
-},
-deleteDesignation:async(id)=>{
-  const response = await apiClient.delete(`/designations/${id}`)
-  return response
-},
-editDesignation:async(id,body)=>{
-  const response = await apiClient.put(`/designations/${id}`,body)
-  return response
-},
-postDesignation: async (body) => {
-  const response = await apiClient.post(`/designations`, body)
-  return response
-},
-deleteDepartment: async (id) => {
-  const response = await apiClient.delete(`/departments/${id}`)
-  return response
-},
-getDepartmentById: async (id) => {
-  const response = await apiClient.get(`/departments/${id}`);
-  return response;
-},
+  getDesignationList: async () => {
+    const response = await apiClient.get(`/designations`)
+    return response
+  },
+  deleteDesignation: async (id) => {
+    const response = await apiClient.delete(`/designations/${id}`)
+    return response
+  },
+  editDesignation: async (id, body) => {
+    const response = await apiClient.put(`/designations/${id}`, body)
+    return response
+  },
+  postDesignation: async (body) => {
+    const response = await apiClient.post(`/designations`, body)
+    return response
+  },
+  deleteDepartment: async (id) => {
+    const response = await apiClient.delete(`/departments/${id}`)
+    return response
+  },
+  getDepartmentById: async (id) => {
+    const response = await apiClient.get(`/departments/${id}`)
+    return response
+  },
 
-updateDepartment: async (id, body) => {
-  const response = await apiClient.put(`/departments/${id}`, body);
-  return response;
-},
-postDepartment:async(body)=>{
-  const response = await apiClient.post(`/departments`, body);
-  return response;
-},
-postRole: async (body) => {
-  const response = await apiClient.post('/role', body);
-  return response;
-},
+  updateDepartment: async (id, body) => {
+    const response = await apiClient.put(`/departments/${id}`, body)
+    return response
+  },
+  postDepartment: async (body) => {
+    const response = await apiClient.post(`/departments`, body)
+    return response
+  },
+  postRole: async (body) => {
+    const response = await apiClient.post('/role', body)
+    return response
+  },
 
-getRoleById: async (id) => {
-  const response = await apiClient.get(`/role/${id}`);
-  return response;
-},
+  getRoleById: async (id) => {
+    const response = await apiClient.get(`/role/${id}`)
+    return response
+  },
 
-updateRole: async (id, body) => {
-  const response = await apiClient.put(`/role/${id}`, body);
-  return response;
-},
+  updateRole: async (id, body) => {
+    const response = await apiClient.put(`/role/${id}`, body)
+    return response
+  },
 
-deleteRole: async (id) => {
-  const response = await apiClient.delete(`/role/${id}`);
-  return response;
-},
-getRoles: async () => {
-  try {
-    return await apiClient.get(`/role`)
-  } catch (error) {
-    console.error(error)
-  }
+  deleteRole: async (id) => {
+    const response = await apiClient.delete(`/role/${id}`)
+    return response
+  },
+  getRoles: async () => {
+    try {
+      return await apiClient.get(`/role`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  //
+  //items
+
+  getItemList: async (params = {}) => {
+    try {
+      return await apiClient.get('/items', {
+        params: {
+          client: params.client || '',
+
+          sales_status: params.sales_status || '',
+
+          page: params.page || 1,
+
+          limit: params.limit || 10,
+        },
+      })
+    } catch (error) {
+      console.error('Error fetching items:', error.response?.data || error.message)
+
+      throw error
+    }
+  },
+
+  getItemData: async (id) => {
+    return await apiClient.get(`/items/${id}`)
+  },
+
+  addItem: async (body) => {
+    return await apiClient.post(`/items`, body)
+  },
+
+  updateItem: async (id, body) => {
+    return await apiClient.put(`/items/${id}`, body)
+  },
+
+  deleteItem: async (id) => {
+    return await apiClient.delete(`/items/delete/${id}`)
+  },
+
+  // po-order
+
+  getPurchaseOrders: async (params = {}) => {
+    try {
+      const token = localStorage.getItem('token')
+
+      if (!token) {
+        throw new Error('No token found. Please log in again.')
+      }
+
+      const response = await apiClient.get('/purchase-order', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+
+        params: {
+          status: params.status || 'active',
+
+          page: params.page || 1,
+
+          limit: params.limit || 10,
+
+          client: params.client || '',
+
+          search: params.search || '',
+        },
+      })
+
+      const transformedData = response.data.data.map((po) => ({
+        ...po,
+
+        items: po.PurchaseOrderItems || [], // Map PurchaseOrderItems to items
+      }))
+
+      return {
+        success: response.data.success,
+
+        message: response.data.message,
+
+        data: transformedData,
+
+        totalCount: response.data.totalCount,
+      }
+    } catch (error) {
+      console.error('Error fetching purchase orders:', error.response?.data || error.message)
+
+      throw error
+    }
+  },
+
+  // Get a single purchase order by ID
+
+  getPurchaseOrderById: async (id) => {
+    try {
+      const token = localStorage.getItem('token')
+
+      if (!token) {
+        throw new Error('No token found. Please log in again.')
+      }
+
+      const response = await apiClient.get(`/purchase-order/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const transformedData = {
+        ...response.data.data,
+
+        items: response.data.data.PurchaseOrderItems || [],
+      }
+
+      return {
+        success: response.data.success,
+
+        message: response.data.message,
+
+        data: transformedData,
+      }
+    } catch (error) {
+      console.error(`Error fetching purchase order ${id}:`, error.response?.data || error.message)
+
+      throw error
+    }
+  },
+
+  createPurchaseOrder: async (data) => {
+    try {
+      return await apiClient.post('/purchase-order', data)
+    } catch (error) {
+      console.error('Error creating purchase order:', error.response?.data || error.message)
+
+      throw error
+    }
+  },
+
+  updatePurchaseOrder: async (id, data) => {
+    try {
+      return await apiClient.put(`/purchase-order/${id}`, data)
+    } catch (error) {
+      console.error(
+        `Error updating purchase order ID ${id}:`,
+        error.response?.data || error.message,
+      )
+
+      throw error
+    }
+  },
+
+  deletePurchaseOrder: async (id) => {
+    try {
+      return await apiClient.delete(`/purchase-order/${id}`)
+    } catch (error) {
+      console.error(
+        `Error deleting purchase order ID ${id}:`,
+        error.response?.data || error.message,
+      )
+
+      throw error
+    }
+  },
+
+  getPurchaseOrderList: async (params) => {
+    try {
+      const response = await apiClient.get('/purchase-order', {
+        params: {
+          search: params.search || '',
+
+          client: params.client || '',
+
+          page: params.page || 1,
+
+          limit: params.limit || 10,
+        },
+      })
+
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
 }
-}
-
 
 export default apiMethods

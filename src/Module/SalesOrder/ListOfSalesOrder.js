@@ -34,8 +34,25 @@ function ListOfSalesOrder() {
   const searchBarRef = useRef(null)
 
 
+
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      await apiMethods.updateSalesOrderStatus(orderId, { sales_status: newStatus });
+      // Optionally refresh the list or update the local state here
+      console.log('Status updated successfully');
+      fetchData()
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
+  };
+
+
+  
+
   const fetchData = async () => {
     try {
+        setLoading(true)
       const response = await apiMethods.getSalesOrderList({
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,
@@ -51,6 +68,7 @@ function ListOfSalesOrder() {
       setLoading(false)
     }
   }
+  
   useEffect(() => {
     fetchData()
   }, [paginationParams])
@@ -133,9 +151,9 @@ function ListOfSalesOrder() {
   };
 
   return (
-    <div>
+    <div className=''>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <div className="h-full w-full flex flex-col">
+      <div className="h-full  w-full flex flex-col">
         {/* Header */}
         <div className="w-full h-[40px]">
           <div className="flex justify-between items-center">
@@ -145,22 +163,24 @@ function ListOfSalesOrder() {
 
         {/* Table */}
 
-        <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
+        <div className="overflow-x-auto border border-gray-200 h-full p-3 rounded-md">
           <div className="flex justify-between items-center">
             <div className='flex gap-1 '>
               <SearchBar text="sales order" data={data} ref={searchBarRef} />
               <select
                 id="status-filter"
-                className="border border-[#e7e5e4] p-[6px] h-[35px] rounded-md"
+                className="border border-[#e7e5e4] py-[2px] px-[6px] h-[35px] rounded-md"
                 defaultValue=""
                 value={status}
                 onChange={handleStatus}
               >
                 <option value="" disabled>
-                  status
+                  Filter
                 </option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
+                <option value="Pending">Pending</option>
+                <option value="Completed">Completed</option>
+                <option value="Rejected">Rejected</option>
+                <option value="In-progress">In-progress</option>
               </select>
               <button
                 className="border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition flex items-center gap-1"
@@ -169,7 +189,7 @@ function ListOfSalesOrder() {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-                Clear Filters
+                Clear
               </button>
             </div>
             <div className="flex justify-center items-center gap-2">
@@ -191,6 +211,7 @@ function ListOfSalesOrder() {
             handleDelete={handleDelete}
             handleView={handleView}
             loading={loading}
+            handleStatusChange={handleStatusChange}
 
           />
           <SalesOrderView
@@ -232,7 +253,7 @@ function ListOfSalesOrder() {
           onClose={() => { setIsConfirmationModaleOpen(false) }}
           onConfirm={OnDeleteConfirmation}
         />
-        <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} />
+        {/* <ActionPopup visible={isActionDrawerOpen} setVisible={() => setActionDrawerOpen(false)} /> */}
       </div>
       <div>
         <VersionsPopup

@@ -5,7 +5,10 @@ import {
   MdOutlineSettingsInputComposite,
   MdCheckroom,
   MdClearAll,
+  MdFavorite
 } from 'react-icons/md'
+import { AiFillCarryOut, AiFillCodeSandboxCircle } from "react-icons/ai";
+
 import Drawer from '../../components/Drawer/Drawer'
 import apiMethods from '../../api/config'
 import CommonPagination from '../../components/New/Pagination'
@@ -20,6 +23,9 @@ import { useSearch } from '../../components/New/SearchContext'
 import CustomAlert from '../../components/New/CustomAlert'
 import createInitialSkuData from './CreateInitialSkuData'
 import { bottom } from '@popperjs/core'
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux'
+
 
 function SkuList() {
   const [skuType, setSkuType] = useState([])
@@ -43,9 +49,16 @@ function SkuList() {
   const location = useLocation()
   const searchBarRef = useRef(null)
   const [boardSizeError, setBoardSizeError] = useState('')
+  const navigate = useNavigate();
+  const [isSingleViewPopupForType, setisSingleViewPopupForType] = useState(false);
+  const [isPopupOpen, setPopupOpen] = useState(false)
+  const [message, setMessage] = useState("")
+  const dispatch = useDispatch()
+
+console.log("suuuuu",user)
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
-    client_id: user?.id,
+    client_id: null,
     client: null,
     ply: null,
     length: null,
@@ -73,11 +86,12 @@ function SkuList() {
     minimum_order_level: null,
     sku_type: 'RSC box',
     part_value: [],
+    route:[],
     part_count: null,
     estimate_composite_item: null,
     description: null,
     default_sku_details: null,
-    tags: [],
+    tags: {},
     sku_values: [
       {
         layer: null,
@@ -91,7 +105,6 @@ function SkuList() {
       },
     ],
   })
-
   useEffect(() => {
     if (location.state?.initialRender) {
       setDrawerOpen(true)
@@ -114,12 +127,45 @@ function SkuList() {
   }, [location.state])
 
   const handleChange = (event) => {
-    const { name, value } = event.target
-    setAddNewSkuData((prevData) => ({
-      ...prevData,
+    const { name, value } = event.target;
+  
+    if (name === 'client' && value === 'add_client') {
+      setPopupOpen(true);
+  
+      // Don't set 'add_client' as the selected value
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        client: null,
+      }));
+      return;
+    }
+   
+    setAddNewSkuData((prev) => ({
+      ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  
+    // Find the selected client based on the client_id
+    const selectedClient = client.find(item => item.client_id === parseInt(value)); // Ensure value is an integer
+  
+    if (selectedClient) {
+      console.log("company_name", selectedClient.company_name);
+      console.log("client_id", selectedClient.client_id);
+      console.log("client_ui_id", selectedClient.client_ui_id);
+      console.log("client_ref_id", selectedClient.client_ref_id);
+      console.log("gst_status", selectedClient.gst_status);
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        client_id: selectedClient.client_id, // Set client_id
+        client: selectedClient.company_name,   // Set company_name as client
+      }));
+    } else {
+      console.log("No client found for the selected client_id");
+    }
+ 
+    console.log("name", name);
+    console.log("val", value);
+  };
 
   const handleStrictAdherenceToggle = () => {
     const newStrictAdherence = !strictAdherence
@@ -131,10 +177,32 @@ function SkuList() {
     }))
   }
 
+  //useEffect(() => {
+  //  if (user?.id) {
+  //    setAddNewSkuData((prevData) => ({
+  //      ...prevData,
+  //      client_id: user.id,
+  //    }));
+  //  }
+  //}, [user?.id]);
+  const deckleError = useSelector((state) => state.boardCalculations.deckleError);
+  const dieError = useSelector((state) => state.diecutCalculations.deckleError);
+
+
   const handleAddSkuSubmit = async () => {
     try {
       if (editTag) {
-        const response = await apiMethods.updateSku(addNewSkuData)
+        if(dieError){
+          setAlerts([{ severity: 'error', message: dieError }])
+          return  null
+        }
+        const numberSkuData={
+          ...addNewSkuData,
+          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+          deckle_size: Number(addNewSkuData.deckle_size),
+        }
+        const response = await apiMethods.updateSku(numberSkuData)
         if (response?.status === 200) {
           setEditTag(false)
           setRefresh((prev) => !prev)
@@ -148,16 +216,36 @@ function SkuList() {
           setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong' }])
         }
       } else {
+        if(dieError){
+          setAlerts([{ severity: 'error', message: dieError }])
+          return  null
+        }
+        if(deckleError){
+          setAlerts([{ severity: 'error', message: deckleError }])
+          return  null
+        }
         if (boardSizeError) {
           console.warn('Blocked submission due to board size error:', boardSizeError)
           setAlerts([{ severity: 'error', message: boardSizeError }])
           return null // 🔴 Stop submission
         }
-        const response = await apiMethods.addSku(addNewSkuData)
+        console.log("addskkkk",addNewSkuData)
+        const numberSkuData={
+          ...addNewSkuData,
+          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+          deckle_size: Number(addNewSkuData.deckle_size),
+        }
+        const response = await apiMethods.addSku(numberSkuData)
         if (response?.status === 201) {
-          setDrawerOpen(false)
+          //setDrawerOpen(false)
           setRefresh((prev) => !prev)
           setAlerts([{ severity: 'success', message: 'Sku Added successfully!' }])
+          if(isSingleViewPopupForType){
+            setisSingleViewPopupForType(false)
+          }else{
+            setDrawerOpen(false)
+          }
         } else {
           setAlerts([
             { severity: 'error', message: response.data.message || 'Something went wrong' },
@@ -181,8 +269,8 @@ function SkuList() {
     setAddNewSkuData({
       id: selectedSku.id || null,
       sku_name: selectedSku.sku_name || null,
-      client_id: selectedSku.client_id || 1,
-      client: selectedSku.client || null,
+      client_id: selectedSku.client_id || null,
+      client: selectedSku.company_name || null,
       ply: selectedSku.ply || null,
       length: selectedSku.length || null,
       width: selectedSku.width || null,
@@ -207,11 +295,14 @@ function SkuList() {
       minimum_order_level: selectedSku.minimum_order_level || null,
       sku_type: selectedSku.sku_type || null,
       part_value: selectedSku.part_value || [],
+      route: selectedSku.route || [],
       part_count: selectedSku.part_count,
+      width_board_size_cm2:selectedSku.width_board_size_cm2 || null,
+      length_board_size_cm2:selectedSku.length_board_size_cm2 || null,
       estimate_composite_item: selectedSku.estimate_composite_item || null,
       description: selectedSku.description || null,
       default_sku_details: selectedSku.default_sku_details || null,
-      tags: selectedSku.tags || [],
+      tags: selectedSku.tags || {},
       sku_values: selectedSku.sku_values || [
         {
           layer: null,
@@ -241,7 +332,7 @@ function SkuList() {
           client: selectedClient || '',
           sku_type: selectedSkuType || '',
           page: pagination?.currentPage || 1,
-          limit: limit,
+          limit: message ? 10000 : limit,
         })
         const clientResponse = await apiMethods.getClients()
 
@@ -262,6 +353,7 @@ function SkuList() {
     selectedSkuType,
     limit,
     location.state?.skipInitialFetch,
+    message
   ])
 
   // Clear all filters
@@ -286,6 +378,9 @@ function SkuList() {
   const handleClose = () => {
     setAlerts([])
   }
+console.log("client data",client)
+console.log("dashboard",dashboard)
+console.log("mess",message)
 
   return (
     <div>
@@ -296,6 +391,7 @@ function SkuList() {
         {/* <span className="sm:text-[18px] font-semibold text-[#424242] ">
           Total SKU Count: {pagination?.totalCount}
         </span> */}
+        <h3>Total Count:{pagination?.totalCount || 0}</h3>
         <div className="flex gap-2 items-center justify-between w-full sm:w-auto">
           {['Add SKU', 'Bulk Upload', 'Export to Excel'].map((text, index) => (
             <ActionButton
@@ -305,8 +401,22 @@ function SkuList() {
               className="sm:h-8 flex items-center font-bold text-white px-2 rounded-lg shadow-md border-none cursor-pointer"
               onClick={() => {
                 if (text === 'Add SKU') {
+                                dispatch({
+                    type: 'SET_SELECTED_ROUTE_IDS',
+                    payload: [], // 👈 empty array
+                  });
+                  dispatch({
+                    type: 'SET_DECKLE_SIZE',
+                    payload: {
+                      deckle_size: "",
+                      deckleError: "",
+                    },
+                  });
+                  dispatch({ type: 'RESET_DIECUT_CALCULATIONS' });
+
                   setDrawerOpen(true)
                   setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
+    
                 }
                 if (text === 'Bulk Upload') {
                   setVisible(true)
@@ -345,16 +455,30 @@ function SkuList() {
             icon: <MdOutlineSettingsInputComposite className="text-white text-2xl" />,
           },
           {
-            name: 'Total SKU',
-            count: pagination?.totalCount || 0,
-            color: '#c3f2cb',
-            bgColor: '#4cd964',
-            icon: <MdCheckroom className="text-white text-2xl" />,
+            name: 'Composite',
+            count: dashboard?.composite || 0,
+            color: '#87e880',
+            bgColor: '#bfbfbb',
+            icon: <AiFillCarryOut className="text-white text-2xl" />,
           },
+          {
+            name: 'Custom Item',
+            count: dashboard?.customitem || 0,
+            color: '#e2cbf7',
+            bgColor: '#10b3aa',
+            icon: <AiFillCodeSandboxCircle  className="text-white text-2xl" />,
+          },
+          //{
+          //  name: 'Total SKU',
+          //  count: pagination?.totalCount || 0,
+          //  color: '#c3f2cb',
+          //  bgColor: '#4cd964',
+          //  icon: <MdCheckroom className="text-white text-2xl" />,
+          //},
         ].map((item, index) => (
           <div
             key={index}
-            className={`w-full sm:w-[280px] flex items-center justify-between  font-bold rounded-lg shadow-md text-white border p-2`}
+            className={`w-full sm:w-[235px] flex items-center justify-between  font-bold rounded-lg shadow-md text-white border p-2`}
             style={{ backgroundColor: item.color }}
           >
             <div className=" ">
@@ -469,6 +593,7 @@ function SkuList() {
         }}
       >
         <SkuAddEdit
+        isopenval={isDrawerOpen || editTag}
           handleChange={handleChange}
           strictAdherence={strictAdherence}
           handleStrictAdherenceToggle={handleStrictAdherenceToggle}
@@ -492,6 +617,12 @@ function SkuList() {
             setClientDisable(false)
             setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
           }}
+          setisSingleViewPopupForType={setisSingleViewPopupForType}
+          isSingleViewPopupForType={isSingleViewPopupForType}
+          isPopupOpen={isPopupOpen}
+          setPopupOpen={setPopupOpen}
+          message={message}
+          setMessage={setMessage}
         />
       </Drawer>
     </div>

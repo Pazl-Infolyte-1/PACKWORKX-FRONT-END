@@ -14,7 +14,7 @@ import DynamicPagination from '../../components/New/DynamicPagination'
 import { FaFilter } from 'react-icons/fa'
 import { FaChevronDown } from 'react-icons/fa'
 import SearchBar from '../../components/New/SearchBar'
-import { FaSyncAlt } from "react-icons/fa";
+import { FaSyncAlt } from 'react-icons/fa'
 import Loader from '../../components/New/Loader'
 
 function ClientList() {
@@ -29,13 +29,12 @@ function ClientList() {
   const [totalPage, setTotalPage] = useState(1)
 
   const [data, setData] = useState([]) // Stores all fetched data
-  const [searchQuery, setSearchQuery] = useState(""); // State for search input
-  const [entriesPerPage, setEntriesPerPage] = useState(5); // Default value 5
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState("");
-  const [loading, setLoading] = useState(false);
-  
+  const [searchQuery, setSearchQuery] = useState('') // State for search input
+  const [entriesPerPage, setEntriesPerPage] = useState(5) // Default value 5
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [selectedFilter, setSelectedFilter] = useState('')
+  const [loading, setLoading] = useState(false)
 
   //const totalPages = Math.ceil(data.length / entriesPerPage) || 1; // Ensure total pages > 0
   const toggleFilterPopup = () => setIsFilterOpen(!isFilterOpen)
@@ -84,29 +83,28 @@ function ClientList() {
           limit: entriesPerPage,
           page: currentPage,
           entity_type: selectedFilter,
-        };
-  
-        const response = await apiMethods.getClients(queryParams);
-        console.log("clientData:", response);
-        setData(response?.data || []);
-        setTotalPage(response.totalPages);
+        }
+
+        const response = await apiMethods.getClients(queryParams)
+        setData(response?.data || [])
+        setTotalPage(response.totalPages)
       } catch (error) {
-        console.error("Error fetching client data:", error);
+        console.error('Error fetching client data:', error)
       } finally {
-        setLoading(false); // Hide loader after API call
+        setLoading(false) 
       }
-    };
-  
-    fetchClientData();
-  }, [reloadData, searchQuery, entriesPerPage, currentPage, selectedFilter]); 
+    }
+
+    fetchClientData()
+  }, [reloadData, searchQuery, entriesPerPage, currentPage, selectedFilter])
+
   const handleResetFilters = () => {
-    setSearchQuery(""); // Clear search query
-    setCurrentPage(1); // Reset to first page
-    setEntriesPerPage(5); // Reset to default entries per page
-    setSelectedFilter(""); // Clear entity filter
-    setReloadData(prev => !prev); // Toggle reloadData to trigger API call
-  };
-  
+    setSearchQuery('') 
+    setCurrentPage(1) 
+    setEntriesPerPage(5) 
+    setSelectedFilter('')
+    setReloadData((prev) => !prev)
+  }
 
   const refreshClients = () => {
     setReloadData((prev) => !prev) //  Toggle state to trigger `useEffect`
@@ -206,7 +204,7 @@ function ClientList() {
   //];
   return (
     <div className="w-full">
-          <Loader isLoading={loading} />
+      <Loader isLoading={loading} />
       {/* Header Section */}
       <div className="w-full h-[40px] flex justify-between items-center">
         <h4>Client/Vendor</h4>
@@ -218,83 +216,80 @@ function ClientList() {
             {/* Search Input Container */}
             {/*<SearchBar text="Client" data={data} />*/}
             <div className="flex items-center h-[35px] w-[300px] gap-2 border rounded-md">
-    <div className="bg-white h-full w-[40px] flex justify-center items-center rounded-l-md">
-      <IoSearch />
-    </div>
-    <input
-      type="text"
-      placeholder="Search"
-      className="outline-none h-full w-full rounded-r-md pl-2"
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-    />
-  </div>
+              <div className="bg-white h-full w-[40px] flex justify-center items-center rounded-l-md">
+                <IoSearch />
+              </div>
+              <input
+                type="text"
+                placeholder="Search"
+                className="outline-none h-full w-full rounded-r-md pl-2"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
 
+            {/* Filter Icon */}
+            {/*<FaFilter onClick={toggleFilterPopup} className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-900" />*/}
+            <div className="flex items-center gap-3">
+              {/* Dropdown */}
+              <div className="relative inline-block text-left">
+                <button
+                  type="button"
+                  className="inline-flex w-full justify-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  {selectedFilter || 'Entity'}
+                  <FaChevronDown className="size-4 text-gray-400" />
+                </button>
 
-  {/* Filter Icon */}
-  {/*<FaFilter onClick={toggleFilterPopup} className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-900" />*/}
-  <div className="flex items-center gap-3">
-  {/* Dropdown */}
-  <div className="relative inline-block text-left">
-  <button
-    type="button"
-    className="inline-flex w-full justify-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50"
-    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-  >
-    {selectedFilter || "Entity"}
-    <FaChevronDown className="size-4 text-gray-400" />
-  </button>
+                {/* Dropdown Menu */}
+                {isDropdownOpen && (
+                  <div className="absolute right-0 z-20 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5">
+                    <div className="py-1">
+                      <button
+                        className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
+                        onClick={() => {
+                          setSelectedFilter('Client')
+                          setIsDropdownOpen(false)
+                        }}
+                      >
+                        Client
+                      </button>
+                      <button
+                        className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
+                        onClick={() => {
+                          setSelectedFilter('Vendor')
+                          setIsDropdownOpen(false)
+                        }}
+                      >
+                        Vendor
+                      </button>
+                      <button
+                        className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
+                        onClick={() => {
+                          setSelectedFilter('')
+                          setIsDropdownOpen(false)
+                        }}
+                      >
+                        All
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-  {/* Dropdown Menu */}
-  {isDropdownOpen && (
-    <div className="absolute right-0 z-20 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5">
-      <div className="py-1">
-        <button
-          className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
-          onClick={() => {
-            setSelectedFilter("Client");
-            setIsDropdownOpen(false);
-          }}
-        >
-          Client
-        </button>
-        <button
-          className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
-          onClick={() => {
-            setSelectedFilter("Vendor");
-            setIsDropdownOpen(false);
-          }}
-        >
-          Vendor
-        </button>
-        <button
-          className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
-          onClick={() => {
-            setSelectedFilter("");
-            setIsDropdownOpen(false);
-          }}
-        >
-          All
-        </button>
-      </div>
-    </div>
-  )}
-</div>
-
-
-  {/* Refresh Button */}
-  {/*<ActionButton     onClick={handleResetFilters} variant='secondary' label={"Clear"} height={"9"}>
+              {/* Refresh Button */}
+              {/*<ActionButton     onClick={handleResetFilters} variant='secondary' label={"Clear"} height={"9"}>
     {/*<FaSyncAlt className="w-4 h-4 text-gray-600" />*/}
-  {/*</ActionButton>}*/}
-  <button 
-  onClick={handleResetFilters} 
-  className="bg-gray-500 text-white text-sm px-3 py-[6px] rounded-md hover:bg-gray-600 transition-all"
->
-  Clear
-</button>
-
-</div>
-</div>
+              {/*</ActionButton>}*/}
+              <button
+                onClick={handleResetFilters}
+                className="bg-gray-500 text-white text-sm px-3 py-[6px] rounded-md hover:bg-gray-600 transition-all"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
 
           <div className="flex justify-center items-center gap-2">
             {/* <button className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto">
@@ -311,10 +306,10 @@ function ClientList() {
             </button> */}
 
             <ActionButton
-            height={"9"}
-            label={"Export"}
-            //onClick={downloadCSV}
-            onClick={downloadClientExcelSheet}
+              height={'9'}
+              label={'Export'}
+              //onClick={downloadCSV}
+              onClick={downloadClientExcelSheet}
             />
 
             {/* <button
@@ -325,11 +320,11 @@ function ClientList() {
             </button> */}
 
             <ActionButton
-            height={"9"}
-            label={"+ Add"}
-            //onClick={()=>setDrawerOpen(true)}
-            onClick={()=>setPopupOpen(true)}
-            variant='add'
+              height={'9'}
+              label={'+ Add'}
+              //onClick={()=>setDrawerOpen(true)}
+              onClick={() => setPopupOpen(true)}
+              variant="add"
             />
           </div>
         </div>
@@ -391,7 +386,12 @@ function ClientList() {
         </CustomPopup>
       )}
 
-      <Drawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} maxWidth={'1280px'} title={`New ${entityType}`}>
+      <Drawer
+        isOpen={isDrawerOpen}
+        onClose={handleCloseDrawer}
+        maxWidth={'1280px'}
+        title={`New ${entityType}`}
+      >
         {/* Pass handleCloseDrawer as a prop to ClientForm */}
         <ClientForm
           entity_type={entityType}

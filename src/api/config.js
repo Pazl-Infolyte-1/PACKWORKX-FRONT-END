@@ -21,7 +21,7 @@ apiClient.interceptors.request.use(
     return config
   },
   (error) => {
-    console.error('Request interceptor error:',error)
+    console.error('Request interceptor error:', error)
     return Promise.reject(error)
   },
 )
@@ -82,7 +82,7 @@ apiClient.interceptors.response.use(
 export const apiMethods = {
   login: async (credentials) => {
     try {
-      const response = await apiClient.post('/user/login',credentials,{
+      const response = await apiClient.post('/user/login', credentials, {
         headers: {
           'x-api-key':
             '4b3e77f648e5b9055a45f0812b3a4c3b88b08ff10b2f34ec21d11b6f678b6876a4014c88ff2a3c7e8e934c4f4790a94d3acb28d2f78a9b90f18960feaf3e4f99',
@@ -90,13 +90,13 @@ export const apiMethods = {
       })
 
       if (response.data.token) {
-        localStorage.setItem('token',response.data.token)
+        localStorage.setItem('token', response.data.token)
         // await saveToken(response.data.token)
       }
 
       return response.data
     } catch (error) {
-      console.error('Login error:',error)
+      console.error('Login error:', error)
       throw error
     }
   },
@@ -122,7 +122,7 @@ export const apiMethods = {
       if (!token) {
         throw new Error('No token found. Please log in again.')
       }
-      const response = await apiClient.get('/rbac',{
+      const response = await apiClient.get('/rbac', {
         headers: {
           Authorization: `Bearer ${token}`, // Attach token
         },
@@ -130,7 +130,7 @@ export const apiMethods = {
       })
       return response.data
     } catch (error) {
-      console.error('Error fetching clients:',error.response?.data || error.message)
+      console.error('Error fetching clients:', error.response?.data || error.message)
       throw error
     }
   },
@@ -145,29 +145,29 @@ export const apiMethods = {
   },
   //companies
   getCompanies: async (queryParams = {}, singleId) => {
-    console.log("api id", singleId);
+    console.log('api id', singleId)
     try {
-      const token = localStorage.getItem('token');
-  
+      const token = localStorage.getItem('token')
+
       if (!token) {
-        throw new Error('No token found. Please log in again.');
+        throw new Error('No token found. Please log in again.')
       }
-  
+
       // If singleId exists, append it to the endpoint, otherwise, use "/companies"
-      const url = singleId ? `/companies/${singleId}` : '/companies';
-  
+      const url = singleId ? `/companies/${singleId}` : '/companies'
+
       const response = await apiClient.get(url, {
         headers: { Authorization: `Bearer ${token}` },
         params: queryParams, // Pass query parameters if needed
-      });
-  
-      return response.data;
+      })
+
+      return response.data
     } catch (error) {
-      console.error('Error fetching companies:', error.response?.data || error.message);
-      throw error;
+      console.error('Error fetching companies:', error.response?.data || error.message)
+      throw error
     }
   },
-  
+
   createCompany: async (companyData) => {
     try {
       const token = localStorage.getItem('token') // Retrieve token before sending request
@@ -175,33 +175,33 @@ export const apiMethods = {
       if (!token) {
         throw new Error('No token found. Please log in again.')
       }
-      const response = await apiClient.post('/companies',companyData,{
+      const response = await apiClient.post('/companies', companyData, {
         headers: {
           Authorization: `Bearer ${token}`, // Attach token
         },
       })
       return response.data
     } catch (error) {
-      console.error('Error posting client:',error.response?.data || error.message)
+      console.error('Error posting client:', error.response?.data || error.message)
       throw error
     }
   },
-  updateCompany: async (companyId,companyData) => {
-    console.log(companyId,'client124')
+  updateCompany: async (companyId, companyData) => {
+    console.log(companyId, 'client124')
     try {
       const token = localStorage.getItem('token') // Retrieve token before sending request
       // const token = await getToken()
       if (!token) {
         throw new Error('No token found. Please log in again.')
       }
-      const response = await apiClient.put(`/companies/${companyId}`,companyData,{
+      const response = await apiClient.put(`/companies/${companyId}`, companyData, {
         headers: {
           Authorization: `Bearer ${token}`, // Attach token
         },
       })
       return response.data
     } catch (error) {
-      console.error('Error posting client:',error.response?.data || error.message)
+      console.error('Error posting client:', error.response?.data || error.message)
       throw error
     }
   },
@@ -214,14 +214,14 @@ export const apiMethods = {
         throw new Error('No token found. Please log in again.')
       }
 
-      const response = await apiClient.delete(`/companies/${companyId}`,{
+      const response = await apiClient.delete(`/companies/${companyId}`, {
         headers: {
           Authorization: `Bearer ${token}`, // Attach token
         },
       })
       return response.data
     } catch (error) {
-      console.error('Error deleting company:',error.response?.data || error.message)
+      console.error('Error deleting company:', error.response?.data || error.message)
       throw error
     }
   },
@@ -232,7 +232,7 @@ export const apiMethods = {
       )
       return response.data
     } catch (error) {
-      console.error('Error in getClientOrVendors:',error)
+      console.error('Error in getClientOrVendors:', error)
       throw error
     }
   },
@@ -240,13 +240,13 @@ export const apiMethods = {
   formatDate: async (isoString) => {
     try {
       const date = new Date(isoString)
-      return date.toLocaleDateString('en-GB',{
+      return date.toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
       })
     } catch (error) {
-      console.error('Error in formatDate:',error)
+      console.error('Error in formatDate:', error)
       throw error
     }
   },
@@ -259,7 +259,7 @@ export const apiMethods = {
         throw new Error('No token found. Please log in again.')
       }
 
-      const response = await apiClient.post('/clients',clientData,{
+      const response = await apiClient.post('/clients', clientData, {
         headers: {
           Authorization: `Bearer ${token}`, // Attach token
         },
@@ -267,12 +267,12 @@ export const apiMethods = {
 
       return response.data
     } catch (error) {
-      console.error('Error posting client:',error.response?.data || error.message)
+      console.error('Error posting client:', error.response?.data || error.message)
       throw error
     }
   },
-  editClient: async (clientId,clientData) => {
-    console.log(clientId,'client124')
+  editClient: async (clientId, clientData) => {
+    console.log(clientId, 'client124')
     try {
       const token = localStorage.getItem('token') // Retrieve token before sending request
       // const token = await getToken()
@@ -280,7 +280,7 @@ export const apiMethods = {
         throw new Error('No token found. Please log in again.')
       }
 
-      const response = await apiClient.put(`/clients/${clientId}`,clientData,{
+      const response = await apiClient.put(`/clients/${clientId}`, clientData, {
         headers: {
           Authorization: `Bearer ${token}`, // Attach token
         },
@@ -288,7 +288,7 @@ export const apiMethods = {
 
       return response.data
     } catch (error) {
-      console.error('Error posting client:',error.response?.data || error.message)
+      console.error('Error posting client:', error.response?.data || error.message)
       throw error
     }
   },
@@ -300,7 +300,7 @@ export const apiMethods = {
       if (!token) {
         throw new Error('No token found. Please log in again.')
       }
-      const response = await apiClient.get('/clients',{
+      const response = await apiClient.get('/clients', {
         headers: {
           Authorization: `Bearer ${token}`, // Attach token
         },
@@ -308,7 +308,7 @@ export const apiMethods = {
       })
       return response.data
     } catch (error) {
-      console.error('Error fetching clients:',error.response?.data || error.message)
+      console.error('Error fetching clients:', error.response?.data || error.message)
       throw error
     }
   },
@@ -320,14 +320,14 @@ export const apiMethods = {
       if (!token) {
         throw new Error('No token found. Please log in again.')
       }
-      const response = await apiClient.delete(`/clients/${clientId}`,{
+      const response = await apiClient.delete(`/clients/${clientId}`, {
         headers: {
           Authorization: `Bearer ${token}`, // Attach token
         },
       })
       return response.data
     } catch (error) {
-      console.error('Error deleting client:',error.response?.data || error.message)
+      console.error('Error deleting client:', error.response?.data || error.message)
       throw error
     }
   },
@@ -348,32 +348,32 @@ export const apiMethods = {
 
   getGst: async (gstNumber) => {
     try {
-      const token = localStorage.getItem("token"); // Retrieve token before sending request
-  
+      const token = localStorage.getItem('token') // Retrieve token before sending request
+
       if (!token) {
-        throw new Error("No token found. Please log in again.");
+        throw new Error('No token found. Please log in again.')
       }
-  
+
       const response = await apiClient.post(
-        "/clients/check-gst",
+        '/clients/check-gst',
         { gst_number: gstNumber },
         {
           headers: {
             Authorization: `Bearer ${token}`, // Attach token
           },
-        }
-      );
-  
-      return response.data;
+        },
+      )
+
+      return response.data
     } catch (error) {
-      console.error("Error fetching GST details:", error.response?.data || error.message);
-      throw error;
+      console.error('Error fetching GST details:', error.response?.data || error.message)
+      throw error
     }
   },
-  
+
   addSku: async (addNewSkuData) => {
     try {
-      const response = await apiClient.post('/sku-details',addNewSkuData,{})
+      const response = await apiClient.post('/sku-details', addNewSkuData, {})
       return response
     } catch (error) {
       console.error(error)
@@ -382,7 +382,7 @@ export const apiMethods = {
 
   getSkuList: async (params) => {
     try {
-      const response = await apiClient.get('/sku-details',{
+      const response = await apiClient.get('/sku-details', {
         params: {
           search: params.search || '',
           client: params.client || '',
@@ -398,9 +398,9 @@ export const apiMethods = {
   },
 
   updateSku: async (addNewSkuData) => {
-    const { id,...dataWithoutId } = addNewSkuData
-      const response = await apiClient.put(`/sku-details/${addNewSkuData.id}`,dataWithoutId)
-      return response
+    const { id, ...dataWithoutId } = addNewSkuData
+    const response = await apiClient.put(`/sku-details/${addNewSkuData.id}`, dataWithoutId)
+    return response
   },
 
   deleteSku: async (id) => {
@@ -419,7 +419,7 @@ export const apiMethods = {
       if (!token) {
         throw new Error('No token found. Please log in again.')
       }
-      const response = await apiClient.get('/clients/download/excel',{
+      const response = await apiClient.get('/clients/download/excel', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -428,7 +428,7 @@ export const apiMethods = {
       })
       return response.data
     } catch (error) {
-      console.error('Error downloading clients:',error.response?.data || error.message)
+      console.error('Error downloading clients:', error.response?.data || error.message)
       throw error
     }
   },
@@ -477,16 +477,9 @@ export const apiMethods = {
       console.error(error)
     }
   },
-  getRoles: async () => {
-    try {
-      return await apiClient.get(`/role`)
-    } catch (error) {
-      console.error(error)
-    }
-  },
   uploadFile: async (file) => {
     try {
-      return await apiClient.post('/file/upload',file,{
+      return await apiClient.post('/file/upload', file, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
     } catch (error) {
@@ -495,22 +488,22 @@ export const apiMethods = {
   },
   createNewEmployee: async (employeeForm) => {
     // try {
-      return await apiClient.post('/user/register',employeeForm)
+    return await apiClient.post('/user/register', employeeForm)
     // } catch (error) {
-      // console.error(error)
+    // console.error(error)
     // }
   },
   GetEmployeelist: async (params) => {
     try {
-      const response = await apiClient.get('/user/employees',{
+      const response = await apiClient.get('/user/employees', {
         params: {
           page: params.page || 1,
           limit: params.limit || 10,
-          search: params.search || '', 
-          department:params.department,
-          role:params.role,
-          reportingManager:params.reportingManager,
-          status:params.status
+          search: params.search || '',
+          department: params.department,
+          role: params.role,
+          reportingManager: params.reportingManager,
+          status: params.status,
         },
       })
       return response
@@ -518,47 +511,50 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  updateEmployeeStatus:async(id,body)=>{
+    const response = await apiClient.patch(`/user/employees/${id}/status`,body);
+    return response
+  },
   getSkuExcelExport: async (params) => {
     try {
-      const response = await apiClient.get('/sku-details/download/excel',{
-        responseType:'blob',
-        params
+      const response = await apiClient.get('/sku-details/download/excel', {
+        responseType: 'blob',
+        params,
       })
 
-      const blob = new Blob([response.data],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      })
       const url = window.URL.createObjectURL(blob)
 
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download','SKU Details.xlsx')
+      link.setAttribute('download', 'SKU Details.xlsx')
       document.body.appendChild(link)
       link.click()
 
       window.URL.revokeObjectURL(url)
       document.body.removeChild(link)
     } catch (error) {
-      console.error(error);
-      
+      console.error(error)
     }
   },
 
-   DeleteEmployee: async (id) => {
+  DeleteEmployee: async (id) => {
     try {
       return await apiClient.delete(`/user/employees/${id}`)
     } catch (error) {
       console.error(error)
     }
   },
-  editEmployee:async(id,body)=>{
+  editEmployee: async (id, body) => {
     try {
-
-      return await apiClient.put(`/user/employees/${id}`,body)
-
+      return await apiClient.put(`/user/employees/${id}`, body)
     } catch (error) {
       console.error(error)
     }
   },
-  getEmployeeData:async(id)=>{
+  getEmployeeData: async (id) => {
     try {
       return await apiClient.get(`/user/employees/${id}`)
     } catch (error) {
@@ -568,6 +564,7 @@ export const apiMethods = {
   getSkuListOptions: async () => {
     try {
       const response = await apiClient.get('/sku-details',{
+        params: { limit: 10000 }
       })
       return response.data
     } catch (error) {
@@ -576,7 +573,7 @@ export const apiMethods = {
   },
   getPackages: async (params) => {
     try {
-      return await apiClient.get('/packages', {params})
+      return await apiClient.get('/packages', { params })
     } catch (error) {
       console.error(error)
     }
@@ -584,15 +581,15 @@ export const apiMethods = {
 
   AddPacakges: async (payload) => {
     try {
-      return await apiClient.post('/packages/create',payload)
+      return await apiClient.post('/packages/create', payload)
     } catch (error) {
       console.error(error)
     }
   },
-  
-  UpdatePacakges: async (id,payload) => {
+
+  UpdatePacakges: async (id, payload) => {
     try {
-      return await apiClient.put(`/packages/update/${id}`,payload)
+      return await apiClient.put(`/packages/update/${id}`, payload)
     } catch (error) {
       console.error(error)
     }
@@ -624,7 +621,7 @@ export const apiMethods = {
 
   getWorkOrders: async (params) => {
     try {
-      return await apiClient.get('/work-order', {params})
+      return await apiClient.get('/work-order', { params })
     } catch (error) {
       console.error(error)
     }
@@ -632,45 +629,86 @@ export const apiMethods = {
 
   getProcess: async (params) => {
     try {
-      return await apiClient.get('/machines/process',{params})
+      return await apiClient.get('/machines/process', { params })
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
   },
 
   AddProcess: async (formData) => {
-      return await apiClient.post('/machines/process', formData)
+    return await apiClient.post('/machines/process', formData)
   },
-  EditProcess : async (formData) => {
+  EditProcess: async (formData) => {
     try {
       return await apiClient.put(`/machines/process/${formData.id}`, formData)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
   },
 
-  deleteProcess : async (id) => {
+  deleteProcess: async (id) => {
+    return await apiClient.delete(`/machines/process/${id}`)
+  },
+
+  getRoute: async (params) => {
     try {
-      return await apiClient.delete(`/machines/process/${id}`)
+      return await apiClient.get('/mapping/route', { params })
     } catch (error) {
-      console.error(error);
-      
+      console.error(error)
     }
   },
-  getAllFileds : async () => {
+
+  AddRoute: async (formData) => {
+    try {
+      return await apiClient.post('/mapping/route', formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  EditRoute: async (formData) => {
+    try {
+      return await apiClient.put(`/mapping/route/${formData.id}`, formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  DeleteRoute: async (id) => {
+    try {
+      return await apiClient.delete(`/mapping/route/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getRouteById: async (id) => {
+    try {
+      return await apiClient.get(`/mapping/route/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getAllFileds: async () => {
     try {
       return await apiClient.get('/machines/process-fields')
     } catch (error) {
-      console.error(error);
-      
+      console.error(error)
+    }
+  },
+  getAllFiledsById: async (id) => {
+    try {
+      return await apiClient.get(`/machines/process/${id}/fields`)
+    } catch (error) {
+      console.error(error)
     }
   },
   getProcessFields: async (id) => {
     try {
-      return await apiClient.get(`/machines/process/${id}/fields` )
+      return await apiClient.get(`/machines/process/${id}/fields`)
     } catch (error) {
-      console.error(error);
-      
+      console.error(error)
     }
   },
 
@@ -678,8 +716,15 @@ export const apiMethods = {
     try {
       return await apiClient.post('/machines/process-values', payload)
     } catch (error) {
-      console.error(error);
-      
+      console.error(error)
+    }
+  },
+
+  updateProcessValues: async (payload) => {
+    try {
+      return await apiClient.put(`/machines/process-values/${payload.id}`, payload)
+    } catch (error) {
+      console.error(error)
     }
   },
 
@@ -687,21 +732,57 @@ export const apiMethods = {
     try {
       return await apiClient.post('/machines/process-fields', payload)
     } catch (error) {
-      console.error(error);
-      
+      console.error(error)
     }
   },
-
-
-  getDies: async (params) => {
+  updateField: async (payload) => {
     try {
-      return await apiClient.get('/common-service/die', {params})
+      return await apiClient.put(`/machines/process-fields/${payload.id}`, payload)
     } catch (error) {
       console.error(error)
     }
   },
+  deleteField: async (id) => {
+    try {
+      return await apiClient.delete(`/machines/process-fields/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getDies: async (params) => {
+    try {
+      return await apiClient.get('/common-service/die', { params })
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  addDie: async (formData) => {
+    try {
+      return await apiClient.post('/common-service/die/create', formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  updateDie: async (id, formData) => {
+    try {
+      return await apiClient.put(`/common-service/die/update/${id}`, formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  deleteDie: async (id) => {
+    try {
+      return await apiClient.delete(`/common-service/die/delete/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
   getSalesOrderList: async (params = {}) => {
-    console.log(params,'fasdfa')
     try {
       return await apiClient.get('/sale-order', {
         params: {
@@ -710,8 +791,8 @@ export const apiMethods = {
           manufacture: params.manufacture || '',
           sales_status: params.sales_status || '',
           page: params.page || 1,
-          limit: params.limit || 25
-        }
+          limit: params.limit || 25,
+        },
       })
     } catch (error) {
       console.error('Error fetching sales orders:', error.response?.data || error.message)
@@ -719,7 +800,7 @@ export const apiMethods = {
     }
   },
 
-  DeleteSalesOrder : async (id)=>{
+  DeleteSalesOrder: async (id) => {
     const response = await apiClient.delete(`/sale-order/${id}`)
     return response
   },
@@ -730,175 +811,214 @@ export const apiMethods = {
   },
 
   addSalesOrder: async (body) => {
-    const response = await apiClient.post(`/sale-order`,body)
+    const response = await apiClient.post(`/sale-order`, body)
     return response
   },
 
-  editSalesOrder:async(id,body)=>{
-    const response = await apiClient.put(`/sale-order/${id}`,body)
+  editSalesOrder: async (id, body) => {
+    const response = await apiClient.put(`/sale-order/${id}`, body)
     return response
   },
 
-  getSkuVersions:async(id)=>{
+  getSkuVersions: async (id) => {
     const response = await apiClient.get(`/sku-details/sku-version/sku/${id}`)
     return response
   },
 
-  //selva
-  //items
-  getItemList: async (params = {}) => {
+  getFluteType: async () => {
     try {
-      return await apiClient.get('/items', {
-        params: {
-          client: params.client || '',
-          sales_status: params.sales_status || '',
-          page: params.page || 1,
-          limit: params.limit || 10,
-        },
-      })
-    } catch (error) {
-      console.error('Error fetching items:', error.response?.data || error.message)
-      throw error
-    }
-  },
-
-  getItemData: async (id) => {
-    return await apiClient.get(`/items/${id}`);
-  },
-
-  addItem: async (body) => {
-    return await apiClient.post(`/items`, body);
-  },
-
-  updateItem: async (id, body) => {
-    return await apiClient.put(`/items/${id}`, body);
-  },
-
-  deleteItem: async (id) => {
-    return await apiClient.delete(`/items/delete/${id}`);
-  },
-
-
-  // po-order 
-
-  getPurchaseOrders: async (params = {}) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No token found. Please log in again.');
-      }
-  
-      const response = await apiClient.get('/purchase-order', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          status: params.status || 'active',
-          page: params.page || 1,
-          limit: params.limit || 10,
-          client: params.client || '',
-          search: params.search || '',
-        },
-      });
-  
-      const transformedData = response.data.data.map(po => ({
-        ...po,
-        items: po.PurchaseOrderItems || [] // Map PurchaseOrderItems to items
-      }));
-  
-      return {
-        success: response.data.success,
-        message: response.data.message,
-        data: transformedData,
-        totalCount: response.data.totalCount
-      };
-  
-    } catch (error) {
-      console.error('Error fetching purchase orders:', error.response?.data || error.message);
-      throw error;
-    }
-  },
-
-  // Get a single purchase order by ID
-  getPurchaseOrderById: async (id) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No token found. Please log in again.');
-      }
-  
-      const response = await apiClient.get(`/purchase-order/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        }
-      });
-  
-      const transformedData = {
-        ...response.data.data,
-        items: response.data.data.PurchaseOrderItems || []
-      };
-  
-      return {
-        success: response.data.success,
-        message: response.data.message,
-        data: transformedData
-      };
-  
-    } catch (error) {
-      console.error(`Error fetching purchase order ${id}:`, error.response?.data || error.message);
-      throw error;
-    }
-  },
-
-  createPurchaseOrder: async (data) => {
-    try {
-      return await apiClient.post('/purchase-order', data);
-    } catch (error) {
-      console.error('Error creating purchase order:', error.response?.data || error.message);
-      throw error;
-    }
-  },
-
-  updatePurchaseOrder: async (id, data) => {
-    try {
-      return await apiClient.put(`/purchase-order/${id}`, data);
-    } catch (error) {
-      console.error(`Error updating purchase order ID ${id}:`, error.response?.data || error.message);
-      throw error;
-    }
-  },
-
-  deletePurchaseOrder: async (id) => {
-    try {
-      return await apiClient.delete(`/purchase-order/${id}`);
-    } catch (error) {
-      console.error(`Error deleting purchase order ID ${id}:`, error.response?.data || error.message);
-      throw error;
-    }
-  },
-
-  getPurchaseOrderList: async (params) => {
-    try {
-      const response = await apiClient.get('/purchase-order',{
-        params: {
-          search: params.search || '',
-          client: params.client || '',
-          page: params.page || 1,
-          limit: params.limit || 10,
-        },
-      })
-      return response.data
+      return await apiClient.get('/common-service/flute')
     } catch (error) {
       console.error(error)
     }
   },
 
+  deleteFlute: async (id) => {
+    try {
+      return await apiClient.delete(`/common-service/flute/delete/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
+  addFlute: async (formData) => {
+    try {
+      return await apiClient.post('/common-service/flute/create', formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  updateFlute: async (id, formData) => {
+    try {
+      return await apiClient.put(`/common-service/flute/update/${id}`, formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
+  getProcessValues: async () => {
+    try {
+      return await apiClient.get('/machines/process-values')
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getProcessDetails: async (id) => {
+    try {
+      return await apiClient.get(`/machines/process-values/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getSingleSkuData: async (id) => {
+    const response = await apiClient.get(`/sku-details/${id}`)
+    return response
+  },
+  addSkuVersion: async (body) => {
+    const response = await apiClient.post(`/sku-details/sku-version`, body)
+    return response
+  },
+  deleteSkuVersion: async (id) => {
+    const response = await apiClient.delete(`/sku-details/sku-version/${id}`)
+    return response
+  },
+  getSingleSkuVersion: async (id) => {
+    const response = await apiClient.get(`/sku-details/sku-version/${id}`)
+    return response
+  },
+  updateSkuVersion: async (id, body) => {
+    const response = await apiClient.put(`/sku-details/sku-version/${id}`, body)
+    return response
+  },
+  createWorkOrder: async (body) => {
+    const response = await apiClient.post(`/work-order`, body)
+    return response
+  },
+  getWorkOrderById: async (id) => {
+    const response = await apiClient.get(`/work-order/${id}`)
+    return response
+  },
+  workOrderStatusUpdate: async (id, body) => {
+    const response = await apiClient.put(`/work-order/status/${id}`, body)
+    return response
+  },
+  editWorkOrder: async (id, body) => {
+    const response = await apiClient.put(`/work-order/${id}`, body)
+    return response
+  },
 
+  deleteWorkOrder: async (id) => {
+    const response = await apiClient.delete(`/work-order/${id}`)
+    return response
+  },
+  updateSalesOrderStatus: async (id, body) => {
+    const response = await apiClient.patch(`/sale-order/${id}/status`, body)
+    return response
+  },
+
+  getRouteList: async (params) => {
+    try {
+      const response = await apiClient.get('/mapping/route', {
+        params: {
+          search: params.search || '',
+          page: params.page || 1,
+          limit: params.limit || 10
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  getMachine: async (params) => {
+    try {
+      return await apiClient.get('/machines/master/get', { params })
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getMachineById: async (id) => {
+    try {
+      return await apiClient.get(`/machines/master/get/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  AddMachine: async (data) => {
+    return await apiClient.post('/machines/master/create', data)
+  },
+
+  editMachine: async (id, data) => {
+    return await apiClient.put(`/machines/master/update/${id}`, data)
+  },
+
+  deleteMachine: async (id) => {
+    return await apiClient.delete(`/machines/master/delete/${id}`)
+  },
+
+getDesignationList:async()=>{
+  const response = await apiClient.get(`/designations`);
+  return response
+},
+deleteDesignation:async(id)=>{
+  const response = await apiClient.delete(`/designations/${id}`)
+  return response
+},
+editDesignation:async(id,body)=>{
+  const response = await apiClient.put(`/designations/${id}`,body)
+  return response
+},
+postDesignation: async (body) => {
+  const response = await apiClient.post(`/designations`, body)
+  return response
+},
+deleteDepartment: async (id) => {
+  const response = await apiClient.delete(`/departments/${id}`)
+  return response
+},
+getDepartmentById: async (id) => {
+  const response = await apiClient.get(`/departments/${id}`);
+  return response;
+},
+
+updateDepartment: async (id, body) => {
+  const response = await apiClient.put(`/departments/${id}`, body);
+  return response;
+},
+postDepartment:async(body)=>{
+  const response = await apiClient.post(`/departments`, body);
+  return response;
+},
+postRole: async (body) => {
+  const response = await apiClient.post('/role', body);
+  return response;
+},
+
+getRoleById: async (id) => {
+  const response = await apiClient.get(`/role/${id}`);
+  return response;
+},
+
+updateRole: async (id, body) => {
+  const response = await apiClient.put(`/role/${id}`, body);
+  return response;
+},
+
+deleteRole: async (id) => {
+  const response = await apiClient.delete(`/role/${id}`);
+  return response;
+},
+getRoles: async () => {
+  try {
+    return await apiClient.get(`/role`)
+  } catch (error) {
+    console.error(error)
+  }
+}
 }
 
 
 export default apiMethods
-
-

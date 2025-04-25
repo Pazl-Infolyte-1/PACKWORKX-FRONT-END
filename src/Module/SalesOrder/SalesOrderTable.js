@@ -15,7 +15,7 @@ import {
 import React from 'react'
 import Loading from '../../components/New/Loading'
 
-function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, handleDelete,handleEdit,handleView,loading }) {
+function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, handleDelete,handleEdit,handleView,loading,handleStatusChange }) {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -27,16 +27,25 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
     });
   };
 
+  const statusOptions = [
+    { value: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
+    { value: 'In-progress', color: 'bg-blue-100 text-blue-800' },
+    { value: 'Completed', color: 'bg-green-100 text-green-800' },
+    { value: 'Rejected', color: 'bg-red-100 text-red-800' }
+  ];
+ 
+  
+
+
   return (
     <>
       <div className=" h-[80%] ">
-        {console.log(data)}
-        <div className="overflow-x-auto  h-[350px]  border whitespace-nowrap  mt-3">
+        <div className="overflow-x-auto   h-[380px]    border whitespace-nowrap  mt-3">
           <CTable striped hover className="border border-gray-200">
             <CTableHead className="bg-gray-100 sticky top-0 z-10">
               <CTableRow>
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                  Number
+                  Sales ID
                 </CTableHeaderCell>
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                   Client
@@ -52,11 +61,11 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                   Created Date
                 </CTableHeaderCell>
-                <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+                {/* <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                   Due Date
-                </CTableHeaderCell>
+                </CTableHeaderCell> */}
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                  Status
+                  Sales Status
                 </CTableHeaderCell>
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                   Action
@@ -71,12 +80,17 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
                   </div>
                 ) :
             <CTableBody>
-              {data.length > 0 ? (
-                data.map((row, index) => (
+              {data?.length > 0 ? (
+                data?.map((row, index) => (
                   <CTableRow key={index} className="border-b">
-                    <CTableDataCell className="py-3 px-4 text-gray-700">
-                      {row.id}
+                    <CTableDataCell
+                      onClick={() =>handleView(row.id)  
+                      }
+                      className="py-3 px-2 !text-[#8761e5] font-semibold cursor-pointer underline text-start "
+                    >SO-{row.id}
                     </CTableDataCell>
+
+                    
                     <CTableDataCell className="py-3 px-4 text-gray-700">
                       {row.client}
                     </CTableDataCell>
@@ -91,25 +105,34 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
                       {formatDate(row.created_at)}
                     </CTableDataCell>
 
-                    <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {/* <CTableDataCell className="py-3 px-4 text-gray-700">
                       {row.due_date}
-                    </CTableDataCell>
+                    </CTableDataCell> */}
 
 
-                    <CTableDataCell className="py-3 px-4 text-gray-700">
-                      <CBadge
-                        color={
-                          row.status === 'Pending'
-                            ? 'warning'
-                            : row.status === 'active'
-                              ? 'success'
-                              : 'danger'
-                        }
-                        className="w-20 flex items-center justify-center text-sm font-semibold"
-                      >
-                        {row.status}
-                      </CBadge>
-                    </CTableDataCell>
+<CTableDataCell className="py-3 px-4 text-gray-700">
+<select
+  value={row.sales_status}
+  onChange={(e) => handleStatusChange(row.id, e.target.value)}
+  className={`px-2.5 py-1 rounded-full text-sm font-medium outline-none border border-gray-300
+    ${row.sales_status === "Pending"
+      ? "bg-yellow-100 text-yellow-800"
+      : row.sales_status === "In-progress"
+      ? "bg-blue-100 text-blue-800"
+      : row.sales_status === "Completed"
+      ? "bg-green-100 text-green-800"
+      : row.sales_status === "Rejected"
+      ? "bg-red-100 text-red-800"
+      : "bg-gray-100 text-gray-800"
+    }`}
+>
+    <option className="text-gray-700 bg-white" value="Pending">Pending</option>
+    <option className="text-gray-700 bg-white" value="In-progress">In-progress</option>
+    <option className="text-gray-700 bg-white" value="Completed">Completed</option>
+    <option className="text-gray-700 bg-white" value="Rejected">Rejected</option>
+</select>
+</CTableDataCell>
+
                     <CTableDataCell>
                     <ThreeDotMenu
                           value={[

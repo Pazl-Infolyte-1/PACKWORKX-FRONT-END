@@ -1,38 +1,45 @@
-import React,{ useState } from 'react'
+import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { CNavItem,CNavLink,CSidebarNav,CNavTitle,CNavGroup,CNavGroupItems } from '@coreui/react'
+import {
+  CNavItem,
+  CNavLink,
+  CSidebarNav,
+  CNavTitle,
+  CNavGroup,
+  CNavGroupItems,
+} from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import * as iconSet from '@coreui/icons'
 import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
-import { cilCloudDownload,cilLayers,cilPuzzle,cilSpeedometer } from '@coreui/icons'
- 
- 
+import { cilCloudDownload, cilLayers, cilPuzzle, cilSpeedometer,cilUser } from '@coreui/icons'
+
 export const AppSideBarNew = ({ giveAccess }) => {
-  const [expandedModules,setExpandedModules] = useState({})
- 
+  const [expandedModules, setExpandedModules] = useState({})
+  const [isOpen, setIsOpen] = useState(false);
+
   const toggleGroup = (moduleId) => {
     setExpandedModules((prevState) => ({
       ...prevState,
       [moduleId]: !prevState[moduleId],
     }))
   }
- 
-  const navLink = (title,icon) => (
+
+  const navLink = (title, icon) => (
     <div className="d-flex align-items-center">
       {icon && iconSet[icon] && <CIcon icon={iconSet[icon]} className="nav-icon" />}
       <span>{title}</span>
     </div>
   )
- 
-  const NavGroup = ({ moduleId,title,icon,children }) => (
+
+  const NavGroup = ({ moduleId, title, icon, children }) => (
     <div className="nav-group">
       <div
         className="nav-group-toggle nav-link"
         onClick={() => toggleGroup(moduleId)}
         style={{ cursor: 'pointer' }}
       >
-        {navLink(title,icon)}
+        {navLink(title, icon)}
       </div>
       <ul
         className="nav-group-items"
@@ -47,28 +54,43 @@ export const AppSideBarNew = ({ giveAccess }) => {
       </ul>
     </div>
   )
-  const assetModules = giveAccess.filter(module => module.module_group === "Assets");
-  const shouldDisplayAssets = assetModules.some(module => module.modules_description?.trim() !== "");
- 
-  const dashboardModules = giveAccess.filter(module => module.module_group === "Dashboard");
-  const shouldDisplayDashboard = dashboardModules.some(module => module.modules_description?.trim() !== "");
- 
-  const hrmsModules = giveAccess.filter(module => module.module_group === "HRMS");
-  const shouldDisplayHrms = hrmsModules.some(module => module.modules_description?.trim() !== "");
- 
-  const orderManagementModules = giveAccess.filter(module => module.module_group === "Order Management");
-  const shouldDisplayOrderManagement = orderManagementModules.some(module => module.modules_description?.trim() !== "");
- 
-  const reportModules = giveAccess.filter(module => module.module_group === "Reports");
-  const shouldDisplayReports = reportModules.some(module => module.modules_description?.trim() !== "");
- 
-  const settingModules = giveAccess.filter(module => module.module_group === "Settings");
-  const shouldDisplaySettings = settingModules.some(module => module.modules_description?.trim() !== "");
- 
-  const accountsModules = giveAccess.filter(module => module.module_group === "Accounts");
-  const shouldDisplayAccounts = accountsModules.some(module => module.modules_description?.trim() !== "");
- 
- 
+  const assetModules = giveAccess.filter((module) => module.module_group === 'Assets')
+  const shouldDisplayAssets = assetModules.some(
+    (module) => module.modules_description?.trim() !== '',
+  )
+
+  const dashboardModules = giveAccess.filter((module) => module.module_group === 'Dashboard')
+  const shouldDisplayDashboard = dashboardModules.some(
+    (module) => module.modules_description?.trim() !== '',
+  )
+
+  const hrmsModules = giveAccess.filter((module) => module.module_group === 'HRMS')
+  const shouldDisplayHrms = hrmsModules.some((module) => module.modules_description?.trim() !== '')
+
+  const orderManagementModules = giveAccess.filter(
+    (module) => module.module_group === 'Order Management',
+  )
+  const shouldDisplayOrderManagement = orderManagementModules.some(
+    (module) => module.modules_description?.trim() !== '',
+  )
+
+  const reportModules = giveAccess.filter((module) => module.module_group === 'Reports')
+  const shouldDisplayReports = reportModules.some(
+    (module) => module.modules_description?.trim() !== '',
+  )
+
+  const settingModules = giveAccess.filter((module) => module.module_group === 'Settings')
+  const shouldDisplaySettings = settingModules.some(
+    (module) => module.modules_description?.trim() !== '',
+  )
+
+  const accountsModules = giveAccess.filter((module) => module.module_group === 'Accounts')
+  const shouldDisplayAccounts = accountsModules.some(
+    (module) => module.modules_description?.trim() !== '',
+  )
+
+  
+
   return (
     <CSidebarNav as={SimpleBar}>
       {/*<CNavTitle>Static Menu</CNavTitle>
@@ -107,102 +129,115 @@ export const AppSideBarNew = ({ giveAccess }) => {
       {/*<CNavItem>
         <CNavLink as={NavLink} to="/dashboard">{navLink('Dashboard', 'cilUser')}</CNavLink>
       </CNavItem>*/}
- 
- 
- 
-{/*superAdmin*/}
-{/*accounts*/}
-{shouldDisplayAccounts && (
+
+      {/*superAdmin*/}
+      {/*accounts*/}
+      {shouldDisplayAccounts && (
         <>
           <CNavTitle>Accounts</CNavTitle>
-          {accountsModules.map((module,index) => {
-            if (module.modules_description === "Companies") {
+          {accountsModules.map((module, index) => {
+            if (module.modules_description === 'Companies') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/companies">
-                    {navLink("Companies","cibCircle")}
+                    {navLink('Companies', 'cibCircle')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            if (module.modules_description === "Packages") {
+            if (module.modules_description === 'Packages') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/packages">
-                    {navLink("Packages","cibCodepen")}
+                    {navLink('Packages', 'cibCodepen')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            if (module.modules_description === "Billing") {
+            if (module.modules_description === 'Billing') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/billing">
-                    {navLink("Billing","cibFaceit")}
+                    {navLink('Billing', 'cibFaceit')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            if (module.modules_description === "Offline Request") {
+            if (module.modules_description === 'Offline Request') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/offlineRequest">
-                    {navLink("Offline Request","cibDiscourse")}
+                    {navLink('Offline Request', 'cibDiscourse')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            return null;
+            return null
           })}
         </>
       )}
- 
- 
- 
- 
+
       {/*dashboard*/}
       {shouldDisplayDashboard && (
         <>
           <CNavTitle>Dashboard</CNavTitle>
-          {dashboardModules.map((module,index) => {
-            if (module.modules_description === "Dashboard") {
+          {dashboardModules.map((module, index) => {
+            if (module.modules_description === 'Dashboard') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/dashboard">
-                    {navLink("Dashboard","cilSpeedometer")}
+                    {navLink('Dashboard', 'cilSpeedometer')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            return null;
+            return null
           })}
         </>
       )}
- 
+
       {/*AssetGroup*/}
       {shouldDisplayAssets && (
         <>
           <CNavTitle>Assets</CNavTitle>
-          {assetModules.map((module,index) => {
-            if (module.modules_description === "Clients/Vendor") {
+          {assetModules.map((module, index) => {
+            if (module.modules_description === 'Clients/Vendor') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/clients">
-                    {navLink("Clients/Vendor","cilUserPlus")}
+                    {navLink('Clients/Vendor', 'cilUserPlus')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            if (module.modules_description === "Machine") {
+            if (module.modules_description === 'Machine') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/machinedashboard">
-                    {navLink("Machine","cilSettings")}
+                    {navLink('Machine', 'cilSettings')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            return null;
+            if (module.modules_description === 'Process Flow') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/process">
+                    {navLink('Process', 'cilFile')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
+            if (module.modules_description === 'Routes') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/routeprocess">
+                    {navLink('Routes', 'cilBriefcase')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
+            return null
           })}
         </>
       )}
@@ -210,161 +245,222 @@ export const AppSideBarNew = ({ giveAccess }) => {
       {shouldDisplayHrms && (
         <>
           <CNavTitle>HRMS</CNavTitle>
-          {hrmsModules.map((module,index) => {
-            if (module.modules_description === "Employee") {
+          {hrmsModules.map((module, index) => {
+            //if (module.modules_description === 'Employee') {
+            //  return (
+            //    <CNavItem key={index}>
+            //      <CNavLink as={NavLink} to="/employeelist">
+            //        {navLink('Employee', 'cilUser')}
+            //      </CNavLink>
+            //    </CNavItem>
+            //  )
+            //}
+            if (module.modules_description === 'Employee') {
               return (
-                <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/employeelist">
-                    {navLink("Employee","cilUser")}
-                  </CNavLink>
-                </CNavItem>
+                <li key={index} className={`nav-item nav-group ${isOpen ? 'show' : ''}`}>
+                  <a
+                    className="nav-link nav-group-toggle"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsOpen((prev) => !prev);
+                    }}
+                  >
+                    <CIcon icon={cilUser} className="nav-icon" />
+                    Employee
+                  </a>
+                  <ul className="nav-group-items" style={{ display: isOpen ? 'block' : 'none' }}>
+                    <li className="nav-item">
+                      <NavLink className="nav-link" to="/employeelist">
+                        <span className="nav-icon">
+                          <span className="nav-icon-bullet" />
+                        </span>
+                        Employee List
+                      </NavLink>
+                    </li>
+                    <li className="nav-item">
+                      <NavLink className="nav-link" to="/department">
+                        <span className="nav-icon">
+                          <span className="nav-icon-bullet" />
+                        </span>
+                        Department
+                      </NavLink>
+                    </li>
+                    <li className="nav-item">
+                      <NavLink className="nav-link" to="/designation">
+                        <span className="nav-icon">
+                          <span className="nav-icon-bullet" />
+                        </span>
+                        Designation
+                      </NavLink>
+                    </li>
+                    <li className="nav-item">
+                      <NavLink className="nav-link" to="/role">
+                        <span className="nav-icon">
+                          <span className="nav-icon-bullet" />
+                        </span>
+                        Role
+                      </NavLink>
+                    </li>
+                  </ul>
+                </li>
               );
             }
-            if (module.modules_description === "Attendance") {
+            
+            if (module.modules_description === 'Attendance') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/attendance">
-                    {navLink("Attendance","cilUser")}
+                    {navLink('Attendance', 'cilUser')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            return null;
+            return null
           })}
         </>
       )}
- 
+
       {/*ordermanagement*/}
       {shouldDisplayOrderManagement && (
         <>
           <CNavTitle>Order Management</CNavTitle>
-          {orderManagementModules.map((module,index) => {
-            if (module.modules_description === "Sales Order") {
+          {orderManagementModules.map((module, index) => {
+            if (module.modules_description === 'Sales Order') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/salesorder">
-                    {navLink("Sales Order","cilColorBorder")}
+                    {navLink('Sales Order', 'cilColorBorder')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            if (module.modules_description === "Work Order") {
+            if (module.modules_description === 'Work Order') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/workorderlist">
-                    {navLink("Work Order","cilColorBorder")}
+                    {navLink('Work Order', 'cilColorBorder')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            if (module.modules_description === "Sku Details") {
+            if (module.modules_description === 'Sku Details') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/SKU">
-                    {navLink("Sku Details","cilList")}
+                    {navLink('SKU Details', 'cilList')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            if (module.modules_description === "Production") {
+            if (module.modules_description === 'Production') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/production">
-                    {navLink("Production","cilTruck")}
+                    {navLink('Production', 'cilTruck')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            if (module.modules_description === "Purchase Order") {
+
+            if (module.modules_description === 'Product') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/production">
+                    {navLink('Product', 'cilIndustry')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
+            if (module.modules_description === 'Purchase Order') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/purchaseorder">
-                    {navLink("Purchase Order","cilBriefcase")}
+                    {navLink('Purchase Order', 'cilBriefcase')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            if (module.modules_description === "Inventory") {
+            if (module.modules_description === 'Inventory') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/inventoryhandling">
-                    {navLink("Inventory","cilIndustry")}
+                    {navLink('Inventory', 'cilIndustry')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            if (module.modules_description === "Sales Return") {
+            if (module.modules_description === 'Sales Return') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/salesReturn">
-                    {navLink("Sales Return","cilAt")}
+                    {navLink('Sales Return', 'cilAt')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            if (module.modules_description === "Purchase Return") {
+            if (module.modules_description === 'Purchase Return') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/purchaseReturn">
-                    {navLink("Purchase Return","cibHighly")}
+                    {navLink('Purchase Return', 'cibHighly')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            return null;
+            return null
           })}
- 
         </>
       )}
- 
+
       {/*reports*/}
       {shouldDisplayReports && (
         <>
           <CNavTitle>Reports</CNavTitle>
-          {reportModules.map((module,index) => {
-            if (module.modules_description === "Reports") {
+          {reportModules.map((module, index) => {
+            if (module.modules_description === 'Reports') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/reports">
-                    {navLink("Reports","cilFile")}
+                    {navLink('Reports', 'cilFile')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-            return null;
+            return null
           })}
         </>
       )}
- 
+
       {/*Settings*/}
       {shouldDisplaySettings && (
         <>
           <CNavTitle>Settings</CNavTitle>
-          {settingModules.map((module,index) => {
-              if (module.modules_description === "Admin Faq") {
-                return (
-                  <CNavItem key={index}>
-                    <CNavLink as={NavLink} to="/adminFaq">
-                      {navLink("Admin Faq","cilBullhorn")}
-                    </CNavLink>
-                  </CNavItem>
-                );
-              }
-            if (module.modules_description === "Settings") {
+          {settingModules.map((module, index) => {
+            if (module.modules_description === 'Admin Faq') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/adminFaq">
+                    {navLink('Admin Faq', 'cilBullhorn')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
+            if (module.modules_description === 'Settings') {
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/settings">
-                    {navLink("Settings","cilSettings")}
+                    {navLink('Settings', 'cilSettings')}
                   </CNavLink>
                 </CNavItem>
-              );
+              )
             }
-         
-            return null;
+
+            return null
           })}
         </>
       )}
- 
+
       {/*<CNavItem>
         <CNavLink as={NavLink} to="/employeelist">{navLink('HRMS', 'cilUser')}</CNavLink>
       </CNavItem>*/}

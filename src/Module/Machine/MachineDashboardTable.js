@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CTable,
   CTableRow,
@@ -10,60 +10,57 @@ import {
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
+import apiMethods from '../../api/config'
+import Loading from '../../components/New/Loading'
 
-const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
-  const [activeDropdown, setActiveDropdown] = useState(null)
+const MachineDashboardTable = ({
+  cellData,
+  onView,
+  onEdit,
+  setRefresh,
+  isLoading,
+  setIsLoading,
+}) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
 
   const handleCancel = () => {
     setIsConfirmationModalOpen(false)
   }
 
-  const handledeleteClick = () => {
+  const handledeleteClick = (id) => {
     setIsConfirmationModalOpen(true)
+    setDeleteId(id)
   }
 
-  const handledeleteConfirmClick = () => {
-    setIsConfirmationModalOpen(true)
-  }
-
-
-  // Close dropdown when clicking outside
-  const handleClickOutside = () => {
-    setActiveDropdown(null)
-  }
-
-  React.useEffect(() => {
-    document.addEventListener('click', handleClickOutside)
-    return () => {
-      document.removeEventListener('click', handleClickOutside)
+  const handledeleteConfirmClick = async () => {
+    setIsLoading(true)
+    const response = await apiMethods.deleteMachine(deleteId)
+    if (response.status === 200) {
+      setIsLoading(false)
+      setIsConfirmationModalOpen(false)
+      setDeleteId(null)
+      setRefresh((prev) => !prev)
     }
-  }, [])
+  }
 
   return (
     <div>
-    <div className="h-[300px] overflow-y-auto border m-0 border-gray-200 custom-scrollbar">
+      <div className="h-[280px] overflow-y-auto border m-0 border-gray-200 custom-scrollbar">
         <CTable striped hover className=" w-full">
           <CTableHead className="bg-gray-100 sticky top-0 z-10">
             <CTableRow>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">Id</CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">Name</CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">Type</CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Process_Count
+                Model No.
+              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">Power</CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
+                Purchase Date
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Status
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Last_Maintenance
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Next_Maintenance
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">Speed</CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Capacity
+                Warranty Exp.
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Action
@@ -72,25 +69,37 @@ const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
           </CTableHead>
 
           <CTableBody>
-            {cellData.length > 0 ? (
+            {isLoading ? (
+              <CTableRow>
+                <CTableDataCell colSpan={7} className="text-center py-3 h-[250px]">
+                  <div className="flex justify-center items-center h-full">
+                    <Loading isLoading={isLoading} />
+                  </div>
+                </CTableDataCell>
+              </CTableRow>
+            ) : cellData.length > 0 ? (
               cellData.map((cell, index) => (
                 <CTableRow key={index} className="border-b">
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.id}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.name}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.type}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.process_count}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.status}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.last_maintenance}
+                  <CTableDataCell
+                    onClick={() => onView(cell.id)}
+                    className="py-3 px-4 !text-blue-600 underline font-semibold cursor-pointer"
+                  >
+                    {cell.machine_name}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.next_maintenance}
+                    {cell.machine_type}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">{cell.speed}</CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.capacity}
+                    {cell.model_number}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.power_rating}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.purchase_date}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.warranty_expiry}
                   </CTableDataCell>
                   <CTableDataCell className="px-2 sm:px-4 text-gray-700 relative">
                     <ThreeDotMenu
@@ -98,29 +107,22 @@ const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
                         {
                           label: 'View',
                           icon: cilHandPointRight,
-                          onClick: (e) => {
-                            e.stopPropagation()
-                            onView(cell)
-                            setActiveDropdown(null)
+                          onClick: () => {
+                            onView(cell.id)
                           },
                         },
                         {
                           label: 'Edit',
                           icon: cilPencil,
-                          onClick: (e) => {
-                            e.stopPropagation()
-                            onEdit && onEdit(cell)
-                            setActiveDropdown(null)
+                          onClick: () => {
+                            onEdit && onEdit(cell.id)
                           },
                         },
                         {
                           label: 'Delete',
                           icon: cilTrash,
-                          onClick: (e) => {
-                            e.stopPropagation()
-                            onDelete && onDelete(cell)
-                            setActiveDropdown(null)
-                            handledeleteClick()
+                          onClick: () => {
+                            handledeleteClick(cell.id)
                           },
                         },
                       ]}
@@ -144,7 +146,7 @@ const MachineDashboardTable = ({ cellData, onView, onEdit, onDelete }) => {
         onConfirm={handledeleteConfirmClick}
         title="Confirm Deletion"
         message="Are you sure you want to delete this item?"
-        confirmText="Delete"
+        confirmText={isLoading ? 'Deleting...' : 'Delete'}
         cancelText="Cancel"
       />
     </div>

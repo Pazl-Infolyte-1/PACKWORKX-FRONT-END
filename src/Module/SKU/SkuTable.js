@@ -13,11 +13,15 @@ import SkuDetails from './SkuDetails'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
+import { useDispatch, useSelector } from 'react-redux'
+
 
 function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAlerts }) {
   const [showPopUp, setShowPopUp] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
+  const dispatch = useDispatch()
+
 
   const handleSkuDelete = async () => {
     await apiMethods.deleteSku(deleteId)
@@ -77,9 +81,9 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Created Date
             </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+            {/*<CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Status
-            </CTableHeaderCell>
+            </CTableHeaderCell>*/}
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Action
             </CTableHeaderCell>
@@ -113,7 +117,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
                   <CTableDataCell className="py-3 px-2 text-gray-700">
                     {formatDate(cell.updated_at)}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2 text-gray-700">
+                  {/*<CTableDataCell className="py-3 px-2 text-gray-700">
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-medium ${
                         cell.status === 'active'
@@ -123,7 +127,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
                     >
                       {cell.status}
                     </span>
-                  </CTableDataCell>
+                  </CTableDataCell>*/}
                   <CTableDataCell className="py-3 px-2 text-gray-700">
                     <ThreeDotMenu
                       value={[
@@ -138,7 +142,21 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
                           label: 'Edit',
                           icon: cilPencil,
                           onClick: () => {
+                            dispatch({ type: 'RESET_DIECUT_CALCULATIONS' });
+
+                            dispatch({
+                              type: 'SET_SELECTED_ROUTE_IDS',
+                              payload: [], // 👈 empty array
+                            });
+                            dispatch({
+                              type: 'SET_DECKLE_SIZE',
+                              payload: {
+                                deckle_size: "",
+                                deckleError: "",
+                              },
+                            });
                             handleSkuEdit(cell.id)
+                        
                           },
                         },
                         {

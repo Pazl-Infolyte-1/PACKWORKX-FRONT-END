@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import Select from 'react-select'
-import { TrashIcon } from '@heroicons/react/solid'
+import { ChevronDoubleLeftIcon, TrashIcon } from '@heroicons/react/solid'
 
 const GrnItemsFrom = ({
   grnFormData,
@@ -16,23 +16,44 @@ const GrnItemsFrom = ({
   const dropdownRef = useRef(null)
 
   useEffect(() => {
-    const selectedPo = purchaseOrderData.find((po) => po.po_id === grnFormData.po_id)
+    function syncPurchaseOrderItems() {
+      remove()
 
-    if (selectedPo) {
-      const options = selectedPo.PurchaseOrderItems.map((po) => {
-        const label = po.po_item_id
-        return {
-          label: label,
-          value: label,
-        }
-      })
-      setPurchaseItemOptions(options)
-    } else {
-      setPurchaseItemOptions([])
+      const selectedPo = purchaseOrderData.find((po) => po.po_id === grnFormData.po_id)
+
+      if (selectedPo?.PurchaseOrderItems?.length > 0) {
+        const options = selectedPo.PurchaseOrderItems.map((item) => ({
+          label: item.po_item_id,
+          value: item.po_item_id,
+        }))
+
+        setPurchaseItemOptions(options)
+
+        const newItems = selectedPo.PurchaseOrderItems.map((item) => ({
+          po_item_id: item.po_item_id || 0,
+          item_id: item.item_id || 0,
+          item_code: item.item_code || '',
+          grn_item_name: '',
+          description: '',
+          quantity_ordered: item.quantity || 0,
+          quantity_received: 0,
+          accepted_quantity: 0,
+          rejected_quantity: 0,
+          batch_no: '',
+          notes: '',
+          work_order_no: '',
+          location: '',
+        }))
+
+        append(newItems)
+
+        console.log('selectedPo', selectedPo)
+      }
+
+      setTimeout(() => updateParentFormData(), 0)
     }
 
-    remove()
-    setTimeout(() => updateParentFormData(), 0)
+    syncPurchaseOrderItems()
   }, [grnFormData.po_id])
 
   useEffect(() => {
@@ -95,22 +116,10 @@ const GrnItemsFrom = ({
     setSearchTerm(e.target.value)
   }
 
-  const addNewGRNItmes = () => {
-    append({
-      po_item_id: 0,
-      item_id: 0,
-      item_code: '',
-      grn_item_name: '',
-      description: '',
-      quantity_ordered: 0,
-      quantity_received: 0,
-      accepted_quantity: 0,
-      rejected_quantity: 0,
-      batch_no: '',
-      notes: '',
-      work_order_no: '',
-      location: '',
-    })
+  const addNewGRNItems = (po_items) => {
+    if (!po_items || po_items.length === 0) return
+
+    console.log('addNewGRNItems function called', po_items)
   }
 
   const removeGrnItem = (index) => {
@@ -171,9 +180,9 @@ const GrnItemsFrom = ({
   return (
     <>
       <div>
-        <div className="flex justify-content-end mt-4 mb-4">
+        {/* <div className="flex justify-content-end mt-4 mb-4">
           <ActionButton onClick={addNewGRNItmes} variant="add" label={'+ Add GRN Items'} />
-        </div>
+        </div> */}
         <div className="p-2 mt-2 flex flex-1 rounded-lg border border-[#c2c2c2] w-full ">
           <div className="overflow-x-auto p-2">
             <div className=" min-h-[300px] max-h-[300px] overflow-y-auto custom-scrollbar rounded-lg">

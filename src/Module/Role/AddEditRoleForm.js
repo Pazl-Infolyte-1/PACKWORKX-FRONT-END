@@ -91,7 +91,7 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
       <form onSubmit={handleSubmit} className="p-4">
         <div className="mb-4">
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-            Role Name*
+            Role Name <span className='text-red-500'>*</span>
           </label>
           <input
             type="text"

@@ -63,10 +63,10 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellDa
                 Number
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                SKU Name
+                SKU Name <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Manufacture
+                Manufacture <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               {/* <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                 Sales Order

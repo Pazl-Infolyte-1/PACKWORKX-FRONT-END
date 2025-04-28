@@ -48,12 +48,12 @@ function SalesOrderTable({ data, setActionDrawerOpen, setVersionDrawerOpen, hand
                   Sales ID
                 </CTableHeaderCell>
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                  Client
+                  Client <span className="text-gray-500">⌕</span>
                 </CTableHeaderCell>
 
 
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                  No of SKU
+                  No of SKU <span className="text-gray-500">⌕</span>
                 </CTableHeaderCell>
                 <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
                   Expected Delivery Date

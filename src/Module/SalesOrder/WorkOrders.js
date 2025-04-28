@@ -283,7 +283,10 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
   // Special handler just for SKU changes
   const handleSkuChange = async (e, orderId) => {
     const selectedId = parseInt(e.target.value); // since option values are string
+
     const selectedSku = skuList.find((sku) => sku.id === selectedId);
+
+    console.log(selectedSku,'selected skuuuu')
 
     SetselectedSkuID(selectedId)
 
@@ -598,7 +601,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                     {/* First row */}
                     <div className="flex flex-col md:flex-row gap-8">
                       <div className="flex-1 min-w-0">
-                        <label className="block text-gray-800 font-medium mb-1">SKU*</label>
+                        <label className="block text-gray-800 font-medium mb-1">SKU <span className='text-red-500'>*</span></label>
                         <select
                           className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
                           value={item.sku_name}
@@ -667,7 +670,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                     {/* Second row */}
                     <div className="flex flex-col md:flex-row gap-8">
                       <div className="flex-1 min-w-0">
-                        <label className="block text-gray-800 font-medium mb-1">Quantity <span className='text-red-500'>*</span></label>
+                        <label className="block text-gray-800 font-medium mb-1">Quantity  <span className='text-red-500'>*</span></label>
                         <input
                           type="number"
                           // placeholder="100"
@@ -897,7 +900,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                     // </div>
                     <div className="flex flex-col md:flex-row gap-8 mt-4 mb-2">
                       <div className="flex-1 min-w-0">
-                        <label className="block text-gray-800 font-medium mb-1">Sales Order</label>
+                        <label className="block text-gray-800 font-medium mb-1">Sales Order <span className='text-red-500'>*</span></label>
                         <select
                           className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
                           value={order.sales_order_id || ''}

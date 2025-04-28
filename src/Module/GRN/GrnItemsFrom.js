@@ -12,7 +12,6 @@ const GrnItemsFrom = ({
   isEdit,
 }) => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [purchaseItemOptions, setPurchaseItemOptions] = useState([])
   const dropdownRef = useRef(null)
 
   useEffect(() => {
@@ -22,13 +21,6 @@ const GrnItemsFrom = ({
       const selectedPo = purchaseOrderData.find((po) => po.po_id === grnFormData.po_id)
 
       if (selectedPo?.PurchaseOrderItems?.length > 0) {
-        const options = selectedPo.PurchaseOrderItems.map((item) => ({
-          label: item.po_item_id,
-          value: item.po_item_id,
-        }))
-
-        setPurchaseItemOptions(options)
-
         const newItems = selectedPo.PurchaseOrderItems.map((item) => ({
           po_item_id: item.po_item_id || 0,
           item_id: item.item_id || 0,
@@ -190,15 +182,14 @@ const GrnItemsFrom = ({
                 {/* Table Head */}
                 <thead className="sticky top-0 bg-white z-10 text-center">
                   <tr className="border-b-2">
-                    <th className="px-4 py-2 min-w-[180px] text-center">PO Item</th>
-                    <th className="px-4 py-2 min-w-[180px] text-center">Item Name</th>
+                    <th className="px-4 py-2 min-w-[100px] text-center">PO Item</th>
                     <th className="px-4 py-2 min-w-[100px] text-center">Item Id</th>
                     <th className="px-4 py-2 min-w-[180px] text-center">Item Code</th>
-                    <th className="px-4 py-2 min-w-[200px] text-center">Description</th>
                     <th className="px-4 py-2 min-w-[100px] text-center">Ordered Quantity</th>
                     <th className="px-4 py-2 min-w-[100px] text-center">Received Quantity</th>
                     <th className="px-4 py-2 min-w-[100px] text-center">Accepted Quantity</th>
                     <th className="px-4 py-2 min-w-[100px] text-center">Rejected Quantity</th>
+                    <th className="px-4 py-2 min-w-[200px] text-center">Description</th>
                     <th className="px-4 py-2 min-w-[180px] text-center">Batch No.</th>
                     <th className="px-4 py-2 min-w-[180px] text-center">Work Order No.</th>
                     <th className="px-4 py-2 min-w-[180px] text-center">Location</th>
@@ -209,91 +200,12 @@ const GrnItemsFrom = ({
                 <tbody>
                   {fields.map((item, index) => (
                     <tr key={item.id} className="hover:bg-gray-50 border-t">
-                      <td className="px-4 py-2 ">
-                        <Controller
-                          control={control}
-                          name={`grn_items[${index}].po_item_id`}
-                          render={({ field }) => {
-                            const selectedValues = watch('grn_items')
-                              .map((item, idx) => idx !== index && item.po_item_id)
-                              .filter(Boolean)
-
-                            const modifiedOptions = purchaseItemOptions.map((option) => ({
-                              ...option,
-                              isDisabled: selectedValues.includes(option.value),
-                            }))
-
-                            const selectedValue = purchaseItemOptions.find(
-                              (po) => po.value === field.value,
-                            )
-
-                            return (
-                              <div className="w-100 z-[80]">
-                                <div className="relative">
-                                  <Select
-                                    {...field}
-                                    value={selectedValue || null}
-                                    options={modifiedOptions}
-                                    isClearable
-                                    isSearchable
-                                    menuPortalTarget={document.body}
-                                    onChange={(e) => {
-                                      field.onChange(e?.value ?? null)
-                                      updateParentFormData()
-                                    }}
-                                    styles={{
-                                      control: (base) => ({
-                                        ...base,
-                                        minHeight: '40px',
-                                        height: '40px',
-                                        fontSize: 14,
-                                        borderColor: '#c2c2c2',
-                                        width: '100%',
-                                      }),
-                                      container: (base) => ({
-                                        ...base,
-                                        width: '100%',
-                                      }),
-                                      valueContainer: (base) => ({
-                                        ...base,
-                                        padding: '0 8px',
-                                      }),
-                                      indicatorsContainer: (base) => ({
-                                        ...base,
-                                        height: 40,
-                                      }),
-                                      dropdownIndicator: (base) => ({
-                                        ...base,
-                                        padding: 6,
-                                      }),
-                                      clearIndicator: (base) => ({
-                                        ...base,
-                                        padding: 6,
-                                      }),
-                                      menu: (base) => ({
-                                        ...base,
-                                        zIndex: 9999,
-                                      }),
-                                      menuPortal: (base) => ({
-                                        ...base,
-                                        zIndex: 9999,
-                                      }),
-                                    }}
-                                    classNamePrefix="react-select"
-                                    menuPosition="fixed"
-                                  />
-                                </div>
-                              </div>
-                            )
-                          }}
-                        />
-                      </td>
-
                       <td className="px-4 py-2 w-40">
                         <input
                           type="text"
-                          name="grn_item_name"
-                          {...register(`grn_items[${index}].grn_item_name`, {
+                          name="po_item_id"
+                          disabled
+                          {...register(`grn_items[${index}].po_item_id`, {
                             onChange: () => updateParentFormData(),
                           })}
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
@@ -325,16 +237,6 @@ const GrnItemsFrom = ({
                       </td>
 
                       {/* Rate Per SKU Input */}
-                      <td className="px-4 py-2">
-                        <input
-                          type="text"
-                          name="description"
-                          {...register(`grn_items[${index}].description`, {
-                            onChange: () => updateParentFormData(),
-                          })}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                        />
-                      </td>
 
                       {/* Acceptable SKU Units Input */}
                       <td className="px-4 py-2">
@@ -376,6 +278,16 @@ const GrnItemsFrom = ({
                           type="number"
                           name="rejected_quantity"
                           {...register(`grn_items[${index}].rejected_quantity`, {
+                            onChange: () => updateParentFormData(),
+                          })}
+                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                        />
+                      </td>
+                      <td className="px-4 py-2">
+                        <input
+                          type="text"
+                          name="description"
+                          {...register(`grn_items[${index}].description`, {
                             onChange: () => updateParentFormData(),
                           })}
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"

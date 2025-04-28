@@ -106,15 +106,15 @@ const MachineDashboardTable = ({
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     <select
-                      value={cell.status}
+                      value={cell.machine_status}
                       onChange={(e) => handleStatusChange(cell.id, e.target.value)}
                       className={`px-2.5 py-1 rounded-full text-sm font-medium outline-none border border-gray-300
                       ${
-                        cell.status === 'Inactive'
+                        cell.machine_status === 'Inactive'
                           ? 'bg-blue-100 text-blue-800'
-                          : cell.status === 'Active'
+                          : cell.machine_status === 'Active'
                             ? 'bg-green-100 text-green-800'
-                            : cell.status === 'Under Maintenance'
+                            : cell.machine_status === 'Under Maintenance'
                               ? 'bg-red-100 text-red-800'
                               : 'bg-gray-100 text-gray-800'
                       }`}

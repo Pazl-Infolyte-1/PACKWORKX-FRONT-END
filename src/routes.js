@@ -31,6 +31,7 @@ const Role = React.lazy(() => import('./Module/Role/Role.js'))
 
 
 const Items = React.lazy(() => import('./Module/Inventory/Items/items.js'))
+const GRN = React.lazy(() => import('./Module/GRN/Grn.js'))
 
 
 
@@ -48,6 +49,7 @@ const routes = [
   { path: '/packages', name: 'Packages', element: Packages, key: 5001 },
   { path: '/process', name: 'Process', element: Process, key: 5007 },
   { path: '/routeprocess', name: 'Route Process', element: RouteProcess, key: 5008 },
+  { path: '/grn', name: 'GRN', element: GRN, key: 5009 },
 
 
   { path: '/billing', name: 'Billing', element: Billing, key: 5003 },

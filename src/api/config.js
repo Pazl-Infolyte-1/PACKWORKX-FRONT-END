@@ -703,6 +703,8 @@ export const apiMethods = {
     }
   },
 
+
+
   getAllFileds: async () => {
     try {
       return await apiClient.get('/machines/process-fields')
@@ -1219,6 +1221,43 @@ export const apiMethods = {
 
   getAllAssign: async () => {
     return await apiClient.get('/machines/assign')
+  },
+  getGrn: async () => {
+    try {
+      return await apiClient.get('/grn')
+    } catch (error) {
+      console.error(error)
+    }
+  },
+ 
+  postGrn: async (payload) => {
+    try {
+      return await apiClient.post('/grn', payload)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  editGrn: async (payload) => {
+    try {
+      return await apiClient.put(`/grn/${payload.id}`, payload)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  deleteGrn: async (id) => {
+    try {
+      return await apiClient.delete(`/grn/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+ 
+  getGrnById: async (id) => {
+    try {
+      return await apiClient.get(`/grn/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
   },
 }
 

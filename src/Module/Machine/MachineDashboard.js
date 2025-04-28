@@ -165,6 +165,7 @@ export default function MachineMaster() {
           setRefresh={setRefresh}
           isLoading={isLoading}
           setIsLoading={setIsLoading}
+          setAlerts={setAlerts}
         />
 
         <div className="flex justify-center md:justify-end items-center gap-4 mt-2 ">
@@ -198,6 +199,7 @@ export default function MachineMaster() {
             setRefresh={setRefresh}
             setIsLoading={setIsLoading}
             isLoading={isLoading}
+            setAlerts={setAlerts}
           />
         </Drawer>
 

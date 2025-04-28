@@ -3,6 +3,13 @@ import { useForm } from 'react-hook-form'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
 
+const RequiredFieldLabel = ({ label, isRequired }) => (
+  <label className="text-sm font-medium text-gray-600 mr-2">
+    {label}
+    {isRequired && <span className="text-red-500">*</span>}
+  </label>
+)
+
 function AddEditMachine({
   setdrawopen,
   isOpen,
@@ -11,6 +18,7 @@ function AddEditMachine({
   setRefresh,
   isLoading,
   setIsLoading,
+  setAlerts
 }) {
   useEffect(() => {
     if (!isOpen.id) return
@@ -73,8 +81,15 @@ function AddEditMachine({
         setdrawopen({ show: false, id: null })
         setRefresh((prev) => !prev)
         setIsEdit(false)
+        setAlerts([
+          {
+            severity: 'success',
+            message: response.data.message ,
+          },
+        ])
       }
     } catch (error) {
+      setAlerts([{ severity: 'error', message: error?.response?.data?.message || 'Something went wrong' }])
       console.error('Submit Error:', error)
     } finally {
       setIsLoading(false)
@@ -101,7 +116,7 @@ function AddEditMachine({
           <div className="space-y-4">
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Machine Name</label>
+                <RequiredFieldLabel label="Machine Name" isRequired={true} />
                 {errors.machine_name && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.machine_name.message}
@@ -117,7 +132,7 @@ function AddEditMachine({
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Machine Type</label>
+                <RequiredFieldLabel label="Machine Type" isRequired={true} />
                 {errors.machine_type && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.machine_type.message}
@@ -133,7 +148,7 @@ function AddEditMachine({
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Model Number</label>
+                <RequiredFieldLabel label="Model Number" isRequired={true} />
                 {errors.model_number && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.model_number.message}
@@ -149,7 +164,7 @@ function AddEditMachine({
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Serial Number</label>
+                <RequiredFieldLabel label="Serial Number" isRequired={true} />
                 {errors.serial_number && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.serial_number.message}
@@ -165,7 +180,7 @@ function AddEditMachine({
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Manufacturer</label>
+                <RequiredFieldLabel label="Manufacturer" isRequired={true} />
                 {errors.manufacturer && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.manufacturer.message}
@@ -184,7 +199,7 @@ function AddEditMachine({
           <div className="space-y-4">
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Location</label>
+                <RequiredFieldLabel label="Location" isRequired={true} />
                 {errors.location && (
                   <span className="text-red-500 text-xs text-start">{errors.location.message}</span>
                 )}
@@ -198,7 +213,7 @@ function AddEditMachine({
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Power Rating</label>
+                <RequiredFieldLabel label="Power Rating" isRequired={true} />
                 {errors.power_rating && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.power_rating.message}
@@ -214,7 +229,7 @@ function AddEditMachine({
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">IP Address</label>
+                <RequiredFieldLabel label="IP Address" isRequired={true} />
                 {errors.ip_address && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.ip_address.message}
@@ -231,9 +246,7 @@ function AddEditMachine({
             {/* Status toggles centered vertically */}
             <div className="flex items-center justify-between pt-8 pb-2.5">
               <div className="flex items-center space-x-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">
-                  Connectivity Status
-                </label>
+                <RequiredFieldLabel label="Connectivity Status" isRequired={true} />
                 <input
                   {...register('connectivity_status')}
                   type="checkbox"
@@ -243,7 +256,7 @@ function AddEditMachine({
               </div>
 
               <div className="flex items-center space-x-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Machine Status</label>
+                <RequiredFieldLabel label="Machine Status" isRequired={true} />
                 <div
                   onClick={toggleMachineStatus}
                   className={`relative w-12 h-6 transition-colors duration-200 ease-in-out rounded-full cursor-pointer ${machineStatus ? 'bg-green-500' : 'bg-gray-300'}`}
@@ -258,7 +271,7 @@ function AddEditMachine({
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Assigned Operator</label>
+                <RequiredFieldLabel label="Assigned Operator" isRequired={true} />
                 {errors.assigned_operator && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.assigned_operator.message}
@@ -277,7 +290,7 @@ function AddEditMachine({
           <div className="space-y-4">
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Purchase Date</label>
+                <RequiredFieldLabel label="Purchase Date" isRequired={true} />
                 {errors.purchase_date && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.purchase_date.message}
@@ -293,7 +306,7 @@ function AddEditMachine({
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Installation Date</label>
+                <RequiredFieldLabel label="Installation Date" isRequired={true} />
                 {errors.installation_date && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.installation_date.message}
@@ -309,7 +322,7 @@ function AddEditMachine({
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Last Maintenance</label>
+                <RequiredFieldLabel label="Last Maintenance" isRequired={true} />
                 {errors.last_maintenance && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.last_maintenance.message}
@@ -325,9 +338,7 @@ function AddEditMachine({
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">
-                  Next Maintenance Due
-                </label>
+                <RequiredFieldLabel label="Next Maintenance Due" isRequired={true} />
                 {errors.next_maintenance_due && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.next_maintenance_due.message}
@@ -345,7 +356,7 @@ function AddEditMachine({
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <label className="text-sm font-medium text-gray-600 mr-2">Warranty Expiry</label>
+                <RequiredFieldLabel label="Warranty Expiry" isRequired={true} />
                 {errors.warranty_expiry && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.warranty_expiry.message}
@@ -362,9 +373,9 @@ function AddEditMachine({
         </div>
         {/* Remarks - Full Width, moved outside the grid */}
         <div className="w-full bg-gray-50 p-6 rounded-lg shadow-sm">
-          <label className="block text-sm font-medium text-gray-600 mb-1">Notes & Remarks</label>
+          <RequiredFieldLabel label="Notes & Remarks" isRequired={true} />
           <textarea
-            {...register('remarks_notes')}
+            {...register('remarks_notes',{required: 'Notes & Remarks is required'})}
             rows="3"
             className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
           ></textarea>

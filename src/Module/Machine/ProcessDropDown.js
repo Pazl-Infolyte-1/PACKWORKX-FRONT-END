@@ -78,7 +78,7 @@ const ProcessDropDown = ({
 
   return (
     <div className="relative w-full z-20" ref={dropdownRef}>
-      <p className="text-sm font-medium text-gray-700 mb-1">Process Fields</p>
+      <p className="text-sm font-medium text-gray-700 mb-1">Process Fields <span className="text-red-500">*</span></p>
       <div
         className={`p-2 my-2 h-10 border border-gray-300 rounded flex justify-between items-center ${!readOnly ? 'cursor-pointer' : ''}`}
         onClick={() => !readOnly && setIsOpen((prev) => !prev)}

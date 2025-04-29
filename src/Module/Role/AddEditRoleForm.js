@@ -107,7 +107,7 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
         
         <div className="mb-4">
           <label htmlFor="display_name" className="block text-sm font-medium text-gray-700 mb-1">
-            Display Name*
+            Display Name <span className='text-red-500'>*</span>
           </label>
           <input
             type="text"

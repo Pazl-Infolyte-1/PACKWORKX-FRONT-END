@@ -127,12 +127,12 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
             if (!selectedWorkOrderId) return;
       
             const workOrderResponse = await apiMethods.getWorkOrderById(selectedWorkOrderId);
-            const workOrder = workOrderResponse.data;
+            const workOrder = workOrderResponse?.data;
             setWorkOrderData(workOrder);
             setFormValues({ ...workOrder });
       
             // 3. Fetch Sales Order data using sales_order_id
-            const salesOrderResponse = await apiMethods.getSaleOrderData(workOrder.sales_order_id);
+            const salesOrderResponse = await apiMethods.getSaleOrderData(workOrder?.sales_order_id);
             const salesSkuDetails = salesOrderResponse.data.SalesSkuDetails;
       
             // 4. Extract allowed SKU names from sales order
@@ -160,10 +160,10 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
 
     useEffect(() => {
         const fetchSkuVersions = async () => {
-            if (formValues.sku_name) {
+            if (formValues.sku_id) {
                 try {
-                    const response = await apiMethods.getSkuVersions(formValues.sku_name);
-                    setSkuVersion(response.data.data); // Assuming response.data contains the versions
+                    const response = await apiMethods.getSkuVersions(formValues.sku_id);
+                    setSkuVersion(response?.data?.data); // Assuming response.data contains the versions
                 } catch (error) {
                     console.error("Failed to fetch SKU versions:", error);
                 }
@@ -171,7 +171,7 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
         };
 
         fetchSkuVersions();
-    }, [formValues.sku_name]);
+    }, [formValues.sku_id]);
 
 
 
@@ -205,10 +205,17 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
 
 
     const handleSkuChange = (e) => {
-        handleChange(e);
-        setFormValues((prev) => ({
+        const selectedSku = skuList.filter((sku) => {
+            return sku.id == e.target.value;
+          });
+          handleChange(e)
+
+
+          
+       setFormValues((prev) => ({
             ...prev,
-            sku_version: ""
+            sku_version: "",
+            sku_name:selectedSku.sku_name
         }));
     };
 
@@ -222,9 +229,9 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
                             <label className="block text-gray-800 font-medium mb-1">SKU</label>
                             <select
                                 className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-                                value={formValues.sku_name}
+                                value={formValues.sku_id}
                                 onChange={(e) => handleSkuChange(e)}
-                                name="sku_name"
+                                name="sku_id"
                             >
                                 <option value="" disabled>
                                     Select SKU

@@ -76,6 +76,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     {
       id: 1,
       sku_name: "",
+      sku_id: "",
       sku_version: "",
       qty: "",
       edd: "",

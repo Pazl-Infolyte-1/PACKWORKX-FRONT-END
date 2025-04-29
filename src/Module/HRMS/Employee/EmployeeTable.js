@@ -77,16 +77,16 @@ function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, hand
                 ID
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Name
+                Name <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Role
+                Role <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Department
+                Department <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-                Designation
+                Designation <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
 
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
@@ -113,7 +113,10 @@ function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, hand
                 employeesdata.length > 0 ? (
                   employeesdata.map((cell, index) => (
                     <CTableRow key={index} className="border-b">
-                      <CTableDataCell className="py-3 px-4 text-gray-700">
+                      <CTableDataCell
+                      onClick={() =>handleView(cell.id)}
+                      className="py-3 px-2 !text-[#8761e5] font-semibold cursor-pointer underline text-start "
+                      >
                         {cell.employee_id}
                       </CTableDataCell>
                       <CTableDataCell className="py-3  text-gray-700">
@@ -209,3 +212,4 @@ function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, hand
 }
 
 export default EmployeeTable
+

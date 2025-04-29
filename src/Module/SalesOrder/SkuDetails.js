@@ -132,28 +132,6 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
     }
   }, [skuDetailsForm, reset, getValues])
 
-  // Calculate totals when form values change
-  // useEffect(() => {
-  //   if (skusData) {
-  //     const qty = skusData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0)
-  //     const amount = skusData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0)
-  //     const sgst = skusData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0)
-  //     const cgst = skusData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0)
-  //     const withGST = skusData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0)
-
-  //     setTotalQuantity(qty)
-  //     setTotalAmount(amount)
-  //     setTotalSGST(sgst)
-  //     setTotalCGST(cgst)
-  //     setTotalWithGST(withGST)
-
-  //     // Update parent component whenever totals change
-  //     updateParentFormData();
-  //   }
-  // }, [skusData])
-
-  // First, add a useEffect that forces a recalculation of the summary totals
-  // whenever the skusData changes
   useEffect(() => {
     const recalculateTotals = () => {
       if (!skusData || skusData.length === 0) return;
@@ -292,47 +270,47 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
   }
 
   // Handle form submission
-  const onSubmit = (data) => {
-    // Format the data to match the expected schema
-    const formattedSkus = data.skus.map(sku => ({
-      sku: sku.sku,
-      quantity_required: sku.quantity,
-      rate_per_sku: sku.rate,
-      acceptable_sku_units: sku.acceptableUnits,
-      sgst: sku.sgst,
-      cgst: sku.cgst,
-      sgst_amount: sku.sgstAmount,
-      cgst_amount: sku.cgstAmount,
-      total_amount: sku.totalAmount,
-      total_incl__gst: sku.total,
-      totalGst: sku.totalGst
-    }))
+  // const onSubmit = (data) => {
+  //   // Format the data to match the expected schema
+  //   const formattedSkus = data.skus.map(sku => ({
+  //     sku: sku.sku,
+  //     quantity_required: sku.quantity,
+  //     rate_per_sku: sku.rate,
+  //     acceptable_sku_units: sku.acceptableUnits,
+  //     sgst: sku.sgst,
+  //     cgst: sku.cgst,
+  //     sgst_amount: sku.sgstAmount,
+  //     cgst_amount: sku.cgstAmount,
+  //     total_amount: sku.totalAmount,
+  //     total_incl__gst: sku.total,
+  //     totalGst: sku.totalGst
+  //   }))
 
-    // Update parent component with SKU details
-    if (setFormData) {
-      setFormData({
-        skuDetails: formattedSkus,
-        totalQuantity,
-        totalAmount,
-        totalSGST,
-        totalCGST,
-        totalWithGST,
-        totalGst
-      })
-    }
+  //   // Update parent component with SKU details
+  //   if (setFormData) {
+  //     setFormData({
+  //       skuDetails: formattedSkus,
+  //       totalQuantity,
+  //       totalAmount,
+  //       totalSGST,
+  //       totalCGST,
+  //       totalWithGST,
+  //       totalGst
+  //     })
+  //   }
 
-    console.log('SKU Form Submitted:', {
-      skus: formattedSkus,
-      totals: {
-        totalQuantity,
-        totalAmount,
-        totalSGST,
-        totalCGST,
-        totalWithGST,
-        totalGst
-      }
-    });
-  }
+  //   console.log('SKU Form Submitted:', {
+  //     skus: formattedSkus,
+  //     totals: {
+  //       totalQuantity,
+  //       totalAmount,
+  //       totalSGST,
+  //       totalCGST,
+  //       totalWithGST,
+  //       totalGst
+  //     }
+  //   });
+  // }
 
   return (
     <div>

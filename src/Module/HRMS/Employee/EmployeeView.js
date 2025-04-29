@@ -52,7 +52,7 @@ function EmployeeView({ employeeData, showEmployeeData, setVisible }) {
                     </span>
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        employeeData.user_status === 'active'
+                        employeeData.user_status === 'Active'
                           ? 'bg-green-800 text-white'
                           : 'bg-red-700 text-white '
                       }`}

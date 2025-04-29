@@ -26,6 +26,7 @@ const WorkOrders = () => {
   const [isConfirmationModaleOpen,setIsConfirmationModaleOpen]=useState(false)
   const [deleteId, setDeleteId] = useState(null); // holds id to delete
   const [alerts,setAlerts] = useState([])
+  const [loading,setLoading]= useState(true)
   const [manufactureFilter,setManufactureFilter] = useState([])
   const searchBarRef = useRef(null)
 
@@ -33,6 +34,7 @@ const WorkOrders = () => {
 
   const  fetchData = async () => {
     try {
+      setLoading(true)
       const response = await apiMethods.getWorkOrders({
         manufacture:manufactureFilter ,
         sku_name: searchQuery,
@@ -47,6 +49,9 @@ const WorkOrders = () => {
       }))
     } catch (error) {
       console.error('Error fetching data:', error)
+    }
+    finally{
+    setLoading(false)
     }
   }
   // Fetch Data
@@ -162,6 +167,7 @@ const WorkOrders = () => {
             setShowPopUp={setShowPopUp}
             handleEdit={handleEdit}
             handleDelete={handleDelete}
+            loading={loading}
           />
         </div>
 

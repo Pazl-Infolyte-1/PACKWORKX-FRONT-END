@@ -96,7 +96,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
       await Promise.all(
         workOrders.map(async (item) => {
           try {
-            const response = await getskuversions(item.sku_name);
+            const response = await getskuversions(item.sku_id);
             versionsMap[item.id] = response?.data?.data; // store versions per workOrder id
           } catch (error) {
             console.error(`Error fetching SKU versions for ${item.sku_name}`, error);
@@ -285,6 +285,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     const selectedId = parseInt(e.target.value); // since option values are string
 
     const selectedSku = skuList.find((sku) => sku.id === selectedId);
+    
 
     console.log(selectedSku,'selected skuuuu')
 
@@ -296,7 +297,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     setSelectedWorkOrderForVersions(orderId)
     setSkuVersionsMap(prev => ({
       ...prev,
-      [orderId]: response.data.data // Store the version data for this work order
+      [orderId]: response?.data?.data // Store the version data for this work order
     }))
 
 
@@ -304,13 +305,9 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     // handleWorkOrderChange1(orderId, 'sku_name', selectedId)
 
     handleWorkOrderChange(orderId, 'sku_version', '')
-    handleWorkOrderChange(orderId, 'sku_name', selectedId)
-
-
-    if (isWorkOrderList) {
-      handleWorkOrderChange(orderId, 'sku_id', selectedId)
-    }
-
+    handleWorkOrderChange(orderId, 'sku_name', selectedSku.sku_name)
+    handleWorkOrderChange(orderId, 'sku_id', selectedId)    
+    
   }
 
   const handleSkuChange1 = async (e, orderId) => {
@@ -330,10 +327,8 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     }))
     //
     handleWorkOrderChange1(orderId, 'sku_version', '')
-    if (isWorkOrderList) {
-      handleWorkOrderChange1(orderId, 'sku_id', selectedId)
-    }
-    handleWorkOrderChange1(orderId, 'sku_name', selectedId)
+    handleWorkOrderChange1(orderId, 'sku_id', selectedId)
+    handleWorkOrderChange1(orderId, 'sku_name', selectedSku.sku_name)
   }
 
   // const handleToggle = () => {
@@ -392,7 +387,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
       {
         id: newId,
         sku_name: '',
-        // sku_id:'',
+        sku_id:'',
         sku_version: '',
         qty: '',
         edd: '',
@@ -425,7 +420,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
 
     setSkuVersionsMap(prev => ({
       ...prev,
-      [id]: response.data.data // Store the version data for this work order
+      [id]: response?.data?.data // Store the version data for this work order
     }))
   }
 
@@ -503,7 +498,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
               {/* Accordion Header (Clickable) */}
               <div
                 className="w-full items-start flex flex-col justify-between cursor-pointer"
-                onClick={() => toggleCreateAccordion1(item.id, item.sku_name)}
+                onClick={() => toggleCreateAccordion1(item.id, item.sku_id)}
               >
                 {/* Left Section - Title */}
                 <p className="text-[#030303] text-[15px] font-lato font-bold leading-[26px] text-justify">
@@ -604,7 +599,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                         <label className="block text-gray-800 font-medium mb-1">SKU <span className='text-red-500'>*</span></label>
                         <select
                           className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-                          value={item.sku_name}
+                          value={item.sku_id}
                           onChange={(e) => handleSkuChange1(e, item.id)}
                         >
                           <option value="" disabled>Select SKU</option>
@@ -742,7 +737,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
 
                     <SkuVersionAddEdit
                       handleDeleteVersion={handleDeleteVersion}
-                      skuID={item.sku_name}
+                      skuID={item.sku_id}
                       setSkuVersionsMap={setSkuVersionsMap}
                       orderId={item.id} // Pass the orderId of the work order being edited
                     />
@@ -939,8 +934,8 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                           // SKU Dropdown shown only in workorderlist
                           <select
                             className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-                            value={order.sku_name || ''}
-                            onChange={(e) => handleSkuChange(e, order.id)}
+                            value={order.sku_id || ''}
+                            onChange={(e) => handleSkuChange(e, order.id)}  
                           >
                             <option value="" disabled>
                               {skuList.filter((skuItem) =>
@@ -962,7 +957,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                           // Original SKU dropdown
                           <select
                             className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-                            value={order.sku_name}
+                            value={order.sku_id || ''}
                             onChange={(e) => handleSkuChange(e, order.id)}
                           >
                             <option value="" disabled>
@@ -1096,12 +1091,14 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                     {/* Submit Button */}
 
                   </div>
+                  {order.sku_id && (
                   <SkuVersionAddEdit
                     handleDeleteVersion={handleDeleteVersion}
-                    skuID={order.sku_name}
+                    skuID={order.sku_id}
                     setSkuVersionsMap={setSkuVersionsMap}
                     orderId={order.id} // Pass the orderId of the work order being edited
                   />
+                  )}
                   <div className="w-full flex justify-end pb-3">
 
                     {!isWorkOrderList && (

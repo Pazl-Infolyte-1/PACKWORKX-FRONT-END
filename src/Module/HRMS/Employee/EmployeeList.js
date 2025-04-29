@@ -183,28 +183,52 @@ function EmployeeList() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Form Data:', formData);
-
-    let response
+  
+    const requiredFields = [
+      "name", "email", "mobile", "employee_id",
+      "department_id", "designation_id", "joining_date",
+      "date_of_birth", "reporting_to", "employment_type",
+      "company_address_id", "role_id", "skills", "country_id"
+    ];
+  
+    if (formData.employment_type === 'Contract') {
+      requiredFields.push("contract_end_date");
+    }
+    if (!isEdit) {
+      requiredFields.push("password");
+    }
+  
+    const missingFields = requiredFields.filter(field => !formData[field]);
+    if (missingFields.length > 0) {
+      const message = missingFields.length > 5
+        ? "Please fill all mandatory fields."
+        : `Please fill the following mandatory fields: ${missingFields.join(", ")}`;
+      
+      setAlerts([{ severity: "error", message }]);
+      return;
+    }
+  
     try {
-      if (isEdit) {
-
-        response = await apiMethods.editEmployee(CurrentEmployeeId, formData);
-        console.log("edit api called")
-      } else {
-        response = await apiMethods.createNewEmployee(formData);
-      }
-
+      const response = isEdit
+        ? await apiMethods.editEmployee(CurrentEmployeeId, formData)
+        : await apiMethods.createNewEmployee(formData);
+  
       if (response?.status === 200 || response?.status === 201) {
-        // alert('Success!'); 
-        setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
-
+        setAlerts([{
+          severity: "success",
+          message: response?.data?.message || (isEdit ? "Employee updated successfully." : "Employee created successfully.")
+        }]);
+  
         setTimeout(() => {
-          handleClose()
-        }, 3000)
-
+          handleClose();
+        }, 3000);
+        clearFilters()
+        fetchEmployeeData()   
         setDrawerOpen(false);
-        setIsEdit(false)
-        fetchEmployeeData()
+        setIsEdit(false);
+
+
+
         setFormData({
           name: '',
           email: '',
@@ -224,22 +248,27 @@ function EmployeeList() {
           company_address_id: null,
           role_id: null,
           image: '',
-        })
-        fetchEmployeeData()
-
+        });
+      } else {
+        throw new Error(response?.data?.message || "Unexpected response from server.");
       }
-
+  
     } catch (error) {
       console.error('Error submitting form:', error);
-      setAlerts([{ severity: "error", message: error?.response?.data?.errors[0]?.message || "Failed To Update Employee " }]);
-
+  
+      const errorMsg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "An error occurred while submitting the form.";
+  
+      setAlerts([{ severity: "error", message: errorMsg }]);
+  
       setTimeout(() => {
-        handleClose()
-      }, 3000)
-
-      console.log('An error occurred. Please check your input and try again.');
+        handleClose();
+      }, 3000);
     }
   };
+  
 
 
   const handlePageChange1 = (event, newPage) => {
@@ -371,20 +400,20 @@ function EmployeeList() {
               <TbSmartHome className="text-teal-500" />
               <span>Total Employees</span>
               <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
-                {EmployeeResponse?.totalRecords}
+                {EmployeeResponse?.totalRecords || 0}
               </span>
             </div>
             <div className="flex gap-1.5 items-center">
               <IoCheckmarkCircleOutline />
               <span>Active</span>
               <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
-                {EmployeeResponse?.activeEmployees}              </span>
+                {EmployeeResponse?.activeEmployees || 0} </span>
             </div>
             <div className="flex gap-1.5 items-center">
               <IoCheckmarkCircleOutline />
               <span>Inactive</span>
               <span className="bg-teal-500 text-white rounded-md h-6 w-10 flex justify-center items-center">
-                {EmployeeResponse?.inactiveEmployees}
+                {EmployeeResponse?.inactiveEmployees || 0}
               </span>
             </div>
           </div>
@@ -466,7 +495,7 @@ function EmployeeList() {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-                Clear Filters
+                Clear 
               </button>
             </div>
             {/* </div> */}

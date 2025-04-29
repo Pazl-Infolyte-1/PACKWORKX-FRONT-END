@@ -109,8 +109,6 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellDa
         <CTableRow key={index} className="border-b">
           <CTableDataCell
             onClick={() =>setShowPopUp(cell.id)} 
-            
-
            className="py-3 px-4 !text-[#8761e5] cursor-pointer underline">
           {`WO-${cell.id}`}
           </CTableDataCell>

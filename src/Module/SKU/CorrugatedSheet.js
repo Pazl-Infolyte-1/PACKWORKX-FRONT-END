@@ -446,6 +446,17 @@ useEffect(() => {
   }
 }, [diecutCalculations.calculatedMin]);
 
+useEffect(() => {
+  if (addNewSkuData.flap_tolerance === "") {
+    setAddNewSkuData((prev) => {
+      // Only update if it's not already null
+      if (prev.flap_tolerance !== null) {
+        return { ...prev, flap_tolerance: null };
+      }
+      return prev; // No update needed
+    });
+  }
+}, [addNewSkuData.flap_tolerance]);
 
   return (
     <div className="rounded-lg">
@@ -635,7 +646,7 @@ useEffect(() => {
             <input
               id="flap_tolerance"
               name="flap_tolerance"
-              value={addNewSkuData.flap_tolerance}
+              value={Number(addNewSkuData.flap_tolerance)}
               onChange={handleChange}
                      min="0"
               type='number'

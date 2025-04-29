@@ -67,16 +67,16 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
               SKU Name
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              SKU Type
+              SKU Type 🔎
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Client
+              Client 🔎
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Dimensions
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Deckle
+              Deckle 🔎
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Created Date

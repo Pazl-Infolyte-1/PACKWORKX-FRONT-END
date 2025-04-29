@@ -45,6 +45,7 @@ import { useFormContext, useFieldArray } from "react-hook-form";
 
  
 const ClientForm = ({editData, closeDrawer,refreshClients,closeDrawerDuringAdd,refreshClientsEdit,entity_type,resetForm,submitFromRsc,setDrawerOpen,isDrawerOpen,setMessage}) => {
+  console.log("entity val",entity_type)
   const [activeTab, setActiveTab] = useState('Other Details')
   const [alerts, setAlerts] = useState([]);
   //const [hasGst, setHasGst] = useState(null); // Set null to avoid pre-selection
@@ -60,6 +61,8 @@ const [addressAdded, setAddressAdded] = useState(0); // Initialize with 0
       setActiveTab(tabs[currentIndex + 1])
     }
   }
+
+
 const handleAddAddress = () => {
   setAddressAdded((prev) => prev + 1); // Increment counter on each click
 };
@@ -136,15 +139,19 @@ const { register, handleSubmit ,reset,watch,formState: { isValid, errors },contr
 //const isButtonDisabled = !isValid || !!errors.gst_number;
 const isButtonDisabled = Object.keys(errors).length > 0 && !(errors.gst_number);
 
-
 useEffect(() => {
-  if (entity_type=== "Vendor") {
-    //setEntityName(entity_type);
-            methods.setValue("clientData.entity_type", "Vendor");
-  }else if(entity_type=== "Client"){
-    methods.setValue("clientData.entity_type", "Client");
-  }
-}, [entity_type]); // Runs only when entity_type changes
+  // Update the entity type in the form
+  methods.setValue("clientData.entity_type", entity_type);
+
+  // Reset the form values to reflect the new entity type
+  reset({
+    ...methods.getValues(),
+    clientData: {
+      ...methods.getValues().clientData,
+      entity_type: entity_type, // Update the entity_type
+    },
+  });
+}, [entity_type]); // Dependency on entity_type
 useEffect(() => {
   if (editData) {
     reset({
@@ -344,9 +351,9 @@ const onSubmit = async (data) => {
     }, 3000);
   } catch (error) {
     console.error("Error processing client:", error);
-    const errorMessage = error.response?.data?.message || "An unknown error occurred.";
-
+    const errorMessage = error.response?.data?.error || error.response?.data?.message || "An unknown error occurred.";
     setAlerts([{ severity: "error", message: errorMessage }]);
+    
 
     if (editData) {
       setTimeout(() => {
@@ -427,8 +434,8 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
       {/* Customer Type (Single Row) */}
         {/* Do You Have GST? - Moved to Left Card */}
         <div className="flex items-center mb-4">
-        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Client Id</label>
-        <input type="text"  placeholder={`${entity_type} Id`}{...register("clientData.client_ref_id")} className="border p-2 rounded flex-1" />
+        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">{editData?.entity_type || entity_type} Id</label>
+        <input type="text"    placeholder={`${editData?.entity_type || entity_type} Id`}{...register("clientData.client_ref_id")} className="border p-2 rounded flex-1" />
       </div>
 
       <div className="mb-4 flex items-center">

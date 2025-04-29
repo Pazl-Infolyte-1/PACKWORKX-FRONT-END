@@ -50,27 +50,27 @@ function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">SKU Name</span>
-                    <span className="text-gray-800 mt-1">{cell.sku_name}</span>
+                    <span className="text-gray-800 mt-1">{cell.sku_name || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Client</span>
-                    <span className="text-gray-800 mt-1">{cell.client}</span>
+                    <span className="text-gray-800 mt-1">{cell.client || "N/A"} </span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">SKU Type</span>
-                    <span className="text-gray-800 mt-1">{cell.sku_type}</span>
+                    <span className="text-gray-800 mt-1">{cell.sku_type || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Customer Reference</span>
-                    <span className="text-gray-800 mt-1">{cell.customer_reference}</span>
+                    <span className="text-gray-800 mt-1">{cell.customer_reference || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Reference Number</span>
-                    <span className="text-gray-800 mt-1">{cell.reference_number}</span>
+                    <span className="text-gray-800 mt-1">{cell.reference_number || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Internal ID</span>
-                    <span className="text-gray-800 mt-1">{cell.internal_id}</span>
+                    <span className="text-gray-800 mt-1">{cell.internal_id || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Created By</span>
@@ -99,56 +99,56 @@ function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
                   {cell.length && (
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-500">Length</span>
-                      <span className="text-gray-800 mt-1">{cell.length}</span>
+                      <span className="text-gray-800 mt-1">{cell.length || "N/A"}</span>
                     </div>
                   )}
                   {cell.width && (
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-500">Width</span>
-                      <span className="text-gray-800 mt-1">{cell.width}</span>
+                      <span className="text-gray-800 mt-1">{cell.width || "N/A"}</span>
                     </div>
                   )}
                   {cell.height && (
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-500">Height</span>
-                      <span className="text-gray-800 mt-1">{cell.height}</span>
+                      <span className="text-gray-800 mt-1">{cell.height || "N/A"}</span>
                     </div>
                   )}
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Flap Width</span>
-                    <span className="text-gray-800 mt-1">{cell.flap_width}</span>
+                    <span className="text-gray-800 mt-1">{cell.flap_width || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Joints</span>
-                    <span className="text-gray-800 mt-1">{cell.joints}</span>
+                    <span className="text-gray-800 mt-1">{cell.joints || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">UPS</span>
-                    <span className="text-gray-800 mt-1">{cell.ups}</span>
+                    <span className="text-gray-800 mt-1">{cell.ups || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Ply</span>
-                    <span className="text-gray-800 mt-1">{cell.ply}</span>
+                    <span className="text-gray-800 mt-1">{cell.ply || "N/A"}</span>
                   </div>
                   {cell.inner_outer_dimension && (
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-500">
                         Inner/Outer Dimension
                       </span>
-                      <span className="text-gray-800 mt-1">{cell.inner_outer_dimension}</span>
+                      <span className="text-gray-800 mt-1">{cell.inner_outer_dimension || "N/A"}</span>
                     </div>
                   )}
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Board Size (cm²)</span>
-                    <span className="text-gray-800 mt-1">{cell.board_size_cm2}</span>
+                    <span className="text-gray-800 mt-1">{cell.board_size_cm2 || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Deckle Size</span>
-                    <span className="text-gray-800 mt-1">{cell.deckle_size}</span>
+                    <span className="text-gray-800 mt-1">{cell.deckle_size || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Minimum Order Level</span>
-                    <span className="text-gray-800 mt-1">{cell.minimum_order_level}</span>
+                    <span className="text-gray-800 mt-1">{cell.minimum_order_level || "N/A"}</span>
                   </div>
                 </div>
               </div>
@@ -163,14 +163,14 @@ function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Flap Tolerance</span>
-                    <span className="text-gray-800 mt-1">{cell.flap_tolerance}</span>
+                    <span className="text-gray-800 mt-1">{cell.flap_tolerance || "N/A"}</span>
                   </div>
                   {cell.length_trimming_tolerance && (
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-500">
                         Length Trimming Tolerance
                       </span>
-                      <span className="text-gray-800 mt-1">{cell.length_trimming_tolerance}</span>
+                      <span className="text-gray-800 mt-1">{cell.length_trimming_tolerance || "N/A"}</span>
                     </div>
                   )}
                   {cell.width_trimming_tolerance && (
@@ -178,7 +178,7 @@ function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
                       <span className="text-sm font-medium text-gray-500">
                         Width Trimming Tolerance
                       </span>
-                      <span className="text-gray-800 mt-1">{cell.width_trimming_tolerance}</span>
+                      <span className="text-gray-800 mt-1">{cell.width_trimming_tolerance || "N/A"}</span>
                     </div>
                   )}
                 </div>
@@ -190,7 +190,7 @@ function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
               <div className="p-6">
                 <h2 className="text-xl font-semibold text-gray-800">Materials & Specifications</h2>
                 <h1 className="text-sm font-semibold text-gray-800 ">
-                  Sku Type: <span>{cell.sku_type}</span>
+                  Sku Type: <span>{cell.sku_type || "N/A"}</span>
                 </h1>
                 <div className="flex items-center mb-3">
                   <span className="text-sm font-medium ">Strict Adherence:</span>

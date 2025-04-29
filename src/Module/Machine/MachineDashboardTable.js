@@ -9,9 +9,8 @@ import {
 } from '@coreui/react'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
+import { cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 import apiMethods from '../../api/config'
-import Loading from '../../components/New/Loading'
 
 const MachineDashboardTable = ({
   cellData,
@@ -20,6 +19,8 @@ const MachineDashboardTable = ({
   setRefresh,
   isLoading,
   setIsLoading,
+  onAddProcess,
+  setAlerts,
 }) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -43,6 +44,26 @@ const MachineDashboardTable = ({
       setRefresh((prev) => !prev)
     }
   }
+  const handleStatusChange = async (Id, newStatus) => {
+    try {
+      const response = await apiMethods.updateMachineStatus(Id, { machine_status: newStatus })
+      setAlerts([
+        {
+          severity: 'success',
+          message: response.data.message || 'Status updated successfully',
+        },
+      ])
+      setRefresh((prev) => !prev)
+    } catch (error) {
+      setAlerts([
+        {
+          severity: 'error',
+          message: error?.response?.data?.message || 'Failed to update status',
+        },
+      ])
+      console.error('Failed to update status:', error)
+    }
+  }
 
   return (
     <div>
@@ -50,17 +71,24 @@ const MachineDashboardTable = ({
         <CTable striped hover className=" w-full">
           <CTableHead className="bg-gray-100 sticky top-0 z-10">
             <CTableRow>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">Name</CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">Type</CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Model No.
+                Name <span className="text-gray-500">⌕</span>
+              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
+                Serial No <span className="text-gray-500">⌕</span>
+              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-3 text-gray-600 font-md">
+                Model No <span className="text-gray-500">⌕</span>
+              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
+                Manufacturer <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">Power</CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Purchase Date
+              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-md">
+                Warranty Exp
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Warranty Exp.
+                Status
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Action
@@ -69,15 +97,7 @@ const MachineDashboardTable = ({
           </CTableHead>
 
           <CTableBody>
-            {isLoading ? (
-              <CTableRow>
-                <CTableDataCell colSpan={7} className="text-center py-3 h-[250px]">
-                  <div className="flex justify-center items-center h-full">
-                    <Loading isLoading={isLoading} />
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-            ) : cellData.length > 0 ? (
+            {cellData.length > 0 ? (
               cellData.map((cell, index) => (
                 <CTableRow key={index} className="border-b">
                   <CTableDataCell
@@ -87,19 +107,45 @@ const MachineDashboardTable = ({
                     {cell.machine_name}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.machine_type}
+                    {cell.serial_number}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.model_number}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.manufacturer}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.power_rating}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.purchase_date}
+                    {cell.warranty_expiry}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.warranty_expiry}
+                    <select
+                      value={cell.machine_status}
+                      onChange={(e) => handleStatusChange(cell.id, e.target.value)}
+                      className={`px-2.5 py-1 rounded-full text-sm font-medium outline-none border border-gray-300
+                      ${
+                        cell.machine_status === 'Under Maintenance'
+                          ? 'bg-blue-100 text-blue-800'
+                          : cell.machine_status === 'Active'
+                            ? 'bg-green-100 text-green-800'
+                            : cell.machine_status === 'Inactive'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      <option className="text-gray-700 bg-white" value="Active">
+                        Active
+                      </option>
+                      <option className="text-gray-700 bg-white" value="Inactive">
+                        Inactive
+                      </option>
+                      <option className="text-gray-700 bg-white" value="Under Maintenance">
+                        Under Maintance
+                      </option>
+                    </select>
                   </CTableDataCell>
                   <CTableDataCell className="px-2 sm:px-4 text-gray-700 relative">
                     <ThreeDotMenu
@@ -109,6 +155,13 @@ const MachineDashboardTable = ({
                           icon: cilHandPointRight,
                           onClick: () => {
                             onView(cell.id)
+                          },
+                        },
+                        {
+                          label: 'Add Process',
+                          icon: cilPlus,
+                          onClick: () => {
+                            onAddProcess && onAddProcess(cell.id, cell.machine_name)
                           },
                         },
                         {

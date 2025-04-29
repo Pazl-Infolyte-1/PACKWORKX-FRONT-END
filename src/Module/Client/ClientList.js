@@ -210,7 +210,7 @@ function ClientList() {
         <h4>Client/Vendor</h4>
       </div>
       {/* Search Bar & Actions */}
-      <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
+      <div className="overflow-x-auto border border-gray-200 p-3 rounded-md h-[520px]">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             {/* Search Input Container */}
@@ -232,51 +232,22 @@ function ClientList() {
             {/*<FaFilter onClick={toggleFilterPopup} className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-900" />*/}
             <div className="flex items-center gap-3">
               {/* Dropdown */}
-              <div className="relative inline-block text-left">
-                <button
-                  type="button"
-                  className="inline-flex w-full justify-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50"
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                >
-                  {selectedFilter || 'Entity'}
-                  <FaChevronDown className="size-4 text-gray-400" />
-                </button>
+             <div className="relative inline-block text-left">
+  <select
+    value={selectedFilter}
+    onChange={(e) => setSelectedFilter(e.target.value)}
+    className="inline-flex w-40 justify-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50 appearance-none"
+  >
+    <option value="" disabled hidden>Entity</option>
+    <option value="Client">Client</option>
+    <option value="Vendor">Vendor</option>
+    <option value="All">All</option>
+  </select>
+  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+    <FaChevronDown className="size-4 text-gray-400" />
+  </div>
+</div>
 
-                {/* Dropdown Menu */}
-                {isDropdownOpen && (
-                  <div className="absolute right-0 z-20 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5">
-                    <div className="py-1">
-                      <button
-                        className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
-                        onClick={() => {
-                          setSelectedFilter('Client')
-                          setIsDropdownOpen(false)
-                        }}
-                      >
-                        Client
-                      </button>
-                      <button
-                        className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
-                        onClick={() => {
-                          setSelectedFilter('Vendor')
-                          setIsDropdownOpen(false)
-                        }}
-                      >
-                        Vendor
-                      </button>
-                      <button
-                        className="block w-full px-4 py-2 text-sm text-gray-700 text-left hover:bg-gray-100"
-                        onClick={() => {
-                          setSelectedFilter('')
-                          setIsDropdownOpen(false)
-                        }}
-                      >
-                        All
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
 
               {/* Refresh Button */}
               {/*<ActionButton     onClick={handleResetFilters} variant='secondary' label={"Clear"} height={"9"}>

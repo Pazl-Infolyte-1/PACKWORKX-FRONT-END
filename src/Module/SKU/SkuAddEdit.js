@@ -137,6 +137,8 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
         deckleError: "",
       },
     });
+    dispatch({ type: 'RESET_DIECUT_CALCULATIONS' });
+
     
     if (option.value === 'addMore') {
       // Handle add more procedure logic if needed
@@ -459,7 +461,7 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
       {/* conditional rendring according to sku_type */}
       {skuComponents[addNewSkuData.sku_type] || null}
 
-      {addNewSkuData.sku_type !== 'Custom Item' || addNewSkuData.sku_type !== 'Composite' && (
+      {addNewSkuData.sku_type !== 'Custom Item' && addNewSkuData.sku_type !== 'Composite' && (
         <div className="flex items-center my-3 space-x-2">
           <span className="text-[16px] font-medium">Strict Adherence for All Layers</span>
           <button

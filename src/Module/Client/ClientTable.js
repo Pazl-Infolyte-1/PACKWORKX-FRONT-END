@@ -138,12 +138,6 @@ const handleEdit = (cell) => {
               <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"190px"}}   onClick={() => openViewCard(cell)} className="py-3 px-4 text-gray-600 font-medium">
               Reference Id
               </CTableHeaderCell>
-              <CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"120px"}}   onClick={() => openViewCard(cell)} className="py-3 px-4 text-gray-600 font-medium">
-                Entity
-              </CTableHeaderCell>
-              <CTableHeaderCell style={{ whiteSpace: "nowrap",minWidth:"200px" }} className="py-3 px-4 text-gray-600 font-medium">
-              Name
-              </CTableHeaderCell>
               <CTableHeaderCell
                 style={{ whiteSpace: 'nowrap' }}
                 className="py-3 px-4 text-gray-600 font-medium"
@@ -156,6 +150,20 @@ const handleEdit = (cell) => {
               >
                 Mobile Number
               </CTableHeaderCell>
+              <CTableHeaderCell
+                style={{ whiteSpace: 'nowrap' }}
+                className="py-3 px-4 text-gray-600 font-medium"
+              >
+                Action
+              </CTableHeaderCell>
+              {/*<CTableHeaderCell style={{ whiteSpace: "nowrap" ,minWidth:"120px"}}   onClick={() => openViewCard(cell)} className="py-3 px-4 text-gray-600 font-medium">
+                Entity
+              </CTableHeaderCell>
+              <CTableHeaderCell style={{ whiteSpace: "nowrap",minWidth:"200px" }} className="py-3 px-4 text-gray-600 font-medium">
+              Name
+              </CTableHeaderCell>
+           
+        
               <CTableHeaderCell
                 style={{ whiteSpace: 'nowrap' }}
                 className="py-3 px-4 text-gray-600 font-medium"
@@ -178,13 +186,8 @@ const handleEdit = (cell) => {
                 className="py-3 px-4 text-gray-600 font-medium"
               >
                 Status
-              </CTableHeaderCell>
-              <CTableHeaderCell
-                style={{ whiteSpace: 'nowrap' }}
-                className="py-3 px-4 text-gray-600 font-medium"
-              >
-                Action
-              </CTableHeaderCell>
+              </CTableHeaderCell>*/}
+
             </CTableRow>
           </CTableHead>
 
@@ -193,16 +196,10 @@ const handleEdit = (cell) => {
               clientdata.map((cell, index) => (
                 <CTableRow style={{ minHeight: "100px" }} key={index} className="border-b">
                   <CTableDataCell onClick={()=>openViewCard(cell)} className="py-3 px-4 !text-blue-600 font-semibold text-decoration-underline cursor-pointer w-[150px]">
-                    {cell.client_id}
+                    {cell.client_ui_id}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700  w-[550px]">
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.client_ref_id}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700  w-[150px]">
-                    {cell.entity_type}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700  w-[150px]">
-                    {cell.display_name}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.email}
@@ -211,44 +208,22 @@ const handleEdit = (cell) => {
                     {cell.mobile}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.PAN}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.gst_number}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700 w-[1000px]">
-                    {/*{apiMethods.formatDate(cell.created_at)}*/}
-                    {new Date(cell.created_at).toLocaleString()}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {/*{cell.status}*/}
-                    <span
-                  className={`px-2.5 py-1 rounded-full text-sm font-medium ${
-                    cell.status === 'active'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  {cell.status}
-                </span>
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
                     <ThreeDotMenu
                       value={[
-                        {
-                          label: 'Add Sku',
-                          icon: cilHandPointRight,
-                          onClick: () => {
-                            navigate('/SKU', {
-                              state: {
-                                initialRender: true,
-                                clientdata: clientdata,
-                                client_id: cell.client_id,
-                                skipInitialFetch: true
-                              },
-                            })
-                          },
-                        },
+                        //{
+                        //  label: 'Add Sku',
+                        //  icon: cilHandPointRight,
+                        //  onClick: () => {
+                        //    navigate('/SKU', {
+                        //      state: {
+                        //        initialRender: true,
+                        //        clientdata: clientdata,
+                        //        client_id: cell.client_id,
+                        //        skipInitialFetch: true
+                        //      },
+                        //    })
+                        //  },
+                        //},
                         {
                           label: 'Edit',
                           icon: cilPencil,
@@ -266,6 +241,36 @@ const handleEdit = (cell) => {
                       ]}
                     />
                   </CTableDataCell>
+                  {/*<CTableDataCell className="py-3 px-4 text-gray-700  w-[150px]">
+                    {cell.entity_type}
+                  </CTableDataCell>
+
+                  <CTableDataCell className="py-3 px-4 text-gray-700  w-[150px]">
+                    {cell.display_name}
+                  </CTableDataCell>
+         
+        
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.PAN}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.gst_number}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700 w-[1000px]">
+                    {new Date(cell.created_at).toLocaleString()}
+                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    <span
+                  className={`px-2.5 py-1 rounded-full text-sm font-medium ${
+                    cell.status === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  {cell.status}
+                </span>
+                  </CTableDataCell>*/}
+              
                 </CTableRow>
               ))
             ) : (
@@ -294,7 +299,7 @@ const handleEdit = (cell) => {
           showCloseButton={true}
           width={'70vw'}
         >
-          <ClientSingleViewCard clientData={singleData} handleEdit={handleEdit}/>
+          <ClientSingleViewCard clientData={singleData} handleEdit={handleEdit} openDeleteModal={openDeleteModal}/>
         </PopUp>
 
         <ConfirmationModale

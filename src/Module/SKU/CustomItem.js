@@ -365,13 +365,14 @@ const [selected, setSelected] = useState('vendor')
             />
           </div>
 
-        <div>
+          <div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Client Name</label>
           <select
             name="client"
             id="client"
             disabled={clientDiasble}
-            value={addNewSkuData?.client || ''}
+            //value={filteredClient ? filteredClient.client_id : addNewSkuData.client || ''}
+            value={addNewSkuData.client_id || null}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
@@ -379,7 +380,7 @@ const [selected, setSelected] = useState('vendor')
               Select
             </option>
             {client?.map((item, index) => (
-              <option key={index} value={item.display_name}>
+              <option key={index} value={item.client_id}>
                 {item.display_name}
               </option>
             ))}
@@ -421,7 +422,7 @@ const [selected, setSelected] = useState('vendor')
           requiredSymbol={true}
         />
 
-         <ChipSelectorWithBrowse
+         {/*<ChipSelectorWithBrowse
                   label="Route"
                   required={true}
                   selectedIds={selectedRouteIds1}
@@ -429,7 +430,7 @@ const [selected, setSelected] = useState('vendor')
                   onRemoveChip={handleRemoveChip}
                   onBrowseClick={handleBrowseClickRoute}
                 />
-                
+                */}
  <div className="col-span-3">
     <button
       type="button"

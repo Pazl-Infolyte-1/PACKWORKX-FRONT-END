@@ -30,7 +30,8 @@ import { useDispatch, useSelector } from 'react-redux'
 function SkuList() {
   const [skuType, setSkuType] = useState([])
   const [client, setClient] = useState([])
-  const [selectedClient, setSelectedClient] = useState('')
+  const [selectedClient, setSelectedClient] = useState(null)
+  const [selectedDisplayName, setSelectedDisplayName] = useState("")
   const [selectedSkuType, setSelectedSkuType] = useState('')
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [visible, setVisible] = useState(false)
@@ -186,11 +187,23 @@ console.log("suuuuu",user)
   //  }
   //}, [user?.id]);
   const deckleError = useSelector((state) => state.boardCalculations.deckleError);
+  const dieError = useSelector((state) => state.diecutCalculations.deckleError);
+
 
   const handleAddSkuSubmit = async () => {
     try {
       if (editTag) {
-        const response = await apiMethods.updateSku(addNewSkuData)
+        if(dieError){
+          setAlerts([{ severity: 'error', message: dieError }])
+          return  null
+        }
+        const numberSkuData={
+          ...addNewSkuData,
+          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+          deckle_size: Number(addNewSkuData.deckle_size),
+        }
+        const response = await apiMethods.updateSku(numberSkuData)
         if (response?.status === 200) {
           setEditTag(false)
           setRefresh((prev) => !prev)
@@ -204,6 +217,10 @@ console.log("suuuuu",user)
           setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong' }])
         }
       } else {
+        if(dieError){
+          setAlerts([{ severity: 'error', message: dieError }])
+          return  null
+        }
         if(deckleError){
           setAlerts([{ severity: 'error', message: deckleError }])
           return  null
@@ -214,7 +231,13 @@ console.log("suuuuu",user)
           return null // 🔴 Stop submission
         }
         console.log("addskkkk",addNewSkuData)
-        const response = await apiMethods.addSku(addNewSkuData)
+        const numberSkuData={
+          ...addNewSkuData,
+          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+          deckle_size: Number(addNewSkuData.deckle_size),
+        }
+        const response = await apiMethods.addSku(numberSkuData)
         if (response?.status === 201) {
           //setDrawerOpen(false)
           setRefresh((prev) => !prev)
@@ -275,6 +298,8 @@ console.log("suuuuu",user)
       part_value: selectedSku.part_value || [],
       route: selectedSku.route || [],
       part_count: selectedSku.part_count,
+      width_board_size_cm2:selectedSku.width_board_size_cm2 || null,
+      length_board_size_cm2:selectedSku.length_board_size_cm2 || null,
       estimate_composite_item: selectedSku.estimate_composite_item || null,
       description: selectedSku.description || null,
       default_sku_details: selectedSku.default_sku_details || null,
@@ -305,7 +330,7 @@ console.log("suuuuu",user)
       try {
         const response = await apiMethods.getSkuList({
           search: searchQuery || '',
-          client: selectedClient || '',
+          client: selectedDisplayName || '',
           sku_type: selectedSkuType || '',
           page: pagination?.currentPage || 1,
           limit: message ? 10000 : limit,
@@ -324,6 +349,7 @@ console.log("suuuuu",user)
   }, [
     refresh,
     selectedClient,
+    selectedDisplayName,
     searchQuery,
     pagination?.currentPage,
     selectedSkuType,
@@ -340,6 +366,7 @@ console.log("suuuuu",user)
     }
     setSelectedSkuType('')
     setSelectedClient('')
+    setSelectedDisplayName("")
   }
 
   const handleSkuExelExport = async () => {
@@ -388,6 +415,8 @@ console.log("mess",message)
                       deckleError: "",
                     },
                   });
+                  dispatch({ type: 'RESET_DIECUT_CALCULATIONS' });
+
                   setDrawerOpen(true)
                   setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
     
@@ -417,29 +446,29 @@ console.log("mess",message)
           {
             name: 'Board',
             count: dashboard?.board || 0,
-            color: '#ffeeaa',
-            bgColor: '#ffcc00',
+            color: '#8000c0',
+            bgColor: '#67009a',
             icon: <MdTakeoutDining className="text-white text-2xl" />,
           },
           {
             name: 'Die Cut Box',
             count: dashboard?.diecutbox || 0,
-            color: '#aad3ff',
-            bgColor: '#007aff',
+            color: '#077A7D',
+            bgColor: '#005a4d',
             icon: <MdOutlineSettingsInputComposite className="text-white text-2xl" />,
           },
           {
             name: 'Composite',
             count: dashboard?.composite || 0,
-            color: '#87e880',
-            bgColor: '#bfbfbb',
+            color: '#C95792',
+            bgColor: '#7a0064',
             icon: <AiFillCarryOut className="text-white text-2xl" />,
           },
           {
             name: 'Custom Item',
             count: dashboard?.customitem || 0,
-            color: '#e2cbf7',
-            bgColor: '#10b3aa',
+            color: '#559400',
+            bgColor: '#4a8000',
             icon: <AiFillCodeSandboxCircle  className="text-white text-2xl" />,
           },
           //{
@@ -495,7 +524,15 @@ console.log("mess",message)
 
           <select
             value={selectedClient}
-            onChange={(e) => setSelectedClient(e.target.value)}
+            onChange={(e) => {
+              setSelectedClient(e.target.value);
+          
+              const selectedItem = client.find(
+                (item) => item.client_id == e.target.value
+              );
+              console.log("hhhhhhhhhhh",selectedItem?.display_name);
+              setSelectedDisplayName(selectedItem?.display_name)
+            }}
             className="sm:w-[150px] p-2 rounded-lg shadow-md bg-white text-[#424242] outline-none border-none"
           >
             <option value="">Select Client</option>

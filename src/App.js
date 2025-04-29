@@ -45,7 +45,7 @@ const App = () => {
       >
         <Routes>
           <Route
-            path="/"
+            path="/login"
             element={
               isAuthenticated == true ? (
                 <Navigate to="/dashboard" replace />

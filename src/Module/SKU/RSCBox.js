@@ -466,7 +466,30 @@ const refreshClients = () => {
         route: selectedRouteIds1,
       }));
     }, [selectedRouteIds1]);
-
+    useEffect(() => {
+      setAddNewSkuData((prev) => {
+        const updatedData = { ...prev };
+        let changed = false;
+    
+        if (prev.flap_tolerance === "") {
+          updatedData.flap_tolerance = null;
+          changed = true;
+        }
+    
+        if (prev.composite_type === "") {
+          updatedData.composite_type = null;
+          changed = true;
+        }
+        
+        if (prev.part_count === "") {
+          updatedData.part_count = null;
+          changed = true;
+        }
+    
+    
+        return changed ? updatedData : prev;
+      });
+    }, [addNewSkuData.flap_tolerance, addNewSkuData.composite_type,addNewSkuData.part_count]);
     
         
   return (

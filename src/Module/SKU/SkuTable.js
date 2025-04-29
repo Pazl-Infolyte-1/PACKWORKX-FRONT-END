@@ -67,16 +67,16 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
               SKU Name
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              SKU Type
+              SKU Type 🔎
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Client
+              Client 🔎
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Dimensions
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Deckle
+              Deckle 🔎
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Created Date
@@ -142,6 +142,8 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
                           label: 'Edit',
                           icon: cilPencil,
                           onClick: () => {
+                            dispatch({ type: 'RESET_DIECUT_CALCULATIONS' });
+
                             dispatch({
                               type: 'SET_SELECTED_ROUTE_IDS',
                               payload: [], // 👈 empty array

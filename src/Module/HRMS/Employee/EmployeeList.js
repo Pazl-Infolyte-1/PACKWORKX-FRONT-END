@@ -182,7 +182,6 @@ function EmployeeList() {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form Data:', formData);
   
     const requiredFields = [
       "name", "email", "mobile", "employee_id",
@@ -478,8 +477,7 @@ function EmployeeList() {
               <select
                 id="status-filter"
                 className="border border-[#e7e5e4] p-[6px] h-[35px] rounded-md"
-                defaultValue=""
-                value={status}
+                value={status || ""}
                 onChange={handleStatus}
               >
                 <option value="" disabled>

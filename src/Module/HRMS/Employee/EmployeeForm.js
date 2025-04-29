@@ -750,7 +750,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     value={formData.reporting_to || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled>Select Reporting To <span className='text-red-600'>*</span></option>
+                    <option value="" disabled>Select Reporting To</option>
 
                     {REPORTING_OPTIONS.map(manager => (
                       <option key={manager.id} value={3}>

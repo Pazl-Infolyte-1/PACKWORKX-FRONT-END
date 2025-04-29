@@ -14,7 +14,7 @@ import apiMethods from '../../api/config'
 import WorkOrderDetails from './WorkOrderDetails'
 import Loading from '../../components/New/Loading'
 
-const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellData,handleDelete,loading,setloading }) => {
+const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellData,handleDelete,loading,setloading,setAlerts }) => {
 
   const handlePriorityChange = async (e, id) => {
     const newValue = e.target.value;
@@ -22,13 +22,16 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellDa
 
   
     try {
-      await apiMethods.workOrderStatusUpdate(id, body);
+     const response =  await apiMethods.workOrderStatusUpdate(id, body);
   
       setCellData(prev =>
         prev.map(r => r.id === id ? { ...r, priority: newValue } : r)
       );
+      setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated Progress" }]);
+      
     } catch (error) {
       console.error("Error updating priority:", error);
+      setAlerts([{ severity: "error", message: response?.data?.message || "failed to update Progress" }]);
     }finally{
     }
   };
@@ -38,17 +41,21 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellDa
   const body = { progress: newValue };
 
   try {
-    await apiMethods.workOrderStatusUpdate(id, body);
+  const response =   await apiMethods.workOrderStatusUpdate(id, body);
 
     // Update UI if cellData is a state
     setCellData(prev =>
       prev.map(r => r.id === id ? { ...r, progress: newValue } : r)
     );
+    setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated Progress" }]);
+
   } catch (error) {
     console.error("Error updating progress:", error);
+    setAlerts([{ severity: "error", message: response?.data?.message || "failed to update Progress" }]);
+
   }
   finally{
-    setloading(false)
+    // setloading(false)
   }
 };
 
@@ -100,9 +107,11 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellDa
 
           <CTableBody>
   {loading ? (
-    <div className="absolute inset-0 flex items-center justify-center">
-      <Loading isLoading={loading} />
-    </div>
+<CTableRow>
+                <CTableDataCell colSpan={8} className="text-center py-6">
+                  <Loading isLoading={loading} />
+                </CTableDataCell>
+              </CTableRow>
   ) : (
     cellData.length > 0 ? (
       cellData.map((cell, index) => (

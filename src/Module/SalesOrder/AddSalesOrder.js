@@ -251,6 +251,8 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
 
     } catch (error) {
       console.error('Error:', error);
+      setAlerts([{ severity: "error", message: error?.response?.data?.message || "Unable To update Work order please try again later " }]);
+
     }
   };
   
@@ -315,10 +317,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     }
   };
 
-  // Display loading indicator when necessary
-  // if (loading) {
-  //   return <Loader />;
-  // }
+
 
 
   return (

@@ -106,9 +106,11 @@ function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, hand
 
               {
                 loading ? (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Loading isLoading={loading} />
-                  </div>
+<CTableRow>
+                <CTableDataCell colSpan={8} className="text-center py-6">
+                  <Loading isLoading={loading} />
+                </CTableDataCell>
+              </CTableRow>
                 ) :
                 employeesdata.length > 0 ? (
                   employeesdata.map((cell, index) => (

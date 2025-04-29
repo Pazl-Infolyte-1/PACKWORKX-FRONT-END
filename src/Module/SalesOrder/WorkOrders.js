@@ -287,7 +287,6 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     const selectedSku = skuList.find((sku) => sku.id === selectedId);
     
 
-    console.log(selectedSku,'selected skuuuu')
 
     SetselectedSkuID(selectedId)
 

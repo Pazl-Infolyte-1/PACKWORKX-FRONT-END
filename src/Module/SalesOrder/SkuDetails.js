@@ -432,6 +432,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           })}
                           type="number"
                           placeholder="0"
+                          min="0"
                           onWheel={(e) => e.target.blur()} // 💡 Prevent scroll value change
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                         />
@@ -448,6 +449,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           })}
                           type="number"
                           placeholder="0"
+                          min="0"
                           onWheel={(e) => e.target.blur()} // 💡 Prevent scroll value change
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                         />
@@ -461,6 +463,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           })}
                           type="number"
                           placeholder="0"
+                          min="0"
                           onWheel={(e) => e.target.blur()} // 💡 Prevent scroll value change
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                         />
@@ -489,6 +492,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           })}
                           type="number"
                           placeholder="0"
+                          min="0"
                           onWheel={(e) => e.target.blur()} // 💡 Prevent scroll value change
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                         />
@@ -516,6 +520,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           })}
                           type="number"
                           placeholder="0"
+                          min="0"
                           onWheel={(e) => e.target.blur()} // 💡 Prevent scroll value change
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                         />

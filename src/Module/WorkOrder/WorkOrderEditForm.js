@@ -205,17 +205,16 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
 
 
     const handleSkuChange = (e) => {
-        const selectedSku = skuList.filter((sku) => {
+        const selectedSku = skuList.find((sku) => {
             return sku.id == e.target.value;
           });
           handleChange(e)
-
 
           
        setFormValues((prev) => ({
             ...prev,
             sku_version: "",
-            sku_name:selectedSku.sku_name
+            sku_name:selectedSku?.sku_name
         }));
     };
 

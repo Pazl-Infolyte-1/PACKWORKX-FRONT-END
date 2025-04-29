@@ -133,7 +133,7 @@ const AddFieldForm = ({
 
           {/* Is Required */}
           <div className="mt-6">
-            <label className="block mb-2 text-gray-600">Is Required</label>
+            <label className="block mb-2 text-gray-600">Is Required <span className="text-red-500">*</span></label>
             <div className="flex items-center gap-6">
               <label className="flex items-center">
                 <input
@@ -173,7 +173,7 @@ const AddFieldForm = ({
 
           {/* Field Type */}
           <div className="mt-6">
-            <label className="block mb-2 text-gray-600">Field Type <span className="text-red-500 text-xs">{isEdit && '(Not Editable)'}</span></label>
+            <label className="block mb-2 text-gray-600">Field Type <span className="text-red-500 text-xs">{isEdit ? '(Not Editable)': <span className="text-red-500">*</span>}</span></label>
             <select
               value={fieldType}
               onChange={(e) => setFieldType(e.target.value)}

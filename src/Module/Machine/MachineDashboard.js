@@ -15,50 +15,60 @@ import SearchBar from '../../components/New/SearchBar'
 import apiMethods from '../../api/config'
 import AddEditMachine from './AddEditMachine'
 import { useSearch } from '../../components/New/SearchContext'
+import AssignProcess from './AssignProcess'
+import CustomAlert from '../../components/New/CustomAlert'
+import AddAssign from './AddAssign'
+import { RiEyeLine, RiEyeOffLine, RiUserLine } from 'react-icons/ri'
 
-const machineData = [
-  {
-    label: 'Total Machine',
-    count: 150,
-    color: '#4a03fa',
-    bgColor: '#c7c7f1',
-    icon: <MdPrecisionManufacturing className="w-[40px] h-[40px] md:w-[50px] md:h-[50px]" />,
-  },
-  {
-    label: 'Active',
-    count: 120,
-    color: '#155724',
-    bgColor: '#c3f2cb',
-    icon: <MdEmojiObjects className="w-[40px] h-[40px] md:w-[50px] md:h-[50px]" />,
-  },
-  {
-    label: 'Under Maintenance',
-    count: 20,
-    color: '#0000ff',
-    bgColor: '#aad3ff',
-    icon: <MdEngineering className="w-[40px] h-[40px] md:w-[50px] md:h-[50px]" />,
-  },
-  {
-    label: 'Disabled',
-    count: 10,
-    color: '#ff2d55',
-    bgColor: '#ffb9c6',
-    icon: <MdDoDisturbOn className="w-[40px] h-[40px] md:w-[50px] md:h-[50px]" />,
-  },
-]
 
 export default function MachineMaster() {
-  const [isdrawopen, setdrawopen] = useState({ show: false, id: null })
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
+  const [preSelectedMachineId, setPreSelectedMachineId] = useState(null)
+  const [isdrawopen, setdrawopen] = useState({ show: false, id: null })
+  const [addProcessModal, setAddProcessModal] = useState({ show: false, machineId: null })
+  const [assignModal, setAssignModal] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [tableData, setTableData] = useState([])
   const [viewDataId, setViewDataId] = useState(null)
   const [isViewMode, setIsViewMode] = useState(false)
+  const [statusCounts, setStatusCounts] = useState([])
   const [limit, setLimit] = useState(10)
   const [isEdit, setIsEdit] = useState(false)
   const [refresh, setRefresh] = useState(false)
+  const [alerts, setAlerts] = useState([])
   const { searchQuery } = useSearch()
   const searchBarRef = useRef(null)
+
+  const machineData = [
+    {
+      label: 'Total Machine',
+      count: pagination?.total,
+      color: '#4a03fa',
+      bgColor: '#c7c7f1',
+      icon: <MdPrecisionManufacturing className="w-[40px] h-[40px] md:w-[50px] md:h-[50px]" />,
+    },
+    {
+      label: 'Active',
+      count: statusCounts?.Active,
+      color: '#155724',
+      bgColor: '#c3f2cb',
+      icon: <MdEmojiObjects className="w-[40px] h-[40px] md:w-[50px] md:h-[50px]" />,
+    },
+    {
+      label: 'Under Maintenance',
+      count: statusCounts?.['Under Maintenance'],
+      color: '#0000ff',
+      bgColor: '#aad3ff',
+      icon: <MdEngineering className="w-[40px] h-[40px] md:w-[50px] md:h-[50px]" />,
+    },
+    {
+      label: 'Disabled',
+      count: statusCounts?.Inactive,
+      color: '#ff2d55',
+      bgColor: '#ffb9c6',
+      icon: <MdDoDisturbOn className="w-[40px] h-[40px] md:w-[50px] md:h-[50px]" />,
+    },
+  ]
 
   const handleView = (Id) => {
     setViewDataId(Id)
@@ -81,6 +91,7 @@ export default function MachineMaster() {
         })
         setTableData(response.data.data)
         setPagination(response.data.pagination)
+        setStatusCounts(response.data.statusCounts)
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
@@ -92,11 +103,19 @@ export default function MachineMaster() {
     fetchData()
   }, [refresh, searchQuery, limit, pagination.page])
 
+  const handleAddProcess = (machineId) => {
+    setAddProcessModal({ show: true, machineId: machineId })
+  }
+
   return (
     <div className="m-0 p-0">
+      <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       <div className="flex flex-col md:flex-row justify-between px-2 ">
         <h1 className="text-black text-xl font-bold">Machine Master Dashboard</h1>
-        <ActionButton label={'+ Add Machine'} onClick={() => setdrawopen({ show: true })} />
+        <div className="flex gap-3">
+          <ActionButton label={'View Process'} icon={RiEyeLine} className='!bg-[#00000052]' onClick={() => setAssignModal(true)} />
+          <ActionButton label={'+ Add Machine'} onClick={() => setdrawopen({ show: true })} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 gap-3 mt-2">
@@ -142,9 +161,11 @@ export default function MachineMaster() {
           cellData={tableData}
           onView={handleView}
           onEdit={handleEdit}
+          onAddProcess={handleAddProcess}
           setRefresh={setRefresh}
           isLoading={isLoading}
           setIsLoading={setIsLoading}
+          setAlerts={setAlerts}
         />
 
         <div className="flex justify-center md:justify-end items-center gap-4 mt-2 ">
@@ -176,8 +197,47 @@ export default function MachineMaster() {
             isEdit={isEdit}
             setIsEdit={setIsEdit}
             setRefresh={setRefresh}
+            setIsLoading={setIsLoading}
+            isLoading={isLoading}
+            setAlerts={setAlerts}
           />
         </Drawer>
+
+        <PopUp
+          visible={assignModal}
+          setVisible={setAssignModal}
+          width={800}
+          height={500}
+          header="Assign Process"
+          showCloseButton={true}
+        >
+          <AssignProcess
+            refresh={refresh}
+            setRefresh={setRefresh}
+            setAlerts={setAlerts}
+            isEdit={isEdit}
+            setIsEdit={setIsEdit}
+            preSelectedMachineId={preSelectedMachineId}
+          />
+        </PopUp>
+
+        <PopUp
+          visible={addProcessModal.show}
+          setVisible={setAddProcessModal}
+          width={800}
+          height={300}
+          header="Add Process to Machine"
+          showCloseButton={true}
+        >
+          <AddAssign
+            isAddModalOpen={{ show: true, id: addProcessModal.machineId }}
+            setIsAddModalOpen={setAddProcessModal}
+            setRefresh={setRefresh}
+            setAlerts={setAlerts}
+            isEdit={false}
+            disableMachineSelection={true}
+          />
+        </PopUp>
       </div>
     </div>
   )

@@ -147,7 +147,9 @@ function AddProcessField({
 
           {selectedProcess?.length > 0 ? (
             <>
-              <h6 className="font-semibold col-span-2 mb-2">Labels</h6>
+              <h6 className="font-semibold col-span-2 mb-2">
+                Labels <span className="text-red-500">*</span>
+              </h6>
               <div className="grid grid-cols-2 gap-4">
                 {selectedProcess.map((item) => (
                   <div key={item.id}>
@@ -185,7 +187,11 @@ function AddProcessField({
                 ))}
               </div>
             </>
-          ) : null}
+          ) : (
+            <div className="text-center py-4 text-gray-500">
+              No Fields available for the selected process
+            </div>
+          )}
         </div>
       </div>
       <div className="flex justify-end my-2 gap-3">

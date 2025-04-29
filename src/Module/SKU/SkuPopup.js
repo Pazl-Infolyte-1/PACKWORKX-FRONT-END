@@ -44,7 +44,7 @@ function SkuPopup({ visible, setVisible }) {
                 </Table>
             </TableContainer>
             <DialogActions style={{ fontSize: '10px',padding:'10px',marginTop:'5px' }} >
-                <Button  onClick={() => setVisible(false)} color="success" variant="contained"> Colse </Button>
+                <Button  onClick={() => setVisible(false)} color="success" variant="contained"> Close </Button>
                 <Button  color="success" variant="contained">Select</Button>
             </DialogActions>
 

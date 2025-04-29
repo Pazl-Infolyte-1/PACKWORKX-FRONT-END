@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import Drawer from '../../components/Drawer/Drawer'
 import { IoFilter, IoFilterOutline, IoSearch } from 'react-icons/io5'
 import apiMethods from '../../api/config'
@@ -16,6 +16,7 @@ import { FaChevronDown } from 'react-icons/fa'
 import SearchBar from '../../components/New/SearchBar'
 import { FaSyncAlt } from 'react-icons/fa'
 import Loader from '../../components/New/Loader'
+import Drawer1 from '../../components/Drawer/Drawer1'
 
 function ClientList() {
   const [selected, setSelected] = useState('vendor')
@@ -35,6 +36,14 @@ function ClientList() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState('')
   const [loading, setLoading] = useState(false)
+  const clientListRef = useRef(null);
+  
+
+  useEffect(() => {
+    if (clientListRef.current) {
+      console.log('ClientList width:', clientListRef.current.offsetWidth, 'px');
+    }
+  }, []); // runs once after mount
 
   //const totalPages = Math.ceil(data.length / entriesPerPage) || 1; // Ensure total pages > 0
   const toggleFilterPopup = () => setIsFilterOpen(!isFilterOpen)
@@ -203,7 +212,7 @@ function ClientList() {
   //  { severity: "success", message: "This is a success Alert." },
   //];
   return (
-    <div className="w-full">
+    <div ref={clientListRef} className="w-full">
       <Loader isLoading={loading} />
       {/* Header Section */}
       <div className="w-full h-[40px] flex justify-between items-center">
@@ -241,7 +250,7 @@ function ClientList() {
     <option value="" disabled hidden>Entity</option>
     <option value="Client">Client</option>
     <option value="Vendor">Vendor</option>
-    <option value="All">All</option>
+    <option value="">All</option>
   </select>
   <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
     <FaChevronDown className="size-4 text-gray-400" />
@@ -357,7 +366,7 @@ function ClientList() {
         </CustomPopup>
       )}
 
-      <Drawer
+      <Drawer1
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
         maxWidth={'1280px'}
@@ -370,7 +379,7 @@ function ClientList() {
           closeDrawerDuringAdd={() => handleCloseDrawer(false)}
           resetForm={isDrawerOpen}
         />
-      </Drawer>
+      </Drawer1>
     </div>
   )
 }

@@ -18,7 +18,7 @@
 	bottom: 0;
 	right: -100%; 
 	width: 90%;
-	height: 92vh;
+	height: 93vh;
 	background: white;
 	box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
 	transition: right 0.3s ease-in-out;
@@ -122,4 +122,6 @@
 	.close-btn {
 		font-size: 14px;
 	}
+
+	
 }

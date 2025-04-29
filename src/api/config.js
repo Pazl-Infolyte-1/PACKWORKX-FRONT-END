@@ -376,7 +376,8 @@ export const apiMethods = {
       const response = await apiClient.post('/sku-details', addNewSkuData, {})
       return response
     } catch (error) {
-      console.error(error)
+      console.error("Error in addSku:", error);
+      throw error;
     }
   },
 
@@ -398,11 +399,16 @@ export const apiMethods = {
   },
 
   updateSku: async (addNewSkuData) => {
-    const { id, ...dataWithoutId } = addNewSkuData
-    const response = await apiClient.put(`/sku-details/${addNewSkuData.id}`, dataWithoutId)
-    return response
+    const { id, ...dataWithoutId } = addNewSkuData;
+    try {
+      const response = await apiClient.put(`/sku-details/${id}`, dataWithoutId);
+      return response;
+    } catch (error) {
+      console.error("Error in updateSku:", error);
+      throw error; // ← this is important for proper error handling
+    }
   },
-
+  
   deleteSku: async (id) => {
     try {
       const response = await apiClient.delete(`/sku-details/${id}`)

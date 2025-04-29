@@ -800,7 +800,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
               {/* Skills */}
               {/* Skills */}
               <div>
-                <h6 className="mb-2">Skills <span className='text-red-600'>*</span></h6>
+                <h6 className="mb-2">Machine Mapping<span className='text-red-600'>*</span></h6>
                 <div className={`flex flex-wrap gap-2 ${skills.length > 0 ? 'mb-2' : ''}`}>
                   {skills?.map((skill, index) => (
                     <div

@@ -18,8 +18,7 @@ import { useSearch } from '../../components/New/SearchContext'
 import AssignProcess from './AssignProcess'
 import CustomAlert from '../../components/New/CustomAlert'
 import AddAssign from './AddAssign'
-import { RiEyeLine, RiEyeOffLine, RiUserLine } from 'react-icons/ri'
-
+import { RiEyeLine } from 'react-icons/ri'
 
 export default function MachineMaster() {
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
@@ -113,8 +112,18 @@ export default function MachineMaster() {
       <div className="flex flex-col md:flex-row justify-between px-2 ">
         <h1 className="text-black text-xl font-bold">Machine Master Dashboard</h1>
         <div className="flex gap-3">
-          <ActionButton label={'View Process'} icon={RiEyeLine} className='!bg-[#00000052]' onClick={() => setAssignModal(true)} />
-          <ActionButton label={'+ Add Machine'} onClick={() => setdrawopen({ show: true })} />
+          <ActionButton
+            label={'View Process'}
+            icon={RiEyeLine}
+            className="!bg-[#00000052]"
+            onClick={() => setAssignModal(true)}
+          />
+          <ActionButton
+            label={'+ Add Machine'}
+            onClick={() => {
+              setdrawopen({ show: true }), setIsEdit(false)
+            }}
+          />
         </div>
       </div>
 
@@ -190,7 +199,7 @@ export default function MachineMaster() {
           />
         </div>
 
-        <Drawer isOpen={isdrawopen.show} onClose={() => setdrawopen({ show: false })}>
+        <Drawer isOpen={isdrawopen.show} onClose={() => setdrawopen({ show: false, id: null })}>
           <AddEditMachine
             setdrawopen={setdrawopen}
             isOpen={isdrawopen}

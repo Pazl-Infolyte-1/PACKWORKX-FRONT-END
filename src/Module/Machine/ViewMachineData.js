@@ -57,11 +57,16 @@ function ViewMachineData({ Id }) {
       <div className="mb-4 flex justify-between items-center">
         <h2 className="text-xl font-bold text-gray-800">{machineData.machine_name}</h2>
         <span
-          className={`px-3 py-1 rounded-full text-sm font-medium ${
-            machineData.machine_status === 'Active'
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-800'
-          }`}
+          className={`px-2.5 py-1 rounded-full text-sm font-medium outline-none border border-gray-300
+            ${
+              machineData.machine_status === 'Under Maintenance'
+                ? 'bg-blue-100 text-blue-800'
+                : machineData.machine_status === 'Active'
+                  ? 'bg-green-100 text-green-800'
+                  : machineData.machine_status === 'Inactive'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-gray-100 text-gray-800'
+            }`}
         >
           {machineData.machine_status}
         </span>
@@ -71,23 +76,23 @@ function ViewMachineData({ Id }) {
         <div className="bg-gray-50 p-4 rounded-lg">
           <h3 className="text-sm uppercase tracking-wide text-black mb-2">Machine Details</h3>
           <div className="space-y-3">
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-3">
               <span className="text-gray-600">Machine Type</span>
               <span className="font-medium">{machineData.machine_type}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-3">
               <span className="text-gray-600">Model Number</span>
               <span className="font-medium">{machineData.model_number}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-3">
               <span className="text-gray-600">Serial Number</span>
               <span className="font-medium">{machineData.serial_number}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-3">
               <span className="text-gray-600">Manufacturer</span>
               <span className="font-medium">{machineData.manufacturer}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-3">
               <span className="text-gray-600">Location</span>
               <span className="font-medium">{machineData.location}</span>
             </div>
@@ -99,21 +104,21 @@ function ViewMachineData({ Id }) {
             Technical Specifications
           </h3>
           <div className="space-y-3">
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-3">
               <span className="text-gray-600">Power Rating</span>
               <span className="font-medium">{machineData.power_rating}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-3">
               <span className="text-gray-600">IP Address</span>
               <span className="font-medium">{machineData.ip_address}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-3">
               <span className="text-gray-600">Connectivity</span>
               <span className="font-medium">
                 {machineData.connectivity_status ? 'Connected' : 'Disconnected'}
               </span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-3">
               <span className="text-gray-600">Assigned Operator</span>
               <span className="font-medium">{machineData.assigned_operator}</span>
             </div>

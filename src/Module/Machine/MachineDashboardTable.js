@@ -72,6 +72,9 @@ const MachineDashboardTable = ({
           <CTableHead className="bg-gray-100 sticky top-0 z-10">
             <CTableRow>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
+                ID
+              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Name <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
@@ -100,6 +103,9 @@ const MachineDashboardTable = ({
             {cellData.length > 0 ? (
               cellData.map((cell, index) => (
                 <CTableRow key={index} className="border-b">
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.machine_generate_id || 'N/A'}
+                  </CTableDataCell>
                   <CTableDataCell
                     onClick={() => onView(cell.id)}
                     className="py-3 px-4 !text-blue-600 underline font-semibold cursor-pointer"

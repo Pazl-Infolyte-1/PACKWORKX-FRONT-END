@@ -21,8 +21,7 @@ const MachineDashboardTable = ({
   setIsLoading,
   onAddProcess,
   setAlerts,
-  setOpenFieldValuesModal,
-  setOpenFieldModal,
+  setOpenFieldValuesModal
 }) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -174,7 +173,7 @@ const MachineDashboardTable = ({
                           label: 'Field, Values',
                           icon: cilFlipToBack,
                           onClick: () => {
-                            setOpenFieldModal({ open: true, id: cell.id })
+                            setOpenFieldValuesModal({ show: true, id: cell.id })
                           },
                         },
                         {

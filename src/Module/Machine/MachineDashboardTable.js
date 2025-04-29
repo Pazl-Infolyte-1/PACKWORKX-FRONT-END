@@ -9,7 +9,7 @@ import {
 } from '@coreui/react'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
+import { cilFlipToBack, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 import apiMethods from '../../api/config'
 
 const MachineDashboardTable = ({
@@ -21,6 +21,8 @@ const MachineDashboardTable = ({
   setIsLoading,
   onAddProcess,
   setAlerts,
+  setOpenFieldValuesModal,
+  setOpenFieldModal,
 }) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -71,9 +73,7 @@ const MachineDashboardTable = ({
         <CTable striped hover className=" w-full">
           <CTableHead className="bg-gray-100 sticky top-0 z-10">
             <CTableRow>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                ID
-              </CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">ID</CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Name <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
@@ -164,10 +164,17 @@ const MachineDashboardTable = ({
                           },
                         },
                         {
-                          label: 'Add Process',
+                          label: 'Assign Process',
                           icon: cilPlus,
                           onClick: () => {
                             onAddProcess && onAddProcess(cell.id, cell.machine_name)
+                          },
+                        },
+                        {
+                          label: 'Field, Values',
+                          icon: cilFlipToBack,
+                          onClick: () => {
+                            setOpenFieldModal({ open: true, id: cell.id })
                           },
                         },
                         {

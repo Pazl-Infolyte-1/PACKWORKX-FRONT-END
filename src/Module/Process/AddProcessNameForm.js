@@ -29,7 +29,7 @@ const ProcessForm = ({ onSubmit, initialData, onCancel }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="col-span-1 sm:col-span-2">
           <label htmlFor="processName" className="block text-sm font-medium text-gray-700">
-            Process Name
+            Process Name <span className="text-red-500">*</span>
           </label>
           <input
             type="text"

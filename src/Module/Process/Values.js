@@ -32,8 +32,7 @@ function Values({
 
       const idToPass = matchingProcess ? matchingProcess.id : openValuesModal.id
       const response = await apiMethods.getProcessDetails(idToPass)
-
-      setProcessValue(response.data.data)
+      setProcessValue(response?.data?.data)
     } catch (error) {
       console.error('Fetch error:', error)
       setAlerts([{ severity: 'error', message: 'Failed to fetch process values' }])
@@ -87,23 +86,28 @@ function Values({
             >
               <div className="flex-1 items-center">
                 <p className="text-sm text-gray-500">
-                  <span className="font-bold text-lg">{processValue.ProcessName?.process_name}</span>
+                  <span className="font-bold text-lg">
+                    {processValue.ProcessName?.process_name}
+                  </span>
                 </p>
               </div>
               <div className="flex items-center gap-4">
-                <button
-                  className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
-                  onClick={(e) => handleEditClick(processValue, e)}
-                >
-                  <FiEdit size={18} />
-                </button>
+                {Object.keys(processValue.process_value).length > 0 && (
+                  <button
+                    className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
+                    onClick={(e) => handleEditClick(processValue, e)}
+                  >
+                    <FiEdit size={18} />
+                  </button>
+                )}
               </div>
             </div>
 
             <div className={`overflow-hidden transition-all duration-300 ease-in-out `}>
               <div className="p-4 border-t border-gray-100">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3">Process Values</h4>
-                {processValue.process_value && (
+                {processValue.process_value &&
+                Object.keys(processValue.process_value).length > 0 ? (
                   <div className="grid grid-cols-2 gap-3">
                     {Object.entries(processValue.process_value).map(([key, value]) => (
                       <div
@@ -119,6 +123,10 @@ function Values({
                       </div>
                     ))}
                   </div>
+                ) : (
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <p className="text-gray-500">No process values available</p>
+                  </div>
                 )}
               </div>
             </div>
@@ -132,7 +140,9 @@ function Values({
                 <ActionButton
                   variant="add"
                   label={'Add Values'}
-                  onClick={() => handleAddField(openValuesModal.id)}
+                  onClick={() => {
+                    handleAddField(openValuesModal.id), setIsEdit(false)
+                  }}
                 />
               </div>
             </div>

@@ -34,8 +34,6 @@ const Process = () => {
   const [showEditModal, setShowEditModal] = useState(false)
   const { searchQuery } = useSearch()
   const searchBarRef = useRef(null)
-  console.log(pagination);
-  
 
   const fetchData = async () => {
     try {

@@ -204,7 +204,7 @@ function AddAssign({
       setAlerts([
         {
           severity: 'success',
-          message: response.data.message || 'Assigned successfully',
+          message: response?.data?.message || 'Assigned successfully',
         },
       ])
     } catch (err) {
@@ -222,7 +222,7 @@ function AddAssign({
     <>
       <div className="flex justify-between gap-3 p-2">
         <div className="w-1/2">
-          <label className="my-2 font-semibold">Machine</label>
+          <label className="my-2 font-semibold">Machine <span className='text-red-500'>*</span></label>
           <Select
             options={machineOptions}
             value={selectedMachine}
@@ -236,7 +236,7 @@ function AddAssign({
           />
         </div>
         <div className="w-1/2">
-          <label className="my-2 font-semibold">Process</label>
+          <label className="my-2 font-semibold">Process <span className='text-red-500'>*</span></label>
           <Select
             options={processOptions}
             value={selectedProcess}

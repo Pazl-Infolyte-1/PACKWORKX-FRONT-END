@@ -28,25 +28,23 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
 
   const childRef = useRef();
 
+  // const handleParentSubmit = () => {
+
+  //   if (childRef.current) {
+  //     handleFormSubmit(childRef.current.getCompleteFormData)
+  //   }
+  // };
+
   const handleParentSubmit = () => {
     if (childRef.current) {
-      handleFormSubmit(childRef.current.getCompleteFormData)
-       // Call child method
+      // Call validation method first
+      const isValid = childRef.current.validateForm();
+      
+      if (isValid) {
+        handleFormSubmit(childRef.current.getCompleteFormData);
+      }
     }
   };
-
-
-
-
-
-  useEffect(()=>{
-    // console.log(totals,'yeyeyeyeyeyeyeyeyeyey')
-  },[totals])
-  
-  // Function to update specific values
-
-  
-
   // Main state for SKU details that will be shared across components
   const [skuDetailsForm, setSkuDetailsForm] = useState([])
 
@@ -61,16 +59,6 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     totalGst:0,
     totalWithGST: 0
   })
-
-
-
-
-  // useEffect(()=>{
-  //   if(workOrdersDummy==[]){
-  //     setWorkOrdersDummy([...workOrdersData])
-  //   }
-  // },[workOrdersData])
-
 
   const [workOrders, setWorkOrders] = useState([
     {
@@ -223,7 +211,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
 
     } catch (error) {
       // console.log(error)
-      setAlerts([{ severity: "error", message: error?.response?.data?.message ||"Failed To Update SalesOrder  " }]);
+      setAlerts([{ severity: "error", message: error?.response?.data?.error ||"Failed To Update SalesOrder  " }]);
       console.error(error);
     } finally {
 

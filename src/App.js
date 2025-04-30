@@ -19,7 +19,6 @@ const App = () => {
   const storedTheme = useSelector((state) => state.theme)
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
 
-
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.href.split('?')[1])
     const theme = urlParams.get('theme') && urlParams.get('theme').match(/^[A-Za-z0-9\s]+/)[0]
@@ -47,6 +46,27 @@ const App = () => {
           <Route
             path="/"
             element={
+              isAuthenticated ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route path="/login" name="Login Page" element={<Login />} />
+          <Route path="/register" name="Register Page" element={<Register />} />
+          <Route path="/404" name="Page 404" element={<Page404 />} />
+          <Route path="/500" name="Page 500" element={<Page500 />} />
+          <Route
+            path="*"
+            element={isAuthenticated ? <DefaultLayout /> : <Navigate to="/login" replace />}
+          />
+        </Routes>
+
+        {/* <Routes>
+          <Route
+            path="/"
+            element={
               isAuthenticated == true ? (
                 <Navigate to="/dashboard" replace />
               ) : (
@@ -66,7 +86,7 @@ const App = () => {
             path="*"
             element={isAuthenticated ? <DefaultLayout /> : <Navigate to="/login" replace />}
           />
-        </Routes>
+        </Routes> */}
       </Suspense>
     </BrowserRouter>
   )

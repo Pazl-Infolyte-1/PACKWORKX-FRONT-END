@@ -51,9 +51,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     }
   }, [skuID, IsEditVersion, skuVersionID,setSkuVersionsMap]);
   
-  useEffect(() => {
-    console.log(skuValues, 'skuValues updated');
-  }, [skuValues]);
+
 
   const handleValueChange = (index, field, value) => {
     const updatedValues = [...skuValues];

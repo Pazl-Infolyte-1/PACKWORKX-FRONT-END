@@ -25,6 +25,7 @@ import createInitialSkuData from './CreateInitialSkuData'
 import { bottom } from '@popperjs/core'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
+import Drawer1 from '../../components/Drawer/Drawer1';
 
 
 function SkuList() {
@@ -55,6 +56,7 @@ function SkuList() {
   const [isPopupOpen, setPopupOpen] = useState(false)
   const [message, setMessage] = useState("")
   const dispatch = useDispatch()
+  const [errors, setErrors] = useState({})
 
 console.log("suuuuu",user)
   const [addNewSkuData, setAddNewSkuData] = useState({
@@ -160,10 +162,25 @@ console.log("suuuuu",user)
         client_id: selectedClient.client_id, // Set client_id
         client: selectedClient.company_name,   // Set company_name as client
       }));
+      if (selectedClient.client_id?.toString().trim()) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.client_id;
+          return newErrors;
+        });
+      }
     } else {
       console.log("No client found for the selected client_id");
     }
  
+
+    if (value?.trim()) {
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[name]
+        return newErrors
+      })
+    }
     console.log("name", name);
     console.log("val", value);
   };
@@ -190,78 +207,177 @@ console.log("suuuuu",user)
   const dieError = useSelector((state) => state.diecutCalculations.deckleError);
 
 
-  const handleAddSkuSubmit = async () => {
-    try {
-      if (editTag) {
-        if(dieError){
-          setAlerts([{ severity: 'error', message: dieError }])
-          return  null
-        }
-        const numberSkuData={
-          ...addNewSkuData,
-          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
-          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
-          deckle_size: Number(addNewSkuData.deckle_size),
-        }
-        const response = await apiMethods.updateSku(numberSkuData)
-        if (response?.status === 200) {
-          setEditTag(false)
-          setRefresh((prev) => !prev)
-          setAlerts([
-            {
-              severity: 'success',
-              message: response?.data?.message || 'Sku updated successfully!',
-            },
-          ])
-        } else {
-          setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong' }])
-        }
-      } else {
-        if(dieError){
-          setAlerts([{ severity: 'error', message: dieError }])
-          return  null
-        }
-        if(deckleError){
-          setAlerts([{ severity: 'error', message: deckleError }])
+//  const handleAddSkuSubmit = async () => {
+//    try {
+//      if (editTag) {
+//        if(dieError){
+//          setAlerts([{ severity: 'error', message: dieError || "1" }])
+//          return  null
+//        }
+//        const numberSkuData={
+//          ...addNewSkuData,
+//          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+//          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+//          deckle_size: Number(addNewSkuData.deckle_size),
+//        }
+//        const response = await apiMethods.updateSku(numberSkuData)
+//        if (response?.status === 200) {
+//          setEditTag(false)
+//          setRefresh((prev) => !prev)
+//          setAlerts([
+//            {
+//              severity: 'success',
+//              message: response?.data?.message || 'Sku updated successfully!',
+//            },
+//          ])
+//        } else {
+//          setAlerts([{ severity: 'error', message: response.error || 'Something went wrong' }])
+//        }
+//      } else {
+//        if(dieError){
+//          setAlerts([{ severity: 'error', message: dieError || "2"  }])
+//          return  null
+//        }
+//        if(deckleError){
+//          setAlerts([{ severity: 'error', message: deckleError|| "3"  }])
+//          return  null
+//        }
+//        if (boardSizeError) {
+//          console.warn('Blocked submission due to board size error:', boardSizeError)
+//          setAlerts([{ severity: 'error', message: boardSizeError || "4" }])
+//          return null 
+//        }
+//        console.log("addskkkk",addNewSkuData)
+//        const numberSkuData={
+//          ...addNewSkuData,
+//          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+//          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+//          deckle_size: Number(addNewSkuData.deckle_size),
+//        }
+//        const response = await apiMethods.addSku(numberSkuData)
+//        if (response?.status===201) {
+//          console.log("success res",JSON.stringify(response))
+    
+//          setRefresh((prev) => !prev)
+//          setAlerts([{ severity: 'success', message: response?.data?.message }])
+
+
+//setTimeout(() => {
+//  setAlerts([]);
+//}, 3000);
+//          if(isSingleViewPopupForType){
+//            setisSingleViewPopupForType(false)
+//          }else{
+//            setDrawerOpen(false)
+//          }
+//        } else {
+//console.log("resss eeee",response.error)
+//        }
+//      }
+//    } catch (error) {
+  
+//    }
+
+//    setTimeout(() => {
+//      setAlerts([]);
+//    }, 3000);
+//    setBoardSizeError('')
+//  }
+
+const handleAddSkuSubmit = async () => {
+  const newErrors = {}
+
+  if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
+  if (!addNewSkuData.client_id) newErrors.client_id = 'Required'
+  if (!addNewSkuData.estimate_composite_item) newErrors.estimate_composite_item = 'Required'
+  if (!addNewSkuData.default_sku_details) newErrors.default_sku_details = 'Required'
+  if (!addNewSkuData.description) newErrors.description = 'Required'
+  if (!addNewSkuData.composite_type) newErrors.composite_type = 'Required'
+  if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
+  if (!addNewSkuData.ups) newErrors.ups = 'Required'
+  if (!addNewSkuData.select_dies) newErrors.select_dies = 'Required'
+  if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
+  if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
+  if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
+  if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
+  if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
+  if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
+  if (!addNewSkuData.ply) newErrors.ply = 'Required'
+
+
+
+
+
+  
+
+
+  setErrors(newErrors)
+
+  if (Object.keys(newErrors).length === 0) {
+    console.log("gggghhhg",)
+  }
+  if(dieError){
+              setAlerts([{ severity: 'error', message: dieError || "1" }])
+              return  null
+            }
+                    if(deckleError){
+          setAlerts([{ severity: 'error', message: deckleError|| "3"  }])
           return  null
         }
         if (boardSizeError) {
           console.warn('Blocked submission due to board size error:', boardSizeError)
-          setAlerts([{ severity: 'error', message: boardSizeError }])
-          return null // 🔴 Stop submission
+          setAlerts([{ severity: 'error', message: boardSizeError || "4" }])
+          return null 
         }
-        console.log("addskkkk",addNewSkuData)
-        const numberSkuData={
-          ...addNewSkuData,
-          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
-          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
-          deckle_size: Number(addNewSkuData.deckle_size),
-        }
-        const response = await apiMethods.addSku(numberSkuData)
-        if (response?.status === 201) {
-          //setDrawerOpen(false)
-          setRefresh((prev) => !prev)
-          setAlerts([{ severity: 'success', message: 'Sku Added successfully!' }])
-          if(isSingleViewPopupForType){
-            setisSingleViewPopupForType(false)
-          }else{
-            setDrawerOpen(false)
-          }
-        } else {
-          setAlerts([
-            { severity: 'error', message: response.data.message || 'Something went wrong' },
-          ])
-        }
-      }
-    } catch (error) {
-      console.error(error)
-      setAlerts([
-        { severity: 'error', message: error?.response?.data?.message || 'Something went wrong' },
-      ])
+
+  console.log("addskkkk", addNewSkuData);
+
+  const numberSkuData = {
+    ...addNewSkuData,
+    width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+    length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+    deckle_size: Number(addNewSkuData.deckle_size),
+  };
+console.log("su data",numberSkuData)
+  try {
+    let response;
+
+    if (editTag) {
+      response = await apiMethods.updateSku(numberSkuData);
+    } else {
+      response = await apiMethods.addSku(numberSkuData);
     }
-    setAlerts([])
-    setBoardSizeError('')
+
+    console.log("SKU request successful:", response);
+    if (response?.data?.message) {
+      setAlerts([{ severity: 'success', message: response.data.message }]);
+      setRefresh((prev) => !prev)
+      if(isSingleViewPopupForType){
+                    setisSingleViewPopupForType(false)
+                  }else{
+                    setDrawerOpen(false)
+                  }
+                  setEditTag(false)
+    }
+  } catch (error) {
+    console.error("Error adding SKU:", error);
+    console.log(JSON.stringify(error))
+    if(error?.response?.data?.error){
+      setAlerts([{ severity: 'error', message: error?.response?.data?.error}]);
+    }else{
+      setAlerts([{ severity: 'error', message: error?.response?.data?.message}]);
+
+    }
+
   }
+   finally {
+    setTimeout(() => {
+      setAlerts([]);
+    }, 3000);
+  }
+};
+
+
 
   const handleSkuEdit = (id) => {
     const selectedSku = skudata.find((sku) => sku.id === id)
@@ -320,31 +436,31 @@ console.log("suuuuu",user)
 
     setStrictAdherence(selectedSku.strict_adherence || false)
   }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      // skip sku get call
-      if (location.state?.skipInitialFetch && !refresh) {
-        return
-      }
-      try {
-        const response = await apiMethods.getSkuList({
-          search: searchQuery || '',
-          client: selectedDisplayName || '',
-          sku_type: selectedSkuType || '',
-          page: pagination?.currentPage || 1,
-          limit: message ? 10000 : limit,
-        })
-        const clientResponse = await apiMethods.getClients()
-
-        setSkuData(response.data)
-        setClient(clientResponse.data)
-        setPagination(response.pagination)
-        setDashboard(response.dashboard)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
+  const fetchData = async () => {
+    // skip sku get call
+    if (location.state?.skipInitialFetch && !refresh) {
+      return
     }
+    try {
+      const response = await apiMethods.getSkuList({
+        search: searchQuery || '',
+        client: selectedDisplayName || '',
+        sku_type: selectedSkuType || '',
+        page: pagination?.currentPage || 1,
+        limit: message ? 10000 : limit,
+      })
+      const clientResponse = await apiMethods.getClients()
+
+      setSkuData(response.data)
+      setClient(clientResponse.data)
+      setPagination(response.pagination)
+      setDashboard(response.dashboard)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
+  useEffect(() => {
+ 
     fetchData()
   }, [
     refresh,
@@ -355,7 +471,7 @@ console.log("suuuuu",user)
     selectedSkuType,
     limit,
     location.state?.skipInitialFetch,
-    message
+    message,
   ])
 
   // Clear all filters
@@ -561,6 +677,7 @@ console.log("mess",message)
             editTag={editTag}
             alerts={alerts}
             setAlerts={setAlerts}
+            onSkuDeleted={fetchData} 
           />
         </div>
       </div>
@@ -634,6 +751,8 @@ console.log("mess",message)
           setPopupOpen={setPopupOpen}
           message={message}
           setMessage={setMessage}
+          errors={errors}
+          setErrors={setErrors}
         />
       </Drawer>
     </div>

@@ -5,7 +5,8 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  useEffect(async() => {
+  useEffect(() => {
+    // Remove the async keyword from useEffect
     const token = localStorage.getItem('token')
 
     if (token) {

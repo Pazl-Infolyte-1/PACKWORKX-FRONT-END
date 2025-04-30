@@ -34,7 +34,9 @@ function DieCutBox({
   setPopupOpen,
   isPopupOpen,
   message,
-  setMessage
+  setMessage,
+  errors,
+  setErrors
 }) {
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
   const [selectedDiePopup, setSelectedDiePopup] = useState(null)
@@ -76,6 +78,13 @@ function DieCutBox({
         length_board_size_cm2:selectedDiePopup.board_length
 
       }))
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.select_dies;
+        delete newErrors.width_board_size_cm2;
+        delete newErrors.length_board_size_cm2;
+        return newErrors;
+      });
     }
   }, [selectedDiePopup])
   console.log("is open",isopenval)
@@ -393,8 +402,15 @@ useEffect(() => {
       ...prev,
       deckle_size: diecutCalculations.calculatedMin,
     }));
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.deckle_size
+      return newErrors;
+    });
   }
 }, [diecutCalculations.calculatedMin]);
+
+console.log("select dies",selectedDiePopup)
 
 
   return (
@@ -473,7 +489,13 @@ useEffect(() => {
         
         </div>
         <div>
-            <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Name</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    SKU Name
+    <span className="text-red-500 ml-1">*</span>
+    {errors.sku_name && (
+      <span className="text-red-500 text-sm ml-2 align-middle">SKU Name is {errors.sku_name}</span>
+    )}
+  </label>
             <input
               id="sku_name"
               name="sku_name"
@@ -484,7 +506,13 @@ useEffect(() => {
           </div>
 
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Client Name</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    Client Name
+    <span className="text-red-500 ml-1">*</span>
+    {errors.client_id && (
+      <span className="text-red-500 text-sm ml-2 align-middle">Client is {errors.client_id}</span>
+    )}
+  </label>
           <select
             name="client"
             id="client"
@@ -553,23 +581,39 @@ useEffect(() => {
           <PlyToggle
   value={addNewSkuData.ply}
   onChange={(selectedPly) => updateSkuValues(selectedPly)}
+  errorMessage={errors.ply}
 />
 <Tooltip title={unitTooltip}>
         <div>
-          <Input
-            skuName="UPS"
-            id="ups"
-            name="ups"
-            value={addNewSkuData.ups}
-            onChange={handleChange}
-            requiredSymbol={true}
-            //placeholder="UPS"
-          />
+          <div>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    UPS
+    <span className="text-red-500 ml-1">*</span>
+    {errors.ups && (
+      <span className="text-red-500 text-sm ml-2 align-middle">UPS is {errors.ups}</span>
+    )}
+  </label>
+            <input
+              id="ups"
+              name="ups"
+              type='number'
+              min={0}
+              value={addNewSkuData.ups}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
         </div>
 </Tooltip>
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Die</label>
-          <div className="flex items-center gap-2">
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    Die
+    <span className="text-red-500 ml-1">*</span>
+    {errors.select_dies && (
+      <span className="text-red-500 text-sm ml-2 align-middle">Die is {errors.select_dies}</span>
+    )}
+  </label>        
+    <div className="flex items-center gap-2">
             <input
               type="text"
               name="select_dies"
@@ -591,7 +635,7 @@ useEffect(() => {
         </div>
 
         <div>
-          <Input
+          {/*<Input
             skuName="Customer Reference"
             id="customer_reference"
             name="customer_reference"
@@ -599,23 +643,52 @@ useEffect(() => {
             onChange={handleChange}
             //placeholder="Customer Reference"
             requiredSymbol={true}
-          />
+          />*/}
+           <div>
+          <div>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        Customer Reference
+    <span className="text-red-500 ml-1">*</span>
+    {errors.customer_reference && (
+      <span className="text-red-500 text-sm ml-2 align-middle">Customer Reference is {errors.customer_reference}</span>
+    )}
+  </label>
+            <input
+              id="customer_reference"
+              name="customer_reference"
+              type='number'
+              min={0}
+              value={addNewSkuData.customer_reference}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+        </div>
         </div>
 
         <div>
-          <Input
-            skuName="Reference #"
-            id="reference_number"
-            name="reference_number"
-            value={addNewSkuData.reference_number}
-            onChange={handleChange}
-            //placeholder="Reference Number"
-            requiredSymbol={true}
-          />
+            <div>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        Reference #
+    <span className="text-red-500 ml-1">*</span>
+    {errors.reference_number && (
+      <span className="text-red-500 text-sm ml-2 align-middle">Reference # is {errors.reference_number}</span>
+    )}
+  </label>
+            <input
+              id="reference_number"
+              name="reference_number"
+              type='number'
+              min={0}
+              value={addNewSkuData.reference_number}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
         </div>
 
         <div>
-          <Input
+          {/*<Input
             skuName="Internal ID"
             id="internal_id"
             name="internal_id"
@@ -623,11 +696,40 @@ useEffect(() => {
             onChange={handleChange}
             //placeholder="Internal ID"
             requiredSymbol={true}
-          />
+          />*/}
+            <div>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        Internal ID
+    <span className="text-red-500 ml-1">*</span>
+    {errors.internal_id && (
+      <span className="text-red-500 text-sm ml-2 align-middle">Internal ID is {errors.internal_id}</span>
+    )}
+  </label>
+            <input
+              id="internal_id"
+              name="internal_id"
+              value={addNewSkuData.internal_id}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
         </div>
+
+
+
+
  <Tooltip title={unitTooltip}>
         <div>
-                      <p className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Board Size<span className="text-gray-500 text-sm">(W × L)</span></p>
+                      <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        Board Size <span className="text-gray-500 text-sm">(W × L)</span>
+    <span className="text-red-500 ml-1">*</span>
+    {errors.width_board_size_cm2 && (
+      <span className="text-red-500 text-sm ml-2 align-middle">Width is {errors.width_board_size_cm2}</span>
+    )}
+        {errors.length_board_size_cm2 && (
+      <span className="text-red-500 text-sm ml-2 align-middle">Length is {errors.length_board_size_cm2}</span>
+    )}
+  </label>
                       <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
                       <input
       id="width_board_size_cm2"
@@ -654,11 +756,18 @@ useEffect(() => {
                     </div>
                     </Tooltip>
 
+
+
         <div>
         <Tooltip title={unitTooltip}>
         <div>
-  <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Deckle Size</label>
-  <input
+   <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        Deckle Size
+    <span className="text-red-500 ml-1">*</span>
+    {errors.deckle_size && (
+      <span className="text-red-500 text-sm ml-2 align-middle">Deckle Size is {errors.deckle_size}</span>
+    )}
+  </label>  <input
   id="deckle_size"
   name="deckle_size"
   type="number"
@@ -677,7 +786,23 @@ useEffect(() => {
         </div>
 
         <div>
-          <Input
+        <div>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        Minimum Order Level
+    <span className="text-red-500 ml-1">*</span>
+    {errors.minimum_order_level && (
+      <span className="text-red-500 text-sm ml-2 align-middle">Minimum Order Level is {errors.minimum_order_level}</span>
+    )}
+  </label>
+            <input
+              id="minimum_order_level"
+              name="minimum_order_level"
+              value={addNewSkuData.minimum_order_level}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+          {/*<Input
             skuName="Minimum Order Level"
             id="minimum_order_level"
             name="minimum_order_level"
@@ -686,7 +811,7 @@ useEffect(() => {
             onChange={handleChange}
             requiredSymbol={true}
             //placeholder="Minimum Order Level"
-          />
+          />*/}
         </div>
 
 

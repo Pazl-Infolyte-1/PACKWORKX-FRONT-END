@@ -20,6 +20,10 @@ import { useEffect, useRef, useState } from 'react'
 import CommonPagination from '../../components/New/Pagination'
 import { IoSearch } from 'react-icons/io5'
 import apiMethods from '../../api/config'
+import { useDispatch, useSelector } from 'react-redux';
+import { setCompositeArray } from '../../action'; // adjust path
+
+
 const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue,setVisible,pagination, setPagination, limit, setLimit, setRefresh,setSearchQuery})=>{
 	const [localSelected, setLocalSelected] = useState([]);
 	const [inputValue, setInputValue] = useState('');
@@ -28,6 +32,8 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
 	const [clients, setClients] = useState([]);
   const [skuTypes, setSkuTypes] = useState([]);
   const [selectedSkuType, setSelectedSkuType] = useState('');
+  const compositeArray = useSelector((state) => state.compositeArray);
+  const dispatch = useDispatch();
   
 	useEffect(() => {
 		const fetchClients = async () => {
@@ -83,6 +89,14 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
 			return updated;
 		  });
 		}
+
+    const idNum = Number(id); // make sure types are consistent
+
+    const updatedArray = checked
+      ? [...compositeArray, idNum] // add if checked
+      : compositeArray.filter((itemId) => itemId !== idNum); // remove if unchecked
+  
+    dispatch(setCompositeArray(updatedArray));
 	  };
 	
 	  const addArray = () => {
@@ -113,6 +127,10 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
       setSelectedClientId && setSelectedClientId("");
       setSelectedSkuType && setSelectedSkuType("");
     };
+
+    useEffect(() => {
+      console.log('Redux compositeArray:', compositeArray);
+    }, [compositeArray]);
 	return (
 		<>
 		<div>
@@ -191,7 +209,9 @@ const CompositePopupTable=({skuSelected,onClientSelect,skuListTable,checkedValue
                 <CTableDataCell className="py-2 py-1 text-center">
                   <input
                     type="checkbox"
+                    checked={compositeArray.includes(item.id)}
                     onChange={(e) => handleCheckboxChange(item.id, e.target.checked)}
+                    disabled={compositeArray.includes(item.id)} 
                   />
                 </CTableDataCell>
                 <CTableDataCell className="py-2 py-1 text-gray-700">{item.id}</CTableDataCell>

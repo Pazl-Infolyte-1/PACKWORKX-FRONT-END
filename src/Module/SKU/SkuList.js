@@ -56,6 +56,7 @@ function SkuList() {
   const [isPopupOpen, setPopupOpen] = useState(false)
   const [message, setMessage] = useState("")
   const dispatch = useDispatch()
+  const [errors, setErrors] = useState({})
 
 console.log("suuuuu",user)
   const [addNewSkuData, setAddNewSkuData] = useState({
@@ -161,10 +162,25 @@ console.log("suuuuu",user)
         client_id: selectedClient.client_id, // Set client_id
         client: selectedClient.company_name,   // Set company_name as client
       }));
+      if (selectedClient.client_id?.toString().trim()) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.client_id;
+          return newErrors;
+        });
+      }
     } else {
       console.log("No client found for the selected client_id");
     }
  
+
+    if (value?.trim()) {
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[name]
+        return newErrors
+      })
+    }
     console.log("name", name);
     console.log("val", value);
   };
@@ -269,6 +285,37 @@ console.log("suuuuu",user)
 //  }
 
 const handleAddSkuSubmit = async () => {
+  const newErrors = {}
+
+  if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
+  if (!addNewSkuData.client_id) newErrors.client_id = 'Required'
+  if (!addNewSkuData.estimate_composite_item) newErrors.estimate_composite_item = 'Required'
+  if (!addNewSkuData.default_sku_details) newErrors.default_sku_details = 'Required'
+  if (!addNewSkuData.description) newErrors.description = 'Required'
+  if (!addNewSkuData.composite_type) newErrors.composite_type = 'Required'
+  if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
+  if (!addNewSkuData.ups) newErrors.ups = 'Required'
+  if (!addNewSkuData.select_dies) newErrors.select_dies = 'Required'
+  if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
+  if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
+  if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
+  if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
+  if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
+  if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
+  if (!addNewSkuData.ply) newErrors.ply = 'Required'
+
+
+
+
+
+  
+
+
+  setErrors(newErrors)
+
+  if (Object.keys(newErrors).length === 0) {
+    console.log("gggghhhg",)
+  }
   if(dieError){
               setAlerts([{ severity: 'error', message: dieError || "1" }])
               return  null
@@ -291,7 +338,7 @@ const handleAddSkuSubmit = async () => {
     length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
     deckle_size: Number(addNewSkuData.deckle_size),
   };
-
+console.log("su data",numberSkuData)
   try {
     let response;
 
@@ -704,6 +751,8 @@ console.log("mess",message)
           setPopupOpen={setPopupOpen}
           message={message}
           setMessage={setMessage}
+          errors={errors}
+          setErrors={setErrors}
         />
       </Drawer>
     </div>

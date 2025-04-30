@@ -13,10 +13,17 @@ function Input({
   readOnly = false,
   title,
   requiredSymbol = false, 
+  errorMessage = "" 
 }) {
   return (
     <div className={`font-sans text-black ${className}`}>
-      {skuName && <label htmlFor={id}           className={`text-[16px] font-medium ${requiredSymbol ? "after:content-['*'] after:text-red-500 after:ml-1" : ""}`}>{skuName}</label>}
+      {skuName &&  <label htmlFor={id} className="text-[16px] font-medium flex items-center gap-1">
+          {skuName}
+          {requiredSymbol && <span className="text-red-500">*</span>}
+          {errorMessage && (
+            <span className="text-red-500 text-sm ml-1">{errorMessage}</span>
+          )}
+        </label>}
       <input
         type={type}
         id={id}

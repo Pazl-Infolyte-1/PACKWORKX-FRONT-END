@@ -5,7 +5,11 @@ import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilPen } from '@coreui/icons'
 import ActionButton from '../../components/New/ActionButton'
 
-function FieldValues({ openFieldValuesModal, setOpenFieldModal }) {
+function FieldValues({
+  openFieldValuesModal,
+  setOpenMachineValuesModal,
+  setOpenMachineFieldModal,
+}) {
   const [assignProcess, setAssignProcess] = useState([])
   const [machineProcess, setMachineProcess] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -75,7 +79,7 @@ function FieldValues({ openFieldValuesModal, setOpenFieldModal }) {
       {/* Machine Header */}
       <div className="mb-6 bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
         <div className="flex items-center justify-between">
-          <div className='flex items-center'>
+          <div className="flex items-center">
             <h2 className="text-2xl font-bold text-gray-800">
               {machineProcess.machine.machine_name}
             </h2>
@@ -116,8 +120,13 @@ function FieldValues({ openFieldValuesModal, setOpenFieldModal }) {
               />
             </div>
             <div className="flex gap-2 mt-2">
-              <ActionButton label={'Fields'} variant='minimal' className='w-1/2'/>
-              <ActionButton label={'Values'} variant='minimal' className='w-1/2'/>
+              <ActionButton
+                label={'Fields'}
+                variant="minimal"
+                className="w-1/2"
+                onClick={() => setOpenMachineFieldModal({ open: true, id: process.process_id })}
+              />
+              <ActionButton label={'Values'} variant="minimal" className="w-1/2" />
             </div>
           </div>
         ))}

@@ -21,7 +21,8 @@ import AddAssign from './AddAssign'
 import { RiEyeLine } from 'react-icons/ri'
 import ProcessForm from '../Process/AddProcessNameForm'
 import FieldValues from './FieldValues'
-import Field from '../Process/Field'
+import MachineField from './MachineField'
+import MachineValues from './MachineValues'
 
 export default function MachineMaster() {
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
@@ -47,6 +48,8 @@ export default function MachineMaster() {
   const [formData, setFormData] = useState({
     process_name: '',
   })
+  const [openMachineValuesModal, setOpenMachineValuesModal] = useState({ open: false, id: null })
+  const [openMachineFieldModal, setOpenMachineFieldModal] = useState({ open: false, id: null })
 
   const machineData = [
     {
@@ -319,7 +322,36 @@ export default function MachineMaster() {
           <FieldValues
             openFieldValuesModal={openFieldValuesModal}
             setOpenFieldModal={setOpenFieldModal}
+            setOpenMachineFieldModal={setOpenMachineFieldModal}
+            setOpenMachineValuesModal={setOpenMachineValuesModal}
           />
+        </PopUp>
+
+        <PopUp
+          visible={openMachineFieldModal.open}
+          setVisible={() => setOpenMachineFieldModal({ open: false, id: null })}
+          width={800}
+          height={600}
+          header="Add Field"
+          showCloseButton={true}
+        >
+          <MachineField
+            openMachineFieldModal={openMachineFieldModal}
+            isEdit={isEdit}
+            setIsEdit={setIsEdit}
+            setAlerts={setAlerts}
+          />
+        </PopUp>
+
+        <PopUp
+          visible={openMachineValuesModal.open}
+          setVisible={() => setOpenMachineValuesModal({ open: false, id: null })}
+          width={800}
+          height={500}
+          header="Values"
+          showCloseButton={true}
+        >
+          <MachineValues id={openMachineValuesModal.id} />
         </PopUp>
       </div>
     </div>

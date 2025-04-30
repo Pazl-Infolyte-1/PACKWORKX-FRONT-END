@@ -79,14 +79,14 @@ const MachineDashboardTable = ({
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Serial No <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-3 text-gray-600 font-md">
+              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-md">
                 Model No <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Manufacturer <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">Power</CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-md">
+              <CTableHeaderCell className="py-3 px-0 text-gray-600 font-md">
                 Warranty Exp
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
@@ -126,7 +126,7 @@ const MachineDashboardTable = ({
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.warranty_expiry}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                  <CTableDataCell className="py-3 px-4 text-gray-700 align-middle">
                     <select
                       value={cell.machine_status}
                       onChange={(e) => handleStatusChange(cell.id, e.target.value)}
@@ -152,7 +152,7 @@ const MachineDashboardTable = ({
                       </option>
                     </select>
                   </CTableDataCell>
-                  <CTableDataCell className="px-2 sm:px-4 text-gray-700 relative">
+                  <CTableDataCell className="px-2 sm:px-4 text-gray-700 align-middle">
                     <ThreeDotMenu
                       value={[
                         {

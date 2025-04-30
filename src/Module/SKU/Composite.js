@@ -24,6 +24,7 @@ import clientImg from '../../assets/images/client.jpg'
 import { useDispatch, useSelector } from 'react-redux'
 import RoutePopup from './RoutePopup'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
+import { setCompositeArray } from '../../action';
 
 const compositeTypes = [
   { id: '1', name: 'Partition' },
@@ -86,6 +87,8 @@ function Composite({
   const [entityType, setEntityType] = useState('') // State to hold entity_type
   const [submitFromRsc, setSubmitFromRsc] = useState(true)
   const dispatch = useDispatch()
+  const compositeArray = useSelector((state) => state.compositeArray);
+
   const [displayAsChips,setDisplayAsChips] = useState([])
   const [isSingleViewPopupRoute, setisSingleViewPopupRoute] = useState(false)
   const [fullRouteResponse, setFullRouteResponse] = useState(null);
@@ -163,7 +166,7 @@ function Composite({
         sku_name: matchedSku ? matchedSku.sku_name : '', // Update sku_name based on selection
         ratio: matchedSku ? matchedSku.ratio : '', // Optionally update ratio if needed
       }
-
+      console.log('Selected dropdown values:', updatedFields);
       return updatedFields // Return the updated fields
     })
   }
@@ -462,6 +465,22 @@ function Composite({
           setisSingleViewPopupRoute(true)
         }
     
+        useEffect(() => {
+          // Only extract ids that are valid, and convert them to numbers
+          const compositeIds = skuFields
+            .filter((field) => field.id !== '') // skip empty ids
+            .map((field) => Number(field.id));  // convert all to numbers
+        
+          console.log('Dispatching composite IDs:', compositeIds);
+        
+          dispatch(setCompositeArray(compositeIds));
+        }, [skuFields]); // runs whenever skuFields changes
+        console.log("sku fields",skuFields)
+
+        useEffect(() => {
+          console.log('Redux main comp:', compositeArray);
+        }, [compositeArray]);
+ 
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
@@ -684,9 +703,10 @@ function Composite({
       )}
       {skuList.map((sku) => {
         // Check if the SKU is already selected in other fields
-        const isSelected = skuFields.some((f, i) => f.id === sku.id && i !== index);
+        //const isSelected = skuFields.some((f, i) => f.id === sku.id && i !== index);
+        const isInComposite = compositeArray.includes(Number(sku.id));
         return (
-          <option key={sku.id} value={sku.id} disabled={isSelected}>
+          <option key={sku.id} value={sku.id} disabled={isInComposite}>
             {sku.sku_name}
           </option>
         );

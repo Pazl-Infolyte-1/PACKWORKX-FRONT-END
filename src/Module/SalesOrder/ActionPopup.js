@@ -7,16 +7,16 @@ function ActionPopup({ visible, setVisible }) {
   const [data, setData] = useState([])
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get('https://mocki.io/v1/ab99355f-def5-4ab1-9402-397d2db4678e')
-        setData(response.data.sections?.[0]?.data || [])
-      } catch (error) {
-        console.error('Error fetching data:', error)
-        console.error('Error fetching data:', error)
-      }
-    }
-    fetchData()
+    // async function fetchData() {
+    //   try {
+    //     const response = await axios.get('https://mocki.io/v1/ab99355f-def5-4ab1-9402-397d2db4678e')
+    //     setData(response.data.sections?.[0]?.data || [])
+    //   } catch (error) {
+    //     console.error('Error fetching data:', error)
+    //     console.error('Error fetching data:', error)
+    //   }
+    // }
+    // fetchData()
   }, [])
   const header = () => (
     <div className="flex space-between items-center gap-52  w-full ">

@@ -12,24 +12,7 @@ import AddEditDesignation from '../../Designation/AddEditDesignation'
 import AddEditRoleForm from '../../Role/AddEditRoleForm'
 import { FaMapMarkerAlt } from 'react-icons/fa'
 
-// Placeholder data for dropdowns (would typically come from API)
-const DEPARTMENT_OPTIONS = [
-  { id: 1, name: 'Engineering' },
-  { id: 2, name: 'Human Resources' },
-  { id: 3, name: 'Marketing' }
-];
 
-const DESIGNATION_OPTIONS = [
-  { id: 1, name: 'Junior Developer' },
-  { id: 2, name: 'Senior Developer' },
-  { id: 3, name: 'Manager' }
-];
-
-const CompanyAddressOption = [
-  { id: 1, name: 'Hueston,Germany' },
-  { id: 2, name: 'Munich,Germany' },
-  { id: 3, name: 'London,UK' }
-];
 
 const REPORTING_OPTIONS = [
   { id: 1, name: 'Jane Smith' },
@@ -37,11 +20,7 @@ const REPORTING_OPTIONS = [
   { id: 3, name: 'Sarah Williams' }
 ];
 
-const Role_Options = [
-  { id: 1, name: 'Upper Management' },
-  { id: 2, name: 'Ethical Hacking Persistance' },
-  { id: 3, name: 'Localised Publisher' }
-];
+
 
 const EMPLOYMENT_TYPES = [
   'Full-time',
@@ -76,7 +55,7 @@ const defaultFormState = {
 
 function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, handleSubmit, isEdit, dropdownOptions, setDropdownOptions, setAlerts, }) {
   const label = { inputProps: { 'aria-label': 'Switch demo' } }
-
+  
   // Add this at the top with your other useState/useEffect hooks
   const fileInputRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -90,7 +69,10 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
   const [machineList, setMachineList] = useState([])
   const [machineSearchQuery, setMachineSearchQuery] = useState('')
   const [machineDropdownOpen, setMachineDropdownOpen] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(null);
   const machineDropdownRef = useRef(null);
+
 
 
 
@@ -158,7 +140,6 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
     setCountrySearchValue("");
   };
 
-  const [selectedCountry, setSelectedCountry] = useState(null);
 
   const handleCountrySelect = (country) => {
     setSelectedCountry(country);
@@ -207,29 +188,38 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
         console.error("No file selected");
         return;
       }
-
+  
+      // Set loading state to true when upload starts
+      setImageLoading(true);
+  
       const formData = new FormData();
       formData.append("file", file);
-
+  
       const apiResponse = await apiMethods.uploadFile(formData);
-
+  
       if (!apiResponse || !apiResponse.data || !apiResponse.data.data) {
         throw new Error("Invalid response from the server");
       }
+  
+      const fileUrl = apiResponse?.data?.data?.file_url;
 
-      const fileUrl = apiResponse.data.data.file_url;
       if (!fileUrl) {
         throw new Error("File URL not found in the response");
       }
-
+  
       setFormData((prev) => ({
         ...prev,
-        image: fileUrl, // Corrected syntax for state update
+        image: fileUrl,
       }));
     } catch (error) {
       console.error("Error uploading image:", error.message || error);
-      alert("Failed to upload image. Please try again.");
+      setAlerts([{
+        severity: "error",
+        message: "Image upload failed. Please try again."
+      }]);      
+      setImageLoading(false);
     }
+    
   };
 
   const handleAddSkill = () => {
@@ -367,21 +357,48 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
           {/* <div className="max-w-7xl mx-auto h-[90vh] px-3 py-3 mt-6 "> */}
           <div className=" mx-auto h-[90vh] px-3 py-3 mt-6 ">
 
-            <div className="flex flex-col items-center justify-center">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleImageUpload}
-                accept="image/*"
-                className="hidden"
-              />
-              <img
-                src={formData.image || profile}
-                alt="Profile"
-                className="w-24 h-24 rounded-full cursor-pointer"
-                onClick={handleImageClick}
-              />
-            </div>
+          {/* Replace your existing image preview with this */}
+<div className="flex flex-col items-center justify-center">
+  <input
+    type="file"
+    ref={fileInputRef}
+    onChange={handleImageUpload}
+    accept="image/*"
+    className="hidden"
+  />
+  <div className="relative w-24 h-24">
+    {/* Image Container */}
+    <div 
+      className="w-24 h-24 rounded-full overflow-hidden cursor-pointer"
+      onClick={handleImageClick}
+    >
+      {/* Display image with an opacity effect while loading */}
+      <img
+  src={formData.image || profile}
+  alt="Profile"
+  className={`w-24 h-24 object-cover ${imageLoading ? 'opacity-40' : 'opacity-100'}`}
+  onLoad={() => setImageLoading(false)} // 👈 This ensures loader is hidden only after image is loaded
+/>
+
+    </div>
+    
+    {/* Loading Indicator - Only shows when imageLoading is true */}
+    {imageLoading && (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    )}
+    
+    {/* Optional: Add an overlay with a camera icon to indicate it's clickable */}
+    <div className="absolute bottom-0 right-0 bg-black rounded-full p-1 shadow cursor-pointer"
+         onClick={handleImageClick}>
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    </div>
+  </div>
+</div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
               {/* Name */}
@@ -733,7 +750,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     value={formData.reporting_to || ""}
                     onChange={handleInputChange}
                   >
-                    <option value="" disabled>Select Reporting To <span className='text-red-600'>*</span></option>
+                    <option value="" disabled>Select Reporting To</option>
 
                     {REPORTING_OPTIONS.map(manager => (
                       <option key={manager.id} value={3}>
@@ -800,7 +817,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
               {/* Skills */}
               {/* Skills */}
               <div>
-                <h6 className="mb-2">Skills <span className='text-red-600'>*</span></h6>
+                <h6 className="mb-2">Machine Mapping<span className='text-red-600'>*</span></h6>
                 <div className={`flex flex-wrap gap-2 ${skills.length > 0 ? 'mb-2' : ''}`}>
                   {skills?.map((skill, index) => (
                     <div

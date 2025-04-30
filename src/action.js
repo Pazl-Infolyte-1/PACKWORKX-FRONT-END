@@ -4,3 +4,10 @@ export const logout = () => {
 	  type: 'LOGOUT',
 	};
   };
+
+  // actions.js
+export const setCompositeArray = (payload) => ({
+	type: 'SET_COMPOSITE_ARRAY',
+	payload,
+  });
+  

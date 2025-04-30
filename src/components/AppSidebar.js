@@ -1,4 +1,4 @@
-import React,{ useEffect,useState,useCallback } from 'react'
+import React,{ useEffect,useState,useCallback, useRef } from 'react'
 import { useSelector,useDispatch } from 'react-redux'
 
 import {
@@ -31,6 +31,14 @@ const AppSidebar = () => {
   const getMemoizedNavigation = useCallback(() => {
     return combinedNavigation
   },[combinedNavigation])
+  const sidebarRef = useRef(null);
+
+  useEffect(() => {
+    if (sidebarRef.current) {
+      console.log('Sidebar width:', sidebarRef.current.offsetWidth, 'px');
+    }
+  }, []); // empty dependency array -> logs once when mounted
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,6 +73,7 @@ const AppSidebar = () => {
       onVisibleChange={(visible) => {
         dispatch({ type: 'set',sidebarShow: visible })
       }}
+      ref={sidebarRef}
     >
       <CSidebarHeader className="border-bottom d-flex align-items-center justify-content-between p-3">
         <CSidebarBrand to="/">

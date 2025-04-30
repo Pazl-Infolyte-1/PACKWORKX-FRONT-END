@@ -26,13 +26,15 @@ const WorkOrders = () => {
   const [isConfirmationModaleOpen,setIsConfirmationModaleOpen]=useState(false)
   const [deleteId, setDeleteId] = useState(null); // holds id to delete
   const [alerts,setAlerts] = useState([])
-  const [manufactureFilter,setManufactureFilter] = useState([])
+  const [loading,setLoading]= useState(true)
+  const [manufactureFilter,setManufactureFilter] = useState("")
   const searchBarRef = useRef(null)
 
 
 
   const  fetchData = async () => {
     try {
+      setLoading(true)
       const response = await apiMethods.getWorkOrders({
         manufacture:manufactureFilter ,
         sku_name: searchQuery,
@@ -47,6 +49,9 @@ const WorkOrders = () => {
       }))
     } catch (error) {
       console.error('Error fetching data:', error)
+    }
+    finally{
+    setLoading(false)
     }
   }
   // Fetch Data
@@ -87,13 +92,14 @@ const WorkOrders = () => {
       try {
         const response = await apiMethods.deleteWorkOrder(deleteId); // correct usage
         if (response?.status === 200 || response?.success) {
-          fetchData()
+          await fetchData()
+          setAlerts([{ severity: "success", message: "Work Order Deleted Successfully" }]);
+
         } else {
-          alert('Failed to delete.');
+          setAlerts([{ severity: "error", message: "Failed To Delete Worker Order" }]);
         }
       } catch (error) {
-        console.error('Delete error:', error);
-        alert('An error occurred while deleting.');
+        setAlerts([{ severity: "error", message: error?.response?.data?.message || "Unable to delete WorkOrder" }]);
       } finally {
         setIsConfirmationModaleOpen(false);
         setDeleteId(null);
@@ -122,8 +128,7 @@ const WorkOrders = () => {
         <select
                 id="manufacture-filter"
                 className="border border-[#e7e5e4] py-[2px] px-[6px] h-[35px] rounded-md"
-                defaultValue=""
-                value={manufactureFilter}
+                value={manufactureFilter || ""}
                 onChange={handleManufactureFilter}
               >
                 <option value="" disabled>
@@ -162,6 +167,8 @@ const WorkOrders = () => {
             setShowPopUp={setShowPopUp}
             handleEdit={handleEdit}
             handleDelete={handleDelete}
+            loading={loading}
+            setAlerts={setAlerts}
           />
         </div>
 

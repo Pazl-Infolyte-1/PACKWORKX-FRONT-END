@@ -56,7 +56,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
        console.log('Formatted data:', formattedData);
        
       if (isEdit) {
-        formattedData.item_id = selectedItemID;
+        formattedData.id = selectedItemID;
         response = await apiMethods.updateItem(selectedItemID, formattedData);
         console.log('Update response:', response);
         

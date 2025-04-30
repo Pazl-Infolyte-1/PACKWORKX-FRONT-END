@@ -18,7 +18,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
             <div className="flex justify-between items-center">
               <div>
                 <h1 className="text-3xl font-bold text-gray-800">Purchase Order Details</h1>
-                <p className="text-gray-500 mt-1">PO #{cell.po_id}</p>
+                <p className="text-gray-500 mt-1">PO #{cell.id}</p>
               </div>
               <div className="flex items-center space-x-3">
                 <span
@@ -77,7 +77,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
               <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
                 <div className="p-6">
                   <h2 className="text-xl font-semibold text-gray-800">Purchase Order Details</h2>
-                  <p className="text-gray-500">PO #{cell.po_id}</p>
+                  <p className="text-gray-500">PO #{cell.id}</p>
 
                   <div className="bg-indigo-50 p-4 rounded-lg mt-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

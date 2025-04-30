@@ -31,7 +31,8 @@ function CustomItem({
   setPopupOpen,
   isPopupOpen,
   message,
-  setMessage
+  setMessage,
+  errors
 }) {
   const [tagFields, setTagFields] = useState([]);
   const [editingLabelIndex, setEditingLabelIndex] = useState(null);
@@ -355,7 +356,13 @@ const [selected, setSelected] = useState('vendor')
           </div>
         </div>
         <div>
-            <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Name</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    SKU Name
+    <span className="text-red-500 ml-1">*</span>
+    {errors.sku_name && (
+      <span className="text-red-500 text-sm ml-2 align-middle">SKU Name is {errors.sku_name}</span>
+    )}
+  </label>
             <input
               id="sku_name"
               name="sku_name"
@@ -366,7 +373,13 @@ const [selected, setSelected] = useState('vendor')
           </div>
 
           <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Client Name</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    Client Name
+    <span className="text-red-500 ml-1">*</span>
+    {errors.client_id && (
+      <span className="text-red-500 text-sm ml-2 align-middle">Client is {errors.client_id}</span>
+    )}
+  </label>
           <select
             name="client"
             id="client"
@@ -400,6 +413,11 @@ const [selected, setSelected] = useState('vendor')
           onChange={handleChange}
           //placeholder="Estimate"
           requiredSymbol={true}
+          errorMessage={
+            errors.estimate_composite_item === 'Required'
+              ? 'Estimate is Required'
+              : errors.estimate_composite_item
+          }
         />
 
         <Input
@@ -410,6 +428,11 @@ const [selected, setSelected] = useState('vendor')
           onChange={handleChange}
           //placeholder="Default SKU Details"
           requiredSymbol={true}
+          errorMessage={
+            errors.default_sku_details === 'Required'
+              ? 'SKU Details is Required'
+              : errors.default_sku_details
+          }
         />
 
         <Input
@@ -420,17 +443,14 @@ const [selected, setSelected] = useState('vendor')
           onChange={handleChange}
           //placeholder="Description"
           requiredSymbol={true}
+          errorMessage={
+            errors.description === 'Required'
+              ? 'Description is Required'
+              : errors.description
+          }
         />
 
-         {/*<ChipSelectorWithBrowse
-                  label="Route"
-                  required={true}
-                  selectedIds={selectedRouteIds1}
-                  allOptions={displayAsChips}
-                  onRemoveChip={handleRemoveChip}
-                  onBrowseClick={handleBrowseClickRoute}
-                />
-                */}
+
  <div className="col-span-3">
     <button
       type="button"

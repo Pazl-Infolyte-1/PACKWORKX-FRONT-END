@@ -1,31 +1,30 @@
 import React, { useEffect, useState } from 'react'
 import apiMethods from '../../api/config'
-import { CiClock1, CiSettings, CiCircleCheck, CiCircleAlert, CiSquareInfo } from 'react-icons/ci'
+import { CiSettings, CiCircleAlert } from 'react-icons/ci'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilPen } from '@coreui/icons'
+import { cilPen, cilTrash } from '@coreui/icons'
 import ActionButton from '../../components/New/ActionButton'
+import ConfirmationModale from '../../components/New/ConfirmationModale'
 
-function FieldValues({
-  openFieldValuesModal,
-  setOpenMachineValuesModal,
-  setOpenMachineFieldModal,
-}) {
+function FieldValues({ openFieldValuesModal, setOpenMachineFieldModal, handleEditProcess }) {
   const [assignProcess, setAssignProcess] = useState([])
   const [machineProcess, setMachineProcess] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [deleteProcess, setDeleteProcess] = useState({ open: false, id: null })
+
+  const fetchData = async () => {
+    setLoading(true)
+    try {
+      const response = await apiMethods.getAllAssign()
+      setAssignProcess(response.data.data)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-      try {
-        const response = await apiMethods.getAllAssign()
-        setAssignProcess(response.data.data)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchData()
   }, [])
 
@@ -57,6 +56,13 @@ function FieldValues({
     }
   }, [assignProcess, openFieldValuesModal])
 
+  // New function to handle editing a process
+  const handleProcessEdit = (processId) => {
+    if (handleEditProcess) {
+      handleEditProcess(processId)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -72,6 +78,12 @@ function FieldValues({
         <p className="text-gray-600 text-lg">No processes found for this machine</p>
       </div>
     )
+  }
+
+  const handleDeleteProcess = async () => {
+    await apiMethods.deleteProcess(deleteProcess.id)
+    setDeleteProcess({ open: false, id: null })
+    fetchData()
   }
 
   return (
@@ -114,7 +126,16 @@ function FieldValues({
                   {
                     label: 'Edit Process',
                     icon: cilPen,
-                    onClick: () => openFieldValuesModal({ id: machineProcess.machine.id }),
+                    onClick: () => {
+                      handleProcessEdit(process.process_id)
+                    },
+                  },
+                  {
+                    label: 'Delete Process',
+                    icon: cilTrash,
+                    onClick: () => {
+                      setDeleteProcess({ show: true, id: process.process_id })
+                    },
                   },
                 ]}
               />
@@ -131,6 +152,11 @@ function FieldValues({
           </div>
         ))}
       </div>
+      <ConfirmationModale
+        isOpen={deleteProcess.show}
+        onClose={() => setDeleteProcess({ show: false, id: null })}
+        onConfirm={handleDeleteProcess}
+      />
     </div>
   )
 }

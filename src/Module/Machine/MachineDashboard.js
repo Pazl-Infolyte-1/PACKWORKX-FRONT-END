@@ -42,6 +42,7 @@ export default function MachineMaster() {
   const { searchQuery } = useSearch()
   const searchBarRef = useRef(null)
   //process
+  const [selectedProcess, setSelectedProcess] = useState(null)
   const [showAddProcessModal, setShowAddProcessModal] = useState(false)
   const [openFieldValuesModal, setOpenFieldValuesModal] = useState({ show: false, id: null })
   const [openFieldModal, setOpenFieldModal] = useState({ open: false, id: null })
@@ -119,6 +120,41 @@ export default function MachineMaster() {
     setAddProcessModal({ show: true, machineId: machineId })
   }
 
+  const handleEditProcess = async (processId) => {
+    try {
+      setIsLoading(true)
+      const response = await apiMethods.getProcess({
+        limit: 20000,
+      })
+      
+      const process = response.data.data.find((item) => item.id === processId)
+      console.log(process);
+      
+      if (!process) {
+        setAlerts([
+          { severity: 'error', message: 'Process not found' },
+        ])
+        return
+      }
+      
+      if (response.status === 200) {
+        setFormData({
+          process_name: process.process_name,
+          id: process.id
+        })
+        setIsEdit(true)
+        setShowAddProcessModal(true)
+      }
+    } catch (error) {
+      setAlerts([
+        { severity: 'error', message: error?.response?.data?.message || 'Failed to fetch process details' },
+      ])
+      console.error('Error fetching process:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleProcessSubmit = async (data) => {
     try {
       if (isEdit) {
@@ -141,10 +177,11 @@ export default function MachineMaster() {
     setShowAddProcessModal(false)
     setFormData({
       process_name: '',
+      id: null,
     })
+    setIsEdit(false)
     setRefresh((prev) => !prev)
   }
-
   return (
     <div className="m-0 p-0">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
@@ -307,7 +344,14 @@ export default function MachineMaster() {
           <ProcessForm
             isEdit={isEdit}
             initialData={formData}
-            onCancel={() => setShowAddProcessModal(false)}
+            onCancel={() => {
+              setShowAddProcessModal(false)
+              setIsEdit(false)
+              setFormData({
+                process_name: '',
+                id: null,
+              })
+            }}
             onSubmit={handleProcessSubmit}
           />
         </PopUp>
@@ -320,10 +364,13 @@ export default function MachineMaster() {
           showCloseButton={true}
         >
           <FieldValues
-            openFieldValuesModal={openFieldValuesModal}
-            setOpenFieldModal={setOpenFieldModal}
-            setOpenMachineFieldModal={setOpenMachineFieldModal}
-            setOpenMachineValuesModal={setOpenMachineValuesModal}
+             openFieldValuesModal={openFieldValuesModal}
+             setOpenFieldModal={setOpenFieldModal}
+             setOpenMachineFieldModal={setOpenMachineFieldModal}
+             setOpenMachineValuesModal={setOpenMachineValuesModal}
+             setShowAddProcessModal={setShowAddProcessModal}
+             handleEditProcess={handleEditProcess}
+             setIsEdit={setIsEdit}
           />
         </PopUp>
 

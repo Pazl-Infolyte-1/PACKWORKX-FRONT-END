@@ -1,10 +1,19 @@
-import React, { useState } from 'react'
-const ProcessForm = ({ onSubmit, initialData, onCancel }) => {
+import React, { useState, useEffect } from 'react'
+
+const ProcessForm = ({ onSubmit, initialData, onCancel, isEdit }) => {
   const [formData, setFormData] = useState(
     initialData || {
       process_name: '',
-    },
+      id: null, // Added id field for edit functionality
+    }
   )
+
+  // Update form data when initialData changes (e.g., when editing a different process)
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData)
+    }
+  }, [initialData])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -22,7 +31,6 @@ const ProcessForm = ({ onSubmit, initialData, onCancel }) => {
     }
     onSubmit(formData)
   }
-  
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 my-3 border border-gray-50 rounded-md p-3">
@@ -56,7 +64,7 @@ const ProcessForm = ({ onSubmit, initialData, onCancel }) => {
           type="submit"
           className="text-white bg-[#8167e5] w-20 rounded p-1 shadow-md hover:bg-[#6b4fd1]"
         >
-          Save
+          {isEdit ? 'Update' : 'Save'}
         </button>
       </div>
     </form>

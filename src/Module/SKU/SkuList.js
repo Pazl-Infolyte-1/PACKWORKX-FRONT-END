@@ -25,6 +25,7 @@ import createInitialSkuData from './CreateInitialSkuData'
 import { bottom } from '@popperjs/core'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
+import Drawer1 from '../../components/Drawer/Drawer1';
 
 
 function SkuList() {
@@ -190,78 +191,146 @@ console.log("suuuuu",user)
   const dieError = useSelector((state) => state.diecutCalculations.deckleError);
 
 
-  const handleAddSkuSubmit = async () => {
-    try {
-      if (editTag) {
-        if(dieError){
-          setAlerts([{ severity: 'error', message: dieError }])
-          return  null
-        }
-        const numberSkuData={
-          ...addNewSkuData,
-          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
-          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
-          deckle_size: Number(addNewSkuData.deckle_size),
-        }
-        const response = await apiMethods.updateSku(numberSkuData)
-        if (response?.status === 200) {
-          setEditTag(false)
-          setRefresh((prev) => !prev)
-          setAlerts([
-            {
-              severity: 'success',
-              message: response?.data?.message || 'Sku updated successfully!',
-            },
-          ])
-        } else {
-          setAlerts([{ severity: 'error', message: response.data.error || 'Something went wrong' }])
-        }
-      } else {
-        if(dieError){
-          setAlerts([{ severity: 'error', message: dieError }])
-          return  null
-        }
-        if(deckleError){
-          setAlerts([{ severity: 'error', message: deckleError }])
+//  const handleAddSkuSubmit = async () => {
+//    try {
+//      if (editTag) {
+//        if(dieError){
+//          setAlerts([{ severity: 'error', message: dieError || "1" }])
+//          return  null
+//        }
+//        const numberSkuData={
+//          ...addNewSkuData,
+//          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+//          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+//          deckle_size: Number(addNewSkuData.deckle_size),
+//        }
+//        const response = await apiMethods.updateSku(numberSkuData)
+//        if (response?.status === 200) {
+//          setEditTag(false)
+//          setRefresh((prev) => !prev)
+//          setAlerts([
+//            {
+//              severity: 'success',
+//              message: response?.data?.message || 'Sku updated successfully!',
+//            },
+//          ])
+//        } else {
+//          setAlerts([{ severity: 'error', message: response.error || 'Something went wrong' }])
+//        }
+//      } else {
+//        if(dieError){
+//          setAlerts([{ severity: 'error', message: dieError || "2"  }])
+//          return  null
+//        }
+//        if(deckleError){
+//          setAlerts([{ severity: 'error', message: deckleError|| "3"  }])
+//          return  null
+//        }
+//        if (boardSizeError) {
+//          console.warn('Blocked submission due to board size error:', boardSizeError)
+//          setAlerts([{ severity: 'error', message: boardSizeError || "4" }])
+//          return null 
+//        }
+//        console.log("addskkkk",addNewSkuData)
+//        const numberSkuData={
+//          ...addNewSkuData,
+//          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+//          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+//          deckle_size: Number(addNewSkuData.deckle_size),
+//        }
+//        const response = await apiMethods.addSku(numberSkuData)
+//        if (response?.status===201) {
+//          console.log("success res",JSON.stringify(response))
+    
+//          setRefresh((prev) => !prev)
+//          setAlerts([{ severity: 'success', message: response?.data?.message }])
+
+
+//setTimeout(() => {
+//  setAlerts([]);
+//}, 3000);
+//          if(isSingleViewPopupForType){
+//            setisSingleViewPopupForType(false)
+//          }else{
+//            setDrawerOpen(false)
+//          }
+//        } else {
+//console.log("resss eeee",response.error)
+//        }
+//      }
+//    } catch (error) {
+  
+//    }
+
+//    setTimeout(() => {
+//      setAlerts([]);
+//    }, 3000);
+//    setBoardSizeError('')
+//  }
+
+const handleAddSkuSubmit = async () => {
+  if(dieError){
+              setAlerts([{ severity: 'error', message: dieError || "1" }])
+              return  null
+            }
+                    if(deckleError){
+          setAlerts([{ severity: 'error', message: deckleError|| "3"  }])
           return  null
         }
         if (boardSizeError) {
           console.warn('Blocked submission due to board size error:', boardSizeError)
-          setAlerts([{ severity: 'error', message: boardSizeError }])
-          return null // 🔴 Stop submission
+          setAlerts([{ severity: 'error', message: boardSizeError || "4" }])
+          return null 
         }
-        console.log("addskkkk",addNewSkuData)
-        const numberSkuData={
-          ...addNewSkuData,
-          width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
-          length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
-          deckle_size: Number(addNewSkuData.deckle_size),
-        }
-        const response = await apiMethods.addSku(numberSkuData)
-        if (response?.status === 201) {
-          //setDrawerOpen(false)
-          setRefresh((prev) => !prev)
-          setAlerts([{ severity: 'success', message: 'Sku Added successfully!' }])
-          if(isSingleViewPopupForType){
-            setisSingleViewPopupForType(false)
-          }else{
-            setDrawerOpen(false)
-          }
-        } else {
-          setAlerts([
-            { severity: 'error', message: response.data.message || 'Something went wrong' },
-          ])
-        }
-      }
-    } catch (error) {
-      console.error(error)
-      setAlerts([
-        { severity: 'error', message: error?.response?.data?.message || 'Something went wrong' },
-      ])
+
+  console.log("addskkkk", addNewSkuData);
+
+  const numberSkuData = {
+    ...addNewSkuData,
+    width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+    length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+    deckle_size: Number(addNewSkuData.deckle_size),
+  };
+
+  try {
+    let response;
+
+    if (editTag) {
+      response = await apiMethods.updateSku(numberSkuData);
+    } else {
+      response = await apiMethods.addSku(numberSkuData);
     }
-    setAlerts([])
-    setBoardSizeError('')
+
+    console.log("SKU request successful:", response);
+    if (response?.data?.message) {
+      setAlerts([{ severity: 'success', message: response.data.message }]);
+      setRefresh((prev) => !prev)
+      if(isSingleViewPopupForType){
+                    setisSingleViewPopupForType(false)
+                  }else{
+                    setDrawerOpen(false)
+                  }
+                  setEditTag(false)
+    }
+  } catch (error) {
+    console.error("Error adding SKU:", error);
+    console.log(JSON.stringify(error))
+    if(error?.response?.data?.error){
+      setAlerts([{ severity: 'error', message: error?.response?.data?.error}]);
+    }else{
+      setAlerts([{ severity: 'error', message: error?.response?.data?.message}]);
+
+    }
+
   }
+   finally {
+    setTimeout(() => {
+      setAlerts([]);
+    }, 3000);
+  }
+};
+
+
 
   const handleSkuEdit = (id) => {
     const selectedSku = skudata.find((sku) => sku.id === id)

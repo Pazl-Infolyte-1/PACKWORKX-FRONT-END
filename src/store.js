@@ -131,6 +131,14 @@ const changeState = (state = initialState, { type, payload, ...rest }) => {
     },
   };
 
+
+  // in changeState reducer
+case 'SET_COMPOSITE_ARRAY':
+  return {
+    ...state,
+    compositeArray: payload,
+  };
+
   
     default:
       return state

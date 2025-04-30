@@ -45,7 +45,7 @@ const App = () => {
       >
         <Routes>
           <Route
-            path="/login"
+            path="/"
             element={
               isAuthenticated == true ? (
                 <Navigate to="/dashboard" replace />
@@ -56,7 +56,7 @@ const App = () => {
           />
           <Route
             exact
-            path="/login"
+            path="/"
             element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />}
           />
           <Route exact path="/register" name="Register Page" element={<Register />} />

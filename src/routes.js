@@ -37,7 +37,7 @@ const GRN = React.lazy(() => import('./Module/GRN/Grn.js'))
 
 
 const routes = [
-  // { path: '/', exact: true, name: 'Home', key: '' },
+  { path: '/', exact: true, name: 'Home', key: '' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },
   { path: '/clients', name: 'Clients', element: Client, key: 10 },
   { path: '/SKU', name: 'SKU', element: SKU, key: 23 },

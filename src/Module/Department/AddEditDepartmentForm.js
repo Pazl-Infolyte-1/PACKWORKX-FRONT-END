@@ -98,7 +98,7 @@ function AddEditDepartmentForm({ showForm, setShowForm, isEdit, departmentData, 
           <div className="flex flex-row gap-4 mb-6">
             <div className="flex-1">
               <label className="block text-gray-700 text-sm font-bold mb-2">
-                Department Name
+                Department Name <span className='text-red-500'>*</span>
               </label>
               <input
                 type="text"

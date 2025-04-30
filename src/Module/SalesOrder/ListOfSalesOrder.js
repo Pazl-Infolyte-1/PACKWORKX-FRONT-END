@@ -39,11 +39,14 @@ function ListOfSalesOrder() {
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       await apiMethods.updateSalesOrderStatus(orderId, { sales_status: newStatus });
-      // Optionally refresh the list or update the local state here
-      console.log('Status updated successfully');
+      setAlerts([{ severity: "success", message: `Status successfully changed to "${newStatus}".` }]);
+
+      // Optionally refresh the list or update the local state here   
       fetchData()
     } catch (error) {
       console.error('Failed to update status:', error);
+      setAlerts([{ severity: "error", message: `Failed to change status to "${newStatus}". Please try again.` }]);
+
     }
   };
 
@@ -70,7 +73,7 @@ function ListOfSalesOrder() {
   }
   
   useEffect(() => {
-    fetchData()
+     fetchData()
   }, [paginationParams])
 
 
@@ -103,8 +106,8 @@ function ListOfSalesOrder() {
     try {
       const response = await apiMethods.DeleteSalesOrder(selectedSalesOrder)
       if (response?.status === 200) {
-        fetchData()
-        setAlerts([{ severity: "success", message: "Sales Order Deletes Successfully" }]);
+        await fetchData()
+        setAlerts([{ severity: "success", message: "Sales Order Deleted Successfully" }]);
 
         setIsConfirmationModaleOpen(false)
 
@@ -170,7 +173,6 @@ function ListOfSalesOrder() {
               <select
                 id="status-filter"
                 className="border border-[#e7e5e4] py-[2px] px-[6px] h-[35px] rounded-md"
-                defaultValue=""
                 value={status}
                 onChange={handleStatus}
               >
@@ -221,7 +223,6 @@ function ListOfSalesOrder() {
           />
 
           <div className="flex justify-end items-center gap-4 mt-4">
-            {console.log(ApiResponse.totalPages)}
             <CommonPagination
               count={ApiResponse?.totalPages}
               page={paginationParams?.currentPage}

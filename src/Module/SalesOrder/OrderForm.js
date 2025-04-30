@@ -340,8 +340,9 @@ const OrderForm = forwardRef(({
                   Freight Paid
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   name="freight_paid"
+                  min="0"
                   value={localFormData.freight_paid || ""}
                   onChange={handleInputChange}
                   className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"

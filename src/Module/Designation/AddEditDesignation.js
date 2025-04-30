@@ -97,7 +97,7 @@ function AddEditDesignation({ showForm, setShowForm, isEdit, designationData, on
           <div className="flex gap-4 mb-6">
             <div className="flex-1">
               <label className="block text-gray-700 text-sm font-semibold mb-2">
-                Designation Name
+                Designation Name <span className='text-red-500'>*</span>
               </label>
               <input
                 type="text"

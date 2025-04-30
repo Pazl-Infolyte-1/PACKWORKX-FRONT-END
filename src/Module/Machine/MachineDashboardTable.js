@@ -9,7 +9,7 @@ import {
 } from '@coreui/react'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
+import { cilFlipToBack, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 import apiMethods from '../../api/config'
 
 const MachineDashboardTable = ({
@@ -21,6 +21,7 @@ const MachineDashboardTable = ({
   setIsLoading,
   onAddProcess,
   setAlerts,
+  setOpenFieldValuesModal
 }) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -71,20 +72,21 @@ const MachineDashboardTable = ({
         <CTable striped hover className=" w-full">
           <CTableHead className="bg-gray-100 sticky top-0 z-10">
             <CTableRow>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">ID</CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Name <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Serial No <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-3 text-gray-600 font-md">
+              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-md">
                 Model No <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Manufacturer <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">Power</CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-md">
+              <CTableHeaderCell className="py-3 px-0 text-gray-600 font-md">
                 Warranty Exp
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
@@ -100,6 +102,9 @@ const MachineDashboardTable = ({
             {cellData.length > 0 ? (
               cellData.map((cell, index) => (
                 <CTableRow key={index} className="border-b">
+                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                    {cell.machine_generate_id || 'N/A'}
+                  </CTableDataCell>
                   <CTableDataCell
                     onClick={() => onView(cell.id)}
                     className="py-3 px-4 !text-blue-600 underline font-semibold cursor-pointer"
@@ -121,7 +126,7 @@ const MachineDashboardTable = ({
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.warranty_expiry}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                  <CTableDataCell className="py-3 px-4 text-gray-700 align-middle">
                     <select
                       value={cell.machine_status}
                       onChange={(e) => handleStatusChange(cell.id, e.target.value)}
@@ -147,7 +152,7 @@ const MachineDashboardTable = ({
                       </option>
                     </select>
                   </CTableDataCell>
-                  <CTableDataCell className="px-2 sm:px-4 text-gray-700 relative">
+                  <CTableDataCell className="px-2 sm:px-4 text-gray-700 align-middle">
                     <ThreeDotMenu
                       value={[
                         {
@@ -158,10 +163,17 @@ const MachineDashboardTable = ({
                           },
                         },
                         {
-                          label: 'Add Process',
+                          label: 'Assign Process',
                           icon: cilPlus,
                           onClick: () => {
                             onAddProcess && onAddProcess(cell.id, cell.machine_name)
+                          },
+                        },
+                        {
+                          label: 'Field, Values',
+                          icon: cilFlipToBack,
+                          onClick: () => {
+                            setOpenFieldValuesModal({ show: true, id: cell.id })
                           },
                         },
                         {

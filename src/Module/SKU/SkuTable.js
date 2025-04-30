@@ -16,7 +16,7 @@ import CustomAlert from '../../components/New/CustomAlert'
 import { useDispatch, useSelector } from 'react-redux'
 
 
-function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAlerts }) {
+function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAlerts ,onSkuDeleted }) {
   const [showPopUp, setShowPopUp] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -24,11 +24,18 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
 
 
   const handleSkuDelete = async () => {
-    await apiMethods.deleteSku(deleteId)
-    setDeleteModal(false)
-    setSkuData((prevTypes) => prevTypes.filter((type) => type.id !== deleteId))
-    setAlerts([{ severity: 'success', message: 'Sku deleted successfully!' }])
+    try {
+     const response=  await apiMethods.deleteSku(deleteId)
+      setDeleteModal(false)
+      setSkuData((prevTypes) => prevTypes.filter((type) => type.id !== deleteId))
+      setAlerts([{ severity: 'success', message: response.message }])
+      onSkuDeleted()
+    } catch (error) {
+      console.log('Error deleting SKU:', error)
+      setAlerts([{ severity: 'error', message: error.response.data.message}])
+    }
   }
+  
 
   const closeDeleteModal = () => {
     setDeleteModal(false)
@@ -67,16 +74,16 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
               SKU Name
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              SKU Type 🔎
+              SKU Type ⌕
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Client 🔎
+              Client ⌕
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Dimensions
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Deckle 🔎
+              Deckle ⌕
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
               Created Date

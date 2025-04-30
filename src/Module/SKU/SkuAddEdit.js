@@ -440,6 +440,15 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
     if (!isSingleViewPopupForType) {
       setAddNewSkuData(createInitialSkuData());
       setCompositeSelect(null);
+
+    }
+  }, [isSingleViewPopupForType]);
+  useEffect(() => {
+    if (isSingleViewPopupForType || !isSingleViewPopupForType) {
+      dispatch({
+        type: 'SET_SELECTED_ROUTE_IDS',
+        payload: [],
+      })
     }
   }, [isSingleViewPopupForType]);
   

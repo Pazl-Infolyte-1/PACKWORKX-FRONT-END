@@ -389,31 +389,31 @@ const handleAddSkuSubmit = async () => {
 
     setStrictAdherence(selectedSku.strict_adherence || false)
   }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      // skip sku get call
-      if (location.state?.skipInitialFetch && !refresh) {
-        return
-      }
-      try {
-        const response = await apiMethods.getSkuList({
-          search: searchQuery || '',
-          client: selectedDisplayName || '',
-          sku_type: selectedSkuType || '',
-          page: pagination?.currentPage || 1,
-          limit: message ? 10000 : limit,
-        })
-        const clientResponse = await apiMethods.getClients()
-
-        setSkuData(response.data)
-        setClient(clientResponse.data)
-        setPagination(response.pagination)
-        setDashboard(response.dashboard)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
+  const fetchData = async () => {
+    // skip sku get call
+    if (location.state?.skipInitialFetch && !refresh) {
+      return
     }
+    try {
+      const response = await apiMethods.getSkuList({
+        search: searchQuery || '',
+        client: selectedDisplayName || '',
+        sku_type: selectedSkuType || '',
+        page: pagination?.currentPage || 1,
+        limit: message ? 10000 : limit,
+      })
+      const clientResponse = await apiMethods.getClients()
+
+      setSkuData(response.data)
+      setClient(clientResponse.data)
+      setPagination(response.pagination)
+      setDashboard(response.dashboard)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
+  useEffect(() => {
+ 
     fetchData()
   }, [
     refresh,
@@ -424,7 +424,7 @@ const handleAddSkuSubmit = async () => {
     selectedSkuType,
     limit,
     location.state?.skipInitialFetch,
-    message
+    message,
   ])
 
   // Clear all filters
@@ -630,6 +630,7 @@ console.log("mess",message)
             editTag={editTag}
             alerts={alerts}
             setAlerts={setAlerts}
+            onSkuDeleted={fetchData} 
           />
         </div>
       </div>

@@ -68,17 +68,17 @@ function ItemsTable({ data = [], setActionDrawerOpen, setVersionDrawerOpen, hand
                           {
                             label: 'View',
                             icon: cilHandPointRight,
-                            onClick: () => handleView(row.item_id),
+                            onClick: () => handleView(row.id),
                           },
                           {
                             label: 'Edit',
                             icon: cilPencil,
-                            onClick: () => handleEdit(row.item_id),
+                            onClick: () => handleEdit(row.id),
                           },
                           {
                             label: 'Delete',
                             icon: cilTrash,
-                            onClick: () => handleDelete(row.item_id),
+                            onClick: () => handleDelete(row.id),
                           },
                         ]}
                       />

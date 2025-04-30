@@ -14,14 +14,13 @@ const OrderForm = forwardRef(({
   setTotals
 }, ref) => {
 
-
-
-
   const [clients, setClients] = useState([]); // State for client list
   const [skuFormData, setSkuFormData] = useState(null);
   const [localFormData, setLocalFormData] = useState(formData);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+const [errors, setErrors] = useState({});
+const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const dropdownRef = useRef(null);
 
 
@@ -63,6 +62,10 @@ const OrderForm = forwardRef(({
       totalCGST: skuFormData ? skuFormData.totalCGST : 0,
       totalGst: skuFormData ? skuFormData.totalGst : 0,
       totalWithGST: skuFormData ? skuFormData.totalWithGST : 0
+    },
+    validateForm: () => {
+      setAttemptedSubmit(true);
+      return validateForm();
     }
   }));
 
@@ -136,6 +139,7 @@ const OrderForm = forwardRef(({
   // 1. Update handleInputChange to sync with parent component
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    errors[name] = ""
 
     let updatedData;
 
@@ -184,6 +188,30 @@ const OrderForm = forwardRef(({
     setFormData(updatedData);
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Required fields validation
+    if (!localFormData.sales_ui_id) newErrors.sales_ui_id = "Required";
+    if (!localFormData.estimated) newErrors.estimated = "Required";
+    if (!localFormData.client) newErrors.client = "Required";
+    if (!localFormData.credit_period) newErrors.credit_period = "Required";
+    
+    // Confirmation method validation
+    if (confirmationMethod === "Email" && !localFormData.confirmation_email) {
+      newErrors.confirmation_email = "Required";
+    }
+    if (confirmationMethod === "Oral") {
+      if (!localFormData.confirmation_name) newErrors.confirmation_name = "Required";
+      if (!localFormData.confirmation_mobile) newErrors.confirmation_mobile = "Required";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  
+
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -229,6 +257,16 @@ const OrderForm = forwardRef(({
                     onChange={handleInputChange}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
+                  {attemptedSubmit && errors.sales_ui_id && (
+    <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {errors.sales_ui_id}
+    </div>
+  )}
                 </div>
 
                 {/* Estimated */}
@@ -243,6 +281,16 @@ const OrderForm = forwardRef(({
                     onChange={handleInputChange}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#333] text-[16px] leading-[26px] outline-none placeholder:text-sm"
                   />
+                  {attemptedSubmit && errors.estimated && (
+    <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {errors.estimated}
+    </div>
+  )}
                 </div>
               </div>
 
@@ -254,7 +302,11 @@ const OrderForm = forwardRef(({
                 <div className="relative w-full" ref={dropdownRef}>
                   <div
                     className="w-full h-[40px] px-3 border border-gray-300 rounded-md bg-white text-gray-800 flex items-center justify-between cursor-pointer hover:border-[#8167E5] transition-all duration-200"
-                    onClick={() => setIsOpen(!isOpen)}
+                    onClick={() => {
+                      setIsOpen(!isOpen);
+                      errors.client = "";
+                    }}
+                    
                   >
                     <span className=" truncate">
                       {localFormData.client || "Select Client"}
@@ -271,6 +323,16 @@ const OrderForm = forwardRef(({
                       }
                     </span>
                   </div>
+                  {attemptedSubmit && errors.client && (
+      <div className="text-red-500 text-xs mt-1 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        {errors.client}
+      </div>
+    )}
 
                   {isOpen && (
                     <div className="absolute w-full mt-1 border border-gray-200 rounded-md bg-white z-10 max-h-[300px] overflow-y-auto shadow-md">
@@ -332,6 +394,16 @@ const OrderForm = forwardRef(({
                   onChange={handleInputChange}
                   className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                 />
+                {attemptedSubmit && errors.credit_period && (
+    <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {errors.credit_period}
+    </div>
+  )}
               </div>
 
               {/* Freight Paid */}
@@ -395,6 +467,16 @@ const OrderForm = forwardRef(({
                     onChange={handleInputChange}
                     className="w-full h-[40px] px-2 border border-[#c2c2c2] rounded-md outline-none"
                   />
+                      {attemptedSubmit && errors.confirmation_email && (
+      <div className="text-red-500 text-xs mt-1 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        {errors.confirmation_email}
+      </div>
+    )}
                 </div>
               )}
 
@@ -411,6 +493,17 @@ const OrderForm = forwardRef(({
                       onChange={handleInputChange}
                       className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                     />
+                          {attemptedSubmit && errors.confirmation_name && (
+        <div className="text-red-500 text-xs mt-1 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {errors.confirmation_name}
+        </div>
+      )}
+
                   </div>
 
                   <div className="flex flex-col flex-1">
@@ -424,6 +517,16 @@ const OrderForm = forwardRef(({
                       onChange={handleInputChange}
                       className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                     />
+                    {attemptedSubmit && errors.confirmation_mobile && (
+        <div className="text-red-500 text-xs mt-1 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {errors.confirmation_mobile}
+        </div>
+      )}
                   </div>
                 </div>
               )}

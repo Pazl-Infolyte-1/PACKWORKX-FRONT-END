@@ -10,6 +10,26 @@ const RequiredFieldLabel = ({ label, isRequired }) => (
   </label>
 )
 
+const defaultValues = {
+  machine_name: '',
+  machine_type: '',
+  model_number: '',
+  serial_number: '',
+  manufacturer: '',
+  purchase_date: '',
+  installation_date: '',
+  machine_status: true,
+  location: '',
+  last_maintenance: '',
+  next_maintenance_due: '',
+  assigned_operator: '',
+  power_rating: '',
+  connectivity_status: true,
+  ip_address: '',
+  warranty_expiry: '',
+  remarks_notes: '',
+}
+
 function AddEditMachine({
   setdrawopen,
   isOpen,
@@ -20,19 +40,7 @@ function AddEditMachine({
   setIsLoading,
   setAlerts
 }) {
-  useEffect(() => {
-    if (!isOpen.id) return
-    const fetchData = async () => {
-      try {
-        const response = await apiMethods.getMachineById(isOpen.id)
-        reset(response.data.data)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-    fetchData()
-  }, [isOpen])
-
+  
   const {
     register,
     handleSubmit,
@@ -41,31 +49,31 @@ function AddEditMachine({
     formState: { errors },
     reset,
   } = useForm({
-    defaultValues: {
-      machine_name: '',
-      machine_type: '',
-      model_number: '',
-      serial_number: '',
-      manufacturer: '',
-      purchase_date: '',
-      installation_date: '',
-      machine_status: true,
-      location: '',
-      last_maintenance: '',
-      next_maintenance_due: '',
-      assigned_operator: '',
-      power_rating: '',
-      connectivity_status: true,
-      ip_address: '',
-      warranty_expiry: '',
-      remarks_notes: '',
-    },
+    defaultValues
   })
+
+  useEffect(() => {
+    if (!isEdit) {
+      reset(defaultValues)
+    }
+    
+    if (isEdit && isOpen.id) {
+      const fetchData = async () => {
+        try {
+          const response = await apiMethods.getMachineById(isOpen.id)
+          reset(response.data.data)
+        } catch (error) {
+          console.error('Error fetching data:', error)
+        }
+      }
+      fetchData()
+    }
+  }, [isOpen, isEdit, reset])
 
   // Reset form when drawer closes
   useEffect(() => {
     if (!isOpen.show) {
-      reset()
+      reset(defaultValues)
     }
   }, [isOpen, reset])
 
@@ -77,14 +85,14 @@ function AddEditMachine({
       const response = await apiCall
 
       if (response.status === 200 || response.status === 201) {
-        reset()
+        reset(defaultValues)
         setdrawopen({ show: false, id: null })
         setRefresh((prev) => !prev)
         setIsEdit(false)
         setAlerts([
           {
             severity: 'success',
-            message: response.data.message ,
+            message: response.data.message,
           },
         ])
       }
@@ -97,8 +105,9 @@ function AddEditMachine({
   }
 
   const handleCancel = () => {
-    reset()
-    setdrawopen({ show: false })
+    reset(defaultValues)
+    setdrawopen({ show: false, id: null })
+    setIsEdit(false)
   }
 
   const machineStatus = watch('machine_status')
@@ -267,22 +276,6 @@ function AddEditMachine({
                   ></span>
                 </div>
               </div>
-            </div>
-
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Assigned Operator" isRequired={true} />
-                {errors.assigned_operator && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.assigned_operator.message}
-                  </span>
-                )}
-              </div>
-              <input
-                {...register('assigned_operator', { required: 'Assigned operator is required' })}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="text"
-              />
             </div>
           </div>
 

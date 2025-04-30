@@ -33,7 +33,7 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
       const response = await apiMethods.deleteGrn(deleteId)
       if (response.status === 200) {
         setConfirmModal(false)
-        setGrnData((prev) => prev.filter((item) => item.grn_id !== deleteId))
+        setGrnData((prev) => prev.filter((item) => item.id !== deleteId))
         setAlerts([{ severity: 'success', message: 'Route deleted successfully!' }])
       }
     } catch (error) {
@@ -84,10 +84,10 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
               grnData.map((item) => (
                 <CTableRow key={item.id} className="border-b text-center">
                   <CTableDataCell
-                    onClick={() => setOpenGrnModal({ open: true, id: item.grn_id })}
+                    onClick={() => setOpenGrnModal({ open: true, id: item.id })}
                     className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start"
                   >
-                    {item.grn_id}
+                    {item.id}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2  font-semibold">{item.po_id}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2  font-semibold">
@@ -119,7 +119,7 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
                           label: 'Delete',
                           icon: cilTrash,
                           onClick: () => {
-                            openDeleteModal(item.grn_id)
+                            openDeleteModal(item.id)
                           },
                         },
                       ]}

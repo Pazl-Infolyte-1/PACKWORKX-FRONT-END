@@ -219,7 +219,7 @@ function ClientList() {
         <h4>Client/Vendor</h4>
       </div>
       {/* Search Bar & Actions */}
-      <div className="overflow-x-auto border border-gray-200 p-3 rounded-md h-[520px]">
+      <div className="overflow-x-auto border border-gray-200 p-3 rounded-md h-[550px]">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             {/* Search Input Container */}

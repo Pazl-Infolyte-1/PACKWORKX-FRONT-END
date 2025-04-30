@@ -127,8 +127,8 @@ const handleEdit = (cell) => {
     <>
           <CustomAlert alerts={alerts} handleClose={handleClose} />
 
-      <div className="max-h-[350px] overflow-y-auto border border-gray-200 custom-scrollbar">
-        <div className='h-[450px]'>
+      <div className="h-[410px] overflow-y-auto border border-gray-200 custom-scrollbar ">
+        <div className=''>
         <CTable striped hover className=" w-full  m-0">
           <CTableHead className="bg-gray-100 sticky top-0 z-10">
             <CTableRow  style={{ height: "32px" }}>

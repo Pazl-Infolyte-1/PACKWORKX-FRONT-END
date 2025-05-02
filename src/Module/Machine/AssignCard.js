@@ -16,6 +16,10 @@ const AssignCard = ({
 }) => {
   const [deleteAssgined, setDeleteAssgined] = useState({ show: false, id: null })
 
+  if (!machine) {
+    return null
+  }
+  
   const handleDelete = async () => {
     try {
       const response = await apiMethods.deleteAssignMachine(deleteAssgined.id)

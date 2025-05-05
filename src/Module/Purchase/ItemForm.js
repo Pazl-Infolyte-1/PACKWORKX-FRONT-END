@@ -184,13 +184,13 @@ useEffect(() => {
   };
 
   const handleItemChange = (index, selectedItemId) => {
-    const selectedItem = itemList.find(item => item.item_id === parseInt(selectedItemId));
+    const selectedItem = itemList.find(item => item.id === parseInt(selectedItemId));
 
     // console.log('Selected Item:', selectedItem);
 
     if (selectedItem) {
       setValue(`items.${index}`, {
-        item_id: selectedItem.item_id,
+        item_id: selectedItem.id,
         item_code: selectedItem.item_code,
         po_item_name: selectedItem.po_item_name,
         description: selectedItem.description || '',
@@ -324,7 +324,7 @@ useEffect(() => {
                     >
                       <option value="">{isLoading ? "Loading..." : "Select Item"}</option>
                       {itemList.map((item) => (
-                        <option key={item.item_id} value={item.item_id}>
+                        <option key={item.id} value={item.id}>
                           {item.item_name}
                         </option>
                       ))}

@@ -415,7 +415,7 @@ const [selected, setSelected] = useState('vendor')
           requiredSymbol={true}
           errorMessage={
             errors.estimate_composite_item === 'Required'
-              ? 'Estimate is Required'
+              ? 'Required'
               : errors.estimate_composite_item
           }
         />
@@ -430,9 +430,9 @@ const [selected, setSelected] = useState('vendor')
           requiredSymbol={true}
           errorMessage={
             errors.default_sku_details === 'Required'
-              ? 'SKU Details is Required'
+              ? 'Required'
               : errors.default_sku_details
-          }
+          } 
         />
 
         <Input
@@ -445,7 +445,7 @@ const [selected, setSelected] = useState('vendor')
           requiredSymbol={true}
           errorMessage={
             errors.description === 'Required'
-              ? 'Description is Required'
+              ? 'Required'
               : errors.description
           }
         />

@@ -6,7 +6,7 @@ function ItemView({ viewItem, setViewItem, selectedItemData }) {
 
   useEffect(() => {
     if (viewItem) {
-      console.log("Item being viewed:", selectedItemData?.item_id);
+      console.log("Item being viewed:", selectedItemData?.id);
     }
   }, [viewItem, selectedItemData]);
 
@@ -30,7 +30,7 @@ function ItemView({ viewItem, setViewItem, selectedItemData }) {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-indigo-800">Item Details</h2>
             <div className="bg-indigo-100 px-4 py-2 rounded-full">
-              <span className="font-semibold text-indigo-800">Item ID: #{selectedItemData?.item_id}</span>
+              <span className="font-semibold text-indigo-800">Item ID: #{selectedItemData?.id}</span>
             </div>
           </div>
           <div className="mt-2 flex items-center">

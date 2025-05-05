@@ -12,11 +12,11 @@ import CIcon from '@coreui/icons-react'
 import * as iconSet from '@coreui/icons'
 import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
-import { cilCloudDownload, cilLayers, cilPuzzle, cilSpeedometer,cilUser } from '@coreui/icons'
+import { cilCloudDownload, cilLayers, cilPuzzle, cilSpeedometer, cilUser } from '@coreui/icons'
 
 export const AppSideBarNew = ({ giveAccess }) => {
   const [expandedModules, setExpandedModules] = useState({})
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   const toggleGroup = (moduleId) => {
     setExpandedModules((prevState) => ({
@@ -88,8 +88,6 @@ export const AppSideBarNew = ({ giveAccess }) => {
   const shouldDisplayAccounts = accountsModules.some(
     (module) => module.modules_description?.trim() !== '',
   )
-
-  
 
   return (
     <CSidebarNav as={SimpleBar}>
@@ -262,8 +260,8 @@ export const AppSideBarNew = ({ giveAccess }) => {
                     className="nav-link nav-group-toggle"
                     href="#"
                     onClick={(e) => {
-                      e.preventDefault();
-                      setIsOpen((prev) => !prev);
+                      e.preventDefault()
+                      setIsOpen((prev) => !prev)
                     }}
                   >
                     <CIcon icon={cilUser} className="nav-icon" />
@@ -304,9 +302,9 @@ export const AppSideBarNew = ({ giveAccess }) => {
                     </li>
                   </ul>
                 </li>
-              );
+              )
             }
-            
+
             // if (module.modules_description === 'Attendance') {
             //   return (
             //     <CNavItem key={index}>
@@ -353,25 +351,16 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
-            // if (module.modules_description === 'Production') {
-            //   return (
-            //     <CNavItem key={index}>
-            //       <CNavLink as={NavLink} to="/production">
-            //         {navLink('Production', 'cilTruck')}
-            //       </CNavLink>
-            //     </CNavItem>
-            //   )
-            // }
-
-            if (module.modules_description === 'Product') {
+            if (module.modules_description === 'Production') {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/inventory/items">
-                    {navLink('Product', 'cilIndustry')}
+                  <CNavLink as={NavLink} to="/production">
+                    {navLink('Production', 'cilTruck')}
                   </CNavLink>
                 </CNavItem>
               )
             }
+
             if (module.modules_description === 'Purchase Order') {
               return (
                 <CNavItem key={index}>
@@ -386,6 +375,26 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/inventoryhandling">
                     {navLink('Inventory', 'cilIndustry')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
+
+            if (module.modules_description === 'GRN') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/grn">
+                    {navLink('GRN', 'cilTruck')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
+
+            if (module.modules_description === 'Product') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/inventory/items">
+                    {navLink('Product', 'cilIndustry')}
                   </CNavLink>
                 </CNavItem>
               )

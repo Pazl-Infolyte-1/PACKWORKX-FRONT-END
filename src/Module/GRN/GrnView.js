@@ -22,7 +22,7 @@ const GrnView = ({ id, handleEdit, setOpenGrnModal }) => {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-indigo-800">GRN Details</h2>
             <div className="bg-indigo-100 px-4 py-2 rounded-full">
-              <span className="font-semibold text-indigo-800">GRN ID: #{grnDetails?.grn_id}</span>
+              <span className="font-semibold text-indigo-800">GRN ID: #{grnDetails?.id}</span>
             </div>
           </div>
           <div className="mt-2 flex items-center">
@@ -139,7 +139,7 @@ const GrnView = ({ id, handleEdit, setOpenGrnModal }) => {
                     {grnDetails?.GRNItems.map((order, index) => (
                       <tr key={index}>
                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                          #{order?.grn_item_id}
+                          #{order?.id}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                           {order.po_item_id}

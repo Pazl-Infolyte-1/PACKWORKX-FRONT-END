@@ -48,7 +48,7 @@ const Grn = () => {
   const handleEdit = (item) => {
     console.log('Edit item', item)
     setGrnFormData({
-      id: item.grn_id,
+      id: item.id,
       po_id: item.po_id,
       grn_date: item.grn_date,
       delivery_note_no: item.delivery_note_no,

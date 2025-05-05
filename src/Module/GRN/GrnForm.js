@@ -144,9 +144,9 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                             <div
                               key={index}
                               className="px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors duration-150"
-                              onClick={() => selectClient(po.po_id)}
+                              onClick={() => selectClient(po.id)}
                             >
-                              {po.po_id}
+                              {po.id}
                             </div>
                           ))
                         ) : (

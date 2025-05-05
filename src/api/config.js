@@ -376,8 +376,8 @@ export const apiMethods = {
       const response = await apiClient.post('/sku-details', addNewSkuData, {})
       return response
     } catch (error) {
-      console.error("Error in addSku:", error);
-      throw error;
+      console.error('Error in addSku:', error)
+      throw error
     }
   },
 
@@ -399,23 +399,23 @@ export const apiMethods = {
   },
 
   updateSku: async (addNewSkuData) => {
-    const { id, ...dataWithoutId } = addNewSkuData;
+    const { id, ...dataWithoutId } = addNewSkuData
     try {
-      const response = await apiClient.put(`/sku-details/${id}`, dataWithoutId);
-      return response;
+      const response = await apiClient.put(`/sku-details/${id}`, dataWithoutId)
+      return response
     } catch (error) {
-      console.error("Error in updateSku:", error);
-      throw error; // ← this is important for proper error handling
+      console.error('Error in updateSku:', error)
+      throw error // ← this is important for proper error handling
     }
   },
-  
+
   deleteSku: async (id) => {
     try {
       const response = await apiClient.delete(`/sku-details/${id}`)
       return response.data
     } catch (error) {
       console.error(error)
-      throw error; 
+      throw error
     }
   },
 
@@ -709,8 +709,6 @@ export const apiMethods = {
       console.error(error)
     }
   },
-
-
 
   getAllFileds: async () => {
     try {
@@ -1236,7 +1234,7 @@ export const apiMethods = {
       console.error(error)
     }
   },
- 
+
   postGrn: async (payload) => {
     try {
       return await apiClient.post('/grn', payload)
@@ -1258,10 +1256,17 @@ export const apiMethods = {
       console.error(error)
     }
   },
- 
+
   getGrnById: async (id) => {
     try {
       return await apiClient.get(`/grn/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getinventory: async () => {
+    try {
+      return await apiClient.get('/inventory')
     } catch (error) {
       console.error(error)
     }

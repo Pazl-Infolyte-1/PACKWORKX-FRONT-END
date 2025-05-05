@@ -432,7 +432,7 @@ const [selected, setSelected] = useState('vendor')
             errors.default_sku_details === 'Required'
               ? 'Required'
               : errors.default_sku_details
-          }
+          } 
         />
 
         <Input

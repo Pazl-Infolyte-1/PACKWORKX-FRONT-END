@@ -62,8 +62,8 @@ function ListOfSalesOrder() {
         client: searchQuery,
         sales_status: status
       })
-      setData(response.data.data)
-      setApiResponse(response.data)
+      setData(response?.data?.data)
+      setApiResponse(response?.data)
       // setFilteredData(response.data.data)
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -225,7 +225,7 @@ function ListOfSalesOrder() {
           <div className="flex justify-end items-center gap-4 mt-4">
             <CommonPagination
               count={ApiResponse?.totalPages}
-              page={paginationParams?.currentPage}
+              page={paginationParams?.currentPage|| 1}
               onChange={handlePageChange}
               onLimitChange={handleLimitChange}
               limit={paginationParams.pageSize}

@@ -116,12 +116,12 @@ function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, loadi
         <CTableBody>
         {data.length > 0 ? (
                 data.map((row, index) => (
-                <CTableRow key= {row.po_id} className="border-b text-center">
+                <CTableRow key= {row.id} className="border-b text-center">
                   <CTableDataCell
-                    // onClick={() => setShowPopUp(row.po_id)}
+                    // onClick={() => setShowPopUp(row.id)}
                     className="py-3 px-4 text-blue-600 font-semibold cursor-pointer text-start"
                   >
-                    {row.po_id}
+                    {row.id}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {row.supplier_name}
@@ -147,17 +147,17 @@ function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, loadi
                         {
                           label: 'View',
                           icon: cilHandPointRight,
-                          onClick: () => setShowPopUp(row.po_id),
+                          onClick: () => setShowPopUp(row.id),
                         },
                         {
                           label: 'Edit',
                           icon: cilPencil,
-                          onClick: () => handleEdit(row.po_id),
+                          onClick: () => handleEdit(row.id),
                         },
                         {
                           label: 'Delete',
                           icon: cilTrash,
-                          onClick: () => openDeleteModal(row.po_id),
+                          onClick: () => openDeleteModal(row.id),
                         },
                       ]}
                     />
@@ -177,7 +177,7 @@ function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, loadi
                   {showPopUp && (
                     <PurchaseOrderDetails
                       showPopUp={showPopUp}
-                      cell={data.find(row => row.po_id === showPopUp)}
+                      cell={data.find(row => row.id === showPopUp)}
                       editTag={false} // Changed from true to false to allow viewing
                       setShowPopUp={setShowPopUp}
                       handleSkuEdit={handlePoEdit} // Changed from handlePoEdit to handleSkuEdit to match component prop

@@ -489,6 +489,23 @@ function Composite({
         useEffect(() => {
           console.log('Redux main comp:', compositeArray);
         }, [compositeArray]);
+
+        const selectedRouteIds2 = useSelector(
+          (state) => state.routeprocess?.selectedRouteIds || []
+        );
+        
+        useEffect(() => {
+          console.log('Selected Route IDs in comp:', selectedRouteIds2);
+        
+          if (selectedRouteIds2.length > 0) {
+            setErrors((prev) => {
+              const newErrors = { ...prev };
+              delete newErrors.route;
+              return newErrors;
+            });
+          }
+        }, [selectedRouteIds2]);
+        
  
   return (
     <div className="rounded-lg">
@@ -529,7 +546,7 @@ function Composite({
     SKU Name
     <span className="text-red-500 ml-1">*</span>
     {errors.sku_name && (
-      <span className="text-red-500 text-sm ml-2 align-middle">SKU Name is {errors.sku_name}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
     )}
   </label>
             <input
@@ -546,7 +563,7 @@ function Composite({
     Client Name
     <span className="text-red-500 ml-1">*</span>
     {errors.client_id && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Client is {errors.client_id}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
     )}
   </label>
           <select
@@ -607,7 +624,7 @@ function Composite({
     Partition Panel
     <span className="text-red-500 ml-1">*</span>
     {errors.composite_type && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Partition Panel is {errors.composite_type}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.composite_type}</span>
     )}
   </label>
           <select
@@ -629,7 +646,7 @@ function Composite({
         Minimum Order Level
     <span className="text-red-500 ml-1">*</span>
     {errors.minimum_order_level && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Minimum Order Level is {errors.minimum_order_level}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.minimum_order_level}</span>
     )}
   </label>
             <input
@@ -665,6 +682,7 @@ function Composite({
           allOptions={displayAsChips}
           onRemoveChip={handleRemoveChip}
           onBrowseClick={handleBrowseClickRoute}
+          errors={errors}
         />
         
 

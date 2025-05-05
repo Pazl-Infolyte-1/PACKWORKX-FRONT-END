@@ -8,17 +8,21 @@ const ChipSelectorWithBrowse = ({
   onRemoveChip,
   onBrowseClick,
   required = false,
+  errors
 }) => {
   const selectedChips = allOptions.filter((item) =>
     selectedIds.includes(item.id)
   );
-
+console.log("route errors",errors)
   return (
     <div className="flex flex-col">
-      <label className="block text-[16px] font-medium text-gray-700 mb-2">
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
+     <label className="block text-[16px] font-medium text-gray-700 mb-2">
+      {label}
+      <span className="text-red-500 ml-1">*</span>
+      {errors?.route === 'Required' && (
+        <span className="text-red-500 ml-2">Required</span>
+      )}
+    </label>
       <div className="flex items-center gap-2">
         <div className="flex flex-nowrap gap-2 mt-2 border rounded h-[60px] w-[300px] overflow-x-auto px-2 py-1">
           {selectedChips.map((chip) => (

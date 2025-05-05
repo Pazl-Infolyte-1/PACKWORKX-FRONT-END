@@ -332,18 +332,18 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                 {/* Table Head */}
                 <thead className="sticky top-0 bg-white z-10 text-center">
                   <tr className='border-b-2'>
-                    <th className="px-4 py-2 text-center">Sku</th>
-                    <th className="px-4 py-2 text-center">Quantity Required</th>
-                    <th className="px-4 py-2 text-center">Rate Per Sku</th>
-                    <th className="px-4 py-2 text-center">Acceptable Sku Units</th>
-                    <th className="px-4 py-2 text-center">Total Amount</th>
-                    <th className="px-4 py-2 text-center">SGST %</th>
-                    <th className="px-4 py-2 text-center">SGST Amount</th>
-                    <th className="px-4 py-2 text-center">CGST %</th>
-                    <th className="px-4 py-2 text-center">CGST Amount</th>
-                    <th className="px-4 py-2 text-center">Total GST</th>
-                    <th className="px-4 py-2 text-center">Total Inc GST</th>
-                    <th className="px-4 py-2 text-center">History</th>
+                    <th className=" py-2 text-center">Sku <span className='text-red-500'>*</span></th>
+                    <th className=" py-2 text-center">Quantity Required <span className='text-red-500'>*</span></th>
+                    <th className=" py-2 text-center">Rate Per Sku <span className='text-red-500'>*</span></th>
+                    <th className=" py-2 text-center">Acceptable Sku Units <span className='text-red-500'>*</span></th>
+                    <th className=" py-2 text-center">Total Amount <span className='text-red-500'>*</span></th>
+                    <th className=" py-2 text-center">SGST % <span className='text-red-500'>*</span></th>
+                    <th className=" py-2 text-center">SGST Amount <span className='text-red-500'>*</span></th>
+                    <th className=" py-2 text-center">CGST % <span className='text-red-500'>*</span></th>
+                    <th className=" py-2 text-center">CGST Amount <span className='text-red-500'>*</span></th>
+                    <th className=" py-2 text-center">Total GST <span className='text-red-500'>*</span></th>
+                    <th className=" py-2 text-center">Total Inc GST <span className='text-red-500'>*</span></th>
+                    <th className=" py-2 text-center">History <span className='text-red-500'>*</span></th>
                   </tr>
                 </thead>
 

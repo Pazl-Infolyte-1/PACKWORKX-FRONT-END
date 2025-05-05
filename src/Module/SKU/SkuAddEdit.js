@@ -35,7 +35,9 @@ function SkuAddEdit({
   setPopupOpen,
   isPopupOpen,
   message,
-  setMessage
+  setMessage,
+  errors,
+  setErrors
 }) {
   const { user } = useContext(AuthContext)
   const [isOpen, setIsOpen] = useState(false)
@@ -139,7 +141,7 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
     });
     dispatch({ type: 'RESET_DIECUT_CALCULATIONS' });
 
-    
+    setErrors({});
     if (option.value === 'addMore') {
       // Handle add more procedure logic if needed
       setIsOpen(false)
@@ -265,6 +267,12 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
       ply: plyCount,
       sku_values: newSkuValues,
     }))
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.ply;
+      return newErrors;
+    });
+
   }
 
   const toThreeDecimalFixed = (value) => {
@@ -351,6 +359,8 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
                 isPopupOpen={isPopupOpen}
                 message={message}
                 setMessage={setMessage}
+                errors={errors}
+                setErrors={setErrors}
       />
     ),
     Composite: (
@@ -377,6 +387,8 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
                     isPopupOpen={isPopupOpen}
                     message={message}
                     setMessage={setMessage}
+                    errors={errors}
+                    setErrors={setErrors}
       />
     ),
     'Custom Item': (
@@ -401,6 +413,7 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
           isPopupOpen={isPopupOpen}
           message={message}
           setMessage={setMessage}
+          errors={errors}
       />
     ),
   }

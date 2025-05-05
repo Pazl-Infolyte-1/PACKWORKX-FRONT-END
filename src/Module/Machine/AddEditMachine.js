@@ -238,7 +238,7 @@ function AddEditMachine({
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="IP Address" isRequired={true} />
+                <RequiredFieldLabel label="IP Address" />
                 {errors.ip_address && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.ip_address.message}
@@ -246,7 +246,7 @@ function AddEditMachine({
                 )}
               </div>
               <input
-                {...register('ip_address', { required: 'IP address is required' })}
+                {...register('ip_address', { required: 'required' })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="text"
               />

@@ -18,11 +18,11 @@ const GrnItemsFrom = ({
     function syncPurchaseOrderItems() {
       remove()
 
-      const selectedPo = purchaseOrderData.find((po) => po.po_id === grnFormData.po_id)
+      const selectedPo = purchaseOrderData.find((po) => po.id === grnFormData.po_id)
 
       if (selectedPo?.PurchaseOrderItems?.length > 0) {
         const newItems = selectedPo.PurchaseOrderItems.map((item) => ({
-          po_item_id: item.po_item_id || 0,
+          po_item_id: item.id || 0,
           item_id: item.item_id || 0,
           item_code: item.item_code || '',
           grn_item_name: '',
@@ -126,14 +126,16 @@ const GrnItemsFrom = ({
     if (!currentValues || !Array.isArray(currentValues)) return
 
     const formatedValues = currentValues.map((item, index) => {
+      console.log('item', item)
       let quantity_ordered = 0
       let item_code = ''
       let item_id = 0
 
       if (item.po_item_id && item.po_item_id !== 0 && grnFormData?.po_id) {
-        const selectedPO = purchaseOrderData.find((po) => po.po_id === grnFormData.po_id)
+        const selectedPO = purchaseOrderData.find((po) => po.id === grnFormData.po_id)
+        console.log('selectedPO', selectedPO)
         const poItem = selectedPO?.PurchaseOrderItems?.find(
-          (poItem) => poItem.po_item_id === item.po_item_id,
+          (poItem) => poItem.id === item.po_item_id,
         )
 
         item_code = poItem?.item_code || ''

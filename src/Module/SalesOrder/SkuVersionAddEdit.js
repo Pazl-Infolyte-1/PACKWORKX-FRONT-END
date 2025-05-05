@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import apiMethods from "../../api/config";
-import { FaEye } from "react-icons/fa";
+import { FaEye, FaSpinner } from "react-icons/fa";
 import CustomAlert from "../../components/New/CustomAlert";
 import PopUp from "../../components/New/PopUp";
 
@@ -10,6 +10,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   const [skuVersion, setSkuVersion] = useState("");
   const [alerts, setAlerts] = useState([]);
   const [skuversionLimit,setSkuversionLimit] = useState()
+  const [isLoading, setIsLoading] = useState(false);
 
 
   useEffect(() => {
@@ -60,6 +61,8 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
+
     const requestBody = {
       sku_id: skuID,
       sku_version: skuVersion,
@@ -72,7 +75,9 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
       try {
         const response = await apiMethods.updateSkuVersion(skuVersionID, requestBody);
         setAlerts([{ severity: "success", message: response?.data?.message || "SKU Version updated successfully" }]);
-        setVisible(false)
+        setTimeout(() => {
+          setVisible(false)
+        }, 1000);
   
         const updatedVersionsResponse = await apiMethods.getSkuVersions(skuID);
         if (updatedVersionsResponse?.data?.data) {
@@ -112,6 +117,9 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
       } catch (error) {
         setAlerts([{ severity: "error", message: error?.response?.data?.message || "Failed to add SKU Version" }]);
         console.error("Error submitting data:", error);
+      }
+      finally{
+        setIsLoading(false);
       }
     }
   };
@@ -233,11 +241,19 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
               </table>
               <div className="p-2 flex w-[100%]  justify-end">
               <button 
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
-                onClick={handleSubmit}
-              >
-                {IsEditVersion ? "Update Version" : "Add As Version"}
-              </button>
+  className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
+  onClick={handleSubmit}
+  disabled={isLoading}
+>
+  {isLoading ? (
+    <>
+      <FaSpinner className="animate-spin mr-2" />
+      {IsEditVersion ? "Updating..." : "Processing..."}
+    </>
+  ) : (
+    IsEditVersion ? "Update Version" : "Add As Version"
+  )}
+</button>
             </div>
             </div>
             

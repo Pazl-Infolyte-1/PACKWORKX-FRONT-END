@@ -1,6 +1,6 @@
 import React from 'react'
 
-const PlyToggle = ({ value, onChange }) => {
+const PlyToggle = ({ value, onChange ,errorMessage }) => {
   const options = [2, 3, 5, 7, 9]
 
   const getLeftPosition = (val) => {
@@ -10,7 +10,13 @@ const PlyToggle = ({ value, onChange }) => {
 
   return (
     <div>
-      <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Ply</label>
+      <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        Ply
+        <span className="text-red-500 ml-1">*</span>
+        {errorMessage && (
+          <span className="text-red-500 text-sm ml-2 align-middle">Ply is {errorMessage}</span>
+        )}
+      </label>
       <div className="relative w-full h-[40px] bg-white border border-blue-500 rounded-md shadow-sm flex items-center justify-between px-1 overflow-hidden">
         {/* Toggle Background */}
         <div

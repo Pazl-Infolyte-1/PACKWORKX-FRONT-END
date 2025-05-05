@@ -1,7 +1,7 @@
 import React from 'react';
 import PopUp from '../../components/New/PopUp';
 
-const ReelsDetails = ({ visible, setVisible, reels = [], itemdata = [] }) => {
+const PastingGlueDetails = ({ visible, setVisible, rawMaterials = [], itemdata = [] }) => {
     const filteredRawMaterials = itemdata.filter(item => item.item_type?.toLowerCase() === "raw-materials");
 
   return (
@@ -19,7 +19,7 @@ const ReelsDetails = ({ visible, setVisible, reels = [], itemdata = [] }) => {
             <div className="w-[100%] shadow-lg rounded-lg px-2 flex flex-col">
                 {/* Fixed Header */}
                 <div className="bg-[#8167e5] text-white text-lg font-semibold p-3 rounded-md flex justify-center items-center h-10 mt-4 mb-2">
-                    Reel Details
+                Pasting Glue Details
                 </div>
 
                 <div className="overflow-y-auto max-h-[500px] space-y-3 custom-scrollbar px-2">
@@ -65,18 +65,13 @@ const ReelsDetails = ({ visible, setVisible, reels = [], itemdata = [] }) => {
                             </div>
                         ))
                     ) : (
-                        <p className="text-gray-500 text-center">No  Reels found.</p>
+                        <p className="text-gray-500 text-center">No Pasting Glue found.</p>
                     )}
                 </div>
             </div>
-          
-
-
-          
-        
       </div>
     </PopUp>
   );
 };
 
-export default ReelsDetails;
+export default PastingGlueDetails;

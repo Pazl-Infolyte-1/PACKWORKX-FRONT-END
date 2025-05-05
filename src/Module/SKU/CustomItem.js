@@ -360,7 +360,7 @@ const [selected, setSelected] = useState('vendor')
     SKU Name
     <span className="text-red-500 ml-1">*</span>
     {errors.sku_name && (
-      <span className="text-red-500 text-sm ml-2 align-middle">SKU Name is {errors.sku_name}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
     )}
   </label>
             <input
@@ -377,7 +377,7 @@ const [selected, setSelected] = useState('vendor')
     Client Name
     <span className="text-red-500 ml-1">*</span>
     {errors.client_id && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Client is {errors.client_id}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
     )}
   </label>
           <select
@@ -415,7 +415,7 @@ const [selected, setSelected] = useState('vendor')
           requiredSymbol={true}
           errorMessage={
             errors.estimate_composite_item === 'Required'
-              ? 'Estimate is Required'
+              ? 'Required'
               : errors.estimate_composite_item
           }
         />
@@ -430,7 +430,7 @@ const [selected, setSelected] = useState('vendor')
           requiredSymbol={true}
           errorMessage={
             errors.default_sku_details === 'Required'
-              ? 'SKU Details is Required'
+              ? 'Required'
               : errors.default_sku_details
           }
         />
@@ -445,7 +445,7 @@ const [selected, setSelected] = useState('vendor')
           requiredSymbol={true}
           errorMessage={
             errors.description === 'Required'
-              ? 'Description is Required'
+              ? 'Required'
               : errors.description
           }
         />

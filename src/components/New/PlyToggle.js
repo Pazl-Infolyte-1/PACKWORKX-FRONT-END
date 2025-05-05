@@ -14,7 +14,7 @@ const PlyToggle = ({ value, onChange ,errorMessage }) => {
         Ply
         <span className="text-red-500 ml-1">*</span>
         {errorMessage && (
-          <span className="text-red-500 text-sm ml-2 align-middle">Ply is {errorMessage}</span>
+          <span className="text-red-500 text-sm ml-2 align-middle">{errorMessage}</span>
         )}
       </label>
       <div className="relative w-full h-[40px] bg-white border border-blue-500 rounded-md shadow-sm flex items-center justify-between px-1 overflow-hidden">

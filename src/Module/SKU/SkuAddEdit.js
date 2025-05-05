@@ -37,7 +37,8 @@ function SkuAddEdit({
   message,
   setMessage,
   errors,
-  setErrors
+  setErrors,
+  setSkuVariant
 }) {
   const { user } = useContext(AuthContext)
   const [isOpen, setIsOpen] = useState(false)
@@ -154,7 +155,7 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
       client: addNewSkuData.client,
       sku_type: option.sku_type || option.value,
     }
-
+setSkuVariant(option.sku_type || option.value)
     setAddNewSkuData(baseSkuData)
   }
 
@@ -312,6 +313,8 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
         isPopupOpen={isPopupOpen}
         message={message}
         setMessage={setMessage}
+        errors={errors}
+        setErrors={setErrors}
       />
     ),
     //'Corrugated Sheet': (
@@ -336,6 +339,8 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
                isPopupOpen={isPopupOpen}
                message={message}
                setMessage={setMessage}
+               errors={errors}
+               setErrors={setErrors}
       />
     ),
     'Die Cut box': (

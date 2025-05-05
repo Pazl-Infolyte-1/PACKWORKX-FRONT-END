@@ -16,7 +16,7 @@ import CustomAlert from '../../components/New/CustomAlert'
 import { useDispatch, useSelector } from 'react-redux'
 
 
-function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAlerts ,onSkuDeleted }) {
+function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAlerts ,onSkuDeleted ,setErrors}) {
   const [showPopUp, setShowPopUp] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -149,6 +149,7 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
                           label: 'Edit',
                           icon: cilPencil,
                           onClick: () => {
+                            setErrors({})
                             dispatch({ type: 'RESET_DIECUT_CALCULATIONS' });
 
                             dispatch({

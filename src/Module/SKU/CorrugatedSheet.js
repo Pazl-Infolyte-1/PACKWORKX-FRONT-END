@@ -41,7 +41,9 @@ function CorrugatedSheet({
   setPopupOpen,
   isPopupOpen,
   message,
-  setMessage
+  setMessage,
+  errors,
+  setErrors
 }) {
   const [alerts, setAlerts] = useState([])
   const filteredClient = locationvalue
@@ -458,6 +460,23 @@ useEffect(() => {
   }
 }, [addNewSkuData.flap_tolerance]);
 
+const selectedRouteIds2 = useSelector(
+  (state) => state.routeprocess?.selectedRouteIds || []
+);
+
+useEffect(() => {
+  console.log('Selected Route IDs in comp:', selectedRouteIds2);
+
+  if (selectedRouteIds2.length > 0) {
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.route;
+      return newErrors;
+    });
+  }
+}, [selectedRouteIds2]);
+
+
   return (
     <div className="rounded-lg">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -508,7 +527,13 @@ useEffect(() => {
         </div>
 
         <div>
-            <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Name</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    SKU Name
+    <span className="text-red-500 ml-1">*</span>
+    {errors.sku_name && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
+    )}
+  </label>
             <input
               id="sku_name"
               name="sku_name"
@@ -519,7 +544,13 @@ useEffect(() => {
           </div>
 
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Client Name</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    Client Name
+    <span className="text-red-500 ml-1">*</span>
+    {errors.client_id && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
+    )}
+  </label>
           <select
             name="client"
             id="client"
@@ -590,11 +621,18 @@ useEffect(() => {
                <PlyToggle
   value={addNewSkuData.ply}
   onChange={(selectedPly) => updateSkuValues(selectedPly)}
+  errorMessage={errors.ply}
 />
 
         <Tooltip title={unitTooltip}>
           <div>
-            <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Joints</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    Joints
+    <span className="text-red-500 ml-1">*</span>
+    {errors.joints && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.joints}</span>
+    )}
+  </label>
             <input
               id="joints"
               name="joints"
@@ -610,7 +648,13 @@ useEffect(() => {
 
         <Tooltip title={unitTooltip}>
           <div>
-            <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">UPS</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    UPS
+    <span className="text-red-500 ml-1">*</span>
+    {errors.ups && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.ups}</span>
+    )}
+  </label>
             <input
               id="ups"
               name="ups"
@@ -626,7 +670,13 @@ useEffect(() => {
 
         <Tooltip title={unitTooltip}>
           <div>
-            <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Flap Width</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    Flap Width
+    <span className="text-red-500 ml-1">*</span>
+    {errors.flap_width && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.flap_width}</span>
+    )}
+  </label>
             <input
               id="flap_width"
               name="flap_width"
@@ -642,7 +692,13 @@ useEffect(() => {
 
         <Tooltip title={unitTooltip}>
           <div>
-            <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Flap Tolerance</label>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    Flap Tolerance
+    <span className="text-red-500 ml-1">*</span>
+    {errors.flap_tolerance && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.flap_tolerance}</span>
+    )}
+  </label>
             <input
               id="flap_tolerance"
               name="flap_tolerance"
@@ -658,7 +714,13 @@ useEffect(() => {
 
         <Tooltip title={unitTooltip}>
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Trimming Tolerance</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    Trimming Tolereance
+    <span className="text-red-500 ml-1">*</span>
+    {errors.length_trimming_tolerance && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.length_trimming_tolerance}</span>
+    )}
+  </label>
           <input
               id="length_trimming_tolerance"
               name="length_trimming_tolerance"
@@ -673,7 +735,13 @@ useEffect(() => {
         </Tooltip>
 
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Customer Reference</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+   Customer Reference
+    <span className="text-red-500 ml-1">*</span>
+    {errors.customer_reference && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.customer_reference}</span>
+    )}
+  </label>
           <input
             id="customer_reference"
             name="customer_reference"
@@ -685,7 +753,13 @@ useEffect(() => {
         </div>
         
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Reference #</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+   Reference #
+    <span className="text-red-500 ml-1">*</span>
+    {errors.reference_number && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.reference_number}</span>
+    )}
+  </label>
           <input
             id="reference_number"
             name="reference_number"
@@ -697,7 +771,13 @@ useEffect(() => {
         </div>
         
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Internal ID</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+  Internal Id
+    <span className="text-red-500 ml-1">*</span>
+    {errors.internal_id && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.internal_id}</span>
+    )}
+  </label>
           <input
             id="internal_id"
             name="internal_id"
@@ -727,7 +807,16 @@ useEffect(() => {
           </div>*/}
 
           <div>
-                      <p className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Board Size<span className="text-gray-500 text-sm">(W × L)</span></p>
+          <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        Board Size <span className="text-gray-500 text-sm">(W × L)</span>
+    <span className="text-red-500 ml-1">*</span>
+    {errors.width_board_size_cm2 && errors.length_board_size_cm2 &&(
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.width_board_size_cm2}</span>
+    )}
+        {/*{errors.length_board_size_cm2 && (
+      <span className="text-red-500 text-sm ml-2 align-middle">Length is {errors.length_board_size_cm2}</span>
+    )}*/}
+  </label>
                       <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
                         <input
                           id="width_board_size_cm2"
@@ -773,7 +862,13 @@ useEffect(() => {
 
         <Tooltip title={unitTooltip}>
         <div>
-  <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Deckle Size</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        Deckle Size
+    <span className="text-red-500 ml-1">*</span>
+    {errors.deckle_size && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.deckle_size}</span>
+    )}
+  </label>  
   <input
   id="deckle_size"
   name="deckle_size"
@@ -793,7 +888,13 @@ useEffect(() => {
         </Tooltip>
 
         <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">Minimum Order Level</label>
+        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        Minimum Order Level
+    <span className="text-red-500 ml-1">*</span>
+    {errors.minimum_order_level && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.minimum_order_level}</span>
+    )}
+  </label>  
           <input
             id="minimum_order_level"
             name="minimum_order_level"
@@ -813,6 +914,7 @@ useEffect(() => {
   allOptions={displayAsChips}
   onRemoveChip={handleRemoveChip}
   onBrowseClick={handleBrowseClickRoute}
+  errors={errors}
 />
 
 

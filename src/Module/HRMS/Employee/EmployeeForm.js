@@ -11,6 +11,7 @@ import AddEditDepartmentForm from '../../Department/AddEditDepartmentForm'
 import AddEditDesignation from '../../Designation/AddEditDesignation'
 import AddEditRoleForm from '../../Role/AddEditRoleForm'
 import { FaMapMarkerAlt } from 'react-icons/fa'
+import ConfirmationModale from '../../../components/New/ConfirmationModale'
 
 
 
@@ -72,6 +73,9 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
   const [imageLoading, setImageLoading] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const machineDropdownRef = useRef(null);
+  const [canDeactivate,setCanDeactivate] = useState(false);
+  const [isTouched,setIsTouched] = useState(false)
+
 
 
 
@@ -148,9 +152,13 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
   };
   // Handle drawer close with form reset
   const handleCloseDrawer = () => {
-    setDrawerOpen(false);
-    // Form will be reset by the useEffect above when isDrawerOpen becomes false
+    if (isTouched) {
+      setCanDeactivate(true); // show modal
+    } else {
+      setDrawerOpen(false); // just close
+    }
   };
+
 
 
 
@@ -159,6 +167,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
   }, [isEdit]);
 
   const handleInputChange = (e) => {
+    setIsTouched(true)
     const { name, value } = e.target;
     setFormData(prevState => ({
       ...prevState,
@@ -352,10 +361,10 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
 
   return (
     <>
-      <Drawer  isOpen={isDrawerOpen} onClose={handleCloseDrawer} title={isEdit ? "Edit Employee" : "Add Employee"}>
+      <Drawer  isOpen={isDrawerOpen} onClose={handleCloseDrawer} maxWidth="1280px" title={isEdit ? "Edit Employee" : "Add Employee"}>
         <form onSubmit={handleSubmit} className=''>
           {/* <div className="max-w-7xl mx-auto h-[90vh] px-3 py-3 mt-6 "> */}
-          <div className=" mx-auto h-[90vh] px-3 py-3 mt-6 ">
+          <div className=" mx-auto px-3 py-3 mt-6 ">
 
           {/* Replace your existing image preview with this */}
 <div className="flex flex-col items-center justify-center">
@@ -906,7 +915,8 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                 type="button"
                 onClick={() => {
                   // TODO: Implement edit functionality
-                  setDrawerOpen(false)
+                  // setCanDeactivate(true)
+                  handleCloseDrawer()
                 }}
               />
               <ActionButton
@@ -917,6 +927,20 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
             </div>
           </div>
         </form>
+
+        {canDeactivate && (
+  <ConfirmationModale 
+    isOpen={canDeactivate}
+    onClose={() => setCanDeactivate(false)}
+    onConfirm={() => {
+      setDrawerOpen(false);
+      setIsTouched(false)
+      setCanDeactivate(false);
+        }
+    }
+    variant="unsavedChanges"
+  />
+)}
 
         {activeModal === 'department' &&
           <AddEditDepartmentForm
@@ -941,6 +965,8 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
             isEdit={false}
             onSuccess={handleRoleFormSuccess}
           />}
+
+
 
       </Drawer>
     </>

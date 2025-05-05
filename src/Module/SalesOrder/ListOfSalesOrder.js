@@ -30,6 +30,10 @@ function ListOfSalesOrder() {
   const [isEditMode, setIsEditMode] = useState(false)
   const { searchQuery, filteredSearchData } = useSearch() ///need to verify
   const [loading,setLoading]= useState(true)
+  const [canDeactivate,setCanDeactivate] = useState(false);
+  const [isTouched,setIsTouched] = useState(false)
+
+
 
   const searchBarRef = useRef(null)
 
@@ -152,6 +156,13 @@ function ListOfSalesOrder() {
     }
 
   };
+  const handleCloseDrawer = ()=>{
+    if(isTouched){
+      setCanDeactivate(true)
+    }else{
+      setDrawerOpen(false)
+    }
+  }
 
   return (
     <div className=''>
@@ -232,8 +243,9 @@ function ListOfSalesOrder() {
             />
           </div>
         </div>
+
 {isDrawerOpen&&(
-  <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth="1280px">
+  <Drawer isOpen={isDrawerOpen} onClose={() => handleCloseDrawer()} maxWidth="1280px">
     <AddSalesOrder 
       currentTab={'salesOrder'} 
       isEdit={isEditMode} 
@@ -241,11 +253,29 @@ function ListOfSalesOrder() {
       setDrawer={setDrawerOpen}
       setisEdit={setIsEditMode}
       fetchData={fetchData}
+      setIsFormTouched = {setIsTouched}
+      handleCloseDrawer = {handleCloseDrawer}
       />
   </Drawer>
     )}
 
       </div>
+
+
+      {canDeactivate && (
+  <ConfirmationModale 
+    isOpen={canDeactivate}
+    onClose={() => setCanDeactivate(false)}
+    onConfirm={() => {
+      isTouched(false)
+      setDrawerOpen(false)
+      setCanDeactivate(false);
+        }
+    }
+    variant="unsavedChanges"
+  />
+      )}
+      
       <div>
         <ConfirmationModale
           isOpen={isConfirmationModaleOpen}

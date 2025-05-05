@@ -119,7 +119,7 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellDa
           <CTableDataCell
             onClick={() =>setShowPopUp(cell.id)} 
            className="py-3 px-4 !text-[#8761e5] cursor-pointer underline">
-          {`WO-${cell.id}`}
+          {cell.work_generate_id} 
           </CTableDataCell>
           <CTableDataCell className="py-3 px-4 text-gray-700">
             {cell.sku_name}

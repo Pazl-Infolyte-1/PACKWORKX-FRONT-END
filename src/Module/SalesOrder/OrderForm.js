@@ -11,7 +11,8 @@ const OrderForm = forwardRef(({
   handleFormSubmit,
   setDrawer,
   totals,
-  setTotals
+  setTotals,
+  setIsFormTouched
 }, ref) => {
 
   const [clients, setClients] = useState([]); // State for client list
@@ -139,8 +140,9 @@ const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   // 1. Update handleInputChange to sync with parent component
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    setIsFormTouched(true)
     errors[name] = ""
-
+    
     let updatedData;
 
     // For client selection, include both name and ID
@@ -540,6 +542,7 @@ const [attemptedSubmit, setAttemptedSubmit] = useState(false);
           showSubmitButton={false} // This prop tells SkuDetails not to show its submit button
           totals={totals}
           setTotals={setTotals}
+          setIsFormTouched={setIsFormTouched}
         />
 
         {/* Submit Button */}

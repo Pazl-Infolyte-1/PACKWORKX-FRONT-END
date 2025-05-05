@@ -7,6 +7,7 @@ import SkuVersionAddEdit from './SkuVersionAddEdit'
 import PopUp from '../../components/New/PopUp'
 import { useLocation } from 'react-router-dom'
 import CustomAlert from '../../components/New/CustomAlert'
+import ConfirmationModale from '../../components/New/ConfirmationModale'
 
 const accordionCardSummary = {
   data: [
@@ -27,7 +28,7 @@ const accordionCardSummary = {
 }
 
 
-const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders, setWorkOrders, setDrawer, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit, skuDetailsForm }) => {
+const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleCloseDrawer, workOrders, setWorkOrders, setDrawer,setIsFormTouched, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit, skuDetailsForm }) => {
   const [selectedOption, setSelectedOption] = useState('inhouse')
   const [openIndices, setOpenIndices] = useState([])
   const [openAccordions, setOpenAccordions] = useState({})
@@ -47,6 +48,8 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
   const [salesOrder, setSalesOrder] = useState([])
   const [versionAlerts, setVersionAlerts] = useState([])
   const [salesOrderSkus, setSalesOrderSkus] = useState([])
+  const [canDeactivate,setCanDeactivate] = useState(false);
+
 
 
   // useEffect(() => {
@@ -115,6 +118,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
 
   // Update work order data
   const handleWorkOrderChange = (orderId, field, value) => {
+    setIsFormTouched(true)
     setWorkOrders(prevOrders =>
       prevOrders.map(order =>
         order.id === orderId
@@ -1153,8 +1157,10 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
         <div className='flex gap-3'>
           <ActionButton
             onClick={() => {
-              setDrawer(false)
-            }}
+              // setCanDeactivate(true)
+              // setDrawer(false)
+              handleCloseDrawer()
+                        }}
             variant="cancel"
             label={"cancel"}
           />
@@ -1167,6 +1173,19 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
         </div>
 
       </div>
+
+      {canDeactivate && (
+  <ConfirmationModale 
+    isOpen={canDeactivate}
+    onClose={() => setCanDeactivate(false)}
+    onConfirm={() => {
+      setDrawer(false)
+      setCanDeactivate(false);
+        }
+    }
+    variant="unsavedChanges"
+  />
+)}
       <VersionsPopup
         visible={isVersionDrawerOpen}
         setVisible={() => setVersionDrawerOpen(false)}

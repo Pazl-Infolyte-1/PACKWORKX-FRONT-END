@@ -8,7 +8,7 @@ import apiMethods from '../../api/config'
 import CustomAlert from '../../components/New/CustomAlert'
 import ActionButton from '../../components/New/ActionButton'
 
-const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, setisEdit, fetchData }) => {
+const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, setisEdit, fetchData,setIsFormTouched,handleCloseDrawer }) => {
   const [activeTab, setActiveTab] = useState(currentTab)
   const [loading, setLoading] = useState(false)
   const [existingSalesOrderData, setExistingSalesOrderData] = useState('')
@@ -493,6 +493,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
             totals={totals}
             setTotals={setTotals}
             ref={childRef}
+            setIsFormTouched={setIsFormTouched}
           />
         )}
         {activeTab === 'skuDetails' && (
@@ -510,6 +511,8 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
               skuVersionsMap={skuVersionsMap}
               setSkuVersionsMap={setSkuVersionsMap}
               workOrderListSubmit={workOrderListSubmit}
+              setIsFormTouched={setIsFormTouched}
+              handleCloseDrawer={handleCloseDrawer}
             />
           </div>
         )}

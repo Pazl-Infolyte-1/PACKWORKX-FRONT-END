@@ -7,7 +7,7 @@ import apiMethods from '../../api/config'
 import Select from "react-select";
 import { Controller } from "react-hook-form";
 
-const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = true, totals, setTotals }) => {
+const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = true, totals, setTotals, setIsFormTouched }) => {
   const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
   const [totalQuantity, setTotalQuantity] = useState(0)
   const [totalAmount, setTotalAmount] = useState(0)
@@ -223,7 +223,9 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
     setValue(`skus[${index}].sgstAmount`, sgstAmount.toFixed(2));
     setValue(`skus[${index}].cgstAmount`, cgstAmount.toFixed(2));
     setValue(`skus[${index}].total`, total.toFixed(2));
-    setValue(`skus[${index}].totalGst`, totalGst.toFixed(2));
+    setValue(`skus[${index}].totalGst`, (cgstAmount + sgstAmount).toFixed(2));
+    // setValue(`skus[${index}].totalGst`, totalGst.toFixed(2));
+
 
     // Force the form to update
     // This line is key - it ensures React Hook Form knows values have changed
@@ -542,7 +544,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                       </td>
 
                       {/* Total GST */}
-                      <td className="px-4 py-2">
+                      {/* <td className="px-4 py-2">
                         <input
                           {...register(`skus[${index}].totalGst`)}
                           type="number"
@@ -550,6 +552,21 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                           readOnly
                         />
+                      </td> */}
+
+                      <td className="px-4 py-2">
+                        <input
+                          value={
+                            (parseFloat(skusData[index]?.cgstAmount) || 0) +
+                            (parseFloat(skusData[index]?.sgstAmount) || 0)
+                          }
+                          type="number"
+                          placeholder="0"
+                          readOnly
+                          className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+                        />
+
+                        
                       </td>
 
                       {/* Total */}
@@ -622,7 +639,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                   Total GST:
                 </td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  {totals.totalGst.toFixed(2)}
+                { (totals.cgst + totals.sgst).toFixed(2) }
                 </td>
 
 

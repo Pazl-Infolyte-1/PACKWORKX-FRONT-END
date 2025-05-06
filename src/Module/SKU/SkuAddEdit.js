@@ -94,6 +94,7 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
         color: null,
         flute_type: null,
         weight: null,
+        bursting_strength:null
         //flute_ratio: null,
       },
     ],
@@ -260,6 +261,7 @@ setSkuVariant(option.sku_type || option.value)
       color: '',
       flute_type: layer.layer.toLowerCase().includes('corrugated') ? '' : 'N/A',
       weight: '',
+      bursting_strength:''
       //flute_ratio: '',
     }))
 
@@ -483,6 +485,32 @@ setSkuVariant(option.sku_type || option.value)
     prevIsSingleViewRef.current = isSingleViewPopupForType;
   }, [isSingleViewPopupForType]);
   
+  useEffect(() => {
+    const updatedSkuValues = addNewSkuData.sku_values.map((item) => {
+      if (item.gsm && item.bf) {
+        const calculatedBS = Number(((item.gsm * item.bf) / 1000).toFixed(3));
+
+        // Only update if bursting_strength actually changed
+        if (item.bursting_strength !== calculatedBS) {
+          return { ...item, bursting_strength: calculatedBS };
+        }
+      }
+      return item;
+    });
+  
+    const hasChanged = updatedSkuValues.some((item, index) =>
+      item.bursting_strength !== addNewSkuData.sku_values[index].bursting_strength
+    );
+  
+    if (hasChanged) {
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        sku_values: updatedSkuValues,
+      }));
+    }
+  }, [addNewSkuData.sku_values]);
+  
+
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
@@ -769,7 +797,8 @@ setSkuVariant(option.sku_type || option.value)
                     <p>{toThreeDecimalFixed(item.weight) || 'N/A'}</p>
                   </td>
                   <td className="p-2 text-center w-full sm:w-1/12">
-                    <p>{toThreeDecimalFixed(item.gsm * item.bf / 1000)}</p>
+                    {/*<p>{toThreeDecimalFixed(item.gsm * item.bf / 1000)}</p>*/}
+                    <p>{item.bursting_strength}</p>
                   </td>
                 </tr>
               ))}

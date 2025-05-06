@@ -191,6 +191,9 @@ const [selected, setSelected] = useState('vendor')
           }, []) // Runs once on mount
       
           const handleKeyDown = (event) => {
+            if (!isPopupOpen) {
+              return; // Disable arrow key functionality if the popup is not open
+            }
             if (event.key === 'ArrowRight') {
               handleSelectAction('client')
               setEntityType('Client') // Update state

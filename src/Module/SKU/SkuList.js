@@ -33,6 +33,8 @@ function SkuList() {
   const [client, setClient] = useState([])
   const [selectedClient, setSelectedClient] = useState(null)
   const [selectedDisplayName, setSelectedDisplayName] = useState("")
+  const [clientName, setClientName] = useState("")
+
   const [selectedSkuType, setSelectedSkuType] = useState('')
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [visible, setVisible] = useState(false)
@@ -114,6 +116,7 @@ console.log("suuuuu",user)
         color: null,
         flute_type: null,
         weight: null,
+        bursting_strength:null,
         flute_ratio: null,
       },
     ],
@@ -193,6 +196,7 @@ console.log("suuuuu",user)
     }
     console.log("name", name);
     console.log("val", value);
+    
   };
 
   const handleStrictAdherenceToggle = () => {
@@ -540,6 +544,7 @@ setAlerts([]);
           color: null,
           flute_type: null,
           weight: null,
+          bursting_strength:null,
           flute_ratio: null,
         },
       ],
@@ -555,7 +560,7 @@ setAlerts([]);
     try {
       const response = await apiMethods.getSkuList({
         search: searchQuery || '',
-        client: selectedDisplayName || '',
+        client: clientName || '',
         sku_type: selectedSkuType || '',
         page: pagination?.currentPage || 1,
         limit: message ? 10000 : limit,
@@ -577,10 +582,11 @@ setAlerts([]);
     refresh,
     selectedClient,
     selectedDisplayName,
+    clientName,
     searchQuery,
     pagination?.currentPage,
     selectedSkuType,
-    limit,
+    limit,+
     location.state?.skipInitialFetch,
     message,
   ])
@@ -758,8 +764,13 @@ console.log("mess",message)
               const selectedItem = client.find(
                 (item) => item.client_id == e.target.value
               );
+              console.log("hhhhhhhhhhh",selectedItem);
+
               console.log("hhhhhhhhhhh",selectedItem?.display_name);
+              console.log("hhhhhhhhhhh",selectedItem?.client);
+
               setSelectedDisplayName(selectedItem?.display_name)
+              setClientName(selectedItem?.company_name)
             }}
             className="sm:w-[150px] p-2 rounded-lg shadow-md bg-white text-[#424242] outline-none border-none"
           >

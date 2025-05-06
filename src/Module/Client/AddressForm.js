@@ -6,7 +6,7 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
   //console.log("addressadd",addressAdded)
-  const { control, register } = useFormContext();
+  const { control, register, formState: { errors } } = useFormContext();
   //const { fields, append, remove } = useFieldArray({
   //  control,
   //  name: "addresses",
@@ -94,9 +94,14 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     </label>
                     <input
                       type="text"
-                      {...register(`addresses.${index}.attention`)}
+                      {...register(`addresses.${index}.attention`, { required: "Required" })}
                       className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
                     />
+                    {errors.addresses?.[index]?.attention && (
+        <p className="text-red-500 text-xs mt-1">
+          ⚠️ {errors.addresses[index].attention.message}
+        </p>
+      )}
                   </div>
 
                   {/* Country Select */}
@@ -105,7 +110,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                       Country/Region<span className="text-red-500 ml-1">*</span>
                     </label>
                     <select
-                      {...register(`addresses.${index}.country`)}
+                      {...register(`addresses.${index}.country`,{ required: "Required" })}
                       defaultValue="IN"
                       className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
                     >
@@ -113,6 +118,11 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                       <option value="India">India</option>
                       <option value="US">United States</option>
                     </select>
+                    {errors.addresses?.[index]?.country && (
+        <p className="text-red-500 text-xs mt-1">
+          ⚠️ {errors.addresses[index].country.message}
+        </p>
+      )}
                   </div>
 
                   {/* Street 1 */}
@@ -142,9 +152,14 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     </label>
                     <input
                       type="text"
-                      {...register(`addresses.${index}.city`)}
+                      {...register(`addresses.${index}.city`, { required: "Required" })}
                       className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
                     />
+                    {errors.addresses?.[index]?.city && (
+        <p className="text-red-500 text-xs mt-1">
+          ⚠️ {errors.addresses[index].city.message}
+        </p>
+      )}
                   </div>
 
                   {/* State Select */}
@@ -154,7 +169,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     </label>
                     <select
                       defaultValue="tn"
-                      {...register(`addresses.${index}.state`)}
+                      {...register(`addresses.${index}.state`, { required: "Required" })}
                       className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
                     >
                       <option value="">Select State</option>
@@ -163,6 +178,11 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                       <option value="Kerala">Kerala</option>
 
                     </select>
+                    {errors.addresses?.[index]?.state && (
+        <p className="text-red-500 text-xs mt-1">
+          ⚠️ {errors.addresses[index].state.message}
+        </p>
+      )}
                   </div>
 
                   {/* Pin Code */}
@@ -172,9 +192,14 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     </label>
                     <input
                       type="text"
-                      {...register(`addresses.${index}.pinCode`)}
+                      {...register(`addresses.${index}.pinCode`, { required: "Required" })}
                       className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
                     />
+                     {errors.addresses?.[index]?.pinCode && (
+        <p className="text-red-500 text-xs mt-1">
+          ⚠️ {errors.addresses[index].pinCode.message}
+        </p>
+      )}
                   </div>
 
                   {/* Phone */}
@@ -184,9 +209,14 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     </label>
                     <input
                       type="text"
-                      {...register(`addresses.${index}.phone`)}
+                      {...register(`addresses.${index}.phone`, { required: "Required" })}
                       className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
                     />
+                     {errors.addresses?.[index]?.phone && (
+        <p className="text-red-500 text-xs mt-1">
+          ⚠️ {errors.addresses[index].phone.message}
+        </p>
+      )}
                   </div>
                 </div>
               )}

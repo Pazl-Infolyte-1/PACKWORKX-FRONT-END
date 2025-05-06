@@ -306,6 +306,19 @@ const onSubmit = async (data) => {
       addresses: data.addresses.map(({ type, ...rest }) => rest),
     };
 
+    const isAddressEmpty = filteredData.addresses.every(address =>
+      Object.values(address).every(value => value.trim() === "")
+    );
+  
+    if (isAddressEmpty) {
+      console.log("Address Form must be filled");
+      setAlerts([{ severity: "error", message: "Fill the Addresses" }]);
+      setTimeout(() => {
+        setAlerts([]); // Clear alerts after 3 seconds
+      }, 3000);
+      return; // Stop further execution
+    }
+  
     let response;
     let successMessage;
 
@@ -433,60 +446,159 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
     <div className="bg-white p-6">
       {/* Customer Type (Single Row) */}
         {/* Do You Have GST? - Moved to Left Card */}
-        <div className="flex items-center mb-4">
-        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">
-         Reference Id</label>
-        <input type="text"    
-        placeholder={`Reference Id`}
-        {...register("clientData.client_ref_id")} className="border p-2 rounded flex-1" />
-      </div>
-
-      <div className="mb-4 flex items-center">
-  <label className="font-medium w-40 text-indigo-600 after:content-['*'] after:text-red-500 after:ml-1">Do you have GST?</label>
-  <div className="flex items-center space-x-6 h-10">
-    <label className="flex items-center space-x-2">
-      <input type="radio" {...register("clientData.gst_status")} value="true" />
-      <span>Yes</span>
+        <div className="mb-4">
+  <div className="flex items-center">
+    <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">
+      Reference Id
     </label>
-    <label className="flex items-center space-x-2">
-      <input type="radio" {...register("clientData.gst_status")} value="false" />
-      <span>No</span>
-    </label>
+    <input
+      type="text"
+      placeholder="Reference Id"
+      {...register("clientData.client_ref_id", {
+        required: "Required",
+      })}
+      className="border p-2 rounded flex-1"
+    />
   </div>
+  {errors.clientData?.client_ref_id && (
+    <div className="flex">
+      <div className="w-40" /> {/* empty space to align with label */}
+      <p className="text-red-500 text-xs">
+      ⚠️ {errors.clientData.client_ref_id.message}
+    </p>
+    </div>
+  )}
 </div>
-      <div className="mb-4 flex items-center">
+
+<div className="mb-4 flex flex-col">
+  <div className="flex items-center">
+    <label className="font-medium w-40 text-indigo-600 after:content-['*'] after:text-red-500 after:ml-1">
+      Do you have GST?
+    </label>
+    <div className="flex items-center space-x-6 h-10">
+      <label className="flex items-center space-x-2">
+        <input
+          type="radio"
+          {...register("clientData.gst_status", {
+            required: "Required",
+          })}
+          value="true"
+        />
+        <span>Yes</span>
+      </label>
+      <label className="flex items-center space-x-2">
+        <input
+          type="radio"
+          {...register("clientData.gst_status", {
+            required: "Required",
+          })}
+          value="false"
+        />
+        <span>No</span>
+      </label>
+    </div>
+  </div>
+  {errors.clientData?.gst_status && (
+    <div className="flex">
+      <div className="w-40" /> {/* spacing under label */}
+      <p className="text-red-500 text-xs">
+      ⚠️{errors.clientData.gst_status.message}
+      </p>
+    </div>
+  )}
+</div>
+
+      <div className="mb-4 flex flex-col">
+      <div className="flex items-center">
         <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Customer Type</label>
         <div className="flex items-center space-x-6 h-10">
           <label className="flex items-center space-x-2">
-            <input type="radio" {...register("clientData.customer_type")} value="Business" />
+            <input type="radio" {...register("clientData.customer_type", { required: "Required"})} value="Business" />
             <span>Business</span>
           </label>
           <label className="flex items-center space-x-2">
-            <input type="radio" {...register("clientData.customer_type")} value="Individual" />
+            <input type="radio" {...register("clientData.customer_type", { required: "Required"})} value="Individual" />
             <span>Individual</span>
           </label>
         </div>
+        </div>
+        {errors.clientData?.customer_type && (
+    <div className="flex">
+      <div className="w-40" /> {/* spacing under label */}
+      <p className="text-red-500 text-xs">
+      ⚠️{errors.clientData.customer_type.message}
+      </p>
+    </div>
+  )}
       </div>
 
       {/* Full Name (Single Row) */}
-      <div className="flex items-center mb-4">
-        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Full Name</label>
-        <div className="flex gap-2">
-          <select {...register("clientData.salutation")} className="border p-2 rounded w-28 ml-[38px]">
-            <option value="" disabled>Salutation</option>
-            <option value="Mr.">Mr.</option>
-            <option value="Mrs.">Mrs.</option>
-          </select>
-          <input type="text" placeholder="First Name" {...register("clientData.first_name")} className="border p-2 rounded w-full" />
-          <input type="text" placeholder="Last Name" {...register("clientData.last_name")} className="border p-2 rounded w-full" />
-        </div>
-      </div>
+      <div className="mb-4 flex flex-col">
+  <div className="flex items-center">
+    <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">
+      Full Name
+    </label>
+    <div className="flex gap-2">
+      <select
+        {...register("clientData.salutation", {
+          required: "Required",
+        })}
+        className="border p-2 rounded w-28 ml-[38px]"
+      >
+        <option value="" disabled>
+          Salutation
+        </option>
+        <option value="Mr.">Mr.</option>
+        <option value="Mrs.">Mrs.</option>
+      </select>
+      <input
+        type="text"
+        placeholder="First Name"
+        {...register("clientData.first_name", { required: "Required" })}
+        className="border p-2 rounded w-full"
+      />
+      <input
+        type="text"
+        placeholder="Last Name"
+        {...register("clientData.last_name", { required: "Required" })}
+        className="border p-2 rounded w-full"
+      />
+    </div>
+  </div>
+
+  {(errors.clientData?.salutation ||
+    errors.clientData?.first_name ||
+    errors.clientData?.last_name) && (
+    <div className="flex gap-4 mt-1 ml-[160px]">
+      {errors.clientData?.salutation && (
+        <p className="text-red-500 text-xs">⚠️ {errors.clientData.salutation.message}</p>
+      )}
+      {errors.clientData?.first_name && (
+        <p className="text-red-500 text-xs ml-[33px]">⚠️ {errors.clientData.first_name.message}</p>
+      )}
+      {errors.clientData?.last_name && (
+        <p className="text-red-500 text-xs ml-[40px]">⚠️ {errors.clientData.last_name.message}</p>
+      )}
+    </div>
+  )}
+</div>
 
       {/* Company Name */}
-      <div className="flex items-center mb-4">
+      <div className="mb-4">
+      <div className="flex items-center">
         <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Company</label>
-        <input type="text" placeholder="Company Name" {...register("clientData.company_name")} className="border p-2 rounded flex-1" />
+        <input type="text" placeholder="Company Name" {...register("clientData.company_name", { required: "Required" })} className="border p-2 rounded flex-1" />
       </div>
+      {errors.clientData?.company_name && (
+    <div className="flex">
+      <div className="w-40" /> {/* empty space to align with label */}
+      <p className="text-red-500 text-xs">
+      ⚠️ {errors.clientData.company_name.message}
+    </p>
+    </div>
+  )}
+      </div>
+       
 
 
 
@@ -507,7 +619,8 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
         <input type="text" placeholder="Enter display name" {...register("clientData.display_name")} className="border p-2 rounded flex-1" />*/}
       </div>)}
       {gstStatus === "true" && (
-  <div className="mb-4 flex items-center h-10">
+    <div className="mb-4 h-10">
+      <div className="flex items-center">
     <label className="font-medium w-40 flex items-center leading-none after:content-['*'] after:text-red-500 after:ml-1">
       GST Number
     </label>
@@ -515,32 +628,63 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
       <input 
         type="text" 
         placeholder="Enter GST Number" 
-        {...register("clientData.gst_number")} 
+        {...register("clientData.gst_number", { required: "Required" })} 
         className="border p-2 rounded w-[295px]"
       />
       <ActionButton height={"9"} label={"Search"} onClick={handleSearch} className='ml-[20px]' />
     </div>
+
+  </div>
+  {errors.clientData?.gst_number && (
+    <div className="flex">
+      <div className="w-40" /> {/* empty space to align with label */}
+      <p className="text-red-500 text-xs">
+      ⚠️ {errors.clientData.gst_number.message}
+    </p>
+    </div>
+  )}
   </div>
 )}
 
-        <div className="flex items-center mb-4">
+<div className="mb-4">
+<div className="flex items-center">
         <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Display Name</label>
-        <input type="text" placeholder="Enter display name" {...register("clientData.display_name")} className="border p-2 rounded flex-1" />
+        <input type="text" placeholder="Enter display name" {...register("clientData.display_name", { required: "Required" })} className="border p-2 rounded flex-1" />
+      </div>
+      {errors.clientData?.display_name && (
+    <div className="flex">
+      <div className="w-40" /> {/* empty space to align with label */}
+      <p className="text-red-500 text-xs">
+      ⚠️ {errors.clientData.display_name.message}
+    </p>
+    </div>
+  )}
       </div>
 
    
 
       {/* Email */}
-      <div className="flex items-center mb-4">
+      <div className="mb-4">
+      <div className="flex items-center">
       <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">
   Email
 </label>
 
-        <input disabled={editData} type="text" placeholder="Email Address" {...register("clientData.email")} className="border p-2 rounded flex-1" />
+        <input disabled={editData} type="text" placeholder="Email Address" {...register("clientData.email", { required: "Required" })} className="border p-2 rounded flex-1" />
+      </div>
+      {errors.clientData?.email && (
+    <div className="flex">
+      <div className="w-40" /> {/* empty space to align with label */}
+      <p className="text-red-500 text-xs">
+      ⚠️ {errors.clientData.email.message}
+    </p>
+    </div>
+  )}
       </div>
 
       {/* Phone Numbers */}
-      <div className="flex items-center mb-4">
+      <div className="mb-4">
+      <div className="flex items-center">
   <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">
     Phone
   </label>
@@ -549,7 +693,7 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
       <img src={Phone} alt="Work Phone" className="mr-2" />
       <input
         type="text"
-        {...register("clientData.work_phone")}
+        {...register("clientData.work_phone", { required: "Required" })}
         placeholder="Work"
         className="outline-none w-full"
       />
@@ -558,12 +702,27 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
       <img src={Cell} alt="Mobile" className="mr-2" />
       <input
         type="text"
-        {...register("clientData.mobile")}
+        {...register("clientData.mobile", { required: "Required" })}
         placeholder="Mobile"
         className="outline-none w-full"
       />
     </div>
+    </div>
   </div>
+  {(errors.clientData?.work_phone || errors.clientData?.mobile) && (
+    <div className="flex gap-x-4 mt-1 ml-[160px]">
+      {errors.clientData?.work_phone && (
+        <p className="text-red-500 text-xs">
+          ⚠️ {errors.clientData.work_phone.message}
+        </p>
+      )}
+      {errors.clientData?.mobile && (
+        <p className="text-red-500 text-xs ml-[120px]">
+          ⚠️ {errors.clientData.mobile.message}
+        </p>
+      )}
+    </div>
+  )}
 </div>
 
 

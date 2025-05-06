@@ -93,10 +93,7 @@ const methods = useForm({
       payment_terms: "",
       //enable_portal: false,
       portal_language: "",
-      documents: {
-        id_proof: "file1.pdf",
-        //contract: "file2.pdf",
-      },
+      documents: [],
       website_url: "",
       department: "",
       designation: "",

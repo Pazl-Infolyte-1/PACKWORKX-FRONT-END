@@ -225,9 +225,6 @@ function EmployeeList() {
         fetchEmployeeData()   
         setDrawerOpen(false);
         setIsEdit(false);
-
-
-
         setFormData({
           name: '',
           email: '',
@@ -248,9 +245,9 @@ function EmployeeList() {
           role_id: null,
           image: '',
         });
-      } else {
-        throw new Error(response?.data?.message || "Unexpected response from server.");
-      }
+      } 
+
+      
   
     } catch (error) {
       console.error('Error submitting form:', error);

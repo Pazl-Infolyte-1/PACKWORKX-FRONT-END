@@ -7,7 +7,7 @@ import apiMethods from '../../api/config'
 import Select from "react-select";
 import { Controller } from "react-hook-form";
 
-const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = true, totals, setTotals }) => {
+const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = true, totals, setTotals,errors,setErrors }) => {
   const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
   const [totalQuantity, setTotalQuantity] = useState(0)
   const [totalAmount, setTotalAmount] = useState(0)
@@ -18,12 +18,22 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
   const [isLoading, setIsLoading] = useState(true)
   const [previousValues, setPreviousValues] = useState(null)
   const [totalGst, setTotalGst] = useState(0)
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+
 
   const updateTotals = (key, value) => {
     setTotals((prevTotals) => ({
       ...prevTotals,
       [key]: value,
     }));
+  };
+
+  const validateSkus = () => {
+    setAttemptedSubmit(true);
+    
+    // Check if any SKUs are empty
+    const emptySkus = getValues('skus').some(item => !item.sku);
+    return !emptySkus;
   };
 
   // Initialize form with skuDetailsForm data if it exists
@@ -223,7 +233,9 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
     setValue(`skus[${index}].sgstAmount`, sgstAmount.toFixed(2));
     setValue(`skus[${index}].cgstAmount`, cgstAmount.toFixed(2));
     setValue(`skus[${index}].total`, total.toFixed(2));
-    setValue(`skus[${index}].totalGst`, totalGst.toFixed(2));
+    setValue(`skus[${index}].totalGst`, (cgstAmount + sgstAmount).toFixed(2));
+    // setValue(`skus[${index}].totalGst`, totalGst.toFixed(2));
+
 
     // Force the form to update
     // This line is key - it ensures React Hook Form knows values have changed
@@ -375,6 +387,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
 
       return (
         <div className="w-[280px] z-[80]">
+
           <Select
             {...field}
             value={selectedValue || null}
@@ -385,6 +398,13 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
             menuPortalTarget={document.body}
             onChange={(selectedOption) => {
               field.onChange(selectedOption?.value || "");
+              if (selectedOption?.value && errors?.skuDetails?.[index]) {
+                const newErrors = {...errors};
+                if (newErrors.skuDetails) {
+                  newErrors.skuDetails[index] = undefined;
+                  setErrors(newErrors);
+                }
+              }
               calculateRowValues(index);
               updateParentFormData();
             }}
@@ -394,6 +414,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                 minHeight: 32,
                 height: 32,
                 fontSize: 14,
+                borderColor: errors?.skuDetails?.[index] ? 'red' : base.borderColor,
               }),
               valueContainer: (base) => ({
                 ...base,
@@ -542,7 +563,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                       </td>
 
                       {/* Total GST */}
-                      <td className="px-4 py-2">
+                      {/* <td className="px-4 py-2">
                         <input
                           {...register(`skus[${index}].totalGst`)}
                           type="number"
@@ -550,6 +571,21 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                           className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
                           readOnly
                         />
+                      </td> */}
+
+                      <td className="px-4 py-2">
+                        <input
+                          value={
+                            (parseFloat(skusData[index]?.cgstAmount) || 0) +
+                            (parseFloat(skusData[index]?.sgstAmount) || 0)
+                          }
+                          type="number"
+                          placeholder="0"
+                          readOnly
+                          className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-white text-[#030303] outline-none"
+                        />
+
+                        
                       </td>
 
                       {/* Total */}
@@ -622,7 +658,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                   Total GST:
                 </td>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  {totals.totalGst.toFixed(2)}
+                { (totals.cgst + totals.sgst).toFixed(2) }
                 </td>
 
 

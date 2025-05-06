@@ -79,7 +79,7 @@ function SalesOrderTable({
                     onClick={() => handleView(row.id)}
                     className="py-3 px-2 !text-[#8761e5] font-semibold cursor-pointer underline text-start"
                   >
-                    SO-{row.id}
+                    {row.sales_generate_id}
                   </CTableDataCell>
 
                   <CTableDataCell className="py-3 px-4 text-gray-700">

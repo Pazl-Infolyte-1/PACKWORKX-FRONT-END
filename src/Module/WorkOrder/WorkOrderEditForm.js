@@ -10,6 +10,8 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
     const [skuList, setSkuList] = useState([]);
     const [skuVersion, setSkuVersion] = useState([])
     const [fullSkuList, setFullSkuList] = useState([]);
+    const [validationErrors, setValidationErrors] = useState({});
+
 
 
 
@@ -181,27 +183,59 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
             ...prev,
             [name]: value
         }));
+
+        if (validationErrors[name]) {
+            setValidationErrors({
+              ...validationErrors,
+              [name]: ''
+            });
+          }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-        try {
-            // Add your API call here to submit the form data
-            console.log('Submitted data:', formValues);
-            // Simulate API call
-            await apiMethods.editWorkOrder(formValues.id, formValues)
 
-            setIsEditFormVisible(false)
+    const validateForm = (formData) => {
+        const requiredFields = [
+          'sku_id',
+          'planned_start_date',
+          'planned_end_date',
+          'edd',
+          'qty',
+        ];
+      
+        const errors = {};
+        let isValid = true;
+      
+        requiredFields.forEach(field => {
+          if (!formData[field]) {
+            errors[field] = 'Required';
+            isValid = false;
+          }
+        });
+      
+        setValidationErrors(errors);
+        return isValid;
+      };
 
-            fetchData()
-            // Close form or show success message
-        } catch (error) {
-            console.error('Error submitting form:', error);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const isValid = validateForm(formValues);
+  if (!isValid) return;
+
+  setIsSubmitting(true);
+  try {
+    console.log('Submitted data:', formValues);
+    await apiMethods.editWorkOrder(formValues.id, formValues);
+    
+    setIsEditFormVisible(false);
+    fetchData(); // Refresh data after successful submit
+  } catch (error) {
+    console.error('Error submitting form:', error);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
 
     const handleSkuChange = (e) => {
@@ -225,7 +259,7 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
                     {/* First row */}
                     <div className="flex flex-col md:flex-row gap-8">
                         <div className="flex-1 min-w-0">
-                            <label className="block text-gray-800 font-medium mb-1">SKU</label>
+                            <label className="block text-gray-800 font-medium mb-1">SKU <span className='text-red-600'>*</span></label>
                             <select
                                 className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
                                 value={formValues.sku_id}
@@ -241,6 +275,16 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
                                     </option>
                                 ))}
                             </select>
+                            {validationErrors.sku_id && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.sku_id}
+    </div>
+    )}
                         </div>
     
                         <div className="flex-1 min-w-0">
@@ -264,7 +308,7 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
                     {/* Second row */}
                     <div className="flex flex-col md:flex-row gap-8">
                         <div className="flex-1 min-w-0">
-                            <label className="block text-gray-800 font-medium mb-1">Quantity</label>
+                            <label className="block text-gray-800 font-medium mb-1">Quantity <span className='text-red-600'>*</span></label>
                             <input
                                 type="number"
                                 name="qty"
@@ -274,6 +318,16 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
                                 className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
                                 min="1"
                             />
+                                                    {validationErrors.qty && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.qty}
+    </div>
+                                                    )}
                         </div>
     
                         <div className="flex-1 min-w-0">
@@ -293,7 +347,7 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
                     {/* Third row */}
                     <div className="flex flex-col md:flex-row gap-8">
                         <div className="flex-1 min-w-0">
-                            <label className="block text-gray-800 font-medium mb-1">Start Date</label>
+                            <label className="block text-gray-800 font-medium mb-1">Start Date <span className='text-red-600'>*</span></label>
                             <input
                                 type="date"
                                 name="planned_start_date"
@@ -301,10 +355,20 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
                                 onChange={handleChange}
                                 className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
                             />
+                                                                        {validationErrors.planned_start_date && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.planned_start_date}
+    </div>
+                                                    )}
                         </div>
     
                         <div className="flex-1 min-w-0">
-                            <label className="block text-gray-800 font-medium mb-1">End Date</label>
+                            <label className="block text-gray-800 font-medium mb-1">End Date <span className='text-red-600'>*</span></label>
                             <input
                                 type="date"
                                 name="planned_end_date"
@@ -312,13 +376,23 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
                                 onChange={handleChange}
                                 className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
                             />
+                                                                        {validationErrors.planned_end_date && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.planned_end_date}
+    </div>
+                                                    )}
                         </div>
                     </div>
     
                     {/* Fourth row */}
                     <div className="flex flex-col md:flex-row gap-8">
                         <div className="flex-1 min-w-0">
-                            <label className="block text-gray-800 font-medium mb-1">Estimated Delivery Date</label>
+                            <label className="block text-gray-800 font-medium mb-1">Estimated Delivery Date <span className='text-red-600'>*</span></label>
                             <input
                                 type="date"
                                 name="edd"
@@ -326,6 +400,16 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
                                 onChange={handleChange}
                                 className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none"
                             />
+                                                                        {validationErrors.edd && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.edd}
+    </div>
+                                                    )}
                         </div>
     
                         <div className="flex-1 min-w-0">

@@ -37,59 +37,59 @@ console.log("client data",clientData.status)
             <div className="grid grid-cols-3 gap-4 p-4">
               <div>
                 <label className="text-sm font-medium text-gray-500">Client ID</label>
-                <div className="text-gray-800 mt-1">{clientData.client_id || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.client_id || "-"}</div>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Company Name</label>
-                <div className="text-gray-800 mt-1">{clientData.company_name || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.company_name || "-"}</div>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Customer Type</label>
-                <div className="text-gray-800 mt-1">{clientData.customer_type || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.customer_type || "-"}</div>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Display Name</label>
-                <div className="text-gray-800 mt-1">{clientData.display_name || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.display_name || "-"}</div>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Email</label>
-                <div className="text-gray-800 mt-1">{clientData.email || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.email || "-"}</div>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Work Phone</label>
-                <div className="text-gray-800 mt-1">{clientData.work_phone || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.work_phone || "-"}</div>
               </div>
 			  <div>
                 <label className="text-sm font-medium text-gray-500">Mobile</label>
-                <div className="text-gray-800 mt-1">{clientData.mobile || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.mobile || "-"}</div>
               </div>
 			  <div>
                 <label className="text-sm font-medium text-gray-500">PAN</label>
-                <div className="text-gray-800 mt-1">{clientData.PAN || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.PAN || "-"}</div>
               </div>
 			  <div>
                 <label className="text-sm font-medium text-gray-500">Currency</label>
-                <div className="text-gray-800 mt-1">{clientData.currency || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.currency || "-"}</div>
               </div>
 			  <div>
                 <label className="text-sm font-medium text-gray-500">Payment Terms</label>
-                <div className="text-gray-800 mt-1">{clientData.payment_terms || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.payment_terms || "-"}</div>
               </div>
 			  <div>
                 <label className="text-sm font-medium text-gray-500">Website</label>
-                <div className="text-gray-800 mt-1">{clientData.website_url || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.website_url || "-"}</div>
               </div>
 			  <div>
                 <label className="text-sm font-medium text-gray-500">Twitter</label>
-                <div className="text-gray-800 mt-1">{clientData.twitter || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.twitter || "-"}</div>
               </div>
 			  <div>
                 <label className="text-sm font-medium text-gray-500">Skype</label>
-                <div className="text-gray-800 mt-1">{clientData.skype || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.skype || "-"}</div>
               </div>
 			  <div>
                 <label className="text-sm font-medium text-gray-500">Facebook</label>
-                <div className="text-gray-800 mt-1">{clientData.facebook || "N/A"}</div>
+                <div className="text-gray-800 mt-1">{clientData.facebook || "-"}</div>
               </div>
 
             </div>
@@ -107,31 +107,31 @@ console.log("client data",clientData.status)
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="text-sm font-medium text-gray-500">Attention</label>
-                        <div className="text-gray-800 mt-1">{address.attention || "N/A"}</div>
+                        <div className="text-gray-800 mt-1">{address.attention || "-"}</div>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-500">Street</label>
-                        <div className="text-gray-800 mt-1">{address.street1 || "N/A"}, {address.street2 || "N/A"}</div>
+                        <div className="text-gray-800 mt-1">{address.street1 || "-"}, {address.street2 || "-"}</div>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-500">City</label>
-                        <div className="text-gray-800 mt-1">{address.city || "N/A"}</div>
+                        <div className="text-gray-800 mt-1">{address.city || "-"}</div>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-500">State</label>
-                        <div className="text-gray-800 mt-1">{address.state || "N/A"} - {address.pinCode || "N/A"}</div>
+                        <div className="text-gray-800 mt-1">{address.state || "-"} - {address.pinCode || "-"}</div>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-500">Country</label>
-                        <div className="text-gray-800 mt-1">{address.country || "N/A"}</div>
+                        <div className="text-gray-800 mt-1">{address.country || "-"}</div>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-500">Phone</label>
-                        <div className="text-gray-800 mt-1">{address.phone || "N/A"}</div>
+                        <div className="text-gray-800 mt-1">{address.phone || "-"}</div>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-500">FAX</label>
-                        <div className="text-gray-800 mt-1">{address.faxNumber || "N/A"}</div>
+                        <div className="text-gray-800 mt-1">{address.faxNumber || "-"}</div>
                       </div>
                     </div>
                   </div>

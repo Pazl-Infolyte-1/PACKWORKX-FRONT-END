@@ -148,6 +148,10 @@ function ClientList() {
 
   let entity_type = ''
   const handleKeyDown = (event) => {
+    if (!isPopupOpen) {
+      return; // Disable arrow key functionality if the popup is not open
+    }
+  
     if (event.key === 'ArrowRight') {
       handleSelectAction('client')
       setEntityType('Client') // Update state

@@ -229,6 +229,9 @@ const refreshClients = () => {
     }, []) // Runs once on mount
 
     const handleKeyDown = (event) => {
+      if (!isPopupOpen) {
+        return; // Disable arrow key functionality if the popup is not open
+      }
       if (event.key === 'ArrowRight') {
         handleSelectAction('client')
         setEntityType('Client') // Update state
@@ -702,7 +705,8 @@ useEffect(() => {
             <input
               id="flap_tolerance"
               name="flap_tolerance"
-              value={Number(addNewSkuData.flap_tolerance)}
+              value={addNewSkuData.flap_tolerance ?? ""}
+              //value={Number(addNewSkuData.flap_tolerance)}
               onChange={handleChange}
                      min="0"
               type='number'

@@ -7,7 +7,7 @@ import { useFormContext } from "react-hook-form";
 
 
 const OtherDetailForm =()=>{
-	const { register } = useFormContext(); 
+	const { register, formState: { errors } } = useFormContext(); 
 
 	return (
 		<div className="bg-white p-6 w-full">
@@ -16,17 +16,24 @@ const OtherDetailForm =()=>{
 		  {/* Left Side */}
 		  <div className="space-y-4 ml-[20px]">
 			{/* PAN */}
+			<div className="mb-4 flex flex-col">
 			<div className="flex items-center">
 			  <label className="font-medium w-44 flex items-center after:content-['*'] after:text-red-500 after:ml-1">
 				PAN
 			  </label>
 			  <input
 				type="text"
-				{...register("clientData.PAN")}
+				{...register("clientData.PAN", { required: "Required" })}
 				className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-indigo-400"
 			  />
 			</div>
-  
+			{errors.clientData?.PAN && (
+          <div className="flex mt-1">
+            <div className="w-40" />
+            <p className="text-red-500 text-xs ml-0">⚠️ {errors.clientData.PAN.message}</p>
+          </div>
+        )}
+  </div>
 			{/* Currency */}
 			<div className="flex items-center">
 			  <label className="font-medium w-44">Currency</label>

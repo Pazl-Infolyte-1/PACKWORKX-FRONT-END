@@ -161,6 +161,9 @@ useEffect(() => {
         }, []) // Runs once on mount
     
         const handleKeyDown = (event) => {
+          if (!isPopupOpen) {
+            return; // Disable arrow key functionality if the popup is not open
+          }
           if (event.key === 'ArrowRight') {
             handleSelectAction('client')
             setEntityType('Client') // Update state
@@ -672,7 +675,7 @@ console.log("select dies",selectedDiePopup)
             <input
               id="customer_reference"
               name="customer_reference"
-              type='number'
+              //type='number'
               min={0}
               value={addNewSkuData.customer_reference}
               onChange={handleChange}
@@ -694,7 +697,7 @@ console.log("select dies",selectedDiePopup)
             <input
               id="reference_number"
               name="reference_number"
-              type='number'
+              //type='number'
               min={0}
               value={addNewSkuData.reference_number}
               onChange={handleChange}

@@ -8,31 +8,37 @@ import GrnTable from './GrnTable'
 import Drawer from '../../components/Drawer/Drawer'
 import GrnForm from './GrnForm'
 import apiMethods from '../../api/config'
+import { useSearch } from '../../components/New/SearchContext'
 
 const Grn = () => {
   const [alerts, setAlerts] = useState([])
   const [isEdit, setIsEdit] = useState(false)
-  const [showGrnModal, setShowGrnModal] = useState(false)
   const [grnData, setGrnData] = useState([])
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
   const [limit, setLimit] = useState(10)
   const searchBarRef = useRef(null)
+  const [errors, setErrors] = useState({})
+  const { searchQuery } = useSearch()
 
   const fetchData = async () => {
     try {
-      const response = await apiMethods.getGrn()
-      if (response.status === 200) {
-        setGrnData(response.data.data)
-      }
+      const response = await apiMethods.getGrn({
+        search: searchQuery,
+        page: pagination.page,
+        limit: limit,
+      })
+      setGrnData(response?.data?.data)
+      // setPagination(response.data.pagination)
     } catch (error) {
       console.error(error)
     }
   }
 
   useEffect(() => {
+    console.log('Search query:', searchQuery)
     fetchData()
-  }, [])
+  }, [limit, searchQuery, pagination])
 
   const [grnFormData, setGrnFormData] = useState({
     po_id: null,
@@ -80,34 +86,68 @@ const Grn = () => {
     setIsEdit(false)
   }
 
+  const clearFilters = () => {
+    if (searchBarRef.current) {
+      searchBarRef.current.clearSearch()
+    }
+  }
+
   const handleSubmit = async (data) => {
-    console.log('Form data', data)
-    try {
-      if (isEdit) {
-        data.id = grnFormData.id
-        const response = await apiMethods.editGrn(data)
-        setAlerts((prev) => [
-          ...prev,
-          { severity: 'success', message: response.data.message || 'GRN Uopdated Successfully' },
-        ])
-      } else {
-        const response = await apiMethods.postGrn(data)
-        setAlerts((prev) => [
-          ...prev,
-          { severity: 'success', message: response.data.message || 'GRN Added Successfully' },
+    let newErrors = {}
+    if (!grnFormData.po_id) newErrors.po_id = 'Required'
+    if (!grnFormData.grn_date) newErrors.grn_date = 'Required'
+    if (!grnFormData.delivery_note_no) newErrors.delivery_note_no = 'Required'
+    if (!grnFormData.invoice_no) newErrors.invoice_no = 'Required'
+    if (!grnFormData.invoice_date) newErrors.invoice_date = 'Required'
+    if (!grnFormData.received_by) newErrors.received_by = 'Required'
+    if (!grnFormData.notes) newErrors.notes = 'Required'
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      setAlerts((prev) => [
+        ...prev,
+        { severity: 'error', message: 'Please fill all the required fields' },
+      ])
+    } else {
+      setAlerts([])
+      try {
+        if (isEdit) {
+          data.id = grnFormData.id
+          const response = await apiMethods.editGrn(data)
+          setAlerts((prev) => [
+            ...prev,
+            { severity: 'success', message: response.data.message || 'GRN Uopdated Successfully' },
+          ])
+        } else {
+          const response = await apiMethods.postGrn(data)
+          setAlerts((prev) => [
+            ...prev,
+            { severity: 'success', message: response.data.message || 'GRN Added Successfully' },
+          ])
+        }
+        setGrnFormData({
+          po_id: null,
+          grn_date: '',
+          delivery_note_no: '',
+          invoice_no: '',
+          invoice_date: '',
+          received_by: '',
+          notes: '',
+          items: [],
+        })
+        setErrors({})
+
+        await fetchData()
+        handleCloseDrawer()
+      } catch (error) {
+        console.error(error)
+        setAlerts([
+          {
+            severity: 'error',
+            message: error?.response?.data?.message || 'Something went wrong',
+          },
         ])
       }
-
-      await fetchData()
-      handleCloseDrawer()
-    } catch (error) {
-      console.error(error)
-      setAlerts([
-        {
-          severity: 'error',
-          message: error?.response?.data?.message || 'Something went wrong',
-        },
-      ])
     }
   }
 
@@ -120,6 +160,27 @@ const Grn = () => {
       <div className="bg-white p-3 rounded-lg w-full h-full">
         <div className="flex items-center">
           <SearchBar data={grnData} text={'Grn'} ref={searchBarRef} />
+          <button
+            className="ml-4 border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition-colors duration-200 flex items-center gap-1"
+            onClick={clearFilters}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+            <span className="whitespace-nowrap">Clear</span>
+          </button>
+
           <div className="flex-grow flex justify-end gap-3">
             <ActionButton
               variant="add"
@@ -171,6 +232,8 @@ const Grn = () => {
             onSubmit={handleSubmit}
             isEdit={isEdit}
             handleCloseDrawer={handleCloseDrawer}
+            errors={errors}
+            setErrors={setErrors}
           />
         </Drawer>
       </div>

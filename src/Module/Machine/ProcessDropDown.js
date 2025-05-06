@@ -20,7 +20,7 @@ const ProcessDropDown = ({
   useEffect(() => {
     if (value && options.length > 0) {
       let selected = options.find(
-        (opt) => opt.id === value.processId || opt.ProcessName?.id === value.processId,
+        (opt) => opt.id === value.processId || opt.ProcessName?.id === value.processId || opt.process_id === value.processId,
       )
 
       if (!selected) {

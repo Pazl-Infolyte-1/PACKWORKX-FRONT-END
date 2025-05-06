@@ -58,16 +58,16 @@ function SkuList() {
   const dispatch = useDispatch()
   const [errors, setErrors] = useState({})
   const [skuVariant, setSkuVariant] = useState("RSC Box")
-  const isDrawerOpenroute = location.pathname === '/SKU/add-edit';
+  //const isDrawerOpenroute = location.pathname === '/SKU/add-edit';
 
-  useEffect(() => {
-    if (isDrawerOpenroute) {
-      console.log('Drawer opened');
-      // You can trigger analytics, focus a field, etc.
-    } else {
-      console.log('Drawer closed');
-    }
-  }, [isDrawerOpenroute]);
+  //useEffect(() => {
+  //  if (isDrawerOpenroute) {
+  //    console.log('Drawer opened');
+  //    // You can trigger analytics, focus a field, etc.
+  //  } else {
+  //    console.log('Drawer closed');
+  //  }
+  //}, [isDrawerOpenroute]);
 console.log("suuuuu",user)
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
@@ -647,7 +647,7 @@ console.log("mess",message)
 
                   setDrawerOpen(true)
                   setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
-                  navigate('/SKU/add-edit')
+                  //navigate('/SKU/add-edit')
                 }
                 if (text === 'Bulk Upload') {
                   setVisible(true)
@@ -822,7 +822,7 @@ console.log("mess",message)
       <div>
         <SkuPopup visible={visible} setVisible={setVisible} />
       </div>
-      {isDrawerOpen && (
+      {/*{isDrawerOpen || editTag && (*/}
       <Drawer
         maxWidth="1280px"
         isOpen={isDrawerOpen || editTag}
@@ -832,7 +832,7 @@ console.log("mess",message)
           setEditTag(false)
           setClientDisable(false)
           setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
-          navigate('/SKU')
+          //navigate('/SKU')
         }}
       >
         <SkuAddEdit
@@ -859,7 +859,7 @@ console.log("mess",message)
             setEditTag(false)
             setClientDisable(false)
             setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
-            navigate('/SKU')
+            //navigate('/SKU')
           }}
           setisSingleViewPopupForType={setisSingleViewPopupForType}
           isSingleViewPopupForType={isSingleViewPopupForType}
@@ -871,7 +871,8 @@ console.log("mess",message)
           setErrors={setErrors}
           setSkuVariant={setSkuVariant}
         />
-      </Drawer>)}
+      </Drawer>
+      {/*)}*/}
     </div>
   )
 }

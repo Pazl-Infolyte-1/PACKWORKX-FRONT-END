@@ -100,7 +100,7 @@ const methods = useForm({
       website_url: "",
       department: "",
       designation: "",
-      opening_balance:"",
+      opening_balance:0,
       twitter: "",
       skype: "",
       facebook: "",
@@ -434,8 +434,11 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
       {/* Customer Type (Single Row) */}
         {/* Do You Have GST? - Moved to Left Card */}
         <div className="flex items-center mb-4">
-        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">{editData?.entity_type || entity_type} Id</label>
-        <input type="text"    placeholder={`${editData?.entity_type || entity_type} Id`}{...register("clientData.client_ref_id")} className="border p-2 rounded flex-1" />
+        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">
+         Reference Id</label>
+        <input type="text"    
+        placeholder={`Reference Id`}
+        {...register("clientData.client_ref_id")} className="border p-2 rounded flex-1" />
       </div>
 
       <div className="mb-4 flex items-center">

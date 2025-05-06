@@ -1227,9 +1227,9 @@ export const apiMethods = {
   getAllAssign: async () => {
     return await apiClient.get('/machines/assign')
   },
-  getGrn: async () => {
+  getGrn: async (params) => {
     try {
-      return await apiClient.get('/grn')
+      return await apiClient.get('/grn', { params })
     } catch (error) {
       console.error(error)
     }

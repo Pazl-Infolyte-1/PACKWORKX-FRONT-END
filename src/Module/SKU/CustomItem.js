@@ -360,7 +360,7 @@ const [selected, setSelected] = useState('vendor')
     SKU Name
     <span className="text-red-500 ml-1">*</span>
     {errors.sku_name && (
-      <span className="text-red-500 text-sm ml-2 align-middle">SKU Name is {errors.sku_name}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
     )}
   </label>
             <input
@@ -377,7 +377,7 @@ const [selected, setSelected] = useState('vendor')
     Client Name
     <span className="text-red-500 ml-1">*</span>
     {errors.client_id && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Client is {errors.client_id}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
     )}
   </label>
           <select

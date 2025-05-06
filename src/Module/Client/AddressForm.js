@@ -159,7 +159,9 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     >
                       <option value="">Select State</option>
                       <option value="Tamilnadu">Tamilnadu</option>
-                      <option value="Andra">Andra</option>
+                      <option value="Andhra Pradesh">Andhra Pradesh</option>
+                      <option value="Kerala">Kerala</option>
+
                     </select>
                   </div>
 

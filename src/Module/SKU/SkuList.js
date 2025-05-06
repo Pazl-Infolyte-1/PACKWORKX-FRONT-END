@@ -57,7 +57,17 @@ function SkuList() {
   const [message, setMessage] = useState("")
   const dispatch = useDispatch()
   const [errors, setErrors] = useState({})
+  const [skuVariant, setSkuVariant] = useState("RSC Box")
+  //const isDrawerOpenroute = location.pathname === '/SKU/add-edit';
 
+  //useEffect(() => {
+  //  if (isDrawerOpenroute) {
+  //    console.log('Drawer opened');
+  //    // You can trigger analytics, focus a field, etc.
+  //  } else {
+  //    console.log('Drawer closed');
+  //  }
+  //}, [isDrawerOpenroute]);
 console.log("suuuuu",user)
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
@@ -285,95 +295,196 @@ console.log("suuuuu",user)
 //  }
 
 const handleAddSkuSubmit = async () => {
-  const newErrors = {}
+  console.log("skuVariant type",skuVariant)
+  console.log("skuVariant typeddd",addNewSkuData.sku_type)
 
-  if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
-  if (!addNewSkuData.client_id) newErrors.client_id = 'Required'
-  if (!addNewSkuData.estimate_composite_item) newErrors.estimate_composite_item = 'Required'
-  if (!addNewSkuData.default_sku_details) newErrors.default_sku_details = 'Required'
-  if (!addNewSkuData.description) newErrors.description = 'Required'
-  if (!addNewSkuData.composite_type) newErrors.composite_type = 'Required'
-  if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
-  if (!addNewSkuData.ups) newErrors.ups = 'Required'
-  if (!addNewSkuData.select_dies) newErrors.select_dies = 'Required'
-  if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
-  if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
-  if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
-  if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
-  if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
-  if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
-  if (!addNewSkuData.ply) newErrors.ply = 'Required'
-
-
-
-
-
+  let newErrors = {};
+  if (addNewSkuData.sku_type === "Custom Item") {
+    // Validate only for Custom Item
+    if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required';
+    if (!addNewSkuData.client_id) newErrors.client_id = 'Required';
+    if (!addNewSkuData.estimate_composite_item) newErrors.estimate_composite_item = 'Required';
+    if (!addNewSkuData.default_sku_details) newErrors.default_sku_details = 'Required';
+    if (!addNewSkuData.description) newErrors.description = 'Required';
+  } 
   
+  else if (addNewSkuData.sku_type === "Composite") {
+    // Validate only for Composite
+    if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required';
+    if (!addNewSkuData.client_id) newErrors.client_id = 'Required';
+    if (!addNewSkuData.composite_type) newErrors.composite_type = 'Required';
+    if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required';
+    if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
+      newErrors.route = 'Required';
+    }}
+    
+    else if (addNewSkuData.sku_type === "Die Cut box") {
+      // Validate only for Composite
+      if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required';
+      if (!addNewSkuData.client_id) newErrors.client_id = 'Required';
+      if (!addNewSkuData.ply) newErrors.ply = 'Required'
+ if (!addNewSkuData.ups) newErrors.ups = 'Required'
+   if (!addNewSkuData.select_dies) newErrors.select_dies = 'Required'
+     if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
+       if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
+      if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required';
+      if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
+      if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
+      if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
+      if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
+        if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
+      if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
+        newErrors.route = 'Required';
+      }}
+      
+      else if (addNewSkuData.sku_type === "Board") {
+        // Validate only for Composite
+        if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required';
+        if (!addNewSkuData.client_id) newErrors.client_id = 'Required';
+        if (!addNewSkuData.ply) newErrors.ply = 'Required'
+        if (!addNewSkuData.joints) newErrors.joints = 'Required'
+   if (!addNewSkuData.ups) newErrors.ups = 'Required'
+       if (!addNewSkuData.flap_width) newErrors.flap_width = 'Required'
+  if (!addNewSkuData.flap_tolerance) newErrors.flap_tolerance = 'Required'
+  if (!addNewSkuData.length_trimming_tolerance) newErrors.length_trimming_tolerance = 'Required'
+       if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
+         if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
+        if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
+        if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
+        if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
+        if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
+        if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
+          if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required';
+        if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
+          newErrors.route = 'Required';
+        }}
+        
+        else if (addNewSkuData.sku_type === "RSC box") {
+          // Validate only for Composite
+          if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required';
+          if (!addNewSkuData.client_id) newErrors.client_id = 'Required';
+          if (!addNewSkuData.ply) newErrors.ply = 'Required'
 
+          if (!addNewSkuData.joints) newErrors.joints = 'Required'
+     if (!addNewSkuData.ups) newErrors.ups = 'Required'
+            if (!addNewSkuData.length) newErrors.length = 'Required'
+  if (!addNewSkuData.width) newErrors.width = 'Required'
+  if (!addNewSkuData.height) newErrors.height = 'Required'
+    if (!addNewSkuData.joints) newErrors.joints = 'Required'
+      if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
+       if (!addNewSkuData.inner_outer_dimension) newErrors.inner_outer_dimension = 'Required'
+        if (!addNewSkuData.flap_width) newErrors.flap_width = 'Required'
+    if (!addNewSkuData.length_trimming_tolerance) newErrors.length_trimming_tolerance = 'Required'
+      if (!addNewSkuData.width_trimming_tolerance) newErrors.width_trimming_tolerance = 'Required'
+         if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
+           if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
+          if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
+          if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
+          if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
+  if (!addNewSkuData.ups) newErrors.ups = 'Required'
+          if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
+          if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
+            newErrors.route = 'Required';
+          }}
+
+    else {
+      // All other skuVariants: No validation required
+      newErrors = {};
+    }
+  //if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
+  //if (!addNewSkuData.client_id) newErrors.client_id = 'Required'
+  //if (!addNewSkuData.estimate_composite_item) newErrors.estimate_composite_item = 'Required'
+  //if (!addNewSkuData.default_sku_details) newErrors.default_sku_details = 'Required'
+  //if (!addNewSkuData.description) newErrors.description = 'Required'
+  //if (!addNewSkuData.composite_type) newErrors.composite_type = 'Required'
+  //if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
+  //if (!addNewSkuData.ups) newErrors.ups = 'Required'
+  //if (!addNewSkuData.joints) newErrors.joints = 'Required'
+  //  if (!addNewSkuData.flap_width) newErrors.flap_width = 'Required'
+  //if (!addNewSkuData.flap_tolerance) newErrors.flap_tolerance = 'Required'
+  //if (!addNewSkuData.length_trimming_tolerance) newErrors.length_trimming_tolerance = 'Required'
+  //if (!addNewSkuData.width_trimming_tolerance) newErrors.width_trimming_tolerance = 'Required'
+  //if (!addNewSkuData.select_dies) newErrors.select_dies = 'Required'
+  //if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
+  //if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
+  //if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
+  //if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
+  //if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
+  //  if (!addNewSkuData.length) newErrors.length = 'Required'
+  //if (!addNewSkuData.width) newErrors.width = 'Required'
+  //if (!addNewSkuData.height) newErrors.height = 'Required'
+  //if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
+  //  if (!addNewSkuData.inner_outer_dimension) newErrors.inner_outer_dimension = 'Required'
+  //if (!addNewSkuData.ply) newErrors.ply = 'Required'
+  //if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
+  //  newErrors.route = 'Required';
+  //}
 
   setErrors(newErrors)
+ 
 
+console.log("erroexxx",newErrors)
   if (Object.keys(newErrors).length === 0) {
     console.log("gggghhhg",)
-  }
-  if(dieError){
-              setAlerts([{ severity: 'error', message: dieError || "1" }])
-              return  null
-            }
-                    if(deckleError){
-          setAlerts([{ severity: 'error', message: deckleError|| "3"  }])
-          return  null
-        }
-        if (boardSizeError) {
-          console.warn('Blocked submission due to board size error:', boardSizeError)
-          setAlerts([{ severity: 'error', message: boardSizeError || "4" }])
-          return null 
-        }
+    if(dieError){
+      setAlerts([{ severity: 'error', message: dieError || "1" }])
+      return  null
+    }
+            if(deckleError){
+  setAlerts([{ severity: 'error', message: deckleError|| "3"  }])
+  return  null
+}
+if (boardSizeError) {
+  console.warn('Blocked submission due to board size error:', boardSizeError)
+  setAlerts([{ severity: 'error', message: boardSizeError || "4" }])
+  return null 
+}
 
-  console.log("addskkkk", addNewSkuData);
+console.log("addskkkk", addNewSkuData);
 
-  const numberSkuData = {
-    ...addNewSkuData,
-    width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
-    length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
-    deckle_size: Number(addNewSkuData.deckle_size),
-  };
+const numberSkuData = {
+...addNewSkuData,
+width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
+length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
+deckle_size: Number(addNewSkuData.deckle_size),
+};
 console.log("su data",numberSkuData)
-  try {
-    let response;
+try {
+let response;
 
-    if (editTag) {
-      response = await apiMethods.updateSku(numberSkuData);
-    } else {
-      response = await apiMethods.addSku(numberSkuData);
-    }
+if (editTag) {
+response = await apiMethods.updateSku(numberSkuData);
+} else {
+response = await apiMethods.addSku(numberSkuData);
+}
 
-    console.log("SKU request successful:", response);
-    if (response?.data?.message) {
-      setAlerts([{ severity: 'success', message: response.data.message }]);
-      setRefresh((prev) => !prev)
-      if(isSingleViewPopupForType){
-                    setisSingleViewPopupForType(false)
-                  }else{
-                    setDrawerOpen(false)
-                  }
-                  setEditTag(false)
-    }
-  } catch (error) {
-    console.error("Error adding SKU:", error);
-    console.log(JSON.stringify(error))
-    if(error?.response?.data?.error){
-      setAlerts([{ severity: 'error', message: error?.response?.data?.error}]);
-    }else{
-      setAlerts([{ severity: 'error', message: error?.response?.data?.message}]);
+console.log("SKU request successful:", response);
+if (response?.data?.message) {
+setAlerts([{ severity: 'success', message: response.data.message }]);
+setRefresh((prev) => !prev)
+if(isSingleViewPopupForType){
+            setisSingleViewPopupForType(false)
+          }else{
+            setDrawerOpen(false)
+          }
+          setEditTag(false)
+}
+} catch (error) {
+console.error("Error adding SKU:", error);
+console.log(JSON.stringify(error))
+if(error?.response?.data?.error){
+setAlerts([{ severity: 'error', message: error?.response?.data?.error}]);
+}else{
+setAlerts([{ severity: 'error', message: error?.response?.data?.message}]);
 
-    }
+}
 
-  }
-   finally {
-    setTimeout(() => {
-      setAlerts([]);
-    }, 3000);
+}
+finally {
+setTimeout(() => {
+setAlerts([]);
+}, 3000);
+}
   }
 };
 
@@ -520,6 +631,7 @@ console.log("mess",message)
               className="sm:h-8 flex items-center font-bold text-white px-2 rounded-lg shadow-md border-none cursor-pointer"
               onClick={() => {
                 if (text === 'Add SKU') {
+                  setErrors({})
                                 dispatch({
                     type: 'SET_SELECTED_ROUTE_IDS',
                     payload: [], // 👈 empty array
@@ -535,7 +647,7 @@ console.log("mess",message)
 
                   setDrawerOpen(true)
                   setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
-    
+                  //navigate('/SKU/add-edit')
                 }
                 if (text === 'Bulk Upload') {
                   setVisible(true)
@@ -678,6 +790,7 @@ console.log("mess",message)
             alerts={alerts}
             setAlerts={setAlerts}
             onSkuDeleted={fetchData} 
+            setErrors={setErrors}
           />
         </div>
       </div>
@@ -709,6 +822,7 @@ console.log("mess",message)
       <div>
         <SkuPopup visible={visible} setVisible={setVisible} />
       </div>
+      {/*{isDrawerOpen || editTag && (*/}
       <Drawer
         maxWidth="1280px"
         isOpen={isDrawerOpen || editTag}
@@ -718,6 +832,7 @@ console.log("mess",message)
           setEditTag(false)
           setClientDisable(false)
           setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
+          //navigate('/SKU')
         }}
       >
         <SkuAddEdit
@@ -744,6 +859,7 @@ console.log("mess",message)
             setEditTag(false)
             setClientDisable(false)
             setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
+            //navigate('/SKU')
           }}
           setisSingleViewPopupForType={setisSingleViewPopupForType}
           isSingleViewPopupForType={isSingleViewPopupForType}
@@ -753,8 +869,10 @@ console.log("mess",message)
           setMessage={setMessage}
           errors={errors}
           setErrors={setErrors}
+          setSkuVariant={setSkuVariant}
         />
       </Drawer>
+      {/*)}*/}
     </div>
   )
 }

@@ -81,12 +81,11 @@ function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, loadi
   }
 
   return (
-    <div className="h-[400px] overflow-y-auto border border-gray-200 custom-scrollbar">
-      <CustomAlert alerts={alerts} handleClose={handleCloseAlert} />
+  <div className="h-[400px] overflow-x-auto h-[350px] border whitespace-nowrap mt-2">      <CustomAlert alerts={alerts} handleClose={handleCloseAlert} />
       <CTable striped hover className="w-full m-0">
         <CTableHead className="bg-gray-100 sticky top-0 z-10">
           <CTableRow className="text-center">
-            <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+            <CTableHeaderCell className="py-3 px-3 text-gray-600 font-medium">
               PO ID
             </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
@@ -107,7 +106,7 @@ function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, loadi
             <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
               Payment Terms
             </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
+            <CTableHeaderCell className="py-3 px-3 text-gray-600 font-medium">
               Action
             </CTableHeaderCell>
           </CTableRow>
@@ -118,11 +117,14 @@ function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, loadi
                 data.map((row, index) => (
                 <CTableRow key= {row.id} className="border-b text-center">
                   <CTableDataCell
-                    // onClick={() => setShowPopUp(row.id)}
-                    className="py-3 px-4 text-blue-600 font-semibold cursor-pointer text-start"
-                  >
+                     onClick={() => setShowPopUp(row.id)}
+                    
+                 
+                    className="py-3 px-4 !text-blue-600 font-semibold cursor-pointer underline text-start "
+                 >
                     {row.id}
                   </CTableDataCell>
+                  
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {row.supplier_name}
                   </CTableDataCell>

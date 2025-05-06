@@ -412,6 +412,22 @@ useEffect(() => {
 
 console.log("select dies",selectedDiePopup)
 
+   const selectedRouteIds2 = useSelector(
+          (state) => state.routeprocess?.selectedRouteIds || []
+        );
+        
+        useEffect(() => {
+          console.log('Selected Route IDs in comp:', selectedRouteIds2);
+        
+          if (selectedRouteIds2.length > 0) {
+            setErrors((prev) => {
+              const newErrors = { ...prev };
+              delete newErrors.route;
+              return newErrors;
+            });
+          }
+        }, [selectedRouteIds2]);
+        
 
   return (
     <div className="rounded-lg">
@@ -493,7 +509,7 @@ console.log("select dies",selectedDiePopup)
     SKU Name
     <span className="text-red-500 ml-1">*</span>
     {errors.sku_name && (
-      <span className="text-red-500 text-sm ml-2 align-middle">SKU Name is {errors.sku_name}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
     )}
   </label>
             <input
@@ -510,7 +526,7 @@ console.log("select dies",selectedDiePopup)
     Client Name
     <span className="text-red-500 ml-1">*</span>
     {errors.client_id && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Client is {errors.client_id}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
     )}
   </label>
           <select
@@ -590,7 +606,7 @@ console.log("select dies",selectedDiePopup)
     UPS
     <span className="text-red-500 ml-1">*</span>
     {errors.ups && (
-      <span className="text-red-500 text-sm ml-2 align-middle">UPS is {errors.ups}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.ups}</span>
     )}
   </label>
             <input
@@ -610,7 +626,7 @@ console.log("select dies",selectedDiePopup)
     Die
     <span className="text-red-500 ml-1">*</span>
     {errors.select_dies && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Die is {errors.select_dies}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.select_dies}</span>
     )}
   </label>        
     <div className="flex items-center gap-2">
@@ -650,7 +666,7 @@ console.log("select dies",selectedDiePopup)
         Customer Reference
     <span className="text-red-500 ml-1">*</span>
     {errors.customer_reference && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Customer Reference is {errors.customer_reference}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.customer_reference}</span>
     )}
   </label>
             <input
@@ -672,7 +688,7 @@ console.log("select dies",selectedDiePopup)
         Reference #
     <span className="text-red-500 ml-1">*</span>
     {errors.reference_number && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Reference # is {errors.reference_number}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.reference_number}</span>
     )}
   </label>
             <input
@@ -702,7 +718,7 @@ console.log("select dies",selectedDiePopup)
         Internal ID
     <span className="text-red-500 ml-1">*</span>
     {errors.internal_id && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Internal ID is {errors.internal_id}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.internal_id}</span>
     )}
   </label>
             <input
@@ -723,12 +739,12 @@ console.log("select dies",selectedDiePopup)
                       <label className="block text-[16px] font-medium text-gray-700 mb-2">
         Board Size <span className="text-gray-500 text-sm">(W × L)</span>
     <span className="text-red-500 ml-1">*</span>
-    {errors.width_board_size_cm2 && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Width is {errors.width_board_size_cm2}</span>
+    {errors.width_board_size_cm2 && errors.length_board_size_cm2 &&(
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.width_board_size_cm2}</span>
     )}
-        {errors.length_board_size_cm2 && (
+        {/*{errors.length_board_size_cm2 && (
       <span className="text-red-500 text-sm ml-2 align-middle">Length is {errors.length_board_size_cm2}</span>
-    )}
+    )}*/}
   </label>
                       <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
                       <input
@@ -765,9 +781,10 @@ console.log("select dies",selectedDiePopup)
         Deckle Size
     <span className="text-red-500 ml-1">*</span>
     {errors.deckle_size && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Deckle Size is {errors.deckle_size}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.deckle_size}</span>
     )}
-  </label>  <input
+  </label>  
+  <input
   id="deckle_size"
   name="deckle_size"
   type="number"
@@ -791,7 +808,7 @@ console.log("select dies",selectedDiePopup)
         Minimum Order Level
     <span className="text-red-500 ml-1">*</span>
     {errors.minimum_order_level && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Minimum Order Level is {errors.minimum_order_level}</span>
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.minimum_order_level}</span>
     )}
   </label>
             <input
@@ -822,6 +839,7 @@ console.log("select dies",selectedDiePopup)
           allOptions={displayAsChips}
           onRemoveChip={handleRemoveChip}
           onBrowseClick={handleBrowseClickRoute}
+          errors={errors}
         />
         
       </div>

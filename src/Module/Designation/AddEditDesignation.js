@@ -6,6 +6,9 @@ function AddEditDesignation({ showForm, setShowForm, isEdit, designationData, on
   const [designations, setDesignations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState({
+    name: ''
+  });
   const [formData, setFormData] = useState({
     name: '',
     parent_id: ''
@@ -37,6 +40,12 @@ function AddEditDesignation({ showForm, setShowForm, isEdit, designationData, on
         parent_id: ''
       });
     }
+
+        // Reset validation errors when form changes
+        setValidationErrors({
+          name: ''
+        });
+
   }, [isEdit, designationData]);
 
   const handleChange = (e) => {
@@ -45,10 +54,34 @@ function AddEditDesignation({ showForm, setShowForm, isEdit, designationData, on
       ...formData,
       [name]: value
     });
+        // Clear validation error when user types in the field
+        if (validationErrors[name]) {
+          setValidationErrors({
+            ...validationErrors,
+            [name]: ''
+          });
+        }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    let isValid = true;
+    
+    if (!formData.name.trim()) {
+      errors.name = 'Required';
+      isValid = false;
+    }
+    
+    setValidationErrors(errors);
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
     setLoading(true);
     setError('');
 
@@ -105,9 +138,17 @@ function AddEditDesignation({ showForm, setShowForm, isEdit, designationData, on
                 value={formData.name}
                 onChange={handleChange}
                 className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                // placeholder="Enter designation name"
-                required
               />
+                {validationErrors.name && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.name}
+    </div>
+    )}
             </div>
             
             <div className="flex-1">

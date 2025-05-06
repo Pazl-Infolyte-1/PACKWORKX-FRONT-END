@@ -225,9 +225,6 @@ function EmployeeList() {
         fetchEmployeeData()   
         setDrawerOpen(false);
         setIsEdit(false);
-
-
-
         setFormData({
           name: '',
           email: '',

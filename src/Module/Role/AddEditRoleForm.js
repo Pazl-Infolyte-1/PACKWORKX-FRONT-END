@@ -40,8 +40,8 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Role name is required';
-    if (!formData.display_name.trim()) newErrors.display_name = 'Display name is required';
+    if (!formData.name.trim()) newErrors.name = 'Required';
+    if (!formData.display_name.trim()) newErrors.display_name = 'Required';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -102,7 +102,16 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
             className={`w-full px-3 py-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
             // placeholder="Enter role name"
           />
-          {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
+          {errors.name && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {errors.name}
+    </div>
+    )}
         </div>
         
         <div className="mb-4">
@@ -118,7 +127,17 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
             className={`w-full px-3 py-2 border ${errors.display_name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
             // placeholder="Enter display name"
           />
-          {errors.display_name && <p className="mt-1 text-sm text-red-500">{errors.display_name}</p>}
+            {errors.display_name && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {errors.display_name}
+    </div>
+    )}
+          
         </div>
         
         <div className="mb-4">

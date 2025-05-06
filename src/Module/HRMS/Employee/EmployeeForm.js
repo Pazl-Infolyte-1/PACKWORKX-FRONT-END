@@ -75,6 +75,8 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
   const machineDropdownRef = useRef(null);
   const [canDeactivate,setCanDeactivate] = useState(false);
   const [isTouched,setIsTouched] = useState(false)
+  const [validationErrors, setValidationErrors] = useState({});
+
 
 
 
@@ -86,6 +88,8 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
     // When drawer closes, reset the form
     if (!isDrawerOpen) {
       resetForm();
+      setValidationErrors({});
+
     }
   }, [isDrawerOpen]);
 
@@ -178,7 +182,50 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
           ? (value === '' ? null : Number(value))
           : value
     }));
+
+
+      if (validationErrors[name]) {
+    setValidationErrors({
+      ...validationErrors,
+      [name]: null
+    });
+  } 
   };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    
+    // Define same required fields as in parent
+    const requiredFields = [
+      "name", "email", "mobile", "employee_id",
+      "department_id", "designation_id", "joining_date",
+      "date_of_birth", "reporting_to", "employment_type",
+      "company_address_id", "role_id", "skills", "country_id"
+    ];
+    
+    if (formData.employment_type === 'Contract') {
+      requiredFields.push("contract_end_date");
+    }
+    if (!isEdit) {
+      requiredFields.push("password");
+    }
+    
+    // Check for missing fields and set validation errors
+    const errors = {};
+    requiredFields.forEach(field => {
+      if (!formData[field]) {
+        errors[field] = "Required";
+      }
+    });
+    
+    // Update validation errors state
+    setValidationErrors(errors);
+    
+    // If there are no errors, call the parent's handleSubmit
+    if (Object.keys(errors).length === 0) {
+      handleSubmit(e);
+    }
+  }
 
   useEffect(() => {
     if (formData.image) {
@@ -251,6 +298,12 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
         ...prev,
         skills: updatedSkills.join(","), // Store as string in formData
       }));
+
+      setValidationErrors(prev => ({
+        ...prev,
+        skills: null
+      }));
+
       setMachineDropdownOpen(false);
       setMachineSearchQuery(''); // Reset search when skill is added
     }
@@ -362,7 +415,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
   return (
     <>
       <Drawer  isOpen={isDrawerOpen} onClose={handleCloseDrawer} maxWidth="1280px" title={isEdit ? "Edit Employee" : "Add Employee"}>
-        <form onSubmit={handleSubmit} className=''>
+        <form onSubmit={handleFormSubmit} className=''>
           {/* <div className="max-w-7xl mx-auto h-[90vh] px-3 py-3 mt-6 "> */}
           <div className=" mx-auto px-3 py-3 mt-6 ">
 
@@ -424,6 +477,17 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                   />
                   <RiUserLine className="pr-2 h-10 w-10" />
                 </div>
+                
+                {validationErrors.name && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.name}
+    </div>
+    )}
               </div>
 
               {/* Email */}
@@ -440,6 +504,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                   />
                   <IoIosAt className="pr-2 h-10 w-10" />
                 </div>
+                {validationErrors.email && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.email}
+    </div>
+    )}
               </div>
 
               {/* Employee ID */}
@@ -455,6 +529,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     onChange={handleInputChange}
                   />
                 </div>
+                {validationErrors.employee_id && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.employee_id}
+    </div>
+    )}
               </div>
 
               {/* Mobile */}
@@ -562,6 +646,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     className="flex-grow border-0 h-10 px-3 outline-none"
                   />
                 </div>
+                {validationErrors.mobile && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.mobile}
+    </div>
+    )}
               </div>
               {/* Password */}
               <div>
@@ -586,6 +680,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     }
                   </button>
                 </div>
+                {validationErrors.password && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.password}
+    </div>
+    )}
               </div>
 
               {/* Company Address */}
@@ -606,6 +710,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     ))}
                   </select>
                 </div>
+                {validationErrors.company_address_id && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.company_address_id}
+    </div>
+    )}
               </div>
 
               {/* Department */}
@@ -642,6 +756,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                   </button> */}
 
                 </div>
+                {validationErrors.department_id && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.department_id}
+    </div>
+    )}
               </div>
 
               {/* Designation */}
@@ -671,6 +795,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     onClick={() => openModal('designation')}
                   />
                 </div>
+                {validationErrors.designation_id && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.designation_id}
+    </div>
+    )}
               </div>
 
               {/* Role */}
@@ -704,6 +838,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     />
                   </div>
                 </div>
+                {validationErrors.role_id && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.role_id}
+    </div>
+    )}
               </div>
 
               {/* Joining Date */}
@@ -718,6 +862,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     onChange={handleInputChange}
                   />
                 </div>
+                {validationErrors.joining_date && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.joining_date}
+    </div>
+    )}
               </div>
 
               {/* Date of Birth */}
@@ -732,6 +886,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     onChange={handleInputChange}
                   />
                 </div>
+                {validationErrors.date_of_birth && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.date_of_birth}
+    </div>
+    )}
               </div>
 
               {/* About Me */}
@@ -768,6 +932,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     ))}
                   </select>
                 </div>
+                {validationErrors.reporting_to && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.reporting_to}
+    </div>
+    )}
               </div>
 
               {/* Employment Type */}
@@ -789,6 +963,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     ))}
                   </select>
                 </div>
+                {validationErrors.employment_type && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.employment_type}
+    </div>
+    )}
               </div>
 
               {/* Contract End Date */}
@@ -804,6 +988,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                       onChange={handleInputChange}
                     />
                   </div>
+                  {validationErrors.contract_end_date && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.contract_end_date}
+    </div>
+    )}
                 </div>
               )}
 
@@ -823,7 +1017,6 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                 </div>
               </div>
 
-              {/* Skills */}
               {/* Skills */}
               <div>
                 <h6 className="mb-2">Machine Mapping<span className='text-red-600'>*</span></h6>
@@ -904,6 +1097,16 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
                     </div>
                   )}
                 </div>
+                {validationErrors.skills && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.skills}
+    </div>
+    )}
               </div>
             </div>
 

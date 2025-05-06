@@ -14,7 +14,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting }) => 
     tax_amount: 0,
     total_amount: 0
   });
-  
+
   const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
     defaultValues: orderData || {
       po_date: new Date().toISOString().split("T")[0],
@@ -81,39 +81,51 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting }) => 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
           <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier ID</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier ID <span className="text-red-500"> *</span></label>
             <input
               type="number"
-              {...register('supplier_id',{ required: 'Supplier id is required' })}
+              {...register('supplier_id', { required: 'Supplier id is required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
+            {errors.supplier_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.supplier_id.message}</p>
+            )}
           </div>
 
           <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Name <span className="text-red-500"> *</span></label>
             <input
               type="text"
-              {...register('supplier_name',)}
+              {...register('supplier_name', { required: 'Supplier Name is required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
+            {errors.supplier_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.supplier_name.message}</p>
+            )}
           </div>
 
           <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Contact</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Contact <span className="text-red-500"> *</span></label>
             <input
               type="number"
-              {...register('supplier_contact',{ required: 'Supplier contact is required' })}
+              {...register('supplier_contact', { required: 'Supplier contact is required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
+            {errors.supplier_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.supplier_contact.message}</p>
+            )}
           </div>
 
           <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier E-mail</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier E-mail <span className="text-red-500"> *</span></label>
             <input
               type="email"
-              {...register('supplier_email',)}
+              {...register('supplier_email', { required: 'Supplier E-mail is required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
+            {errors.supplier_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.supplier_email.message}</p>
+            )}
           </div>
 
           <div className="form-group">
@@ -126,12 +138,15 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting }) => 
           </div>
 
           <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Terms</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Terms <span className="text-red-500"> *</span> </label>
             <input
               type="text"
-              {...register('payment_terms')}
+              {...register('payment_terms', { required: 'Payment-terms is required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
+            {errors.supplier_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.payment_terms.message}</p>
+            )}
           </div>
 
           <div className="form-gro  up">
@@ -144,12 +159,15 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting }) => 
           </div>
 
           <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Valid Till</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Valid Till <span className="text-red-500"> *</span> </label>
             <input
               type="date"
-              {...register('valid_till',)}
+              {...register('valid_till', { required: 'Valid-till is required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
+            {errors.supplier_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.valid_till.message}</p>
+            )}
           </div>
 
           <div className="form-group">

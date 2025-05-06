@@ -84,12 +84,12 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
       setIsSubmitting(false);
     }
   };
-
+{/* <span className="text-red-500 ml-1">*</span> */}
   const formFields = [
-    { label: 'Item Code *', name: 'item_code', required: true },
-    { label: 'Item Name *', name: 'item_name', required: true },
+    { label: 'Product Code', name: 'item_code', required: true },
+    { label: 'Product Name', name: 'item_name', required: true },
     { label: 'HSN Code', name: 'hsn_code' },
-    { label: 'UOM *', name: 'uom', required: true },
+    { label: 'UOM', name: 'uom', required: true },
     { 
       label: 'CGST %', 
       name: 'cgst', 
@@ -104,7 +104,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
       min: 0,
       max: 100
     },
-    { label: 'Category *', name: 'category', required: true },
+    { label: 'Category', name: 'category', required: true },
     { label: 'Manufacturer', name: 'manufacturer' },
     { 
       label: 'Min Stock Level', 
@@ -119,7 +119,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
       min: 0
     },
     { 
-      label: 'Standard Cost *', 
+      label: 'Standard Cost', 
       name: 'standard_cost', 
       type: 'number',
       required: true,
@@ -129,14 +129,14 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
   ];
 
   return (
-    <div className="p-6 bg-white rounded shadow-md">
+    <div className="p-6 bg-white rounded">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       <h2 className="text-lg font-semibold mb-4">{isEdit ? 'Edit Item' : 'Add Item'}</h2>
       
       <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {formFields.map(({ label, name, type = 'text', required, min, max, step, readOnly, defaultValue, excluded }) => (
           <div key={name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{label}{required && <span className="text-red-500"> *</span>}</label>
             <input
               type={type}
               min={min}
@@ -157,7 +157,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
         ))}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Item Type *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Product Type <span className="text-red-500"> *</span></label>
           <select
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
             {...register('item_type', { required: 'Item Type is required' })}
@@ -180,7 +180,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description<span className="text-red-500"> *</span></label>
           <textarea
             className="w-full border border-gray-300 rounded px-3 py-2 h-24 focus:outline-none focus:ring focus:border-blue-500"
             {...register('description', { required: 'Description is required' })}
@@ -189,7 +189,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
         </div>
         </div>
 
-        <div className="md:col-span-2 flex justify-end">
+        <div className="md:col-span-3 flex justify-center">
           <button
             type="submit"
             disabled={isSubmitting}

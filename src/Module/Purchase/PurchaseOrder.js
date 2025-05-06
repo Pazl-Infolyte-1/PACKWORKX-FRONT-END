@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import PurchaseOrderTable from "./PurchaseOrderTable";
 import AddPurchaseOrder from "./AddPurchaseOrder";
 import Drawer from "../../components/Drawer/Drawer";
@@ -24,7 +24,9 @@ const PurchaseOrder = () => {
     currentPage: 1,
     pageSize: 10,
   });
-  const searchBarRef = useRef(null)
+  const searchBarRef = useRef(null);
+    const [status, setStatus] = useState('');
+  
 
   const fetchData = async () => {
     setLoading(true);
@@ -94,16 +96,25 @@ const PurchaseOrder = () => {
   const closeAlert = () => {
     setAlert({ ...alert, show: false });
   };
-  // const clearFilters = () => {
-  //   setStatus('');
-  //   if (searchBarRef.current) {
-  //     searchBarRef.current.clearSearch();
+
+  // const handleDelete = async (id) => {
+  //   try {
+  //     await apiMethods.deletePurchaseOrder(id);
+  //     setAlert({ show: true, message: "Purchase order deleted successfully!", type: "success" });
+  //     fetchData(); // Re-fetch the updated data
+  //   } catch (error) {
+  //     setAlert({ show: true, message: "Failed to delete purchase order.", type: "error" });
   //   }
-
   // };
-
+  const clearFilters = () => {
+    setStatus('');
+    if (searchBarRef.current) {
+      searchBarRef.current.clearSearch();
+    }
+  };
+  
   return (
-    <div className="p-4">
+    <div className="p-1">
       {alert.show && (
         <CustomAlert
           message={alert.message}
@@ -111,55 +122,73 @@ const PurchaseOrder = () => {
           onClose={closeAlert}
         />
       )}
+      <div className="h-full w-full flex flex-col">
 
-      <div className="flex justify-between items-center mb-4">
-      <SearchBar text="Purchase order" data={data} ref={searchBarRef} />
-      {/* <button
-        className="border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition flex items-center gap-1"
-        onClick={clearFilters}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-        Clear Filters
-      </button> */}
-        <ActionButton label="Add Purchase" onClick={handleAddNew} variant="add" />
-      </div>
+        <div className="w-full h-[40px] flex justify-between items-center">
+          <h4>Purchase Order</h4>
+        </div>
+        <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
+          <div className="flex justify-between items-center mb-4">
+          <div className='flex gap-1'>
+            <SearchBar text="Purchase order" data={data} ref={searchBarRef} />
+            
+            
+            
+            <button
+                className="border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition flex items-center gap-1"
+                onClick={clearFilters}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Clear Filters
+            </button>
+            </div>
 
-      {loading ? (
-        <Loader />
-      ) : (
-        <>
-          <PurchaseOrderTable 
-          data={filteredSearchData.length ? filteredSearchData : data}
-          handleEdit={handleEdit} />
-          
-          <div className="flex justify-end items-center gap-4 mt-4">
-            <CommonPagination
-              count={totalPages} // Use totalPages directly
-              page={paginationParams.currentPage}
-              onChange={handlePageChange}
-              onLimitChange={handleLimitChange}
-              limit={paginationParams.pageSize}
-            />
+
+
+
+            <ActionButton label="Add Purchase" onClick={handleAddNew} variant="add" />
           </div>
-        </>
-      )}
 
-      <Drawer
-        isOpen={isDrawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        maxWidth={"1280px"}
-        title={isEdit ? "Edit Purchase Order" : "Add Purchase Order"}
-      >
-        <AddPurchaseOrder
-          isEdit={isEdit}
-          selectedPoId={selectedPoId}
-          setDrawer={setDrawerOpen}
-          onSuccess={handleSuccess}
-          fetchData={fetchData}
-        />
-      </Drawer>
+          {loading ? (
+            <Loader />
+          ) : (
+            <>
+              <PurchaseOrderTable
+                data={filteredSearchData.length ? filteredSearchData : data}
+                handleEdit={handleEdit}
+                // handleDelete={handleDelete}
+                />
+
+              <div className="flex justify-end items-center gap-4 mt-2">
+                <CommonPagination
+                  count={totalPages} // Use totalPages directly
+                  page={paginationParams.currentPage}
+                  onChange={handlePageChange}
+                  onLimitChange={handleLimitChange}
+                  limit={paginationParams.pageSize}
+                />
+              </div>
+            </>
+          )}
+        </div>
+
+        <Drawer
+          isOpen={isDrawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          maxWidth={"1280px"}
+          title={isEdit ? "Edit Purchase Order" : "Add Purchase Order"}
+        >
+          <AddPurchaseOrder
+            isEdit={isEdit}
+            selectedPoId={selectedPoId}
+            setDrawer={setDrawerOpen}
+            onSuccess={handleSuccess}
+            fetchData={fetchData}
+          />
+        </Drawer>
+      </div>
     </div>
   );
 };

@@ -1,33 +1,60 @@
 import React, { useEffect, useState } from 'react'
 import apiMethods from '../../api/config'
-import { CiClock1, CiSettings, CiCircleCheck, CiCircleAlert, CiSquareInfo } from 'react-icons/ci'
+import { CiSettings, CiCircleAlert } from 'react-icons/ci'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilPen } from '@coreui/icons'
+import { cilPen, cilTrash } from '@coreui/icons'
 import ActionButton from '../../components/New/ActionButton'
+import ConfirmationModale from '../../components/New/ConfirmationModale'
+import MachineValues from './MachineValues'
+import AddMachineField from './AddMachineField'
 
 function FieldValues({
   openFieldValuesModal,
-  setOpenMachineValuesModal,
   setOpenMachineFieldModal,
+  setOpenMachineValuesModal,
+  openMachineValuesModal,
+  handleEditProcess,
 }) {
   const [assignProcess, setAssignProcess] = useState([])
   const [machineProcess, setMachineProcess] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [deleteProcess, setDeleteProcess] = useState({ open: false, id: null })
+  const [showMachineFields, setShowMachineFields] = useState(false)
+  const [selectedMachineValue, setSelectedMachineValue] = useState(null)
+  const [isEdit, setIsEdit] = useState(false)
+  const [refresh, setRefresh] = useState(false)
+  const [allMachineValue, setAllMachineValue] = useState([])
+  const [processFields, setProcessFields] = useState({})
+
+  const fetchData = async () => {
+    setLoading(true)
+    try {
+      const response = await apiMethods.getAllAssign()
+      setAssignProcess(response.data.data)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchProcessFields = async (processId) => {
+    if (!processId) return
+
+    try {
+      const response = await apiMethods.getProcessFields(processId)
+      setProcessFields((prev) => ({
+        ...prev,
+        [processId]: response?.data?.data,
+      }))
+    } catch (error) {
+      console.error('Error fetching process fields:', error)
+    }
+  }
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-      try {
-        const response = await apiMethods.getAllAssign()
-        setAssignProcess(response.data.data)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchData()
-  }, [])
+  }, [refresh])
 
   useEffect(() => {
     if (openFieldValuesModal && openFieldValuesModal.id && assignProcess.length > 0) {
@@ -51,11 +78,42 @@ function FieldValues({
         }
 
         setMachineProcess(machine)
+
+        // Fetch fields for all processes
+        filteredData.forEach((item) => {
+          fetchProcessFields(item.process_id)
+        })
       } else {
         setMachineProcess(null)
       }
     }
   }, [assignProcess, openFieldValuesModal])
+
+  const handleProcessEdit = (processId) => {
+    if (handleEditProcess) {
+      handleEditProcess(processId)
+    }
+  }
+
+  const handleAddField = (id) => {
+    setShowMachineFields(true)
+    
+    // Normalize the process data structure
+    let processDataToEdit;
+    
+    if (typeof id === 'object' && id !== null) {
+      processDataToEdit = {
+        processId: id.processId || id.process_id || id,
+        process_value: id.machine_value || id.process_value || {}
+      }
+    } else {
+      processDataToEdit = {
+        processId: id
+      }
+    }
+    
+    setSelectedMachineValue(processDataToEdit)
+  }
 
   if (loading) {
     return (
@@ -67,11 +125,17 @@ function FieldValues({
 
   if (!machineProcess) {
     return (
-      <div className="flex flex-col items-center justify-center p-8">
+      <div className="flex flex-col items-center justify-center p-8 border py-12 border-gray-200 rounded-lg border-dashed">
         <CiCircleAlert className="w-12 h-12 text-yellow-500 mb-4" />
         <p className="text-gray-600 text-lg">No processes found for this machine</p>
       </div>
     )
+  }
+
+  const handleDeleteProcess = async () => {
+    await apiMethods.deleteProcess(deleteProcess.id)
+    setDeleteProcess({ open: false, id: null })
+    fetchData()
   }
 
   return (
@@ -114,7 +178,16 @@ function FieldValues({
                   {
                     label: 'Edit Process',
                     icon: cilPen,
-                    onClick: () => openFieldValuesModal({ id: machineProcess.machine.id }),
+                    onClick: () => {
+                      handleProcessEdit(process.process_id)
+                    },
+                  },
+                  {
+                    label: 'Delete Process',
+                    icon: cilTrash,
+                    onClick: () => {
+                      setDeleteProcess({ show: true, id: process.process_id })
+                    },
                   },
                 ]}
               />
@@ -126,12 +199,61 @@ function FieldValues({
                 className="w-1/2"
                 onClick={() => setOpenMachineFieldModal({ open: true, id: process.process_id })}
               />
-              <ActionButton label={'Values'} variant="minimal" className="w-1/2" />
+              <ActionButton
+                label={'Values'}
+                variant="minimal"
+                className="w-1/2"
+                onClick={() => {setOpenMachineValuesModal({ open: true, id: process.process_id })}}
+              />
             </div>
           </div>
         ))}
       </div>
+
+      {/* Machine Values Modal */}
+      {openMachineValuesModal.open && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">Machine Values</h3>
+              <button
+                onClick={() => {setOpenMachineValuesModal({ open: false, id: null }), setShowMachineFields(false)}}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            {showMachineFields ? (
+              <AddMachineField
+                fieldData={machineProcess.processes}
+                setShowMachineFields={setShowMachineFields}
+                isEditing={isEdit}
+                selectedMachineValue={selectedMachineValue}
+                setSelectedMachineValue={setSelectedMachineValue}
+                setRefresh={setRefresh}
+                setAllMachineValue={setAllMachineValue}
+              />
+            ) : (
+              <MachineValues
+                handleAddField={handleAddField}
+                openMachineValuesModal={openMachineValuesModal}
+                allMachineValue={allMachineValue}
+                setIsEdit={setIsEdit}
+                refresh={refresh}
+                setAllMachineValue={setAllMachineValue}
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      <ConfirmationModale
+        isOpen={deleteProcess.show}
+        onClose={() => setDeleteProcess({ show: false, id: null })}
+        onConfirm={handleDeleteProcess}
+      />
     </div>
   )
 }
+
 export default FieldValues

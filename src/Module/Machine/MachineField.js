@@ -26,6 +26,7 @@ function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
   const [currentFieldId, setCurrentFieldId] = useState(null)
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
   const [fieldToDelete, setFieldToDelete] = useState(null)
+  const [errors, setErrors] = useState({ fieldLabel: '' })
 
   useEffect(() => {
     const fetchFields = async () => {
@@ -91,30 +92,35 @@ function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
         required: isRequired,
       }
 
-      let response;
+      let response
       if (isEdit && currentFieldId) {
-        // For editing, include the id in the payload for updateField
-        payload.id = currentFieldId;
-        
-        // Use the existing updateField method 
+        payload.id = currentFieldId
+
         response = await apiMethods.updateField(payload)
-        setAlerts([{ severity: 'success', message: response.data.message || 'Field updated successfully' }])
+        setAlerts([
+          { severity: 'success', message: response.data.message || 'Field updated successfully' },
+        ])
       } else {
-        // Use addFields for creating new field
         response = await apiMethods.addFields(payload)
-        setAlerts([{ severity: 'success', message: response.data.message || 'Field added successfully' }])
+        setAlerts([
+          { severity: 'success', message: response.data.message || 'Field added successfully' },
+        ])
       }
       setShowAddFieldModal(false)
       setRefresh((prev) => !prev)
       resetForm()
     } catch (error) {
       console.error('Error saving field:', error)
-      setAlerts([{ 
-        severity: 'error', 
-        message:  error?.response?.data?.message || isEdit ?  'Failed to update field' : 'Failed to add field' 
-      }])
-    }
-    finally {
+      setAlerts([
+        {
+          severity: 'error',
+          message:
+            error?.response?.data?.message || isEdit
+              ? 'Failed to update field'
+              : 'Failed to add field',
+        },
+      ])
+    } finally {
       setLoading(false)
     }
   }
@@ -138,16 +144,20 @@ function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
   }
 
   const handleDeleteField = async () => {
-    if (!fieldToDelete) return;
-    
+    if (!fieldToDelete) return
+
     try {
       const response = await apiMethods.deleteField(fieldToDelete)
       setRefresh((prev) => !prev)
-      setAlerts([{ severity: 'success', message: response.data.message || 'Field deleted successfully' }])
+      setAlerts([
+        { severity: 'success', message: response.data.message || 'Field deleted successfully' },
+      ])
       closeDeleteConfirmation()
     } catch (error) {
       console.error('Error deleting field:', error)
-      setAlerts([{ severity: 'error', message: error?.response?.data?.message || 'Failed to delete field' }])
+      setAlerts([
+        { severity: 'error', message: error?.response?.data?.message || 'Failed to delete field' },
+      ])
     }
   }
 
@@ -160,16 +170,29 @@ function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
     setIsEdit(true)
   }
 
+  const validateForm = () => {
+    let isValid = true
+    const newErrors = { fieldLabel: '' }
+
+    if (!fieldLabel.trim()) {
+      newErrors.fieldLabel = 'Required'
+      isValid = false
+    }
+
+    setErrors(newErrors)
+    return isValid
+  }
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Machine Fields</h2>
-        <ActionButton 
-          label="Add Field" 
+        <ActionButton
+          label="Add Field"
           onClick={() => {
             resetForm()
             setShowAddFieldModal(true)
-          }} 
+          }}
         />
       </div>
 
@@ -238,7 +261,29 @@ function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
           </div>
         </div>
       ) : (
-        <div className="text-center">No fields found</div>
+        <div className="flex flex-col items-center justify-center py-12 px-4 border-2 border-dashed border-gray-200 rounded-lg">
+          <div className="bg-gray-50 rounded-full p-6 mb-4">
+            <svg
+              className="w-12 h-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Fields Found</h3>
+          <p className="text-gray-500 text-center max-w-md">
+            There are no fields configured for this process yet. Click the "Add Field" button to
+            create your first field.
+          </p>
+        </div>
       )}
 
       {showAddFieldModal && (
@@ -297,6 +342,7 @@ function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
                 {/* Field Label */}
                 <label className="block mb-2 text-gray-600">
                   Field Label <span className="text-red-500">*</span>
+                  {errors.fieldLabel && <span className="text-red-500 text-sm ml-2">{errors.fieldLabel}</span>}
                 </label>
                 <input
                   type="text"
@@ -338,12 +384,11 @@ function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
                 }}
               />
               <ActionButton
-                label={isEdit ? loading ? 'Updating...' : 'Update' : loading ? 'Adding...' : 'Add'}
+                label={
+                  isEdit ? (loading ? 'Updating...' : 'Update') : loading ? 'Adding...' : 'Add'
+                }
                 onClick={() => {
-                  if (!fieldLabel.trim()) {
-                    setAlerts([{ severity: 'error', message: 'Field label is required' }])
-                    return
-                  }
+                  if (!validateForm()) return
                   handleAddOrUpdateField()
                 }}
               />
@@ -353,9 +398,9 @@ function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
       )}
 
       {/* Confirmation Modal */}
-      <ConfirmationModale 
-        isOpen={isConfirmationModalOpen} 
-        onClose={closeDeleteConfirmation} 
+      <ConfirmationModale
+        isOpen={isConfirmationModalOpen}
+        onClose={closeDeleteConfirmation}
         onConfirm={handleDeleteField}
       />
     </div>

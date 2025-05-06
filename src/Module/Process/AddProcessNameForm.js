@@ -1,10 +1,20 @@
-import React, { useState } from 'react'
-const ProcessForm = ({ onSubmit, initialData, onCancel }) => {
+import React, { useState, useEffect } from 'react'
+
+const ProcessForm = ({ onSubmit, initialData, onCancel, isEdit }) => {
+  const [error, setError] = useState(null)
   const [formData, setFormData] = useState(
     initialData || {
       process_name: '',
-    },
+      id: null,
+    }
   )
+
+  // Update form data when initialData changes (e.g., when editing a different process)
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData)
+    }
+  }, [initialData])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -17,19 +27,18 @@ const ProcessForm = ({ onSubmit, initialData, onCancel }) => {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!formData.process_name) {
-      alert('Process name cannot be empty!')
+      setError('required')
       return
     }
     onSubmit(formData)
   }
-  
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 my-3 border border-gray-50 rounded-md p-3">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="col-span-1 sm:col-span-2">
           <label htmlFor="processName" className="block text-sm font-medium text-gray-700">
-            Process Name <span className="text-red-500">*</span>
+            Process Name <span className="text-red-500">* <span className='text-xs'>{error}</span></span>
           </label>
           <input
             type="text"
@@ -39,7 +48,6 @@ const ProcessForm = ({ onSubmit, initialData, onCancel }) => {
             placeholder="Process Name"
             onChange={handleChange}
             className="w-full p-2 my-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#8167e5] focus:border-transparent"
-            required
           />
         </div>
       </div>
@@ -56,7 +64,7 @@ const ProcessForm = ({ onSubmit, initialData, onCancel }) => {
           type="submit"
           className="text-white bg-[#8167e5] w-20 rounded p-1 shadow-md hover:bg-[#6b4fd1]"
         >
-          Save
+          {isEdit ? 'Update' : 'Save'}
         </button>
       </div>
     </form>

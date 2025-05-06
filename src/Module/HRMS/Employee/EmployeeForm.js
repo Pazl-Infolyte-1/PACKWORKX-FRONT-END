@@ -222,6 +222,7 @@ function EmployeeForm({ isDrawerOpen, setDrawerOpen, formData, setFormData, hand
     setValidationErrors(errors);
     
     // If there are no errors, call the parent's handleSubmit
+    console.log(errors,'ffff')
     if (Object.keys(errors).length === 0) {
       handleSubmit(e);
     }

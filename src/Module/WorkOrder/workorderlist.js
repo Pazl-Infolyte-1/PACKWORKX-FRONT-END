@@ -127,14 +127,18 @@ const WorkOrders = () => {
   }
 
   return (
-    <div className="w-full mb-3">
+    <div className="w-full mb-3 ">
       {/* Header Section */}
-      <div className="flex justify-between mb-3">
-        <h5>Work Orders</h5>
-      </div>
+      <div className="w-full h-[40px]">
+          <div className="flex justify-between items-center">
+            <h4>Work Order</h4>
+          </div>
+        </div>
+
+              <div className="flex flex-col justify-between p-3 border">
 
       {/* Button section with Search */}
-      <div className="flex justify-between items-center gap-2 h-10">
+      <div className="flex justify-between items-center gap-2 h-10 ">
         <div className='flex  gap-1'>
         <SearchBar text="workorder" data={data} ref={searchBarRef} />
         <select
@@ -248,6 +252,8 @@ alerts={alerts}
 handleClose={handleClose}
 />
     </div>
+    </div>
+
   )
 }
 

@@ -192,13 +192,13 @@ const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
-    
+  
     // Required fields validation
     if (!localFormData.sales_ui_id) newErrors.sales_ui_id = "Required";
     if (!localFormData.estimated) newErrors.estimated = "Required";
     if (!localFormData.client) newErrors.client = "Required";
     if (!localFormData.credit_period) newErrors.credit_period = "Required";
-    
+  
     // Confirmation method validation
     if (confirmationMethod === "Email" && !localFormData.confirmation_email) {
       newErrors.confirmation_email = "Required";
@@ -207,7 +207,22 @@ const [attemptedSubmit, setAttemptedSubmit] = useState(false);
       if (!localFormData.confirmation_name) newErrors.confirmation_name = "Required";
       if (!localFormData.confirmation_mobile) newErrors.confirmation_mobile = "Required";
     }
+  
+    // SKU validation
+    const skuErrors = [];
+    let hasSkuError = false;
     
+    skuFormData.skuDetails?.forEach((skuItem, index) => {
+      if (!skuItem.sku || skuItem.sku.trim() === "") {
+        skuErrors[index] = "Required";
+        hasSkuError = true;
+      }
+    });
+  
+    if (hasSkuError) {
+      newErrors.skuDetails = skuErrors;
+    }
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -543,6 +558,8 @@ const [attemptedSubmit, setAttemptedSubmit] = useState(false);
           totals={totals}
           setTotals={setTotals}
           setIsFormTouched={setIsFormTouched}
+          errors={errors} // Pass the errors object from your parent component
+          setErrors={setErrors}
         />
 
         {/* Submit Button */}

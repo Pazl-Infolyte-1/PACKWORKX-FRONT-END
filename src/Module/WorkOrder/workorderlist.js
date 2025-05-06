@@ -134,7 +134,6 @@ const WorkOrders = () => {
             <h4>Work Order</h4>
           </div>
         </div>
-
               <div className="flex flex-col justify-between p-3 border">
 
       {/* Button section with Search */}

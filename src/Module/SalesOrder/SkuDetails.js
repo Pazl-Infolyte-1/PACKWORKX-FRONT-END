@@ -7,7 +7,7 @@ import apiMethods from '../../api/config'
 import Select from "react-select";
 import { Controller } from "react-hook-form";
 
-const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = true, totals, setTotals, setIsFormTouched }) => {
+const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = true, totals, setTotals,errors,setErrors }) => {
   const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
   const [totalQuantity, setTotalQuantity] = useState(0)
   const [totalAmount, setTotalAmount] = useState(0)
@@ -18,12 +18,22 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
   const [isLoading, setIsLoading] = useState(true)
   const [previousValues, setPreviousValues] = useState(null)
   const [totalGst, setTotalGst] = useState(0)
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+
 
   const updateTotals = (key, value) => {
     setTotals((prevTotals) => ({
       ...prevTotals,
       [key]: value,
     }));
+  };
+
+  const validateSkus = () => {
+    setAttemptedSubmit(true);
+    
+    // Check if any SKUs are empty
+    const emptySkus = getValues('skus').some(item => !item.sku);
+    return !emptySkus;
   };
 
   // Initialize form with skuDetailsForm data if it exists
@@ -377,6 +387,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
 
       return (
         <div className="w-[280px] z-[80]">
+
           <Select
             {...field}
             value={selectedValue || null}
@@ -387,6 +398,13 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
             menuPortalTarget={document.body}
             onChange={(selectedOption) => {
               field.onChange(selectedOption?.value || "");
+              if (selectedOption?.value && errors?.skuDetails?.[index]) {
+                const newErrors = {...errors};
+                if (newErrors.skuDetails) {
+                  newErrors.skuDetails[index] = undefined;
+                  setErrors(newErrors);
+                }
+              }
               calculateRowValues(index);
               updateParentFormData();
             }}
@@ -396,6 +414,7 @@ const SkuDetails = ({ formData, setFormData, skuDetailsForm, showSubmitButton = 
                 minHeight: 32,
                 height: 32,
                 fontSize: 14,
+                borderColor: errors?.skuDetails?.[index] ? 'red' : base.borderColor,
               }),
               valueContainer: (base) => ({
                 ...base,

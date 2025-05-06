@@ -351,15 +351,15 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
-            // if (module.modules_description === 'Production') {
-            //   return (
-            //     <CNavItem key={index}>
-            //       <CNavLink as={NavLink} to="/production">
-            //         {navLink('Production', 'cilTruck')}
-            //       </CNavLink>
-            //     </CNavItem>
-            //   )
-            // }
+            if (module.modules_description === 'Production') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/production">
+                    {navLink('Production', 'cilTruck')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
 
             if (module.modules_description === 'Purchase Order') {
               return (

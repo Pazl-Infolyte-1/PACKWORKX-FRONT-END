@@ -3,7 +3,7 @@ import apiMethods from '../../api/config'
 import GrnItemsFrom from './GrnItemsFrom'
 import ActionButton from '../../components/New/ActionButton'
 
-const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDrawer }) => {
+const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDrawer, errors }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [purchaseOrderData, setPurchaseOrderData] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -30,16 +30,6 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
   const handleSubmit = (e) => {
     e.preventDefault()
     onSubmit(grnFormData)
-    setGrnFormData({
-      po_id: null,
-      grn_date: '',
-      delivery_note_no: '',
-      invoice_no: '',
-      invoice_date: '',
-      received_by: '',
-      notes: '',
-      items: [],
-    })
   }
 
   useEffect(() => {
@@ -65,9 +55,16 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 {/* Item 1 - Split into Two Inputs */}
                 <div className="p-2 rounded-lg flex flex-col">
-                  <label className="text-black font-normal leading-6 mb-2 text-left">
-                    Purchase Order <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label className="text-black font-normal leading-6 mb-2 text-left">
+                      Purchase Order <span className="text-red-500">*</span>
+                    </label>
+                    {errors.po_id && (
+                      <span className="text-red-500 text-sm ml-2 mb-2 align-middle">
+                        {errors.po_id}
+                      </span>
+                    )}
+                  </div>
                   <div className="relative w-full" ref={dropdownRef}>
                     <div
                       className="w-full h-[40px] px-3 border border-gray-300 rounded-md bg-white text-gray-800 flex items-center justify-between cursor-pointer hover:border-[#8167E5] transition-all duration-200"
@@ -157,11 +154,16 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                   </div>
                 </div>
 
-                {/* Client Period */}
                 <div className="p-2 rounded-lg flex flex-col">
-                  <label className="text-black font-normal leading-6 mb-2 text-left">
-                    Grn Date <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label className="text-black font-normal leading-6 text-left">
+                      Grn Date <span className="text-red-500">*</span>
+                    </label>
+                    {errors.grn_date && (
+                      <span className="text-red-500 text-sm ml-2 mb-2">{errors.grn_date}</span>
+                    )}
+                  </div>
+
                   <input
                     type="date"
                     name="grn_date"
@@ -172,9 +174,16 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                 </div>
 
                 <div className="p-2 rounded-lg flex flex-col">
-                  <label className="text-black font-normal leading-6 mb-2 text-left">
-                    Delivery Note No. <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label className="text-black font-normal leading-6 mb-2 text-left">
+                      Delivery Note No. <span className="text-red-500">*</span>
+                    </label>
+                    {errors.delivery_note_no && (
+                      <span className="text-red-500 text-sm ml-2 mb-2 align-middle">
+                        {errors.delivery_note_no}
+                      </span>
+                    )}
+                  </div>
                   <input
                     type="text"
                     name="delivery_note_no"
@@ -185,9 +194,16 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                 </div>
 
                 <div className="p-2 rounded-lg flex flex-col">
-                  <label className="text-black font-normal leading-6 mb-2 text-left">
-                    Invoice No. <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label className="text-black font-normal leading-6 mb-2 text-left">
+                      Invoice No. <span className="text-red-500">*</span>
+                    </label>
+                    {errors.invoice_no && (
+                      <span className="text-red-500 text-sm ml-2 mb-2 align-middle">
+                        {errors.invoice_no}
+                      </span>
+                    )}
+                  </div>
                   <input
                     type="text"
                     name="invoice_no"
@@ -197,9 +213,16 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                   />
                 </div>
                 <div className="p-2 rounded-lg flex flex-col">
-                  <label className="text-black font-normal leading-6 mb-2 text-left">
-                    Invoice Date <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label className="text-black font-normal leading-6 mb-2 text-left">
+                      Invoice Date <span className="text-red-500">*</span>
+                    </label>
+                    {errors.invoice_date && (
+                      <span className="text-red-500 text-sm ml-2 mb-2 align-middle">
+                        {errors.invoice_date}
+                      </span>
+                    )}
+                  </div>
                   <input
                     type="date"
                     name="invoice_date"
@@ -209,9 +232,16 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                   />
                 </div>
                 <div className="p-2 rounded-lg flex flex-col">
-                  <label className="text-black font-normal leading-6 mb-2 text-left">
-                    Received By <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label className="text-black font-normal leading-6 mb-2 text-left">
+                      Received By <span className="text-red-500">*</span>
+                    </label>
+                    {errors.received_by && (
+                      <span className="text-red-500 text-sm ml-2 mb-2 align-middle">
+                        {errors.received_by}
+                      </span>
+                    )}
+                  </div>
                   <input
                     type="text"
                     name="received_by"
@@ -221,9 +251,16 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                   />
                 </div>
                 <div className="p-2 rounded-lg flex flex-col">
-                  <label className="text-black font-normal leading-6 mb-2 text-left">
-                    Notes <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label className="text-black font-normal leading-6 mb-2 text-left">
+                      Notes <span className="text-red-500">*</span>
+                    </label>
+                    {errors.notes && (
+                      <span className="text-red-500 text-sm ml-2 mb-2 align-middle">
+                        {errors.notes}
+                      </span>
+                    )}
+                  </div>
                   <input
                     type="text"
                     name="notes"

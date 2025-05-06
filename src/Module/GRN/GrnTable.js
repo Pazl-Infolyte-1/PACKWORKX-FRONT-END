@@ -34,7 +34,7 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
       if (response.status === 200) {
         setConfirmModal(false)
         setGrnData((prev) => prev.filter((item) => item.id !== deleteId))
-        setAlerts([{ severity: 'success', message: 'Route deleted successfully!' }])
+        setAlerts([{ severity: 'error', message: 'Route deleted successfully!' }])
       }
     } catch (error) {
       console.error(error)
@@ -50,7 +50,7 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
   return (
     <>
       <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar rounded-lg p-2">
-        <CTable striped hover className="w-full m-0 table-fixed">
+        <CTable striped hover className="w-full m-0">
           <CTableHead className="bg-gray-100 sticky -top-2 z-10">
             <CTableRow className="text-center">
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">
@@ -85,26 +85,20 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
                 <CTableRow key={item.id} className="border-b text-center">
                   <CTableDataCell
                     onClick={() => setOpenGrnModal({ open: true, id: item.id })}
-                    className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start"
+                    className="py-3 px-2 !text-blue-600 cursor-pointer underline text-start"
                   >
                     {item.id}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2  font-semibold">{item.po_id}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-2  font-semibold">
+                  <CTableDataCell className="py-3 px-2">{item.po_id}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-2">
                     {new Date(item.grn_date).toLocaleString()}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2  font-semibold">
-                    {item.delivery_note_no}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2  font-semibold">
-                    {item.invoice_no}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2  font-semibold">
+                  <CTableDataCell className="py-3 px-2">{item.delivery_note_no}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-2">{item.invoice_no}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-2">
                     {new Date(item.invoice_date).toLocaleString()}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2  font-semibold">
-                    {item.received_by}
-                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-2">{item.received_by}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2">
                     <ThreeDotMenu
                       value={[

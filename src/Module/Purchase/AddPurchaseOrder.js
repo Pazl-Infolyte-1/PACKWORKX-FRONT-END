@@ -20,6 +20,24 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, fetchDat
   });
   const [itemsData, setItemsData] = useState([]);
 
+
+  useEffect(() => {
+    if (!isEdit) {
+      setOrderData({
+        po_date: new Date().toISOString().split("T")[0],
+        valid_till: "",
+        supplier_id: "",
+        supplier_name: "",
+        supplier_contact: "",
+        supplier_email: "",
+        supplier_address: "",
+        payment_terms: "",
+        freight_terms: "",
+      });
+      setItemsData([{ item_id: "", quantity: 1 }]); // clear previous items
+    }
+  }, [isEdit]);
+
   useEffect(() => {
     if (isEdit && selectedPoId) {
       fetchPoDetails();

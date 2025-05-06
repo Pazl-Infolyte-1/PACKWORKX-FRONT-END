@@ -29,6 +29,10 @@ const WorkOrders = () => {
   const [loading,setLoading]= useState(true)
   const [manufactureFilter,setManufactureFilter] = useState("")
   const searchBarRef = useRef(null)
+  const [canDeactivate,setCanDeactivate] = useState(false);
+  const [isTouched,setIsTouched] = useState(false)
+
+
 
 
 
@@ -114,15 +118,26 @@ const WorkOrders = () => {
     setIsConfirmationModaleOpen(true);   // Open the modal
   }
 
+  const handleCloseDrawer = ()=>{
+    if(isTouched){
+      setCanDeactivate(true)
+    }else{
+      setDrawerOpen(false)
+    }
+  }
+
   return (
-    <div className="w-full mb-3">
+    <div className="w-full mb-3 ">
       {/* Header Section */}
-      <div className="flex justify-between mb-3">
-        <h5>Work Orders</h5>
-      </div>
+      <div className="w-full h-[40px]">
+          <div className="flex justify-between items-center">
+            <h4>Work Order</h4>
+          </div>
+        </div>
+              <div className="flex flex-col justify-between p-3 border">
 
       {/* Button section with Search */}
-      <div className="flex justify-between items-center gap-2 h-10">
+      <div className="flex justify-between items-center gap-2 h-10 ">
         <div className='flex  gap-1'>
         <SearchBar text="workorder" data={data} ref={searchBarRef} />
         <select
@@ -195,9 +210,9 @@ const WorkOrders = () => {
           />
         </div>
       </div>
-      <Drawer isOpen={drawerOpen} maxWidth="1280px" onClose={() => setDrawerOpen(false)}>
+      <Drawer isOpen={drawerOpen} maxWidth="1280px" onClose={() => handleCloseDrawer()}>
       {drawerOpen && (
-        <AddSalesOrder currentTab={'skuDetails'} setDrawer={setDrawerOpen} fetchData={fetchData} />
+        <AddSalesOrder currentTab={'skuDetails'} setDrawer={setDrawerOpen} fetchData={fetchData} setIsFormTouched = {setIsTouched} handleCloseDrawer={handleCloseDrawer} />
       )}
       </Drawer>
 
@@ -210,20 +225,34 @@ const WorkOrders = () => {
     setIsEditFormVisible={setIsFormVisible}
     fetchData={fetchData}
   />
-
-  
 )}
+
+<ConfirmationModale 
+  isOpen={canDeactivate}
+  onClose={() => setCanDeactivate(false)}
+  onConfirm={() => {
+    setDrawerOpen(false);
+    setCanDeactivate(false);
+  }}
+  variant="unsavedChanges"
+/>
+
+
+
 <ConfirmationModale
   isOpen={isConfirmationModaleOpen}
   onClose={() => setIsConfirmationModaleOpen(false)}
   onConfirm={ConfirmDelete}
 />
 
+
 <CustomAlert
 alerts={alerts}
 handleClose={handleClose}
 />
     </div>
+    </div>
+
   )
 }
 

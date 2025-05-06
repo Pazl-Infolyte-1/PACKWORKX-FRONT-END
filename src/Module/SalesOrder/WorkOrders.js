@@ -7,6 +7,7 @@ import SkuVersionAddEdit from './SkuVersionAddEdit'
 import PopUp from '../../components/New/PopUp'
 import { useLocation } from 'react-router-dom'
 import CustomAlert from '../../components/New/CustomAlert'
+import ConfirmationModale from '../../components/New/ConfirmationModale'
 
 const accordionCardSummary = {
   data: [
@@ -27,7 +28,7 @@ const accordionCardSummary = {
 }
 
 
-const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders, setWorkOrders, setDrawer, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit, skuDetailsForm }) => {
+const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleCloseDrawer, workOrders, setWorkOrders, setDrawer,setIsFormTouched, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit, skuDetailsForm }) => {
   const [selectedOption, setSelectedOption] = useState('inhouse')
   const [openIndices, setOpenIndices] = useState([])
   const [openAccordions, setOpenAccordions] = useState({})
@@ -47,6 +48,10 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
   const [salesOrder, setSalesOrder] = useState([])
   const [versionAlerts, setVersionAlerts] = useState([])
   const [salesOrderSkus, setSalesOrderSkus] = useState([])
+  const [canDeactivate,setCanDeactivate] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
+
+
 
 
   // useEffect(() => {
@@ -115,6 +120,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
 
   // Update work order data
   const handleWorkOrderChange = (orderId, field, value) => {
+    setIsFormTouched(true)
     setWorkOrders(prevOrders =>
       prevOrders.map(order =>
         order.id === orderId
@@ -122,6 +128,13 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
           : order
       )
     )
+
+    if (validationErrors[field]) {
+      setValidationErrors({
+        ...validationErrors,
+        [field]: ''
+      });
+    }
   }
 
   const handleWorkOrderChange1 = (orderId, field, value) => {
@@ -134,16 +147,43 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
     )
   }
 
+
+  const validateForm = (formData) => {
+    const requiredFields = [
+      'sales_order_id',
+      'sku_id',
+      'planned_start_date',
+      'planned_end_date',
+      'edd',
+      'qty',
+    ];
+  
+    const errors = {};
+    let isValid = true;
+  
+    requiredFields.forEach(field => {
+      if (!formData[field]) {
+        errors[field] = 'Required';
+        isValid = false;
+      }
+    });
+  
+    setValidationErrors(errors);
+    return isValid;
+  };
+  
+
   // Handle form submission for all work orders
   const handleSubmit = (e) => {
 
     e.preventDefault() // Prevent default form submission
 
-
-
-
     if (isWorkOrderList) {
-      workOrderListSubmit(workOrders[0])
+      const isValid = validateForm(workOrders[0]); // Validate first order only
+      if (isValid) {
+        console.log(workOrders[0],'fafasdfasdfasdfasf')
+        workOrderListSubmit(workOrders[0]);
+      }
     } else {
       // console.log("Submitting work orders:", filledWorkOrders)
       const filledWorkOrders = workOrders.filter(order =>
@@ -914,6 +954,16 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                             </option>
                           ))}
                         </select>
+                        {validationErrors.sales_order_id && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.sales_order_id}
+    </div>
+    )}
                       </div>
 
                       {/* Empty column to maintain consistent layout */}
@@ -931,6 +981,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
 
                         {isWorkOrderList ? (
                           // SKU Dropdown shown only in workorderlist
+                          <div>
                           <select
                             className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
                             value={order.sku_id || ''}
@@ -952,6 +1003,19 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                                 </option>
                               ))}
                           </select>
+                          {validationErrors.sku_id && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.sku_id}
+    </div>
+    )}
+                          
+                          </div>
+                          
                         ) : (
                           // Original SKU dropdown
                           <select
@@ -1024,6 +1088,16 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                           onChange={(e) => handleWorkOrderChange(order.id, 'qty', e.target.value)}
                           className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
                         />
+                                        {validationErrors.qty && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.qty}
+    </div>
+    )}
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -1036,6 +1110,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                           className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
                         />
                       </div>
+
                     </div>
 
                     {/* Third row */}
@@ -1048,6 +1123,16 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                           onChange={(e) => handleWorkOrderChange(order.id, 'planned_start_date', e.target.value)}
                           className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
                         />
+                                                                      {validationErrors.planned_start_date && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.planned_start_date}
+    </div>
+                      )}
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -1059,6 +1144,16 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                           onChange={(e) => handleWorkOrderChange(order.id, 'planned_end_date', e.target.value)}
                           className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
                         />
+                                              {validationErrors.planned_end_date && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.planned_end_date}
+    </div>
+                      )}
                       </div>
                     </div>
 
@@ -1072,6 +1167,16 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
                           onChange={(e) => handleWorkOrderChange(order.id, 'edd', e.target.value)}
                           className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none"
                         />
+                    {validationErrors.edd && (
+                  <div className="text-red-500 text-xs mt-1 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {validationErrors.edd}
+    </div>
+                      )}
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -1153,8 +1258,10 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
         <div className='flex gap-3'>
           <ActionButton
             onClick={() => {
-              setDrawer(false)
-            }}
+              // setCanDeactivate(true)
+              // setDrawer(false)
+              handleCloseDrawer()
+                        }}
             variant="cancel"
             label={"cancel"}
           />
@@ -1167,6 +1274,19 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, workOrders
         </div>
 
       </div>
+
+      {canDeactivate && (
+  <ConfirmationModale 
+    isOpen={canDeactivate}
+    onClose={() => setCanDeactivate(false)}
+    onConfirm={() => {
+      setDrawer(false)
+      setCanDeactivate(false);
+        }
+    }
+    variant="unsavedChanges"
+  />
+)}
       <VersionsPopup
         visible={isVersionDrawerOpen}
         setVisible={() => setVersionDrawerOpen(false)}

@@ -4,10 +4,33 @@ import Phone from '../../assets/images/phone.png'
 import Cell from '../../assets/images/mob.png'
 import Facebook from '../../assets/images/fb.png'
 import { useFormContext } from "react-hook-form";
+import { useState } from 'react';
+import apiMethods from '../../api/config';
 
 
 const OtherDetailForm =()=>{
-	const { register, formState: { errors } } = useFormContext(); 
+	const { register, formState: { errors },setValue } = useFormContext(); 
+
+
+	const handleFileUpload = async (event) => {
+		const file = event.target.files[0];
+		if (!file) return;
+	
+		const formData = new FormData();
+		formData.append("file", file);
+	
+		try {
+		  const response = await apiMethods.uploadFile(formData);
+		  const fileUrl = response?.data?.data?.file_url;
+	
+		  if (fileUrl) {
+			// ✅ Set the uploaded URL into form field
+			setValue("clientData.documents.id_proof", fileUrl);
+		  }
+		} catch (err) {
+		  console.error("File upload failed", err);
+		}
+	  };
 
 	return (
 		<div className="bg-white p-6 w-full">
@@ -61,7 +84,22 @@ const OtherDetailForm =()=>{
   {/* Documents */}
  {/* Documents */}
 <div className="space-y-4">
+
+
+		
   <div className="flex items-center">
+    <label className="font-medium w-44">ID Proof</label>
+	<input
+  type="file"
+  className="w-full border border-gray-300 p-2 rounded"
+  accept="application/pdf"
+  onChange={handleFileUpload}
+/>
+
+  </div>
+
+	
+  {/* <div className="flex items-center">
     <label className="font-medium w-44">ID Proof</label>
     <input
       type="file"
@@ -69,7 +107,7 @@ const OtherDetailForm =()=>{
       className="w-full border border-gray-300 p-2 rounded"
       accept="application/pdf"
     />
-  </div>
+  </div> */}
 
   {/*<div className="flex items-center">
     <label className="font-medium w-44">Contract</label>

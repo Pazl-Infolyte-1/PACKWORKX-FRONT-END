@@ -86,7 +86,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
   };
 {/* <span className="text-red-500 ml-1">*</span> */}
   const formFields = [
-    { label: 'Product Code', name: 'item_code', required: true },
+    { label: 'Product Code (unique)', name: 'item_code', required: true },
     { label: 'Product Name', name: 'item_name', required: true },
     { label: 'HSN Code', name: 'hsn_code' },
     { label: 'UOM', name: 'uom', required: true },
@@ -131,7 +131,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
   return (
     <div className="p-6 bg-white rounded">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
-      <h2 className="text-lg font-semibold mb-4">{isEdit ? 'Edit Item' : 'Add Item'}</h2>
+      <h2 className="text-lg font-semibold mb-4">{isEdit ? 'Edit Product' : 'Add Product'}</h2>
       
       <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {formFields.map(({ label, name, type = 'text', required, min, max, step, readOnly, defaultValue, excluded }) => (
@@ -147,7 +147,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
               className={`w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500 
                 ${readOnly ? 'bg-gray-50' : ''}`}
               {...(excluded ? {} : register(name, {
-                required: required ? `${label} is required` : false,
+                required: required ? ` required` : false,
                 min: min !== undefined ? { value: min, message: `Minimum value is ${min}` } : undefined,
                 max: max !== undefined ? { value: max, message: `Maximum value is ${max}` } : undefined
               }))}
@@ -160,7 +160,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
           <label className="block text-sm font-medium text-gray-700 mb-1">Product Type <span className="text-red-500"> *</span></label>
           <select
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
-            {...register('item_type', { required: 'Item Type is required' })}
+            {...register('item_type', { required: 'required' })}
           >
             <option value="raw-materials">Raw Materials</option>
             <option value="reels">Reels</option>
@@ -183,21 +183,30 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
           <label className="block text-sm font-medium text-gray-700 mb-1">Description<span className="text-red-500"> *</span></label>
           <textarea
             className="w-full border border-gray-300 rounded px-3 py-2 h-24 focus:outline-none focus:ring focus:border-blue-500"
-            {...register('description', { required: 'Description is required' })}
+            {...register('description', { required: 'required' })}
           />
           {errors.description && <p className="text-sm text-red-600 mt-1">{errors.description.message}</p>}
         </div>
         </div>
 
-        <div className="md:col-span-3 flex justify-center">
+        <div className="md:col-span-3 flex justify-end">
+
+        <button 
+        onClick={() => setDrawer(false)}
+        className="p-2 border border-gray-300 rounded w-24 mr-2 hover:bg-gray-100 transition"
+        >
+          Cancel
+        </button>
+          
           <button
             type="submit"
             disabled={isSubmitting}
             className={`px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow-sm transition duration-200
-              ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            {isSubmitting ? 'Processing...' : (isEdit ? 'Update Item' : 'Add Item')}
+              ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            {isSubmitting ? 'Processing...' : (isEdit ? 'Update' : 'Submit')}
           </button>
+
+
         </div>
       </form>
     </div>

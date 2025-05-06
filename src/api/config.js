@@ -555,11 +555,7 @@ export const apiMethods = {
     }
   },
   editEmployee: async (id, body) => {
-    try {
       return await apiClient.put(`/user/employees/${id}`, body)
-    } catch (error) {
-      console.error(error)
-    }
   },
   getEmployeeData: async (id) => {
     try {
@@ -1227,9 +1223,9 @@ export const apiMethods = {
   getAllAssign: async () => {
     return await apiClient.get('/machines/assign')
   },
-  getGrn: async () => {
+  getGrn: async (params) => {
     try {
-      return await apiClient.get('/grn')
+      return await apiClient.get('/grn', { params })
     } catch (error) {
       console.error(error)
     }

@@ -40,7 +40,7 @@ function ItemsTable({ data = [], setActionDrawerOpen, setVersionDrawerOpen, hand
             </CTableRow>
           </CTableHead>
 
-          {loading ? (
+          {/* {loading ? (
             <tbody>
               <tr>
                 <td colSpan="9" className="text-center py-5">
@@ -48,7 +48,7 @@ function ItemsTable({ data = [], setActionDrawerOpen, setVersionDrawerOpen, hand
                 </td>
               </tr>
             </tbody>
-          ) : (
+          ) : ( */}
             <CTableBody>
               {data.length > 0 ? (
                 data.map((row, index) => (
@@ -92,7 +92,7 @@ function ItemsTable({ data = [], setActionDrawerOpen, setVersionDrawerOpen, hand
                 </CTableRow>
               )}
             </CTableBody>
-          )}
+          {/* )} */}
         </CTable>
       </div>
   );

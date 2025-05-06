@@ -70,6 +70,9 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
       <CTable striped hover className="w-full m-0">
         <CTableHead className="bg-gray-100 sticky top-0 z-10">
           <CTableRow className="text-center">
+          <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">
+              SKU Id
+            </CTableHeaderCell>
             <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">
               SKU Name
             </CTableHeaderCell>
@@ -103,6 +106,9 @@ function SkuTable({ skudata, setSkuData, handleSkuEdit, editTag, alerts, setAler
               .filter((item) => item.status === 'active')
               .map((cell, index) => (
                 <CTableRow key={index} className="border-b text-center">
+                   <CTableDataCell className="py-3 px-2 text-gray-700  text-start ">
+                    {cell.sku_ui_id}
+                  </CTableDataCell>
                   <CTableDataCell
                     onClick={() => setShowPopUp(cell.id)}
                     className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start "

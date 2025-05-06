@@ -32,6 +32,12 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
     name: 'items'
   });
 
+  useEffect(() => {
+    if (fields.length === 0) {
+      append({ item_id: "", quantity: 1 });
+    } 
+  }, [append, fields.length]);
+
   // Calculate totals from items without setting values
   // This prevents the infinite update loop
   const totals = useMemo(() => {
@@ -195,7 +201,7 @@ useEffect(() => {
         po_item_name: selectedItem.po_item_name,
         description: selectedItem.description || '',
         hsn_code: selectedItem.hsn_code || '',
-        quantity: 0,
+        quantity: 1,
         uom: selectedItem.uom || 'pcs',
         unit_price: selectedItem.standard_cost,
         standard_cost: selectedItem.unit_price || selectedItem.standard_cost,
@@ -319,7 +325,7 @@ useEffect(() => {
                   <td className="px-4 py-2">
                     <select
                       {...register(`items.${index}.item_id`)}
-                      onChange={(e) => handleItemChange(index, e.target.value)}
+                      onChange={(e) => handleItemChange(index, e.target.value)} 
                       className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                     >
                       <option value="">{isLoading ? "Loading..." : "Select Item"}</option>
@@ -370,12 +376,14 @@ useEffect(() => {
                   <td className="px-4 py-2">
                     <input
                       {...register(`items.${index}.sgst`)}
+                      readOnly
                       className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-gray-50"
                     />
                   </td>
                   <td className="px-4 py-2">
                     <input
                       {...register(`items.${index}.cgst`)}
+                      readOnly
                       className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-gray-50"
                     />
                   </td>

@@ -228,9 +228,9 @@ const InventoryDashboard = () => {
       <div className="grid grid-cols-3 gap-3">
       {console.log('inventorySummary', inventorySummary)}
 
-        <StockCard title="Raw Materials" quantity={inventorySummary["raw-materials"]?.total || 0} status={getStatus("Raw Materials")} bgColor="bg-indigo-100" textColor="text-indigo-700" buttonColor="bg-indigo-700" icon={<FaUsers />} modalname="raw_material" />
+        {/* <StockCard title="Raw Materials" quantity={inventorySummary["raw-materials"]?.total || 0} status={getStatus("Raw Materials")} bgColor="bg-indigo-100" textColor="text-indigo-700" buttonColor="bg-indigo-700" icon={<FaUsers />} modalname="raw_material" /> */}
         <StockCard title="Reels" quantity={inventorySummary["reels"]?.total || 0} status={getStatus("Reels")} bgColor="bg-green-100" textColor="text-green-800" buttonColor="bg-green-700" icon={<BiDollarCircle />} modalname="reels_details" />
-        {/* <StockCard title="Corrugation Glue" quantity={inventorySummary["Corrugation Glue"]?.total || 0} status={getStatus("Corrugation Glue")} bgColor="bg-yellow-100" textColor="text-yellow-800" buttonColor="bg-yellow-700" icon={<FaStar />} modalname="corrugation_glue" /> */}
+        <StockCard title="Corrugation Glue" quantity={inventorySummary["Corrugation Glue"]?.total || 0} status={getStatus("Corrugation Glue")} bgColor="bg-yellow-100" textColor="text-yellow-800" buttonColor="bg-yellow-700" icon={<FaStar />} modalname="corrugation_glue" />
         <StockCard title="Pasting Glue" quantity={inventorySummary["Pasting Glue"]?.total || 0} status={getStatus("Pasting Glue")} bgColor="bg-red-100" textColor="text-red-800" buttonColor="bg-red-700" icon={<CgWorkAlt />} modalname="pasting_glue" />
         <StockCard title="Finished Goods" quantity={inventorySummary["Finished Goods"]?.total || 0} status={getStatus("Finished Goods")} bgColor="bg-gray-200" textColor="text-gray-700" buttonColor="bg-gray-700" icon={<FaShieldAlt />} modalname="finished_goods" />
         <StockCard title="Semi Finished Goods" quantity={inventorySummary["Semi Finished Goods"]?.total || 0} status={getStatus("Semi Finished Goods")} bgColor="bg-indigo-100" textColor="text-indigo-700" buttonColor="bg-indigo-700" icon={<FaUsers />} modalname="finished_goods" />

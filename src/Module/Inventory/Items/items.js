@@ -147,7 +147,7 @@ function Items() {
                 <option value="" disabled>Status</option>
                 <option value="pending">Pending</option>
                 <option value="completed">Completed</option>
-              </select>
+              </select> */}
               <button
                 className="border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition flex items-center gap-1"
                 onClick={clearFilters}
@@ -155,11 +155,11 @@ function Items() {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-                Clear Filters
-              </button> */}
+                Clear
+              </button>
             </div>
             <ActionButton 
-              label="Add Item"
+              label="Add Product"
               onClick={() => {
                 setIsEditMode(false);
                 setDrawerOpen(true);
@@ -182,7 +182,7 @@ function Items() {
             selectedItemData={selectedItemData}
           />
 
-          <div className="flex justify-end items-center gap-4 mt-4">
+          <div className="flex justify-end items-center gap-4 mt-2">
             <CommonPagination
               count={totalPages}
               page={paginationParams.currentPage}

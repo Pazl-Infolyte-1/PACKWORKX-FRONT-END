@@ -24,13 +24,12 @@ function ItemsTable({ data = [], setActionDrawerOpen, setVersionDrawerOpen, hand
   };
 
   return (
-    <div className="h-[80%]">
-      <div className="overflow-x-auto h-[350px] border whitespace-nowrap mt-3">
+      <div className="h-[420px] overflow-x-auto h-[350px] border whitespace-nowrap mt-2">
         <CTable striped hover className="border border-gray-200">
           <CTableHead className="bg-gray-100 sticky top-0 z-10">
             <CTableRow>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">Item Code</CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">Item Name</CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">Product Code</CTableHeaderCell>
+              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">Product Name</CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">UOM</CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-3 text-gray-600 font-medium">HSN Code</CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-3 text-gray-600 font-medium">Category</CTableHeaderCell>
@@ -54,7 +53,7 @@ function ItemsTable({ data = [], setActionDrawerOpen, setVersionDrawerOpen, hand
               {data.length > 0 ? (
                 data.map((row, index) => (
                   <CTableRow key={index} className="border-b">
-                    <CTableDataCell className="py-3 px-4 text-gray-700">{row.item_code || ''}</CTableDataCell>
+                    <CTableDataCell className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start " onClick={() => handleView(row.id)}>{row.item_code || ''}</CTableDataCell>
                     <CTableDataCell className="py-3 px-4 text-gray-700">{row.item_name || ''}</CTableDataCell>
                     <CTableDataCell className="py-3 px-4 text-gray-700">{row.uom || ''}</CTableDataCell>
                     <CTableDataCell className="py-3 px-4 text-gray-700">{row.hsn_code || ''}</CTableDataCell>
@@ -96,7 +95,6 @@ function ItemsTable({ data = [], setActionDrawerOpen, setVersionDrawerOpen, hand
           )}
         </CTable>
       </div>
-    </div>
   );
 }
 

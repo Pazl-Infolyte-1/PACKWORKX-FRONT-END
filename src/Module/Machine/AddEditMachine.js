@@ -1,7 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
+import { useLocation, useNavigate } from 'react-router-dom'
+import CustomAlert from '../../components/New/CustomAlert'
 
 const RequiredFieldLabel = ({ label, isRequired }) => (
   <label className="text-sm font-medium text-gray-600 mr-2">
@@ -30,17 +32,12 @@ const defaultValues = {
   remarks_notes: '',
 }
 
-function AddEditMachine({
-  setdrawopen,
-  isOpen,
-  isEdit,
-  setIsEdit,
-  setRefresh,
-  isLoading,
-  setIsLoading,
-  setAlerts
-}) {
-  
+function AddEditMachine({}) {
+  const [isLoading, setIsLoading] = useState(false)
+  const [alerts, setAlerts] = useState([])
+  const location = useLocation()
+  const { Id, isEdit } = location.state || {}
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -49,18 +46,18 @@ function AddEditMachine({
     formState: { errors },
     reset,
   } = useForm({
-    defaultValues
+    defaultValues,
   })
 
   useEffect(() => {
     if (!isEdit) {
       reset(defaultValues)
     }
-    
-    if (isEdit && isOpen.id) {
+
+    if (isEdit && Id) {
       const fetchData = async () => {
         try {
-          const response = await apiMethods.getMachineById(isOpen.id)
+          const response = await apiMethods.getMachineById(Id)
           reset(response.data.data)
         } catch (error) {
           console.error('Error fetching data:', error)
@@ -68,36 +65,33 @@ function AddEditMachine({
       }
       fetchData()
     }
-  }, [isOpen, isEdit, reset])
+  }, [isEdit, reset])
 
   // Reset form when drawer closes
   useEffect(() => {
-    if (!isOpen.show) {
-      reset(defaultValues)
-    }
-  }, [isOpen, reset])
+    reset(defaultValues)
+  }, [reset])
 
   const onSubmit = async (data) => {
     try {
       setIsLoading(true)
-      const apiCall = isEdit ? apiMethods.editMachine(isOpen.id, data) : apiMethods.AddMachine(data)
-
+      const apiCall = isEdit ? apiMethods.editMachine(Id, data) : apiMethods.AddMachine(data)
       const response = await apiCall
 
       if (response.status === 200 || response.status === 201) {
         reset(defaultValues)
-        setdrawopen({ show: false, id: null })
-        setRefresh((prev) => !prev)
-        setIsEdit(false)
         setAlerts([
           {
             severity: 'success',
             message: response.data.message,
           },
         ])
+        navigate('/machinedashboard')
       }
     } catch (error) {
-      setAlerts([{ severity: 'error', message: error?.response?.data?.message || 'Something went wrong' }])
+      setAlerts([
+        { severity: 'error', message: error?.response?.data?.message || 'Something went wrong' },
+      ])
       console.error('Submit Error:', error)
     } finally {
       setIsLoading(false)
@@ -106,8 +100,7 @@ function AddEditMachine({
 
   const handleCancel = () => {
     reset(defaultValues)
-    setdrawopen({ show: false, id: null })
-    setIsEdit(false)
+    navigate('/machinedashboard')
   }
 
   const machineStatus = watch('machine_status')
@@ -116,9 +109,9 @@ function AddEditMachine({
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto my-3">
       <div className="text-xl font-semibold mb-4">{isEdit ? 'Edit Machine' : 'Add Machine'}</div>
-
+      <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-gray-50 p-6 rounded-lg shadow-sm gap-6">
           {/* Column 1 */}
@@ -133,7 +126,7 @@ function AddEditMachine({
                 )}
               </div>
               <input
-                {...register('machine_name', { required: 'Machine name is required' })}
+                {...register('machine_name', { required: 'required' })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="text"
               />
@@ -149,7 +142,7 @@ function AddEditMachine({
                 )}
               </div>
               <input
-                {...register('machine_type', { required: 'Machine type is required' })}
+                {...register('machine_type', { required: 'required' })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="text"
               />
@@ -165,7 +158,7 @@ function AddEditMachine({
                 )}
               </div>
               <input
-                {...register('model_number', { required: 'Model number is required' })}
+                {...register('model_number', { required: 'required' })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="text"
               />
@@ -181,7 +174,7 @@ function AddEditMachine({
                 )}
               </div>
               <input
-                {...register('serial_number', { required: 'Serial number is required' })}
+                {...register('serial_number', { required: 'required' })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="text"
               />
@@ -197,7 +190,7 @@ function AddEditMachine({
                 )}
               </div>
               <input
-                {...register('manufacturer', { required: 'Manufacturer is required' })}
+                {...register('manufacturer', { required: 'required' })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="text"
               />
@@ -214,7 +207,7 @@ function AddEditMachine({
                 )}
               </div>
               <input
-                {...register('location', { required: 'Location is required' })}
+                {...register('location', { required: 'required' })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="text"
               />
@@ -230,7 +223,7 @@ function AddEditMachine({
                 )}
               </div>
               <input
-                {...register('power_rating', { required: 'Power rating is required' })}
+                {...register('power_rating', { required: 'required' })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="text"
               />
@@ -253,7 +246,7 @@ function AddEditMachine({
             </div>
 
             {/* Status toggles centered vertically */}
-            <div className="flex items-center justify-between pt-8 pb-2.5">
+            <div className='py-9'>
               <div className="flex items-center space-x-2">
                 <RequiredFieldLabel label="Connectivity Status" isRequired={true} />
                 <input
@@ -263,18 +256,17 @@ function AddEditMachine({
                   id="connectivity"
                 />
               </div>
-
-              <div className="flex items-center space-x-2">
-                <RequiredFieldLabel label="Machine Status" isRequired={true} />
-                <div
-                  onClick={toggleMachineStatus}
-                  className={`relative w-12 h-6 transition-colors duration-200 ease-in-out rounded-full cursor-pointer ${machineStatus ? 'bg-green-500' : 'bg-gray-300'}`}
-                >
-                  <input type="checkbox" className="sr-only" {...register('machine_status')} />
-                  <span
-                    className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out ${machineStatus ? 'transform translate-x-6' : ''}`}
-                  ></span>
-                </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RequiredFieldLabel label="Machine Status" isRequired={true} />
+              <div
+                onClick={toggleMachineStatus}
+                className={`relative w-12 h-6 transition-colors duration-200 ease-in-out rounded-full cursor-pointer ${machineStatus ? 'bg-green-500' : 'bg-gray-300'}`}
+              >
+                <input type="checkbox" className="sr-only" {...register('machine_status')} />
+                <span
+                  className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out ${machineStatus ? 'transform translate-x-6' : ''}`}
+                ></span>
               </div>
             </div>
           </div>
@@ -291,7 +283,7 @@ function AddEditMachine({
                 )}
               </div>
               <input
-                {...register('purchase_date', { required: 'Purchase date is required' })}
+                {...register('purchase_date', { required: 'required' })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
               />
@@ -307,7 +299,7 @@ function AddEditMachine({
                 )}
               </div>
               <input
-                {...register('installation_date', { required: 'Installation date is required' })}
+                {...register('installation_date', { required: 'required' })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
               />
@@ -323,7 +315,7 @@ function AddEditMachine({
                 )}
               </div>
               <input
-                {...register('last_maintenance', { required: 'Last maintenance date is required' })}
+                {...register('last_maintenance', { required: 'required' })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
               />
@@ -340,7 +332,7 @@ function AddEditMachine({
               </div>
               <input
                 {...register('next_maintenance_due', {
-                  required: 'Next maintenance date is required',
+                  required: 'required',
                 })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
@@ -357,7 +349,7 @@ function AddEditMachine({
                 )}
               </div>
               <input
-                {...register('warranty_expiry', { required: 'Warranty expiry date is required' })}
+                {...register('warranty_expiry', { required: 'required' })}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
               />
@@ -368,7 +360,7 @@ function AddEditMachine({
         <div className="w-full bg-gray-50 p-6 rounded-lg shadow-sm">
           <RequiredFieldLabel label="Notes & Remarks" isRequired={true} />
           <textarea
-            {...register('remarks_notes',{required: 'Notes & Remarks is required'})}
+            {...register('remarks_notes', { required: 'required' })}
             rows="3"
             className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
           ></textarea>

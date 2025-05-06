@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 
 const ProcessForm = ({ onSubmit, initialData, onCancel, isEdit }) => {
+  const [error, setError] = useState(null)
   const [formData, setFormData] = useState(
     initialData || {
       process_name: '',
-      id: null, // Added id field for edit functionality
+      id: null,
     }
   )
 
@@ -26,7 +27,7 @@ const ProcessForm = ({ onSubmit, initialData, onCancel, isEdit }) => {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!formData.process_name) {
-      alert('Process name cannot be empty!')
+      setError('required')
       return
     }
     onSubmit(formData)
@@ -37,7 +38,7 @@ const ProcessForm = ({ onSubmit, initialData, onCancel, isEdit }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="col-span-1 sm:col-span-2">
           <label htmlFor="processName" className="block text-sm font-medium text-gray-700">
-            Process Name <span className="text-red-500">*</span>
+            Process Name <span className="text-red-500">* <span className='text-xs'>{error}</span></span>
           </label>
           <input
             type="text"
@@ -47,7 +48,6 @@ const ProcessForm = ({ onSubmit, initialData, onCancel, isEdit }) => {
             placeholder="Process Name"
             onChange={handleChange}
             className="w-full p-2 my-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#8167e5] focus:border-transparent"
-            required
           />
         </div>
       </div>

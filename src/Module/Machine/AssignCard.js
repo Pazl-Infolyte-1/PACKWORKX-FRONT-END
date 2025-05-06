@@ -47,15 +47,15 @@ const AssignCard = ({
       <div className="mb-4 border border-gray-200 rounded-lg shadow-sm">
         <div className="flex items-center justify-between p-4 cursor-pointer" onClick={onToggle}>
           <div className="flex items-center">
-            <h3 className="ml-2 font-medium text-lg">{machine.machine_name}</h3>
-            <span className="ml-2 text-sm text-gray-500">({machine.machine_type})</span>
+            <h3 className="ml-2 font-medium text-lg">{machine?.machine_name}</h3>
+            <span className="ml-2 text-sm text-gray-500">({machine?.machine_type})</span>
           </div>
           <div className="flex gap-2 items-center">
             <CIcon
               icon={cilTrash}
               onClick={(e) => {
                 e.stopPropagation()
-                setDeleteAssgined({ show: true, id: machine.id })
+                setDeleteAssgined({ show: true, id: machine?.id })
               }}
             />
 
@@ -71,11 +71,11 @@ const AssignCard = ({
                 {processes.map((process, index) => (
                   <div key={index} className="items-center p-2 bg-gray-100 rounded">
                     <div className="w-full flex justify-between items-center">
-                      <span className="text-sm font-medium">{process.process_name}</span>
+                      <span className="text-sm font-medium">{process?.process_name}</span>
                       <CIcon
                         icon={cilPencil}
                         className="cursor-pointer text-blue-500 hover:text-blue-700"
-                        onClick={() => handleAssignEdit(machine.id, process.process_id)}
+                        onClick={() => handleAssignEdit(machine.id, process?.process_id)}
                       />
                     </div>
                   </div>

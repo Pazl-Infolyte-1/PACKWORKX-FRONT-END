@@ -22,7 +22,7 @@ import { RiEyeLine } from 'react-icons/ri'
 import ProcessForm from '../Process/AddProcessNameForm'
 import FieldValues from './FieldValues'
 import MachineField from './MachineField'
-import MachineValues from './MachineValues'
+import { useNavigate } from 'react-router-dom'
 
 export default function MachineMaster() {
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
@@ -41,8 +41,8 @@ export default function MachineMaster() {
   const [alerts, setAlerts] = useState([])
   const { searchQuery } = useSearch()
   const searchBarRef = useRef(null)
+  const navigate = useNavigate()
   //process
-  const [selectedProcess, setSelectedProcess] = useState(null)
   const [showAddProcessModal, setShowAddProcessModal] = useState(false)
   const [openFieldValuesModal, setOpenFieldValuesModal] = useState({ show: false, id: null })
   const [openFieldModal, setOpenFieldModal] = useState({ open: false, id: null })
@@ -89,8 +89,7 @@ export default function MachineMaster() {
   }
 
   const handleEdit = (id) => {
-    setdrawopen({ show: true, id: id })
-    setIsEdit(true)
+    navigate('/machinedashboard/form', { state: { Id: id, isEdit: true } })
   }
 
   useEffect(() => {
@@ -126,28 +125,28 @@ export default function MachineMaster() {
       const response = await apiMethods.getProcess({
         limit: 20000,
       })
-      
+
       const process = response.data.data.find((item) => item.id === processId)
-      console.log(process);
-      
+
       if (!process) {
-        setAlerts([
-          { severity: 'error', message: 'Process not found' },
-        ])
+        setAlerts([{ severity: 'error', message: 'Process not found' }])
         return
       }
-      
+
       if (response.status === 200) {
         setFormData({
           process_name: process.process_name,
-          id: process.id
+          id: process.id,
         })
         setIsEdit(true)
         setShowAddProcessModal(true)
       }
     } catch (error) {
       setAlerts([
-        { severity: 'error', message: error?.response?.data?.message || 'Failed to fetch process details' },
+        {
+          severity: 'error',
+          message: error?.response?.data?.message || 'Failed to fetch process details',
+        },
       ])
       console.error('Error fetching process:', error)
     } finally {
@@ -196,9 +195,10 @@ export default function MachineMaster() {
           />
           <ActionButton
             label={'+ Add Machine'}
-            onClick={() => {
-              setdrawopen({ show: true }), setIsEdit(false)
-            }}
+            onClick={() => navigate('/machinedashboard/form', { state: { isEdit: false } })}
+            // onClick={() => {
+            //   setdrawopen({ show: true }), setIsEdit(false)
+            // }}
           />
         </div>
       </div>
@@ -285,19 +285,6 @@ export default function MachineMaster() {
           />
         </div>
 
-        <Drawer isOpen={isdrawopen.show} onClose={() => setdrawopen({ show: false, id: null })}>
-          <AddEditMachine
-            setdrawopen={setdrawopen}
-            isOpen={isdrawopen}
-            isEdit={isEdit}
-            setIsEdit={setIsEdit}
-            setRefresh={setRefresh}
-            setIsLoading={setIsLoading}
-            isLoading={isLoading}
-            setAlerts={setAlerts}
-          />
-        </Drawer>
-
         <PopUp
           visible={assignModal}
           setVisible={setAssignModal}
@@ -364,13 +351,14 @@ export default function MachineMaster() {
           showCloseButton={true}
         >
           <FieldValues
-             openFieldValuesModal={openFieldValuesModal}
-             setOpenFieldModal={setOpenFieldModal}
-             setOpenMachineFieldModal={setOpenMachineFieldModal}
-             setOpenMachineValuesModal={setOpenMachineValuesModal}
-             setShowAddProcessModal={setShowAddProcessModal}
-             handleEditProcess={handleEditProcess}
-             setIsEdit={setIsEdit}
+            openFieldValuesModal={openFieldValuesModal}
+            setOpenFieldModal={setOpenFieldModal}
+            setOpenMachineFieldModal={setOpenMachineFieldModal}
+            setOpenMachineValuesModal={setOpenMachineValuesModal}
+            openMachineValuesModal={openMachineValuesModal}
+            setShowAddProcessModal={setShowAddProcessModal}
+            handleEditProcess={handleEditProcess}
+            setIsEdit={setIsEdit}
           />
         </PopUp>
 
@@ -388,17 +376,6 @@ export default function MachineMaster() {
             setIsEdit={setIsEdit}
             setAlerts={setAlerts}
           />
-        </PopUp>
-
-        <PopUp
-          visible={openMachineValuesModal.open}
-          setVisible={() => setOpenMachineValuesModal({ open: false, id: null })}
-          width={800}
-          height={500}
-          header="Values"
-          showCloseButton={true}
-        >
-          <MachineValues id={openMachineValuesModal.id} />
         </PopUp>
       </div>
     </div>

@@ -77,7 +77,7 @@ const RouteProcessTable = ({
                     onClick={() => setOpenRouteModal({ open: true, id: item.id })}
                     className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start"
                   >
-                    {item.id}
+                    {item.route_generate_id}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2  font-semibold">
                     {item.route_name}

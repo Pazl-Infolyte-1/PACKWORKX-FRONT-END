@@ -15,6 +15,7 @@ import { logo } from 'src/assets/brand/logo'
 import { sygnet } from 'src/assets/brand/sygnet'
 import apiMethods from '../api/config'
 import { AppSideBarNew } from './AppSideBarNew'
+import { cibAdobePhotoshop } from '@coreui/icons'
 
 // Define static menu items
 const staticMenuItems = [
@@ -65,7 +66,7 @@ const AppSidebar = () => {
 
   return (
     <CSidebar
-      className="border-end"
+      //className="border-end bg-blue-800 text-white"
       colorScheme="dark"
       position="fixed"
       unfoldable={unfoldable}
@@ -77,7 +78,7 @@ const AppSidebar = () => {
     >
       <CSidebarHeader className="border-bottom d-flex align-items-center justify-content-between p-3">
         <CSidebarBrand to="/">
-          <CIcon icon={logo} height={32} />
+          <CIcon icon={cibAdobePhotoshop} height={24} className='mb-1' />
           {(!unfoldable && sidebarShow) && <CIcon icon={sygnet} height={32} />}
         </CSidebarBrand>
         <CCloseButton

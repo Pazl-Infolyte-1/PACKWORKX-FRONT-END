@@ -55,7 +55,7 @@ const OtherDetailForm =()=>{
 			{errors.clientData?.PAN && (
           <div className="flex mt-1">
             <div className="w-40" />
-            <p className="text-red-500 text-xs ml-0">⚠️ {errors.clientData.PAN.message}</p>
+            <p className="text-red-500 text-xs ml-0">⊛ {errors.clientData.PAN.message}</p>
           </div>
         )}
   </div>

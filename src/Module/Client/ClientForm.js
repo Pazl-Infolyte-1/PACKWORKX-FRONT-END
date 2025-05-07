@@ -461,7 +461,7 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
     <div className="flex">
       <div className="w-40" /> {/* empty space to align with label */}
       <p className="text-red-500 text-xs">
-      ⚠️ {errors.clientData.client_ref_id.message}
+      ⊛ {errors.clientData.client_ref_id.message}
     </p>
     </div>
   )}
@@ -499,7 +499,7 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
     <div className="flex">
       <div className="w-40" /> {/* spacing under label */}
       <p className="text-red-500 text-xs">
-      ⚠️{errors.clientData.gst_status.message}
+      ⊛{errors.clientData.gst_status.message}
       </p>
     </div>
   )}
@@ -523,7 +523,7 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
     <div className="flex">
       <div className="w-40" /> {/* spacing under label */}
       <p className="text-red-500 text-xs">
-      ⚠️{errors.clientData.customer_type.message}
+      ⊛{errors.clientData.customer_type.message}
       </p>
     </div>
   )}
@@ -568,13 +568,13 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
     errors.clientData?.last_name) && (
     <div className="flex gap-4 mt-1 ml-[160px]">
       {errors.clientData?.salutation && (
-        <p className="text-red-500 text-xs">⚠️ {errors.clientData.salutation.message}</p>
+        <p className="text-red-500 text-xs">⊛ {errors.clientData.salutation.message}</p>
       )}
       {errors.clientData?.first_name && (
-        <p className="text-red-500 text-xs ml-[33px]">⚠️ {errors.clientData.first_name.message}</p>
+        <p className="text-red-500 text-xs ml-[33px]">⊛ {errors.clientData.first_name.message}</p>
       )}
       {errors.clientData?.last_name && (
-        <p className="text-red-500 text-xs ml-[40px]">⚠️ {errors.clientData.last_name.message}</p>
+        <p className="text-red-500 text-xs ml-[40px]">⊛ {errors.clientData.last_name.message}</p>
       )}
     </div>
   )}
@@ -590,7 +590,7 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
     <div className="flex">
       <div className="w-40" /> {/* empty space to align with label */}
       <p className="text-red-500 text-xs">
-      ⚠️ {errors.clientData.company_name.message}
+      ⊛ {errors.clientData.company_name.message}
     </p>
     </div>
   )}
@@ -636,7 +636,7 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
     <div className="flex">
       <div className="w-40" /> {/* empty space to align with label */}
       <p className="text-red-500 text-xs">
-      ⚠️ {errors.clientData.gst_number.message}
+      ⊛ {errors.clientData.gst_number.message}
     </p>
     </div>
   )}
@@ -652,7 +652,7 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
     <div className="flex">
       <div className="w-40" /> {/* empty space to align with label */}
       <p className="text-red-500 text-xs">
-      ⚠️ {errors.clientData.display_name.message}
+      ⊛ {errors.clientData.display_name.message}
     </p>
     </div>
   )}
@@ -673,7 +673,7 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
     <div className="flex">
       <div className="w-40" /> {/* empty space to align with label */}
       <p className="text-red-500 text-xs">
-      ⚠️ {errors.clientData.email.message}
+      ⊛ {errors.clientData.email.message}
     </p>
     </div>
   )}
@@ -710,12 +710,12 @@ console.log("hhjhh",isDrawerOpen,setDrawerOpen)
     <div className="flex gap-x-4 mt-1 ml-[160px]">
       {errors.clientData?.work_phone && (
         <p className="text-red-500 text-xs">
-          ⚠️ {errors.clientData.work_phone.message}
+          ⊛ {errors.clientData.work_phone.message}
         </p>
       )}
       {errors.clientData?.mobile && (
         <p className="text-red-500 text-xs ml-[120px]">
-          ⚠️ {errors.clientData.mobile.message}
+          ⊛ {errors.clientData.mobile.message}
         </p>
       )}
     </div>

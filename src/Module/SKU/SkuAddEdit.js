@@ -470,6 +470,7 @@ setSkuVariant(option.sku_type || option.value)
         payload: [],
       })
     }
+    setErrors({})
   }, [isSingleViewPopupForType]);
   
   useEffect(() => {

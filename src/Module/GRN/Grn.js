@@ -15,7 +15,7 @@ const Grn = () => {
   const [isEdit, setIsEdit] = useState(false)
   const [grnData, setGrnData] = useState([])
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
+  const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 })
   const [limit, setLimit] = useState(10)
   const searchBarRef = useRef(null)
   const [errors, setErrors] = useState({})
@@ -25,20 +25,20 @@ const Grn = () => {
     try {
       const response = await apiMethods.getGrn({
         search: searchQuery,
-        page: pagination.page,
+        page: pagination.currentPage,
         limit: limit,
       })
       setGrnData(response?.data?.data)
-      // setPagination(response.data.pagination)
+      setPagination(response.data.pagination)
     } catch (error) {
       console.error(error)
     }
   }
 
   useEffect(() => {
-    console.log('Search query:', searchQuery)
+    console.log('Fetching data with limit:', limit, 'and searchQuery:', searchQuery)
     fetchData()
-  }, [limit, searchQuery, pagination])
+  }, [limit, searchQuery, pagination.currentPage])
 
   const [grnFormData, setGrnFormData] = useState({
     po_id: null,
@@ -203,11 +203,11 @@ const Grn = () => {
         <div>
           <CommonPagination
             count={pagination?.totalPages || 1}
-            page={pagination?.page || 1}
+            page={pagination?.currentPage || 1}
             onChange={(event, value) => {
               setPagination((prev) => ({
                 ...prev,
-                page: value,
+                currentPage: value,
               }))
             }}
             onLimitChange={(newLimit) => {

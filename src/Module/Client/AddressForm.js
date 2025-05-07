@@ -99,7 +99,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     />
                     {errors.addresses?.[index]?.attention && (
         <p className="text-red-500 text-xs mt-1">
-          ⚠️ {errors.addresses[index].attention.message}
+          ⊛ {errors.addresses[index].attention.message}
         </p>
       )}
                   </div>
@@ -120,7 +120,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     </select>
                     {errors.addresses?.[index]?.country && (
         <p className="text-red-500 text-xs mt-1">
-          ⚠️ {errors.addresses[index].country.message}
+          ⊛ {errors.addresses[index].country.message}
         </p>
       )}
                   </div>
@@ -157,7 +157,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     />
                     {errors.addresses?.[index]?.city && (
         <p className="text-red-500 text-xs mt-1">
-          ⚠️ {errors.addresses[index].city.message}
+          ⊛ {errors.addresses[index].city.message}
         </p>
       )}
                   </div>
@@ -180,7 +180,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     </select>
                     {errors.addresses?.[index]?.state && (
         <p className="text-red-500 text-xs mt-1">
-          ⚠️ {errors.addresses[index].state.message}
+          ⊛ {errors.addresses[index].state.message}
         </p>
       )}
                   </div>
@@ -197,7 +197,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     />
                      {errors.addresses?.[index]?.pinCode && (
         <p className="text-red-500 text-xs mt-1">
-          ⚠️ {errors.addresses[index].pinCode.message}
+          ⊛ {errors.addresses[index].pinCode.message}
         </p>
       )}
                   </div>
@@ -214,7 +214,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     />
                      {errors.addresses?.[index]?.phone && (
         <p className="text-red-500 text-xs mt-1">
-          ⚠️ {errors.addresses[index].phone.message}
+          ⊛ {errors.addresses[index].phone.message}
         </p>
       )}
                   </div>

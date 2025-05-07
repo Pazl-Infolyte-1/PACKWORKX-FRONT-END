@@ -170,7 +170,7 @@ useEffect(() => {
         payment_terms: editData.payment_terms || "",
         //enable_portal: editData.enable_portal || false,
         portal_language: editData.portal_language || "",
-        documents: JSON.parse(editData.documents || "{}"),
+        documents: JSON.parse(editData.documents || "[]"),
         website_url: editData.website_url || "",
         department: editData.department || "",
         designation: editData.designation || "",
@@ -261,8 +261,8 @@ const handleSearch = async () => {
     setGstData(response?.data);
 
     // Extract trade name and address
-    const tradeName = response?.data?.tradeNam || "";
-    const address = response?.data?.pradr?.adr || "";
+    const tradeName = response?.gstDetails?.data?.tradeNam || "";
+    const address = response?.gstDetails?.data?.pradr?.adr || "";
 
     // Update form values using setValue from useForm
     methods.setValue("clientData.company_name", tradeName);

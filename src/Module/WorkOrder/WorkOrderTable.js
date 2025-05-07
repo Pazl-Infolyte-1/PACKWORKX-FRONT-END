@@ -58,11 +58,8 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellDa
     // setloading(false)
   }
 };
-
-
   return (
-    <div>
-      <div className="h-[370px] overflow-y-auto border border-gray-200 custom-scrollbar">
+      <div className="h-[400px] overflow-y-auto border border-gray-200 custom-scrollbar">
         <CTable striped hover className="w-full">
           <CTableHead className="bg-gray-100 sticky top-0 z-10">
             <CTableRow>
@@ -226,7 +223,6 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellDa
 </CTableBody>
         </CTable>
       </div>
-    </div>
   )
 }
 

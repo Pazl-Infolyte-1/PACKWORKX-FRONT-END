@@ -25,7 +25,9 @@ const OtherDetailForm =()=>{
 	
 		  if (fileUrl) {
 			// ✅ Set the uploaded URL into form field
-			setValue("clientData.documents.id_proof", fileUrl);
+			//setValue("clientData.documents.id_proof", fileUrl);
+			setValue("clientData.documents", [fileUrl]);
+
 		  }
 		} catch (err) {
 		  console.error("File upload failed", err);

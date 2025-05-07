@@ -239,7 +239,7 @@ function AddEditMachine({}) {
                 )}
               </div>
               <input
-                {...register('ip_address', { required: 'required' })}
+                {...register('ip_address')}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="text"
               />
@@ -275,7 +275,7 @@ function AddEditMachine({}) {
           <div className="space-y-4">
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Purchase Date" isRequired={true} />
+                <RequiredFieldLabel label="Purchase Date" />
                 {errors.purchase_date && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.purchase_date.message}
@@ -283,7 +283,7 @@ function AddEditMachine({}) {
                 )}
               </div>
               <input
-                {...register('purchase_date', { required: 'required' })}
+                {...register('purchase_date')}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
               />
@@ -291,7 +291,7 @@ function AddEditMachine({}) {
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Installation Date" isRequired={true} />
+                <RequiredFieldLabel label="Installation Date"/>
                 {errors.installation_date && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.installation_date.message}
@@ -299,7 +299,7 @@ function AddEditMachine({}) {
                 )}
               </div>
               <input
-                {...register('installation_date', { required: 'required' })}
+                {...register('installation_date')}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
               />
@@ -307,7 +307,7 @@ function AddEditMachine({}) {
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Last Maintenance" isRequired={true} />
+                <RequiredFieldLabel label="Last Maintenance"/>
                 {errors.last_maintenance && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.last_maintenance.message}
@@ -315,7 +315,7 @@ function AddEditMachine({}) {
                 )}
               </div>
               <input
-                {...register('last_maintenance', { required: 'required' })}
+                {...register('last_maintenance')}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
               />
@@ -323,7 +323,7 @@ function AddEditMachine({}) {
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Next Maintenance Due" isRequired={true} />
+                <RequiredFieldLabel label="Next Maintenance Due"/>
                 {errors.next_maintenance_due && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.next_maintenance_due.message}
@@ -331,9 +331,7 @@ function AddEditMachine({}) {
                 )}
               </div>
               <input
-                {...register('next_maintenance_due', {
-                  required: 'required',
-                })}
+                {...register('next_maintenance_due')}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
               />
@@ -341,7 +339,7 @@ function AddEditMachine({}) {
 
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Warranty Expiry" isRequired={true} />
+                <RequiredFieldLabel label="Warranty Expiry"/>
                 {errors.warranty_expiry && (
                   <span className="text-red-500 text-xs text-start">
                     {errors.warranty_expiry.message}
@@ -349,7 +347,7 @@ function AddEditMachine({}) {
                 )}
               </div>
               <input
-                {...register('warranty_expiry', { required: 'required' })}
+                {...register('warranty_expiry')}
                 className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
               />

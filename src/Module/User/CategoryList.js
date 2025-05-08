@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react'
-import AddDropdownName from './AddDropdownName'
-import PopUp from '../../components/New/PopUp'
+import React, { useState, useRef, useEffect, useContext } from 'react'
+import AddNameForm from './AddNameForm'
 import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
+import ActionButton from '../../components/New/ActionButton'
 
 const CategoryList = ({
   categories,
@@ -14,18 +14,18 @@ const CategoryList = ({
 }) => {
   const [editingCategoryId, setEditingCategoryId] = useState(null)
   const [editedCategoryName, setEditedCategoryName] = useState('')
-  const [openAddEditModal, setOpenAddEditModal] = useState(false)
+  const [isAddingCategory, setIsAddingCategory] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
   const [openDeleteModal, setOpenDeleteModal] = useState({ isOpen: false, id: null })
   const [isLoading, setIsLoading] = useState(false)
   const menuRef = useRef(null)
   const editInputRef = useRef(null)
 
   const handleEditStart = (category, e) => {
-    e.stopPropagation() // Prevent category selection when clicking edit
+    e.stopPropagation()
     setEditingCategoryId(category.id)
-    setEditedCategoryName(category.name)
+    setEditedCategoryName(category.dropdown_name)
 
-    // Scroll the edited item into view after a short delay to ensure the DOM has updated
     setTimeout(() => {
       if (editInputRef.current) {
         editInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -34,7 +34,7 @@ const CategoryList = ({
   }
 
   const handleEditSave = async (categoryId, e) => {
-    e.stopPropagation() // Prevent category selection when clicking save
+    e.stopPropagation()
     const payload = {
       client_id: categoryId,
       dropdown_name: editedCategoryName,
@@ -49,17 +49,16 @@ const CategoryList = ({
   }
 
   const handleEditCancel = (e) => {
-    e.stopPropagation() // Prevent category selection when canceling
+    e.stopPropagation()
     setEditingCategoryId(null)
   }
 
-  // Handle click outside
   // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target) && isMobileMenuOpen) {
         setIsMobileMenuOpen(false)
-        setEditingCategoryId(null) // Ensure edit mode is also closed
+        setEditingCategoryId(null)
       }
     }
 
@@ -109,16 +108,33 @@ const CategoryList = ({
     <div ref={menuRef} className="w-full h-full flex flex-col bg-white border-r border-gray-200">
       {/* Header - simplified on mobile */}
       <div className="p-4 border-b border-gray-200 relative">
-        <h1 className="text-lg font-semibold text-gray-800">Settings</h1>
+        <div className="flex justify-between items-center mb-2">
+          <h1 className="text-lg font-semibold text-gray-800">Settings</h1>
+          
+          {!isAddingCategory && (
+            <ActionButton
+              onClick={() => setIsAddingCategory(true)}
+              className="h-7 px-1"
+              label="Add"
+            />
+          )}
+        </div>
         <p className="hidden md:block text-xs text-gray-500">Manage dropdown options</p>
-
-        <button
-          onClick={() => setOpenAddEditModal(true)}
-          className="bg-blue-500 text-white text-xs px-2 py-1 rounded hover:bg-blue-600 absolute bottom-2 right-2"
-        >
-          + Add
-        </button>
       </div>
+
+      {/* Add Form */}
+      <AddNameForm
+        isVisible={isAddingCategory}
+        newCategoryName={newCategoryName}
+        onChange={(e) => setNewCategoryName(e.target.value)}
+        onCancel={() => {
+          setIsAddingCategory(false)
+          setNewCategoryName('')
+        }}
+        setNewCategoryName={setNewCategoryName}
+        setIsAddingCategory={setIsAddingCategory}
+        setRefresh={setRefresh}
+      />
 
       {/* Category list - list layout for both mobile and desktop */}
       <div className="overflow-y-auto flex-grow">
@@ -241,15 +257,6 @@ const CategoryList = ({
           </div>
         )}
       </div>
-      <PopUp
-        visible={openAddEditModal}
-        setVisible={setOpenAddEditModal}
-        width={'30%'}
-        header="DropDown Name"
-        showCloseButton={true}
-      >
-        <AddDropdownName setOpenAddEditModal={setOpenAddEditModal} setRefresh={setRefresh} />
-      </PopUp>
 
       <ConfirmationModale
         isOpen={openDeleteModal.isOpen}

@@ -55,7 +55,7 @@ const Setting = () => {
     setSelectedCategory(category)
     setIsAddingOption(false)
     setEditingOption(null)
-    setIsMobileMenuOpen(false) // Close mobile menu when category is selected
+    setIsMobileMenuOpen(false)
   }
 
   const handleAddOption = async () => {
@@ -175,10 +175,9 @@ const Setting = () => {
                   selectedCategory={selectedCategory}
                   onSelectCategory={(category) => {
                     handleSelectCategory(category)
-                    setIsMobileMenuOpen(false) // Close dropdown after selecting
+                    setIsMobileMenuOpen(false)
                   }}
                   onEditCategory={handleEditCategory}
-                  // onDeleteCategory={handleDeleteCategory}
                   setRefresh={setRefresh}
                 />
               </div>
@@ -193,7 +192,6 @@ const Setting = () => {
             selectedCategory={selectedCategory}
             onSelectCategory={handleSelectCategory}
             onEditCategory={handleEditCategory}
-            // onDeleteCategory={handleDeleteCategory}
             setRefresh={setRefresh}
           />
         </div>

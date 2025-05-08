@@ -607,22 +607,22 @@ const ReturnablesContent = ({
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {group.items.reduce(
+                      {group?.items?.reduce(
                         (sum, g) => (g.finished_goods ? sum + g.finished_goods : sum + 0),
                         0,
                       )}{' '}
                       /
-                      {group.items.reduce((sum, g) => (g.quantity ? sum + g.quantity : sum + 0), 0)}
+                      {group?.items?.reduce((sum, g) => (g.quantity ? sum + g.quantity : sum + 0), 0)}
                       <div style={{ marginLeft: '10px', width: '45px', height: '40px' }}>
                         <ProgressBar
                           value={Math.min(
                             Math.max(
                               (() => {
-                                const totalFinishedGoods = group.items.reduce(
+                                const totalFinishedGoods = group?.items?.reduce(
                                   (sum, g) => sum + (g.finished_goods || 0),
                                   0,
                                 )
-                                const totalQuantity = group.items.reduce(
+                                const totalQuantity = group?.items?.reduce(
                                   (sum, g) => sum + (g.quantity || 0),
                                   0,
                                 )
@@ -643,7 +643,7 @@ const ReturnablesContent = ({
                   </div>
 
                   <CCollapse className="custom-collapse" visible={visibleGroupIndex === groupIndex}>
-                    {group.items.map((i, itemIndex) => (
+                    {group?.items?.map((i, itemIndex) => (
                       <GroupDropZone
                         key={itemIndex}
                         i={i}

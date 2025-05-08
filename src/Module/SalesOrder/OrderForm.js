@@ -590,7 +590,6 @@ const [attemptedSubmit, setAttemptedSubmit] = useState(false);
             Submit Order
           </button> */}
 
-
       </div>
     </form>
   );

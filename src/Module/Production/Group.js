@@ -72,31 +72,45 @@ function LayerDragble({ lg, workOrderId }) {
   return (
     <CCard
       ref={drag}
-      style={{
-        padding: '10px',
-        marginTop: '10px',
-        backgroundColor: '#f5f4f7',
-        borderRadius: '10px',
-      }}
+      className="p-2.5 mt-2.5 bg-transparent rounded-lg flex "
     >
-      {lg.layer_name}
-      <br />
-      <div
-        style={{
-          marginTop: '10px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: '8px',
-        }}
-      >
-        <span>Board Size (L x W) : {lg.dimensions}</span>
-        <span>{lg.color}</span>
-        <span>{lg.gsm} GSM</span>
-        <span>{lg.bf} BF</span>
+      <div className='flex justify-between'>
+        <div className='flex flex-col items-start  '>
+          <div className="font-semibold">{lg.layer_name}</div>
+          <div className="flex gap-2 mt-3 text-sm">
+            <span>Board Size (L x W) : {lg.boardSize.length}-{lg.boardSize.width}</span>
+            <span>{lg.color}</span>
+            <span>{lg.gsm} GSM</span>
+            <span>{lg.bf} BF</span>
+          </div>
+          
+        </div>
+        <div className='flex justify-end items-center'>
+
+        <div className="w-11">
+            <ProgressBar value={39} />
+          </div>
+        </div>
+
       </div>
+
     </CCard>
   )
 }
+
+function formatDate(dateString) {
+  if (!dateString) return 'N/A';
+
+  const date = new Date(dateString);
+  if (isNaN(date)) return 'Invalid Date';
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}
+
 
 function WorkOrderCard({
   order,
@@ -133,79 +147,69 @@ function WorkOrderCard({
       }}
     >
       <CCardBody>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <span
-            onClick={toggleCollapse}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {order.order_id} {visibleIndex === index ? <FaAngleUp /> : <FaAngleDown />}
-          </span>
-          <ThreeDotMenu
-            value={[
-              {
-                label: 'View Work Order',
-                icon: cilBriefcase,
-                onClick: () => {
-                  console.log('View Work Order')
-                },
-              },
-              {
-                label: 'View Sales Order',
-                icon: cilClipboard,
-                onClick: () => {
-                  console.log('View Sales Order')
-                },
-              },
-              {
-                label: 'Remove from Plan',
-                icon: cilTrash,
-                onClick: () => {
-                  removeWOFromPlan(order)
-                },
-              },
-              {
-                label: 'Split Work Order',
-                icon: cilCut,
-                onClick: () => {
-                  setVisibleSplit(true)
-                },
-              },
-            ]}
-          />
+        <div className="cursor-pointer flex flex-col">
+          <div className="flex justify-between items-center">
+            <div className=' flex flex-1 justify-between items-start'>
+              <span
+                onClick={toggleCollapse}
+                className="flex items-center gap-1.5 whitespace-nowrap font-bold"
+              >
+                {order.work_generate_id} {visibleIndex === index ? <FaAngleUp /> : <FaAngleDown />}
+              </span>
+
+
+              <div className="flex items-start gap-3">
+                {/* Progress bar moved to the right side */}
+
+                <h6 className='text-primary'>123/2450</h6>
+                <div className="w-12">
+                  <ProgressBar
+                    value={69}
+                  />
+                </div>
+
+                <ThreeDotMenu
+                  value={[
+                    {
+                      label: 'View Work Order',
+                      icon: cilBriefcase,
+                      onClick: () => {
+                        console.log('View Work Order')
+                      },
+                    },
+                    {
+                      label: 'View Sales Order',
+                      icon: cilClipboard,
+                      onClick: () => {
+                        console.log('View Sales Order')
+                      },
+                    },
+                    {
+                      label: 'Remove from Plan',
+                      icon: cilTrash,
+                      onClick: () => {
+                        removeWOFromPlan(order)
+                      },
+                    },
+                    {
+                      label: 'Split Work Order',
+                      icon: cilCut,
+                      onClick: () => {
+                        setVisibleSplit(true)
+                      },
+                    },
+                  ]}
+                />
+              </div>
+            </div>
+          </div>
         </div>
+
+
 
         <CCollapse className="custom-collapse" visible={visibleIndex === index}>
           <hr />
-
-          <div
-            style={{
-              marginTop: '10px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: '8px',
-            }}
-          >
-            <span>{order.sku_name}</span>
-            <span>{order.dimension}</span>
-            <span>{order.layers} PLY</span>
-            <span>{order.print}</span>
-
-            <span>Quantity :{order.quantity}</span>
-            <span>{order.route}</span>
-          </div>
-          {order.layer_group.map((lg) => (
+          {order?.layer_group?.map((lg) => (
             <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
           ))}
           <div
@@ -290,7 +294,8 @@ function GroupOrderDropZone({
           </CCardBody>
         </CCard>
 
-        {groupOrder.items.map((item, itemIndex) => {
+        {groupOrder?.items?.map((item, itemIndex) => {
+          console.log(item)
           const uniqueIndex = `${groupIndex}-${itemIndex}`
           return (
             <CCard
@@ -321,7 +326,7 @@ function GroupOrderDropZone({
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {item.order_id ? item.order_id : `${item.layer_name}, ${item.wo}`}
+                    {item.work_generate_id ? item.work_generate_id : `${item.layer_name}, ${item.id}`}
 
                     {groupVisibleIndex === uniqueIndex ? <FaAngleUp /> : <FaAngleDown />}
                   </span>
@@ -336,7 +341,7 @@ function GroupOrderDropZone({
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {item.quantity ? `${item.finished_goods} / ${item.quantity}` : ''}
+                    {item.qty ? `${item.qty} / ${item.qty}` : ''}
                   </span>
 
                   <Dropdown>
@@ -387,12 +392,49 @@ function GroupOrderDropZone({
                 </div>
 
                 <CCollapse className="custom-collapse" visible={groupVisibleIndex === uniqueIndex}>
-                  <div className="mt-1">
-                    GSM - {item?.gsm} <br />
-                    BF - {item?.bf} <br />
-                    Dimensions - {item?.dimensions} <br />
-                    Color - {item?.color} <br />
-                  </div>
+                  <dl className="text-gray-700 grid grid-cols-1 gap-1 mt-4">
+                    <dt className="sr-only">Sku Name</dt>
+                    <dd>{item.sku_name}</dd>
+
+                    <dt className="sr-only">Project</dt>
+                    <dd>{item.layer || 'N/A'}</dd>
+
+                    <dt className="sr-only"> Dimensions</dt>
+                    <dd> Dimensions (mm) - {item.Dimensions || 'N/A'}</dd>
+
+                    <dt className="sr-only">Planned Start</dt>
+                    <dd> Planned Start - {formatDate(item.planned_start_date) || 'N/A'}</dd>
+
+                    <dt className="sr-only">Planned End</dt>
+                    <dd> Planned End  - {formatDate(item.planned_end_date) || 'N/A'}</dd>
+
+                    <dt className="sr-only">Quantity</dt>
+                    <dd>Qty - {item.qty}</dd>
+
+                    <dt className="sr-only">Route</dt>
+                    <dd>Route -  {item.Route || "N/A"}</dd>
+
+                    <div className="flex items-center gap-2 text-sm">
+                      <label htmlFor="finishedGoods" className="font-medium">
+                        Finished Goods -
+                      </label>
+
+                      <input
+                        id="finishedGoods"
+                        type="number"
+                        defaultValue={138}
+                        className="w-16 px-1 py-0.5 text-sm border rounded"
+                      />
+
+                      <button className="p-1 bg-green-600 hover:bg-green-700 rounded text-white">
+                        ✔
+                      </button>
+                    </div>
+
+
+                    <dt className="sr-only">Qty To Manufacture</dt>
+                    <dd>Qty To Manufacture: {item.qty_to_manufacture || "N/A"}</dd>
+                  </dl>
 
                   <div
                     style={{
@@ -444,7 +486,7 @@ const Group = ({
       ),
     )
     setWorkOrders((prevOrders) => {
-      const updatedOrders = [...prevOrders, order]
+      const updatedOrders = [...prevOrders,]
       updatedOrders.sort((a, b) => a.id - b.id)
       return updatedOrders
     })
@@ -473,8 +515,8 @@ const Group = ({
         return prevGroups
       }
       setWorkOrders(
-        workOrders.filter(
-          (order) => !autoSyncOrders.items.some((a_order) => order.id === a_order.id),
+        workOrders?.filter(
+          (order) => !autoSyncOrders?.items?.some((a_order) => order.id === a_order.id),
         ),
       )
 
@@ -488,7 +530,7 @@ const Group = ({
         alert('Cannot manually add work orders to the Auto Sync group.')
         return prevGroups
       }
-      const itemToAdd = order.order
+      const itemToAdd = order.order  //checking whethers its a full workorder
         ? { ...order.order, workOrderId: order.order.id }
         : { ...order.lg, workOrderId: order.workOrderId }
 
@@ -500,7 +542,7 @@ const Group = ({
         return prevGroups
       }
 
-      if (order.order) {
+      if (order.order) { //filtering out dragges items
         setWorkOrders((prevOrders) => prevOrders.filter((item) => item.id !== order.order.id))
       } else if (order.lg) {
         setWorkOrders((prevOrders) =>
@@ -563,8 +605,8 @@ const Group = ({
         <CRow className="mt-3">
           <CCol xs={12}>
             {workOrders
-              .filter((order) => order.layer_group && order.layer_group.length > 0)
-              .map((order) => (
+              ?.filter((order) => order.layer_group && order.layer_group.length > 0)
+              ?.map((order) => (
                 <WorkOrderCard
                   key={order.id}
                   order={order}

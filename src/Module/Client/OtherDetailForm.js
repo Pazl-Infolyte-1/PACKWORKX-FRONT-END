@@ -73,14 +73,25 @@ const OtherDetailForm =()=>{
 			</div>
   
 			{/* Opening Balance */}
+			<div className="mb-4 flex flex-col">
 			<div className="flex items-center">
 			  <label className="font-medium w-44">Opening Balance</label>
 			  <input
 				type="text"
 				placeholder="INR"
-				{...register("clientData.opening_balance")}
+				{...register("clientData.opening_balance", {
+					validate: value =>
+					  value === "" || !isNaN(Number(value)) || "Opening Balance must be a number",
+				  })}
 				className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-indigo-400"
 			  />
+			  </div>
+			  {errors?.clientData?.opening_balance && (
+          <div className="flex mt-1">
+            <div className="w-40" />
+            <p className="text-red-500 text-xs ml-0">⊛       {errors.clientData.opening_balance.message}</p>
+          </div>
+        )}
 			</div>
   
   {/* Documents */}

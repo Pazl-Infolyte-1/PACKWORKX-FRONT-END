@@ -435,8 +435,8 @@ console.log("select dies",selectedDiePopup)
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
-      <div className="grid grid-cols-3 gap-6 p-6 border border-gray-200 rounded-lg">
-      <div> 
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 p-3 border border-gray-200 rounded-lg">
+      <div className='w-[200px]'> 
           {/*<div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2">SKU Type</label>
           <div className="relative w-full" ref={dropdownRef}>
@@ -466,10 +466,10 @@ console.log("select dies",selectedDiePopup)
             )}
               
           </div>*/}
-          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Type</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Type</label>
           <div className="relative w-full" ref={dropdownRef}>
             <div
-              className="p-2 h-10 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
+              className="p-1 h-8 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
               onClick={() => setIsOpen((prev) => !prev)}
             >
               <span className="text-gray-800">{addNewSkuData?.sku_type || 'Select Type'}</span>
@@ -507,8 +507,8 @@ console.log("select dies",selectedDiePopup)
           </div>
         
         </div>
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
     SKU Name
     <span className="text-red-500 ml-1">*</span>
     {errors.sku_name && (
@@ -520,12 +520,12 @@ console.log("select dies",selectedDiePopup)
               name="sku_name"
               value={addNewSkuData.sku_name}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
 
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
     Client Name
     <span className="text-red-500 ml-1">*</span>
     {errors.client_id && (
@@ -539,7 +539,7 @@ console.log("select dies",selectedDiePopup)
             //value={filteredClient ? filteredClient.client_id : addNewSkuData?.client || ''}
             value={addNewSkuData.client_id}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="" hidden>
               Select
@@ -553,7 +553,52 @@ console.log("select dies",selectedDiePopup)
 
           </select>
         </div>
-      </div>
+
+        <div>
+          <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+        Customer Reference Code
+    {/*<span className="text-red-500 ml-1">*</span>
+    {errors.customer_reference && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.customer_reference}</span>
+    )}*/}
+  </label>
+            <input
+              id="customer_reference"
+              name="customer_reference"
+              //type='number'
+              min={0}
+              value={addNewSkuData.customer_reference}
+              onChange={handleChange}
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+        </div>
+
+        <div>
+            <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+        Reference #
+    {/*<span className="text-red-500 ml-1">*</span>
+    {errors.reference_number && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.reference_number}</span>
+    )}*/}
+  </label>
+            <input
+              id="reference_number"
+              name="reference_number"
+              //type='number'
+              min={0}
+              value={addNewSkuData.reference_number}
+              onChange={handleChange}
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+        </div>
+
+
+
+      </div >
         <div className="w-full flex justify-end mt-4">
         <div className="flex items-center space-x-2">
           <label className="text-sm text-gray-700 font-medium">Select Units:</label>
@@ -574,7 +619,7 @@ console.log("select dies",selectedDiePopup)
         </div>
       </div>
       {/* Main content */}
-      <div className="grid grid-cols-3 gap-6 p-6 mt-6 border border-gray-200 rounded-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3 mt-6 border border-gray-200 rounded-lg">
         {/*<div>
           <label className="block text-[16px] font-medium text-gray-700 mb-2">Ply</label>
           <select
@@ -603,9 +648,9 @@ console.log("select dies",selectedDiePopup)
   errorMessage={errors.ply}
 />
 <Tooltip title={unitTooltip}>
-        <div>
+        <div className='w-[200px]'>
           <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
     UPS
     <span className="text-red-500 ml-1">*</span>
     {errors.ups && (
@@ -619,13 +664,13 @@ console.log("select dies",selectedDiePopup)
               min={0}
               value={addNewSkuData.ups}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
         </div>
 </Tooltip>
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
     Die
     <span className="text-red-500 ml-1">*</span>
     {errors.select_dies && (
@@ -639,13 +684,13 @@ console.log("select dies",selectedDiePopup)
               id="select_dies"
               value={addNewSkuData.select_dies || ''}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               placeholder="Select"
               readOnly={true}
             />
             <button
               type="button"
-              className="bg-gray-400 text-white px-4 py-2 rounded-md shadow-md hover:bg-gray-500 transition-colors"
+              className="bg-gray-400 text-white text-sm px-1 py-1 rounded-md shadow-md hover:bg-gray-500 transition-colors"
               onClick={handleBrowseClick}
             >
               Browse
@@ -653,59 +698,7 @@ console.log("select dies",selectedDiePopup)
           </div>
         </div>
 
-        <div>
-          {/*<Input
-            skuName="Customer Reference"
-            id="customer_reference"
-            name="customer_reference"
-            value={addNewSkuData.customer_reference}
-            onChange={handleChange}
-            //placeholder="Customer Reference"
-            requiredSymbol={true}
-          />*/}
-           <div>
-          <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
-        Customer Reference
-    <span className="text-red-500 ml-1">*</span>
-    {errors.customer_reference && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.customer_reference}</span>
-    )}
-  </label>
-            <input
-              id="customer_reference"
-              name="customer_reference"
-              //type='number'
-              min={0}
-              value={addNewSkuData.customer_reference}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
-        </div>
-        </div>
-
-        <div>
-            <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
-        Reference #
-    <span className="text-red-500 ml-1">*</span>
-    {errors.reference_number && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.reference_number}</span>
-    )}
-  </label>
-            <input
-              id="reference_number"
-              name="reference_number"
-              //type='number'
-              min={0}
-              value={addNewSkuData.reference_number}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
-        </div>
-
+      
         <div>
           {/*<Input
             skuName="Internal ID"
@@ -716,8 +709,8 @@ console.log("select dies",selectedDiePopup)
             //placeholder="Internal ID"
             requiredSymbol={true}
           />*/}
-            <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+            <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
         Internal ID
     <span className="text-red-500 ml-1">*</span>
     {errors.internal_id && (
@@ -729,7 +722,7 @@ console.log("select dies",selectedDiePopup)
               name="internal_id"
               value={addNewSkuData.internal_id}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
         </div>
@@ -738,8 +731,8 @@ console.log("select dies",selectedDiePopup)
 
 
  <Tooltip title={unitTooltip}>
-        <div>
-                      <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <div className='w-[200px]'>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
         Board Size <span className="text-gray-500 text-sm">(W × L)</span>
     <span className="text-red-500 ml-1">*</span>
     {errors.width_board_size_cm2 && errors.length_board_size_cm2 &&(
@@ -757,7 +750,7 @@ console.log("select dies",selectedDiePopup)
       onChange={handleChange}
       readOnly
       type="number"
-      className="w-1/2 p-1 text-center focus:outline-none rounded-l-md bg-gray-50"
+      className="w-[50%] p-[2px] text-center focus:outline-none rounded-l-md bg-gray-50"
       min="0"
     />
                         <span className="flex items-center justify-center text-gray-500">x</span>
@@ -768,7 +761,7 @@ console.log("select dies",selectedDiePopup)
       onChange={handleChange}
       readOnly
       type="number"
-      className="w-1/2 p-1 text-center focus:outline-none bg-gray-50"
+      className="w-[50%] p-[2px] text-center focus:outline-none bg-gray-50"
       min="0"
     />
                       </div>
@@ -779,8 +772,8 @@ console.log("select dies",selectedDiePopup)
 
         <div>
         <Tooltip title={unitTooltip}>
-        <div>
-   <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <div className='w-[200px]'>
+   <label className="block text-sm font-medium text-gray-700 mb-2">
         Deckle Size
     <span className="text-red-500 ml-1">*</span>
     {errors.deckle_size && (
@@ -794,7 +787,7 @@ console.log("select dies",selectedDiePopup)
   value={addNewSkuData.deckle_size}
          min="0"
   onChange={handleChange}
-  className={`w-full p-2 border rounded-md focus:ring-2 transition-colors ${
+  className={`w-full p-1 border rounded-md focus:ring-2 transition-colors ${
     diecutCalculations.deckleError ? 'border-red-500 ring-red-400' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
   }`}
 />
@@ -805,9 +798,9 @@ console.log("select dies",selectedDiePopup)
 </Tooltip>
         </div>
 
+        <div className='w-[200px]'>
         <div>
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
         Minimum Order Level
     <span className="text-red-500 ml-1">*</span>
     {errors.minimum_order_level && (
@@ -819,19 +812,9 @@ console.log("select dies",selectedDiePopup)
               name="minimum_order_level"
               value={addNewSkuData.minimum_order_level}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
-          {/*<Input
-            skuName="Minimum Order Level"
-            id="minimum_order_level"
-            name="minimum_order_level"
-            type="number"
-            value={addNewSkuData.minimum_order_level}
-            onChange={handleChange}
-            requiredSymbol={true}
-            //placeholder="Minimum Order Level"
-          />*/}
         </div>
 
 
@@ -844,9 +827,29 @@ console.log("select dies",selectedDiePopup)
           onBrowseClick={handleBrowseClickRoute}
           errors={errors}
         />
-        
+          <div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Tax Master
+    {/*<span className="text-red-500 ml-1">*</span>
+    {errors.tax_master && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.tax_master}</span>
+    )}*/}
+  </label>
+  <select
+    id="gst_percentage"
+    name="gst_percentage"
+    value={addNewSkuData?.gst_percentage || ""}
+    onChange={handleChange}
+    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+  >
+    <option value="">Select Tax</option>
+    <option value={5}>5%</option>
+    <option value={10}>10%</option>
+    <option value={15}>15%</option>
+  </select>
+</div>
       </div>
-
+    
       <PopUp
         header={'Select SKU'}
         visible={isSingleViewPopup}

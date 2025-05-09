@@ -316,12 +316,12 @@ const [selected, setSelected] = useState('vendor')
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
-      <div className="grid grid-cols-3 gap-6 p-6 border border-gray-200 rounded-lg">
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Type</label>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3 border border-gray-200 rounded-lg">
+        <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Type</label>
           <div className="relative w-full" ref={dropdownRef}>
             <div
-              className="p-2 h-10 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
+              className="p-1 h-8 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
               onClick={() => setIsOpen((prev) => !prev)}
             >
               <span className="text-gray-800">{addNewSkuData?.sku_type || 'Select Type'}</span>
@@ -358,8 +358,8 @@ const [selected, setSelected] = useState('vendor')
             )}
           </div>
         </div>
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
     SKU Name
     <span className="text-red-500 ml-1">*</span>
     {errors.sku_name && (
@@ -371,12 +371,12 @@ const [selected, setSelected] = useState('vendor')
               name="sku_name"
               value={addNewSkuData.sku_name}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
 
-          <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">
+          <div className='w-[200px]'>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
     Client Name
     <span className="text-red-500 ml-1">*</span>
     {errors.client_id && (
@@ -390,7 +390,7 @@ const [selected, setSelected] = useState('vendor')
             //value={filteredClient ? filteredClient.client_id : addNewSkuData.client || ''}
             value={addNewSkuData.client_id || null}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="" hidden>
               Select
@@ -407,8 +407,10 @@ const [selected, setSelected] = useState('vendor')
       </div>
       
       {/* Main content */}
-      <div className="grid grid-cols-3 gap-6 p-6 mt-6 border border-gray-200 rounded-lg">
+      <div className='p-3 mt-6 border border-gray-200 rounded-lg'>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         <Input
+        className='w-[200px]'
           skuName="Estimate"
           id="estimate_composite_item"
           name="estimate_composite_item"
@@ -424,6 +426,7 @@ const [selected, setSelected] = useState('vendor')
         />
 
         <Input
+         className='w-[200px]'
           skuName="Default SKU Details"
           id="default_sku_details"
           name="default_sku_details"
@@ -439,6 +442,7 @@ const [selected, setSelected] = useState('vendor')
         />
 
         <Input
+         className='w-[200px]'
           skuName="Description"
           id="description"
           name="description"
@@ -453,22 +457,42 @@ const [selected, setSelected] = useState('vendor')
           }
         />
 
+<div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Tax Master
+  </label>
+  <select
+    id="gst_percentage"
+    name="gst_percentage"
+    value={addNewSkuData?.gst_percentage || ""}
+    onChange={handleChange}
+    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+  >
+    <option value="">Select Tax</option>
+    <option value={5}>5%</option>
+    <option value={10}>10%</option>
+    <option value={15}>15%</option>
+  </select>
+</div>
+      </div>
+   
 
- <div className="col-span-3">
+      <div className="col-span-4 mt-2 mb-2">
     <button
       type="button"
       onClick={handleAddField}
-      className="bg-purple-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-purple-400 transition-colors"
+      className="bg-purple-500 text-white text-sm px-1 py-1 rounded-md shadow-md hover:bg-purple-400 transition-colors"
     >
       + Add Fields
     </button>
   </div>
 
   {/* Render Dynamic Tag Fields */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
   {tagFields.map((field, index) => (
     <div
       key={index}
-      className="relative flex flex-col gap-1"
+      className="relative flex flex-col gap-1 w-[200px]"
     >
       {/* Label title */}
       <label className="text-sm font-medium text-gray-700">
@@ -497,7 +521,7 @@ const [selected, setSelected] = useState('vendor')
         placeholder="Value"
         value={field.value}
         onChange={(e) => handleTagChange(index, 'value', e.target.value)}
-        className="w-full p-2 mt-2 shadow-md border-l-2 rounded-md"
+        className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
       />
 
       {/* Remove icon */}
@@ -509,9 +533,8 @@ const [selected, setSelected] = useState('vendor')
       />
     </div>
   ))}
-
-      </div>
-   
+  </div>
+  </div>
       {/*popup for client create*/}
       {!isDrawerOpen && (
                  <PopUp

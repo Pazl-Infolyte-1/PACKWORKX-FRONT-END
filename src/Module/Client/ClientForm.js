@@ -296,8 +296,12 @@ const handleSearch = async () => {
 };
 const onSubmit = async (data) => {
   setLoading(true); // Show loader before API call
-
+console.log("datass",data)
   try {
+    const openingBalance = data.clientData.opening_balance;
+    if (openingBalance === null || openingBalance === "") {
+      data.clientData.opening_balance = 0;
+    }
     const filteredData = {
       ...data,
       addresses: data.addresses.map(({ type, ...rest }) => rest),

@@ -9,15 +9,15 @@ const PlyToggle = ({ value, onChange ,errorMessage }) => {
   }
 
   return (
-    <div>
-      <label className="block text-[16px] font-medium text-gray-700 mb-2">
+    <div className="w-[200px]">
+      <label className="block text-sm font-medium text-gray-700 mb-2">
         Ply
         <span className="text-red-500 ml-1">*</span>
         {errorMessage && (
           <span className="text-red-500 text-sm ml-2 align-middle">{errorMessage}</span>
         )}
       </label>
-      <div className="relative w-full h-[40px] bg-white border border-blue-500 rounded-md shadow-sm flex items-center justify-between px-1 overflow-hidden">
+      <div className="relative w-full h-[30px] bg-white border border-blue-500 rounded-md shadow-sm flex items-center justify-between px-1 overflow-hidden">
         {/* Toggle Background */}
         <div
           className="absolute top-1/2 w-[20%] h-[75%] bg-blue-500 rounded-md transform -translate-y-1/2 transition-all duration-300 z-0"

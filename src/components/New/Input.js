@@ -17,7 +17,7 @@ function Input({
 }) {
   return (
     <div className={`font-sans text-black ${className}`}>
-      {skuName &&  <label htmlFor={id} className="text-[16px] font-medium flex items-center gap-1">
+      {skuName &&  <label htmlFor={id} className="text-sm font-medium flex items-center gap-1">
           {skuName}
           {requiredSymbol && <span className="text-red-500">*</span>}
           {errorMessage && (
@@ -32,7 +32,7 @@ function Input({
         onChange={onChange}
         placeholder={placeholder}
         readOnly={readOnly}
-        className={`w-full p-2 mt-2 shadow-md border-l-2 rounded-md ${inputClassName}`}
+        className={`w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${inputClassName}`}
         title={title}
       />
     </div>

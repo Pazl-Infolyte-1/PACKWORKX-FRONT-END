@@ -36,14 +36,13 @@ function ClientList() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState('')
   const [loading, setLoading] = useState(false)
-  const clientListRef = useRef(null);
-  
+  const clientListRef = useRef(null)
 
   useEffect(() => {
     if (clientListRef.current) {
-      console.log('ClientList width:', clientListRef.current.offsetWidth, 'px');
+      console.log('ClientList width:', clientListRef.current.offsetWidth, 'px')
     }
-  }, []); // runs once after mount
+  }, []) // runs once after mount
 
   //const totalPages = Math.ceil(data.length / entriesPerPage) || 1; // Ensure total pages > 0
   const toggleFilterPopup = () => setIsFilterOpen(!isFilterOpen)
@@ -100,7 +99,7 @@ function ClientList() {
       } catch (error) {
         console.error('Error fetching client data:', error)
       } finally {
-        setLoading(false) 
+        setLoading(false)
       }
     }
 
@@ -108,9 +107,9 @@ function ClientList() {
   }, [reloadData, searchQuery, entriesPerPage, currentPage, selectedFilter])
 
   const handleResetFilters = () => {
-    setSearchQuery('') 
-    setCurrentPage(1) 
-    setEntriesPerPage(5) 
+    setSearchQuery('')
+    setCurrentPage(1)
+    setEntriesPerPage(5)
     setSelectedFilter('')
     setReloadData((prev) => !prev)
   }
@@ -149,9 +148,9 @@ function ClientList() {
   let entity_type = ''
   const handleKeyDown = (event) => {
     if (!isPopupOpen) {
-      return; // Disable arrow key functionality if the popup is not open
+      return // Disable arrow key functionality if the popup is not open
     }
-  
+
     if (event.key === 'ArrowRight') {
       handleSelectAction('client')
       setEntityType('Client') // Update state
@@ -245,22 +244,23 @@ function ClientList() {
             {/*<FaFilter onClick={toggleFilterPopup} className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-900" />*/}
             <div className="flex items-center gap-3">
               {/* Dropdown */}
-             <div className="relative inline-block text-left">
-  <select
-    value={selectedFilter}
-    onChange={(e) => setSelectedFilter(e.target.value)}
-    className="inline-flex w-40 justify-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50 appearance-none"
-  >
-    <option value="" disabled hidden>Entity</option>
-    <option value="Client">Client</option>
-    <option value="Vendor">Vendor</option>
-    <option value="">All</option>
-  </select>
-  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-    <FaChevronDown className="size-4 text-gray-400" />
-  </div>
-</div>
-
+              <div className="relative inline-block text-left">
+                <select
+                  value={selectedFilter}
+                  onChange={(e) => setSelectedFilter(e.target.value)}
+                  className="inline-flex w-40 justify-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50 appearance-none"
+                >
+                  <option value="" disabled hidden>
+                    Entity
+                  </option>
+                  <option value="Client">Client</option>
+                  <option value="Vendor">Vendor</option>
+                  <option value="">All</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                  <FaChevronDown className="size-4 text-gray-400" />
+                </div>
+              </div>
 
               {/* Refresh Button */}
               {/*<ActionButton     onClick={handleResetFilters} variant='secondary' label={"Clear"} height={"9"}>

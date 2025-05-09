@@ -1,5 +1,5 @@
-import React,{ useEffect,useState,useCallback, useRef } from 'react'
-import { useSelector,useDispatch } from 'react-redux'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 
 import {
   CCloseButton,
@@ -18,28 +18,25 @@ import { AppSideBarNew } from './AppSideBarNew'
 import { cibAdobePhotoshop } from '@coreui/icons'
 
 // Define static menu items
-const staticMenuItems = [
-
-]
+const staticMenuItems = []
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
-  const [combinedNavigation,setCombinedNavigation] = useState([...staticMenuItems])
+  const [combinedNavigation, setCombinedNavigation] = useState([...staticMenuItems])
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
-  const [accessingDatas,setAccessingDatas] = useState([])
+  const [accessingDatas, setAccessingDatas] = useState([])
   // Memoize the combined navigation to prevent unnecessary re-renders
   const getMemoizedNavigation = useCallback(() => {
     return combinedNavigation
-  },[combinedNavigation])
-  const sidebarRef = useRef(null);
+  }, [combinedNavigation])
+  const sidebarRef = useRef(null)
 
   useEffect(() => {
     if (sidebarRef.current) {
-      console.log('Sidebar width:', sidebarRef.current.offsetWidth, 'px');
+      console.log('Sidebar width:', sidebarRef.current.offsetWidth, 'px')
     }
-  }, []); // empty dependency array -> logs once when mounted
-
+  }, []) // empty dependency array -> logs once when mounted
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,13 +53,13 @@ const AppSidebar = () => {
           console.warn('Invalid response format, using static navigation only')
         }
       } catch (error) {
-        console.error('Fetch error:',error)
+        console.error('Fetch error:', error)
         // On error, keep using static items only
       }
     }
 
     fetchData()
-  },[])
+  }, [])
 
   return (
     <CSidebar
@@ -72,19 +69,19 @@ const AppSidebar = () => {
       unfoldable={unfoldable}
       visible={sidebarShow}
       onVisibleChange={(visible) => {
-        dispatch({ type: 'set',sidebarShow: visible })
+        dispatch({ type: 'set', sidebarShow: visible })
       }}
       ref={sidebarRef}
     >
       <CSidebarHeader className="border-bottom d-flex align-items-center justify-content-between p-3">
         <CSidebarBrand to="/">
-          <CIcon icon={cibAdobePhotoshop} height={24} className='mb-1' />
-          {(!unfoldable && sidebarShow) && <CIcon icon={sygnet} height={32} />}
+          <CIcon icon={cibAdobePhotoshop} height={24} className="mb-1" />
+          {!unfoldable && sidebarShow && <CIcon icon={sygnet} height={32} />}
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"
           dark
-          onClick={() => dispatch({ type: 'set',sidebarShow: false })}
+          onClick={() => dispatch({ type: 'set', sidebarShow: false })}
         />
       </CSidebarHeader>
 
@@ -92,7 +89,7 @@ const AppSidebar = () => {
       <AppSideBarNew giveAccess={accessingDatas} />
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler
-          onClick={() => dispatch({ type: 'set',sidebarUnfoldable: !unfoldable })}
+          onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}
         />
       </CSidebarFooter>
     </CSidebar>

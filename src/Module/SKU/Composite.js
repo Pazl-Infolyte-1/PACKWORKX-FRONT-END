@@ -513,12 +513,12 @@ function Composite({
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
-      <div className="grid grid-cols-3 gap-6 p-6 border border-gray-200 rounded-lg">
-        <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Type</label>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-3 border border-gray-200 rounded-lg">
+        <div className='w-[200px]'>
+          <label className="block text-sm font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Type</label>
           <div className="relative w-full" ref={dropdownRef}>
             <div
-              className="p-2 h-10 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
+              className="p-1 h-8 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
               onClick={() => setIsOpen((prev) => !prev)}
             >
               <span className="text-gray-800">{addNewSkuData?.sku_type || 'Select Type'}</span>
@@ -544,8 +544,8 @@ function Composite({
           </div>
         </div>
 
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
     SKU Name
     <span className="text-red-500 ml-1">*</span>
     {errors.sku_name && (
@@ -557,12 +557,12 @@ function Composite({
               name="sku_name"
               value={addNewSkuData.sku_name}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
 
-          <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">
+          <div className='w-[200px]'>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
     Client Name
     <span className="text-red-500 ml-1">*</span>
     {errors.client_id && (
@@ -576,7 +576,7 @@ function Composite({
             //value={filteredClient ? filteredClient.client_id : addNewSkuData?.client || ''}
             value={addNewSkuData.client_id}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="" hidden>
               Select
@@ -593,37 +593,9 @@ function Composite({
       </div>
 
       {/* Main content */}
-      <div className="grid grid-cols-3 gap-6 p-6 mt-6 border border-gray-200 rounded-lg">
-        {/*<div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">Ply</label>
-          <select
-            name="ply"
-            id="ply"
-            value={addNewSkuData?.ply}
-            onChange={(e) => {
-              const selectedPly = Number(e.target.value)
-              updateSkuValues(selectedPly)
-            }}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          >
-            <option value="" hidden>
-              Select Number of Layers
-            </option>
-            <option value={2}>2 Ply</option>
-            <option value={3}>3 Ply</option>
-            <option value={5}>5 Ply</option>
-            <option value={7}>7 Ply</option>
-            <option value={9}>9 Ply</option>
-          </select>
-        </div>*/}
-           {/*<PlyToggle
-  value={addNewSkuData.ply}
-  onChange={(selectedPly) => updateSkuValues(selectedPly)}
-/>*/}
-
-
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3 mt-6 border border-gray-200 rounded-lg">
+        <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
     Partition Panel
     <span className="text-red-500 ml-1">*</span>
     {errors.composite_type && (
@@ -634,7 +606,7 @@ function Composite({
             name="composite_type"
             id="composite_type"
             value={addNewSkuData?.composite_type}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             onChange={handleCompositeTypeChange}
           >
             <option value="">Select</option>
@@ -643,9 +615,9 @@ function Composite({
           </select>
         </div>
 
+        <div className='w-[200px]'>
         <div>
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
         Minimum Order Level
     <span className="text-red-500 ml-1">*</span>
     {errors.minimum_order_level && (
@@ -657,24 +629,9 @@ function Composite({
               name="minimum_order_level"
               value={addNewSkuData.minimum_order_level}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
-          {/*<Input
-            skuName="Minimum Order Level"
-            id="minimum_order_level"
-            name="minimum_order_level"
-            type="number"
-            value={addNewSkuData.minimum_order_level}
-            onChange={handleChange}
-            //placeholder="Minimum Order Level"
-            requiredSymbol={true}
-            errorMessage={
-              errors.minimum_order_level === 'Required'
-                ? 'Minimum Order Level is Required'
-                : errors.minimum_order_level
-            }
-          />*/}
         </div>
 
 
@@ -687,13 +644,31 @@ function Composite({
           onBrowseClick={handleBrowseClickRoute}
           errors={errors}
         />
-        
+        <div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Tax Master
+  </label>
+  <select
+    id="gst_percentage"
+    name="gst_percentage"
+    value={addNewSkuData?.gst_percentage || ""}
+    onChange={handleChange}
+    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+  >
+    <option value="">Select Tax</option>
+    <option value={5}>5%</option>
+    <option value={10}>10%</option>
+    <option value={15}>15%</option>
+  </select>
+</div>
+
+      </div>
 
         <div className="col-span-3">
           <div className="flex items-center gap-4 mt-4">
             <button
               type="button"
-              className="bg-purple-400 text-white px-4 py-2 rounded-md shadow-md hover:bg-purple-500 transition-colors"
+              className="bg-purple-400 text-white text-sm px-2 py-1 rounded-md shadow-md hover:bg-purple-500 transition-colors"
               onClick={handleAddSkuField}
             >
               + Add
@@ -701,7 +676,7 @@ function Composite({
 
             <button
               type="button"
-              className="bg-gray-400 text-white px-4 py-2 rounded-md shadow-md hover:bg-gray-500 transition-colors"
+              className="bg-gray-400 text-white text-sm px-2 py-1 rounded-md shadow-md hover:bg-gray-500 transition-colors"
               onClick={tablepopup}
             >
               Browse
@@ -730,8 +705,6 @@ function Composite({
 
           </div>
         </div>
-      </div>
-
       {/* SKU Selection Area */}
       <div className="mt-2 w-full overflow-auto">
         {skuFields.length > 0 && (

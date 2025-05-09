@@ -521,18 +521,18 @@ const refreshClients = () => {
       }
     }, [selectedRouteIds2]);
     
-    
+    console.log("errors",errors)
   return (
     <div className="rounded-lg ">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       
       {/* Top header fields */}
-      <div className="grid grid-cols-3 gap-6 p-6 border border-gray-200 rounded-lg">
-        <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Type</label>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 p-3 border border-gray-200 rounded-lg">
+        <div className="w-[200px]">
+          <label className="block text-sm  font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Type</label>
           <div className="relative w-full" ref={dropdownRef}>
             <div
-              className="p-2 h-10 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
+              className="p-1 h-8 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
               onClick={() => setIsOpen((prev) => !prev)}
             >
               <span className="text-gray-800">{addNewSkuData?.sku_type || 'Select Type'}</span>
@@ -580,8 +580,8 @@ const refreshClients = () => {
           </div>
         </div>
 
- <div>
- <label className="block text-[16px] font-medium text-gray-700 mb-2">
+ <div className="w-[200px]">
+ <label className="block text-sm font-medium text-gray-700 mb-2">
     SKU Name
     <span className="text-red-500 ml-1">*</span>
     {errors.sku_name && (
@@ -593,11 +593,11 @@ const refreshClients = () => {
               name="sku_name"
               value={addNewSkuData?.sku_name}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <div className="w-[200px]">
+        <label className="block text-sm  font-medium text-gray-700 mb-2">
     Client Name
     <span className="text-red-500 ml-1">*</span>
     {errors.client_id && (
@@ -611,7 +611,7 @@ const refreshClients = () => {
             //value={filteredClient ? filteredClient.client_id : addNewSkuData?.client || ''}
             value={addNewSkuData.client_id}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="" hidden>
               Select
@@ -625,10 +625,48 @@ const refreshClients = () => {
 
           </select>
         </div>
+
+
+
+        <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+   Customer Reference Code
+    {/*<span className="text-red-500 ml-1">*</span>
+    {errors.customer_reference && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.customer_reference}</span>
+    )}*/}
+  </label>
+          <input
+            id="customer_reference"
+            name="customer_reference"
+            value={addNewSkuData.customer_reference}
+            onChange={handleChange}
+            //placeholder="Customer Reference"
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+        </div>
+        
+        <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+   Reference #
+    {/*<span className="text-red-500 ml-1">*</span>
+    {errors.reference_number && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.reference_number}</span>
+    )}*/}
+  </label>
+          <input
+            id="reference_number"
+            name="reference_number"
+            value={Number(addNewSkuData.reference_number) || null}
+            onChange={handleChange}
+            //placeholder="Reference Number"
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+        </div>
       </div>
       
       {/* Main content */}
-      <div className="grid grid-cols-3 gap-6 p-6 mt-6 border border-gray-200 rounded-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3 mt-6 border border-gray-200 rounded-lg">
       <div>
   <PlyToggle
   value={addNewSkuData?.ply}
@@ -639,148 +677,150 @@ const refreshClients = () => {
 
 
         <Tooltip title={unitTooltip}>
-          <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">
-        Dimensions <span className="text-gray-500 text-sm">(W × L × H)</span>
-        <span className="text-red-500 ml-1">*</span>
-  {errors.width === 'Required' &&
-   errors.length === 'Required' &&
-   errors.height === 'Required' && (
-     <span className="text-red-500 text-sm ml-2 align-middle">
-       Required
-     </span>
-  )}
-
+        <div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Dimensions <span className="text-gray-500 text-xs">(W × L × H)</span>
+    <span className="text-red-500 ml-1">*</span>
+    {errors.width === 'Required' &&
+      errors.length === 'Required' &&
+      errors.height === 'Required' && (
+        <span className="text-red-500 text-xs ml-2 align-middle">Required</span>
+      )}
   </label>
-  <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
-              <input
-                id="length"
-                name="length"
-                type="number"
-                value={Number(addNewSkuData.length) || null}
-                onChange={modifiedHandleChange}
-                //placeholder="Length"
-                className="w-1/4 p-1 text-center focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-l-md"
-              />
-              <span className="flex items-center justify-center text-gray-500">x</span>
-              <input
-                id="width"
-                name="width"
-                type="number"
-                value={Number(addNewSkuData.width) || null}
-                //value={addNewSkuData.width}
-                onChange={modifiedHandleChange}
-                //placeholder="Width"
-                className="w-1/4 p-1 text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-              <span className="flex items-center justify-center text-gray-500">x</span>
-              <input
-                id="height"
-                name="height"
-                type="number"
-                value={Number(addNewSkuData.height) || null}
-                //value={addNewSkuData.height}
-                onChange={modifiedHandleChange}
-                //placeholder="Depth"
-                className="w-1/4 p-1 text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-              <div className="w-1/4 flex justify-end relative">
-                <select
-                  value={addNewSkuData.unit || 'mm'}
-                  onChange={handleUnitChange}
-                  className="w-full appearance-none bg-blue-600 text-white py-2 px-3 rounded-r-md hover:bg-blue-700 transition-colors focus:outline-none"
-                  title="Select unit of measurement"
-                >
-                  <option value="mm" className="bg-white text-gray-800">mm</option>
-                  <option value="cm" className="bg-white text-gray-800">cm</option>
-                  <option value="in" className="bg-white text-gray-800">in</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
-                  <CIcon icon={cilChevronCircleDownAlt} size="sm" />
-                </div>
-              </div>
-            </div>
-          </div>
+
+  <div className="h-8 w-[260px] border border-gray-300 rounded-md flex items-center bg-white">
+    <input
+      id="length"
+      name="length"
+      type="number"
+      value={Number(addNewSkuData.length) || ""}
+      onChange={modifiedHandleChange}
+      className="w-[60px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-l-md"
+    />
+    <span className="text-gray-500 px-1">x</span>
+    <input
+      id="width"
+      name="width"
+      type="number"
+      value={Number(addNewSkuData.width) || ""}
+      onChange={modifiedHandleChange}
+      className="w-[60px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+    />
+    <span className="text-gray-500 px-1">x</span>
+    <input
+      id="height"
+      name="height"
+      type="number"
+      value={Number(addNewSkuData.height) || ""}
+      onChange={modifiedHandleChange}
+      className="w-[60px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+    />
+
+    <div className="w-[70px] relative">
+      <select
+        value={addNewSkuData.unit || 'mm'}
+        onChange={handleUnitChange}
+        className="w-full appearance-none bg-blue-600 text-white py-1 px-2 text-sm rounded-r-md hover:bg-blue-700 focus:outline-none"
+        title="Select unit of measurement"
+      >
+        <option value="mm" className="bg-white text-gray-800">mm</option>
+        <option value="cm" className="bg-white text-gray-800">cm</option>
+        <option value="in" className="bg-white text-gray-800">in</option>
+      </select>
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-white">
+        <CIcon icon={cilChevronCircleDownAlt} size="sm" />
+      </div>
+    </div> 
+  </div>
+</div>
+
         </Tooltip>
         
         <Tooltip title={unitTooltip}>
-          <div className="flex gap-3">
-            <div className="w-1/2">
-            <label className="block text-[16px] font-medium text-gray-700 mb-2">
-        Joints
-    <span className="text-red-500 ml-1">*</span>
-    {errors.joints && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.joints}</span>
-    )}
-  </label>  
-              <input
-                id="joints"
-                name="joints"
-                value={Number(addNewSkuData.joints) || null}
-                //value={addNewSkuData.joints}
-                onChange={handleChange}
-                //placeholder="Joints"
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              />
-            </div>
-            <div className="w-1/2">
-            <label className="block text-[16px] font-medium text-gray-700 mb-2">
-        Deckle Size
-    <span className="text-red-500 ml-1">*</span>
-    {errors.deckle_size && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.deckle_size}</span>
-    )}
-  </label>  
-              <input
-                id="deckle_size"
-                name="deckle_size"
-                //value={Number(addNewSkuData.joints) || null}
-                value={Number(toThreeDecimalFixed(addNewSkuData.deckle_size)) || null}
-                onChange={modifiedHandleChange}
-                //placeholder="Deckle Size"
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              />
-            </div>
-          </div>
+        <div className="flex gap-3">
+  <div className="w-1/2">
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Joints
+      <span className="text-red-500 ml-1">*</span>
+      {errors.joints && (
+        <span className="text-red-500 text-xs ml-2 align-middle">
+          {errors.joints}
+        </span>
+      )}
+    </label>
+    <input
+      id="joints"
+      name="joints"
+      value={Number(addNewSkuData.joints) || ""}
+      onChange={handleChange}
+      className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+    />
+  </div>
+
+  <div className="w-1/2">
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Deckle Size
+      <span className="text-red-500 ml-1">*</span>
+      {errors.deckle_size && (
+        <span className="text-red-500 text-xs ml-2 align-middle">
+          {errors.deckle_size}
+        </span>
+      )}
+    </label>
+    <input
+      id="deckle_size"
+      name="deckle_size"
+      value={Number(toThreeDecimalFixed(addNewSkuData.deckle_size)) || ""}
+      onChange={modifiedHandleChange}
+      className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+    />
+  <p className="text-[10px] text-gray-500 mt-1">
+    Deckle should be greater than (BW × UPS)
+  </p>
+  </div>
+</div>
+
         </Tooltip>
         
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <div className='w-[200px]'>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
     Inner/Outer Dimension
     <span className="text-red-500 ml-1">*</span>
     {errors.inner_outer_dimension && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.inner_outer_dimension}</span>
+      <span className="text-red-500 text-xs ml-2 align-middle">
+        {errors.inner_outer_dimension}
+      </span>
     )}
-  </label>  
-          <div className="flex space-x-4 p-2 border border-gray-300 rounded-md h-10 items-center">
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="inner_outer_dimension"
-                value="Inner"
-                checked={addNewSkuData.inner_outer_dimension === 'Inner'}
-                onChange={handleChange}
-                className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-gray-800">Inner</span>
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="inner_outer_dimension"
-                value="Outer"
-                checked={addNewSkuData.inner_outer_dimension === 'Outer'}
-                onChange={handleChange}
-                className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-gray-800">Outer</span>
-            </label>
-          </div>
-        </div>
+  </label>
+  <div className="flex space-x-4 p-1 border border-gray-300 rounded-md h-9 items-center">
+    <label className="flex items-center cursor-pointer text-sm">
+      <input
+        type="radio"
+        name="inner_outer_dimension"
+        value="Inner"
+        checked={addNewSkuData.inner_outer_dimension === 'Inner'}
+        onChange={handleChange}
+        className="mr-1 h-3.5 w-3.5 text-blue-600 focus:ring-blue-500"
+      />
+      <span className="text-gray-800">Inner</span>
+    </label>
+    <label className="flex items-center cursor-pointer text-sm">
+      <input
+        type="radio"
+        name="inner_outer_dimension"
+        value="Outer"
+        checked={addNewSkuData.inner_outer_dimension === 'Outer'}
+        onChange={handleChange}
+        className="mr-1 h-3.5 w-3.5 text-blue-600 focus:ring-blue-500"
+      />
+      <span className="text-gray-800">Outer</span>
+    </label>
+  </div>
+</div>
 
         <Tooltip title={unitTooltip}>
-          <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">
+          <div className='w-[200px]'>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
     Flap Width
     <span className="text-red-500 ml-1">*</span>
     {errors.flap_width && (
@@ -793,89 +833,16 @@ const refreshClients = () => {
               value={Number(addNewSkuData.flap_width) || null}
               onChange={modifiedHandleChange}
               //placeholder="Flap Width"
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
         </Tooltip>
 
-        <Tooltip title={unitTooltip}>
-          <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">
-    Length Trimming Tolereance
-    <span className="text-red-500 ml-1">*</span>
-    {errors.length_trimming_tolerance && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.length_trimming_tolerance}</span>
-    )}
-  </label>
-            <input
-              id="length_trimming_tolerance"
-              name="length_trimming_tolerance"
-              value={Number(addNewSkuData.length_trimming_tolerance) || null}
-              onChange={modifiedHandleChange}
-              //placeholder="Length Trimming Tolerance"
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
-        </Tooltip>
-
-        <Tooltip title={unitTooltip}>
-          <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">
-    Width Trimming Tolereance
-    <span className="text-red-500 ml-1">*</span>
-    {errors.width_trimming_tolerance && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.width_trimming_tolerance}</span>
-    )}
-  </label>
-            <input
-              id="width_trimming_tolerance"
-              name="width_trimming_tolerance"
-              value={Number(addNewSkuData.width_trimming_tolerance) || null}
-              onChange={modifiedHandleChange}
-              //placeholder="Width Trimming Tolerance"
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
-        </Tooltip>
         
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
-   Customer Reference
-    <span className="text-red-500 ml-1">*</span>
-    {errors.customer_reference && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.customer_reference}</span>
-    )}
-  </label>
-          <input
-            id="customer_reference"
-            name="customer_reference"
-            value={addNewSkuData.customer_reference}
-            onChange={handleChange}
-            //placeholder="Customer Reference"
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          />
-        </div>
+       
         
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
-   Reference #
-    <span className="text-red-500 ml-1">*</span>
-    {errors.reference_number && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.reference_number}</span>
-    )}
-  </label>
-          <input
-            id="reference_number"
-            name="reference_number"
-            value={Number(addNewSkuData.reference_number) || null}
-            onChange={handleChange}
-            //placeholder="Reference Number"
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          />
-        </div>
-        
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
   Internal Id
     <span className="text-red-500 ml-1">*</span>
     {errors.internal_id && (
@@ -888,64 +855,62 @@ const refreshClients = () => {
             value={Number(addNewSkuData.internal_id) || null}
             onChange={handleChange}
             //placeholder="Internal ID"
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
         </div>
 
         <Tooltip title={unitTooltip}>
-          <div>
-          <label className="block text-[16px] font-medium text-gray-700 mb-2">
-        Board Size <span className="text-gray-500 text-sm">(W × L)</span>
+        <div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Board Size <span className="text-gray-500 text-xs">(W × L)</span>
     <span className="text-red-500 ml-1">*</span>
-    {errors.width_board_size_cm2 && errors.length_board_size_cm2 &&(
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.width_board_size_cm2}</span>
+    {errors.width_board_size_cm2 && errors.length_board_size_cm2 && (
+      <span className="text-red-500 text-xs ml-2 align-middle">
+        {errors.width_board_size_cm2}
+      </span>
     )}
-        {/*{errors.length_board_size_cm2 && (
-      <span className="text-red-500 text-sm ml-2 align-middle">Length is {errors.length_board_size_cm2}</span>
-    )}*/}
   </label>
-            <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
-              <input
-                id="width_board_size_cm2"
-                name="width_board_size_cm2"
-                value={Number(toThreeDecimalFixed(addNewSkuData.width_board_size_cm2)) || null}
-                onChange={modifiedHandleChange}
-                //placeholder="Width"
-                className="w-1/3 p-1 text-center focus:outline-none rounded-l-md bg-gray-50"
-                title={unitTooltip}
-                readOnly={true}
-              />
-              <span className="flex items-center justify-center text-gray-500">x</span>
-              <input
-                id="length_board_size_cm2"
-                name="length_board_size_cm2"
-                value={Number(toThreeDecimalFixed(addNewSkuData.length_board_size_cm2)) || null}
-                onChange={modifiedHandleChange}
-                //placeholder="Length"
-                className="w-1/3 p-1 text-center focus:outline-none bg-gray-50"
-                title={unitTooltip}
-                readOnly={true}
-              />
-              <div className="w-1/3 flex justify-end relative">
-                <select
-                  value={addNewSkuData.unit || 'mm'}
-                  onChange={handleUnitChange}
-                  className="w-full appearance-none bg-blue-600 text-white py-2 px-3 rounded-r-md hover:bg-blue-700 transition-colors focus:outline-none"
-                >
-                  <option value="mm" className="bg-white text-gray-800">mm</option>
-                  <option value="cm" className="bg-white text-gray-800">cm</option>
-                  <option value="in" className="bg-white text-gray-800">in</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
-                  <CIcon icon={cilChevronCircleDownAlt} size="sm" />
-                </div>
-              </div>
-            </div>
-          </div>
+  <div className="h-8 w-[200px] border border-gray-300 rounded-md flex items-center bg-white">
+    <input
+      id="width_board_size_cm2"
+      name="width_board_size_cm2"
+      value={Number(toThreeDecimalFixed(addNewSkuData.width_board_size_cm2)) || ''}
+      onChange={modifiedHandleChange}
+      className="w-[30%] p-[2px] text-center text-sm focus:outline-none rounded-l-md bg-gray-50"
+      title={unitTooltip}
+      readOnly
+    />
+    <span className="flex items-center justify-center text-gray-500 text-sm">x</span>
+    <input
+      id="length_board_size_cm2"
+      name="length_board_size_cm2"
+      value={Number(toThreeDecimalFixed(addNewSkuData.length_board_size_cm2)) || ''}
+      onChange={modifiedHandleChange}
+      className="w-[30%] p-[2px] text-center text-sm focus:outline-none bg-gray-50"
+      title={unitTooltip}
+      readOnly
+    />
+    <div className="w-[40%] flex justify-end relative">
+      <select
+        value={addNewSkuData.unit || 'mm'}
+        onChange={handleUnitChange}
+        className="w-full text-sm appearance-none bg-blue-600 text-white py-[6px] px-2 rounded-r-md hover:bg-blue-700 focus:outline-none"
+      >
+        <option value="mm" className="bg-white text-gray-800">mm</option>
+        <option value="cm" className="bg-white text-gray-800">cm</option>
+        <option value="in" className="bg-white text-gray-800">in</option>
+      </select>
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+        <CIcon icon={cilChevronCircleDownAlt} size="sm" />
+      </div>
+    </div>
+  </div>
+</div>
+
         </Tooltip>
 
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+        <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
         UPS
     <span className="text-red-500 ml-1">*</span>
     {errors.ups && (
@@ -958,12 +923,53 @@ const refreshClients = () => {
             value={Number(addNewSkuData?.ups) || null}
             onChange={modifiedHandleChange}
             //placeholder="UPS"
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
         </div>
 
-        <div>
-        <label className="block text-[16px] font-medium text-gray-700 mb-2">
+
+        <Tooltip title={unitTooltip}>
+          <div className='w-[200px]'>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+    Length Trimming Tolereance
+    <span className="text-red-500 ml-1">*</span>
+    {errors.length_trimming_tolerance && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.length_trimming_tolerance}</span>
+    )}
+  </label>
+            <input
+              id="length_trimming_tolerance"
+              name="length_trimming_tolerance"
+              value={Number(addNewSkuData.length_trimming_tolerance) || null}
+              onChange={modifiedHandleChange}
+              //placeholder="Length Trimming Tolerance"
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+        </Tooltip>
+
+        <Tooltip title={unitTooltip}>
+          <div className='w-[200px]'>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+    Width Trimming Tolereance
+    <span className="text-red-500 ml-1">*</span>
+    {errors.width_trimming_tolerance && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.width_trimming_tolerance}</span>
+    )}
+  </label>
+            <input
+              id="width_trimming_tolerance"
+              name="width_trimming_tolerance"
+              value={Number(addNewSkuData.width_trimming_tolerance) || null}
+              onChange={modifiedHandleChange}
+              //placeholder="Width Trimming Tolerance"
+              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+        </Tooltip>
+        
+        <div className='w-[200px]'>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
         Minimum Order Level
     <span className="text-red-500 ml-1">*</span>
     {errors.minimum_order_level && (
@@ -977,7 +983,7 @@ const refreshClients = () => {
             value={Number(addNewSkuData.minimum_order_level) || null}
             onChange={handleChange}
             //placeholder="Minimum Order Level"
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
         </div>
         {/*<div className="flex flex-col">
@@ -1019,6 +1025,30 @@ const refreshClients = () => {
   onBrowseClick={handleBrowseClickRoute}
   errors={errors}
 />
+
+<div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Tax Master
+    {/*<span className="text-red-500 ml-1">*</span>*/}
+    {/*{errors.gst_percentage && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.gst_percentage}</span>
+    )}*/}
+  </label>
+  <select
+  id="gst_percentage"
+  name="gst_percentage"
+  value={addNewSkuData?.gst_percentage || null}
+  onChange={handleChange}
+  className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+>
+  <option value="">Select Tax</option>
+  <option value={5}>5%</option>
+  <option value={10}>10%</option>
+  <option value={15}>15%</option>
+</select>
+
+</div>
+
 
         
       </div>

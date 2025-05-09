@@ -1,832 +1,759 @@
 import React, { useEffect, useState } from 'react'
-import same from '../../assets/images/info.png'
 import Phone from '../../assets/images/phone.png'
 import Cell from '../../assets/images/mob.png'
-import Facebook from '../../assets/images/fb.png'
 import OtherDetailForm from './OtherDetailForm'
 import AddressForm from './AddressForm'
 import ContactPersonsForm from './ContactPersonsForm'
-import { HiOutlinePencilAlt } from "react-icons/hi";
+import GSTModal from './GSTComponent'
 import { FormProvider, useForm } from 'react-hook-form'
 import apiMethods from '../../api/config'
 import CustomAlert from '../../components/New/CustomAlert'
-import { useNavigate } from "react-router-dom";
 import ActionButton from '../../components/New/ActionButton'
 import Loader from '../../components/New/Loader'
-import {
-  CRow,
-  CCol,
-  CCard,
-  CCardBody,
-  CCardText,
-  CNav,
-  CNavItem,
-  CNavLink,
-  CButton,
-  CCollapse,
-  CModalHeader,
-  CModalTitle,
-  CModalBody,
-  CModalFooter,
-  CTable,
-  CCardHeader,
-  CFormInput,
-  CFormSelect,
-  CModal,
-  CListGroup,
-  CListGroupItem,
-  CTableRow,
-  CTableHead,
-  CTableDataCell,
-  CTableHeaderCell,
-  CTableBody,
-} from '@coreui/react'
-import { useFormContext, useFieldArray } from "react-hook-form";
+import { CRow, CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
+import { useFieldArray } from 'react-hook-form'
 
- 
-const ClientForm = ({editData, closeDrawer,refreshClients,closeDrawerDuringAdd,refreshClientsEdit,entity_type,resetForm,submitFromRsc,setDrawerOpen,isDrawerOpen,setMessage}) => {
-  console.log("entity val",entity_type)
+const ClientForm = ({
+  editData,
+  closeDrawer,
+  refreshClients,
+  closeDrawerDuringAdd,
+  refreshClientsEdit,
+  entity_type,
+  resetForm,
+  setDrawerOpen,
+  isDrawerOpen,
+  setMessage,
+  setReloadData,
+}) => {
   const [activeTab, setActiveTab] = useState('Other Details')
-  const [alerts, setAlerts] = useState([]);
-  //const [hasGst, setHasGst] = useState(null); // Set null to avoid pre-selection
-  const [gstNumber, setGstNumber] = useState('');
-const [gstData,setGstData] = useState("")
-const [entityName, setEntityName] = useState("Client");
-const [loading, setLoading] = useState(false);
-const [addressAdded, setAddressAdded] = useState(0); // Initialize with 0
+  const [alerts, setAlerts] = useState([])
+  const [gstNumber, setGstNumber] = useState('')
+  const [gstData, setGstData] = useState(null)
+  const [entityName, setEntityName] = useState('Client')
+  const [loading, setLoading] = useState(false)
+  const [isGstModalOpen, setIsGstModalOpen] = useState(false)
   const tabs = ['Other Details', 'Address']
-  const handleNextStep = () => {
-    const currentIndex = tabs.indexOf(activeTab)
-    if (currentIndex < tabs.length - 1) {
-      setActiveTab(tabs[currentIndex + 1])
-    }
+
+  const handleClose = () => {
+    setAlerts([])
   }
 
-
-const handleAddAddress = () => {
-  setAddressAdded((prev) => prev + 1); // Increment counter on each click
-};
-const handleClose = () => {
-  setAlerts([]);
-};
-const navigate = useNavigate();
-
-const methods = useForm({
-  mode: "onChange",
-  defaultValues: editData || {
-    clientData: {
-      customer_type: "",
-      client_ref_id:"",
-      entity_type: entityName,  
-      gst_number:"",
-      gst_status:false,
-      salutation: "",
-      first_name: "",
-      last_name: "",
-      display_name: "",
-      company_name: "",
-      email: "",
-      work_phone: "",
-      mobile: "",
-      PAN: "",
-      currency: "",
-      payment_terms: "",
-      //enable_portal: false,
-      portal_language: "",
-      documents: [],
-      website_url: "",
-      department: "",
-      designation: "",
-      opening_balance:0,
-      twitter: "",
-      skype: "",
-      facebook: "",
-    },
-    addresses: [
-      {
-        type: "Billing", // Billing Address
-        attention: "",
-        country: "",
-        street1: "",
-        street2: "",
-        city: "",
-        state: "",
-        pinCode: "",
-        phone: "",
-        //faxNumber: "",
-      },
-      {
-        type: "Shipping", // Shipping Address
-        attention: "",
-        country: "",
-        street1: "",
-        street2: "",
-        city: "",
-        state: "",
-        pinCode: "",
-        phone: "",
-        //faxNumber: "",
-      },
-    ],
-  },
-});
-
-const { register, handleSubmit ,reset,watch,formState: { isValid, errors },control} = methods;
-
-//const isButtonDisabled = !isValid || !!errors.gst_number;
-const isButtonDisabled = Object.keys(errors).length > 0 && !(errors.gst_number);
-
-useEffect(() => {
-  // Update the entity type in the form
-  methods.setValue("clientData.entity_type", entity_type);
-
-  // Reset the form values to reflect the new entity type
-  reset({
-    ...methods.getValues(),
-    clientData: {
-      ...methods.getValues().clientData,
-      entity_type: entity_type, // Update the entity_type
-    },
-  });
-}, [entity_type]); // Dependency on entity_type
-useEffect(() => {
-  if (editData) {
-    reset({
+  const methods = useForm({
+    mode: 'onChange',
+    defaultValues: editData || {
       clientData: {
-        customer_type: editData.customer_type || "",
-        gst_number:editData.gst_number || "",
-        gst_status: editData.gst_status ? "true" : "false",
-        entity_type:editData.entity_type || "",
-        salutation: editData.salutation || "",
-        first_name: editData.first_name || "",
-        last_name: editData.last_name || "",
-        display_name: editData.display_name || "",
-        company_name: editData.company_name || "",
-        email: editData.email || "",
-        work_phone: editData.work_phone || "",
-        mobile: editData.mobile || "",
-        PAN: editData.PAN || "",
-        currency: editData.currency || "",
-        payment_terms: editData.payment_terms || "",
-        //enable_portal: editData.enable_portal || false,
-        portal_language: editData.portal_language || "",
-        documents: JSON.parse(editData.documents || "[]"),
-        website_url: editData.website_url || "",
-        department: editData.department || "",
-        designation: editData.designation || "",
-        opening_balance:editData.opening_balance || "",
-        twitter: editData.twitter || "",
-        skype: editData.skype || "",
-        facebook: editData.facebook || "",
-        client_ref_id:editData.client_ref_id || "", //editing
-        company_id:editData.company_id || "" //editing
+        customer_type: '',
+        client_ref_id: '',
+        entity_type: entityName,
+        gst_number: '',
+        gst_status: false,
+        salutation: '',
+        first_name: '',
+        last_name: '',
+        display_name: '',
+        company_name: '',
+        email: '',
+        work_phone: '',
+        mobile: '',
+        PAN: '',
+        currency: '',
+        payment_terms: '',
+        portal_language: '',
+        documents: [],
+        website_url: '',
+        department: '',
+        designation: '',
+        opening_balance: 0,
+        twitter: '',
+        skype: '',
+        facebook: '',
       },
-      addresses: editData?.addresses?.map((addr, index) => ({
-        type: index === 0 ? "Billing" : "Shipping", // Assign "Billing" to first, "Shipping" to second
-        attention: addr.attention || "",
-        country: addr.country || "",
-        street1: addr.street1 || "",
-        street2: addr.street2 || "",
-        city: addr.city || "",
-        state: addr.state || "",
-        pinCode: addr.pinCode || "",
-        phone: addr.phone || "",
-        //faxNumber: addr.faxNumber || "",
-      })),
-      
-    });
-  }
-}, [editData, reset]);
-const clientData = watch("clientData");
-const addresses = watch("addresses");
-const gstStatus = watch("clientData.gst_status");
-const gstnumberVal = watch("clientData.gst_number")
+      addresses: [
+        {
+          type: 'Billing',
+          attention: '',
+          country: '',
+          street1: '',
+          street2: '',
+          city: '',
+          state: '',
+          pinCode: '',
+          phone: '',
+        },
+        {
+          type: 'Shipping',
+          attention: '',
+          country: '',
+          street1: '',
+          street2: '',
+          city: '',
+          state: '',
+          pinCode: '',
+          phone: '',
+        },
+      ],
+    },
+  })
 
-useEffect(() => {
-  if (resetForm) {
-    reset();  // Reset form fields
-  }
-}, [resetForm, reset]);
-const { fields, append, remove } = useFieldArray({
-  control,
-  name: "addresses",
-});
-
-const [expandedIndices, setExpandedIndices] = useState({});
-
-const addShippingAddress = () => {
-  append({
-    type: "Shipping",
-    attention: "",
-    country: "",
-    street1: "",
-    street2: "",
-    city: "",
-    state: "",
-    pinCode: "",
-    phone: "",
-    // faxNumber: "",
-  });
-
-  // Expand the newly added card by default
-  setExpandedIndices((prev) => ({ ...prev, [fields.length]: false }));
-};
-
-const toggleExpand = (index) => {
-  setExpandedIndices((prev) => ({ ...prev, [index]: !prev[index] }));
-};
-const isFormInvalid = () => {
-  // Exclude gst_number from validation
-  const clientDataValues = Object.entries(clientData).some(
-    ([key, value]) =>
-      key !== "gst_number" && (value === "" || value === null || value === undefined)
-  );
-
-  // Check all fields in each address inside `addresses`
-  const addressValues = addresses.some((address) =>
-    Object.values(address).some(
-      (value) => value === "" || value === null || value === undefined
-    )
-  );
-
-  return clientDataValues || addressValues;
-};
-
-const handleSearch = async () => {
-  setLoading(true); // Show loader before API call
-
-  try {
-    const response = await apiMethods.getGst(gstnumberVal);
-
-    setGstData(response?.data);
-
-    // Extract trade name and address
-    const tradeName = response?.gstDetails?.data?.tradeNam || "";
-    const address = response?.gstDetails?.data?.pradr?.adr || "";
-
-    // Update form values using setValue from useForm
-    methods.setValue("clientData.company_name", tradeName);
-    methods.setValue("addresses.0.street1", address);
-
-    console.log("Trade Name:", tradeName);
-    console.log("Address:", address);
-    console.log("res.////", JSON.stringify(response?.data));
-    const alerts = [{ severity: "success", message: response?.message || "GST details fetched successfully" }];
-
-    // Check if credit is not available
-    if (response?.gstDetails?.flag === false && response?.gstDetails?.message) {
-      alerts.push({ severity: "warning", message: response.gstDetails.message });
-    }
-
-    setAlerts(alerts); // Update alert messages
-    setTimeout(() => {
-      setAlerts([]);
-    }, 3000);
-  } catch (error) {
-    console.error("Error fetching client data:", error);
-
-    // Set error message
-    setAlerts([{ severity: "error", message: error.response?.data?.message || "Failed to fetch GST details" }]);
-    setTimeout(() => {
-      setAlerts([]); // Clear alerts after 3 seconds
-    }, 3000);
-  } finally {
-    setLoading(false); // Hide loader after API call
-  }
-};
-const onSubmit = async (data) => {
-  setLoading(true); // Show loader before API call
-
-  try {
-    const filteredData = {
-      ...data,
-      addresses: data.addresses.map(({ type, ...rest }) => rest),
-    };
-
-    const isAddressEmpty = filteredData.addresses.every(address =>
-      Object.values(address).every(value => value.trim() === "")
-    );
-  
-    if (isAddressEmpty) {
-      console.log("Address Form must be filled");
-      setAlerts([{ severity: "error", message: "Fill the Addresses" }]);
-      setTimeout(() => {
-        setAlerts([]); // Clear alerts after 3 seconds
-      }, 3000);
-      return; // Stop further execution
-    }
-  
-    let response;
-    let successMessage;
-
-    if (editData) {
-      console.log("editttt",JSON.stringify(editData))
-      const clientId = editData.client_id;
-      const filteredData1 = {
-        ...data,
-        addresses: data.addresses.map(({ type, ...rest }, index) => ({
-          ...rest,
-          id: editData.addresses?.[index]?.id, // keep the original address ID
-        })),
-      };
-      response = await apiMethods.editClient(clientId, filteredData1);
-      successMessage = "Client Edited successfully!";
-    } else {
-      response = await apiMethods.postClient(filteredData);
-      successMessage = "Client added successfully!";
-    }
-
-    setAlerts([{ severity: "success", message: response?.message }]);
-
-    if (editData) {
-      setTimeout(() => {
-        setAlerts([]);
-        refreshClientsEdit();
-        closeDrawer();
-        reset();
-      }, 3000);
-    }
-
-
-    if (isDrawerOpen) {
-      setDrawerOpen(false);
-      console.log("respon mess",response.message)
-      setMessage(response.message)
-    }
-    setTimeout(() => {
-      setAlerts([]);
-      refreshClients();
-      closeDrawerDuringAdd();
-      reset();
-    }, 3000);
-  } catch (error) {
-    console.error("Error processing client:", error);
-    const errorMessage = error.response?.data?.error || error.response?.data?.message || "An unknown error occurred.";
-    setAlerts([{ severity: "error", message: errorMessage }]);
-    
-
-    if (editData) {
-      setTimeout(() => {
-        setAlerts([]);
-      }, 3000);
-    }
-
-    setTimeout(() => {
-      setAlerts([]);
-    }, 3000);
-  } finally {
-    setLoading(false); // Hide loader after API call
-  }
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { isValid, errors, isSubmitted },
+    control,
+    setValue,
+  } = methods
 
   useEffect(() => {
-    if (clientData?.entity_type) {
-      setValue("clientData.entity_type",clientData.entity_type);
-    }else if((editData?.entity_type)){
-      setValue("clientData.entity_type",editData?.entity_type);
+    methods.setValue('clientData.entity_type', entity_type)
+    reset({
+      ...methods.getValues(),
+      clientData: {
+        ...methods.getValues().clientData,
+        entity_type: entity_type,
+      },
+    })
+  }, [entity_type])
+
+  useEffect(() => {
+    if (editData) {
+      reset({
+        clientData: {
+          customer_type: editData.customer_type || '',
+          gst_number: editData.gst_number || '',
+          gst_status: editData.gst_status ? 'true' : 'false',
+          entity_type: editData.entity_type || '',
+          salutation: editData.salutation || '',
+          first_name: editData.first_name || '',
+          last_name: editData.last_name || '',
+          display_name: editData.display_name || '',
+          company_name: editData.company_name || '',
+          email: editData.email || '',
+          work_phone: editData.work_phone || '',
+          mobile: editData.mobile || '',
+          PAN: editData.PAN || '',
+          currency: editData.currency || '',
+          payment_terms: editData.payment_terms || '',
+          portal_language: editData.portal_language || '',
+          documents: JSON.parse(editData.documents || '[]'),
+          website_url: editData.website_url || '',
+          department: editData.department || '',
+          designation: editData.designation || '',
+          opening_balance: editData.opening_balance || '',
+          twitter: editData.twitter || '',
+          skype: editData.skype || '',
+          facebook: editData.facebook || '',
+          client_ref_id: editData.client_ref_id || '',
+          company_id: editData.company_id || '',
+        },
+        addresses: editData?.addresses?.map((addr, index) => ({
+          type: index === 0 ? 'Billing' : 'Shipping',
+          attention: addr.attention || '',
+          country: addr.country || '',
+          street1: addr.street1 || '',
+          street2: addr.street2 || '',
+          city: addr.city || '',
+          state: addr.state || '',
+          pinCode: addr.pinCode || '',
+          phone: addr.phone || '',
+        })),
+      })
     }
-  }, [clientData, setValue,editData]);
+  }, [editData, reset])
 
+  const gstStatus = watch('clientData.gst_status')
 
+  useEffect(() => {
+    if (resetForm) {
+      reset()
+    }
+  }, [resetForm, reset])
 
-};
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'addresses',
+  })
 
+  const [expandedIndices, setExpandedIndices] = useState({})
 
-const handleCancel = () => {
-  if (typeof closeDrawer === "function") {
-    closeDrawer();
-  } else if (typeof closeDrawerDuringAdd === "function") {
-    closeDrawerDuringAdd();
+  const addShippingAddress = () => {
+    append({
+      type: 'Shipping',
+      attention: '',
+      country: '',
+      street1: '',
+      street2: '',
+      city: '',
+      state: '',
+      pinCode: '',
+      phone: '',
+    })
+    setExpandedIndices((prev) => ({ ...prev, [fields.length]: false }))
   }
-  reset();
-};
 
+  const toggleExpand = (index) => {
+    setExpandedIndices((prev) => ({ ...prev, [index]: !prev[index] }))
+  }
 
-console.log("hhjhh",isDrawerOpen,setDrawerOpen)
+  const handleGstStatusChange = (e) => {
+    setValue('clientData.gst_status', e.target.value)
+    if (e.target.value === 'true') {
+      setIsGstModalOpen(true)
+    }
+  }
+
+  const closeGstModal = () => {
+    setIsGstModalOpen(false)
+    // If no GST data was fetched, set status back to false
+    if (!gstData) {
+      setValue('clientData.gst_status', 'false')
+    }
+  }
+
+  const handleSearch = async () => {
+    setLoading(true)
+    try {
+      const response = await apiMethods.getGst(gstNumber)
+      setGstData(response)
+
+      const tradeName = response?.gstDetails?.data?.tradeNam || ''
+      const legalName = response?.gstDetails?.data?.lgnm || ''
+      const addressData = response?.gstDetails?.data?.pradr?.addr || {}
+
+      const stateCode = addressData.stcd || ''
+      let stateName = stateCode
+
+      const stateMapping = {
+        TN: 'Tamil Nadu',
+        AP: 'Andhra Pradesh',
+        KL: 'Kerala',
+      }
+
+      if (stateMapping[stateCode]) {
+        stateName = stateMapping[stateCode]
+      }
+
+      setValue('clientData.company_name', tradeName || legalName)
+      setValue('clientData.gst_number', gstNumber)
+
+      setValue('addresses.0.attention', legalName)
+      setValue('addresses.0.country', 'India')
+      setValue(
+        'addresses.0.street1',
+        addressData.bno ? `${addressData.bno}, ${addressData.bnm || ''}` : addressData.bnm || '',
+      )
+      setValue('addresses.0.street2', addressData.st || '')
+      setValue('addresses.0.city', addressData.dst || addressData.loc || '')
+      setValue('addresses.0.state', stateName)
+      setValue('addresses.0.pinCode', addressData.pncd || '')
+
+      const alerts = [
+        { severity: 'success', message: response?.message || 'GST details fetched successfully' },
+      ]
+      if (response?.gstDetails?.flag === false && response?.gstDetails?.message) {
+        alerts.push({ severity: 'warning', message: response.gstDetails.message })
+      }
+      setAlerts(alerts)
+    } catch (error) {
+      console.error('Error fetching client data:', error)
+      setAlerts([
+        {
+          severity: 'error',
+          message: error.response?.data?.message || 'Failed to fetch GST details',
+        },
+      ])
+      setTimeout(() => {
+        setAlerts([])
+      }, 3000)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const onSubmit = async (data) => {
+    console.log('Form data:', data)
+    console.log('Form errors:', errors)
+    console.log('Is form valid:', isValid)
+
+    setLoading(true)
+    try {
+      const filteredData = {
+        ...data,
+        addresses: data.addresses.map(({ type, ...rest }) => rest),
+      }
+
+      const isAddressEmpty = filteredData.addresses.every((address) =>
+        Object.values(address).every((value) => value.trim() === ''),
+      )
+
+      if (isAddressEmpty) {
+        setAlerts([{ severity: 'error', message: 'Fill the Addresses' }])
+        setTimeout(() => {
+          setAlerts([])
+        }, 3000)
+        return
+      }
+
+      let response
+      let successMessage
+
+      if (editData) {
+        const clientId = editData.client_id
+        const filteredData1 = {
+          ...data,
+          addresses: data.addresses.map(({ type, ...rest }, index) => ({
+            ...rest,
+            id: editData.addresses?.[index]?.id,
+          })),
+        }
+
+        response = await apiMethods.editClient(clientId, filteredData1)
+        successMessage = 'Client Edited successfully!'
+        if (response.status === 200 || response.status === 201) {
+          setReloadData((prev) => !prev)
+        }
+      } else {
+        response = await apiMethods.postClient(filteredData)
+        if (response.status === 200 || response.status === 201) {
+          setReloadData((prev) => !prev)
+        }
+        successMessage = 'Client added successfully!'
+      }
+
+      setAlerts([{ severity: 'success', message: response?.message }])
+
+      if (editData) {
+        setTimeout(() => {
+          setAlerts([])
+          refreshClientsEdit()
+          closeDrawer()
+          reset()
+        }, 3000)
+      }
+
+      if (isDrawerOpen) {
+        setDrawerOpen(false)
+        setMessage(response.message)
+      }
+      setTimeout(() => {
+        setAlerts([])
+        refreshClients()
+        closeDrawerDuringAdd()
+        reset()
+      }, 3000)
+    } catch (error) {
+      console.error('Error processing client:', error)
+      const errorMessage =
+        error.response?.data?.message || error.response?.data?.error || 'An unknown error occurred.'
+      setAlerts([{ severity: 'error', message: errorMessage }])
+      setTimeout(() => {
+        setAlerts([])
+      }, 3000)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCancel = () => {
+    if (typeof closeDrawer === 'function') {
+      closeDrawer()
+    } else if (typeof closeDrawerDuringAdd === 'function') {
+      closeDrawerDuringAdd()
+    }
+    reset()
+  }
+
+  // Helper function to apply red border style
+  const getInputStyle = (hasError) => ({
+    border: hasError && isSubmitted ? '1px solid #EF4444' : '1px solid #D1D5DB',
+  })
+  const checkValdation = () => {
+    console.log('Client data:', methods.getValues('clientData'))
+    console.log('Form validation errors:', methods.formState.errors)
+  }
+
   return (
     <>
-    <Loader isLoading={loading} />
+      <Loader isLoading={loading} />
       <CustomAlert alerts={alerts} handleClose={handleClose} />
 
-        <FormProvider {...methods}>
-        <div className="pb-4 -r-4 pl-4 relative border-b border-gray-300">
-  {/* Title Section - Outside Cards */}
-  <div className="flex items-center ml-6 md:mt-6 sm:mt-6 ">
-  {/* Title with Icon */}
-  {/*<h2 className="text-xl font-semibold flex items-center gap-x-1.5 absolute lg:top-1 md:top-10 sm:top-10 left-8">
-  {editData?.display_name ? (
-    <>
-      Edit {editData.display_name}
-      <HiOutlinePencilAlt className="w-4 h-4 text-gray-500" />
-    </>
-  ) : (
-    <>
-      <span className="font-bold">New {entity_type} </span>
-    </>
-  )}
-</h2>*/}
-
-
-  {/* Move Input Close to Title */}
-  {/*<input
-    type="text"
-    placeholder={`${entity_type} Id`}
-    {...register("clientData.client_ref_id")}
-    className="border border-gray-300 p-1.5 rounded w-40 text-sm focus:ring-2 focus:ring-indigo-400 ml-4"
-  />*/}
-  
-</div>
-
-
-  {/* Main Layout - Left & Right Cards */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-65">
-    {/* Left Card */}
-    <div className="bg-white p-6">
-      {/* Customer Type (Single Row) */}
-        {/* Do You Have GST? - Moved to Left Card */}
-        <div className="mb-4">
-  <div className="flex items-center">
-    <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">
-      Reference Id
-    </label>
-    <input
-      type="text"
-      placeholder="Reference Id"
-      {...register("clientData.client_ref_id", {
-        required: "Required",
-      })}
-      className="border p-2 rounded flex-1"
-    />
-  </div>
-  {errors.clientData?.client_ref_id && (
-    <div className="flex">
-      <div className="w-40" /> {/* empty space to align with label */}
-      <p className="text-red-500 text-xs">
-      ⊛ {errors.clientData.client_ref_id.message}
-    </p>
-    </div>
-  )}
-</div>
-
-<div className="mb-4 flex flex-col">
-  <div className="flex items-center">
-    <label className="font-medium w-40 text-indigo-600 after:content-['*'] after:text-red-500 after:ml-1">
-      Do you have GST?
-    </label>
-    <div className="flex items-center space-x-6 h-10">
-      <label className="flex items-center space-x-2">
-        <input
-          type="radio"
-          {...register("clientData.gst_status", {
-            required: "Required",
-          })}
-          value="true"
+      <div className="w-full relative">
+        <GSTModal
+          isOpen={isGstModalOpen}
+          setIsGstModalOpen={setIsGstModalOpen}
+          onFetch={handleSearch}
+          loading={loading}
+          gstNumber={gstNumber}
+          setGstNumber={setGstNumber}
+          gstData={gstData}
+          setValue={setValue}
         />
-        <span>Yes</span>
-      </label>
-      <label className="flex items-center space-x-2">
-        <input
-          type="radio"
-          {...register("clientData.gst_status", {
-            required: "Required",
-          })}
-          value="false"
-        />
-        <span>No</span>
-      </label>
-    </div>
-  </div>
-  {errors.clientData?.gst_status && (
-    <div className="flex">
-      <div className="w-40" /> {/* spacing under label */}
-      <p className="text-red-500 text-xs">
-      ⊛{errors.clientData.gst_status.message}
-      </p>
-    </div>
-  )}
-</div>
-
-      <div className="mb-4 flex flex-col">
-      <div className="flex items-center">
-        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Customer Type</label>
-        <div className="flex items-center space-x-6 h-10">
-          <label className="flex items-center space-x-2">
-            <input type="radio" {...register("clientData.customer_type", { required: "Required"})} value="Business" />
-            <span>Business</span>
-          </label>
-          <label className="flex items-center space-x-2">
-            <input type="radio" {...register("clientData.customer_type", { required: "Required"})} value="Individual" />
-            <span>Individual</span>
-          </label>
-        </div>
-        </div>
-        {errors.clientData?.customer_type && (
-    <div className="flex">
-      <div className="w-40" /> {/* spacing under label */}
-      <p className="text-red-500 text-xs">
-      ⊛{errors.clientData.customer_type.message}
-      </p>
-    </div>
-  )}
       </div>
+      <FormProvider {...methods}>
+        <div className="pr-2 pl-2 relative border-b border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-auto">
+            <div className="bg-white p-4">
+              {/* Reference ID */}
+              <div className="mb-2">
+                <div className="flex items-center">
+                  <label className="text-sm  w-32 after:content-['*'] after:text-red-500 after:ml-1">
+                    Reference Id
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Reference Id"
+                    {...register('clientData.client_ref_id', { required: true })}
+                    style={getInputStyle(errors.clientData?.client_ref_id)}
+                    className="p-1.5 text-sm rounded flex-1"
+                  />
+                </div>
+              </div>
 
-      {/* Full Name (Single Row) */}
-      <div className="mb-4 flex flex-col">
-  <div className="flex items-center">
-    <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">
-      Full Name
-    </label>
-    <div className="flex gap-2">
-      <select
-        {...register("clientData.salutation", {
-          required: "Required",
-        })}
-        className="border p-2 rounded w-28 ml-[38px]"
-      >
-        <option value="" disabled>
-          Salutation
-        </option>
-        <option value="Mr.">Mr.</option>
-        <option value="Mrs.">Mrs.</option>
-      </select>
-      <input
-        type="text"
-        placeholder="First Name"
-        {...register("clientData.first_name", { required: "Required" })}
-        className="border p-2 rounded w-full"
-      />
-      <input
-        type="text"
-        placeholder="Last Name"
-        {...register("clientData.last_name", { required: "Required" })}
-        className="border p-2 rounded w-full"
-      />
-    </div>
-  </div>
+              {/* Customer Type */}
+              <div className="mb-2">
+                <div className="flex items-center">
+                  <label className="text-sm  w-32 after:content-['*'] after:text-red-500 after:ml-1">
+                    Customer Type
+                  </label>
+                  <div className="flex items-center space-x-4 h-8">
+                    <label className="flex items-center space-x-1 text-sm">
+                      <input
+                        type="radio"
+                        {...register('clientData.customer_type', { required: true })}
+                        value="Business"
+                      />
+                      <span>Business</span>
+                    </label>
+                    <label className="flex items-center space-x-1 text-sm">
+                      <input
+                        type="radio"
+                        {...register('clientData.customer_type', { required: true })}
+                        value="Individual"
+                      />
+                      <span>Individual</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
 
-  {(errors.clientData?.salutation ||
-    errors.clientData?.first_name ||
-    errors.clientData?.last_name) && (
-    <div className="flex gap-4 mt-1 ml-[160px]">
-      {errors.clientData?.salutation && (
-        <p className="text-red-500 text-xs">⊛ {errors.clientData.salutation.message}</p>
-      )}
-      {errors.clientData?.first_name && (
-        <p className="text-red-500 text-xs ml-[33px]">⊛ {errors.clientData.first_name.message}</p>
-      )}
-      {errors.clientData?.last_name && (
-        <p className="text-red-500 text-xs ml-[40px]">⊛ {errors.clientData.last_name.message}</p>
-      )}
-    </div>
-  )}
-</div>
+              {/* Full Name */}
+              <div className="mb-2">
+                <div className="flex items-center">
+                  <label className="text-sm  w-32 after:content-['*'] after:text-red-500 after:ml-1">
+                    Full Name
+                  </label>
+                  <div className="flex gap-2">
+                    <select
+                      {...register('clientData.salutation', { required: true })}
+                      style={getInputStyle(errors.clientData?.salutation)}
+                      className="p-1.5 text-sm rounded w-20"
+                    >
+                      <option value="" disabled>
+                        Salutation
+                      </option>
+                      <option value="Mr.">Mr.</option>
+                      <option value="Mrs.">Mrs.</option>
+                    </select>
+                    <input
+                      type="text"
+                      placeholder="First Name"
+                      {...register('clientData.first_name', { required: true })}
+                      style={getInputStyle(errors.clientData?.first_name)}
+                      className="p-1.5 text-sm rounded w-full"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Last Name"
+                      {...register('clientData.last_name', { required: true })}
+                      style={getInputStyle(errors.clientData?.last_name)}
+                      className="p-1.5 text-sm rounded w-full"
+                    />
+                  </div>
+                </div>
+              </div>
 
-      {/* Company Name */}
-      <div className="mb-4">
-      <div className="flex items-center">
-        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Company</label>
-        <input type="text" placeholder="Company Name" {...register("clientData.company_name", { required: "Required" })} className="border p-2 rounded flex-1" />
-      </div>
-      {errors.clientData?.company_name && (
-    <div className="flex">
-      <div className="w-40" /> {/* empty space to align with label */}
-      <p className="text-red-500 text-xs">
-      ⊛ {errors.clientData.company_name.message}
-    </p>
-    </div>
-  )}
-      </div>
-       
+              {/* Company Name */}
+              <div className="mb-2">
+                <div className="flex items-center">
+                  <label className="text-sm  w-32 after:content-['*'] after:text-red-500 after:ml-1">
+                    Company
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Company Name"
+                    {...register('clientData.company_name', { required: true })}
+                    style={getInputStyle(errors.clientData?.company_name)}
+                    className="p-1.5 text-sm rounded flex-1"
+                  />
+                </div>
+              </div>
 
+              {/* Display Name */}
+              <div className="mb-2">
+                <div className="flex items-center">
+                  <label className="text-sm  w-32 after:content-['*'] after:text-red-500 after:ml-1">
+                    Display Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter display name"
+                    {...register('clientData.display_name', { required: true })}
+                    style={getInputStyle(errors.clientData?.display_name)}
+                    className="p-1.5 text-sm rounded flex-1"
+                  />
+                </div>
+              </div>
 
+              {/* Email */}
+              <div className="mb-2">
+                <div className="flex items-center">
+                  <label className="text-sm  w-32 after:content-['*'] after:text-red-500 after:ml-1">
+                    Email
+                  </label>
+                  <input
+                    disabled={editData}
+                    type="text"
+                    placeholder="Email Address"
+                    {...register('clientData.email', { required: true })}
+                    style={getInputStyle(errors.clientData?.email)}
+                    className="p-1.5 text-sm rounded flex-1"
+                  />
+                </div>
+              </div>
 
-    
-    </div>
+              {/* Phone Numbers */}
+              <div className="mb-2">
+                <div className="flex items-center">
+                  <label className="text-sm w-32 after:content-['*'] after:text-red-500 after:ml-1">
+                    Phone
+                  </label>
+                  <div className="flex gap-5">
+                    {/* Work Phone Input */}
+                    <div
+                      className="flex items-center p-1.5 rounded w-1/2"
+                      style={getInputStyle(errors.clientData?.work_phone)}
+                    >
+                      <img src={Phone} alt="Work Phone" className="mr-1 h-4 w-4" />
+                      <input
+                        type="tel"
+                        placeholder="Work"
+                        maxLength={10}
+                        {...register('clientData.work_phone', {
+                          pattern: {
+                            value: /^\d{10}$/,
+                            message: 'Invalid phone number',
+                          },
+                        })}
+                        onKeyDown={(e) => {
+                          if (
+                            !(
+                              /[0-9]/.test(e.key) ||
+                              ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(
+                                e.key,
+                              ) ||
+                              e.ctrlKey ||
+                              e.metaKey // Allow Ctrl/Cmd + key (e.g., Ctrl+V)
+                            )
+                          ) {
+                            e.preventDefault()
+                          }
+                        }}
+                        onPaste={(e) => {
+                          const pasteData = e.clipboardData.getData('text')
+                          if (!/^\d*$/.test(pasteData)) {
+                            e.preventDefault()
+                          }
+                        }}
+                        className="outline-none w-full text-sm bg-transparent"
+                      />
+                    </div>
 
-    {/* Right Card */}
-    <div className="bg-white p-6 h-72">
-      {/* Display Name */}
-        {/* GST Number - Moved to Right Card */}
+                    {/* Mobile Input */}
+                    <div
+                      className="flex items-center p-1.5 rounded w-1/2"
+                      style={getInputStyle(errors.clientData?.mobile)}
+                    >
+                      <img src={Cell} alt="Mobile" className="mr-1 h-4 w-4" />
+                      <input
+                        type="tel"
+                        placeholder="Mobile"
+                        maxLength={10}
+                        {...register('clientData.mobile', {
+                          pattern: {
+                            value: /^\d{10}$/,
+                            message: 'Invalid phone number',
+                          },
+                        })}
+                        onKeyDown={(e) => {
+                          if (
+                            !(
+                              /[0-9]/.test(e.key) ||
+                              ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(
+                                e.key,
+                              ) ||
+                              e.ctrlKey ||
+                              e.metaKey // Allow Ctrl/Cmd + key (e.g., Ctrl+V)
+                            )
+                          ) {
+                            e.preventDefault()
+                          }
+                        }}
+                        onPaste={(e) => {
+                          const pasteData = e.clipboardData.getData('text')
+                          if (!/^\d*$/.test(pasteData)) {
+                            e.preventDefault()
+                          }
+                        }}
+                        className="outline-none w-full text-sm bg-transparent"
+                      />
+                    </div>
+                  </div>
+                </div>
 
-        <div className="flex items-center mb-4 h-10">
-        {/*<label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Display Name</label>
-        <input type="text" placeholder="Enter display name" {...register("clientData.display_name")} className="border p-2 rounded flex-1" />*/}
-      </div>
-      {gstStatus !== "true" && (   <div className="flex items-center mb-4 h-10">
-        {/*<label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Display Name</label>
-        <input type="text" placeholder="Enter display name" {...register("clientData.display_name")} className="border p-2 rounded flex-1" />*/}
-      </div>)}
-      {gstStatus === "true" && (
-    <div className="mb-4 h-10">
-      <div className="flex items-center">
-    <label className="font-medium w-40 flex items-center leading-none after:content-['*'] after:text-red-500 after:ml-1">
-      GST Number
-    </label>
-    <div className="flex items-center space-x-4">
-      <input 
-        type="text" 
-        placeholder="Enter GST Number" 
-        {...register("clientData.gst_number", { required: "Required" })} 
-        className="border p-2 rounded w-[295px]"
-      />
-      <ActionButton height={"9"} label={"Search"} onClick={handleSearch} className='ml-[20px]' />
-    </div>
+                {/* Error Messages */}
+                {(errors.clientData?.work_phone || errors.clientData?.mobile) && (
+                  <div className="flex mt-0.5">
+                    <div className="w-32" />
+                    <p className="text-red-500 text-xs">
+                      ⊛
+                      {errors.clientData?.work_phone?.message || errors.clientData?.mobile?.message}
+                    </p>
+                  </div>
+                )}
+              </div>
 
-  </div>
-  {errors.clientData?.gst_number && (
-    <div className="flex">
-      <div className="w-40" /> {/* empty space to align with label */}
-      <p className="text-red-500 text-xs">
-      ⊛ {errors.clientData.gst_number.message}
-    </p>
-    </div>
-  )}
-  </div>
-)}
+              {/* GST Status */}
+              <div className="mb-2">
+                <div className="flex items-center">
+                  <label className="text-sm w-32 after:content-['*'] after:text-red-500 after:ml-1">
+                    Do you have GST?
+                  </label>
+                  <div className="flex items-center space-x-4 h-8">
+                    <label className="flex items-center space-x-1 text-sm">
+                      <input
+                        type="radio"
+                        {...register('clientData.gst_status', { required: true })}
+                        value="true"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setIsGstModalOpen(true)
+                          }
+                        }}
+                      />
+                      <span>Yes</span>
+                    </label>
+                    <label className="flex items-center space-x-1 text-sm">
+                      <input
+                        type="radio"
+                        {...register('clientData.gst_status', { required: true })}
+                        value="false"
+                      />
+                      <span>No</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
 
-<div className="mb-4">
-<div className="flex items-center">
-        <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">Display Name</label>
-        <input type="text" placeholder="Enter display name" {...register("clientData.display_name", { required: "Required" })} className="border p-2 rounded flex-1" />
-      </div>
-      {errors.clientData?.display_name && (
-    <div className="flex">
-      <div className="w-40" /> {/* empty space to align with label */}
-      <p className="text-red-500 text-xs">
-      ⊛ {errors.clientData.display_name.message}
-    </p>
-    </div>
-  )}
-      </div>
+              {gstStatus === 'true' && (
+                <div className="mb-4 h-10">
+                  <label className="text-sm w-32 after:content-['*'] after:text-red-500 after:ml-1">
+                    GST Number
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter GST Number"
+                    {...register('clientData.gst_number', {
+                      required: gstStatus === 'true' ? 'GST number is required' : false,
+                    })}
+                    className="border p-2 rounded w-[295px]"
+                    readOnly={!!gstData} // Make read-only only after data is fetched
+                  />
+                  {errors.clientData?.gst_number && (
+                    <div className="flex">
+                      <div className="w-40" /> {/* empty space to align with label */}
+                      <p className="text-red-500 text-xs">
+                        ⊛ {errors.clientData.gst_number.message}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
 
-   
+          <div className="flex justify-end items-center h-6 mb-2">
+            {activeTab === 'Address' && (
+              <ActionButton label="+ Add" onClick={addShippingAddress} variant="add" size="sm" />
+            )}
+          </div>
 
-      {/* Email */}
-      <div className="mb-4">
-      <div className="flex items-center">
-      <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">
-  Email
-</label>
+          <CCol xs={12}>
+            <CNav variant="tabs" className="mb-2">
+              {tabs.map((tab) => (
+                <CNavItem key={tab}>
+                  <CNavLink
+                    active={activeTab === tab}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setActiveTab(tab)
+                    }}
+                    style={{
+                      backgroundColor: activeTab === tab ? '#8761e5' : 'transparent',
+                      color: activeTab === tab ? '#ffffff' : '#8761e5',
+                      cursor: 'pointer',
+                      padding: '0.5rem 1rem',
+                      fontSize: '0.875rem',
+                    }}
+                  >
+                    {tab}
+                  </CNavLink>
+                </CNavItem>
+              ))}
+            </CNav>
+          </CCol>
 
-        <input disabled={editData} type="text" placeholder="Email Address" {...register("clientData.email", { required: "Required" })} className="border p-2 rounded flex-1" />
-      </div>
-      {errors.clientData?.email && (
-    <div className="flex">
-      <div className="w-40" /> {/* empty space to align with label */}
-      <p className="text-red-500 text-xs">
-      ⊛ {errors.clientData.email.message}
-    </p>
-    </div>
-  )}
-      </div>
-
-      {/* Phone Numbers */}
-      <div className="mb-4">
-      <div className="flex items-center">
-  <label className="font-medium w-40 after:content-['*'] after:text-red-500 after:ml-1">
-    Phone
-  </label>
-  <div className="flex space-x-2">
-    <div className="flex items-center border p-2 rounded w-[190px]">
-      <img src={Phone} alt="Work Phone" className="mr-2" />
-      <input
-        type="text"
-        {...register("clientData.work_phone", { required: "Required" })}
-        placeholder="Work"
-        className="outline-none w-full"
-      />
-    </div>
-    <div className="flex items-center border p-2 rounded w-[190px]">
-      <img src={Cell} alt="Mobile" className="mr-2" />
-      <input
-        type="text"
-        {...register("clientData.mobile", { required: "Required" })}
-        placeholder="Mobile"
-        className="outline-none w-full"
-      />
-    </div>
-    </div>
-  </div>
-  {(errors.clientData?.work_phone || errors.clientData?.mobile) && (
-    <div className="flex gap-x-4 mt-1 ml-[160px]">
-      {errors.clientData?.work_phone && (
-        <p className="text-red-500 text-xs">
-          ⊛ {errors.clientData.work_phone.message}
-        </p>
-      )}
-      {errors.clientData?.mobile && (
-        <p className="text-red-500 text-xs ml-[120px]">
-          ⊛ {errors.clientData.mobile.message}
-        </p>
-      )}
-    </div>
-  )}
-</div>
-
-
-    </div>
-  </div>
-
-    
-  {/*{activeTab === "Address" && (
-    <ActionButton height={"7"} label={"+ Add "} className="ml-auto" onClick={handleAddAddress}  />
-  )}*/}
-  
- <div className="d-flex justify-content-between align-items-center h-7">
-        <div className="ms-auto flex flex-row">
-          {activeTab === 'Address' && (
-            <ActionButton
-            label={" + Add "}
-            onClick={addShippingAddress}
-            variant='add'
-            />
+          <CRow className="mb-5">
+            {activeTab === 'Other Details' && <OtherDetailForm />}
+            {activeTab === 'Address' && (
+              <AddressForm
+                fields={fields}
+                remove={remove}
+                expandedIndices={expandedIndices}
+                toggleExpand={toggleExpand}
+              />
+            )}
+          </CRow>
+          {activeTab === 'contactPersons' && <ContactPersonsForm></ContactPersonsForm>}
+          {activeTab === 'remarks' && (
+            <div>
+              <h3>Remarks</h3>
+              <p>Enter remarks about the customer here...</p>
+            </div>
           )}
-          
+        </div>
+      </FormProvider>
+
+      <div className="flex justify-between items-center w-full pt-2 bottom-0 bg-white fixed border-t-2 border-gray-100">
+        <div className="text-left my-1">
+          <button
+            className="p-1.5 rounded w-20 mr-3 text-white bg-purple-600 hover:bg-purple-700 text-sm"
+            onClick={() => {
+              checkValdation()
+              handleSubmit(onSubmit)()
+            }}
+          >
+            Save
+          </button>
+          <button
+            className="p-1.5 border border-gray-300 rounded w-20 text-sm"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
         </div>
       </div>
-  <CCol xs={12}>
-        <CNav variant="tabs">
-          {tabs.map((tab) => (
-            <CNavItem key={tab}>
-              <CNavLink
-                active={activeTab === tab}
-                onClick={(e) => {
-                  e.preventDefault()
-                  setActiveTab(tab)
-                }}
-                style={{
-                  backgroundColor: activeTab === tab ? '#8761e5' : 'transparent',
-                  color: activeTab === tab ? '#ffffff' : '#8761e5',
-                  cursor: 'pointer',
-                }}
-              >
-                {tab}
-              </CNavLink>
-            </CNavItem>
-          ))}
-        </CNav>
-      </CCol>
-
-      <CRow>
-        {activeTab === 'Other Details' && (
-           <OtherDetailForm></OtherDetailForm>
-        )}
-        {activeTab === 'Address' && (
-        <AddressForm  fields={fields}
-        remove={remove}
-        expandedIndices={expandedIndices}
-        toggleExpand={toggleExpand}  />
-        )}
-      </CRow>
-
-
-      {/* className="w-100% h-10 p-6 bg-white shadow-md rounded-lg" */}
-      {/* Tab Content */}
-      {/*{activeTab === 'otherDetails' && (
-       <OtherDetailForm></OtherDetailForm>
-      )}
-   {activeTab === 'address' && <AddressForm addressAdded={addressAdded} />}*/}
-
-      {activeTab === 'contactPersons' && (
-<ContactPersonsForm></ContactPersonsForm>
-      )}
-      {activeTab === 'remarks' && (
-        <div>
-          <h3>Remarks</h3>
-          <p>Enter remarks about the customer here...</p>
-        </div>
-      )}
- 
-    </div>
-    </FormProvider>
-    <div className="flex justify-between items-center w-full px-6 pt-3">
-  {/* Left side: Buttons */}
-  <div className="text-left ml-[2%]">
-  {/*<button
-    className={`p-2 rounded w-24 mr-4 text-white ${
-      isFormInvalid()
-        ? "bg-gray-400 cursor-not-allowed" // Grey when disabled
-        : "bg-purple-600 hover:bg-purple-700" // Purple when enabled
-    }`}
-    onClick={handleSubmit(onSubmit)}
-    //disabled={isFormInvalid()} // Disable when form is invalid
-    //disabled={isButtonDisabled}
-  >
-    Save
-  </button>*/}
-  <button
-    className="p-2 rounded w-24 mr-4 text-white bg-purple-600 hover:bg-purple-700"
-    onClick={handleSubmit(onSubmit)}
-  >
-    Save
-  </button>
-    <button className="p-2 border border-gray-300 rounded w-24" onClick={handleCancel}>Cancel</button>
-  </div>
-
-  {/* Right side: Alert messages */}
-  {/*{alerts.length > 0 && <div className="ml-auto"><CustomAlert alerts={alerts} /></div>}*/}
-
-</div>
-
     </>
   )
 }

@@ -5,14 +5,12 @@ import {
   CNavLink,
   CSidebarNav,
   CNavTitle,
-  CNavGroup,
-  CNavGroupItems,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import * as iconSet from '@coreui/icons'
 import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
-import { cilCloudDownload, cilLayers, cilPuzzle, cilSpeedometer, cilUser } from '@coreui/icons'
+import {cilUser } from '@coreui/icons'
 
 export const AppSideBarNew = ({ giveAccess }) => {
   const [expandedModules, setExpandedModules] = useState({})
@@ -27,8 +25,8 @@ export const AppSideBarNew = ({ giveAccess }) => {
 
   const navLink = (title, icon) => (
     <div className="d-flex align-items-center">
-      {icon && iconSet[icon] && <CIcon icon={iconSet[icon]} className="nav-icon" />}
-      <span>{title}</span>
+      {icon && iconSet[icon] && <CIcon icon={iconSet[icon]} className="nav-icon text-xs" />}
+      <span className="text-xs">{title}</span>
     </div>
   )
 
@@ -45,8 +43,8 @@ export const AppSideBarNew = ({ giveAccess }) => {
         className="nav-group-items"
         style={{
           display: expandedModules[moduleId] ? 'block' : 'none',
-          paddingLeft: '1.5rem',
-          listStyleType: 'disc', // Adds bullet dots
+          paddingLeft: '1rem',
+          listStyleType: 'disc',
           transition: 'height 0.2s ease-in-out',
         }}
       >
@@ -178,7 +176,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
       {/*dashboard*/}
       {shouldDisplayDashboard && (
         <>
-          <CNavTitle>Dashboard</CNavTitle>
+          <CNavTitle className="!text-xs !py-1 !mt-0">Dashboard</CNavTitle>
           {dashboardModules.map((module, index) => {
             if (module.modules_description === 'Dashboard') {
               return (
@@ -197,7 +195,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
       {/*AssetGroup*/}
       {shouldDisplayAssets && (
         <>
-          <CNavTitle>Assets</CNavTitle>
+          <CNavTitle className="!text-xs !py-1 !mt-0">Assets</CNavTitle>
           {assetModules.map((module, index) => {
             if (module.modules_description === 'Clients/Vendor') {
               return (
@@ -242,7 +240,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
       {/*dashboard*/}
       {shouldDisplayHrms && (
         <>
-          <CNavTitle>HRMS</CNavTitle>
+          <CNavTitle className="!text-xs !py-1 !mt-0">HRMS</CNavTitle>
           {hrmsModules.map((module, index) => {
             //if (module.modules_description === 'Employee') {
             //  return (
@@ -255,7 +253,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             //}
             if (module.modules_description === 'Employee') {
               return (
-                <li key={index} className={`nav-item nav-group ${isOpen ? 'show' : ''}`}>
+                <li key={index} className={`nav-item nav-group text-xs ${isOpen ? 'show' : ''}`}>
                   <a
                     className="nav-link nav-group-toggle"
                     href="#"
@@ -267,7 +265,10 @@ export const AppSideBarNew = ({ giveAccess }) => {
                     <CIcon icon={cilUser} className="nav-icon" />
                     Employee
                   </a>
-                  <ul className="nav-group-items" style={{ display: isOpen ? 'block' : 'none' }}>
+                  <ul
+                    className="nav-group-items text-xs !py-0"
+                    style={{ display: isOpen ? 'block' : 'none' }}
+                  >
                     <li className="nav-item">
                       <NavLink className="nav-link" to="/employeelist">
                         <span className="nav-icon">
@@ -322,7 +323,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
       {/*ordermanagement*/}
       {shouldDisplayOrderManagement && (
         <>
-          <CNavTitle>Order Management</CNavTitle>
+          <CNavTitle className="!text-xs !py-1 !mt-0">Order Management</CNavTitle>
           {orderManagementModules.map((module, index) => {
             if (module.modules_description === 'Sales Order') {
               return (
@@ -425,17 +426,17 @@ export const AppSideBarNew = ({ giveAccess }) => {
       {/*reports*/}
       {shouldDisplayReports && (
         <>
-          <CNavTitle>Reports</CNavTitle>
+          <CNavTitle className="!text-xs !py-1 !mt-0">Reports</CNavTitle>
           {reportModules.map((module, index) => {
-            // if (module.modules_description === 'Reports') {
-            //   return (
-            //     <CNavItem key={index}>
-            //       <CNavLink as={NavLink} to="/reports">
-            //         {navLink('Reports', 'cilFile')}
-            //       </CNavLink>
-            //     </CNavItem>
-            //   )
-            // }
+            if (module.modules_description === 'Reports') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/reports">
+                    {navLink('Reports', 'cilFile')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
             return null
           })}
         </>
@@ -444,7 +445,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
       {/*Settings*/}
       {shouldDisplaySettings && (
         <>
-          <CNavTitle>Settings</CNavTitle>
+          <CNavTitle className="!text-xs !py-1 !mt-0">Settings</CNavTitle>
           {settingModules.map((module, index) => {
             if (module.modules_description === 'Admin Faq') {
               return (

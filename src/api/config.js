@@ -1299,6 +1299,10 @@ export const apiMethods = {
   deleteDropDownValue: async (id) => {
     return await apiClient.delete(`/common-service/dropdown-value/${id}`)
   },
+
+  getState: async () => {
+    return await apiClient.get('/common-service/states')
+  },
 }
 
 export default apiMethods

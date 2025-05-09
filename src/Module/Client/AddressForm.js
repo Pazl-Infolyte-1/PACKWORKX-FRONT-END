@@ -1,84 +1,107 @@
-import { useEffect, useState } from "react";
-import { useFormContext, useFieldArray } from "react-hook-form";
-import ActionButton from "../../components/New/ActionButton";
-import { IoTrash } from "react-icons/io5";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { useFormContext } from 'react-hook-form'
+import { IoTrash } from 'react-icons/io5'
+import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io'
+import { FiCopy } from 'react-icons/fi'
+import { useEffect, useState } from 'react'
+import apiMethods from '../../api/config'
 
 const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
-  //console.log("addressadd",addressAdded)
-  const { control, register, formState: { errors } } = useFormContext();
-  //const { fields, append, remove } = useFieldArray({
-  //  control,
-  //  name: "addresses",
-  //});
+  const {
+    register,
+    formState: { errors },
+    setValue,
+    getValues,
+  } = useFormContext()
 
-  //const [expandedIndices, setExpandedIndices] = useState({}); // Track expanded state for each card
+  const [state, setState] = useState([])
 
-  //const addShippingAddress = () => {
-  //  append(
-  //    {
-  //    type: "Shipping",
-  //    attention: "",
-  //    country: "",
-  //    street1: "",
-  //    street2: "",
-  //    city: "",
-  //    state: "",
-  //    pinCode: "",
-  //    phone: "",
-  //    //faxNumber: "",
-  //  }
-  //);
+  // Set default country value for all addresses on initial load
+  useEffect(() => {
+    fields.forEach((field, index) => {
+      setValue(`addresses.${index}.country`, 'India')
+    })
+  }, [fields, setValue])
 
-  //  // Expand the newly added card by default
-  //  setExpandedIndices((prev) => ({ ...prev, [fields.length]: false }));
-  //};
+  // Function to copy billing address details to shipping address
+  const copyBillingToShipping = () => {
+    // Get the billing address values (always at index 0)
+    const billingAddress = getValues('addresses.0')
 
-  //const toggleExpand = (index) => {
-  //  setExpandedIndices((prev) => ({ ...prev, [index]: !prev[index] }));
-  //};
-  //useEffect(() => {
-  //  if (addressAdded) {
-  //    addShippingAddress();
-  //  }
-  //}, [addressAdded]);
+    // Set shipping address values (always at index 1)
+    setValue('addresses.1.attention', billingAddress.attention)
+    setValue('addresses.1.country', billingAddress.country)
+    setValue('addresses.1.street1', billingAddress.street1)
+    setValue('addresses.1.street2', billingAddress.street2)
+    setValue('addresses.1.city', billingAddress.city)
+    setValue('addresses.1.state', billingAddress.state)
+    setValue('addresses.1.pinCode', billingAddress.pinCode)
+    setValue('addresses.1.phone', billingAddress.phone)
+  }
+
+  useEffect(() => {
+    const FetchData = async () => {
+      try {
+        const response = await apiMethods.getState()
+        setState(response.data.data)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    FetchData()
+  }, [])
+
   return (
-    <div className="ml-5 w-full mt-4">
-      <div className="grid grid-cols-2 gap-6 bg-white rounded-lg w-full">
+    <div className="ml-4 w-full m-2">
+      <div className="grid grid-cols-2 gap-3 bg-white rounded-lg w-full">
         {fields.map((address, index) => {
-          const isExpanded = index <= 1 || expandedIndices[index]; // First two always expanded
+          const isExpanded = index <= 1 || expandedIndices[index]
+          const isFirstShippingAddress = index === 1
 
           return (
             <div
               key={address.id}
-              className={`bg-white shadow-lg rounded-2xl transition-all duration-300 ${
-                isExpanded ? "p-3" : "p-2 h-12 flex items-center"
+              className={`bg-white shadow-md p-4 px-4 rounded-lg transition-all duration-300 ${
+                isExpanded ? 'p-2' : 'p-1 h-10 flex items-center'
               }`}
             >
               {/* Header with title and actions */}
               <div className="flex justify-between items-center w-full">
-                <h3 className="text-lg font-semibold text-gray-700">
-                  {address.type} Address
-                </h3>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-medium text-gray-700">{address.type} Address</h3>
+
+                  {/* Copy Billing Address button only for first Shipping address */}
+                  {isFirstShippingAddress && (
+                    <button
+                      type="button"
+                      onClick={copyBillingToShipping}
+                      className="text-blue-600 hover:text-blue-800 text-xs flex items-center gap-1"
+                    >
+                      <FiCopy size={12} /> Copy billing address
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-1">
                   {/* Toggle Expand Button (Only for added cards, index > 1) */}
                   {index > 1 && (
                     <button
+                      type="button"
                       onClick={() => toggleExpand(index)}
                       className="text-gray-600 hover:text-gray-800 focus:outline-none"
                       aria-label="Toggle Expand"
                     >
-                      {isExpanded ? <IoIosArrowUp size={20} /> : <IoIosArrowDown size={20} />}
+                      {isExpanded ? <IoIosArrowUp size={16} /> : <IoIosArrowDown size={16} />}
                     </button>
                   )}
                   {/* Remove Button (Only for added addresses) */}
                   {index > 1 && (
                     <button
+                      type="button"
                       onClick={() => remove(index)}
                       className="text-red-600 hover:text-red-800 focus:outline-none"
                       aria-label="Remove Address"
                     >
-                      <IoTrash size={20} />
+                      <IoTrash size={16} />
                     </button>
                   )}
                 </div>
@@ -86,146 +109,126 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
 
               {/* Form Fields - Show only when expanded */}
               {isExpanded && (
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                  {/* Name Field */}
-                  <div className="flex flex-col">
-                    <label className="text-sm font-medium text-gray-600">
-                      Name<span className="text-red-500 ml-1">*</span>
-                    </label>
+                <div className="mt-1">
+                  {/* Attention Field */}
+                  <div className="flex items-center mb-2">
+                    <label className="text-xs font-medium text-gray-600 w-24 mr-2">Name</label>
                     <input
                       type="text"
-                      {...register(`addresses.${index}.attention`, { required: "Required" })}
-                      className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
+                      {...register(`addresses.${index}.attention`, { required: 'Required' })}
+                      className="w-64 border border-gray-300 p-1 rounded text-sm"
                     />
-                    {errors.addresses?.[index]?.attention && (
-        <p className="text-red-500 text-xs mt-1">
-          ⊛ {errors.addresses[index].attention.message}
-        </p>
-      )}
                   </div>
 
-                  {/* Country Select */}
-                  <div className="flex flex-col">
-                    <label className="text-sm font-medium text-gray-600">
-                      Country/Region<span className="text-red-500 ml-1">*</span>
+                  {/* Country/Region */}
+                  <div className="flex items-center mb-2">
+                    <label className="text-xs font-medium text-gray-600 w-24 mr-2">
+                      Country/Region
                     </label>
                     <select
-                      {...register(`addresses.${index}.country`,{ required: "Required" })}
-                      defaultValue="IN"
-                      className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
+                      {...register(`addresses.${index}.country`, { required: 'Required' })}
+                      className="w-64 border border-gray-300 p-1 rounded text-sm"
+                      defaultValue="India"
                     >
-                      <option value="">Select</option>
                       <option value="India">India</option>
-                      <option value="US">United States</option>
                     </select>
-                    {errors.addresses?.[index]?.country && (
-        <p className="text-red-500 text-xs mt-1">
-          ⊛ {errors.addresses[index].country.message}
-        </p>
-      )}
                   </div>
 
-                  {/* Street 1 */}
-                  <div className="flex flex-col col-span-2">
-                    <label className="text-sm font-medium text-gray-600">Street 1</label>
-                    <input
-                      type="text"
+                  {/* Address - Street 1 */}
+                  <div className="flex items-start mb-2">
+                    <label className="text-xs font-medium text-gray-600 w-24 mr-2 pt-1">
+                      Address
+                    </label>
+                    <textarea
                       {...register(`addresses.${index}.street1`)}
-                      className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
+                      className="w-64 border border-gray-300 p-1 rounded text-sm h-10"
+                      placeholder="Street 1"
                     />
                   </div>
 
-                  {/* Street 2 */}
-                  <div className="flex flex-col col-span-2">
-                    <label className="text-sm font-medium text-gray-600">Street 2</label>
-                    <input
-                      type="text"
+                  {/* Street 2 - Without Label */}
+                  <div className="flex items-center mb-2">
+                    <div className="w-24 mr-2"></div>
+                    <textarea
                       {...register(`addresses.${index}.street2`)}
-                      className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
+                      className="w-64 border border-gray-300 p-1 rounded text-sm h-10"
+                      placeholder="Street 2"
                     />
                   </div>
 
                   {/* City */}
-                  <div className="flex flex-col">
-                    <label className="text-sm font-medium text-gray-600">
-                      City<span className="text-red-500 ml-1">*</span>
-                    </label>
+                  <div className="flex items-center mb-2">
+                    <label className="text-xs font-medium text-gray-600 w-24 mr-2">City</label>
                     <input
                       type="text"
-                      {...register(`addresses.${index}.city`, { required: "Required" })}
-                      className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
+                      {...register(`addresses.${index}.city`, { required: 'Required' })}
+                      className="w-64 border border-gray-300 p-1 rounded text-sm"
                     />
-                    {errors.addresses?.[index]?.city && (
-        <p className="text-red-500 text-xs mt-1">
-          ⊛ {errors.addresses[index].city.message}
-        </p>
-      )}
                   </div>
 
-                  {/* State Select */}
-                  <div className="flex flex-col">
-                    <label className="text-sm font-medium text-gray-600">
-                      State<span className="text-red-500 ml-1">*</span>
-                    </label>
+                  {/* State */}
+                  <div className="flex items-center mb-2">
+                    <label className="text-xs font-medium text-gray-600 w-24 mr-2">State</label>
                     <select
-                      defaultValue="tn"
-                      {...register(`addresses.${index}.state`, { required: "Required" })}
-                      className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
+                      {...register(`addresses.${index}.state`, { required: 'Required' })}
+                      className="w-64 border border-gray-300 p-1 rounded text-sm"
                     >
                       <option value="">Select State</option>
-                      <option value="Tamilnadu">Tamilnadu</option>
-                      <option value="Andhra Pradesh">Andhra Pradesh</option>
-                      <option value="Kerala">Kerala</option>
-
+                      {state.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.states}
+                        </option>
+                      ))}
                     </select>
-                    {errors.addresses?.[index]?.state && (
-        <p className="text-red-500 text-xs mt-1">
-          ⊛ {errors.addresses[index].state.message}
-        </p>
-      )}
                   </div>
 
                   {/* Pin Code */}
-                  <div className="flex flex-col">
-                    <label className="text-sm font-medium text-gray-600">
-                      Pin Code<span className="text-red-500 ml-1">*</span>
-                    </label>
+                  <div className="flex items-center mb-2">
+                    <label className="text-xs font-medium text-gray-600 w-24 mr-2">Pin Code</label>
                     <input
                       type="text"
-                      {...register(`addresses.${index}.pinCode`, { required: "Required" })}
-                      className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
+                      {...register(`addresses.${index}.pinCode`, { required: 'Required' })}
+                      className="w-64 border border-gray-300 p-1 rounded text-sm"
                     />
-                     {errors.addresses?.[index]?.pinCode && (
-        <p className="text-red-500 text-xs mt-1">
-          ⊛ {errors.addresses[index].pinCode.message}
-        </p>
-      )}
                   </div>
 
                   {/* Phone */}
-                  <div className="flex flex-col">
-                    <label className="text-sm font-medium text-gray-600">
-                      Phone<span className="text-red-500 ml-1">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      {...register(`addresses.${index}.phone`, { required: "Required" })}
-                      className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-200"
-                    />
-                     {errors.addresses?.[index]?.phone && (
-        <p className="text-red-500 text-xs mt-1">
-          ⊛ {errors.addresses[index].phone.message}
-        </p>
-      )}
+                  <div className="flex items-center mb-2">
+                    <label className="text-xs font-medium text-gray-600 w-24 mr-2">Phone</label>
+                    <div className="w-64 flex flex-col">
+                      <input
+                        type="tel"
+                        onKeyDown={(e) => {
+                          // Allow only numbers and specific control keys
+                          if (!/[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/.test(e.key)) {
+                            e.preventDefault()
+                          }
+                        }}
+                        maxLength={10}
+                        {...register(`addresses.${index}.phone`, {
+                          required: 'Phone number is required',
+                          pattern: {
+                            value: /^\d{10}$/,
+                            message: 'Phone number must be exactly 10 digits',
+                          },
+                        })}
+                        className="border border-gray-300 p-1 rounded text-sm w-full"
+                      />
+                      {errors?.addresses?.[index]?.phone && (
+                        <span className="text-red-500 text-xs mt-1">
+                          {errors.addresses[index].phone.message}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
             </div>
-          );
+          )
         })}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AddressForm;
+export default AddressForm

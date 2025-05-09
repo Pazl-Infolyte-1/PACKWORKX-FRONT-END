@@ -28,14 +28,16 @@ const GrnView = ({ id, handleEdit, setOpenGrnModal }) => {
           <div className="mt-2 flex items-center">
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${
-                grnDetails?.status === 'Pending'
+                grnDetails?.status === 'inactive'
                   ? 'bg-yellow-100 text-yellow-800'
-                  : grnDetails?.status === 'Completed'
+                  : grnDetails?.status === 'active'
                     ? 'bg-green-100 text-green-800'
                     : 'bg-gray-100 text-gray-800'
               }`}
             >
-              {grnDetails?.status}
+              {grnDetails?.status
+                ? grnDetails.status.charAt(0).toUpperCase() + grnDetails.status.slice(1)
+                : ''}
             </span>
             <span className="mx-2 text-gray-400">•</span>
             <span className="text-gray-600">
@@ -116,9 +118,6 @@ const GrnView = ({ id, handleEdit, setOpenGrnModal }) => {
                         Item Code
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Grn Item Name
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Ordered Quantity
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -149,9 +148,6 @@ const GrnView = ({ id, handleEdit, setOpenGrnModal }) => {
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                           {order.item_code}
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                          {order.grn_item_name}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                           {order.quantity_ordered}

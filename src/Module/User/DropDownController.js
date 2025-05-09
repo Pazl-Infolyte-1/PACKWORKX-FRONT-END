@@ -1,251 +1,145 @@
-import React, { useEffect, useRef, useState } from 'react';
-import CategoryList from './CategoryList.js';
-import CategoryOptions from './CategoryOption.js';
-import EmptyState from './EmptyState.js';
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import CategoryList from './CategoryList.js'
+import CategoryOptions from './CategoryOption.js'
+import EmptyState from './EmptyState.js'
+import apiMethods from '../../api/config'
+import { AuthContext } from '../../Context/AuthContext.js'
 
 const Setting = () => {
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [isAddingOption, setIsAddingOption] = useState(false);
-  const [newOptionText, setNewOptionText] = useState('');
-  const [editingOption, setEditingOption] = useState(null);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const menuRef = useRef(null);
-  
-  const [categories, setCategories] = useState([
-        {
-          id: 1,
-          name: 'Materials',
-          items: [
-            { id: 101, value: 'Wood' },
-            { id: 102, value: 'Steel' },
-            { id: 103, value: 'Plastic' },
-            { id: 104, value: 'Glass' },
-            { id: 105, value: 'Aluminum' }
-          ]
-        },
-        {
-          id: 2,
-          name: 'Sizes',
-          items: [
-            { id: 201, value: 'Small' },
-            { id: 202, value: 'Medium' },
-            { id: 203, value: 'Large' },
-            { id: 204, value: 'X-Large' },
-            { id: 205, value: 'Custom' }
-          ]
-        },
-        {
-          id: 3,
-          name: 'Colors',
-          items: [
-            { id: 301, value: 'Red' },
-            { id: 302, value: 'Blue' },
-            { id: 303, value: 'Green' },
-            { id: 304, value: 'Yellow' },
-            { id: 305, value: 'Black' },
-            { id: 306, value: 'White' }
-          ]
-        },
-        {
-          id: 4,
-          name: 'Finishes',
-          items: [
-            { id: 401, value: 'Matte' },
-            { id: 402, value: 'Glossy' },
-            { id: 403, value: 'Textured' },
-            { id: 404, value: 'Polished' }
-          ]
-        },
-        {
-          id: 5,
-          name: 'Weights',
-          items: [
-            { id: 501, value: 'Light' },
-            { id: 502, value: 'Medium' },
-            { id: 503, value: 'Heavy' }
-          ]
-        },
-        {
-          id: 6,
-          name: 'Shapes',
-          items: [
-            { id: 601, value: 'Square' },
-            { id: 602, value: 'Rectangle' },
-            { id: 603, value: 'Circle' },
-            { id: 604, value: 'Triangle' },
-            { id: 605, value: 'Custom' }
-          ]
-        },
-        {
-          id: 7,
-          name: 'Patterns',
-          items: [
-            { id: 701, value: 'Solid' },
-            { id: 702, value: 'Striped' },
-            { id: 703, value: 'Dotted' },
-            { id: 704, value: 'Checkered' }
-          ]
-        },
-        {
-          id: 8,
-          name: 'Textures',
-          items: [
-            { id: 801, value: 'Smooth' },
-            { id: 802, value: 'Rough' },
-            { id: 803, value: 'Bumpy' },
-            { id: 804, value: 'Ridged' }
-          ]
-        },
-        {
-          id: 9,
-          name: 'Styles',
-          items: [
-            { id: 901, value: 'Modern' },
-            { id: 902, value: 'Classic' },
-            { id: 903, value: 'Vintage' },
-            { id: 904, value: 'Industrial' },
-            { id: 905, value: 'Minimalist' }
-          ]
-        },
-                {
-          id: 10,
-          name: 'Gender',
-          items: [
-            { id: 901, value: 'Modern' },
-            { id: 902, value: 'Classic' },
-            { id: 903, value: 'Vintage' },
-            { id: 904, value: 'Industrial' },
-            { id: 905, value: 'Minimalist' }
-          ]
-        },
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [isAddingOption, setIsAddingOption] = useState(false)
+  const [newOptionText, setNewOptionText] = useState('')
+  const [editingOption, setEditingOption] = useState(null)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const menuRef = useRef(null)
+  const [refresh, setRefresh] = useState(false)
+  const [categories, setCategories] = useState([])
+  const { user } = useContext(AuthContext)
+  const [dropdownValue, setDropDownValue] = useState([])
 
-      ]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await apiMethods.getDropDown()
+        setCategories(response.data)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    fetchData()
+  }, [refresh])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await apiMethods.getDropDownValue()
+        setDropDownValue(response.data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    fetchData()
+  }, [refresh])
+
+  console.log(refresh, 'categories')
+
   // Generate a new ID for a new option
   const generateNewId = (categoryId) => {
-    const prefix = categoryId * 100;
-    const currentItems = categories.find(cat => cat.id === categoryId).items;
-    const maxId = currentItems.reduce((max, item) => Math.max(max, item.id), prefix);
-    return maxId + 1;
-  };
+    const prefix = categoryId * 100
+    const currentItems = categories.find((cat) => cat.id === categoryId).items
+    const maxId = currentItems.reduce((max, item) => Math.max(max, item.id), prefix)
+    return maxId + 1
+  }
 
   const handleSelectCategory = (category) => {
-    setSelectedCategory(category);
-    setIsAddingOption(false);
-    setEditingOption(null);
-    setIsMobileMenuOpen(false); // Close mobile menu when category is selected
-  };
+    setSelectedCategory(category)
+    setIsAddingOption(false)
+    setEditingOption(null)
+    setIsMobileMenuOpen(false)
+  }
 
-  const handleAddOption = () => {
-    if (newOptionText.trim() && selectedCategory) {
-      const updatedCategories = categories.map(category => {
-        if (category.id === selectedCategory.id) {
-          return {
-            ...category,
-            items: [
-              ...category.items,
-              {
-                id: generateNewId(category.id),
-                value: newOptionText.trim()
-              }
-            ]
-          };
-        }
-        return category;
-      });
-      
-      setCategories(updatedCategories);
-      setNewOptionText('');
-      setIsAddingOption(false);
+  const handleAddOption = async () => {
+    if (newOptionText?.trim() && selectedCategory) {
+      const payload = {
+        client_id: user.id,
+        dropdown_id: selectedCategory.id,
+        dropdown_value: newOptionText.trim(),
+      }
+
+      const response = await apiMethods.addDropDownValue(payload)
+      if (response.status === 200 || response.status === 201) {
+        setRefresh((prev) => !prev)
+      }
+      setNewOptionText('')
+      setIsAddingOption(false)
     }
-  };
+  }
 
   const handleEditCategory = (categoryId, newName) => {
-    const updatedCategories = categories.map(category => {
+    console.log('Edit category', categoryId, newName)
+
+    const updatedCategories = categories.map((category) => {
       if (category.id === categoryId) {
         return {
           ...category,
-          name: newName
-        };
+          name: newName,
+        }
       }
-      return category;
-    });
-    
-    setCategories(updatedCategories);
-    
+      return category
+    })
+
+    setCategories(updatedCategories)
+
     // If we're editing the currently selected category, update it too
     if (selectedCategory && selectedCategory.id === categoryId) {
       setSelectedCategory({
         ...selectedCategory,
-        name: newName
-      });
+        name: newName,
+      })
     }
-  };
+  }
 
-  const handleUpdateOption = (optionId, newValue) => {
-    if (newValue.trim() && selectedCategory) {
-      const updatedCategories = categories.map(category => {
-        if (category.id === selectedCategory.id) {
-          return {
-            ...category,
-            items: category.items.map(item => 
-              item.id === optionId ? { ...item, value: newValue.trim() } : item
-            )
-          };
-        }
-        return category;
-      });
-      
-      setCategories(updatedCategories);
-      setEditingOption(null);
+  const handleUpdateOption = async (item, editData) => {
+    try {
+      const payload = {
+        id: item.id,
+        client_id: user.id,
+        dropdown_id: item.dropdown_id,
+        dropdown_value: editData,
+      }
+      const response = await apiMethods.updateDropDownValue(payload)
+      if (response.status === 200 || response.status === 201) {
+        setRefresh((prev) => !prev)
+      }
+    } catch (error) {
+      console.error(error)
     }
-  };
+    setEditingOption(null)
+  }
 
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setIsMobileMenuOpen(false);
+        setIsMobileMenuOpen(false)
       }
-    };
+    }
 
     if (isMobileMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside)
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isMobileMenuOpen]);
-
-  const handleDeleteOption = (optionId) => {
-    console.log("del",optionId)
-    const updatedCategories = categories.map(category => {
-      if (category.id === selectedCategory.id) {
-        return {
-          ...category,
-          items: category.items.filter(item => item.id !== optionId)
-        };
-      }
-      return category;
-    });
-    
-    setCategories(updatedCategories);
-  };
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-  const handleDeleteCategory = (categoryId) => {
-    if (window.confirm("Are you sure you want to delete this category?")) {
-      const updatedCategories = categories.filter(category => category.id !== categoryId);
-      setCategories(updatedCategories);
-  
-      // If the deleted category was the selected one, clear selection
-      if (selectedCategory?.id === categoryId) {
-        setSelectedCategory(null);
-      }
+      document.removeEventListener('mousedown', handleClickOutside)
     }
-  };
-  
+  }, [isMobileMenuOpen])
+
+  const handleDeleteOption = async (optionId) => {
+    const response = await apiMethods.deleteDropDownValue(optionId)
+    if (response.status === 200 || response.status === 201) {
+      setRefresh((prev) => !prev)
+    }
+  }
+
   return (
     <div className="flex h-[80vh] w-full xxxl:h-[90vh] overflow-hidden">
       <div className="flex flex-col md:flex-row w-full bg-gray-50 relative">
@@ -271,7 +165,7 @@ const Setting = () => {
               />
             </svg>
           </button>
-  
+
           {/* Dropdown list for categories on mobile */}
           {isMobileMenuOpen && (
             <div className="absolute left-4 right-4 top-[70px] bg-white shadow-lg rounded-lg overflow-hidden z-50 border border-gray-200">
@@ -280,17 +174,17 @@ const Setting = () => {
                   categories={categories}
                   selectedCategory={selectedCategory}
                   onSelectCategory={(category) => {
-                    handleSelectCategory(category);
-                    setIsMobileMenuOpen(false); // Close dropdown after selecting
+                    handleSelectCategory(category)
+                    setIsMobileMenuOpen(false)
                   }}
                   onEditCategory={handleEditCategory}
-                  onDeleteCategory={handleDeleteCategory}
+                  setRefresh={setRefresh}
                 />
               </div>
             </div>
           )}
         </div>
-  
+
         {/* Category sidebar - only visible on md screens and larger */}
         <div className="hidden md:block bg-white shadow-sm md:shadow-md md:w-64">
           <CategoryList
@@ -298,15 +192,15 @@ const Setting = () => {
             selectedCategory={selectedCategory}
             onSelectCategory={handleSelectCategory}
             onEditCategory={handleEditCategory}
-            onDeleteCategory={handleDeleteCategory}
-
+            setRefresh={setRefresh}
           />
         </div>
-  
+
         {/* Main content area */}
         <div className="flex-1 p-4 overflow-auto">
           {selectedCategory ? (
             <CategoryOptions
+              dropdownValue={dropdownValue}
               category={selectedCategory}
               isAddingOption={isAddingOption}
               newOptionText={newOptionText}
@@ -317,6 +211,7 @@ const Setting = () => {
               onSetAddingOption={setIsAddingOption}
               onSetNewOptionText={setNewOptionText}
               onSetEditingOption={setEditingOption}
+              refresh={refresh}
             />
           ) : (
             <EmptyState />
@@ -324,9 +219,7 @@ const Setting = () => {
         </div>
       </div>
     </div>
-  );
-  
-  
-};
+  )
+}
 
-export default Setting;
+export default Setting

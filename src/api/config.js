@@ -1267,6 +1267,42 @@ export const apiMethods = {
       console.error(error)
     }
   },
+
+  getDropDown: async () =>{
+    return await apiClient.get('/common-service/dropdown-name')
+  },
+
+  addDropdownName: async (payload) => {
+    return await apiClient.post('/common-service/dropdown-name', payload)
+  },
+
+  editDropdownName: async (payload) => {
+    return await apiClient.put(`/common-service/dropdown-name/${payload.client_id}`, payload)
+  },
+
+  deleteDropdownName: async (id) => {
+    return await apiClient.delete(`/common-service/dropdown-name/${id}`)
+  },
+
+  getDropDownValue: async () => {
+    return await apiClient.get('/common-service/dropdown-value')
+  },
+
+  addDropDownValue: async (payload) => {
+    return await apiClient.post('/common-service/dropdown-value', payload)
+  },
+
+  updateDropDownValue: async (payload) => {
+    return await apiClient.put(`/common-service/dropdown-value/${payload.id}`, payload)
+  },
+
+  deleteDropDownValue: async (id) => {
+    return await apiClient.delete(`/common-service/dropdown-value/${id}`)
+  },
+
+  getState: async () => {
+    return await apiClient.get('/common-service/states')
+  },
 }
 
 export default apiMethods

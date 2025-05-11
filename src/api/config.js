@@ -1267,6 +1267,9 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  getSkuByClientId:async(client_id)=>{
+    return await apiClient.get(`sku-details/client-sku/${client_id}`)
+  }
 }
 
 export default apiMethods

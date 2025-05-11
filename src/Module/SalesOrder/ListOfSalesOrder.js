@@ -269,7 +269,7 @@ function ListOfSalesOrder() {
     onConfirm={() => {
       setCanDeactivate(false);
       setDrawerOpen(false)
-      isTouched(false)
+      setIsTouched(false)
         }
     }
     variant="unsavedChanges"

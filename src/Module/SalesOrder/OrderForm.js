@@ -2,6 +2,7 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } f
 import SkuDetails from './SkuDetails'
 import apiMethods from '../../api/config';
 import ActionButton from '../../components/New/ActionButton';
+import { useSelector } from 'react-redux';
 
 const OrderForm = forwardRef(({
   formData,
@@ -12,7 +13,8 @@ const OrderForm = forwardRef(({
   setDrawer,
   totals,
   setTotals,
-  setIsFormTouched
+  setIsFormTouched,
+  handleSubmit1
 }, ref) => {
 
   const [clients, setClients] = useState([]); // State for client list
@@ -20,8 +22,14 @@ const OrderForm = forwardRef(({
   const [localFormData, setLocalFormData] = useState(formData);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-const [errors, setErrors] = useState({});
-const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+  const [selectedClient,setSelectedClient] = useState('')
+  const stateID = useSelector(state => state.auth)
+
+
+
+
   const dropdownRef = useRef(null);
 
 
@@ -46,12 +54,32 @@ const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   }, []);
 
   // Handle client selection
-  const selectClient = (clientName) => {
+  const selectClient = (clientName,client_id) => {
+
     // Update form with selected client
     const event = { target: { name: 'client', value: clientName } };
+    setSelectedClient(client_id)
     handleInputChange(event);
     setIsOpen(false);
   };
+
+  useEffect(() => {
+
+    const selectedClient = clients.find(
+      (client) => client.company_name === localFormData.client
+    );
+  
+    if (selectedClient) {
+      if(selectedClient.stateID == stateID){
+      alert('cgst and sgst ')
+      }else{
+        // alert('igst')
+      }
+
+      setSelectedClient(selectedClient?.client_id)
+    }
+  }, [localFormData.client,clients]);
+  
 
   useImperativeHandle(ref, () => ({
     getCompleteFormData: {
@@ -142,7 +170,7 @@ const [attemptedSubmit, setAttemptedSubmit] = useState(false);
     const { name, value } = e.target;
     setIsFormTouched(true)
     errors[name] = ""
-    
+
     let updatedData;
 
     // For client selection, include both name and ID
@@ -192,42 +220,34 @@ const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
-  
+
     // Required fields validation
     if (!localFormData.sales_ui_id) newErrors.sales_ui_id = "Required";
     if (!localFormData.estimated) newErrors.estimated = "Required";
     if (!localFormData.client) newErrors.client = "Required";
     if (!localFormData.credit_period) newErrors.credit_period = "Required";
-  
-    // Confirmation method validation
-    if (confirmationMethod === "Email" && !localFormData.confirmation_email) {
-      newErrors.confirmation_email = "Required";
-    }
-    if (confirmationMethod === "Oral") {
-      if (!localFormData.confirmation_name) newErrors.confirmation_name = "Required";
-      if (!localFormData.confirmation_mobile) newErrors.confirmation_mobile = "Required";
-    }
-  
+
+
     // SKU validation
     const skuErrors = [];
     let hasSkuError = false;
-    
+
     skuFormData.skuDetails?.forEach((skuItem, index) => {
       if (!skuItem.sku || skuItem.sku.trim() === "") {
         skuErrors[index] = "Required";
         hasSkuError = true;
       }
     });
-  
+
     if (hasSkuError) {
       newErrors.skuDetails = skuErrors;
     }
-  
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  
+
 
   // Handle form submission
   const handleSubmit = (e) => {
@@ -253,106 +273,53 @@ const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <div className="p-2 mt-2 flex flex-1 rounded-lg border border-[#c2c2c2] w-full ">
-          {/* Title */}
+    <form onSubmit={handleSubmit} className="pl-2">
+      <div className="relative">
+        <div className="w-full">
+          {/* Form Content */}
           <div className="w-full">
-            <h2 className="text-lg font-semibold">Order Details</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              {/* Item 1 - Split into Two Inputs */}
-              <div className="p-2 rounded-lg flex flex-col sm:flex-row gap-4">
-                {/* Sales Order Id */}
-                <div className="flex flex-col flex-1">
-                  <label className="text-black font-normal leading-6 mb-2 text-left">
-                    Sales Order Id <span className='text-red-500'>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="sales_ui_id"
-                    value={localFormData.sales_ui_id || ""}
-                    onChange={handleInputChange}
-                    className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                  />
-                  {attemptedSubmit && errors.sales_ui_id && (
-    <div className="text-red-500 text-xs mt-1 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      {errors.sales_ui_id}
-    </div>
-  )}
-                </div>
-
-                {/* Estimated */}
-                <div className="flex flex-col flex-1">
-                  <label className="text-black font-normal leading-6 mb-2 text-left">
-                    Estimated <span className='text-red-500'>*</span>
-                  </label>
-                  <input
-                    type="date"
-                    name="estimated"
-                    value={formatDate(localFormData.estimated) || ""}
-                    onChange={handleInputChange}
-                    className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white text-[#333] text-[16px] leading-[26px] outline-none placeholder:text-sm"
-                  />
-                  {attemptedSubmit && errors.estimated && (
-    <div className="text-red-500 text-xs mt-1 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      {errors.estimated}
-    </div>
-  )}
-                </div>
-              </div>
-
-              {/* Client */}
-              <div className="p-2 rounded-lg flex flex-col">
-                <label className="text-black font-normal leading-6 mb-2 text-left">
-                  Client <span className='text-red-500'>*</span>
+            <div className="flex flex-col gap-4">
+              {/* Customer Name */}
+              <div className="flex items-center bg-gray-50 py-4">
+                <label className="text-sm text-red-600 w-40">
+                  Customer Name*
                 </label>
-                <div className="relative w-full" ref={dropdownRef}>
+                <div className="relative" ref={dropdownRef}>
                   <div
-                    className="w-full h-[40px] px-3 border border-gray-300 rounded-md bg-white text-gray-800 flex items-center justify-between cursor-pointer hover:border-[#8167E5] transition-all duration-200"
+                    className="flex h-9 w-[30rem] items-center justify-between rounded-l border border-gray-300 px-3 text-sm cursor-pointer bg-white"
                     onClick={() => {
                       setIsOpen(!isOpen);
                       errors.client = "";
                     }}
-                    
                   >
-                    <span className=" truncate">
-                      {localFormData.client || "Select Client"}
+                    <span className="truncate text-sm text-gray-500">
+                      {localFormData.client || "Select or add a customer"}
                     </span>
                     <span className="text-gray-500">
                       {isOpen ?
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="m18 15-6-6-6 6" />
                         </svg>
                         :
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="m6 9 6 6 6-6" />
                         </svg>
                       }
                     </span>
                   </div>
                   {attemptedSubmit && errors.client && (
-      <div className="text-red-500 text-xs mt-1 flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        {errors.client}
-      </div>
-    )}
+                    <div className="text-red-500 text-xs mt-1 flex items-center absolute">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                      </svg>
+                      {errors.client}
+                    </div>
+                  )}
 
                   {isOpen && (
-                    <div className="absolute w-full mt-1 border border-gray-200 rounded-md bg-white z-10 max-h-[300px] overflow-y-auto shadow-md">
+                    <div className="absolute z-10 mt-1 max-h-60 w-96 overflow-y-auto rounded border border-gray-200 bg-white shadow-md">
                       <div className="sticky top-0 bg-white p-2 border-b border-gray-200">
                         <div className="relative">
                           <input
@@ -360,20 +327,20 @@ const [attemptedSubmit, setAttemptedSubmit] = useState(false);
                             placeholder="Search clients..."
                             value={searchTerm}
                             onChange={handleSearchChange}
-                            className="w-full h-[35px] pl-8 pr-2 border border-gray-200 rounded-md bg-gray-50 text-black focus:outline-none focus:border-[#8167E5] focus:bg-white"
+                            className="h-9 w-full rounded border border-gray-300 bg-gray-50 pl-8 pr-2 text-sm"
                             onClick={(e) => e.stopPropagation()}
                           />
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
+                            width="12"
+                            height="12"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                           >
                             <circle cx="11" cy="11" r="8" />
                             <path d="m21 21-4.3-4.3" />
@@ -385,210 +352,248 @@ const [attemptedSubmit, setAttemptedSubmit] = useState(false);
                         clients.map((client, index) => (
                           <div
                             key={index}
-                            className="px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors duration-150"
-                            onClick={() => selectClient(client.company_name)}
+                            className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
+                            onClick={() => selectClient(client.company_name,client.client_id)}
                           >
                             {client.company_name}
                           </div>
                         ))
                       ) : (
-                        <div className="px-3 py-2 text-gray-500">No results found</div>
+                        <div className="px-3 py-2 text-xs text-gray-500">No results found</div>
                       )}
+                    </div>
+                  )}
+                </div>
+                <button type='button' className=" h-9 w-9 flex items-center justify-center bg-blue-500 text-white rounded-r">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Sales Order Id */}
+              <div className="flex items-center mt-3">
+                <label className="text-sm text-red-600 w-40">
+                  Sales Order#*
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="sales_ui_id"
+                    value={localFormData.sales_ui_id || ""}
+                    onChange={handleInputChange}
+                    className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
+                  />
+                  <button type='button' className="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="3" />
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                  </button>
+                  {attemptedSubmit && errors.sales_ui_id && (
+                    <div className="text-red-500 text-xs mt-1 flex items-center absolute">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                      </svg>
+                      {errors.sales_ui_id}
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Client Period */}
-              <div className="p-2 rounded-lg flex flex-col">
-                <label className="text-black font-normal leading-6 mb-2 text-left">
-                  Client Period <span className='text-red-500'>*</span>
+
+              {/* Expected Shipment */}
+              <div className="flex items-center">
+                <label className="text-sm text-red-600 w-40">
+                  Expected Shipment
                 </label>
-                <input
-                  type="number"
-                  name="credit_period"
-                  value={localFormData.credit_period || ""}
-                  onChange={handleInputChange}
-                  className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                />
-                {attemptedSubmit && errors.credit_period && (
-    <div className="text-red-500 text-xs mt-1 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      {errors.credit_period}
-    </div>
-  )}
-              </div>
-
-              {/* Freight Paid */}
-              <div className="p-2 rounded-lg flex flex-col">
-                <label className="text-black font-normal leading-6 mb-2 text-left">
-                  Freight Paid
-                </label>
-                <input
-                  type="number"
-                  name="freight_paid"
-                  min="0"
-                  value={localFormData.freight_paid || ""}
-                  onChange={handleInputChange}
-                  className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                />
-              </div>
-
-              {/* Confirmation By */}
-              <div className="p-2 rounded-lg flex flex-col">
-                <label className="text-black font-normal leading-6 mb-2 text-left">
-                  Confirmation By <span className='text-red-500'>*</span>
-                </label>
-                <div
-                  className="relative w-[160px] h-[34px] bg-white border border-[#8167E5] rounded-[10px] shadow-md cursor-pointer flex items-center justify-between px-2"
-                  onClick={handleToggleChange}
-                >
-                  {/* Email Text */}
-                  <span
-                    className={`text-[14px] text-center w-1/2 z-10 transition-all ${confirmationMethod === "Email" ? "text-white" : "text-black"
-                      }`}
-                  >
-                    Email
-                  </span>
-
-                  {/* Toggle Indicator */}
-                  <div
-                    className={`absolute top-1/2 w-[50%] h-[100%] bg-[#8167E5] rounded-[10px] transform -translate-y-1/2 transition-all duration-300 ${confirmationMethod === "Email" ? "left-0" : "left-1/2"
-                      }`}
-                  ></div>
-
-                  {/* Oral Text */}
-                  <span
-                    className={`text-[14px] text-center w-1/2 z-10 transition-all ${confirmationMethod === "Email" ? "text-black" : "text-white"
-                      }`}
-                  >
-                    Oral
-                  </span>
+                <div className="relative">
+                  <input
+                    type="date"
+                    name="estimated"
+                    placeholder="dd/MM/yyyy"
+                    value={localFormData.estimated || ""}
+                    onChange={handleInputChange}
+                    className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
+                  />
+                  {attemptedSubmit && errors.estimated && (
+                    <div className="text-red-500 text-xs mt-1 flex items-center absolute">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                      </svg>
+                      {errors.estimated}
+                    </div>
+                  )}
                 </div>
               </div>
 
+
+              {/* Credit Period */}
+              <div className="flex items-center">
+                <label className="text-sm text-red-600 w-40">
+                  Client Period
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    name="credit_period"
+                    value={localFormData.credit_period || ""}
+                    onChange={handleInputChange}
+                    className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
+                  />
+                  {attemptedSubmit && errors.credit_period && (
+                    <div className="text-red-500 text-xs mt-1 flex items-center absolute">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                      </svg>
+                      {errors.credit_period}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Freight Paid */}
+              <div className="flex items-center">
+                <label className="text-sm text-gray-700 w-40">
+                  Freight Paid
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    name="freight_paid"
+                    min="0"
+                    value={localFormData.freight_paid || ""}
+                    onChange={handleInputChange}
+                    className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
+                  />
+                </div>
+              </div>
+
+        <div className="border-t border-gray-100 mt-2 pb-2 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div>
+
+
+              {/* Confirmation By */}
+              <div className="flex items-center">
+                <label className="text-sm text-gray-700 w-40">
+                  Confirmation By <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div
+                    className="relative flex h-8 w-48 cursor-pointer items-center justify-between rounded border border-[#8761e5] px-2"
+                    onClick={handleToggleChange}
+                  >
+                    {/* Email Text */}
+                    <span
+                      className={`z-10 w-1/2 text-center text-xs transition-all ${confirmationMethod === "Email" ? "text-white" : "text-black"}`}
+                    >
+                      Email
+                    </span>
+
+                    {/* Toggle Indicator */}
+                    <div
+                      className={`absolute left-0 top-0 h-full w-1/2 rounded bg-[#8761e5] transition-all duration-300 ${confirmationMethod === "Email" ? "left-0" : "left-1/2"
+                        }`}
+                    ></div>
+
+                    {/* Oral Text */}
+                    <span
+                      className={`z-10 w-1/2 text-center text-xs transition-all ${confirmationMethod === "Email" ? "text-black" : "text-white"}`}
+                    >
+                      Oral
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+
               {/* Dynamic Input Fields */}
               {confirmationMethod === "Email" && (
-                <div className="p-2 rounded-lg flex flex-col">
-                  <label className="text-black font-normal leading-6 mb-2 text-left">
-                    Confirmation Email <span className='text-red-500'>*</span>
+                <div className="flex items-center">
+                  <label className="text-sm text-gray-700 w-40">
+                    Confirmation Email
                   </label>
-                  <input
-                    type="email"
-                    name="confirmation_email"
-                    value={localFormData.confirmation_email || ""}
-                    onChange={handleInputChange}
-                    className="w-full h-[40px] px-2 border border-[#c2c2c2] rounded-md outline-none"
-                  />
-                      {attemptedSubmit && errors.confirmation_email && (
-      <div className="text-red-500 text-xs mt-1 flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        {errors.confirmation_email}
-      </div>
-    )}
+                  <div className="relative z-1">
+                    <input
+                      type="email"
+                      name="confirmation_email"
+                      value={localFormData.confirmation_email || ""}
+                      onChange={handleInputChange}
+                      className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
+                    />
+                  </div>
                 </div>
               )}
 
               {confirmationMethod === "Oral" && (
-                <div className="p-2 rounded-lg flex flex-col sm:flex-row gap-4">
-                  <div className="flex flex-col flex-1">
-                    <label className="text-black font-normal leading-6 mb-2 text-left">
-                      Confirmation Name <span className='text-red-500'>*</span>
+                <>
+                  <div className="flex items-center">
+                    <label className="text-sm text-gray-700 w-40">
+                      Confirmation Name
                     </label>
-                    <input
-                      type="text"
-                      name="confirmation_name"
-                      value={localFormData.confirmation_name || ""}
-                      onChange={handleInputChange}
-                      className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                    />
-                          {attemptedSubmit && errors.confirmation_name && (
-        <div className="text-red-500 text-xs mt-1 flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-          {errors.confirmation_name}
-        </div>
-      )}
-
+                    <div className="relative">
+                      <input
+                        type="text"
+                        name="confirmation_name"
+                        value={localFormData.confirmation_name || ""}
+                        onChange={handleInputChange}
+                        className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
+                      />
+                    </div>
                   </div>
-
-                  <div className="flex flex-col flex-1">
-                    <label className="text-black font-normal leading-6 mb-2 text-left">
-                      Confirmation Mobile <span className='text-red-500'>*</span>
-                    </label>
-                    <input
-                      type="number"
-                      name="confirmation_mobile"
-                      value={localFormData.confirmation_mobile || ""}
-                      onChange={handleInputChange}
-                      className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                    />
-                    {attemptedSubmit && errors.confirmation_mobile && (
-        <div className="text-red-500 text-xs mt-1 flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-          {errors.confirmation_mobile}
-        </div>
-      )}
-                  </div>
-                </div>
+                </>
               )}
             </div>
           </div>
         </div>
 
-        <SkuDetails
-          skuDetailsForm={skuDetailsForm}
-          setFormData={handleSkuForm}
-          showSubmitButton={false} // This prop tells SkuDetails not to show its submit button
-          totals={totals}
-          setTotals={setTotals}
-          setIsFormTouched={setIsFormTouched}
-          errors={errors} // Pass the errors object from your parent component
-          setErrors={setErrors}
-        />
+        <div className="border-t border-gray-100 mt-10 pb-6 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div>
 
-        {/* Submit Button */}
-        {/* <div className="mt-4 flex justify-end">
-          <div className='flex gap-4'>
-          <ActionButton
-          onClick={()=>{
-            setDrawer(false)
-          }}
-            variant="cancel"
-            label={"cancel"}
-            />
+        
 
-          <button
-            type="submit"
-            className="px-4 py-2 bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
-            >
-            Submit Order
-          </button>
+        <div className="mt-8 mb-4">
+          <SkuDetails
+            skuDetailsForm={skuDetailsForm}
+            setFormData={handleSkuForm} 
+            showSubmitButton={false}
+            totals={totals}
+            setTotals={setTotals}
+            setIsFormTouched={setIsFormTouched}
+            errors={errors}
+            setErrors={setErrors}
+            selectedClient={selectedClient}
+          />
+        </div>
 
+        {/* Submit Buttons Section */}
+        <div className="fixed bottom-0 bg-white border-t border-gray-200 z-10 flex p-1 py-2 w-full">
+          <div className="flex-1 justify-start">
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => setDrawer(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-all"
+                
+              >
+                Cancel
+              </button>
+
+              <ActionButton
+                onClick={handleSubmit1}
+                className="px-4 py-2 bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
+                label={"Submit Order"}
+              >
+                
+              </ActionButton>
             </div>
-        </div> */}
-
-        {/* <button
-            type="submit"
-            className="px-4 py-2 bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
-            >
-            Submit Order
-          </button> */}
+          </div>
+        </div>
 
       </div>
     </form>

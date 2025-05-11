@@ -309,57 +309,57 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
 
 
   return (
-    <div className="screen p-4">
+    <div className="screen p-1">
       <CCol xs={12}>
-  <div className="d-flex justify-content-between align-items-center">
-    <CNav variant="tabs" className="flex-grow-1">
-      <CNavItem key={'salesOrder'}>
-        <CNavLink
-          active={activeTab === 'salesOrder'}
-          onClick={(e) => {
-            e.preventDefault()
-            setActiveTab('salesOrder')
-          }}
-          style={{
-            backgroundColor: activeTab === 'salesOrder' ? '#8761e5' : 'transparent',
-            color: activeTab === 'salesOrder' ? '#ffffff' : '#8761e5',
-            cursor: 'pointer',
-          }}
-        >
-          {'Add Sales Order'}
-        </CNavLink>
-      </CNavItem>
-      <CNavItem key={'skuDetails'}>
-        <CNavLink
-          active={activeTab === 'skuDetails'}
-          onClick={(e) => {
-            e.preventDefault()
-            setActiveTab('skuDetails')
-          }}
-          style={{
-            backgroundColor: activeTab === 'skuDetails' ? '#8761e5' : 'transparent',
-            color: activeTab === 'skuDetails' ? '#ffffff' : '#8761e5',
-            cursor: 'pointer',
-          }}
-        >
-          {'Work Order'}
-        </CNavLink>
-      </CNavItem>
-
-{/* Next/Back Navigation */}
-
-
-    </CNav>
+  <div className="flex justify-content-between">
+   <CNav variant="tabs" className="flex-grow-1">
+  <CNavItem key={'salesOrder'}>
+    <CNavLink
+      active={activeTab === 'salesOrder'}
+      onClick={(e) => {
+        e.preventDefault()
+        setActiveTab('salesOrder')
+      }}
+      style={{
+        backgroundColor: activeTab === 'salesOrder' ? '#8761e5' : 'transparent',
+        color: activeTab === 'salesOrder' ? '#ffffff' : '#8761e5',
+        cursor: 'pointer',
+        fontSize: '0.85rem',       // Reduced font size
+        padding: '0.4rem 0.8rem',  // Reduced padding
+      }}
+    >
+      {'Add Sales Order'}
+    </CNavLink>
+  </CNavItem>
+  <CNavItem key={'skuDetails'}>
+    <CNavLink
+      active={activeTab === 'skuDetails'}
+      onClick={(e) => {
+        e.preventDefault()
+        setActiveTab('skuDetails')
+      }}
+      style={{
+        backgroundColor: activeTab === 'skuDetails' ? '#8761e5' : 'transparent',
+        color: activeTab === 'skuDetails' ? '#ffffff' : '#8761e5',
+        cursor: 'pointer',
+        fontSize: '0.85rem',       // Reduced font size
+        padding: '0.4rem 0.8rem',  // Reduced padding
+      }}
+    >
+      {'Work Order'}
+    </CNavLink>
+  </CNavItem>
+</CNav>
     
 
-    {activeTab === 'salesOrder' && (
+    {/* {activeTab === 'salesOrder' && (
 
 <ActionButton
  onClick={handleParentSubmit}
  label={"Submit"}
  variant='submit'
  />
-    )}
+    )} */}
 
 
 <div className="ml-2 flex items-center space-x-2">
@@ -494,6 +494,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
             setTotals={setTotals}
             ref={childRef}
             setIsFormTouched={setIsFormTouched}
+            handleSubmit1={handleParentSubmit}
           />
         )}
         {activeTab === 'skuDetails' && (

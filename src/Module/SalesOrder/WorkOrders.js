@@ -28,7 +28,7 @@ const accordionCardSummary = {
 }
 
 
-const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleCloseDrawer, workOrders, setWorkOrders, setDrawer,setIsFormTouched, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit, skuDetailsForm }) => {
+const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleCloseDrawer, workOrders, setWorkOrders, setDrawer, setIsFormTouched, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit, skuDetailsForm }) => {
   const [selectedOption, setSelectedOption] = useState('inhouse')
   const [openIndices, setOpenIndices] = useState([])
   const [openAccordions, setOpenAccordions] = useState({})
@@ -48,7 +48,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
   const [salesOrder, setSalesOrder] = useState([])
   const [versionAlerts, setVersionAlerts] = useState([])
   const [salesOrderSkus, setSalesOrderSkus] = useState([])
-  const [canDeactivate,setCanDeactivate] = useState(false);
+  const [canDeactivate, setCanDeactivate] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
 
 
@@ -157,21 +157,21 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
       'edd',
       'qty',
     ];
-  
+
     const errors = {};
     let isValid = true;
-  
+
     requiredFields.forEach(field => {
       if (!formData[field]) {
         errors[field] = 'Required';
         isValid = false;
       }
     });
-  
+
     setValidationErrors(errors);
     return isValid;
   };
-  
+
 
   // Handle form submission for all work orders
   const handleSubmit = (e) => {
@@ -181,7 +181,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
     if (isWorkOrderList) {
       const isValid = validateForm(workOrders[0]); // Validate first order only
       if (isValid) {
-        console.log(workOrders[0],'fafasdfasdfasdfasf')
+        console.log(workOrders[0], 'fafasdfasdfasdfasf')
         workOrderListSubmit(workOrders[0]);
       }
     } else {
@@ -325,7 +325,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
     const selectedId = parseInt(e.target.value); // since option values are string
 
     const selectedSku = skuList.find((sku) => sku.id === selectedId);
-    
+
 
 
     SetselectedSkuID(selectedId)
@@ -345,8 +345,8 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
 
     handleWorkOrderChange(orderId, 'sku_version', '')
     handleWorkOrderChange(orderId, 'sku_name', selectedSku.sku_name)
-    handleWorkOrderChange(orderId, 'sku_id', selectedId)    
-    
+    handleWorkOrderChange(orderId, 'sku_id', selectedId)
+
   }
 
   const handleSkuChange1 = async (e, orderId) => {
@@ -426,7 +426,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
       {
         id: newId,
         sku_name: '',
-        sku_id:'',
+        sku_id: '',
         sku_version: '',
         qty: '',
         edd: '',
@@ -613,7 +613,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
                 <div className="mt-2 p-3 border-t border-gray-300">
                   <div className="w-full flex flex-col gap-12 py-4 px-24">
                     {/* <div className="flex flex-col md:flex-row gap-8"> */}
-                    {/* <div className="flex-1 min-w-0">
+                    {/* <div className="flex">
           <label className="block text-gray-800 font-medium mb-1">Sales Order</label>
           <select
             className=" h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
@@ -633,7 +633,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
         <div></div>
       </div> */}
                     {/* First row */}
-                    <div className="flex flex-col md:flex-row gap-8">
+                    <div className="grid grid-cols-1 md:flex-row gap-8">
                       <div className="flex-1 min-w-0">
                         <label className="block text-gray-800 font-medium mb-1">SKU <span className='text-red-500'>*</span></label>
                         <select
@@ -932,8 +932,8 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
 
                     //   </div>
                     // </div>
-                    <div className="flex flex-col md:flex-row gap-8 mt-4 mb-2">
-                      <div className="flex-1 min-w-0">
+                    <div className="flex flex-col bg-yellow-200 gap-8 mt-4 mb-2">
+                      <div className="flex">
                         <label className="block text-gray-800 font-medium mb-1">Sales Order <span className='text-red-500'>*</span></label>
                         <select
                           className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
@@ -955,15 +955,15 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
                           ))}
                         </select>
                         {validationErrors.sales_order_id && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      {validationErrors.sales_order_id}
-    </div>
-    )}
+                          <div className="text-red-500 text-xs mt-1 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" y1="8" x2="12" y2="12"></line>
+                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            {validationErrors.sales_order_id}
+                          </div>
+                        )}
                       </div>
 
                       {/* Empty column to maintain consistent layout */}
@@ -973,49 +973,49 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
 
                   )}
 
-                  <div className="w-full flex flex-col  mt-2 gap-12 py-4">
+                  <div className="w-full flex flex-col bg-yellow-400 mt-2 gap-12 py-4">
                     {/* First row */}
-                    <div className="flex flex-col md:flex-row gap-8">
-                      <div className="flex-1 min-w-0">
+                    <div className="flex flex-col gap-8">
+                      <div className="flex bg-blue-400">
                         <label className="block text-gray-800 font-medium mb-1">SKU <span className='text-red-500'>*</span></label>
 
                         {isWorkOrderList ? (
                           // SKU Dropdown shown only in workorderlist
                           <div>
-                          <select
-                            className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-                            value={order.sku_id || ''}
-                            onChange={(e) => handleSkuChange(e, order.id)}  
-                          >
-                            <option value="" disabled>
-                              {skuList.filter((skuItem) =>
-                                (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
-                              ).length === 0 ? "No SKU Available" : "Select SKU"}
-                            </option>
+                            <select
+                              className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
+                              value={order.sku_id || ''}
+                              onChange={(e) => handleSkuChange(e, order.id)}
+                            >
+                              <option value="" disabled>
+                                {skuList.filter((skuItem) =>
+                                  (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
+                                ).length === 0 ? "No SKU Available" : "Select SKU"}
+                              </option>
 
-                            {skuList
-                              .filter((skuItem) =>
-                                (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
-                              )
-                              .map((skuItem) => (
-                                <option key={skuItem.id} value={skuItem.id}>
-                                  {skuItem.sku_name}
-                                </option>
-                              ))}
-                          </select>
-                          {validationErrors.sku_id && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      {validationErrors.sku_id}
-    </div>
-    )}
-                          
+                              {skuList
+                                .filter((skuItem) =>
+                                  (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
+                                )
+                                .map((skuItem) => (
+                                  <option key={skuItem.id} value={skuItem.id}>
+                                    {skuItem.sku_name}
+                                  </option>
+                                ))}
+                            </select>
+                            {validationErrors.sku_id && (
+                              <div className="text-red-500 text-xs mt-1 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                                  <circle cx="12" cy="12" r="10"></circle>
+                                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                                {validationErrors.sku_id}
+                              </div>
+                            )}
+
                           </div>
-                          
+
                         ) : (
                           // Original SKU dropdown
                           <select
@@ -1044,7 +1044,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
 
 
 
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 flex min-w-0">
                         <label className="block text-gray-800 font-medium mb-1">SKU Version</label>
                         <div className="flex flex-col sm:flex-row gap-2">
                           <select
@@ -1078,29 +1078,29 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
                     </div>
 
                     {/* Second row */}
-                    <div className="flex flex-col md:flex-row gap-8">
-                      <div className="flex-1 min-w-0">
+                    <div className="flex flex-col gap-8">
+                      <div className="flex min-w-0">
                         <label className="block text-gray-800 font-medium mb-1">Quantity <span className='text-red-500'>*</span></label>
                         <input
                           type="number"
                           // placeholder="100"
                           value={order.qty}
                           onChange={(e) => handleWorkOrderChange(order.id, 'qty', e.target.value)}
-                          className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
-                        />
-                                        {validationErrors.qty && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      {validationErrors.qty}
-    </div>
-    )}
+                          className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
+                          />
+                        {validationErrors.qty && (
+                          <div className="text-red-500 text-xs mt-1 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" y1="8" x2="12" y2="12"></line>
+                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            {validationErrors.qty}
+                          </div>
+                        )}
                       </div>
 
-                      <div className="flex-1 min-w-0">
+                      <div className="flex">
                         <label className="block text-gray-800 font-medium mb-1">Acceptable Excess Units</label>
                         <input
                           type="number"
@@ -1114,8 +1114,8 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
                     </div>
 
                     {/* Third row */}
-                    <div className="flex flex-col md:flex-row gap-8">
-                      <div className="flex-1 min-w-0">
+                    <div className="flex flex-col gap-8">
+                      <div className="flex">
                         <label className="block text-gray-800 font-medium mb-1">Planned Start Date <span className='text-red-500'>*</span></label>
                         <input
                           type="date"
@@ -1123,19 +1123,19 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
                           onChange={(e) => handleWorkOrderChange(order.id, 'planned_start_date', e.target.value)}
                           className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
                         />
-                                                                      {validationErrors.planned_start_date && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      {validationErrors.planned_start_date}
-    </div>
-                      )}
+                        {validationErrors.planned_start_date && (
+                          <div className="text-red-500 text-xs mt-1 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" y1="8" x2="12" y2="12"></line>
+                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            {validationErrors.planned_start_date}
+                          </div>
+                        )}
                       </div>
 
-                      <div className="flex-1 min-w-0">
+                      <div className="flex">
                         <label className="block text-gray-800 font-medium mb-1">Planned End Date <span className='text-red-500'>*</span></label>
                         <input
                           type="date"
@@ -1144,22 +1144,22 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
                           onChange={(e) => handleWorkOrderChange(order.id, 'planned_end_date', e.target.value)}
                           className="w-full h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
                         />
-                                              {validationErrors.planned_end_date && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      {validationErrors.planned_end_date}
-    </div>
-                      )}
+                        {validationErrors.planned_end_date && (
+                          <div className="text-red-500 text-xs mt-1 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" y1="8" x2="12" y2="12"></line>
+                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            {validationErrors.planned_end_date}
+                          </div>
+                        )}
                       </div>
                     </div>
 
                     {/* Fourth row */}
-                    <div className="flex flex-col md:flex-row gap-8">
-                      <div className="flex-1 min-w-0">
+                    <div className="flex flex-col gap-8">
+                      <div className="flex">
                         <label className="block text-gray-800 font-medium mb-1">Estimated Delivery Date <span className='text-red-500'>*</span></label>
                         <input
                           type="date"
@@ -1167,19 +1167,19 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
                           onChange={(e) => handleWorkOrderChange(order.id, 'edd', e.target.value)}
                           className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none"
                         />
-                    {validationErrors.edd && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      {validationErrors.edd}
-    </div>
-                      )}
+                        {validationErrors.edd && (
+                          <div className="text-red-500 text-xs mt-1 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" y1="8" x2="12" y2="12"></line>
+                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            {validationErrors.edd}
+                          </div>
+                        )}
                       </div>
 
-                      <div className="flex-1 min-w-0">
+                      <div className="flex">
                         <label className="block text-gray-800 font-medium mb-1">Description</label>
                         <input
                           // placeholder="Description"
@@ -1196,12 +1196,12 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
 
                   </div>
                   {order.sku_id && (
-                  <SkuVersionAddEdit
-                    handleDeleteVersion={handleDeleteVersion}
-                    skuID={order.sku_id}
-                    setSkuVersionsMap={setSkuVersionsMap}
-                    orderId={order.id} // Pass the orderId of the work order being edited
-                  />
+                    <SkuVersionAddEdit
+                      handleDeleteVersion={handleDeleteVersion}
+                      skuID={order.sku_id}
+                      setSkuVersionsMap={setSkuVersionsMap}
+                      orderId={order.id} // Pass the orderId of the work order being edited
+                    />
                   )}
                   <div className="w-full flex justify-end pb-3">
 
@@ -1261,7 +1261,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
               // setCanDeactivate(true)
               // setDrawer(false)
               handleCloseDrawer()
-                        }}
+            }}
             variant="cancel"
             label={"cancel"}
           />
@@ -1276,17 +1276,17 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
       </div>
 
       {canDeactivate && (
-  <ConfirmationModale 
-    isOpen={canDeactivate}
-    onClose={() => setCanDeactivate(false)}
-    onConfirm={() => {
-      setDrawer(false)
-      setCanDeactivate(false);
-        }
-    }
-    variant="unsavedChanges"
-  />
-)}
+        <ConfirmationModale
+          isOpen={canDeactivate}
+          onClose={() => setCanDeactivate(false)}
+          onConfirm={() => {
+            setDrawer(false)
+            setCanDeactivate(false);
+          }
+          }
+          variant="unsavedChanges"
+        />
+      )}
       <VersionsPopup
         visible={isVersionDrawerOpen}
         setVisible={() => setVersionDrawerOpen(false)}
@@ -1304,4 +1304,4 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData,handleClose
   )
 }
 
-export default WorkOrders
+export default WorkOrders 

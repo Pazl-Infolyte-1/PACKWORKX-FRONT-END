@@ -17,7 +17,7 @@ import CustomAlert from '../../components/New/CustomAlert'
 const WorkOrders = () => {
   const [data, setData] = useState([])
   const [limit, setLimit] = useState(10)
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(true)
   const { filteredSearchData, searchQuery, } = useSearch()
   const [showPopUp, setShowPopUp] = useState(null)
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1 })

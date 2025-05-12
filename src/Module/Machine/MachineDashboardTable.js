@@ -70,15 +70,15 @@ const MachineDashboardTable = ({
     <div>
       <div className="h-[280px] overflow-y-auto border m-0 border-gray-200 custom-scrollbar">
         <CTable striped hover className=" w-full">
-          <CTableHead className="bg-gray-100 sticky top-0 z-10">
-            <CTableRow>
+          <CTableHead className="bg-gray-100 sticky top-0 z-10 whitespace-nowrap ">
+            <CTableRow> 
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">ID</CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Name <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
+              {/* <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Serial No <span className="text-gray-500">⌕</span>
-              </CTableHeaderCell>
+              </CTableHeaderCell> */}
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-md">
                 Model No <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
@@ -86,9 +86,9 @@ const MachineDashboardTable = ({
                 Manufacturer <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">Power</CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-0 text-gray-600 font-md">
+              {/* <CTableHeaderCell className="py-3 px-0 text-gray-600 font-md">
                 Warranty Exp
-              </CTableHeaderCell>
+              </CTableHeaderCell> */}
               <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
                 Status
               </CTableHeaderCell>
@@ -101,7 +101,7 @@ const MachineDashboardTable = ({
           <CTableBody>
             {cellData.length > 0 ? (
               cellData.map((cell, index) => (
-                <CTableRow key={index} className="border-b">
+                <CTableRow key={index} className="border-b whitespace-nowrap">
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.machine_generate_id || 'N/A'}
                   </CTableDataCell>
@@ -111,9 +111,9 @@ const MachineDashboardTable = ({
                   >
                     {cell.machine_name}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                  {/* <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.serial_number}
-                  </CTableDataCell>
+                  </CTableDataCell> */}
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.model_number}
                   </CTableDataCell>
@@ -123,9 +123,9 @@ const MachineDashboardTable = ({
                   <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.power_rating}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
+                  {/* <CTableDataCell className="py-3 px-4 text-gray-700">
                     {cell.warranty_expiry}
-                  </CTableDataCell>
+                  </CTableDataCell> */}
                   <CTableDataCell className="py-3 px-4 text-gray-700 align-middle">
                     <select
                       value={cell.machine_status}

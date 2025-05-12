@@ -172,8 +172,8 @@ const WorkOrders = () => {
       </div>
 
       {/* Table Container */}
-      <div className="border h-[80%] mt-4">
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap p-3">
+      {/* <div> */}
+        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap mt-2">
           <WorkOrderTable
             // cellData={filteredSearchData.length ? filteredSearchData :data}
             cellData={data}
@@ -188,7 +188,7 @@ const WorkOrders = () => {
         </div>
 
         {/* Pagination Section */}
-        <div className="flex justify-end items-center gap-4 mt-2 mb-2">
+        <div className="flex justify-end items-center gap-4 mt-4">
           <CommonPagination
             count={pagination?.totalPages}
             page={pagination?.page}
@@ -209,7 +209,7 @@ const WorkOrders = () => {
             limit={limit}
           />
         </div>
-      </div>
+      {/* </div> */}
       <Drawer isOpen={drawerOpen} maxWidth="1280px" onClose={() => handleCloseDrawer()}>
       {drawerOpen && (
         <AddSalesOrder currentTab={'skuDetails'} setDrawer={setDrawerOpen} fetchData={fetchData} setIsFormTouched = {setIsTouched} handleCloseDrawer={handleCloseDrawer} />

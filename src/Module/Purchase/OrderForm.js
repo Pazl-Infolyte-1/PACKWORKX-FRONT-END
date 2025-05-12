@@ -5,7 +5,7 @@ import ItemForm from './ItemForm';
 import 'core-js/stable';
 
 
-const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting }) => {
+const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, setDrawer }) => {
   const [items, setItems] = useState(itemsData || []);
   const [poTotals, setPoTotals] = useState({
     total_qty: 0,
@@ -84,7 +84,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting }) => 
             <label className="block text-sm font-medium text-gray-700 mb-1">Supplier ID <span className="text-red-500"> *</span></label>
             <input
               type="number"
-              {...register('supplier_id', { required: 'Supplier id is required' })}
+              {...register('supplier_id', { required: 'required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
             {errors.supplier_id && (
@@ -96,7 +96,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting }) => 
             <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Name <span className="text-red-500"> *</span></label>
             <input
               type="text"
-              {...register('supplier_name', { required: 'Supplier Name is required' })}
+              {...register('supplier_name', { required: 'required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
             {errors.supplier_id && (
@@ -108,7 +108,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting }) => 
             <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Contact <span className="text-red-500"> *</span></label>
             <input
               type="number"
-              {...register('supplier_contact', { required: 'Supplier contact is required' })}
+              {...register('supplier_contact', { required: 'required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
             {errors.supplier_id && (
@@ -120,7 +120,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting }) => 
             <label className="block text-sm font-medium text-gray-700 mb-1">Supplier E-mail <span className="text-red-500"> *</span></label>
             <input
               type="email"
-              {...register('supplier_email', { required: 'Supplier E-mail is required' })}
+              {...register('supplier_email', { required: 'required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
             {errors.supplier_id && (
@@ -141,7 +141,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting }) => 
             <label className="block text-sm font-medium text-gray-700 mb-1">Payment Terms <span className="text-red-500"> *</span> </label>
             <input
               type="text"
-              {...register('payment_terms', { required: 'Payment-terms is required' })}
+              {...register('payment_terms', { required: 'required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
             {errors.supplier_id && (
@@ -162,7 +162,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting }) => 
             <label className="block text-sm font-medium text-gray-700 mb-1">Valid Till <span className="text-red-500"> *</span> </label>
             <input
               type="date"
-              {...register('valid_till', { required: 'Valid-till is required' })}
+              {...register('valid_till', { required: 'required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
             {errors.supplier_id && (
@@ -219,10 +219,18 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting }) => 
 
 
         <div className="mt-6 flex justify-end gap-3">
+
+        <button 
+        onClick={() => setDrawer(false)}
+        className="p-2 border border-gray-300 rounded w-24 mr-2 hover:bg-gray-100 transition"
+        >
+          Cancel
+        </button>
+
           <ActionButton
             type="submit"
             variant="primary"
-            label={isEdit ? "Update Purchase Order" : "Create Purchase Order"}
+            label={isEdit ? "Update" : "Submit"}
             isLoading={isSubmitting}
           />
         </div>

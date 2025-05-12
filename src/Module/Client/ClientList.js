@@ -23,34 +23,30 @@ function ClientList() {
   const [triggerSelection, setTriggerSelection] = useState(false)
   const [isPopupOpen, setPopupOpen] = useState(false)
   const [isDrawerOpen, setDrawerOpen] = useState(false)
-  const [reloadData, setReloadData] = useState(false) //Trigger reload
-  const [entityType, setEntityType] = useState('') // State to hold entity_type
+  const [reloadData, setReloadData] = useState(false)
+  const [entityType, setEntityType] = useState('')
 
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPage, setTotalPage] = useState(1)
 
-  const [data, setData] = useState([]) // Stores all fetched data
-  const [searchQuery, setSearchQuery] = useState('') // State for search input
-  const [entriesPerPage, setEntriesPerPage] = useState(5) // Default value 5
+  const [data, setData] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [entriesPerPage, setEntriesPerPage] = useState(5)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState('')
   const [loading, setLoading] = useState(false)
-  const clientListRef = useRef(null);
-  
+  const clientListRef = useRef(null)
 
   useEffect(() => {
     if (clientListRef.current) {
-      console.log('ClientList width:', clientListRef.current.offsetWidth, 'px');
+      console.log('ClientList width:', clientListRef.current.offsetWidth, 'px')
     }
-  }, []); // runs once after mount
-
-  //const totalPages = Math.ceil(data.length / entriesPerPage) || 1; // Ensure total pages > 0
-  const toggleFilterPopup = () => setIsFilterOpen(!isFilterOpen)
+  }, [])
 
   const handleEntriesChange = (newEntries) => {
     setEntriesPerPage(newEntries)
-    setCurrentPage(1) // Reset to page 1 when changing entries per page
+    setCurrentPage(1)
   }
 
   const handlePageChange = (event, newPage) => {
@@ -61,15 +57,6 @@ function ClientList() {
     setDrawerOpen(false)
   }
 
-  console.log('curr pg', currentPage)
-  //const handlePageChange = (event, newPage) => {
-  //  setCurrentPage(newPage);
-  //};
-  //const handleEntriesChange = (newEntries) => {
-  //  setEntriesPerPage(newEntries)
-  //  console.log('Updated Entries Per Page:', newEntries)
-  //  //setCurrentPage(1) // Reset to first page when changing entries
-  //}
   const selectionFrame = {
     vendor: {
       id: 1,
@@ -85,7 +72,6 @@ function ClientList() {
 
   useEffect(() => {
     const fetchClientData = async () => {
-      //setLoading(true); // Show loader before API call
       try {
         const queryParams = {
           ...(searchQuery && { search: searchQuery }),
@@ -100,7 +86,7 @@ function ClientList() {
       } catch (error) {
         console.error('Error fetching client data:', error)
       } finally {
-        setLoading(false) 
+        setLoading(false)
       }
     }
 
@@ -108,23 +94,19 @@ function ClientList() {
   }, [reloadData, searchQuery, entriesPerPage, currentPage, selectedFilter])
 
   const handleResetFilters = () => {
-    setSearchQuery('') 
-    setCurrentPage(1) 
-    setEntriesPerPage(5) 
+    setSearchQuery('')
+    setCurrentPage(1)
+    setEntriesPerPage(5)
     setSelectedFilter('')
     setReloadData((prev) => !prev)
   }
 
   const refreshClients = () => {
-    setReloadData((prev) => !prev) //  Toggle state to trigger `useEffect`
+    setReloadData((prev) => !prev)
   }
-
-  //const totalPages = Math.ceil(data?.length / rowsPerPage)
 
   const handleSelection = (selection) => {
     const optionValue = selectionFrame[selection].id
-    console.log(`Selected ID: ${optionValue}`)
-
     if (optionValue === 2) {
       setEntityType('Client')
       setPopupOpen(false)
@@ -138,25 +120,28 @@ function ClientList() {
     }
   }
 
-  // Updates selection but does NOT trigger `handleSelection`
   const handleSelectAction = (selection) => {
     setSelected(selection)
-    setTriggerSelection(true) // Ensures it runs handleSelection
+    setTriggerSelection(true)
   }
 
   // Handles key events
 
   let entity_type = ''
   const handleKeyDown = (event) => {
+    if (!isPopupOpen) {
+      return
+    }
+
     if (event.key === 'ArrowRight') {
       handleSelectAction('client')
-      setEntityType('Client') // Update state
+      setEntityType('Client')
     } else if (event.key === 'ArrowLeft') {
       handleSelectAction('vendor')
-      setEntityType('Vendor') // Update state
+      setEntityType('Vendor')
     } else if (event.key === 'Enter') {
       console.log('Enter Pressed: Executing Selection')
-      setTriggerSelection(true) // Mark that Enter was pressed
+      setTriggerSelection(true)
     }
   }
 
@@ -164,17 +149,14 @@ function ClientList() {
   useEffect(() => {
     if (triggerSelection) {
       handleSelection(selected)
-      setTriggerSelection(false) // Reset trigger
+      setTriggerSelection(false)
     }
-  }, [selected, triggerSelection]) // Runs when `selected` or `triggerSelection` changes
+  }, [selected, triggerSelection])
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, []) // Runs once on mount
-
-  //const handlePageChange = useCallback((event, value) => setCurrentPage(value), [])
-  //console.log("curr rows",currentRows)
+  }, [])
 
   const downloadClientExcelSheet = async () => {
     try {
@@ -196,7 +178,7 @@ function ClientList() {
       // Create a temporary link element
       const a = document.createElement('a')
       a.href = url
-      a.download = 'clients.xlsx' // Set the downloaded file name
+      a.download = 'clients.xlsx'
       document.body.appendChild(a)
       a.click()
 
@@ -208,9 +190,6 @@ function ClientList() {
     }
   }
 
-  //const alertsData = [
-  //  { severity: "success", message: "This is a success Alert." },
-  //];
   return (
     <div ref={clientListRef} className="w-full">
       <Loader isLoading={loading} />
@@ -223,7 +202,7 @@ function ClientList() {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             {/* Search Input Container */}
-            {/*<SearchBar text="Client" data={data} />*/}
+
             <div className="flex items-center h-[35px] w-[300px] gap-2 border rounded-md">
               <div className="bg-white h-full w-[40px] flex justify-center items-center rounded-l-md">
                 <IoSearch />
@@ -238,30 +217,25 @@ function ClientList() {
             </div>
 
             {/* Filter Icon */}
-            {/*<FaFilter onClick={toggleFilterPopup} className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-900" />*/}
             <div className="flex items-center gap-3">
               {/* Dropdown */}
-             <div className="relative inline-block text-left">
-  <select
-    value={selectedFilter}
-    onChange={(e) => setSelectedFilter(e.target.value)}
-    className="inline-flex w-40 justify-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50 appearance-none"
-  >
-    <option value="" disabled hidden>Entity</option>
-    <option value="Client">Client</option>
-    <option value="Vendor">Vendor</option>
-    <option value="">All</option>
-  </select>
-  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-    <FaChevronDown className="size-4 text-gray-400" />
-  </div>
-</div>
-
-
-              {/* Refresh Button */}
-              {/*<ActionButton     onClick={handleResetFilters} variant='secondary' label={"Clear"} height={"9"}>
-    {/*<FaSyncAlt className="w-4 h-4 text-gray-600" />*/}
-              {/*</ActionButton>}*/}
+              <div className="relative inline-block text-left">
+                <select
+                  value={selectedFilter}
+                  onChange={(e) => setSelectedFilter(e.target.value)}
+                  className="inline-flex w-40 justify-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 shadow-xs hover:bg-gray-50 appearance-none"
+                >
+                  <option value="" disabled hidden>
+                    Entity
+                  </option>
+                  <option value="Client">Client</option>
+                  <option value="Vendor">Vendor</option>
+                  <option value="">All</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                  <FaChevronDown className="size-4 text-gray-400" />
+                </div>
+              </div>
               <button
                 onClick={handleResetFilters}
                 className="bg-gray-500 text-white text-sm px-3 py-[6px] rounded-md hover:bg-gray-600 transition-all"
@@ -272,37 +246,12 @@ function ClientList() {
           </div>
 
           <div className="flex justify-center items-center gap-2">
-            {/* <button className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto">
-              Import
-            </button> */}
-
             <ActionButton height="9" label="Import" />
 
-            {/* <button
-              className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto"
-              onClick={downloadCSV}
-            >
-              Download
-            </button> */}
-
-            <ActionButton
-              height={'9'}
-              label={'Export'}
-              //onClick={downloadCSV}
-              onClick={downloadClientExcelSheet}
-            />
-
-            {/* <button
-              className="h-9 flex items-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md border-none cursor-pointer ml-auto"
-              onClick={() => setDrawerOpen(true)}
-            >
-              Add Client
-            </button> */}
-
+            <ActionButton height={'9'} label={'Export'} onClick={downloadClientExcelSheet} />
             <ActionButton
               height={'9'}
               label={'+ Add'}
-              //onClick={()=>setDrawerOpen(true)}
               onClick={() => setPopupOpen(true)}
               variant="add"
             />
@@ -317,7 +266,6 @@ function ClientList() {
         {/* Pagination Section */}
 
         <div className="flex justify-end items-center gap-4 mt-3">
-          {/*<DynamicPagination count={totalPages} page={currentPage} onChange={handlePageChange} />*/}
           <DynamicPagination
             count={totalPage}
             page={currentPage}
@@ -326,9 +274,6 @@ function ClientList() {
             onEntriesChange={handleEntriesChange}
           />
         </div>
-        {/*<div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
-      <CustomAlert alerts={alertsData} />
-    </div>*/}
       </div>
 
       {/* Drawer */}
@@ -347,12 +292,12 @@ function ClientList() {
                 className={`w-1/3 flex flex-col items-center border-4 p-2 cursor-pointer focus:outline-none ${
                   selected === key ? 'border-blue-200' : 'border-gray-100'
                 }`}
-                onClick={() => handleSelectAction(key)} // Mouse Click Support
+                onClick={() => handleSelectAction(key)}
                 onKeyDown={(event) => {
-                  if (event.key === 'Enter') handleSelectAction(key) // Keyboard Support
+                  if (event.key === 'Enter') handleSelectAction(key)
                 }}
-                tabIndex={0} // Makes div focusable for keyboard navigation
-                role="button" // Improves accessibility
+                tabIndex={0}
+                role="button"
               >
                 <img
                   src={selectionFrame[key].image}
@@ -378,6 +323,7 @@ function ClientList() {
           refreshClients={refreshClients}
           closeDrawerDuringAdd={() => handleCloseDrawer(false)}
           resetForm={isDrawerOpen}
+          setReloadData={setReloadData}
         />
       </Drawer1>
     </div>

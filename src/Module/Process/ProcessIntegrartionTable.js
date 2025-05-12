@@ -94,7 +94,7 @@ function ProcessIntegrartionTable({
                   }}
                   className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start"
                 >
-                  {item.id}
+                  {item.process_generate_id}
                 </CTableDataCell>
                 <CTableDataCell className="py-3 px-2  font-semibold">
                   {item.process_name}

@@ -182,7 +182,7 @@ function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, loadi
                       cell={data.find(row => row.id === showPopUp)}
                       editTag={false} // Changed from true to false to allow viewing
                       setShowPopUp={setShowPopUp}
-                      handleSkuEdit={handlePoEdit} // Changed from handlePoEdit to handleSkuEdit to match component prop
+                      handleEdit={handleEdit} // Changed from handlePoEdit to handleSkuEdit to match component prop
                     />
                   )}
                 </CTableRow>

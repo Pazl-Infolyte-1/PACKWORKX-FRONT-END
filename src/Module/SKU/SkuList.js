@@ -33,6 +33,8 @@ function SkuList() {
   const [client, setClient] = useState([])
   const [selectedClient, setSelectedClient] = useState(null)
   const [selectedDisplayName, setSelectedDisplayName] = useState("")
+  const [clientName, setClientName] = useState("")
+
   const [selectedSkuType, setSelectedSkuType] = useState('')
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [visible, setVisible] = useState(false)
@@ -77,6 +79,7 @@ console.log("suuuuu",user)
     length: null,
     width: null,
     height: null,
+        lwh:null,
     unit: 'mm',
     joints: null,
     ups: null,
@@ -105,6 +108,7 @@ console.log("suuuuu",user)
     description: null,
     default_sku_details: null,
     tags: {},
+    gst_percentage:null,
     sku_values: [
       {
         layer: null,
@@ -114,6 +118,7 @@ console.log("suuuuu",user)
         color: null,
         flute_type: null,
         weight: null,
+        bursting_strength:null,
         flute_ratio: null,
       },
     ],
@@ -151,7 +156,14 @@ console.log("suuuuu",user)
         client: null,
       }));
       return;
+    }if (name === "gst_percentage") {
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        gst_percentage: value,
+      }));
+      return;
     }
+    
    
     setAddNewSkuData((prev) => ({
       ...prev,
@@ -193,6 +205,7 @@ console.log("suuuuu",user)
     }
     console.log("name", name);
     console.log("val", value);
+    
   };
 
   const handleStrictAdherenceToggle = () => {
@@ -203,6 +216,7 @@ console.log("suuuuu",user)
       ...prevData,
       strict_adherence: newStrictAdherence,
     }))
+    
   }
 
   //useEffect(() => {
@@ -325,8 +339,8 @@ const handleAddSkuSubmit = async () => {
       if (!addNewSkuData.ply) newErrors.ply = 'Required'
  if (!addNewSkuData.ups) newErrors.ups = 'Required'
    if (!addNewSkuData.select_dies) newErrors.select_dies = 'Required'
-     if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
-       if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
+    // if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
+      // if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
       if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required';
       if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
       if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
@@ -347,8 +361,8 @@ const handleAddSkuSubmit = async () => {
        if (!addNewSkuData.flap_width) newErrors.flap_width = 'Required'
   if (!addNewSkuData.flap_tolerance) newErrors.flap_tolerance = 'Required'
   if (!addNewSkuData.length_trimming_tolerance) newErrors.length_trimming_tolerance = 'Required'
-       if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
-         if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
+      // if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
+        // if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
         if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
         if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
         if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
@@ -358,7 +372,8 @@ const handleAddSkuSubmit = async () => {
         if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
           newErrors.route = 'Required';
         }}
-        
+        //if (!addNewSkuData.gst_percentage) newErrors.gst_percentage = 'Required'
+
         else if (addNewSkuData.sku_type === "RSC box") {
           // Validate only for Composite
           if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required';
@@ -376,8 +391,8 @@ const handleAddSkuSubmit = async () => {
         if (!addNewSkuData.flap_width) newErrors.flap_width = 'Required'
     if (!addNewSkuData.length_trimming_tolerance) newErrors.length_trimming_tolerance = 'Required'
       if (!addNewSkuData.width_trimming_tolerance) newErrors.width_trimming_tolerance = 'Required'
-         if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
-           if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
+        // if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
+          // if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
           if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
           if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
           if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
@@ -385,8 +400,11 @@ const handleAddSkuSubmit = async () => {
           if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
           if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
             newErrors.route = 'Required';
-          }}
-
+          }
+        
+        
+        }
+//if (!addNewSkuData.gst_percentage) newErrors.gst_percentage = 'Required'
     else {
       // All other skuVariants: No validation required
       newErrors = {};
@@ -447,6 +465,7 @@ const numberSkuData = {
 width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
 length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
 deckle_size: Number(addNewSkuData.deckle_size),
+gst_percentage: Number(addNewSkuData.gst_percentage),
 };
 console.log("su data",numberSkuData)
 try {
@@ -503,6 +522,7 @@ setAlerts([]);
       length: selectedSku.length || null,
       width: selectedSku.width || null,
       height: selectedSku.height || null,
+    lwh: selectedSku.lwh || null,
       unit: selectedSku.unit || null,
       joints: selectedSku.joints || null,
       ups: selectedSku.ups || null,
@@ -531,6 +551,7 @@ setAlerts([]);
       description: selectedSku.description || null,
       default_sku_details: selectedSku.default_sku_details || null,
       tags: selectedSku.tags || {},
+      gst_percentage:selectedSku.gst_percentage ||null,
       sku_values: selectedSku.sku_values || [
         {
           layer: null,
@@ -540,6 +561,7 @@ setAlerts([]);
           color: null,
           flute_type: null,
           weight: null,
+          bursting_strength:null,
           flute_ratio: null,
         },
       ],
@@ -555,7 +577,7 @@ setAlerts([]);
     try {
       const response = await apiMethods.getSkuList({
         search: searchQuery || '',
-        client: selectedDisplayName || '',
+        client: clientName || '',
         sku_type: selectedSkuType || '',
         page: pagination?.currentPage || 1,
         limit: message ? 10000 : limit,
@@ -577,10 +599,11 @@ setAlerts([]);
     refresh,
     selectedClient,
     selectedDisplayName,
+    clientName,
     searchQuery,
     pagination?.currentPage,
     selectedSkuType,
-    limit,
+    limit,+
     location.state?.skipInitialFetch,
     message,
   ])
@@ -758,8 +781,13 @@ console.log("mess",message)
               const selectedItem = client.find(
                 (item) => item.client_id == e.target.value
               );
+              console.log("hhhhhhhhhhh",selectedItem);
+
               console.log("hhhhhhhhhhh",selectedItem?.display_name);
+              console.log("hhhhhhhhhhh",selectedItem?.client);
+
               setSelectedDisplayName(selectedItem?.display_name)
+              setClientName(selectedItem?.company_name)
             }}
             className="sm:w-[150px] p-2 rounded-lg shadow-md bg-white text-[#424242] outline-none border-none"
           >

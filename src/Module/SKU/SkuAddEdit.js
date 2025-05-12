@@ -11,6 +11,9 @@ import FluteTypeView from './FluteTypeView'
 import Composite from './Composite'
 import CustomItem from './CustomItem'
 import { useDispatch } from 'react-redux'
+import CIcon from '@coreui/icons-react'
+import { cilArrowThickFromTop } from '@coreui/icons'
+import updown from "../../assets/images/updown.png"
 
 function SkuAddEdit({
   isopenval,
@@ -85,6 +88,7 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
     description: null,
     default_sku_details: null,
     tags: {},
+    gst_percentage:null,
     sku_values: [
       {
         layer: null,
@@ -94,6 +98,7 @@ const prevIsSingleViewRef = useRef(isSingleViewPopupForType);
         color: null,
         flute_type: null,
         weight: null,
+        bursting_strength:null
         //flute_ratio: null,
       },
     ],
@@ -177,18 +182,24 @@ setSkuVariant(option.sku_type || option.value)
       const updatedSkuValues = [...prevData.sku_values];
       const updatedItem = { ...updatedSkuValues[index], [field]: value };
   
-      if (field === 'gsm') {
-        console.log("entered value",value)
-        console.log("updated meterSquareData",meterSquareData)
+      const isCorrugated = updatedItem.layer?.toLowerCase().includes('corrugated');
 
-        updatedItem.weight = value * meterSquareData;
+      // Update weight based on conditions
+      if (field === 'gsm' || field === 'bf' || field === 'layer') {
+        const gsm = field === 'gsm' ? value : updatedItem.gsm;
+        const bf = field === 'bf' ? value : updatedItem.bf;
+  
+        if (isCorrugated && gsm && bf) {
+          updatedItem.weight = gsm * bf * meterSquareData;
+        } else if (gsm) {
+          updatedItem.weight = gsm * meterSquareData;
+        }
       }
   
-      // Auto-set flute_type when layer name is changed
+      // Auto-set flute_type for corrugated layer
       if (field === 'layer') {
-        updatedItem.flute_type = value.toLowerCase().includes('corrugated') ? '' : 'N/A';
+        updatedItem.flute_type = isCorrugated ? '' : 'N/A';
       }
-  
       updatedSkuValues[index] = updatedItem;
       return { ...prevData, sku_values: updatedSkuValues };
     });
@@ -260,6 +271,7 @@ setSkuVariant(option.sku_type || option.value)
       color: '',
       flute_type: layer.layer.toLowerCase().includes('corrugated') ? '' : 'N/A',
       weight: '',
+      bursting_strength:''
       //flute_ratio: '',
     }))
 
@@ -468,6 +480,7 @@ setSkuVariant(option.sku_type || option.value)
         payload: [],
       })
     }
+    setErrors({})
   }, [isSingleViewPopupForType]);
   
   useEffect(() => {
@@ -483,6 +496,52 @@ setSkuVariant(option.sku_type || option.value)
     prevIsSingleViewRef.current = isSingleViewPopupForType;
   }, [isSingleViewPopupForType]);
   
+  useEffect(() => {
+    const updatedSkuValues = addNewSkuData.sku_values.map((item) => {
+      if (item.gsm && item.bf) {
+        const calculatedBS = Number(((item.gsm * item.bf) / 1000).toFixed(3));
+
+        // Only update if bursting_strength actually changed
+        if (item.bursting_strength !== calculatedBS) {
+          return { ...item, bursting_strength: calculatedBS };
+        }
+      }
+      return item;
+    });
+  
+    const hasChanged = updatedSkuValues.some((item, index) =>
+      item.bursting_strength !== addNewSkuData.sku_values[index].bursting_strength
+    );
+  
+    if (hasChanged) {
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        sku_values: updatedSkuValues,
+      }));
+    }
+  }, [addNewSkuData.sku_values]);
+  const handleAutofillRow = (currentIndex) => {
+    if (currentIndex === 0) return;
+  
+    const previousRow = addNewSkuData.sku_values[currentIndex - 1];
+    const updatedRow = { ...addNewSkuData.sku_values[currentIndex] };
+  
+    // Copy selected fields
+    const fieldsToCopy = ['gsm', 'bf', 'color', 'material',"weight","bursting_strength"];
+    fieldsToCopy.forEach(field => {
+      updatedRow[field] = previousRow[field];
+    });
+  
+    const updatedSkuValues = [...addNewSkuData.sku_values];
+    updatedSkuValues[currentIndex] = updatedRow;
+  
+    setAddNewSkuData(prev => ({
+      ...prev,
+      sku_values: updatedSkuValues,
+    }));
+  };
+  
+
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
@@ -490,7 +549,7 @@ setSkuVariant(option.sku_type || option.value)
 
       {addNewSkuData.sku_type !== 'Custom Item' && addNewSkuData.sku_type !== 'Composite' && (
         <div className="flex items-center my-3 space-x-2">
-          <span className="text-[16px] font-medium">Strict Adherence for All Layers</span>
+          <span className="text-[14px] font-medium">Strict Adherence for All Layers</span>
           <button
             className={`w-11 h-[23px] flex items-center border border-blue-600 rounded-full p-1 cursor-pointer 
               ${strictAdherence ? 'bg-blue-600' : 'bg-gray-300'}`}
@@ -530,15 +589,29 @@ setSkuVariant(option.sku_type || option.value)
               <tbody>
                 {addNewSkuData?.sku_values?.map((item, index) => (
                   <tr key={index} className="flex-wrap">
-                    <td className="p-2 text-center w-full sm:w-2/12 md:w-2/12 lg:w-2/12 ">
-                      <input
-                        type="text"
-                        placeholder="Layers"
-                        className="p-1 border rounded w-full"
-                        value={item.layer}
-                        onChange={(e) => handleSkuValuesChange(index, 'layer', e.target.value)}
-                      />
-                    </td>
+                  <td className="p-2 text-center w-full sm:w-2/12 md:w-2/12 lg:w-2/12">
+  <div className="relative w-full">
+    <input
+      type="text"
+      placeholder="Layers"
+      className="p-1 pr-8 border rounded w-full bg-gray-100 cursor-not-allowed"
+      value={item.layer}
+      onChange={(e) => handleSkuValuesChange(index, 'layer', e.target.value)}
+      readOnly
+    />
+    <img
+      src={updown}
+      alt="Autofill from above"
+      title="Autofill from above"
+      className={`absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+        index === 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer hover:opacity-80'
+      }`}
+      onClick={() => index !== 0 && handleAutofillRow(index)}
+    />
+  </div>
+</td>
+
+
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
                       <input
                         type="number"
@@ -619,15 +692,26 @@ setSkuVariant(option.sku_type || option.value)
         </div>
       )}
 
-      <div className="flex justify-end space-x-4 mt-6">
-        <button className="p-2 border border-gray-300 rounded w-24" onClick={handleCancel}>
+{addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (<tr className="bg-gray-100 font-semibold text-center">
+    <td colSpan={6} className="p-2 text-right">Total Weight:</td>
+    <td className="p-2 text-center">
+      {toThreeDecimalFixed(
+        addNewSkuData.sku_values?.reduce((acc, item) => acc + (Number(item.weight) || 0), 0)
+      )}
+    </td>
+    <td></td> {/* Empty cell to align with the columns */}
+  </tr>)}
+
+<div className="sticky bottom-[-20px] bg-white border-t pt-4 pb-6 px-4 flex justify-end space-x-4">
+
+        <button className="p-1 border border-gray-300 rounded w-20" onClick={handleCancel}>
           Cancel
         </button>
         <ActionButton
           onClick={handleAddSkuSubmit}
           label={editTag ? 'Update' : 'Submit'}
           variant="save"
-          className="bg-[#079b54] text-white px-4 py-2 rounded-md"
+          className="bg-[#079b54] text-white px-2 py-1 rounded-md"
         />
       </div>
       <PopUp
@@ -655,7 +739,7 @@ setSkuVariant(option.sku_type || option.value)
     {/* Strict Adherence Toggle */}
     {compositeSelect !== 'Custom Item' && (
       <div className="flex items-center my-3 space-x-2">
-        <span className="text-[16px] font-medium">Strict Adherence for All Layers</span>
+        <span className="text-[14px] font-medium">Strict Adherence for All Layers</span>
         <button
           className={`w-11 h-[23px] flex items-center border border-blue-600 rounded-full p-1 cursor-pointer 
             ${strictAdherence ? 'bg-blue-600' : 'bg-gray-300'}`}
@@ -681,7 +765,7 @@ setSkuVariant(option.sku_type || option.value)
                 <th className="p-2">BF</th>
                 <th className="p-2">Color</th>
                 <th className="p-2">Flute Type</th>
-                <th className="p-2">Material</th>
+                <th className="p-2">Mill</th>
                 <th className="p-2">Weight (Kg)</th>
                 <th className="p-2">
                   Bursting Strength <br />
@@ -769,7 +853,8 @@ setSkuVariant(option.sku_type || option.value)
                     <p>{toThreeDecimalFixed(item.weight) || 'N/A'}</p>
                   </td>
                   <td className="p-2 text-center w-full sm:w-1/12">
-                    <p>{toThreeDecimalFixed(item.gsm * item.bf / 1000)}</p>
+                    {/*<p>{toThreeDecimalFixed(item.gsm * item.bf / 1000)}</p>*/}
+                    <p>{item.bursting_strength}</p>
                   </td>
                 </tr>
               ))}

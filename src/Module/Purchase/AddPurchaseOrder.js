@@ -148,6 +148,7 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, fetchDat
         <OrderForm
           orderData={orderData}
           itemsData={itemsData}
+          setDrawer={setDrawer}
           onSubmit={handleFormSubmit}
           isEdit={isEdit}
           isSubmitting={loading}

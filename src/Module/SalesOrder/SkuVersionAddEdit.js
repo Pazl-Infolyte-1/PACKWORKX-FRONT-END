@@ -3,6 +3,7 @@ import apiMethods from "../../api/config";
 import { FaEye, FaSpinner } from "react-icons/fa";
 import CustomAlert from "../../components/New/CustomAlert";
 import PopUp from "../../components/New/PopUp";
+import VersionChoicePopup from "./VersionChoicePopup";
 
 function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, skuVersionID,visible,setVisible }) {
   const [skuValues, setSkuValues] = useState([]);
@@ -11,6 +12,11 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   const [alerts, setAlerts] = useState([]);
   const [skuversionLimit,setSkuversionLimit] = useState()
   const [isLoading, setIsLoading] = useState(false);
+  const [VersionChoiceOpen,setVersionChoiceOpen] = useState(false)
+  const [SkuInitalData,setSkuInitalData] = useState([])
+  const [editedMap, setEditedMap] = useState({});
+
+
 
 
   useEffect(() => {
@@ -33,6 +39,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     
           if (response?.data?.sku_values && Array.isArray(response.data.sku_values)) {
             setSkuValues(response.data.sku_values);
+            setSkuInitalData(response.data.sku_values)
             setClientID(response.data.client_id);
             setSkuversionLimit(response.data.sku_version_limit)
           }
@@ -58,10 +65,56 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     const updatedValues = [...skuValues];
     updatedValues[index][field] = value;
     setSkuValues(updatedValues);
+
+     // Track changed field per index
+  setEditedMap(prev => {
+    const updatedFields = { ...(prev[index] || {}) };
+    updatedFields[field] = value;
+    return { ...prev, [index]: updatedFields };
+  });
   };
+  const handleAddOption = async () => {
+    try {
+      const field_options = Object.entries(editedMap).flatMap(([index, fields]) => {
+        return Object.entries(fields).map(([fieldName, fieldValue]) => ({
+          field_path: `sku_values.${index}.${fieldName}`,
+          field_name: fieldName,
+          field_value: fieldValue
+        }));
+      });
+  
+      console.log("field_options:", field_options);
+  
+      const requestBody = {
+        sku_id: skuID,
+        sku_version: null,
+        field_options: field_options
+      };
+  
+      const response = await apiMethods.postSkuValuesOptions(requestBody);
+  
+      console.log(response);
+
+  setTimeout(() => {
+    setAlerts([{ severity: "success", message: response?.data?.message || "SKU Options Added Successfully" }]);
+  }, 1000);
+  
+      // Optionally clear the edited map
+      setEditedMap({});
+      setVersionChoiceOpen(false)
+
+    } catch (error) {
+      console.error("Error adding SKU options:", error);
+      setAlerts([{ severity: "error", message: error?.response?.data?.message || "Failed to add SKU options." }]);
+    }
+  };
+  
+  
+
+  
 
   const handleSubmit = async () => {
-    setIsLoading(true);
+    // setIsLoading(true);
 
     const requestBody = {
       sku_id: skuID,
@@ -92,37 +145,13 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
       }
     } else {
       // Create mode
-      try {
-        // Get the current versions before submitting
-        const versionsResponse = await apiMethods.getSkuVersions(skuID);
-        const currentVersionCount = versionsResponse?.data?.data?.length || 0;
-  
-        if (skuversionLimit && currentVersionCount >= skuversionLimit) {
-          setAlerts([{ severity: "error", message: `Maximum SKU version limit of ${skuversionLimit} reached.` }]);
-          return; // Exit early, do not proceed
-        }
+      setVersionChoiceOpen(true)
 
-        requestBody.sku_version = `v${currentVersionCount + 1}_${Date.now()}`;
-  
-        const response = await apiMethods.addSkuVersion(requestBody);
-        setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
-  
-        const updatedVersionsResponse = await apiMethods.getSkuVersions(skuID);
-        if (updatedVersionsResponse?.data?.data) {
-          setSkuVersionsMap(prev => ({
-            ...prev,
-            [orderId]: updatedVersionsResponse.data.data
-          }));
-        }
-      } catch (error) {
-        setAlerts([{ severity: "error", message: error?.response?.data?.message || "Failed to add SKU Version" }]);
-        console.error("Error submitting data:", error);
-      }
-      finally{
-        setIsLoading(false);
-      }
     }
   };
+
+
+
   
   
 
@@ -133,6 +162,51 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   const openViewCard = () => {
     console.log("View flute card details");
   };
+
+ const handleAddVersion = async()=>{
+  try {
+  // Get the current versions before submitting
+
+  const requestBody = {
+    sku_id: skuID,
+    sku_version: skuVersion,
+    client_id: clientID,
+    sku_values: skuValues
+  };
+
+  const versionsResponse = await apiMethods.getSkuVersions(skuID);
+  const currentVersionCount = versionsResponse?.data?.data?.length || 0;
+
+  if (skuversionLimit && currentVersionCount >= skuversionLimit) {
+    setAlerts([{ severity: "error", message: `Maximum SKU version limit of ${skuversionLimit} reached.` }]);
+    return; // Exit early, do not proceed
+  }
+
+  requestBody.sku_version = `v${currentVersionCount + 1}_${Date.now()}`;
+
+  const response = await apiMethods.addSkuVersion(requestBody);
+  setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
+
+  const updatedVersionsResponse = await apiMethods.getSkuVersions(skuID);
+  if (updatedVersionsResponse?.data?.data) {
+    setSkuVersionsMap(prev => ({
+      ...prev,
+      [orderId]: updatedVersionsResponse.data.data
+    }));
+  }
+} catch (error) {
+  setAlerts([{ severity: "error", message: error?.response?.data?.message || "Failed to add SKU Version" }]);
+  console.error("Error submitting data:", error);
+}
+finally{
+  setIsLoading(false);
+}
+  }
+
+
+
+ 
+
 
   return (
     <>
@@ -263,8 +337,21 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
           </div>
         </div>
       )}
+
+<VersionChoicePopup
+      isOpen={VersionChoiceOpen}
+      setIsOpen={setVersionChoiceOpen}
+      handleAddVersion={handleAddVersion}
+      handleAddOption={handleAddOption}
+      >
+      </VersionChoicePopup>
     </>
   );
 }
 
 export default SkuVersionAddEdit;
+
+
+
+
+

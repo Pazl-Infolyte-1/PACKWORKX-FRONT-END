@@ -273,164 +273,164 @@ const OrderForm = forwardRef(({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="pl-2">
-      <div className="relative">
-        <div className="w-full">
-          {/* Form Content */}
+      <form onSubmit={handleSubmit} className="pl-2">
+        <div className="relative">
           <div className="w-full">
-            <div className="flex flex-col gap-4">
-              {/* Customer Name */}
-              <div className="flex items-center bg-gray-50 py-4">
-                <label className="text-sm text-red-600 w-40">
-                  Customer Name*
-                </label>
-                <div className="relative" ref={dropdownRef}>
-                  <div
-                    className="flex h-9 w-[30rem] items-center justify-between rounded-l border border-gray-300 px-3 text-sm cursor-pointer bg-white"
-                    onClick={() => {
-                      setIsOpen(!isOpen);
-                      errors.client = "";
-                    }}
-                  >
-                    <span className="truncate text-sm text-gray-500">
-                      {localFormData.client || "Select or add a customer"}
-                    </span>
-                    <span className="text-gray-500">
-                      {isOpen ?
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="m18 15-6-6-6 6" />
-                        </svg>
-                        :
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      }
-                    </span>
-                  </div>
-                  {attemptedSubmit && errors.client && (
-                    <div className="text-red-500 text-xs mt-1 flex items-center absolute">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                      </svg>
-                      {errors.client}
-                    </div>
-                  )}
-
-                  {isOpen && (
-                    <div className="absolute z-10 mt-1 max-h-60 w-96 overflow-y-auto rounded border border-gray-200 bg-white shadow-md">
-                      <div className="sticky top-0 bg-white p-2 border-b border-gray-200">
-                        <div className="relative">
-                          <input
-                            type="text"
-                            placeholder="Search clients..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            className="h-9 w-full rounded border border-gray-300 bg-gray-50 pl-8 pr-2 text-sm"
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                          >
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="m21 21-4.3-4.3" />
+            {/* Form Content */}
+            <div className="w-full">
+              <div className="flex flex-col gap-4">
+                {/* Customer Name */}
+                <div className="flex items-center bg-gray-50 py-4">
+                  <label className="text-sm text-red-600 w-40">
+                    Customer Name*
+                  </label>
+                  <div className="relative" ref={dropdownRef}>
+                    <div
+                      className="flex h-9 w-[30rem] items-center justify-between rounded-l border border-gray-300 px-3 text-sm cursor-pointer bg-white"
+                      onClick={() => {
+                        setIsOpen(!isOpen);
+                        errors.client = "";
+                      }}
+                    >
+                      <span className="truncate text-sm text-gray-500">
+                        {localFormData.client || "Select or add a customer"}
+                      </span>
+                      <span className="text-gray-500">
+                        {isOpen ?
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m18 15-6-6-6 6" />
                           </svg>
-                        </div>
-                      </div>
-
-                      {clients.length > 0 ? (
-                        clients.map((client, index) => (
-                          <div
-                            key={index}
-                            className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
-                            onClick={() => selectClient(client.company_name,client.client_id)}
-                          >
-                            {client.company_name}
-                          </div>
-                        ))
-                      ) : (
-                        <div className="px-3 py-2 text-xs text-gray-500">No results found</div>
-                      )}
+                          :
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m6 9 6 6 6-6" />
+                          </svg>
+                        }
+                      </span>
                     </div>
-                  )}
-                </div>
-                <button type='button' className=" h-9 w-9 flex items-center justify-center bg-blue-500 text-white rounded-r">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="m21 21-4.3-4.3" />
-                  </svg>
-                </button>
-              </div>
+                    {attemptedSubmit && errors.client && (
+                      <div className="text-red-500 text-xs mt-1 flex items-center absolute">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="8" x2="12" y2="12"></line>
+                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        {errors.client}
+                      </div>
+                    )}
 
-              {/* Sales Order Id */}
-              <div className="flex items-center mt-3">
-                <label className="text-sm text-red-600 w-40">
-                  Sales Order#*
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="sales_ui_id"
-                    value={localFormData.sales_ui_id || ""}
-                    onChange={handleInputChange}
-                    className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                  />
-                  <button type='button' className="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-500">
+                    {isOpen && (
+                      <div className="absolute z-10 mt-1 max-h-60 w-96 overflow-y-auto rounded border border-gray-200 bg-white shadow-md">
+                        <div className="sticky top-0 bg-white p-2 border-b border-gray-200">
+                          <div className="relative">
+                            <input
+                              type="text"
+                              placeholder="Search clients..."
+                              value={searchTerm}
+                              onChange={handleSearchChange}
+                              className="h-9 w-full rounded border border-gray-300 bg-gray-50 pl-8 pr-2 text-sm"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                            >
+                              <circle cx="11" cy="11" r="8" />
+                              <path d="m21 21-4.3-4.3" />
+                            </svg>
+                          </div>
+                        </div>
+
+                        {clients.length > 0 ? (
+                          clients.map((client, index) => (
+                            <div
+                              key={index}
+                              className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
+                              onClick={() => selectClient(client.company_name,client.client_id)}
+                            >
+                              {client.company_name}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="px-3 py-2 text-xs text-gray-500">No results found</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <button type='button' className=" h-9 w-9 flex items-center justify-center bg-blue-500 text-white rounded-r">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="3" />
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                      <circle cx="11" cy="11" r="8" />
+                      <path d="m21 21-4.3-4.3" />
                     </svg>
                   </button>
-                  {attemptedSubmit && errors.sales_ui_id && (
-                    <div className="text-red-500 text-xs mt-1 flex items-center absolute">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                      </svg>
-                      {errors.sales_ui_id}
-                    </div>
-                  )}
                 </div>
-              </div>
+
+                {/* Sales Order Id */}
+                <div className="flex items-center mt-3">
+                  <label className="text-sm text-red-600 w-40">
+                    Sales Order#*
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="sales_ui_id"
+                      value={localFormData.sales_ui_id || ""}
+                      onChange={handleInputChange}
+                      className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
+                    />
+                    <button type='button' className="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                      </svg>
+                    </button>
+                    {attemptedSubmit && errors.sales_ui_id && (
+                      <div className="text-red-500 text-xs mt-1 flex items-center absolute">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="8" x2="12" y2="12"></line>
+                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        {errors.sales_ui_id}
+                      </div>
+                    )}
+                  </div>
+                </div>
 
 
-              {/* Expected Shipment */}
-              <div className="flex items-center">
-                <label className="text-sm text-red-600 w-40">
-                  Expected Shipment
-                </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    name="estimated"
-                    placeholder="dd/MM/yyyy"
-                    value={localFormData.estimated || ""}
-                    onChange={handleInputChange}
-                    className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                  />
-                  {attemptedSubmit && errors.estimated && (
-                    <div className="text-red-500 text-xs mt-1 flex items-center absolute">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                      </svg>
-                      {errors.estimated}
-                    </div>
-                  )}
+                {/* Expected Shipment */}
+                <div className="flex items-center">
+                  <label className="text-sm text-red-600 w-40">
+                    Expected Shipment
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      name="estimated"
+                      placeholder="dd/MM/yyyy"
+                      value={localFormData.estimated || ""}
+                      onChange={handleInputChange}
+                      className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
+                    />
+                    {attemptedSubmit && errors.estimated && (
+                      <div className="text-red-500 text-xs mt-1 flex items-center absolute">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="8" x2="12" y2="12"></line>
+                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        {errors.estimated}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
 
 
               {/* Credit Period */}

@@ -1275,7 +1275,7 @@ export const apiMethods = {
   },
 
   getSkuValuesOptions:async(id)=>{
-    return await apiClient.post(`sku-details/${id}/options`,)
+    return await apiClient.get(`sku-details/${id}/options`,)
   }
 
 }

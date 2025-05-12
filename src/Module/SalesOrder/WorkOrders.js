@@ -334,6 +334,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
     SetselectedSkuID(selectedId)
 
     const response = await getskuversions(selectedId)
+
     // console.log(response.data.data)
 
     setSelectedWorkOrderForVersions(orderId)

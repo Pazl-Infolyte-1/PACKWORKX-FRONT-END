@@ -52,6 +52,7 @@ const Login = () => {
       if (response.status === true && response) {
         // Save token or user data in localStorage or context if needed
         localStorage.setItem('token', response.token)
+        localStorage.setItem('company_state_id', response.company_state_id)
         console.log('Token stored:', localStorage.getItem('token'))
 
         // Dispatch the login success action

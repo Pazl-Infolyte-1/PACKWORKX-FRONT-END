@@ -312,7 +312,14 @@ const [selected, setSelected] = useState('vendor')
                     setisSingleViewPopupRoute(true)
                   }
               
-          
+            useEffect(() => {
+    if (editTag && addNewSkuData?.gst_percentage) {
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        gst_percentage: addNewSkuData.gst_percentage,
+      }));
+    }
+  }, [editTag, addNewSkuData?.gst_percentage]);
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
@@ -464,7 +471,7 @@ const [selected, setSelected] = useState('vendor')
   <select
     id="gst_percentage"
     name="gst_percentage"
-    value={addNewSkuData?.gst_percentage || ""}
+ value={addNewSkuData?.gst_percentage ? parseFloat(addNewSkuData.gst_percentage) : ""}
     onChange={handleChange}
     className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
   >

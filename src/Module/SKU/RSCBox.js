@@ -521,6 +521,19 @@ const refreshClients = () => {
       }
     }, [selectedRouteIds2]);
     
+
+    useEffect(() => {
+  const { length, width, height } = addNewSkuData;
+
+  // Check all three values are present and not null
+  if (length && width && height) {
+    const lwhValue = `${length}X${width}X${height}`;
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      lwh: lwhValue,
+    }));
+  }
+}, [addNewSkuData.length, addNewSkuData.width, addNewSkuData.height]);
     console.log("errors",errors)
   return (
     <div className="rounded-lg ">
@@ -568,7 +581,7 @@ const refreshClients = () => {
         !compositeSelect && !editTag ? () => handleSelect(option) : undefined
       }
     >
-      {option.sku_type}
+      {option?.sku_type}
     </li>
   </div>
 ))}

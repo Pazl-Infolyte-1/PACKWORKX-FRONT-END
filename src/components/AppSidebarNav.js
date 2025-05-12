@@ -79,7 +79,7 @@ export const AppSidebarNav = ({ items }) => {
     const path = getPathFromKey(key)
 
     return (
-      <Component as="div" key={index}>
+      <Component  as="div" key={index}>
         <CNavLink as={NavLink} to={path}>
           {navLink(title, icon, badge, indent)}
         </CNavLink>

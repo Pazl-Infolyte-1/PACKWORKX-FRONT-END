@@ -63,7 +63,7 @@ const AppSidebar = () => {
 
   return (
     <CSidebar
-      //className="border-end bg-blue-800 text-white"
+      className="border-end !w-[200px] text-white"
       colorScheme="dark"
       position="fixed"
       unfoldable={unfoldable}
@@ -73,7 +73,7 @@ const AppSidebar = () => {
       }}
       ref={sidebarRef}
     >
-      <CSidebarHeader className="border-bottom d-flex align-items-center justify-content-between p-3">
+      <CSidebarHeader className="h-12">
         <CSidebarBrand to="/">
           <CIcon icon={cibAdobePhotoshop} height={24} className="mb-1" />
           {!unfoldable && sidebarShow && <CIcon icon={sygnet} height={32} />}

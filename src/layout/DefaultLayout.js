@@ -3,9 +3,9 @@ import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/inde
 
 const DefaultLayout = () => {
   return (
-    <div>
+    <div className="w-full">
       <AppSidebar />
-      <div className="wrapper d-flex flex-column min-vh-100">
+      <div className="pl-[183px] flex-column min-vh-100 ">
         <AppHeader />
         <div className="body flex-grow-1 ">
           <AppContent />

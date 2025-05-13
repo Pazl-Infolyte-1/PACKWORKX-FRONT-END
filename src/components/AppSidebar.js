@@ -63,14 +63,16 @@ const AppSidebar = () => {
 
   return (
     <CSidebar
-      className="border-end !w-[200px] text-white"
-      colorScheme="dark"
-      position="fixed"
-      unfoldable={unfoldable}
       visible={sidebarShow}
       onVisibleChange={(visible) => {
         dispatch({ type: 'set', sidebarShow: visible })
       }}
+      className={`border-end text-white transition-all duration-300 ${
+        unfoldable ? 'w-[80px] ' : '!w-[200px]'
+      }`}
+      colorScheme="dark"
+      position="fixed"
+      unfoldable={unfoldable}
       ref={sidebarRef}
     >
       <CSidebarHeader className="h-12">

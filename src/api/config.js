@@ -5,7 +5,7 @@ const GST_URL = 'http://sheet.gstincheck.co.in/check/9ee24120971acd5c17dc6cad239
 // Create axios instance with default config
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 20000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -439,6 +439,15 @@ export const apiMethods = {
       throw error
     }
   },
+
+  singleclients: async (id) => { 
+  try {
+    const response = await apiClient.get(`clients/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+},
 
   getSkuType: async () => {
     try {

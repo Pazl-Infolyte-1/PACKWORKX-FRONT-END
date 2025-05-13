@@ -10,7 +10,7 @@ import {
   CSidebarToggler,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { AppSidebarNav } from './AppSidebarNav'
+//import { AppSidebarNav } from './AppSidebarNav'
 import { logo } from 'src/assets/brand/logo'
 import { sygnet } from 'src/assets/brand/sygnet'
 import apiMethods from '../api/config'
@@ -63,7 +63,7 @@ const AppSidebar = () => {
 
   return (
     <CSidebar
-      //className="border-end bg-blue-800 text-white"
+      className="border-end !w-[200px] text-white"
       colorScheme="dark"
       position="fixed"
       unfoldable={unfoldable}
@@ -73,7 +73,7 @@ const AppSidebar = () => {
       }}
       ref={sidebarRef}
     >
-      <CSidebarHeader className="border-bottom d-flex align-items-center justify-content-between p-3">
+      <CSidebarHeader className="h-12">
         <CSidebarBrand to="/">
           <CIcon icon={cibAdobePhotoshop} height={24} className="mb-1" />
           {!unfoldable && sidebarShow && <CIcon icon={sygnet} height={32} />}

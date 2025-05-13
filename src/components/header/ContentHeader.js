@@ -150,9 +150,9 @@ function ContentHeader({
         </div>
 
         {/* Help Button */}
-        <button onClick={onHelpClick} className="bg-orange-400 p-2 rounded-md text-white">
+        {/*<button onClick={onHelpClick} className="bg-orange-400 p-2 rounded-md text-white">
           <BiHelpCircle className="text-xl" />
-        </button>
+        </button>*/}
       </div>
     </div>
   )

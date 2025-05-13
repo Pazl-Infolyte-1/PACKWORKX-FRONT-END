@@ -1,22 +1,17 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react'
-import Drawer from '../../components/Drawer/Drawer'
-import { IoFilter, IoFilterOutline, IoSearch } from 'react-icons/io5'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import apiMethods from '../../api/config'
-import CommonPagination from '../../components/New/Pagination'
 import ClientTable from './ClientTable'
 import ClientForm from './ClientForm'
-import ActionButton from '../../components/New/ActionButton'
 import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'
 import vendorImg from '../../assets/images/vendor.png'
 import clientImg from '../../assets/images/client.jpg'
-import CustomAlert from '../../components/New/CustomAlert'
-import DynamicPagination from '../../components/New/DynamicPagination'
-import { FaFilter } from 'react-icons/fa'
-import { FaChevronDown } from 'react-icons/fa'
-import SearchBar from '../../components/New/SearchBar'
-import { FaSyncAlt } from 'react-icons/fa'
+import { FaAccessibleIcon, FaFilter, FaUserCheck, FaUserSlash } from 'react-icons/fa'
 import Loader from '../../components/New/Loader'
 import Drawer1 from '../../components/Drawer/Drawer1'
+import ContentHeader from '../../components/header/ContentHeader'
+import { FiDownload, FiUpload } from 'react-icons/fi'
+import { FolderIcon } from '@heroicons/react/solid'
+import { FaUserGroup } from 'react-icons/fa6'
 
 function ClientList() {
   const [selected, setSelected] = useState('vendor')
@@ -192,18 +187,48 @@ function ClientList() {
 
   return (
     <div ref={clientListRef} className="w-full">
+      <ContentHeader
+        heading="Client/Vendor"
+        menuOptions={[
+          {
+            icon: <FiUpload className="mr-2 text-blue-500" />,
+            label: 'Import',
+            onClick: () => console.log('Import clicked'),
+          },
+          {
+            icon: <FiDownload className="mr-2 text-blue-500" />,
+            label: 'Export',
+            onClick: downloadClientExcelSheet,
+          },
+        ]}
+        onAddClick={() => setPopupOpen(true)}
+        headingOptions={[
+          {
+            label: 'All Clients',
+            icon: <FaUserGroup size={16} />,
+            onClick: () => console.log('All Clients selected'),
+          },
+          {
+            label: 'Active Clients',
+            icon: <FaUserCheck size={16} />,
+            onClick: () => console.log('Active Clients selected'),
+          },
+          {
+            label: 'Inactive Clients',
+            icon: <FaUserSlash size={16} />,
+            onClick: () => console.log('Inactive Clients selected'),
+          },
+        ]}
+      />
       <Loader isLoading={loading} />
-      {/* Header Section */}
-      <div className="w-full h-[40px] flex justify-between items-center">
-        <h4>Client/Vendor</h4>
-      </div>
-      {/* Search Bar & Actions */}
-      <div className="overflow-x-auto border border-gray-200 p-3 rounded-md h-[550px]">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            {/* Search Input Container */}
 
-            <div className="flex items-center h-[35px] w-[300px] gap-2 border rounded-md">
+      {/* Search Bar & Actions */}
+      {/* <div className="overflow-x-auto border border-gray-200 p-3 rounded-md h-[550px]">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2"> */}
+      {/* Search Input Container */}
+
+      {/* <div className="flex items-center h-[35px] w-[300px] gap-2 border rounded-md">
               <div className="bg-white h-full w-[40px] flex justify-center items-center rounded-l-md">
                 <IoSearch />
               </div>
@@ -214,11 +239,11 @@ function ClientList() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-            </div>
+            </div> */}
 
-            {/* Filter Icon */}
-            <div className="flex items-center gap-3">
-              {/* Dropdown */}
+      {/* Filter Icon */}
+      {/* Dropdown */}
+      {/* <div className="flex items-center gap-3">
               <div className="relative inline-block text-left">
                 <select
                   value={selectedFilter}
@@ -242,30 +267,18 @@ function ClientList() {
               >
                 Clear
               </button>
-            </div>
-          </div>
+            </div> */}
+      {/* </div>
+        </div> */}
 
-          <div className="flex justify-center items-center gap-2">
-            <ActionButton height="9" label="Import" />
+      {/* Table Section */}
+      <div className="mt-3 overflow-x-auto h-[500px]">
+        <ClientTable refreshClients={refreshClients} clientdata={data} />
+      </div>
 
-            <ActionButton height={'9'} label={'Export'} onClick={downloadClientExcelSheet} />
-            <ActionButton
-              height={'9'}
-              label={'+ Add'}
-              onClick={() => setPopupOpen(true)}
-              variant="add"
-            />
-          </div>
-        </div>
+      {/* Pagination Section */}
 
-        {/* Table Section */}
-        <div className="mt-3 overflow-x-auto">
-          <ClientTable refreshClients={refreshClients} clientdata={data} />
-        </div>
-
-        {/* Pagination Section */}
-
-        <div className="flex justify-end items-center gap-4 mt-3">
+      {/* <div className="flex justify-end items-center gap-4 mt-3">
           <DynamicPagination
             count={totalPage}
             page={currentPage}
@@ -273,8 +286,8 @@ function ClientList() {
             entriesPerPage={entriesPerPage}
             onEntriesChange={handleEntriesChange}
           />
-        </div>
-      </div>
+        </div> */}
+      {/* </div> */}
 
       {/* Drawer */}
 

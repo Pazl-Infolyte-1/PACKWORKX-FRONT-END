@@ -10,7 +10,7 @@ import {
   CSidebarToggler,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { AppSidebarNav } from './AppSidebarNav'
+//import { AppSidebarNav } from './AppSidebarNav'
 import { logo } from 'src/assets/brand/logo'
 import { sygnet } from 'src/assets/brand/sygnet'
 import apiMethods from '../api/config'

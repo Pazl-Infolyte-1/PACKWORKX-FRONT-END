@@ -15,6 +15,7 @@ import ContentHeader from '../../components/header/ContentHeader';
 import { FiDownload, FiUpload } from 'react-icons/fi';
 import { FaUserGroup } from 'react-icons/fa6';
 import ActionButton from '../../components/New/ActionButton';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 function ClientList() {
   const [selected, setSelected] = useState('vendor');
@@ -33,7 +34,7 @@ function ClientList() {
   const [isMinimized, setIsMinimized] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const clientListRef = useRef(null);
-
+ const navigate = useNavigate();
   const selectionFrame = {
     vendor: { id: 1, name: 'vendor', image: vendorImg },
     client: { id: 2, name: 'client', image: clientImg },
@@ -157,6 +158,7 @@ function ClientList() {
       <div ref={clientListRef} className={isMinimized ? 'w-[320px]' : 'w-full'}>
 
         <ContentHeader
+        isMinimized={isMinimized}
           heading="Client/Vendor"
           menuOptions={[
             {
@@ -170,7 +172,7 @@ function ClientList() {
               onClick: downloadClientExcelSheet,
             },
           ]}
-          onAddClick={() => setPopupOpen(true)}
+         onAddClick={() => navigate('/clients/new')}
           headingOptions={[
             {
               label: 'All Clients',
@@ -191,22 +193,6 @@ function ClientList() {
         />
 
         <Loader isLoading={loading} />
-
-        <div className="w-full flex justify-end items-center gap-2">
-          <ActionButton
-            height={'9'}
-            width={isMinimized ? '9' : '30'}
-            label={isMinimized ? '+' : '+ New'}
-            onClick={() => setPopupOpen(true)}
-            variant="add"
-          />
-          <button
-            className="h-9 w-9 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-100"
-            onClick={() => console.log('More options clicked')}
-          >
-            <CIcon icon={cilOptions} className="text-gray-700 w-4 h-4" />
-          </button>
-        </div>
 
         <div className="mt-3 overflow-x-auto">
           <ClientTable
@@ -272,6 +258,7 @@ function ClientList() {
           />
         </div>
       )}
+         {/*<Outlet />*/}
     </div>
   );
 }

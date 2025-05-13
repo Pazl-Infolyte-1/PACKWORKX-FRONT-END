@@ -12,6 +12,7 @@ import ActionButton from '../../components/New/ActionButton'
 import Loader from '../../components/New/Loader'
 import { CRow, CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
 import { useFieldArray } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 
 const ClientForm = ({
   editData,
@@ -34,6 +35,7 @@ const ClientForm = ({
   const [loading, setLoading] = useState(false)
   const [isGstModalOpen, setIsGstModalOpen] = useState(false)
   const tabs = ['Other Details', 'Address']
+   const navigate = useNavigate();
 
   const handleClose = () => {
     setAlerts([])
@@ -363,6 +365,7 @@ const ClientForm = ({
       closeDrawerDuringAdd()
     }
     reset()
+    navigate('/clients')
   }
 
   // Helper function to apply red border style

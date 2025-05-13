@@ -22,7 +22,7 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import PopUp from '../../components/New/PopUp'
 import { TiFlowSwitch } from 'react-icons/ti'
 
-function ClientTable({ clientdata, refreshClients }) {
+function ClientTable({ clientdata, refreshClients,setIsMinimized,isMinimized,setSelectedRowData}) {
   //const [fakeClientData, setFakeClientData] = useState(jsonval)
   const [isModalOpen, setModalOpen] = useState(false)
   const [selectedClient, setSelectedClient] = useState(null) // Store selected client
@@ -65,7 +65,7 @@ function ClientTable({ clientdata, refreshClients }) {
   }
 
   const openViewCard = (data) => {
-    setisSingleViewPopup(true)
+    //setisSingleViewPopup(true)
     console.log(JSON.stringify(data))
     setSingleData(data)
   }
@@ -137,199 +137,142 @@ function ClientTable({ clientdata, refreshClients }) {
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-
       <div className=" overflow-y-auto custom-scrollbar ">
-        {/* <div className="">
-          <CTable striped hover className=" w-full  m-0">
-            <CTableHead className="bg-gray-100 sticky top-0 z-10">
-              <CTableRow style={{ height: '32px' }}>
-                <CTableHeaderCell
-                  style={{ whiteSpace: 'nowrap', minWidth: '120px' }}
-                  onClick={() => openViewCard(cell)}
-                  className="py-3 px-4 text-gray-600 font-medium"
-                >
-                  Id
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  style={{ whiteSpace: 'nowrap', minWidth: '190px' }}
-                  onClick={() => openViewCard(cell)}
-                  className="py-3 px-4 text-gray-600 font-medium"
-                >
-                  Reference Id
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  style={{ whiteSpace: 'nowrap' }}
-                  className="py-3 px-4 text-gray-600 font-medium"
-                >
-                  Email
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  style={{ whiteSpace: 'nowrap' }}
-                  className="py-3 px-4 text-gray-600 font-medium"
-                >
-                  Mobile Number
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  style={{ whiteSpace: 'nowrap' }}
-                  className="py-3 px-4 text-gray-600 font-medium"
-                >
-                  Action
-                </CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
+        <div className="bg-white shadow-sm border border-gray-200 rounded-lg h-[600px]">
+         <CTable hover className="w-full">
+  {/* Render table headers only if not minimized */}
+  {!isMinimized && (
+    <CTableHead className="!bg-gray-300 sticky top-0 z-10">
+      <CTableRow>
+        <CTableHeaderCell className='!w-3 !m-0'>
+          <TiFlowSwitch className="rotate-90 text-blue-600" size={20} />
+        </CTableHeaderCell>
+        <CTableHeaderCell className="px-4 w-10">
+          <input
+            type="checkbox"
+            checked={selectedRows.length === clientdata.length}
+            onChange={handleSelectAll}
+            className="form-checkbox h-3 w-3 text-blue-600 rounded"
+          />
+        </CTableHeaderCell>
+        <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+          Name
+        </CTableHeaderCell>
+        <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+          Id
+        </CTableHeaderCell>
+        <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+          Reference Id
+        </CTableHeaderCell>
+        <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+          Email
+        </CTableHeaderCell>
+        <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+          Phone
+        </CTableHeaderCell>
+        <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+          Actions
+        </CTableHeaderCell>
+      </CTableRow>
+    </CTableHead>
+  )}
 
-            <CTableBody>
-              {clientdata.length > 0 ? (
-                clientdata.map((cell, index) => (
-                  <CTableRow style={{ minHeight: '100px' }} key={index} className="border-b">
-                    <CTableDataCell
-                      onClick={() => openViewCard(cell)}
-                      className="py-3 px-4 !text-blue-600 font-semibold text-decoration-underline cursor-pointer w-[150px]"
-                    >
-                      {cell.client_ui_id}
-                    </CTableDataCell>
-                    <CTableDataCell className="py-3 px-4 text-gray-700">
-                      {cell.client_ref_id}
-                    </CTableDataCell>
-                    <CTableDataCell className="py-3 px-4 text-gray-700">
-                      {cell.email}
-                    </CTableDataCell>
-                    <CTableDataCell className="py-3 px-4 text-gray-700">
-                      {cell.mobile}
-                    </CTableDataCell>
-                    <CTableDataCell className="py-3 px-4 text-gray-700">
-                      <ThreeDotMenu
-                        value={[
-                          {
-                            label: 'Edit',
-                            icon: cilPencil,
-                            onClick: () => {
-                              handleEdit(cell)
-                            },
-                          },
-                          {
-                            label: 'Delete',
-                            icon: cilTrash,
-                            onClick: () => {
-                              openDeleteModal(cell?.client_id)
-                            },
-                          },
-                        ]}
-                      />
-                    </CTableDataCell>
-                  </CTableRow>
-                ))
-              ) : (
-                <CTableRow>
-                  <CTableDataCell colSpan={10} className="text-center py-3">
-                    No data available
-                  </CTableDataCell>
-                </CTableRow>
-              )}
-            </CTableBody>
-          </CTable>
-        </div> */}
-        <div className="bg-white shadow-sm border border-gray-200 rounded-lg">
-          <CTable hover className="w-full">
-            <CTableHead className="!bg-gray-300 sticky top-0 z-10">
-              <CTableRow>
-                <CTableHeaderCell className='!w-3 !m-0 '>
-                  <TiFlowSwitch className=" rotate-90 text-blue-600" size={20} />
-                </CTableHeaderCell>
-                <CTableHeaderCell className="px-4 w-10">
-                  <input
-                    type="checkbox"
-                    checked={selectedRows.length === clientdata.length}
-                    onChange={handleSelectAll}
-                    className="form-checkbox h-3 w-3 text-blue-600 rounded"
-                  />
-                </CTableHeaderCell>
-                <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider ">
-                  Name
-                </CTableHeaderCell>
-                <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                  Id
-                </CTableHeaderCell>
-                <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                  Reference Id
-                </CTableHeaderCell>
+  <CTableBody>
+    {clientdata.map((client) => (
+      <CTableRow
+        key={client.client_id}
+        onClick={() =>{ setIsMinimized(true)
+            setSelectedRowData(client);
+          }
+        }
+        className={`${
+          selectedRows.includes(client.client_id)
+            ? 'bg-blue-50'
+            : 'hover:bg-gray-50'
+        } border-b cursor-pointer`}
+      >
+        {/* When minimized: Only render checkbox and display name */}
+        {isMinimized ? (
+          <>
+            <CTableDataCell className="px-4 py-3">
+              <input
+                type="checkbox"
+                checked={selectedRows.includes(client.client_id)}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  handleRowSelect(client.client_id);
+                }}
+                className="form-checkbox h-3 w-3 text-blue-600 rounded"
+              />
+            </CTableDataCell>
+            <CTableDataCell
+              onClick={(e) => {
+                //e.stopPropagation();
+                openViewCard(client);
+              }}
+              className="px-4 py-3 text-sm !text-blue-600 font-semibold"
+            >
+              {client.display_name || 'N/A'}
+            </CTableDataCell>
+          </>
+        ) : (
+          <>
+            <CTableDataCell>{''}</CTableDataCell>
+            <CTableDataCell className="px-4 py-3">
+              <input
+                type="checkbox"
+                checked={selectedRows.includes(client.client_id)}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  handleRowSelect(client.client_id);
+                }}
+                className="form-checkbox h-3 w-3 text-blue-600 rounded"
+              />
+            </CTableDataCell>
+            <CTableDataCell
+              onClick={(e) => {
+                //e.stopPropagation();
+                openViewCard(client);
+              }}
+              className="px-4 py-3 text-sm !text-blue-600 font-semibold"
+            >
+              {client.display_name || 'N/A'}
+            </CTableDataCell>
+            <CTableDataCell className="px-4 py-3 text-sm text-gray-900">
+              {client.client_ui_id || 'N/A'}
+            </CTableDataCell>
+            <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
+              {client.client_ref_id || 'N/A'}
+            </CTableDataCell>
+            <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
+              {client.email || 'N/A'}
+            </CTableDataCell>
+            <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
+              {client.mobile || 'N/A'}
+            </CTableDataCell>
+            <CTableDataCell className="px-4 py-3">
+              <ThreeDotMenu
+                value={[
+                  {
+                    label: 'Edit',
+                    icon: cilPencil,
+                    onClick: () => console.log('Edit', client),
+                  },
+                  {
+                    label: 'Delete',
+                    icon: cilTrash,
+                    onClick: () => console.log('Delete', client),
+                  },
+                ]}
+              />
+            </CTableDataCell>
+          </>
+        )}
+      </CTableRow>
+    ))}
+  </CTableBody>
+</CTable>
 
-                <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                  Email
-                </CTableHeaderCell>
-                <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                  Phone
-                </CTableHeaderCell>
-
-                <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                  Actions
-                </CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {clientdata.map((client, index) => (
-                <CTableRow
-                  key={client.client_id}
-                  className={`
-                ${selectedRows.includes(client.client_id) ? 'bg-blue-50' : 'hover:bg-gray-50'}
-                border-b
-              `}
-                >
-                  <CTableDataCell>{''}</CTableDataCell>
-                  <CTableDataCell className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedRows.includes(client.client_id)}
-                      onChange={() => handleRowSelect(client.client_id)}
-                      className="form-checkbox h-3 w-3 text-blue-600 rounded"
-                    />
-                  </CTableDataCell>
-                  <CTableDataCell
-                    onClick={() => openViewCard(cell)}
-                    className="px-4 py-3 text-sm !text-blue-600 font-semibold "
-                  >
-                    {client.display_name || 'N/A'}
-                  </CTableDataCell>
-                  <CTableDataCell className="px-4 py-3 text-sm text-gray-900">
-                    {client.client_ui_id || 'N/A'}
-                  </CTableDataCell>
-                  <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
-                    {client.client_ref_id || 'N/A'}
-                  </CTableDataCell>
-
-                  <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
-                    {client.email || 'N/A'}
-                  </CTableDataCell>
-                  <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
-                    {client.mobile || 'N/A'}
-                  </CTableDataCell>
-
-                  <CTableDataCell className="px-4 py-3">
-                    <ThreeDotMenu
-                      value={[
-                        {
-                          label: 'Edit',
-                          icon: cilPencil,
-                          onClick: () => {
-                            // Implement edit logic
-                            console.log('Edit', client)
-                          },
-                        },
-                        {
-                          label: 'Delete',
-                          icon: cilTrash,
-                          onClick: () => {
-                            // Implement delete logic
-                            console.log('Delete', client)
-                          },
-                        },
-                      ]}
-                    />
-                  </CTableDataCell>
-                </CTableRow>
-              ))}
-            </CTableBody>
-          </CTable>
         </div>
 
         <Drawer

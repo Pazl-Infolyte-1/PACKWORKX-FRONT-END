@@ -6,6 +6,8 @@ const SettingsLayout = React.lazy(() => import('./Module/Settings/SettingsLayout
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Client = React.lazy(() => import('./Module/Client/ClientList.js'))
+const OverviewComponent = React.lazy(() => import('./Module/Client/OverviewComponent'))
+const ClientForm = React.lazy(() => import('./Module/Client/ClientForm.js'));
 const SKU = React.lazy(() => import('./Module/SKU/SkuList.js'))
 //const SKUaddEdit = React.lazy(() => import('./Module/SKU/SkuAddEdit.js'))
 const EmployeeList = React.lazy(() => import('./Module/HRMS/Employee/EmployeeList.js'))
@@ -43,6 +45,8 @@ const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },
   { path: '/clients', name: 'Clients', element: Client, key: 10 },
+  
+  { path: '/clients/new', name: 'Add Client', element: ClientForm, key: '10-1' },
   { path: '/SKU', name: 'SKU', element: SKU, key: 23 },
   //{ path: '/SKU/add-edit', name: 'Add/Edit SKU', element: SKU, key: 'SKU_ADD_EDIT'},
   { path: '/employeelist', name: 'Employee List', element: EmployeeList, key: 21 },

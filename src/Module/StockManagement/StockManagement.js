@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import PurchaseOrderTable from "./PurchaseOrderTable";
-import AddPurchaseOrder from "./AddPurchaseOrder";
-import AddPurchaseOrderReturn from "../PurchaseReturn/AddPurchaseReturn";
 import Drawer from "../../components/Drawer/Drawer";
+import StockManagementTable from './StockManagementTable';
+
 import CustomAlert from "../../components/New/CustomAlert";
 import SearchBar from "../../components/New/SearchBar";
 import apiMethods from "../../api/config";
@@ -12,7 +11,7 @@ import CommonPagination from '../../components/New/Pagination';
 import { useSearch } from '../../components/New/SearchContext'
 
 
-const PurchaseOrder = () => {
+const StockManagement = () => {
   const [data, setData] = useState([]);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [isReturnDrawerOpen, setReturnDrawerOpen] = useState(false);
@@ -30,6 +29,30 @@ const PurchaseOrder = () => {
   const searchBarRef = useRef(null);
     const [status, setStatus] = useState('');
   
+
+    const sampleData = [
+        {
+          id: 1,
+          item_name: "Laptop",
+          sku: "LAP123",
+          previous_qty: 10,
+          adjusted_qty: 8,
+          difference: -2,
+          reason: "Damaged during transit",
+          remarks: "2 units scratched",
+        },
+        {
+          id: 2,
+          item_name: "Mouse",
+          sku: "MOU456",
+          previous_qty: 50,
+          adjusted_qty: 52,
+          difference: 2,
+          reason: "Stock Recount",
+          remarks: "Inventory mismatch corrected",
+        },
+      ];
+
 
   const fetchData = async () => {
     setLoading(true);
@@ -108,15 +131,6 @@ const PurchaseOrder = () => {
     setAlert({ ...alert, show: false });
   };
 
-  // const handleDelete = async (id) => {
-  //   try {
-  //     await apiMethods.deletePurchaseOrder(id);
-  //     setAlert({ show: true, message: "Purchase order deleted successfully!", type: "success" });
-  //     fetchData(); // Re-fetch the updated data
-  //   } catch (error) {
-  //     setAlert({ show: true, message: "Failed to delete purchase order.", type: "error" });
-  //   }
-  // };
   const clearFilters = () => {
     setStatus('');
     if (searchBarRef.current) {
@@ -136,12 +150,12 @@ const PurchaseOrder = () => {
       <div className="h-full w-full flex flex-col">
 
         <div className="w-full h-[40px] flex justify-between items-center">
-          <h4>Purchase Order</h4>
+          <h4>Stock Management</h4>
         </div>
         <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">
           <div className="flex justify-between items-center mb-4">
           <div className='flex gap-1'>
-            <SearchBar text="Purchase order" data={data} ref={searchBarRef} />
+            <SearchBar text="Stock Management" data={data} ref={searchBarRef} />
             
             
             
@@ -155,27 +169,22 @@ const PurchaseOrder = () => {
                 Clear Filters
             </button>
             </div>
-
-
-
-
-            <ActionButton label="Add Purchase" onClick={handleAddNew} variant="add" />
           </div>
 
           {loading ? (
             <Loader />
           ) : (
             <>
-              <PurchaseOrderTable
-                data={filteredSearchData.length ? filteredSearchData : data}
+              <StockManagementTable
+                data={sampleData}
                 handleEdit={handleEdit}
-                handlePurchaseDetails = {handlePurchaseDetails}
+                // handleStockManagementDetails = {handleStockManagementDetails}
                 // handleDelete={handleDelete}
                 />
 
               <div className="flex justify-end items-center gap-4 mt-2">
                 <CommonPagination
-                  count={totalPages} // Use totalPages directly
+                  count={totalPages} 
                   page={paginationParams.currentPage}
                   onChange={handlePageChange}
                   onLimitChange={handleLimitChange}
@@ -185,43 +194,9 @@ const PurchaseOrder = () => {
             </>
           )}
         </div>
-
-        <Drawer
-          isOpen={isDrawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          maxWidth={"1280px"}
-          title={isEdit ? "Edit Purchase Order" : "Add Purchase Order"}
-        >
-          <AddPurchaseOrder
-            isEdit={isEdit}
-            selectedPoId={selectedPoId}
-            setDrawer={setDrawerOpen}
-            onSuccess={handleSuccess}
-            fetchData={fetchData}
-          />
-        </Drawer>
-
-
-
-
-        <Drawer
-            isOpen={isReturnDrawerOpen}
-            onClose={() => setReturnDrawerOpen(false)}
-            maxWidth={"1270px"}
-            title={isEdit ? "Purchase Order Return" : "Edit Purchase Order Return"}
-          >
-            
-            <AddPurchaseOrderReturn
-              isEdit={isEdit}
-              selectedPoId={selectedPoId}
-              setDrawer={setReturnDrawerOpen}
-              onSuccess={handleSuccess}
-              fetchData={fetchData}
-            />
-          </Drawer>
       </div>
     </div>
   );
 };
 
-export default PurchaseOrder;
+export default StockManagement;

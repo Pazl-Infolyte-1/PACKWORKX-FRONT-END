@@ -27,6 +27,9 @@ const RawMaterialsDetails = ({ visible, setVisible, rawMaterials = [], itemdata 
                         itemdata.filter(item => item.item_type?.toLowerCase() === "raw-materials")
                         .map((item) => (
 
+                        //      {itemdata.length > 0 ? (
+                                 // itemdata.map((item) => (
+
                                 // const relatedItem = itemdata.find(i => i.id === item.item_id);
 
 

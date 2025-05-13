@@ -8,6 +8,9 @@ import clientImg from '../../assets/images/client.jpg'
 import { FaAccessibleIcon, FaFilter, FaUserCheck, FaUserSlash } from 'react-icons/fa'
 import Loader from '../../components/New/Loader'
 import Drawer1 from '../../components/Drawer/Drawer1'
+import TableView from './TableView'
+import CIcon from '@coreui/icons-react'
+import { cilOptions } from '@coreui/icons'
 import ContentHeader from '../../components/header/ContentHeader'
 import { FiDownload, FiUpload } from 'react-icons/fi'
 import { FolderIcon } from '@heroicons/react/solid'
@@ -32,6 +35,10 @@ function ClientList() {
   const [selectedFilter, setSelectedFilter] = useState('')
   const [loading, setLoading] = useState(false)
   const clientListRef = useRef(null)
+const [isMinimized, setIsMinimized] = useState(false);
+// Add this in your component
+const [selectedRowData, setSelectedRowData] = useState(null);
+
 
   useEffect(() => {
     if (clientListRef.current) {
@@ -185,8 +192,10 @@ function ClientList() {
     }
   }
 
+  console.log("main pagfe data",selectedRowData)
   return (
-    <div ref={clientListRef} className="w-full">
+    <div className="flex w-full">
+    <div ref={clientListRef} className={isMinimized ? "w-[320px]" : "w-full"} transition-all duration-300>
       <ContentHeader
         heading="Client/Vendor"
         menuOptions={[
@@ -267,16 +276,33 @@ function ClientList() {
               >
                 Clear
               </button>
-            </div> */}
-      {/* </div>
-        </div> */}
+            </div>
+          </div>*/}
 
-      {/* Table Section */}
-      <div className="mt-3 overflow-x-auto h-[500px]">
-        <ClientTable refreshClients={refreshClients} clientdata={data} />
-      </div>
+   <div className="w-full flex justify-end items-center gap-2">
+  {/* <ActionButton height={'9'} label={'Export'} onClick={downloadClientExcelSheet} /> */}
+ <ActionButton
+  height={'9'}
+  width={isMinimized ? '9' : '30'} // shrink width when minimized
+  label={isMinimized ? '+' : '+ New'} // shrink label when minimized
+  onClick={() => setPopupOpen(true)}
+  variant="add"
+/>
 
-      {/* Pagination Section */}
+  <button
+    className="h-9 w-9 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-100"
+    onClick={() => console.log('More options clicked')}
+  >
+    <CIcon icon={cilOptions} className="text-gray-700 w-4 h-4" />
+  </button>
+</div>
+
+        </div>
+
+        {/* Table Section */}
+        <div className="mt-3 overflow-x-auto">
+          <ClientTable setSelectedRowData={setSelectedRowData} isMinimized={isMinimized} setIsMinimized={setIsMinimized} refreshClients={refreshClients} clientdata={data}/>
+        </div>
 
       {/* <div className="flex justify-end items-center gap-4 mt-3">
           <DynamicPagination
@@ -339,6 +365,12 @@ function ClientList() {
           setReloadData={setReloadData}
         />
       </Drawer1>
+    </div>
+  {isMinimized && (
+    <div className="flex-1 transition-all duration-300">
+      <TableView selectedRowData={selectedRowData} onClose={() => setIsMinimized(false)}/>
+    </div>
+  )}
     </div>
   )
 }

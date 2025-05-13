@@ -51,6 +51,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.5",
     "react-select": "^5.10.1",
+    "react-spinners": "^0.17.0",
     "react-tooltip": "^5.28.0",
     "redux": "5.0.1",
     "simplebar-react": "^3.3.0",

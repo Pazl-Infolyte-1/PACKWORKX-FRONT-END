@@ -56,7 +56,7 @@ const AppHeader = () => {
         >
           <CIcon icon={cilMenu} size="lg" />
         </button>
-        <CHeaderNav className="d-none d-md-flex px-2">
+        <CHeaderNav className="d-none d-md-flex">
           <CNavItem>
             <CNavLink className="text-white font-normal !text-sm" to="/dashboard" as={NavLink}>
               Dashboard

@@ -79,7 +79,7 @@ const AppSidebar = () => {
       <CSidebarHeader className="h-12">
         <CSidebarBrand to="/">
           <CIcon icon={cibHouzz} height={24} className="mb-1" />
-          {!unfoldable && sidebarShow && <CIcon icon={sygnet} height={32} width={200} />}
+          {!unfoldable && sidebarShow && <CIcon icon={sygnet} height={30} width={170} />}
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"

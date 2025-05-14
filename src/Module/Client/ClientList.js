@@ -16,6 +16,7 @@ import { FiDownload, FiUpload } from 'react-icons/fi';
 import { FaUserGroup } from 'react-icons/fa6';
 import ActionButton from '../../components/New/ActionButton';
 import { Outlet, useNavigate } from 'react-router-dom';
+import DynamicPagination from '../../../../code backups/paxk workx/PACKWORKX-FRONT-END/src/components/New/DynamicPagination';
 
 function ClientList() {
   const [selected, setSelected] = useState('vendor');
@@ -154,7 +155,7 @@ function ClientList() {
   };
 
   return (
-    <div className="flex w-full">
+    <div className="flex">
       <div ref={clientListRef} className={isMinimized ? 'w-[320px] border-r' : 'w-full'}>
 
         <ContentHeader
@@ -172,7 +173,7 @@ function ClientList() {
               onClick: downloadClientExcelSheet,
             },
           ]}
-         onAddClick={() => navigate('/clients/new')}
+         onAddClick={() => navigate('/clients/clientForm')}
           headingOptions={[
             {
               label: 'All Clients',
@@ -203,7 +204,15 @@ function ClientList() {
             clientdata={data}
           />
         </div>
-
+  <div className="flex justify-end items-center gap-4 mt-3">
+          <DynamicPagination
+            count={totalPage}
+            page={currentPage}
+            onPageChange={handlePageChange}
+            entriesPerPage={entriesPerPage}
+            onEntriesChange={handleEntriesChange}
+          />
+        </div>
         {!isDrawerOpen && (
           <CustomPopup
             isOpen={isPopupOpen}

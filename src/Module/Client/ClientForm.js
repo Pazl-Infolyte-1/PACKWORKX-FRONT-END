@@ -12,10 +12,10 @@ import ActionButton from '../../components/New/ActionButton'
 import Loader from '../../components/New/Loader'
 import { CRow, CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
 import { useFieldArray } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const ClientForm = ({
-  editData,
+  //editData,
   closeDrawer,
   refreshClients,
   closeDrawerDuringAdd,
@@ -34,9 +34,17 @@ const ClientForm = ({
   const [entityName, setEntityName] = useState('Client')
   const [loading, setLoading] = useState(false)
   const [isGstModalOpen, setIsGstModalOpen] = useState(false)
+  const [editData,setEditData]=useState(null);
   const tabs = ['Other Details', 'Address']
    const navigate = useNavigate();
-
+const location = useLocation();
+const client = location.state?.client;
+useEffect(() => {
+  if (client) {
+    setEditData(client);
+  }
+}, [client]);
+console.log("params data",client)
   const handleClose = () => {
     setAlerts([])
   }
@@ -329,21 +337,23 @@ const ClientForm = ({
       if (editData) {
         setTimeout(() => {
           setAlerts([])
-          refreshClientsEdit()
-          closeDrawer()
+          //refreshClientsEdit()
+          //closeDrawer()
           reset()
+                    navigate("/clients")
         }, 3000)
       }
 
-      if (isDrawerOpen) {
-        setDrawerOpen(false)
-        setMessage(response.message)
-      }
+      //if (isDrawerOpen) {
+      //  setDrawerOpen(false)
+      //  setMessage(response.message)
+      //}
       setTimeout(() => {
         setAlerts([])
-        refreshClients()
-        closeDrawerDuringAdd()
+        //refreshClients()
+        //closeDrawerDuringAdd()
         reset()
+                  navigate("/clients")
       }, 3000)
     } catch (error) {
       console.error('Error processing client:', error)
@@ -359,11 +369,11 @@ const ClientForm = ({
   }
 
   const handleCancel = () => {
-    if (typeof closeDrawer === 'function') {
-      closeDrawer()
-    } else if (typeof closeDrawerDuringAdd === 'function') {
-      closeDrawerDuringAdd()
-    }
+    //if (typeof closeDrawer === 'function') {
+    //  closeDrawer()
+    //} else if (typeof closeDrawerDuringAdd === 'function') {
+    //  closeDrawerDuringAdd()
+    //}
     reset()
     navigate('/clients')
   }
@@ -628,6 +638,7 @@ const ClientForm = ({
               </div>
 
               {/* GST Status */}
+              <div className="flex items-start space-x-8 mb-4">
               <div className="mb-2">
                 <div className="flex items-center">
                   <label className="text-sm w-32 after:content-['*'] after:text-red-500 after:ml-1">
@@ -661,16 +672,16 @@ const ClientForm = ({
 
               {gstStatus === 'true' && (
                 <div className="mb-4 h-10">
-                  <label className="text-sm w-32 after:content-['*'] after:text-red-500 after:ml-1">
+                  {/*<label className="text-sm w-32 after:content-['*'] after:text-red-500 after:ml-1">
                     GST Number
-                  </label>
+                  </label>*/}
                   <input
                     type="text"
                     placeholder="Enter GST Number"
                     {...register('clientData.gst_number', {
                       required: gstStatus === 'true' ? 'GST number is required' : false,
                     })}
-                    className="border p-2 rounded w-[295px]"
+                    className="border p-1 rounded w-[295px]"
                     readOnly={!!gstData} // Make read-only only after data is fetched
                   />
                   {errors.clientData?.gst_number && (
@@ -683,6 +694,7 @@ const ClientForm = ({
                   )}
                 </div>
               )}
+              </div>
             </div>
           </div>
 

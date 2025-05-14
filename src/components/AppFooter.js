@@ -6,14 +6,14 @@ const AppFooter = () => {
     <CFooter className="px-4">
       <div>
         <a href="" target="_blank" rel="noopener noreferrer">
-          Pack Workx
+      
         </a>
-        <span className="ms-1">&copy; 2025 </span>
+        <span className="ms-1"> </span>
       </div>
       <div className="ms-auto">
-        <span className="me-1">Powered by</span>
+        <span className="me-1"> </span>
         <a href="" target="_blank" rel="noopener noreferrer">
-          Pazl
+  
         </a>
       </div>
     </CFooter>

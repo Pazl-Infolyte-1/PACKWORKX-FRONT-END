@@ -138,7 +138,7 @@ function ClientTable({ clientdata, refreshClients,setIsMinimized,isMinimized,set
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className=" overflow-y-auto custom-scrollbar ">
-        <div className="bg-white shadow-sm border border-gray-200 rounded-lg h-[600px]">
+        <div className="bg-white shadow-sm border border-gray-200 rounded-lg h-[500px]">
          <CTable hover className="w-full">
   {/* Render table headers only if not minimized */}
   {!isMinimized && (
@@ -264,7 +264,9 @@ function ClientTable({ clientdata, refreshClients,setIsMinimized,isMinimized,set
         {
           label: 'Edit',
           icon: cilPencil,
-          onClick: () => console.log('Edit', client),
+          onClick: () => {console.log('Edit', client)
+            navigate("/clients/clientForm", { state: { client } })
+          },
         },
         {
           label: 'Delete',

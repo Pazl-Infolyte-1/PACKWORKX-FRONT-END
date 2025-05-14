@@ -13,6 +13,7 @@ import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import SalesOrderView from './viewSalesOrder'
+import ContentHeader from '../../components/header/ContentHeader'
 
 function ListOfSalesOrder() {
   const [data, setData] = useState([])
@@ -167,18 +168,20 @@ function ListOfSalesOrder() {
   return (
     <div className=''>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <div className="h-full  w-full flex flex-col">
-        {/* Header */}
-        <div className="w-full h-[40px]">
-          <div className="flex justify-between items-center">
-            <h4>Sales Order</h4>
-          </div>
-        </div>
+      <ContentHeader
+      heading={"Sales Order"}
+      onAddClick={() => {
+        setIsEditMode(false)
+        setDrawerOpen(true)
+      }}
+      />
+      <div className="h-full  w-full flex flex-col" >
+
 
         {/* Table */}
 
-        <div className="overflow-x-auto border border-gray-200 h-full p-3 rounded-md">
-          <div className="flex justify-between items-center">
+        <div className="overflow-x-auto h-full  rounded-md">
+          {/* <div className="flex justify-between items-center">
             <div className='flex gap-1 '>
               <SearchBar text="sales order" data={data} ref={searchBarRef} />
               <select
@@ -215,7 +218,7 @@ function ListOfSalesOrder() {
                 variant='add'
               />
             </div>
-          </div>
+          </div> */}
           <SalesOrderTable
             data={filteredSearchData.length ? filteredSearchData : data}
             setActionDrawerOpen={setActionDrawerOpen}

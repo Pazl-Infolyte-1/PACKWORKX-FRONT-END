@@ -12,9 +12,14 @@ import { cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import apiMethods from '../../api/config'
 import PopUp from '../../components/New/PopUp'
-import GrnView from './GrnView'
+// import GrnView from './GrnView'
 
-const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
+const PurchaseReturnTable = ({ 
+    poData,
+    setPoData,
+    setAlerts,
+    handleEdit
+ }) => {
   const [confirmModal, setConfirmModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [openGrnModal, setOpenGrnModal] = useState(false)
@@ -23,29 +28,29 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
     setConfirmModal(false)
   }
 
-  const openDeleteModal = (id) => {
-    setDeleteId(id)
-    setConfirmModal(true)
-  }
+//   const openDeleteModal = (id) => {
+//     setDeleteId(id)
+//     setConfirmModal(true)
+//   }
 
-  const handleDelete = async () => {
-    try {
-      const response = await apiMethods.deleteGrn(deleteId)
-      if (response.status === 200) {
-        setConfirmModal(false)
-        setGrnData((prev) => prev.filter((item) => item.id !== deleteId))
-        setAlerts([{ severity: 'error', message: 'GRN deleted successfully!' }])
-      }
-    } catch (error) {
-      console.error(error)
-      setAlerts([
-        {
-          severity: 'error',
-          message: error?.response?.data?.message || 'Failed to delete process',
-        },
-      ])
-    }
-  }
+//   const handleDelete = async () => {
+//     try {
+//       const response = await apiMethods.deleteGrn(deleteId)
+//       if (response.status === 200) {
+//         setConfirmModal(false)
+//         setGrnData((prev) => prev.filter((item) => item.id !== deleteId))
+//         setAlerts([{ severity: 'error', message: 'Route deleted successfully!' }])
+//       }
+//     } catch (error) {
+//       console.error(error)
+//       setAlerts([
+//         {
+//           severity: 'error',
+//           message: error?.response?.data?.message || 'Failed to delete process',
+//         },
+//       ])
+//     }
+//   }
 
   return (
     <>
@@ -80,8 +85,8 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {grnData && grnData.length > 0 ? (
-              grnData.map((item) => (
+            {poData && poData.length > 0 ? (
+              poData.map((item) => (
                 <CTableRow key={item.id} className="border-b text-center">
                   <CTableDataCell
                     onClick={() => setOpenGrnModal({ open: true, id: item.id })}
@@ -100,7 +105,7 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2">{item.received_by}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2">
-                    <ThreeDotMenu
+                    {/* <ThreeDotMenu
                       value={[
                         {
                           label: 'Edit Grn',
@@ -117,7 +122,7 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
                           },
                         },
                       ]}
-                    />
+                    /> */}
                   </CTableDataCell>
                 </CTableRow>
               ))
@@ -130,11 +135,11 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
             )}
           </CTableBody>
         </CTable>
-        <ConfirmationModale
+        {/* <ConfirmationModale
           isOpen={confirmModal}
           onClose={closeDeleteModal}
           onConfirm={handleDelete}
-        />
+        /> */}
         <PopUp
           visible={openGrnModal.open}
           setVisible={(isVisible) => {
@@ -144,11 +149,11 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
           width={'60vw'}
           height="660px"
         >
-          <GrnView id={openGrnModal.id} handleEdit={handleEdit} setOpenGrnModal={setOpenGrnModal} />
+          {/* <GrnView id={openGrnModal.id} handleEdit={handleEdit} setOpenGrnModal={setOpenGrnModal} /> */}
         </PopUp>
       </div>
     </>
   )
 }
 
-export default GrnTable
+export default PurchaseReturnTable

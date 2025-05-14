@@ -11,11 +11,11 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 //import { AppSidebarNav } from './AppSidebarNav'
-import { logo } from 'src/assets/brand/logo'
+// import { logo } from 'src/assets/brand/logo'
 import { sygnet } from 'src/assets/brand/sygnet'
 import apiMethods from '../api/config'
 import { AppSideBarNew } from './AppSideBarNew'
-import { cibAdobePhotoshop } from '@coreui/icons'
+import { cibAboutMe, cibAdobePhotoshop, cibHouzz } from '@coreui/icons'
 
 // Define static menu items
 const staticMenuItems = []
@@ -68,17 +68,18 @@ const AppSidebar = () => {
         dispatch({ type: 'set', sidebarShow: visible })
       }}
       className={`border-end text-white transition-all duration-300 ${
-        unfoldable ? 'w-[80px] ' : '!w-[200px]'
+        unfoldable ? 'w-[80px]' : '!w-[200px]'
       }`}
       colorScheme="dark"
       position="fixed"
       unfoldable={unfoldable}
       ref={sidebarRef}
     >
+
       <CSidebarHeader className="h-12">
         <CSidebarBrand to="/">
-          <CIcon icon={cibAdobePhotoshop} height={24} className="mb-1" />
-          {!unfoldable && sidebarShow && <CIcon icon={sygnet} height={32} />}
+          <CIcon icon={cibHouzz} height={24} className="mb-1" />
+          {!unfoldable && sidebarShow && <CIcon icon={sygnet} height={30} width={170} />}
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"

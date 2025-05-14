@@ -52,11 +52,11 @@ const AppHeader = () => {
             console.log('Raw button clicked')
             dispatch({ type: 'set', sidebarShow: !sidebarShow })
           }}
-          className={`${sidebarShow ? 'ml-10' : "ml-2"} p-2 text-white`}
+          className={`${sidebarShow ? 'ml-3' : "ml-2"} p-2 text-white`}
         >
           <CIcon icon={cilMenu} size="lg" />
         </button>
-        <CHeaderNav className="d-none d-md-flex px-2">
+        <CHeaderNav className="d-none d-md-flex">
           <CNavItem>
             <CNavLink className="text-white font-normal !text-sm" to="/dashboard" as={NavLink}>
               Dashboard

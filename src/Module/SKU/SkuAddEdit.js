@@ -451,10 +451,8 @@ setSkuVariant(option.sku_type || option.value)
     //handleClose()
     setisSingleViewPopup(false)
   }
-  console.log("got key value",compositeSelect)
   useEffect(() => {
     if (compositeSelect) {
-      console.log("got key value", compositeSelect);
       setisSingleViewPopupForType(true);
       //setIsCompositePopupCreate(true)
     }else {
@@ -464,8 +462,6 @@ setSkuVariant(option.sku_type || option.value)
     }
   }, [compositeSelect]);
   
-  console.log("composite create",compositeSelect)
-  console.log("single view",isSingleViewPopupForType)
   useEffect(() => {
     if (!isSingleViewPopupForType) {
       setAddNewSkuData(createInitialSkuData());

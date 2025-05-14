@@ -278,8 +278,6 @@ const [previousSkuType, setPreviousSkuType] = useState(null);
     setAreaInM2(convertedArea)
   }, [addNewSkuData?.board_size_cm2, metricSign])
 
-console.log("is open",isopenval)
-console.log("area in m2",areaInM2)
 useEffect(() => {
   const handleBeforeUnload = (event) => {
     if (isopenval) {
@@ -328,7 +326,6 @@ const refreshClients = () => {
 
   const handleSelection = (selection) => {
     const optionValue = selectionFrame[selection].id
-    console.log(`Selected ID: ${optionValue}`)
 
     if (optionValue === 2) {
       setEntityType('Client')
@@ -338,8 +335,6 @@ const refreshClients = () => {
       setEntityType('Vendor')
       setPopupOpen(false)
       setDrawerOpen(true)
-    } else {
-      console.log('option not selected')
     }
   }
 
@@ -359,12 +354,10 @@ const refreshClients = () => {
         handleSelectAction('vendor')
         setEntityType('Vendor') // Update state
       } else if (event.key === 'Enter') {
-        console.log('Enter Pressed: Executing Selection')
         setTriggerSelection(true) // Mark that Enter was pressed
       }
     }
   
-    console.log("jjjj",message)
 
     useEffect(() => {
       if (message) {
@@ -383,14 +376,6 @@ const refreshClients = () => {
       setisSingleViewPopupRoute(true)
     }
 
-
-
-    console.log("route edit val",editTag)
-    console.log("route edit val",addNewSkuData.route)
-
-
-
-    
     useEffect(() => {
       const fetchRoutes = async () => {
         const params = {
@@ -401,7 +386,6 @@ const refreshClients = () => {
     
         try {
           const response = await apiMethods.getRouteList(params);
-          console.log('Full API Response:', response);
           setFullRouteResponse(response); // ✅ Save full response here
           setDisplayAsChips(response.data.routes)
         } catch (err) {
@@ -412,10 +396,6 @@ const refreshClients = () => {
       fetchRoutes();
     }, []);
     
-
-
-    console.log("route edit val",editTag)
-    console.log("route edit val",addNewSkuData.route)
     const selectedRouteIds1 = useSelector((state) => state.routeprocess.selectedRouteIds || []);
 
     useEffect(() => {
@@ -443,7 +423,6 @@ const refreshClients = () => {
     
     // Optional: track Redux changes
     useEffect(() => {
-      console.log("Redux -> routeprocess.selectedRouteIds:", selectedRouteIds1);
     }, [selectedRouteIds1]);
     
     const selectedChips = displayAsChips.filter((item) =>
@@ -463,10 +442,8 @@ const refreshClients = () => {
 
     
     const handleRemoveChip = (idToRemove) => {
-      console.log("Removing chip with id:", idToRemove);
     
       const updated = selectedRouteIds1.filter((id) => id !== idToRemove);
-      console.log("update", updated);
     
       dispatch({
         type: 'SET_SELECTED_ROUTE_IDS',
@@ -510,7 +487,6 @@ const refreshClients = () => {
     );
     
     useEffect(() => {
-      console.log('Selected Route IDs in comp:', selectedRouteIds2);
     
       if (selectedRouteIds2.length > 0) {
         setErrors((prev) => {
@@ -534,7 +510,6 @@ const refreshClients = () => {
     }));
   }
 }, [addNewSkuData.length, addNewSkuData.width, addNewSkuData.height]);
-    console.log("errors",errors)
   return (
     <div className="rounded-lg ">
       <CustomAlert alerts={alerts} handleClose={handleClose} />

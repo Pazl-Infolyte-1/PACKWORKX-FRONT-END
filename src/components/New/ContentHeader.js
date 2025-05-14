@@ -11,7 +11,7 @@ function ContentHeader({
   addLabel = 'New',
   menuOptions = [],
   headingOptions = [],
-  isMinimized
+  isMinimized,
 }) {
   const [showMenu, setShowMenu] = useState(false)
   const [showHeadingDropdown, setShowHeadingDropdown] = useState(false)
@@ -109,14 +109,14 @@ function ContentHeader({
 
       {/* Action Buttons */}
       <div className="flex items-center gap-3">
- <button
-  onClick={onAddClick}
-  className={`flex items-center justify-center rounded-md transition-all duration-200
+        <button
+          onClick={onAddClick}
+          className={`flex items-center justify-center rounded-md transition-all duration-200
     ${isMinimized ? 'w-8 h-8 text-xl bg-blue-500 text-white' : 'bg-blue-500 text-white py-1.5 px-3'}
   `}
->
-  {isMinimized ? '+' : `+ ${addLabel}`}
-</button>
+        >
+          {isMinimized ? '+' : `+ ${addLabel}`}
+        </button>
 
         {/* Three Dot Menu */}
         <div className="relative">

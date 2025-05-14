@@ -395,9 +395,9 @@ const ClientForm = ({
         />
       </div>
       <FormProvider {...methods}>
-        <div className="pr-2 pl-2 relative border-b border-gray-200">
+        <div className="pr-2 pl-2 relative border-b border-gray-200 bg-white">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-auto">
-            <div className="bg-white p-4">
+            <div className=" p-4">
               {/* Reference ID */}
               <div className="mb-2">
                 <div className="flex items-center">

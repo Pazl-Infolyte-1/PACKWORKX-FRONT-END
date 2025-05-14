@@ -33,7 +33,7 @@ const Designation = React.lazy(() => import('./Module/Designation/Designation.js
 const Department = React.lazy(() => import('./Module/Department/Department.js'))
 const RouteProcess = React.lazy(() => import('./Module/RouteProcess/RouteProcess.js'))
 const Role = React.lazy(() => import('./Module/Role/Role.js'))
-
+const StockManagement = React.lazy(() => import('./Module/StockManagement/StockManagement.js'))
 
 const Items = React.lazy(() => import('./Module/Inventory/Items/items.js'))
 const GRN = React.lazy(() => import('./Module/GRN/Grn.js'))
@@ -69,7 +69,7 @@ const routes = [
   { path: '/salesorder', name: 'SalesOrder', element: SalesOrder, key: 24 },
   { path: '/attendance', name: 'Attendance', element: Attendance, key: '' },
   { path: '/salesReturn', name: 'Sales Return', element: SalesReturn, key: '' },
-  { path: '/purchaseReturn', name: 'Purchase Return', element: PurchaseReturn, key: '' },
+  { path: '/purchase-return', name: 'Purchase Return', element: PurchaseReturn, key: '' },
   { path: '/reports', name: 'Reports', element: Reports, key: '' },
   { path: '/offlineRequest', name: 'Offline Request', element: OfflineRequest, key: '' },
   { path: '/adminFaq', name: 'Admin Faq', element: AdminFaq, key: '' },
@@ -86,6 +86,7 @@ const routes = [
     children: settingsRoutes,
   },
   {path:'/inventory/items',name:'inventory',element:Items,key:''},
+  {path:'/stockmanagement',name:'stockmanagement',element:StockManagement,key:''},
 ]
 
 export default routes

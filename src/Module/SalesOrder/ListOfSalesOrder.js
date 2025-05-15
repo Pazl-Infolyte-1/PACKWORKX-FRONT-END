@@ -30,9 +30,10 @@ function ListOfSalesOrder() {
   const [selectedSalesOrderData, SetselectedSalesOrderData] = useState([])
   const [isEditMode, setIsEditMode] = useState(false)
   const { searchQuery, filteredSearchData } = useSearch() ///need to verify
-  const [loading,setLoading]= useState(true)
-  const [canDeactivate,setCanDeactivate] = useState(false);
-  const [isTouched,setIsTouched] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [canDeactivate, setCanDeactivate] = useState(false);
+  const [isTouched, setIsTouched] = useState(false)
+  const [isMinimiseTable, setIsminimiseTable] = useState(false)
 
 
 
@@ -56,11 +57,11 @@ function ListOfSalesOrder() {
   };
 
 
-  
+
 
   const fetchData = async () => {
     try {
-        setLoading(true)
+      setLoading(true)
       const response = await apiMethods.getSalesOrderList({
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,
@@ -72,13 +73,13 @@ function ListOfSalesOrder() {
       // setFilteredData(response.data.data)
     } catch (error) {
       console.error('Error fetching data:', error)
-    }finally{
+    } finally {
       setLoading(false)
     }
   }
-  
+
   useEffect(() => {
-     fetchData()
+    fetchData()
   }, [paginationParams])
 
 
@@ -92,7 +93,7 @@ function ListOfSalesOrder() {
 
 
   const handleLimitChange = (value) => {
-    setPaginationParams({ ...paginationParams, pageSize: value, currentPage:1 })
+    setPaginationParams({ ...paginationParams, pageSize: value, currentPage: 1 })
   }
 
   const handlePageChange = (event, newPage) => {
@@ -130,11 +131,16 @@ function ListOfSalesOrder() {
     try {
       const response = await apiMethods.getSaleOrderData(id)
       SetselectedSalesOrderData(response?.data)
+      setIsminimiseTable(true)
       SetviewSalesOrder(true)
     } catch (error) {
       console.error('Error viewing sales order:', error)
       setAlerts([{ severity: "error", message: error?.response?.data?.message || "Error viewing sales order" }]);
     }
+  }
+
+  const handleRowClick = async (row) => {
+    handleView(row.id)
   }
 
   const handleEdit = (id) => {
@@ -157,29 +163,63 @@ function ListOfSalesOrder() {
     }
 
   };
-  const handleCloseDrawer = ()=>{
-    if(isTouched){
+  const handleCloseDrawer = () => {
+    if (isTouched) {
       setCanDeactivate(true)
-    }else{
+    } else {
       setDrawerOpen(false)
     }
   }
 
   return (
-    <div className=''>
-      <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <ContentHeader
-      heading={"Sales Order"}
-      onAddClick={() => {
-        setIsEditMode(false)
-        setDrawerOpen(true)
-      }}
-      />
+    <div className='p-0 m-0'>
+      <div className='flex w-full'>
+
+
+        <CustomAlert alerts={alerts} handleClose={handleClose} />
+        <div className={`${isMinimiseTable ? 'w-1/4' : 'w-full'} h-full`}>
+        <ContentHeader
+            heading={"Sales Order"}
+            onAddClick={() => {
+              setIsEditMode(false)
+              setDrawerOpen(true)
+            }}
+          />
+          <SalesOrderTable
+            data={filteredSearchData.length ? filteredSearchData : data}
+            setActionDrawerOpen={setActionDrawerOpen}
+            setVersionDrawerOpen={setVersionDrawerOpen}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+            handleView={handleView}
+            loading={loading}
+            handleStatusChange={handleStatusChange}
+            isMinimiseTable={isMinimiseTable}
+            handleRowClick={handleRowClick}
+          />
+
+          {/* <div className="flex justify-end items-center gap-4 mt-4">
+            <CommonPagination
+              count={ApiResponse?.totalPages}
+              page={paginationParams?.currentPage || 1}
+              onChange={handlePageChange}
+              onLimitChange={handleLimitChange}
+              limit={paginationParams.pageSize}
+            />
+          </div> */}
+
+        </div>
+        {isMinimiseTable &&  (
+            <SalesOrderView
+              viewSalesOrder={viewSalesOrder}
+              SetviewSalesOrder={SetviewSalesOrder}
+              salesOrderData={selectedSalesOrderData}
+              setIsminimiseTable={setIsminimiseTable}
+            />
+          )}
+      </div>
+
       <div className="h-full  w-full flex flex-col" >
-
-
-        {/* Table */}
-
         <div className="overflow-x-auto h-full  rounded-md">
           {/* <div className="flex justify-between items-center">
             <div className='flex gap-1 '>
@@ -219,66 +259,43 @@ function ListOfSalesOrder() {
               />
             </div>
           </div> */}
-          <SalesOrderTable
-            data={filteredSearchData.length ? filteredSearchData : data}
-            setActionDrawerOpen={setActionDrawerOpen}
-            setVersionDrawerOpen={setVersionDrawerOpen}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-            handleView={handleView}
-            loading={loading}
-            handleStatusChange={handleStatusChange}
 
-          />
-          <SalesOrderView
-            viewSalesOrder={viewSalesOrder}
-            SetviewSalesOrder={SetviewSalesOrder}
-            salesOrderData={selectedSalesOrderData}
-          />
 
-          <div className="flex justify-end items-center gap-4 mt-4">
-            <CommonPagination
-              count={ApiResponse?.totalPages}
-              page={paginationParams?.currentPage|| 1}
-              onChange={handlePageChange}
-              onLimitChange={handleLimitChange}
-              limit={paginationParams.pageSize}
-            />
-          </div>
+
         </div>
 
-{isDrawerOpen&&(
-  <Drawer isOpen={isDrawerOpen} onClose={() => handleCloseDrawer()} maxWidth="1280px">
-    <AddSalesOrder 
-      currentTab={'salesOrder'} 
-      isEdit={isEditMode} 
-      selectedSalesOrderID={selectedSalesOrder} 
-      setDrawer={setDrawerOpen}
-      setisEdit={setIsEditMode}
-      fetchData={fetchData}
-      setIsFormTouched = {setIsTouched}
-      handleCloseDrawer = {handleCloseDrawer}
-      />
-  </Drawer>
-    )}
+        {isDrawerOpen && (
+          <Drawer isOpen={isDrawerOpen} onClose={() => handleCloseDrawer()} maxWidth="1280px">
+            <AddSalesOrder
+              currentTab={'salesOrder'}
+              isEdit={isEditMode}
+              selectedSalesOrderID={selectedSalesOrder}
+              setDrawer={setDrawerOpen}
+              setisEdit={setIsEditMode}
+              fetchData={fetchData}
+              setIsFormTouched={setIsTouched}
+              handleCloseDrawer={handleCloseDrawer}
+            />
+          </Drawer>
+        )}
 
       </div>
 
 
       {canDeactivate && (
-  <ConfirmationModale 
-    isOpen={canDeactivate}
-    onClose={() => setCanDeactivate(false)}
-    onConfirm={() => {
-      setCanDeactivate(false);
-      setDrawerOpen(false)
-      setIsTouched(false)
-        }
-    }
-    variant="unsavedChanges"
-  />
+        <ConfirmationModale
+          isOpen={canDeactivate}
+          onClose={() => setCanDeactivate(false)}
+          onConfirm={() => {
+            setCanDeactivate(false);
+            setDrawerOpen(false)
+            setIsTouched(false)
+          }
+          }
+          variant="unsavedChanges"
+        />
       )}
-      
+
       <div>
         <ConfirmationModale
           isOpen={isConfirmationModaleOpen}

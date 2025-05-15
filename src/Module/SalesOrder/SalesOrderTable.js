@@ -26,6 +26,8 @@ function SalesOrderTable({
   handleView,
   loading,
   handleStatusChange,
+  handleRowClick,
+  isMinimiseTable
 }) {
   const formatDate = (dateString) => {
     const date = new Date(dateString)
@@ -55,7 +57,7 @@ function SalesOrderTable({
       header: '', // empty header for checkbox column
       type: 'checkbox',
     },
-      { key: 'sales_generate_id-', header: 'Sales ID', field: 'sales_generate_id' },  
+      { key: 'sales_generate_id', header: 'Sales ID', field: 'sales_generate_id' },  
       { key: 'client', header: 'Client', field: 'client' },
       { key: 'skuCount', header: 'No of SKU', type:"custom" ,render: (row) => row.SalesSkuDetails?.length || 0, },
       { key: 'estimated', header: 'Expected Delivery Date', type:"date", field: 'estimated'  },
@@ -132,14 +134,18 @@ function SalesOrderTable({
 
 
   return (
-    <>
+    <div className='mt-2'>
     <ReusableTable
     columns={columns}
     data={data}
     onCheckboxChange={handleCheckboxChange}
     onSelectAllChange={handleSelectAllCheckboxes}
+    miniScreenFields={["select","sales_generate_id"]}
+    handleRowClick={handleRowClick}
+    isMinimiseTable={isMinimiseTable}
     />
-    </>
+    </div>
+    
   )
 }
 

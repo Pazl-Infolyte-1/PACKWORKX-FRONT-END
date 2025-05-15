@@ -40,7 +40,7 @@ function ClientTable({
   const [selectedClientDeleteId, setSelectedClientDeleteId] = useState(null)
   const [selectedRows, setSelectedRows] = useState([])
   const [alerts, setAlerts] = useState([])
-
+const navigate=useNavigate()
   const handleClose = () => {
     setAlerts([])
   }

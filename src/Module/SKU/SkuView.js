@@ -198,7 +198,7 @@ const SkuView = ({ setIsMinimized, selectedSku, handleSkuEdit }) => {
                   <span className="font-medium">{selectedSku.gst_percentage || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span className="text-gray-600">Portal Status</span>
+                  <span className="text-gray-600">Ply</span>
                   <span className="flex items-center">
                     <span className="font-medium">{selectedSku.ply || 'N/A'}</span>
                   </span>

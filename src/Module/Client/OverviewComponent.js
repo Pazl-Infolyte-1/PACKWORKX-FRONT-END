@@ -252,7 +252,7 @@ Add Additional Address
 
 
       {/* Vertical divider */}
-      <div className="w-[1px] h-[600px] bg-gray-300 -mt-[25px]"></div>
+      <div className="w-[1px] h-[700px] bg-gray-300 -mt-[25px]"></div>
 
       {/* Right section - 65% */}
       <div className="w-[65%] p-4 rounded">

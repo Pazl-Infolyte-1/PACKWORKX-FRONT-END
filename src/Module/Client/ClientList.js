@@ -16,7 +16,7 @@ import { FiDownload, FiUpload } from 'react-icons/fi';
 import { FaUserGroup } from 'react-icons/fa6';
 import ActionButton from '../../components/New/ActionButton';
 import { Outlet, useNavigate } from 'react-router-dom';
-import DynamicPagination from '../../../../code backups/paxk workx/PACKWORKX-FRONT-END/src/components/New/DynamicPagination';
+import CompactPagination from '../../components/New/CompactPagination';
 
 function ClientList() {
   const [selected, setSelected] = useState('vendor');
@@ -205,7 +205,7 @@ function ClientList() {
           />
         </div>
   <div className="flex justify-end items-center gap-4 mt-3">
-          <DynamicPagination
+          <CompactPagination
             count={totalPage}
             page={currentPage}
             onPageChange={handlePageChange}

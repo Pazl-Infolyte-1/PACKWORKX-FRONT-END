@@ -34,7 +34,7 @@ useEffect(() => {
 }, [selectedRowData?.client_id]);
 
 	return (  <>
-  <div className="relative p-3 h-full">
+  <div className="relative p-3 h-full bg-[#fbfbfb]">
     {/* Top section with display name and close button */}
     <div className="flex justify-between items-start mb-4 -mt-2">
   {tableData && (

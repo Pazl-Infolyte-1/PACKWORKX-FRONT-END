@@ -73,7 +73,9 @@ function ContentHeader({
         <div
           ref={headingRef}
           onClick={headingOptions.length > 0 ? handleHeadingClick : undefined}
-          className={`text-lg font-semibold flex items-center  cursor-${headingOptions.length > 0 ? 'pointer' : 'default'}`}
+   className={`text-lg font-semibold flex items-center px-2 py-1 rounded cursor-${headingOptions.length > 0 ? 'pointer' : 'default'} ${
+    headingOptions.length > 0 ? 'hover:bg-[#f1f2f7] active:bg-[#e4e6ed]' : ''
+  }`}
         >
           {heading}
           {headingOptions.length > 0 && (

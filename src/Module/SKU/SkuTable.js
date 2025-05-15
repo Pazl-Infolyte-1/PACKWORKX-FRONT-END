@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   CTable,
   CTableHead,
@@ -15,7 +15,6 @@ import ThreeDotMenu from '../../components/ThreeDotMenu'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import { useDispatch, useSelector } from 'react-redux'
-import { isMuiElement } from '@mui/material'
 
 function SkuTable({
   skudata,
@@ -33,7 +32,27 @@ function SkuTable({
   const [deleteModal, setDeleteModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [selectedRows, setSelectedRows] = useState([])
+  const [tableHeight, setTableHeight] = useState('calc(85vh - 200px)')
+  const tableRef = useRef(null)
   const dispatch = useDispatch()
+
+  // Handle window resize to update table height dynamically
+  useEffect(() => {
+    const updateHeight = () => {
+      const windowHeight = window.innerHeight
+      const tableTop = tableRef.current?.getBoundingClientRect().top || 0
+      const availableHeight = windowHeight - tableTop - 70
+
+      if (isMinimized) {
+        setTableHeight(`${availableHeight}px`)
+      } else {
+        setTableHeight(`min(${availableHeight}px, calc(100vh - 200px))`)
+      }
+    }
+    updateHeight()
+    window.addEventListener('resize', updateHeight)
+    return () => window.removeEventListener('resize', updateHeight)
+  }, [isMinimized])
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
@@ -61,7 +80,6 @@ function SkuTable({
       onSkuDeleted()
       setSelectedRows(selectedRows.filter((rowId) => rowId !== deleteId))
     } catch (error) {
-      console.log('Error deleting SKU:', error)
       setAlerts([{ severity: 'error', message: error.response.data.message }])
     }
   }
@@ -94,10 +112,10 @@ function SkuTable({
   }
 
   return (
-    <div className="border border-red-200 overflow-hidden">
+    <div className="border border-red-200 overflow-hidden flex flex-col" ref={tableRef}>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <div className="relative">
-        <div className="overflow-hidden">
+      <div className="relative flex-grow">
+        <div className="overflow-hidden h-full flex flex-col">
           <div className="overflow-x-auto">
             <CTable className="w-full m-0 table-fixed">
               <CTableHead className="!bg-gray-100">
@@ -115,6 +133,7 @@ function SkuTable({
                               skudata.filter((item) => item.status === 'active').length &&
                             skudata.length > 0
                           }
+                          value={''}
                           onChange={handleSelectAll}
                           className="form-checkbox h-3 w-3 text-blue-600 rounded mx-auto"
                         />
@@ -134,14 +153,8 @@ function SkuTable({
             </CTable>
           </div>
 
-          {/* Table body - scrollable */}
-          <div
-            className="overflow-y-auto"
-            style={{
-              height: isMinimized ? '520px' : 'auto',
-              maxHeight: isMinimized ? 'none' : 'calc(80vh - 200px)',
-            }}
-          >
+          {/* Table body - scrollable with dynamic height */}
+          <div className="overflow-y-auto flex-grow" style={{ height: tableHeight }}>
             <CTable className="w-full m-0">
               <CTableBody>
                 {skudata.length > 0 ? (
@@ -162,10 +175,11 @@ function SkuTable({
                       >
                         {isMinimized ? (
                           <>
-                            <CTableDataCell className=" py-3">
+                            <CTableDataCell className="py-3">
                               <input
                                 type="checkbox"
                                 checked={selectedRows.includes(cell.id)}
+                                value={''}
                                 onChange={(e) => {
                                   e.stopPropagation()
                                   handleRowSelect(cell.id)
@@ -173,13 +187,7 @@ function SkuTable({
                                 className="form-checkbox h-3 w-3 text-blue-600 rounded"
                               />
                             </CTableDataCell>
-                            <CTableDataCell
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                openViewCard(cell)
-                              }}
-                              className="bg-purple-400 text-start py-3 text-sm !text-blue-600 font-semibold"
-                            >
+                            <CTableDataCell className="text-start py-3 text-sm !text-blue-600 font-semibold">
                               {cell.sku_name || 'N/A'}
                             </CTableDataCell>
                           </>
@@ -190,6 +198,7 @@ function SkuTable({
                               <input
                                 type="checkbox"
                                 checked={selectedRows.includes(cell.id)}
+                                value={''}
                                 onChange={(e) => {
                                   e.stopPropagation()
                                   handleRowSelect(cell.id)

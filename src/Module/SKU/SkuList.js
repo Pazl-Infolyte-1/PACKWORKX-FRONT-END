@@ -1,31 +1,21 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { FaBoxOpen } from 'react-icons/fa'
-import {
-  MdTakeoutDining,
-  MdOutlineSettingsInputComposite,
-  MdCheckroom,
-  MdClearAll,
-  MdFavorite,
-} from 'react-icons/md'
+import { MdTakeoutDining, MdOutlineSettingsInputComposite, MdClearAll } from 'react-icons/md'
 import { AiFillCarryOut, AiFillCodeSandboxCircle } from 'react-icons/ai'
 
 import Drawer from '../../components/Drawer/Drawer'
 import apiMethods from '../../api/config'
-import CommonPagination from '../../components/New/Pagination'
 import SkuPopup from './SkuPopup'
 import SkuTable from './SkuTable'
 import { useLocation } from 'react-router-dom'
 import SkuAddEdit from './SkuAddEdit'
 import ActionButton from '../../components/New/ActionButton'
-import SearchBar from '../../components/New/SearchBar'
 import { AuthContext } from '../../Context/AuthContext'
 import { useSearch } from '../../components/New/SearchContext'
 import CustomAlert from '../../components/New/CustomAlert'
 import createInitialSkuData from './CreateInitialSkuData'
-import { bottom } from '@popperjs/core'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import Drawer1 from '../../components/Drawer/Drawer1'
 import ContentHeader from '../../components/New/ContentHeader'
 import { FiDownload, FiUpload } from 'react-icons/fi'
 import SkuView from './SkuView'
@@ -50,18 +40,17 @@ function SkuList() {
   const [limit, setLimit] = useState(10)
   const [alerts, setAlerts] = useState([])
   const { user } = useContext(AuthContext)
-  const { searchQuery, setSearchQuery, filteredSearchData } = useSearch()
+  const { searchQuery, filteredSearchData } = useSearch()
   const location = useLocation()
   const searchBarRef = useRef(null)
   const [boardSizeError, setBoardSizeError] = useState('')
-  const navigate = useNavigate()
   const [isSingleViewPopupForType, setisSingleViewPopupForType] = useState(false)
   const [isPopupOpen, setPopupOpen] = useState(false)
   const [message, setMessage] = useState('')
   const dispatch = useDispatch()
   const [errors, setErrors] = useState({})
   const [skuVariant, setSkuVariant] = useState('RSC Box')
-  const [isMinimized, setIsMinimized] = useState(true)
+  const [isMinimized, setIsMinimized] = useState(false)
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
     client_id: null,
@@ -178,8 +167,6 @@ function SkuList() {
           return newErrors
         })
       }
-    } else {
-      console.log('No client found for the selected client_id')
     }
 
     if (value?.trim()) {
@@ -205,9 +192,6 @@ function SkuList() {
   const dieError = useSelector((state) => state.diecutCalculations.deckleError)
 
   const handleAddSkuSubmit = async () => {
-    console.log('skuVariant type', skuVariant)
-    console.log('skuVariant typeddd', addNewSkuData.sku_type)
-
     let newErrors = {}
     if (addNewSkuData.sku_type === 'Custom Item') {
       // Validate only for Custom Item
@@ -298,9 +282,7 @@ function SkuList() {
     }
     setErrors(newErrors)
 
-    console.log('erroexxx', newErrors)
     if (Object.keys(newErrors).length === 0) {
-      console.log('gggghhhg')
       if (dieError) {
         setAlerts([{ severity: 'error', message: dieError || '1' }])
         return null
@@ -315,8 +297,6 @@ function SkuList() {
         return null
       }
 
-      console.log('addskkkk', addNewSkuData)
-
       const numberSkuData = {
         ...addNewSkuData,
         width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
@@ -324,7 +304,6 @@ function SkuList() {
         deckle_size: Number(addNewSkuData.deckle_size),
         gst_percentage: Number(addNewSkuData.gst_percentage),
       }
-      console.log('su data', numberSkuData)
       try {
         let response
 
@@ -334,7 +313,6 @@ function SkuList() {
           response = await apiMethods.addSku(numberSkuData)
         }
 
-        console.log('SKU request successful:', response)
         if (response?.data?.message) {
           setAlerts([{ severity: 'success', message: response.data.message }])
           setRefresh((prev) => !prev)
@@ -347,7 +325,6 @@ function SkuList() {
         }
       } catch (error) {
         console.error('Error adding SKU:', error)
-        console.log(JSON.stringify(error))
         if (error?.response?.data?.error) {
           setAlerts([{ severity: 'error', message: error?.response?.data?.error }])
         } else {
@@ -364,6 +341,7 @@ function SkuList() {
   const handleSkuEdit = (id) => {
     const selectedSku = skudata.find((sku) => sku.id === id)
     setEditTag(true)
+    setClientDisable(true)
     setEditedSkuData(selectedSku)
     setAddNewSkuData({
       id: selectedSku.id || null,
@@ -503,7 +481,7 @@ function SkuList() {
 
   return (
     <div className="flex  h-full">
-      <div className={`${isMinimized ? 'w-[350px]' : 'w-full'}`}>
+      <div className={`${isMinimized ? 'w-[28%]' : 'w-full'}`}>
         {/* Header */}
         <ContentHeader
           heading={'SKU'}
@@ -525,7 +503,7 @@ function SkuList() {
         <CustomAlert alerts={alerts} handleClose={handleClose} />
         {/* SKU Boxes */}
         {!isMinimized && (
-          <div className="flex justify-between items-center flex-wrap gap-2 mt-3">
+          <div className="flex justify-between items-center flex-wrap gap-2 mt-3 pl-3">
             {[
               {
                 name: 'RSC Box',
@@ -590,7 +568,7 @@ function SkuList() {
 
             <div className="flex justify-between gap-2 w-full sm:w-auto text-xs">
               <select
-                value={selectedSkuType}
+                value={selectedSkuType || ''}
                 onChange={(e) => setSelectedSkuType(e.target.value)}
                 className="sm:w-[150px] p-2 rounded-lg shadow-md bg-white text-[#424242] outline-none border-none"
               >
@@ -605,7 +583,7 @@ function SkuList() {
               </select>
 
               <select
-                value={selectedClient}
+                value={selectedClient || ''}
                 onChange={(e) => {
                   setSelectedClient(e.target.value)
 
@@ -618,7 +596,7 @@ function SkuList() {
               >
                 <option value="">Select Client</option>
                 {client.map((item, index) => (
-                  <option key={index} value={item.client_id}>
+                  <option key={index} value={item.client_id || ''}>
                     {item.display_name || item.client_id}
                   </option>
                 ))}
@@ -731,8 +709,12 @@ function SkuList() {
         </Drawer>
       </div>
       {isMinimized && (
-        <div className="flex  transition-all duration-300">
-          <SkuView selectedSku={selectedSku} setIsMinimized={setIsMinimized} />
+        <div className="flex w-[75%] transition-all duration-300 ">
+          <SkuView
+            selectedSku={selectedSku}
+            setIsMinimized={setIsMinimized}
+            handleSkuEdit={handleSkuEdit}
+          />
         </div>
       )}
     </div>

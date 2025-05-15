@@ -3,150 +3,100 @@ import CustomAlert from '../../components/New/CustomAlert'
 import SearchBar from '../../components/New/SearchBar'
 import ActionButton from '../../components/New/ActionButton'
 import CommonPagination from '../../components/New/Pagination'
-import PopUp from '../../components/New/ModifiedPopup'
-// import GrnTable from './GrnTable'
 import PurchaseReturnTable from './PurchaseReturnTable'
 import Drawer from '../../components/Drawer/Drawer'
-// import GrnForm from './GrnForm'
 import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
+import PurchaseReturnForm from './PurchaseReturnForm'
 
-const PurchaseOrderReturn = (isEdit, selectedPoId, setDrawer) => {
+const PurchaseOrderReturn = () => {
+  const [isPorEdit, setIsPorEdit] = useState(false)
+  const [selectedPorId, setSelectedPorId] = useState(null)
   const [alerts, setAlerts] = useState([])
-  // const [isEdit, setIsEdit] = useState(false)
-  const [poData, setPoData] = useState([])
+  const [porData, setPorData] = useState([])
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 })
   const [limit, setLimit] = useState(10)
   const searchBarRef = useRef(null)
-  const [errors, setErrors] = useState({})
   const { searchQuery } = useSearch()
 
+  // Fetch data
+  const fetchData = async () => {
+    try {
+      const response = await apiMethods.getPurchaseReturn({
+        search: searchQuery,
+        page: pagination.currentPage,
+        limit: limit,
+      })
+      setPorData(response?.data?.approved || [])
+      setPagination(response.data.pagination || { currentPage: 1, totalPages: 1, total: 0 })
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
+  useEffect(() => {
+    fetchData()
+  }, [limit, searchQuery, pagination.currentPage])
 
-
-  const handlePurchaseDetails = async (selectedPoId) => {
-      try {
-        console.log('PO ID:', selectedPoId);
-    
-        const response = await apiMethods.getinventory();
-        console.log('Full inventory response:', response);
-    
-        const inventoryList = Array.isArray(response?.data.data) ? response.data.data : [];
-    
-        const matchedInventory = inventoryList.find(item => item.po_id === po_id);
-    
-        if (matchedInventory) {
-          const grn_id = matchedInventory.grn_id;    
-          await handlePurchaseReturnDetails(po_id, grn_id);
-        } else {
-          console.warn('No inventory found for PO ID:', po_id);
+  // Fetch details for editing
+  const handlePurchaseDetails = async (id, setFormFields, setItems, setGrnId) => {
+    try {
+      console.log('id',id);
+      
+      const response = await apiMethods.getPurchaseReturn({ id })
+      console.log('response',response);
+      
+      const approvedList = Array.isArray(response?.data?.approved)
+      ? response.data.approved
+      : []     
+      console.log('approvedList',approvedList);
+      
+      const matchedPor = approvedList.find(item => item.id === id)
+      console.log('matchedpor',matchedPor);
+      
+      if (matchedPor) {
+        setGrnId(matchedPor.grn_id)
+        // Set form fields if needed
+        if (setFormFields) {
+          setFormFields({
+            po_id: matchedPor.po_id,
+            grn_id: matchedPor.grn_id,
+            return_date: matchedPor.return_date,
+            reason: matchedPor.reason,
+            payment_terms: matchedPor.payment_terms,
+            notes: matchedPor.notes,
+            return_date: matchedPor.return_date,
+            status: matchedPor.status,
+            total_qty: matchedPor.total_qty,
+            amount: matchedPor.amount,
+            cgst_amount: matchedPor.cgst_amount,
+            sgst_amount: matchedPor.sgst_amount,
+            tax_amount: matchedPor.tax_amount,
+            total_amount: matchedPor.total_amount,
+          })
         }
-      } catch (error) {
-        console.error('Error in handlePurchaseDetails:', error);
+        if (setItems) setItems(matchedPor.items || [])
+      } else {
+        console.warn('No Por found for ID:', id)
       }
-    };
-    
-  
-  
-  
-    const handlePurchaseReturnDetails = async (po_id, grn_id) => {
-      try {
-        console.log('PO ID:', po_id);
-  
-        // Check if grn_id is available
-  
-  
-        console.log('GRN is a ID:', grn_id);
-        
-        const response = await apiMethods.getPurchaseOrderDetails({ po_id, grn_id });
-        const { purchaseOrder, purchaseOrderItemDetails } = response.data;
-    
-        // Set this data to state, form, or navigate to edit page
-        console.log('PO Data:', purchaseOrder);
-        console.log('Items:', purchaseOrderItemDetails);
-      } catch (error) {
-        console.error('Failed to fetch PO details:', error);
-      }
-    };
+    } catch (error) {
+      console.error('Error in handlePurchaseDetails:', error)
+    }
+  }
 
-
-    useEffect(() => {
-      // console.log('isEdit :', isEdit)
-      // console.log('selectedPoId :', selectedPoId);
-        if (isEdit && selectedPoId) {
-          handlePurchaseDetails();
-          
-        }
-      }, [isEdit, selectedPoId]);
-
-
-
-
-
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await apiMethods.getPurchaseOrderDetails({
-  //       search: searchQuery,
-  //       page: pagination.currentPage,
-  //       limit: limit,
-  //     })
-  //     setPoData(response?.data?.data)
-  //     setPagination(response.data.pagination)
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   console.log('Fetching data with limit:', limit, 'and searchQuery:', searchQuery)
-  //   fetchData()
-  // }, [limit, searchQuery, pagination.currentPage])
-
-  // const [grnFormData, setGrnFormData] = useState({
-  //   po_id: null,
-  //   grn_date: '',
-  //   delivery_note_no: '',
-  //   invoice_no: '',
-  //   invoice_date: '',
-  //   received_by: '',
-  //   notes: '',
-  //   items: [],
-  // })
-
+  // Handle edit button
   const handleEdit = (item) => {
-    console.log('Edit item', item)
-    setGrnFormData({
-      id: item.id,
-      po_id: item.po_id,
-      grn_date: item.grn_date,
-      delivery_note_no: item.delivery_note_no,
-      invoice_no: item.invoice_no,
-      invoice_date: item.invoice_date,
-      received_by: item.received_by,
-      notes: item.notes,
-      items: item.GRNItems,
-    })
-    setIsEdit(true)
+    console.log('item.id',item.id)
+    setSelectedPorId(item.id)
+    setIsPorEdit(true)
     setDrawerOpen(true)
   }
 
-  const handleClose = () => {
-    setAlerts([])
-  }
   const handleCloseDrawer = () => {
     setDrawerOpen(false)
-    setGrnFormData({
-      po_id: null,
-      grn_date: '',
-      delivery_note_no: '',
-      invoice_no: '',
-      invoice_date: '',
-      received_by: '',
-      notes: '',
-      items: [],
-    })
-    setIsEdit(false)
+    setIsPorEdit(false)
+    setSelectedPorId(null)
   }
 
   const clearFilters = () => {
@@ -155,74 +105,15 @@ const PurchaseOrderReturn = (isEdit, selectedPoId, setDrawer) => {
     }
   }
 
-  // const handleSubmit = async (data) => {
-  //   let newErrors = {}
-  //   if (!grnFormData.po_id) newErrors.po_id = 'Required'
-  //   if (!grnFormData.grn_date) newErrors.grn_date = 'Required'
-  //   if (!grnFormData.delivery_note_no) newErrors.delivery_note_no = 'Required'
-  //   if (!grnFormData.invoice_no) newErrors.invoice_no = 'Required'
-  //   if (!grnFormData.invoice_date) newErrors.invoice_date = 'Required'
-  //   if (!grnFormData.received_by) newErrors.received_by = 'Required'
-  //   if (!grnFormData.notes) newErrors.notes = 'Required'
-
-  //   if (Object.keys(newErrors).length > 0) {
-  //     setErrors(newErrors)
-  //     setAlerts((prev) => [
-  //       ...prev,
-  //       { severity: 'error', message: 'Please fill all the required fields' },
-  //     ])
-  //   } else {
-  //     setAlerts([])
-  //     try {
-  //       if (isEdit) {
-  //         data.id = grnFormData.id
-  //         const response = await apiMethods.editGrn(data)
-  //         setAlerts((prev) => [
-  //           ...prev,
-  //           { severity: 'success', message: response.data.message || 'GRN Uopdated Successfully' },
-  //         ])
-  //       } else {
-  //         const response = await apiMethods.postGrn(data)
-  //         setAlerts((prev) => [
-  //           ...prev,
-  //           { severity: 'success', message: response.data.message || 'GRN Added Successfully' },
-  //         ])
-  //       }
-  //       setGrnFormData({
-  //         po_id: null,
-  //         grn_date: '',
-  //         delivery_note_no: '',
-  //         invoice_no: '',
-  //         invoice_date: '',
-  //         received_by: '',
-  //         notes: '',
-  //         items: [],
-  //       })
-  //       setErrors({})
-
-  //       await fetchData()
-  //       handleCloseDrawer()
-  //     } catch (error) {
-  //       console.error(error)
-  //       setAlerts([
-  //         {
-  //           severity: 'error',
-  //           message: error?.response?.data?.message || 'Something went wrong',
-  //         },
-  //       ])
-  //     }
-  //   }
-  // }
-
   return (
     <>
-      <CustomAlert alerts={alerts} handleClose={handleClose} />
+      <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       <div className="flex flex-col lg:flex-row item-center gap-5 relative my-3">
         <h3 className="text-xl font-semibold mb-3">Purchase Return</h3>
       </div>
       <div className="bg-white p-3 rounded-lg w-full h-full">
         <div className="flex items-center">
-          <SearchBar data={poData} text={'Purchase Return'} ref={searchBarRef} />
+          <SearchBar data={porData} text={'Purchase Return'} ref={searchBarRef} />
           <button
             className="ml-4 border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition-colors duration-200 flex items-center gap-1"
             onClick={clearFilters}
@@ -243,22 +134,11 @@ const PurchaseOrderReturn = (isEdit, selectedPoId, setDrawer) => {
             </svg>
             <span className="whitespace-nowrap">Clear</span>
           </button>
-
-          <div className="flex-grow flex justify-end gap-3">
-            {/* <ActionButton
-              variant="add"
-              label={'Add Purchase Return'}
-              onClick={() => {
-                setIsEdit(false)
-                setDrawerOpen(true)
-              }}
-            /> */}
-          </div>
         </div>
         <div className="overflow-x-auto overflow-y-auto whitespace-nowrap my-4">
           <PurchaseReturnTable
-            poData={poData}
-            setPoData={setPoData}
+            porData={porData}
+            setPorData={setPorData}
             setAlerts={setAlerts}
             handleEdit={handleEdit}
           />
@@ -277,7 +157,7 @@ const PurchaseOrderReturn = (isEdit, selectedPoId, setDrawer) => {
               setLimit(newLimit)
               setPagination((prev) => ({
                 ...prev,
-                page: 1,
+                currentPage: 1,
               }))
             }}
             limit={limit}
@@ -286,18 +166,16 @@ const PurchaseOrderReturn = (isEdit, selectedPoId, setDrawer) => {
         <Drawer
           isOpen={drawerOpen}
           onClose={handleCloseDrawer}
-          maxWidth={'1265px'}
-          title={isEdit ? `Edit Grn` : `New Grn`}
+          maxWidth={"1270px"}
+          title={isPorEdit ? "Edit Purchase Order Return" : "Add Purchase Order Return"}
         >
-          {/* <GrnForm
-            grnFormData={grnFormData}
-            setGrnFormData={setGrnFormData}
-            onSubmit={handleSubmit}
-            isEdit={isEdit}
-            handleCloseDrawer={handleCloseDrawer}
-            errors={errors}
-            setErrors={setErrors}
-          /> */}
+          <PurchaseReturnForm
+            isPorEdit={isPorEdit}
+            selectedPorId={selectedPorId}
+            setDrawer={setDrawerOpen}
+            handlePurchaseDetails={handlePurchaseDetails}
+            fetchData={fetchData}
+          />
         </Drawer>
       </div>
     </>
@@ -305,10 +183,3 @@ const PurchaseOrderReturn = (isEdit, selectedPoId, setDrawer) => {
 }
 
 export default PurchaseOrderReturn
-
-
-
-
-
-
-

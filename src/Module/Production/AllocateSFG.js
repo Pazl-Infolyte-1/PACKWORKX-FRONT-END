@@ -217,54 +217,35 @@ function GroupDropZone({
   }
 
   return (
-    <CCard
+<CCard
       key={itemIndex}
       ref={drop}
-      className="mb-2"
-      style={{
-        marginTop: '10px',
-        backgroundColor: '#f5f4f7',
-        borderRadius: '10px',
-      }}
+      className="mb-2 mt-2 bg-transparent rounded-xl"
     >
-      <CCardBody>
+      <CCardBody
+      className=' flex justify-between'
+      >
+        <div>
+
         <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            cursor: 'pointer',
-            width: '100%',
-          }}
+          className="flex justify-between items-center cursor-pointer w-full"
         >
           <span
-            onClick={() => toggleItemCollapse(itemIndex)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              whiteSpace: 'nowrap',
-            }}
+            // onClick={() => toggleItemCollapse(itemIndex)}
+            className="flex items-center gap-1.5 whitespace-nowrap font-semibold"
           >
             {i.order_id ? i.order_id : i.layer_name}{' '}
-            {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />}
+            {/* {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />} */}
           </span>
 
-          <span
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              fontSize: '16px',
-              lineHeight: '21px',
-              gap: '4px',
-              whiteSpace: 'nowrap',
-            }}
+          {/* <span
+            className="flex items-center text-base leading-tight gap-1 whitespace-nowrap"
           >
             {i.quantity ? (
               <>
                 {`${i.finished_goods} / ${i.quantity}`}
                 <div
-                  style={{ marginLeft: '10px', marginRight: '10px', width: '45px', height: '40px' }}
+                  className="mx-2.5 w-12 h-10"
                 >
                   <ProgressBar
                     value={Math.min(
@@ -278,7 +259,7 @@ function GroupDropZone({
               <>
                 {`80 / 100`}
                 <div
-                  style={{ marginLeft: '10px', marginRight: '10px', width: '45px', height: '40px' }}
+                  className="mx-2.5 w-12 h-10"
                 >
                   <ProgressBar value={80} />
                 </div>
@@ -290,87 +271,68 @@ function GroupDropZone({
                 <Dropdown.Item onClick={() => console.log('View Work Order')}>
                   <CIcon
                     icon={cilBriefcase}
-                    className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                    className="me-2 text-purple-600 text-xl font-bold"
                   />
                   View Work Order
                 </Dropdown.Item>
                 <Dropdown.Item onClick={() => console.log('View Sales Order')}>
                   <CIcon
                     icon={cilClipboard}
-                    className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                    className="me-2 text-purple-600 text-xl font-bold"
                   />
                   View Sales Order
                 </Dropdown.Item>
                 <Dropdown.Item onClick={() => console.log('Remove from Plan')}>
                   <CIcon
                     icon={cilTrash}
-                    className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                    className="me-2 text-purple-600 text-xl font-bold"
                   />
                   Remove from Plan
                 </Dropdown.Item>
                 <Dropdown.Item onClick={() => setVisibleSplit(true)}>
                   <CIcon
                     icon={cilCut}
-                    className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                    className="me-2 text-purple-600 text-xl font-bold"
                   />
                   Split Work Order
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-          </span>
+          </span> */}
         </div>
 
-        <CCollapse className="custom-collapse" visible={visibleItemIndex === itemIndex}>
+        {/* <CCollapse className="custom-collapse" visible={visibleItemIndex === itemIndex}> */}
           <div
-            style={{
-              marginTop: '10px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: '8px',
-            }}
+            className="mt-2.5 flex justify-between gap-2"
           >
             {i.sku_name ? (
-              <>
+              <span className='text-sm'>
                 <span>{i.sku_name}</span>
                 <span>{i.dimension}</span>
                 <span>{i.layers} PLY</span>
                 <span>{i.print}</span>
                 <span>Quantity :{i.quantity}</span>
                 <span>{i.route}</span>
-              </>
+              </span>
             ) : (
-              <>
+              <span className='text-sm flex gap-2'>
                 <span>GSM - {i.gsm}</span>
                 <span>BF - {i.bf}</span>
                 <span>{i.dimensions} PLY</span>
                 <span>{i.color}</span>
-              </>
+              </span>
             )}
           </div>
           {i.layer_group
             ? i.layer_group.map((lg) => (
                 <CCard
-                  key={lg.layer_name} // Added a unique key
-                  style={{
-                    padding: '10px',
-                    marginTop: '10px',
-                    backgroundColor: '#f5f4f7',
-                    borderRadius: '10px',
-                  }}
+                  key={lg.layer_name}
+                  className="p-2.5 mt-2.5 bg-transparent rounded-xl"
                 >
                   {lg.layer_name}
                   <br />
                   <div
-                    style={{
-                      marginTop: '10px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      gap: '8px',
-                    }}
+                    className="mt-2.5 flex justify-between gap-2"
                   >
                     <span>Board Size (L x W) : {lg.dimensions}</span>
                     <span>{lg.color}</span>
@@ -380,7 +342,70 @@ function GroupDropZone({
                 </CCard>
               ))
             : null}
-        </CCollapse>
+        {/* </CCollapse> */}
+        </div>
+        <div
+            className="flex items-start text-base leading-tight gap-1 whitespace-nowrap  "
+          >
+            {i.quantity ? (
+              <>
+                {`${i.finished_goods} / ${i.quantity}`}
+                <div
+                  className="mx-2.5 w-12 "
+                >
+                  <ProgressBar
+                    value={Math.min(
+                      Math.max(parseFloat(((i.finished_goods / i.quantity) * 100).toFixed(1)), 0),
+                      100,
+                    )}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                {`80 / 100`}
+                <div
+                  className="mx-2.5 w-12 h-10"
+                >
+                  <ProgressBar value={80} />
+                </div>
+              </>
+            )}
+            <Dropdown>
+              <Dropdown.Toggle as={CustomToggle} />
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => console.log('View Work Order')}>
+                  <CIcon
+                    icon={cilBriefcase}
+                    className="me-2 text-purple-600 text-xl font-bold"
+                  />
+                  View Work Order
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => console.log('View Sales Order')}>
+                  <CIcon
+                    icon={cilClipboard}
+                    className="me-2 text-purple-600 text-xl font-bold"
+                  />
+                  View Sales Order
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => console.log('Remove from Plan')}>
+                  <CIcon
+                    icon={cilTrash}
+                    className="me-2 text-purple-600 text-xl font-bold"
+                  />
+                  Remove from Plan
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => setVisibleSplit(true)}>
+                  <CIcon
+                    icon={cilCut}
+                    className="me-2 text-purple-600 text-xl font-bold"
+                  />
+                  Split Work Order
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
+
       </CCardBody>
     </CCard>
   )
@@ -606,22 +631,22 @@ const AllocateSFG = ({
                         whiteSpace: 'nowrap', // Prevents breaking into a new line
                       }}
                     >
-                      {group.items.reduce(
+                      {group?.items?.reduce(
                         (sum, g) => (g.finished_goods ? sum + g.finished_goods : sum + 0),
                         0,
                       )}{' '}
                       /
-                      {group.items.reduce((sum, g) => (g.quantity ? sum + g.quantity : sum + 0), 0)}
+                      {group?.items?.reduce((sum, g) => (g.quantity ? sum + g.quantity : sum + 0), 0)}
                       <div style={{ marginLeft: '10px', width: '45px', height: '40px' }}>
                         <ProgressBar
                           value={Math.min(
                             Math.max(
                               (() => {
-                                const totalFinishedGoods = group.items.reduce(
+                                const totalFinishedGoods = group?.items?.reduce(
                                   (sum, g) => sum + (g.finished_goods || 0),
                                   0,
                                 )
-                                const totalQuantity = group.items.reduce(
+                                const totalQuantity = group?.items?.reduce(
                                   (sum, g) => sum + (g.quantity || 0),
                                   0,
                                 )
@@ -642,7 +667,7 @@ const AllocateSFG = ({
                   </div>
 
                   <CCollapse className="custom-collapse" visible={visibleGroupIndex === groupIndex}>
-                    {group.items.map((i, itemIndex) => (
+                    {group?.items?.map((i, itemIndex) => (
                       <GroupDropZone
                         key={itemIndex}
                         i={i}

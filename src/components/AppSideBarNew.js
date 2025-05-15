@@ -11,6 +11,7 @@ import * as iconSet from '@coreui/icons'
 import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
 import {cilUser } from '@coreui/icons'
+import './style.css'
 
 export const AppSideBarNew = ({ giveAccess }) => {
   const [expandedModules, setExpandedModules] = useState({})
@@ -88,44 +89,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
   )
 
   return (
-    <CSidebarNav as={SimpleBar}>
-      {/*<CNavTitle>Static Menu</CNavTitle>
-      <CNavGroup
-        toggler={
-          <>
-            <CIcon customClassName="nav-icon" icon={cilSpeedometer} /> Admin
-          </>
-        }
-      >
-        <CNavItem>
-          <CNavLink as={NavLink} to="/packages">
-            <span className="nav-icon">
-              <span className="nav-icon-bullet"></span>
-            </span>{' '}
-            Packages
-          </CNavLink>
-        </CNavItem>
-        <CNavItem>
-          <CNavLink as={NavLink} to="/companies">
-            <span className="nav-icon">
-              <span className="nav-icon-bullet"></span>
-            </span>{' '}
-            Companies
-          </CNavLink>
-        </CNavItem>
-        <CNavItem>
-          <CNavLink as={NavLink} to="/billing">
-            <span className="nav-icon">
-              <span className="nav-icon-bullet"></span>
-            </span>{' '}
-            Billings
-          </CNavLink>
-        </CNavItem>
-      </CNavGroup>*/}
-      {/*<CNavItem>
-        <CNavLink as={NavLink} to="/dashboard">{navLink('Dashboard', 'cilUser')}</CNavLink>
-      </CNavItem>*/}
-
+    <CSidebarNav className='sidebar-menu' as={SimpleBar}>
       {/*superAdmin*/}
       {/*accounts*/}
       {shouldDisplayAccounts && (

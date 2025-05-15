@@ -1312,6 +1312,31 @@ export const apiMethods = {
   getState: async () => {
     return await apiClient.get('/common-service/states')
   },
+  
+  getPurchaseOrderDetails: async ({ po_id, grn_id }) => {
+    try {
+      return await apiClient.get('/purchase-order/details/po', {
+        params: {
+          po_id,
+          grn_id,
+        },
+      })
+    } catch (error) {
+      console.error('Error fetching purchase order details:', error.response?.data || error.message)
+      throw error
+    }
+  },
+  
+  submitPurchaseOrderReturn: async (payload) => {
+    try {
+      return await apiClient.post('/purchase-order/return/gst/po', payload)
+    } catch (error) {
+      console.error('Error submitting PO return:', error.response?.data || error.message)
+      throw error
+    }
+  },
+  
+ 
   getSkuByClientId:async(client_id)=>{
     return await apiClient.get(`sku-details/client-sku/${client_id}`)
   },

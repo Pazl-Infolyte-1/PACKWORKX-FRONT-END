@@ -28,6 +28,7 @@ import {
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import SearchBar from './New/SearchBar'
+import { MdOutlineMenu } from 'react-icons/md'
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -46,7 +47,16 @@ const AppHeader = () => {
   return (
     <CHeader position="sticky" className="p-0" ref={headerRef}>
       <CContainer fluid className="border-bottom py-1 bg-[#1E232F]">
-        <CHeaderNav className="d-none d-md-flex px-2">
+        <button
+          onClick={() => {
+            console.log('Raw button clicked')
+            dispatch({ type: 'set', sidebarShow: !sidebarShow })
+          }}
+          className={`${sidebarShow ? 'ml-3' : "ml-2"} p-2 text-white`}
+        >
+          <CIcon icon={cilMenu} size="lg" />
+        </button>
+        <CHeaderNav className="d-none d-md-flex">
           <CNavItem>
             <CNavLink className="text-white font-normal !text-sm" to="/dashboard" as={NavLink}>
               Dashboard
@@ -62,7 +72,7 @@ const AppHeader = () => {
               Settings
             </CNavLink>
           </CNavItem>
-            <SearchBar />
+          <SearchBar />
         </CHeaderNav>
         <CHeaderNav className="ms-auto">
           <CNavItem>

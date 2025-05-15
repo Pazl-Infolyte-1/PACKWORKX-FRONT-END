@@ -1,11 +1,11 @@
 import React from 'react'
 import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
 import { useSelector } from 'react-redux'
- 
+
 const DefaultLayout = () => {
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
- 
+
   return (
     <div className="w-full">
       <AppSidebar />

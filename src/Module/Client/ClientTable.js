@@ -194,31 +194,37 @@ function ClientTable({ clientdata, refreshClients,setIsMinimized,isMinimized,set
         {/* When minimized: Only render checkbox and display name */}
         {isMinimized ? (
           <>
-            <CTableDataCell className="px-4 py-3">
-              <input
-                type="checkbox"
-                checked={selectedRows.includes(client.client_id)}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  handleRowSelect(client.client_id);
-                }}
-                className="form-checkbox h-3 w-3 text-blue-600 rounded"
-              />
-            </CTableDataCell>
-            <CTableDataCell
-              onClick={(e) => {
-                //e.stopPropagation();
-                openViewCard(client);
-              }}
-              className="px-4 py-3 text-sm !text-blue-600 font-semibold"
-            >
-              {client.display_name || 'N/A'}
-            </CTableDataCell>
+          <CTableDataCell className="px-4 py-3 flex items-center gap-2">
+  <input
+    type="checkbox"
+    checked={selectedRows.includes(client.client_id)}
+    onChange={(e) => {
+      e.stopPropagation();
+      handleRowSelect(client.client_id);
+    }}
+    className="form-checkbox h-4 w-4 text-blue-600 rounded mb-2"
+  />
+   <div
+    onClick={(e) => {
+      openViewCard(client);
+    }}
+    className="cursor-pointer flex flex-col"
+  >
+    <span className="text-sm text-black font-semibold">
+      {client.display_name || 'N/A'}
+    </span>
+    <span className="text-xs text-gray-500">
+       ₹ {client.opening_balance}
+    </span>
+  </div>
+</CTableDataCell>
+
           </>
         ) : (
           <>
             <CTableDataCell>{''}</CTableDataCell>
             <CTableDataCell className="px-4 py-3">
+               <div onClick={(e) => e.stopPropagation()}>
               <input
                 type="checkbox"
                 checked={selectedRows.includes(client.client_id)}
@@ -228,6 +234,7 @@ function ClientTable({ clientdata, refreshClients,setIsMinimized,isMinimized,set
                 }}
                 className="form-checkbox h-3 w-3 text-blue-600 rounded"
               />
+              </div>
             </CTableDataCell>
             <CTableDataCell
               onClick={(e) => {
@@ -251,20 +258,22 @@ function ClientTable({ clientdata, refreshClients,setIsMinimized,isMinimized,set
               {client.mobile || 'N/A'}
             </CTableDataCell>
             <CTableDataCell className="px-4 py-3">
-              <ThreeDotMenu
-                value={[
-                  {
-                    label: 'Edit',
-                    icon: cilPencil,
-                    onClick: () => console.log('Edit', client),
-                  },
-                  {
-                    label: 'Delete',
-                    icon: cilTrash,
-                    onClick: () => console.log('Delete', client),
-                  },
-                ]}
-              />
+            <div onClick={(e) => e.stopPropagation()}>
+    <ThreeDotMenu
+      value={[
+        {
+          label: 'Edit',
+          icon: cilPencil,
+          onClick: () => console.log('Edit', client),
+        },
+        {
+          label: 'Delete',
+          icon: cilTrash,
+          onClick: () => console.log('Delete', client),
+        },
+      ]}
+    />
+  </div>
             </CTableDataCell>
           </>
         )}

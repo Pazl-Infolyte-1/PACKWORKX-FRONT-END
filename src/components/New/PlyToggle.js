@@ -1,6 +1,4 @@
-import React from 'react'
-
-const PlyToggle = ({ value, onChange ,errorMessage }) => {
+const PlyToggle = ({ value, onChange, errorMessage, editTag }) => {
   const options = [2, 3, 5, 7, 9]
 
   const getLeftPosition = (val) => {
@@ -17,7 +15,11 @@ const PlyToggle = ({ value, onChange ,errorMessage }) => {
           <span className="text-red-500 text-sm ml-2 align-middle">{errorMessage}</span>
         )}
       </label>
-      <div className="relative w-full h-[30px] bg-white border border-blue-500 rounded-md shadow-sm flex items-center justify-between px-1 overflow-hidden">
+      <div
+        className={`relative w-full h-[30px] bg-white border border-blue-500 rounded-md shadow-sm flex items-center justify-between px-1 overflow-hidden ${
+          editTag ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
+      >
         {/* Toggle Background */}
         <div
           className="absolute top-1/2 w-[20%] h-[75%] bg-blue-500 rounded-md transform -translate-y-1/2 transition-all duration-300 z-0"
@@ -28,10 +30,10 @@ const PlyToggle = ({ value, onChange ,errorMessage }) => {
         {options.map((option) => (
           <span
             key={option}
-            onClick={() => onChange(option)}
-            className={`w-1/5 text-center text-sm cursor-pointer font-medium transition-colors z-10 ${
-              Number(value) === option ? 'text-white' : 'text-gray-700'
-            }`}
+            onClick={() => !editTag && onChange(option)}
+            className={`w-1/5 text-center text-sm font-medium transition-colors z-10 ${
+              editTag ? 'cursor-not-allowed' : 'cursor-pointer'
+            } ${Number(value) === option ? 'text-white' : 'text-gray-700'}`}
           >
             {option}
           </span>

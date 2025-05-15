@@ -24,7 +24,7 @@ import clientImg from '../../assets/images/client.jpg'
 import { useDispatch, useSelector } from 'react-redux'
 import RoutePopup from './RoutePopup'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
-import { setCompositeArray } from '../../action';
+import { setCompositeArray } from '../../action'
 
 const compositeTypes = [
   { id: '1', name: 'Partition' },
@@ -58,7 +58,7 @@ function Composite({
   message,
   setMessage,
   errors,
-  setErrors
+  setErrors,
 }) {
   const [skuListTable, setSkuListTable] = useState([])
   const [skuFields, setSkuFields] = useState([])
@@ -82,18 +82,18 @@ function Composite({
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedClient, setSelectedClient] = useState('')
   const [selectedSkuType, setSelectedSkuType] = useState('')
-  const [selectedSkuTypePopup, setSelectedSkuTypePopup] = useState(null);
+  const [selectedSkuTypePopup, setSelectedSkuTypePopup] = useState(null)
   const [selected, setSelected] = useState('vendor')
   const [triggerSelection, setTriggerSelection] = useState(false)
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [entityType, setEntityType] = useState('') // State to hold entity_type
   const [submitFromRsc, setSubmitFromRsc] = useState(true)
   const dispatch = useDispatch()
-  const compositeArray = useSelector((state) => state.compositeArray);
+  const compositeArray = useSelector((state) => state.compositeArray)
 
-  const [displayAsChips,setDisplayAsChips] = useState([])
+  const [displayAsChips, setDisplayAsChips] = useState([])
   const [isSingleViewPopupRoute, setisSingleViewPopupRoute] = useState(false)
-  const [fullRouteResponse, setFullRouteResponse] = useState(null);
+  const [fullRouteResponse, setFullRouteResponse] = useState(null)
 
   const selectionFrame = {
     vendor: {
@@ -116,10 +116,10 @@ function Composite({
     }))
     if (selectedType.trim()) {
       setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.composite_type;
-        return newErrors;
-      });
+        const newErrors = { ...prev }
+        delete newErrors.composite_type
+        return newErrors
+      })
     }
   }
 
@@ -175,7 +175,6 @@ function Composite({
         sku_name: matchedSku ? matchedSku.sku_name : '', // Update sku_name based on selection
         ratio: matchedSku ? matchedSku.ratio : '', // Optionally update ratio if needed
       }
-      console.log('Selected dropdown values:', updatedFields);
       return updatedFields // Return the updated fields
     })
   }
@@ -260,262 +259,219 @@ function Composite({
       setSkuFields((prev) => [...prev, ...addedFields])
       setCheckboxSelectedArray([])
     }
-    const selectedSkuIds = skuFields.map((field) => parseInt(field.id));
-
+    const selectedSkuIds = skuFields.map((field) => parseInt(field.id))
   }, [checkboxSelectedArray])
 
-  console.log("is open",isopenval)
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       if (isopenval) {
-        const message = "Don't refresh or else your data will be lost!";
-        event.preventDefault(); // For most browsers
-        event.returnValue = message; // For Chrome
-        return message; // For Firefox
+        const message = "Don't refresh or else your data will be lost!"
+        event.preventDefault() // For most browsers
+        event.returnValue = message // For Chrome
+        return message // For Firefox
       }
-    };
-  
-    window.addEventListener('beforeunload', handleBeforeUnload);
-  
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
     // Cleanup function to remove the event listener
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [isopenval]);
-
-
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [isopenval])
 
   const handleSelectPopup = (data) => {
-    console.log("selected data", data.sku_type);
     setCompositeSelect(data.sku_type)
+  }
 
-  };
-
-      //setSelectedSkuTypePopup(data.sku_type);
-    //setisSingleViewPopupForType(true);
-  
   const skuComponents = {
     'RSC box': <RSCBox />,
     Board: <CorrugatedSheet />,
     'Die Cut box': <DieCutBox />,
     Composite: <Composite />,
-    'Custom Item': <CustomItem />
-  };
+    'Custom Item': <CustomItem />,
+  }
 
-  console.log("popup selectr",isSingleViewPopupForType)
-  //const handleClosePopup = () => {
-  //  console.log("popup closed")
-  //  setisSingleViewPopupForType(false);
-  //  setCompositeSelect(null); // reset when popup is closed
-  //};
-  
-  //console.log("pop///",isSingleViewPopupForType)
-  console.log("rebder activate",isactivateRender)
+  const handleSelectAction = (selection) => {
+    setSelected(selection)
+    setTriggerSelection(true)
+  }
 
-  
-    //these are the fonctionalities for client create dropdown
-    
-    const handleSelectAction = (selection) => {
-      setSelected(selection)
-      setTriggerSelection(true) // Ensures it runs handleSelection
+  const handleCloseDrawer = () => {
+    setDrawerOpen(false)
+  }
+  const refreshClients = () => {
+    setReloadData((prev) => !prev)
+  }
+
+  useEffect(() => {
+    if (triggerSelection) {
+      handleSelection(selected)
+      setTriggerSelection(false) 
     }
-    
-    const handleCloseDrawer = () => {
-      setDrawerOpen(false)
+  }, [selected, triggerSelection])
+
+  const handleSelection = (selection) => {
+    const optionValue = selectionFrame[selection].id
+
+    if (optionValue === 2) {
+      setEntityType('Client')
+      setPopupOpen(false)
+      setDrawerOpen(true)
+    } else if (optionValue === 1) {
+      setEntityType('Vendor')
+      setPopupOpen(false)
+      setDrawerOpen(true)
     }
-    const refreshClients = () => {
-      setReloadData((prev) => !prev) //  Toggle state to trigger `useEffect`
+  }
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, []) // Runs once on mount
+
+  const handleKeyDown = (event) => {
+    if (!isPopupOpen) {
+      return // Disable arrow key functionality if the popup is not open
     }
-    
-     useEffect(() => {
-        if (triggerSelection) {
-          handleSelection(selected)
-          setTriggerSelection(false) // Reset trigger
-        }
-      }, [selected, triggerSelection]) 
-    
-      const handleSelection = (selection) => {
-        const optionValue = selectionFrame[selection].id
-        console.log(`Selected ID: ${optionValue}`)
-    
-        if (optionValue === 2) {
-          setEntityType('Client')
-          setPopupOpen(false)
-          setDrawerOpen(true)
-        } else if (optionValue === 1) {
-          setEntityType('Vendor')
-          setPopupOpen(false)
-          setDrawerOpen(true)
-        } else {
-          console.log('option not selected')
-        }
+    if (event.key === 'ArrowRight') {
+      handleSelectAction('client')
+      setEntityType('Client') // Update state
+    } else if (event.key === 'ArrowLeft') {
+      handleSelectAction('vendor')
+      setEntityType('Vendor') // Update state
+    } else if (event.key === 'Enter') {
+      setTriggerSelection(true) // Mark that Enter was pressed
+    }
+  }
+
+
+  useEffect(() => {
+    if (message) {
+      setAlerts([{ severity: 'success', message }])
+
+      const timer = setTimeout(() => {
+        setAlerts([]) // Clear alerts after 3 seconds
+      }, 3000)
+
+      return () => clearTimeout(timer) // Cleanup on unmount or message change
+    }
+  }, [message])
+
+  //functionality for route chip
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      const params = {
+        search: '',
+        page: 1,
+        limit: 10000,
       }
-    
-        useEffect(() => {
-          document.addEventListener('keydown', handleKeyDown)
-          return () => document.removeEventListener('keydown', handleKeyDown)
-        }, []) // Runs once on mount
-    
-        const handleKeyDown = (event) => {
-          if (!isPopupOpen) {
-            return; // Disable arrow key functionality if the popup is not open
-          }
-          if (event.key === 'ArrowRight') {
-            handleSelectAction('client')
-            setEntityType('Client') // Update state
-          } else if (event.key === 'ArrowLeft') {
-            handleSelectAction('vendor')
-            setEntityType('Vendor') // Update state
-          } else if (event.key === 'Enter') {
-            console.log('Enter Pressed: Executing Selection')
-            setTriggerSelection(true) // Mark that Enter was pressed
-          }
-        }
-      
-        console.log("jjjj",message)
-    
-        useEffect(() => {
-          if (message) {
-            setAlerts([{ severity: 'success', message }]);
-        
-            const timer = setTimeout(() => {
-              setAlerts([]); // Clear alerts after 3 seconds
-            }, 3000);
-        
-            return () => clearTimeout(timer); // Cleanup on unmount or message change
-          }
-        }, [message]);
-        
-           
-        //functionality for route chip
-         useEffect(() => {
-              const fetchRoutes = async () => {
-                const params = {
-                  search: '',
-                  page: 1,
-                  limit: 10000,
-                };
-            
-                try {
-                  const response = await apiMethods.getRouteList(params);
-                  console.log('Full API Response:', response);
-                  setFullRouteResponse(response); // ✅ Save full response here
-                  setDisplayAsChips(response.data.routes)
-                } catch (err) {
-                  console.error('Error fetching routes:', err);
-                }
-              };
-            
-              fetchRoutes();
-            }, []);
-            
-        
-        const selectedRouteIds1 = useSelector((state) => state.routeprocess.selectedRouteIds || []);
-        
-        useEffect(() => {
-          if (editTag && typeof addNewSkuData?.route === 'string') {
-            try {
-              const parsedRoutes = JSON.parse(addNewSkuData.route);
-              if (Array.isArray(parsedRoutes) && parsedRoutes.length > 0) {
-                dispatch({
-                  type: 'SET_SELECTED_ROUTE_IDS',
-                  payload: parsedRoutes,
-                });
-        
-                setAddNewSkuData((prevData) => ({
-                  ...prevData,
-                  route: parsedRoutes, // ✅ use parsedRoutes instead of selectedRouteIds1
-                }));
-              }
-            } catch (err) {
-              console.error('Invalid route format:', addNewSkuData.route);
-            }
-          }
-        }, [editTag, addNewSkuData?.route, dispatch]);
-        
-        
-        
-        // Optional: track Redux changes
-        useEffect(() => {
-          console.log("Redux -> routeprocess.selectedRouteIds:", selectedRouteIds1);
-        }, [selectedRouteIds1]);
-        
-        const selectedChips = displayAsChips.filter((item) =>
-          selectedRouteIds1.includes(item.id)
-        );
-        
-        const chipNames = selectedChips.map((chip) => chip.route_name).join(', ');
-        
-        useEffect(() => {
-          if (!editTag) {
-            setAddNewSkuData((prevData) => ({
-              ...prevData,
-              route: selectedRouteIds1,
-            }));
-          }
-        }, [selectedRouteIds1, editTag]);
-        
-        
-        const handleRemoveChip = (idToRemove) => {
-          console.log("Removing chip with id:", idToRemove);
-        
-          const updated = selectedRouteIds1.filter((id) => id !== idToRemove);
-          console.log("update", updated);
-        
+
+      try {
+        const response = await apiMethods.getRouteList(params)
+        setFullRouteResponse(response) // ✅ Save full response here
+        setDisplayAsChips(response.data.routes)
+      } catch (err) {
+        console.error('Error fetching routes:', err)
+      }
+    }
+
+    fetchRoutes()
+  }, [])
+
+  const selectedRouteIds1 = useSelector((state) => state.routeprocess.selectedRouteIds || [])
+
+  useEffect(() => {
+    if (editTag && typeof addNewSkuData?.route === 'string') {
+      try {
+        const parsedRoutes = JSON.parse(addNewSkuData.route)
+        if (Array.isArray(parsedRoutes) && parsedRoutes.length > 0) {
           dispatch({
             type: 'SET_SELECTED_ROUTE_IDS',
-            payload: updated,
-          });
-        };
-        useEffect(() => {
+            payload: parsedRoutes,
+          })
+
           setAddNewSkuData((prevData) => ({
             ...prevData,
-            route: selectedRouteIds1,
-          }));
-        }, [selectedRouteIds1]);
-        const handleBrowseClickRoute = () => {
-          setisSingleViewPopupRoute(true)
+            route: parsedRoutes, 
+          }))
         }
-    
-        useEffect(() => {
-          // Only extract ids that are valid, and convert them to numbers
-          const compositeIds = skuFields
-            .filter((field) => field.id !== '') // skip empty ids
-            .map((field) => Number(field.id));  // convert all to numbers
-        
-          console.log('Dispatching composite IDs:', compositeIds);
-        
-          dispatch(setCompositeArray(compositeIds));
-        }, [skuFields]); // runs whenever skuFields changes
-        console.log("sku fields",skuFields)
+      } catch (err) {
+        console.error('Invalid route format:', addNewSkuData.route)
+      }
+    }
+  }, [editTag, addNewSkuData?.route, dispatch])
 
-        useEffect(() => {
-          console.log('Redux main comp:', compositeArray);
-        }, [compositeArray]);
+  // Optional: track Redux changes
+  useEffect(() => {
+  }, [selectedRouteIds1])
 
-        const selectedRouteIds2 = useSelector(
-          (state) => state.routeprocess?.selectedRouteIds || []
-        );
-        
-        useEffect(() => {
-          console.log('Selected Route IDs in comp:', selectedRouteIds2);
-        
-          if (selectedRouteIds2.length > 0) {
-            setErrors((prev) => {
-              const newErrors = { ...prev };
-              delete newErrors.route;
-              return newErrors;
-            });
-          }
-        }, [selectedRouteIds2]);
-        
- 
+  const selectedChips = displayAsChips.filter((item) => selectedRouteIds1.includes(item.id))
+
+  const chipNames = selectedChips.map((chip) => chip.route_name).join(', ')
+
+  useEffect(() => {
+    if (!editTag) {
+      setAddNewSkuData((prevData) => ({
+        ...prevData,
+        route: selectedRouteIds1,
+      }))
+    }
+  }, [selectedRouteIds1, editTag])
+
+  const handleRemoveChip = (idToRemove) => {
+
+    const updated = selectedRouteIds1.filter((id) => id !== idToRemove)
+
+    dispatch({
+      type: 'SET_SELECTED_ROUTE_IDS',
+      payload: updated,
+    })
+  }
+  useEffect(() => {
+    setAddNewSkuData((prevData) => ({
+      ...prevData,
+      route: selectedRouteIds1,
+    }))
+  }, [selectedRouteIds1])
+  const handleBrowseClickRoute = () => {
+    setisSingleViewPopupRoute(true)
+  }
+
+  useEffect(() => {
+    // Only extract ids that are valid, and convert them to numbers
+    const compositeIds = skuFields
+      .filter((field) => field.id !== '') 
+      .map((field) => Number(field.id)) 
+
+
+    dispatch(setCompositeArray(compositeIds))
+  }, [skuFields]) // runs whenever skuFields changes
+
+  useEffect(() => {
+  }, [compositeArray])
+
+  const selectedRouteIds2 = useSelector((state) => state.routeprocess?.selectedRouteIds || [])
+
+  useEffect(() => {
+
+    if (selectedRouteIds2.length > 0) {
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors.route
+        return newErrors
+      })
+    }
+  }, [selectedRouteIds2])
+
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-3 border border-gray-200 rounded-lg">
-        <div className='w-[200px]'>
-          <label className="block text-sm font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">SKU Type</label>
+        <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2 after:content-['*'] after:text-red-500 after:ml-1">
+            SKU Type
+          </label>
           <div className="relative w-full" ref={dropdownRef}>
             <div
               className="p-1 h-8 border border-gray-300 rounded-md cursor-pointer flex justify-between items-center bg-white hover:border-blue-500 transition-colors"
@@ -544,36 +500,35 @@ function Composite({
           </div>
         </div>
 
-        <div className='w-[200px]'>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-    SKU Name
-    <span className="text-red-500 ml-1">*</span>
-    {errors.sku_name && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
-    )}
-  </label>
-            <input
-              id="sku_name"
-              name="sku_name"
-              value={addNewSkuData.sku_name}
-              onChange={handleChange}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
-
-          <div className='w-[200px]'>
+        <div className="w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-    Client Name
-    <span className="text-red-500 ml-1">*</span>
-    {errors.client_id && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
-    )}
-  </label>
+            SKU Name
+            <span className="text-red-500 ml-1">*</span>
+            {errors.sku_name && (
+              <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
+            )}
+          </label>
+          <input
+            id="sku_name"
+            name="sku_name"
+            value={addNewSkuData.sku_name}
+            onChange={handleChange}
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+        </div>
+
+        <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Client Name
+            <span className="text-red-500 ml-1">*</span>
+            {errors.client_id && (
+              <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
+            )}
+          </label>
           <select
             name="client"
             id="client"
             disabled={clientDiasble}
-            //value={filteredClient ? filteredClient.client_id : addNewSkuData?.client || ''}
             value={addNewSkuData.client_id}
             onChange={handleChange}
             className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -586,26 +541,28 @@ function Composite({
                 {item.display_name}
               </option>
             ))}
-                            <option value="add_client">➕ Add Client</option>
-
+            <option value="add_client">➕ Add Client</option>
           </select>
         </div>
       </div>
 
       {/* Main content */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3 mt-6 border border-gray-200 rounded-lg">
-        <div className='w-[200px]'>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-    Partition Panel
-    <span className="text-red-500 ml-1">*</span>
-    {errors.composite_type && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.composite_type}</span>
-    )}
-  </label>
+        <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Partition Panel
+            <span className="text-red-500 ml-1">*</span>
+            {errors.composite_type && (
+              <span className="text-red-500 text-sm ml-2 align-middle">
+                {errors.composite_type}
+              </span>
+            )}
+          </label>
           <select
             name="composite_type"
             id="composite_type"
             value={addNewSkuData?.composite_type}
+            disabled={editTag}
             className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             onChange={handleCompositeTypeChange}
           >
@@ -615,15 +572,17 @@ function Composite({
           </select>
         </div>
 
-        <div className='w-[200px]'>
-        <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-        Minimum Order Level
-    <span className="text-red-500 ml-1">*</span>
-    {errors.minimum_order_level && (
-      <span className="text-red-500 text-sm ml-2 align-middle">{errors.minimum_order_level}</span>
-    )}
-  </label>
+        <div className="w-[200px]">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Minimum Order Level
+              <span className="text-red-500 ml-1">*</span>
+              {errors.minimum_order_level && (
+                <span className="text-red-500 text-sm ml-2 align-middle">
+                  {errors.minimum_order_level}
+                </span>
+              )}
+            </label>
             <input
               id="minimum_order_level"
               name="minimum_order_level"
@@ -633,7 +592,6 @@ function Composite({
             />
           </div>
         </div>
-
 
         <ChipSelectorWithBrowse
           label="Route"
@@ -645,66 +603,66 @@ function Composite({
           errors={errors}
         />
         <div className="w-[200px]">
-  <label className="block text-sm font-medium text-gray-700 mb-2">
-    Tax Master
-  </label>
-  <select
-    id="gst_percentage"
-    name="gst_percentage"
-    value={addNewSkuData?.gst_percentage || ""}
-    onChange={handleChange}
-    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-  >
-    <option value="">Select Tax</option>
-    <option value={5}>5%</option>
-    <option value={10}>10%</option>
-    <option value={15}>15%</option>
-  </select>
-</div>
-
+          <label className="block text-sm font-medium text-gray-700 mb-2">Tax Master</label>
+          <select
+            id="gst_percentage"
+            name="gst_percentage"
+            value={addNewSkuData?.gst_percentage || ''}
+            onChange={handleChange}
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          >
+            <option value="">Select Tax</option>
+            <option value={5}>5%</option>
+            <option value={10}>10%</option>
+            <option value={15}>15%</option>
+          </select>
+        </div>
       </div>
 
-        <div className="col-span-3">
-          <div className="flex items-center gap-4 mt-4">
-            <button
-              type="button"
-              className="bg-purple-400 text-white text-sm px-2 py-1 rounded-md shadow-md hover:bg-purple-500 transition-colors"
-              onClick={handleAddSkuField}
+      <div className="col-span-3">
+        <div className="flex items-center gap-4 mt-4">
+          <button
+            type="button"
+            className="bg-purple-400 text-white text-sm px-2 py-1 rounded-md shadow-md hover:bg-purple-500 transition-colors"
+            onClick={handleAddSkuField}
+          >
+            + Add
+          </button>
+
+          <button
+            type="button"
+            className="bg-gray-400 text-white text-sm px-2 py-1 rounded-md shadow-md hover:bg-gray-500 transition-colors"
+            onClick={tablepopup}
+          >
+            Browse
+          </button>
+
+          <div className="w-[150px]">
+            <select
+              id="sku_type"
+              name="sku_type"
+              value={selectedFilter || ''}
+              onChange={(e) => {
+                const selectedOption = skuType.find((opt) => opt.sku_type === e.target.value)
+                //handleSelect(selectedOption);
+                handleSelectPopup(selectedOption)
+              }}
+              className="block w-full rounded-md border-gray-300 py-2 px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
             >
-              + Add
-            </button>
-
-            <button
-              type="button"
-              className="bg-gray-400 text-white text-sm px-2 py-1 rounded-md shadow-md hover:bg-gray-500 transition-colors"
-              onClick={tablepopup}
-            >
-              Browse
-            </button>
-
-            <div className="w-[150px]">
-  <select
-    id="sku_type"
-    name="sku_type"
-    value={selectedFilter || ''}
-    onChange={(e) => {
-      const selectedOption = skuType.find(opt => opt.sku_type === e.target.value);
-      //handleSelect(selectedOption);
-      handleSelectPopup(selectedOption)
-    }}
-    className="block w-full rounded-md border-gray-300 py-2 px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
-  >
-    <option value="">Create New</option>
-    {skuType.map((option) => (
-      <option key={option.id} value={option.sku_type}    disabled={option.sku_type === 'Composite'}>
-        {option.sku_type}
-      </option>
-    ))}
-  </select>
-</div>
-
+              <option value="">Create New</option>
+              {skuType.map((option) => (
+                <option
+                  key={option.id}
+                  value={option.sku_type || ''}
+                  disabled={option.sku_type === 'Composite'}
+                >
+                  {option.sku_type}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
+      </div>
       {/* SKU Selection Area */}
       <div className="mt-2 w-full overflow-auto">
         {skuFields.length > 0 && (
@@ -723,37 +681,37 @@ function Composite({
                   <tr key={field.key} className="bg-white hover:bg-gray-50">
                     <td className="border border-gray-300 px-3 py-2">SKU {index + 1}</td>
                     <td className="border border-gray-300 px-3 py-2">
-  {field.readonly ? (
-    <input
-      type="text"
-      value={field.sku_name}
-      readOnly
-      className="w-full px-1 py-[5px] text-sm bg-gray-100 border border-gray-300 rounded text-black"
-    />
-  ) : (
-    <select
-      className="w-full h-[30px] px-1 border border-gray-300 text-sm rounded-md bg-white text-black outline-none"
-      value={field.id}
-      onChange={(e) => handleChangeSkuSelect(index, e.target.value)}
-    >
-      {addNewSkuData.part_value.length === 0 && (
-        <option value="" disabled>
-          Select SKU
-        </option>
-      )}
-      {skuList.map((sku) => {
-        // Check if the SKU is already selected in other fields
-        //const isSelected = skuFields.some((f, i) => f.id === sku.id && i !== index);
-        const isInComposite = compositeArray.includes(Number(sku.id));
-        return (
-          <option key={sku.id} value={sku.id} disabled={isInComposite}>
-            {sku.sku_name}
-          </option>
-        );
-      })}
-    </select>
-  )}
-</td>
+                      {field.readonly ? (
+                        <input
+                          type="text"
+                          value={field.sku_name}
+                          readOnly
+                          className="w-full px-1 py-[5px] text-sm bg-gray-100 border border-gray-300 rounded text-black"
+                        />
+                      ) : (
+                        <select
+                          className="w-full h-[30px] px-1 border border-gray-300 text-sm rounded-md bg-white text-black outline-none"
+                          value={field.id || ''}
+                          onChange={(e) => handleChangeSkuSelect(index, e.target.value)}
+                        >
+                          {addNewSkuData.part_value.length === 0 && (
+                            <option value="" disabled>
+                              Select SKU
+                            </option>
+                          )}
+                          {skuList.map((sku) => {
+                            // Check if the SKU is already selected in other fields
+                            //const isSelected = skuFields.some((f, i) => f.id === sku.id && i !== index);
+                            const isInComposite = compositeArray.includes(Number(sku.id))
+                            return (
+                              <option key={sku.id} value={sku.id} disabled={isInComposite}>
+                                {sku.sku_name}
+                              </option>
+                            )
+                          })}
+                        </select>
+                      )}
+                    </td>
                     <td className="border border-gray-300 px-3 py-2">
                       <input
                         type="number"
@@ -803,7 +761,7 @@ function Composite({
         />
       </PopUp>
 
-     {/*<ModifiedPopup
+      {/*<ModifiedPopup
   header="Selected SKU"
   visible={isSingleViewPopupForType}
   setVisible={handleClosePopup}
@@ -817,51 +775,55 @@ function Composite({
 
       {/*popup for client create*/}
       {!isDrawerOpen && (
-                 <PopUp
-                        header={'Select Client/Vendor'}
-                        visible={isPopupOpen}
-                        setVisible={setPopupOpen}
-                        showCloseButton={true}
-                        width={'35vw'}
-                      >
-                <SelectionCards
-      selectionFrame={selectionFrame}
-      selected={selected}
-      onSelect={handleSelectAction}
-    />
-                </PopUp>
-            )}
+        <PopUp
+          header={'Select Client/Vendor'}
+          visible={isPopupOpen}
+          setVisible={setPopupOpen}
+          showCloseButton={true}
+          width={'35vw'}
+        >
+          <SelectionCards
+            selectionFrame={selectionFrame}
+            selected={selected}
+            onSelect={handleSelectAction}
+          />
+        </PopUp>
+      )}
 
-<PopUp
-                        header={'Select Client/Vendor'}
-                        visible={isDrawerOpen}
-                        setVisible={setDrawerOpen}
-                        showCloseButton={true}
-                        width={'1200px'}
-                        height={"700px"}
-                      >
-              {/* Pass handleCloseDrawer as a prop to ClientForm */}
-              <ClientForm
-                entity_type={entityType}
-                refreshClients={refreshClients}
-                closeDrawerDuringAdd={() => handleCloseDrawer(false)}
-                resetForm={isDrawerOpen}
-                submitFromRsc={submitFromRsc}
-                setDrawerOpen={setDrawerOpen}
-                isDrawerOpen={isDrawerOpen}
-                setMessage={setMessage}
-              />
-          </PopUp>
-          <PopUp
+      <PopUp
+        header={'Select Client/Vendor'}
+        visible={isDrawerOpen}
+        setVisible={setDrawerOpen}
+        showCloseButton={true}
+        width={'1200px'}
+        height={'700px'}
+      >
+        {/* Pass handleCloseDrawer as a prop to ClientForm */}
+        <ClientForm
+          entity_type={entityType}
+          refreshClients={refreshClients}
+          closeDrawerDuringAdd={() => handleCloseDrawer(false)}
+          resetForm={isDrawerOpen}
+          submitFromRsc={submitFromRsc}
+          setDrawerOpen={setDrawerOpen}
+          isDrawerOpen={isDrawerOpen}
+          setMessage={setMessage}
+        />
+      </PopUp>
+      <PopUp
         header={'Select Route'}
         visible={isSingleViewPopupRoute}
         setVisible={setisSingleViewPopupRoute}
         showCloseButton={true}
         width={'60vw'}
       >
-        <RoutePopup  editTag={editTag} addNewSkuData={addNewSkuData}   fullRouteResponse={fullRouteResponse} setisSingleViewPopupRoute={setisSingleViewPopupRoute} />
+        <RoutePopup
+          editTag={editTag}
+          addNewSkuData={addNewSkuData}
+          fullRouteResponse={fullRouteResponse}
+          setisSingleViewPopupRoute={setisSingleViewPopupRoute}
+        />
       </PopUp>
-
     </div>
   )
 }

@@ -15,10 +15,10 @@ const DefaultLayout = () => {
         }`}
       >
         <AppHeader />
-        <div className="body flex-grow-1 py-3">
+        <div className="body flex-grow-1 px-2">
           <AppContent />
         </div>
-        <AppFooter />
+        {/* <AppFooter /> */}
       </div>
     </div>
   )

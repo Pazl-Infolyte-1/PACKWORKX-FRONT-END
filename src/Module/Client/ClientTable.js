@@ -22,12 +22,17 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import PopUp from '../../components/New/PopUp'
 import { TiFlowSwitch } from 'react-icons/ti'
 
-function ClientTable({ clientdata, refreshClients,setIsMinimized,isMinimized,setSelectedRowData}) {
+function ClientTable({
+  clientdata,
+  refreshClients,
+  setIsMinimized,
+  isMinimized,
+  setSelectedRowData,
+}) {
   //const [fakeClientData, setFakeClientData] = useState(jsonval)
   const [isModalOpen, setModalOpen] = useState(false)
   const [selectedClient, setSelectedClient] = useState(null) // Store selected client
   const [isDrawerOpen, setDrawerOpen] = useState(false)
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [selectedClientId, setSelectedClientId] = useState(null)
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
   const [singleData, setSingleData] = useState(null)
@@ -35,33 +40,9 @@ function ClientTable({ clientdata, refreshClients,setIsMinimized,isMinimized,set
   const [selectedClientDeleteId, setSelectedClientDeleteId] = useState(null)
   const [selectedRows, setSelectedRows] = useState([])
   const [alerts, setAlerts] = useState([])
-  const navigate = useNavigate()
 
   const handleClose = () => {
     setAlerts([])
-  }
-  const openModal = (client) => {
-    setSelectedClient(client)
-    //setModalOpen(true)
-    setIsPopoverOpen(true)
-  }
-  const [openPopoverIndex, setOpenPopoverIndex] = useState(null) // Track open popover per row
-
-  const togglePopover = (index) => {
-    setOpenPopoverIndex(openPopoverIndex === index ? null : index) // Toggle popover
-  }
-
-  useEffect(() => {
-    console.log('Drawer open state changed:', isDrawerOpen)
-  }, [isDrawerOpen])
-
-  const handlePageChange = () => {
-    return null
-  }
-
-  const handleCloseSingleViewPopup = () => {
-    setisSingleViewPopup(false)
-    //setSelectedClientId(null); // Reset client ID
   }
 
   const openViewCard = (data) => {
@@ -117,7 +98,6 @@ function ClientTable({ clientdata, refreshClients,setIsMinimized,isMinimized,set
     setisSingleViewPopup(false)
     setSelectedClientId(cell)
     setDrawerOpen(true)
-    setOpenPopoverIndex(null)
   }
 
   const handleRowSelect = (clientId) => {

@@ -13,8 +13,7 @@ import WorkOrderDetails from './WorkOrderDetails'
 import WorkOrderEditForm from './WorkOrderEditForm'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
-import ContentHeader from '../../components/header/ContentHeader'
-
+import ContentHeader from '../../components/New/ContentHeader'
 const WorkOrders = () => {
   const [data, setData] = useState([])
   const [limit, setLimit] = useState(10)

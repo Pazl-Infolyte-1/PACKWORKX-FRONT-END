@@ -155,7 +155,7 @@ function ClientList() {
 
   return (
     <div className="flex w-full">
-      <div ref={clientListRef} className={isMinimized ? 'w-[320px]' : 'w-full'}>
+      <div ref={clientListRef} className={isMinimized ? 'w-[320px] border-r' : 'w-full'}>
 
         <ContentHeader
         isMinimized={isMinimized}

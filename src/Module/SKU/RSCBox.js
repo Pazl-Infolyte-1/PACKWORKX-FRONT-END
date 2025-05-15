@@ -612,7 +612,7 @@ function RSCBox({
             value={addNewSkuData?.ply}
             onChange={(selectedPly) => updateSkuValues(selectedPly)}
             errorMessage={errors.ply}
-            editTag={true}
+            editTag={editTag}
           />
         </div>
 

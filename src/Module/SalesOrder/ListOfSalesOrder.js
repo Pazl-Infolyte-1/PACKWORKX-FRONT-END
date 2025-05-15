@@ -13,7 +13,7 @@ import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import SalesOrderView from './viewSalesOrder'
-import ContentHeader from '../../components/header/ContentHeader'
+import ContentHeader from '../../components/New/ContentHeader'
 
 function ListOfSalesOrder() {
   const [data, setData] = useState([])

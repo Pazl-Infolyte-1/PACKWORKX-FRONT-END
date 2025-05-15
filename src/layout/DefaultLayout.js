@@ -7,7 +7,7 @@ const DefaultLayout = () => {
   const sidebarShow = useSelector((state) => state.sidebarShow)
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-white">
       <AppSidebar />
       <div
         className={`flex-column min-vh-100 ${
@@ -15,10 +15,10 @@ const DefaultLayout = () => {
         }`}
       >
         <AppHeader />
-        <div className="body flex-grow-1 py-3">
+        <div className="body flex-grow-1 px-2">
           <AppContent />
         </div>
-        <AppFooter />
+        {/* <AppFooter /> */}
       </div>
     </div>
   )

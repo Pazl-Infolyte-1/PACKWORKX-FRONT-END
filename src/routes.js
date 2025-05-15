@@ -46,7 +46,7 @@ const routes = [
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },
   { path: '/clients', name: 'Clients', element: Client, key: 10 },
   
-  { path: '/clients/new', name: 'Add Client', element: ClientForm, key: '10-1' },
+  { path: '/clients/clientForm', name: 'Add Client', element: ClientForm, key: '10-1' },
   { path: '/SKU', name: 'SKU', element: SKU, key: 23 },
   //{ path: '/SKU/add-edit', name: 'Add/Edit SKU', element: SKU, key: 'SKU_ADD_EDIT'},
   { path: '/employeelist', name: 'Employee List', element: EmployeeList, key: 21 },

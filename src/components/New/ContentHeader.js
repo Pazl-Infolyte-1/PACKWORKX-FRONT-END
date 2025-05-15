@@ -11,7 +11,7 @@ function ContentHeader({
   addLabel = 'New',
   menuOptions = [],
   headingOptions = [],
-  isMinimized
+  isMinimized,
 }) {
   const [showMenu, setShowMenu] = useState(false)
   const [showHeadingDropdown, setShowHeadingDropdown] = useState(false)
@@ -67,13 +67,15 @@ function ContentHeader({
   }
 
   return (
-    <div className="flex justify-between items-center py-1 px-2 relative">
+    <div className="flex justify-between items-center p-1 px-3 relative">
       {/* Heading with Dropdown */}
       <div className="relative">
         <div
           ref={headingRef}
           onClick={headingOptions.length > 0 ? handleHeadingClick : undefined}
-          className={`text-lg font-semibold flex items-center  cursor-${headingOptions.length > 0 ? 'pointer' : 'default'}`}
+   className={`text-lg font-semibold flex items-center px-2 py-1 rounded cursor-${headingOptions.length > 0 ? 'pointer' : 'default'} ${
+    headingOptions.length > 0 ? 'hover:bg-[#f1f2f7] active:bg-[#e4e6ed]' : ''
+  }`}
         >
           {heading}
           {headingOptions.length > 0 && (
@@ -109,14 +111,14 @@ function ContentHeader({
 
       {/* Action Buttons */}
       <div className="flex items-center gap-3">
- <button
-  onClick={onAddClick}
-  className={`flex items-center justify-center rounded-md transition-all duration-200
+        <button
+          onClick={onAddClick}
+          className={`flex items-center justify-center rounded-md transition-all duration-200
     ${isMinimized ? 'w-8 h-8 text-xl bg-blue-500 text-white' : 'bg-blue-500 text-white py-1.5 px-3'}
   `}
->
-  {isMinimized ? '+' : `+ ${addLabel}`}
-</button>
+        >
+          {isMinimized ? '+' : `+ ${addLabel}`}
+        </button>
 
         {/* Three Dot Menu */}
         <div className="relative">

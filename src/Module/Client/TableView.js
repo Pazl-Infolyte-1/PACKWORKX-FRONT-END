@@ -4,6 +4,7 @@ import OverviewComponent from "./OverviewComponent";
 import Comments from "./Comments";
 import CIcon from "@coreui/icons-react";
 import { cilLink } from "@coreui/icons";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -13,13 +14,15 @@ const TableView=({ onClose ,selectedRowData,setSelectedRowData})=>{
 	console.log("row data",selectedRowData)
 	const [tableData,setTableData] = useState(null)
     const [activeTab, setActiveTab] = useState(0);
-
+    const [client,setClient] = useState(null);
+const navigate=useNavigate()
 useEffect(() => {
   const fetchClient = async () => {
     try {
       const data = await apiMethods.singleclients(selectedRowData.client_id);
       console.log('Client Data:', data);
 	 setTableData(data?.data); 
+   setClient(data?.data);
     } catch (error) {
       console.error('Error fetching client:', error);
     }
@@ -31,7 +34,7 @@ useEffect(() => {
 }, [selectedRowData?.client_id]);
 
 	return (  <>
-  <div className="relative p-3 h-full">
+  <div className="relative p-3 h-full bg-[#fbfbfb]">
     {/* Top section with display name and close button */}
     <div className="flex justify-between items-start mb-4 -mt-2">
   {tableData && (
@@ -42,7 +45,7 @@ useEffect(() => {
 
   {/* Close button */}
    <div className="flex items-center gap-2">
-    <button className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">
+    <button className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300" onClick={ ()=>  navigate("/clients/clientForm", { state: { client } })}>
       Edit
     </button>
     <button className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">
@@ -96,7 +99,10 @@ useEffect(() => {
   </ul>
 </nav>
 
-<div className="max-h-[80%] overflow-y-auto border-t border-gray-300">
+<div className="max-h-[70%] overflow-y-auto border-t border-gray-300 scrollbar-hide"   style={{
+    scrollbarWidth: 'none',          // Firefox
+    msOverflowStyle: 'none',         // IE/Edge
+  }}>
   {activeTab === 0 && <OverviewComponent tableData={tableData} />}
   {activeTab === 1 && <Comments />}
 </div>

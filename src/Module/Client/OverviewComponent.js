@@ -51,7 +51,7 @@ const OverviewComponent = ({tableData}) => {
       {/* Accordion Header */}
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="cursor-pointer bg-gray-100 py-1 flex justify-between items-center border-b border-gray-200"
+        className="cursor-pointer py-1 flex justify-between items-center border-b border-gray-200"
       >
 <h2 className="font-normal text-[13px] text-gray-800">ADDRESS</h2>
 
@@ -124,7 +124,7 @@ Add Additional Address
       {/* Accordion Header */}
       <div
         onClick={() => setIsOpenDetails(!isOpenDetails)}
-        className="cursor-pointer bg-gray-100 py-1 flex justify-between items-center border-b border-gray-200"
+        className="cursor-pointer py-1 flex justify-between items-center border-b border-gray-200"
       >
 <h2 className="font-normal text-[13px] text-gray-800">OTHER DETAILS</h2>
 
@@ -173,7 +173,7 @@ Add Additional Address
       {/* Accordion Header */}
       <div
         onClick={() => setIsOpenContact(!isOpenContact)}
-        className="cursor-pointer bg-gray-100 py-1 flex justify-between items-center border-b border-gray-200"
+        className="cursor-pointer py-1 flex justify-between items-center border-b border-gray-200"
       >
 <h2 className="font-normal text-[13px] text-gray-800">CONTACT PERSONS</h2>
 
@@ -209,7 +209,7 @@ Add Additional Address
       {/* Accordion Header */}
       <div
         onClick={() => setIsOpenRecord(!isOpenRecord)}
-        className="cursor-pointer bg-gray-100 py-1 flex justify-between items-center border-b border-gray-200"
+        className="cursor-pointer py-1 flex justify-between items-center border-b border-gray-200"
       >
 <h2 className="font-normal text-[13px] text-gray-800">RECORD INFO</h2>
         <span
@@ -252,7 +252,7 @@ Add Additional Address
 
 
       {/* Vertical divider */}
-      <div className="w-[1px] h-[600px] bg-gray-300 -mt-[25px]"></div>
+      <div className="w-[1px] h-[700px] bg-gray-300 -mt-[25px]"></div>
 
       {/* Right section - 65% */}
       <div className="w-[65%] p-4 rounded">

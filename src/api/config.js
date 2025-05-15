@@ -1337,6 +1337,17 @@ export const apiMethods = {
   },
   
  
+  getSkuByClientId:async(client_id)=>{
+    return await apiClient.get(`sku-details/client-sku/${client_id}`)
+  },
+  postSkuValuesOptions:async(body)=>{
+    return await apiClient.post(`sku-details/options`,body)
+  },
+
+  getSkuValuesOptions:async(id)=>{
+    return await apiClient.get(`sku-details/${id}/options`,)
+  }
+
 }
 
 export default apiMethods

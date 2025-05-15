@@ -11,11 +11,11 @@ import Drawer1 from '../../components/Drawer/Drawer1';
 import TableView from './TableView';
 import CIcon from '@coreui/icons-react';
 import { cilOptions } from '@coreui/icons';
-import ContentHeader from '../../components/header/ContentHeader';
 import { FiDownload, FiUpload } from 'react-icons/fi';
 import { FaUserGroup } from 'react-icons/fa6';
 import ActionButton from '../../components/New/ActionButton';
-import { Outlet, useNavigate } from 'react-router-dom';
+import ContentHeader from '../../components/New/ContentHeader';
+import { useNavigate } from 'react-router-dom';
 import CompactPagination from '../../components/New/CompactPagination';
 
 function ClientList() {

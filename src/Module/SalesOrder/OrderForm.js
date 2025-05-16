@@ -3,6 +3,7 @@ import SkuDetails from './SkuDetails'
 import apiMethods from '../../api/config';
 import ActionButton from '../../components/New/ActionButton';
 import { useSelector } from 'react-redux';
+import SalesOrderSkuform from './SalesOrderSkuform';
 
 const OrderForm = forwardRef(({
   formData,
@@ -25,7 +26,11 @@ const OrderForm = forwardRef(({
   const [errors, setErrors] = useState({});
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const [selectedClient,setSelectedClient] = useState('')
-  const stateID = useSelector(state => state.auth)
+  const stateID = useSelector(state => state.auth);
+  const [isIgstApplicable,setIsIgstApplicable] = useState(false)
+
+
+
 
 
 
@@ -54,10 +59,18 @@ const OrderForm = forwardRef(({
   }, []);
 
   // Handle client selection
-  const selectClient = (clientName,client_id) => {
+  const selectClient = (clientName,client_id,client_state_id) => {
 
     // Update form with selected client
     const event = { target: { name: 'client', value: clientName } };
+    const company_state_id = localStorage.getItem('company_state_id')
+
+    if(company_state_id == client_state_id){
+      setIsIgstApplicable(false)
+    }
+
+
+
     setSelectedClient(client_id)
     handleInputChange(event);
     setIsOpen(false);
@@ -73,7 +86,7 @@ const OrderForm = forwardRef(({
       if(selectedClient.stateID == stateID){
       alert('cgst and sgst ')
       }else{
-        // alert('igst')
+        alert('igst')
       }
 
       setSelectedClient(selectedClient?.client_id)
@@ -125,20 +138,39 @@ const OrderForm = forwardRef(({
   }, [skuDetailsForm]);
 
   // This function receives data from the SkuDetails component
-  const handleSkuForm = (skuData) => {
-    setSkuFormData(skuData);
+// This function receives data from the SkuDetails component
 
-    // Also pass the data up to the parent (AddSalesOrder)
-    if (handleSkuFormUpdate) {
-      handleSkuFormUpdate(skuData);
-    }
-  };
+
+// const handleSkuForm = (skuData) => {
+//   setSkuFormData(skuData);
+  
+//   // Add console logging here ↓
+//   console.log("SKU data updated:", skuData);
+//   console.log("Tax type applied:", isIgstApplicable ? "IGST" : "CGST+SGST");
+//   console.log("Tax totals:", isIgstApplicable ? 
+//     `IGST: ${skuData.totalGst}` : 
+//     `CGST: ${skuData.totalCGST}, SGST: ${skuData.totalSGST}`
+//   );
+
+//   // Also pass the data up to the parent (AddSalesOrder)
+//   if (handleSkuFormUpdate) {
+//     handleSkuFormUpdate(skuData);
+//   }
+// };
+
+const handleSkuForm = (skuData) =>{
+  console.log(skuData)
+}
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       const fetchClients = async () => {
         try {
-          const params = searchTerm ? { search: searchTerm } : {};
+          const params = {
+            ...(searchTerm && { search: searchTerm }),
+            limit:25,
+          };
+                    
           const response = await apiMethods.getClients(params);
           setClients(response.data); // Assuming response.data contains the client list
         } catch (error) {
@@ -353,7 +385,7 @@ const OrderForm = forwardRef(({
                             <div
                               key={index}
                               className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
-                              onClick={() => selectClient(client.company_name,client.client_id)}
+                              onClick={() => selectClient(client.company_name,client.client_id,client?.addresses?.[0]?.state)}
                             >
                               {client.company_name}
                             </div>
@@ -558,7 +590,7 @@ const OrderForm = forwardRef(({
         
 
         <div className="mt-8 mb-4">
-          <SkuDetails
+          {/* <SkuDetails
             skuDetailsForm={skuDetailsForm}
             setFormData={handleSkuForm} 
             showSubmitButton={false}
@@ -568,6 +600,12 @@ const OrderForm = forwardRef(({
             errors={errors}
             setErrors={setErrors}
             selectedClient={selectedClient}
+            setIsIgstApplicable={setIsIgstApplicable}
+          /> */}
+          <SalesOrderSkuform
+          isIgstApplicable={isIgstApplicable}
+          onSkuTableChange={handleSkuForm}
+          selectedClient={selectedClient}
           />
         </div>
 

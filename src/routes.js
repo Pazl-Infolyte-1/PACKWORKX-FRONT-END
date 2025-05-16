@@ -21,6 +21,7 @@ const Billing = React.lazy(() => import('./Module/Admin/Billing/Billing.js'))
 const Companies = React.lazy(() => import('./Module/Admin/Companies/Companies.js'))
 const WorkOrderList = React.lazy(() => import('./Module/WorkOrder/workorderlist.js'))
 const SalesOrder = React.lazy(() => import('./Module/SalesOrder/ListOfSalesOrder.js'))
+const SalesOrderView = React.lazy(() => import('./Module/SalesOrder/viewSalesOrder.js'))
 const DropDownController = React.lazy(() => import('./Module/User/DropDownController.js'))
 const Attendance = React.lazy(() => import('./Module/Attendance/Attendance.js'))
 const SalesReturn = React.lazy(() => import('./Module/SalesReturn/SalesReturn.js'))
@@ -66,7 +67,19 @@ const routes = [
 
   { path: '/workorderlist', name: 'Workorderlist', element: WorkOrderList, key: 25 },
 
-  { path: '/salesorder', name: 'SalesOrder', element: SalesOrder, key: 24 },
+  { path: '/salesorder',
+     name: 'SalesOrder',
+     element: SalesOrder,
+     key: 24,
+     children:[
+      {
+        path: 'view/:id',
+        name: 'SalesOrderView',
+        element: SalesOrderView,
+        key: "", // Give it a proper key
+      },
+     ] },
+  { path: '/salesorder/view/:id', name: 'SalesOrder', element: SalesOrderView, key:'' },
   { path: '/attendance', name: 'Attendance', element: Attendance, key: '' },
   { path: '/salesReturn', name: 'Sales Return', element: SalesReturn, key: '' },
   { path: '/purchase-return', name: 'Purchase Return', element: PurchaseReturn, key: '' },

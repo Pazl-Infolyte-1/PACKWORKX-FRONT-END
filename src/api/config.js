@@ -293,6 +293,7 @@ export const apiMethods = {
     }
   },
   getClients: async (queryParams = {}) => {
+    console.log(queryParams)
     try {
       const token = localStorage.getItem('token') // Retrieve token
       // const token = await getToken()

@@ -1,9 +1,11 @@
 import { cilDollar, cilEnvelopeOpen, cilPencil, cilPrint } from "@coreui/icons";
 import CIcon from "@coreui/icons-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIsminimiseTable}) {
-  return (
+export default function SalesOrderView({ salesOrderData = [] }) {
+  const navigate = useNavigate()
+    return (
     <div className="bg-white w-full font-sans flex flex-col" style={{height: '90vh'}}>
       {/* Header */}
       <div className="w-full bg-white z-50">
@@ -12,7 +14,7 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
           <div className="flex items-start space-x-4">
             <button className="text-black text-xs">Upload Files</button>
             <button className="text-black text-xs">Comments & History</button>
-            <button className="text-gray-500 text-sm items-start" onClick={()=>{SetviewSalesOrder(false),setIsminimiseTable(false)}}>✕</button>
+            <button className="text-gray-500 text-sm items-start" onClick={()=>{navigate('/salesorder')}}>✕</button>
           </div>
         </div>
         <div className="flex bg-gray-50 px-3 border-t text-xs">

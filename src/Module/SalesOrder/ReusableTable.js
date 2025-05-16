@@ -54,7 +54,7 @@ const handleRowClick1 = (row, e) => {
       <>
         {!isMinimiseTable ? (
           <div className="overflow-x-auto h-full w-full">
-            <CTable  className="w-full border border-gray-200 rounded-lg shadow-sm">
+            <CTable  className="w-full border border-gray-200 ">
               <CTableHead>
                 <CTableRow>
                   {columns?.map((col) => {
@@ -168,7 +168,7 @@ const handleRowClick1 = (row, e) => {
           </div>
         ) : (
           <div className="selected-row-view ">
-          <CTable className="w-full border border-gray-200 bg-white rounded-lg shadow-sm">
+          <CTable className="w-full border border-gray-200 bg-white rounded-lg ">
             <CTableBody>
               {data.map((row, rowIndex) => (
                 <CTableRow

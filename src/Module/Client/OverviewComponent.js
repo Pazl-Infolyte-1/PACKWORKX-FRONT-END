@@ -11,7 +11,6 @@ const OverviewComponent = ({ tableData }) => {
   const [isOpenContact, setIsOpenContact] = useState(true)
   const [isOpenRecord, setIsOpenRecord] = useState(true)
 
-  console.log('table data', JSON.stringify(tableData))
   return (
     <div className="flex w-full gap-4">
       {/* Left section - 35% */}

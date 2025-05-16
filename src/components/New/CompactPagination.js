@@ -4,7 +4,6 @@ import { CFormSelect } from '@coreui/react';
 import { IoSettingsOutline } from "react-icons/io5";
 
 const CompactPagination = ({ count, page, onPageChange, entriesPerPage, onEntriesChange,totalRecords, isMinimized=false }) => {
-  console.log("total rec",totalRecords)
   const handleEntriesChange = (event) => {
     const selectedValue = Number(event.target.value);
     onEntriesChange(selectedValue);

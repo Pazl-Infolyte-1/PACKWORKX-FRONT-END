@@ -15,7 +15,7 @@ import { FiDownload, FiUpload } from 'react-icons/fi'
 import { FaUserGroup } from 'react-icons/fa6'
 import ActionButton from '../../components/New/ActionButton'
 import ContentHeader from '../../components/New/ContentHeader'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import CompactPagination from '../../components/New/CompactPagination'
 
 function ClientList() {
@@ -37,6 +37,7 @@ function ClientList() {
   const [selectedRowData, setSelectedRowData] = useState(null)
   const clientListRef = useRef(null)
   const navigate = useNavigate()
+  const location = useLocation()
   const selectionFrame = {
     vendor: { id: 1, name: 'vendor', image: vendorImg },
     client: { id: 2, name: 'client', image: clientImg },
@@ -47,6 +48,15 @@ function ClientList() {
       console.log('ClientList width:', clientListRef.current.offsetWidth, 'px')
     }
   }, [])
+
+  useEffect(() => {
+    if (location.pathname === '/clients') {
+      setIsMinimized(false)
+    } else {
+      setIsMinimized(true)
+    }
+  }, [location.pathname])
+
 
   useEffect(() => {
     const fetchClientData = async () => {
@@ -267,12 +277,9 @@ function ClientList() {
         </Drawer1>
       </div>
 
-      {isMinimized && (
         <div className="flex-1 transition-all duration-300">
-          <TableView selectedRowData={selectedRowData} onClose={() => setIsMinimized(false)} />
+          <Outlet/>
         </div>
-      )}
-      {/*<Outlet />*/}
     </div>
   )
 }

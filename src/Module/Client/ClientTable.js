@@ -161,10 +161,7 @@ function ClientTable({
               {clientdata.map((client) => (
                 <CTableRow
                   key={client.client_id}
-                  onClick={() => {
-                    setIsMinimized(true)
-                    setSelectedRowData(client)
-                  }}
+                  onClick={() => navigate(`/clients/${client.client_id}`)}
                   className={`${
                     selectedRows.includes(client.client_id) ? 'bg-blue-50' : 'hover:bg-gray-50'
                   } border-b cursor-pointer`}

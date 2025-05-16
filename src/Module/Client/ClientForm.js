@@ -39,7 +39,6 @@ const ClientForm = ({
       setEditData(client)
     }
   }, [client])
-  console.log('params data', client)
   const handleClose = () => {
     setAlerts([])
   }
@@ -212,9 +211,6 @@ const ClientForm = ({
       }
     })
     setChangesCount(changes.length)
-    if (changes.length > 0) {
-      console.log('User changed the following fields:', changes)
-    }
   }, [watchedValues])
   const gstStatus = watch('clientData.gst_status')
 

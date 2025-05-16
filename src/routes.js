@@ -35,6 +35,10 @@ const StockManagement = React.lazy(() => import('./Module/StockManagement/StockM
 
 const Items = React.lazy(() => import('./Module/Inventory/Items/items.js'))
 const GRN = React.lazy(() => import('./Module/GRN/Grn.js'))
+const Products = React.lazy(() => import('./Module/Products/Products.js'))
+
+
+
 
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
@@ -95,8 +99,10 @@ const routes = [
     key: 5462,
     children: settingsRoutes,
   },
-  { path: '/inventory/items', name: 'inventory', element: Items, key: '' },
-  { path: '/stockmanagement', name: 'stockmanagement', element: StockManagement, key: '' },
+  {path:'/inventory/items',name:'inventory',element:Items,key:''},
+  {path:'/stockmanagement',name:'stockmanagement',element:StockManagement,key:''},
+  {path:'/products',name:'products',element:Products,key:''}, 
+
 ]
 
 export default routes

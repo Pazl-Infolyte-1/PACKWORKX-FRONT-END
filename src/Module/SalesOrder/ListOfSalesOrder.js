@@ -14,6 +14,7 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import SalesOrderView from './viewSalesOrder'
 import ContentHeader from '../../components/New/ContentHeader'
+import CompactPagination from '../../components/New/CompactPagination'
 
 function ListOfSalesOrder() {
   const [data, setData] = useState([])
@@ -177,14 +178,16 @@ function ListOfSalesOrder() {
 
 
         <CustomAlert alerts={alerts} handleClose={handleClose} />
-        <div className={`${isMinimiseTable ? 'w-1/4' : 'w-full'} h-full`}>
+        <div className={`${isMinimiseTable ? 'w-1/4' : 'w-full'} !h-[90vh] ` }>
         <ContentHeader
             heading={"Sales Order"}
+            isMinimized={isMinimiseTable}
             onAddClick={() => {
               setIsEditMode(false)
               setDrawerOpen(true)
             }}
           />
+          <div className='flex flex-col justify-between'>
           <SalesOrderTable
             data={filteredSearchData.length ? filteredSearchData : data}
             setActionDrawerOpen={setActionDrawerOpen}
@@ -196,17 +199,20 @@ function ListOfSalesOrder() {
             handleStatusChange={handleStatusChange}
             isMinimiseTable={isMinimiseTable}
             handleRowClick={handleRowClick}
+            
           />
 
-          {/* <div className="flex justify-end items-center gap-4 mt-4">
-            <CommonPagination
+          <div className="flex justify-end items-center gap-4  mt-2">
+            <CompactPagination
               count={ApiResponse?.totalPages}
               page={paginationParams?.currentPage || 1}
-              onChange={handlePageChange}
-              onLimitChange={handleLimitChange}
-              limit={paginationParams.pageSize}
+              onPageChange={handlePageChange}
+              onEntriesChange={handleLimitChange}
+              entriesPerPage={paginationParams.pageSize}
             />
-          </div> */}
+          </div>
+          </div>
+
 
         </div>
         {isMinimiseTable &&  (

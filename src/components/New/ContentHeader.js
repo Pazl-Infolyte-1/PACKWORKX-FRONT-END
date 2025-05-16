@@ -114,7 +114,7 @@ function ContentHeader({
         <button
           onClick={onAddClick}
           className={`flex items-center justify-center rounded-md transition-all duration-200
-    ${isMinimized ? 'w-8 h-8 text-xl bg-blue-500 text-white' : 'bg-blue-500 text-white py-1.5 px-3'}
+    ${isMinimized ? 'w-8 h-8 text-xl bg-blue-600 text-white' : 'bg-blue-500 text-white py-1.5 px-3'}
   `}
         >
           {isMinimized ? '+' : `+ ${addLabel}`}

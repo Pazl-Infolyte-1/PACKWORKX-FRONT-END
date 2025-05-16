@@ -25,13 +25,8 @@ import { TiFlowSwitch } from 'react-icons/ti'
 function ClientTable({
   clientdata,
   refreshClients,
-  setIsMinimized,
   isMinimized,
-  setSelectedRowData,
 }) {
-  //const [fakeClientData, setFakeClientData] = useState(jsonval)
-  const [isModalOpen, setModalOpen] = useState(false)
-  const [selectedClient, setSelectedClient] = useState(null) // Store selected client
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [selectedClientId, setSelectedClientId] = useState(null)
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)

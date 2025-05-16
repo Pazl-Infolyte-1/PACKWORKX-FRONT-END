@@ -12,10 +12,9 @@ import ActionButton from '../../components/New/ActionButton'
 import Loader from '../../components/New/Loader'
 import { CRow, CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
 import { useFieldArray } from 'react-hook-form'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 const ClientForm = ({
-  entity_type,
   resetForm,
   setReloadData,
 }) => {
@@ -23,16 +22,15 @@ const ClientForm = ({
   const [alerts, setAlerts] = useState([])
   const [gstNumber, setGstNumber] = useState('')
   const [gstData, setGstData] = useState(null)
-  const [entityName, setEntityName] = useState('Client')
   const [loading, setLoading] = useState(false)
   const [isGstModalOpen, setIsGstModalOpen] = useState(false)
   const [editData, setEditData] = useState(null)
   const originalDataRef = useRef(null)
   const [changesCount, setChangesCount] = useState(0)
-
   const tabs = ['Other Details', 'Address']
   const navigate = useNavigate()
   const location = useLocation()
+  const {entityType} = useParams()
   const client = location.state?.client
   useEffect(() => {
     if (client) {
@@ -49,7 +47,7 @@ const ClientForm = ({
       clientData: {
         customer_type: '',
         client_ref_id: '',
-        entity_type: entityName,
+        entity_type: entityType,
         gst_number: '',
         gst_status: false,
         salutation: '',
@@ -111,15 +109,15 @@ const ClientForm = ({
   } = methods
 
   useEffect(() => {
-    methods.setValue('clientData.entity_type', entity_type)
+    methods.setValue('clientData.entity_type', entityType)
     reset({
       ...methods.getValues(),
       clientData: {
         ...methods.getValues().clientData,
-        entity_type: entity_type,
+        entity_type: entityType,
       },
     })
-  }, [entity_type])
+  }, [entityType])
 
   useEffect(() => {
     if (editData) {
@@ -322,10 +320,6 @@ const ClientForm = ({
   }
 
   const onSubmit = async (data) => {
-    console.log('Form data:', data)
-    console.log('Form errors:', errors)
-    console.log('Is form valid:', isValid)
-
     setLoading(true)
     try {
       const filteredData = {
@@ -376,21 +370,12 @@ const ClientForm = ({
       if (editData) {
         setTimeout(() => {
           setAlerts([])
-          //refreshClientsEdit()
-          //closeDrawer()
           reset()
           navigate('/clients')
         }, 3000)
       }
-
-      //if (isDrawerOpen) {
-      //  setDrawerOpen(false)
-      //  setMessage(response.message)
-      //}
       setTimeout(() => {
         setAlerts([])
-        //refreshClients()
-        //closeDrawerDuringAdd()
         reset()
         navigate('/clients')
       }, 3000)
@@ -408,11 +393,6 @@ const ClientForm = ({
   }
 
   const handleCancel = () => {
-    //if (typeof closeDrawer === 'function') {
-    //  closeDrawer()
-    //} else if (typeof closeDrawerDuringAdd === 'function') {
-    //  closeDrawerDuringAdd()
-    //}
     reset()
     navigate('/clients')
   }
@@ -445,8 +425,9 @@ const ClientForm = ({
       </div>
       <FormProvider {...methods}>
         <div className="pr-2 pl-2 relative border-b border-gray-200 bg-white">
+          <h5 className='px-4 capitalize'>Add {entityType}</h5>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-auto">
-            <div className=" px-4 pt-4">
+            <div className=" px-4">
               {/* Reference ID */}
               <div className="mb-2">
                 <div className="flex items-center">

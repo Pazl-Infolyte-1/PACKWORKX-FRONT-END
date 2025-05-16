@@ -5,7 +5,7 @@ import ClientForm from './ClientForm'
 import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'
 import vendorImg from '../../assets/images/vendor.png'
 import clientImg from '../../assets/images/client.jpg'
-import { FaUserCheck, FaUserSlash } from 'react-icons/fa'
+import { FaUserCheck, FaUserPlus, FaUsers, FaUserSlash } from 'react-icons/fa'
 import Loader from '../../components/New/Loader'
 import Drawer1 from '../../components/Drawer/Drawer1'
 import TableView from './TableView'
@@ -34,8 +34,9 @@ function ClientList() {
   const [selectedFilter, setSelectedFilter] = useState('')
   const [loading, setLoading] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
-  const [selectedRowData, setSelectedRowData] = useState(null)
+  const [showAddDropdown, setShowAddDropdown] = useState(false)
   const clientListRef = useRef(null)
+  const dropdownRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
   const selectionFrame = {
@@ -57,6 +58,19 @@ function ClientList() {
     }
   }, [location.pathname])
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowAddDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   useEffect(() => {
     const fetchClientData = async () => {
@@ -100,6 +114,17 @@ function ClientList() {
 
   const refreshClients = () => {
     setReloadData((prev) => !prev)
+  }
+
+  const handleAddEntityClick = () => {
+    setShowAddDropdown(!showAddDropdown)
+  }
+
+  const handleEntitySelect = (type) => {
+    setEntityType(type)
+    setShowAddDropdown(false)
+    setDrawerOpen(true)
+    navigate(`/clients/clientForm/${type}`)
   }
 
   const handleSelection = (selection) => {
@@ -169,56 +194,82 @@ function ClientList() {
   return (
     <div className="flex">
       <div ref={clientListRef} className={isMinimized ? 'w-[320px] border-r' : 'w-full'}>
-        <ContentHeader
-          isMinimized={isMinimized}
-          heading="Client/Vendor"
-          onAddClick={() => navigate('/clients/clientForm')}
-          menuOptions={[
-            {
-              icon: <FiUpload className="mr-2 text-blue-500" />,
-              label: 'Import',
-              onClick: () => console.log('Import clicked'),
-            },
-            {
-              icon: <FiDownload className="mr-2 text-blue-500" />,
-              label: 'Export',
-              onClick: downloadClientExcelSheet,
-            },
-          ]}
-          headingOptions={[
-            {
-              label: 'All Clients',
-              icon: <FaUserGroup size={16} />,
-              onClick: () => console.log('All Clients selected'),
-            },
-            {
-              label: 'Active Clients',
-              icon: <FaUserCheck size={16} />,
-              onClick: () => console.log('Active Clients selected'),
-            },
-            {
-              label: 'Inactive Clients',
-              icon: <FaUserSlash size={16} />,
-              onClick: () => console.log('Inactive Clients selected'),
-            },
-          ]}
-        />
+        <div className="relative">
+          <ContentHeader
+            isMinimized={isMinimized}
+            heading="Client/Vendor"
+            onAddClick={handleAddEntityClick}
+            menuOptions={[
+              {
+                icon: <FiUpload className="mr-2 text-blue-500" />,
+                label: 'Import',
+                onClick: () => console.log('Import clicked'),
+              },
+              {
+                icon: <FiDownload className="mr-2 text-blue-500" />,
+                label: 'Export',
+                onClick: downloadClientExcelSheet,
+              },
+            ]}
+            headingOptions={[
+              {
+                label: 'All Clients',
+                icon: <FaUserGroup size={16} />,
+                onClick: () => console.log('All Clients selected'),
+              },
+              {
+                label: 'Active Clients',
+                icon: <FaUserCheck size={16} />,
+                onClick: () => console.log('Active Clients selected'),
+              },
+              {
+                label: 'Inactive Clients',
+                icon: <FaUserSlash size={16} />,
+                onClick: () => console.log('Inactive Clients selected'),
+              },
+            ]}
+          />
+
+          {showAddDropdown && (
+            <div
+              ref={dropdownRef}
+              className="absolute right-4 mt-1 w-32 bg-white rounded-md shadow-lg z-50 border border-gray-200"
+            >
+              <ul className="py-1 m-1">
+                <li
+                  className="flex gap-3 items-center px-2 py-2 text-sm text-gray-700 hover:bg-blue-600 hover:text-white rounded-md cursor-pointer"
+                  onClick={() => handleEntitySelect('Client')}
+                >
+                  <FaUserPlus />
+                  Client
+                </li>
+                <li
+                  className="flex gap-3 items-center px-2 py-2 text-sm text-gray-700 hover:bg-blue-600 hover:text-white rounded-md cursor-pointer"
+                  onClick={() => handleEntitySelect('Vendor')}
+                >
+                  <FaUsers />
+                  Vendor
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
 
         <Loader isLoading={loading} />
 
         <div className="mt-3 overflow-x-auto">
           <ClientTable
-            setSelectedRowData={setSelectedRowData}
             isMinimized={isMinimized}
-            setIsMinimized={setIsMinimized}
             refreshClients={refreshClients}
             clientdata={data}
           />
         </div>
-        <div className={`${isMinimized ? 'flex-col ' : 'flex justify-between '} items-center gap-4 m-2`}>
+        <div
+          className={`${isMinimized ? 'flex-col ' : 'flex justify-between '} items-center gap-4 m-2`}
+        >
           <div className=" flex w-32 items-center gap-1 font-normal text-sm">
             <span>Total Count:</span>
-            <span className='font-medium'>{totalRecords}</span>
+            <span className="font-medium">{totalRecords}</span>
           </div>
 
           <CompactPagination
@@ -277,9 +328,9 @@ function ClientList() {
         </Drawer1>
       </div>
 
-        <div className="flex-1 transition-all duration-300">
-          <Outlet/>
-        </div>
+      <div className="flex-1 transition-all duration-300">
+        <Outlet />
+      </div>
     </div>
   )
 }

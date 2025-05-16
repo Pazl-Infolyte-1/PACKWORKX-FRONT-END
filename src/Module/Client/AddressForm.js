@@ -4,6 +4,7 @@ import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io'
 import { FiCopy } from 'react-icons/fi'
 import { useEffect, useState } from 'react'
 import apiMethods from '../../api/config'
+import get from 'lodash/get'
 
 const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
   const {
@@ -116,7 +117,12 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     <input
                       type="text"
                       {...register(`addresses.${index}.attention`, { required: 'Required' })}
-                      className="w-64 border border-gray-300 p-1 rounded text-sm"
+           style={{
+      border: get(errors, `addresses.${index}.attention`)
+        ? '1px solid #EF4444'
+        : '1px solid #D1D5DB',
+    }}
+    className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
                     />
                   </div>
 
@@ -127,7 +133,12 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     </label>
                     <select
                       {...register(`addresses.${index}.country`, { required: 'Required' })}
-                      className="w-64 border border-gray-300 p-1 rounded text-sm"
+                             style={{
+      border: get(errors, `addresses.${index}.country`)
+        ? '1px solid #EF4444'
+        : '1px solid #D1D5DB',
+    }}
+    className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
                       defaultValue="India"
                     >
                       <option value="India">India</option>
@@ -162,7 +173,12 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     <input
                       type="text"
                       {...register(`addresses.${index}.city`, { required: 'Required' })}
-                      className="w-64 border border-gray-300 p-1 rounded text-sm"
+                 style={{
+      border: get(errors, `addresses.${index}.city`)
+        ? '1px solid #EF4444'
+        : '1px solid #D1D5DB',
+    }}
+    className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
                     />
                   </div>
 
@@ -170,8 +186,13 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                   <div className="flex items-center mb-2">
                     <label className="text-xs font-medium text-gray-600 w-24 mr-2">State</label>
                     <select
-                      {...register(`addresses.${index}.state`, { required: 'Required' })}
-                      className="w-64 border border-gray-300 p-1 rounded text-sm"
+                      {...register(`addresses.${index}.state`, { required: 'Required',setValueAs: (val) => val === '' ? null : Number(val), })}
+                       style={{
+      border: get(errors, `addresses.${index}.state`)
+        ? '1px solid #EF4444'
+        : '1px solid #D1D5DB',
+    }}
+    className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
                     >
                       <option value="">Select State</option>
                       {state.map((item) => (
@@ -188,7 +209,12 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     <input
                       type="text"
                       {...register(`addresses.${index}.pinCode`, { required: 'Required' })}
-                      className="w-64 border border-gray-300 p-1 rounded text-sm"
+                              style={{
+      border: get(errors, `addresses.${index}.pinCode`)
+        ? '1px solid #EF4444'
+        : '1px solid #D1D5DB',
+    }}
+    className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
                     />
                   </div>
 
@@ -212,13 +238,13 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                             message: 'Phone number must be exactly 10 digits',
                           },
                         })}
-                        className="border border-gray-300 p-1 rounded text-sm w-full"
+                                       style={{
+      border: get(errors, `addresses.${index}.phone`)
+        ? '1px solid #EF4444'
+        : '1px solid #D1D5DB',
+    }}
+    className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
                       />
-                      {errors?.addresses?.[index]?.phone && (
-                        <span className="text-red-500 text-xs mt-1">
-                          {errors.addresses[index].phone.message}
-                        </span>
-                      )}
                     </div>
                   </div>
                 </div>

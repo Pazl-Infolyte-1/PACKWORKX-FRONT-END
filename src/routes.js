@@ -1,15 +1,13 @@
 import React from 'react'
 import settingsRoutes from './Module/Settings/SettingsRoutes.js'
-import SkuAddEdit from './Module/SKU/SkuAddEdit.js'
 const SettingsLayout = React.lazy(() => import('./Module/Settings/SettingsLayout.js'))
-
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Client = React.lazy(() => import('./Module/Client/ClientList.js'))
 const OverviewComponent = React.lazy(() => import('./Module/Client/OverviewComponent'))
-const ClientForm = React.lazy(() => import('./Module/Client/ClientForm.js'));
+const ClientForm = React.lazy(() => import('./Module/Client/ClientForm.js'))
 const SKU = React.lazy(() => import('./Module/SKU/SkuList.js'))
-//const SKUaddEdit = React.lazy(() => import('./Module/SKU/SkuAddEdit.js'))
+const SkuAddEdit = React.lazy(() => import('./Module/SKU/SkuAddEdit.js'))
 const EmployeeList = React.lazy(() => import('./Module/HRMS/Employee/EmployeeList.js'))
 const PurchaseOrder = React.lazy(() => import('./Module/Purchase/PurchaseOrder.js'))
 const MachineDashboard = React.lazy(() => import('./Module/Machine/MachineDashboard.js'))
@@ -46,21 +44,36 @@ const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },
   { path: '/clients', name: 'Clients', element: Client, key: 10 },
-  
+
   { path: '/clients/clientForm', name: 'Add Client', element: ClientForm, key: '10-1' },
   { path: '/SKU', name: 'SKU', element: SKU, key: 23 },
-  //{ path: '/SKU/add-edit', name: 'Add/Edit SKU', element: SKU, key: 'SKU_ADD_EDIT'},
+  {
+    path: '/sku/add',
+    name: 'Add SKU',
+    element: SkuAddEdit ,
+    key: 'SKU_ADD',
+  },
+  {
+    path: '/sku/edit/:id',
+    name: 'Edit SKU',
+    element: SkuAddEdit ,
+    key: 'SKU_EDIT',
+  },
   { path: '/employeelist', name: 'Employee List', element: EmployeeList, key: 21 },
   { path: '/purchaseorder', name: 'Purchase Order', element: PurchaseOrder, key: 29 },
   { path: '/machinedashboard', name: 'Machine Dashboard', element: MachineDashboard, key: 22 },
-  { path: '/machinedashboard/form', name: 'Form Machine Dashboard', element: AddEditMachine, key: 22 },
+  {
+    path: '/machinedashboard/form',
+    name: 'Form Machine Dashboard',
+    element: AddEditMachine,
+    key: 22,
+  },
   { path: '/inventoryhandling', name: 'Inventory Handling', element: InventoryHandling, key: 28 },
   { path: '/production', name: 'Production', element: Production, key: 26 },
   { path: '/packages', name: 'Packages', element: Packages, key: 5001 },
   { path: '/process', name: 'Process', element: Process, key: 5007 },
   { path: '/routeprocess', name: 'Route Process', element: RouteProcess, key: 5008 },
   { path: '/grn', name: 'GRN', element: GRN, key: 5009 },
-
 
   { path: '/billing', name: 'Billing', element: Billing, key: 5003 },
   { path: '/companies', name: 'Companies', element: Companies, key: 5002 },

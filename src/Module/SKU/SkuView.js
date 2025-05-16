@@ -9,7 +9,7 @@ const SkuView = ({ setIsMinimized, selectedSku, handleSkuEdit }) => {
   const containerRef = useRef(null)
 
   // Tabs available in the interface
-  const tabs = ['Overview', 'Comments', 'Transactions', 'Mails', 'Statement']
+  const tabs = ['Overview']
 
   useEffect(() => {
     const updateHeight = () => {

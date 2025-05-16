@@ -17,6 +17,7 @@ import ActionButton from '../../components/New/ActionButton'
 import ContentHeader from '../../components/New/ContentHeader'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import CompactPagination from '../../components/New/CompactPagination'
+import { useSearch } from '../../components/New/SearchContext'
 
 function ClientList() {
   const [selected, setSelected] = useState('vendor')
@@ -29,7 +30,7 @@ function ClientList() {
   const [totalRecords, setTotalRecords] = useState(null)
   const [totalPage, setTotalPage] = useState(1)
   const [data, setData] = useState([])
-  const [searchQuery, setSearchQuery] = useState('')
+  // const [searchQuery, setSearchQuery] = useState('')
   const [entriesPerPage, setEntriesPerPage] = useState(5)
   const [selectedFilter, setSelectedFilter] = useState('')
   const [loading, setLoading] = useState(false)
@@ -39,6 +40,7 @@ function ClientList() {
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
+   const { setGlobalPlaceholder, searchQuery  } = useSearch()
   const selectionFrame = {
     vendor: { id: 1, name: 'vendor', image: vendorImg },
     client: { id: 2, name: 'client', image: clientImg },
@@ -49,6 +51,16 @@ function ClientList() {
       console.log('ClientList width:', clientListRef.current.offsetWidth, 'px')
     }
   }, [])
+
+    useEffect(() => {
+    // Set the placeholder when component mounts
+    setGlobalPlaceholder("Search clients....")
+    
+    // Clean up when component unmounts
+    return () => {
+      setGlobalPlaceholder("Search...") // Reset to default
+    }
+  }, [setGlobalPlaceholder])
 
   useEffect(() => {
     if (location.pathname === '/clients') {
@@ -105,7 +117,7 @@ function ClientList() {
   }
 
   const handleResetFilters = () => {
-    setSearchQuery('')
+    // setSearchQuery('')
     setCurrentPage(1)
     setEntriesPerPage(5)
     setSelectedFilter('')

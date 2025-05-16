@@ -12,9 +12,13 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
     formState: { errors },
     setValue,
     getValues,
+    watch,
   } = useFormContext()
 
-  const [state, setState] = useState([])
+  const [stateOptions, setStateOptions] = useState([])
+  
+  // Watch all address values to handle state display properly
+  const addresses = watch('addresses')
 
   // Set default country value for all addresses on initial load
   useEffect(() => {
@@ -25,10 +29,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
 
   // Function to copy billing address details to shipping address
   const copyBillingToShipping = () => {
-    // Get the billing address values (always at index 0)
     const billingAddress = getValues('addresses.0')
-
-    // Set shipping address values (always at index 1)
     setValue('addresses.1.attention', billingAddress.attention)
     setValue('addresses.1.country', billingAddress.country)
     setValue('addresses.1.street1', billingAddress.street1)
@@ -40,15 +41,15 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
   }
 
   useEffect(() => {
-    const FetchData = async () => {
+    const fetchStates = async () => {
       try {
         const response = await apiMethods.getState()
-        setState(response.data.data)
+        setStateOptions(response.data.data)
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error('Error fetching states:', error)
       }
     }
-    FetchData()
+    fetchStates()
   }, [])
 
   return (
@@ -57,6 +58,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
         {fields.map((address, index) => {
           const isExpanded = index <= 1 || expandedIndices[index]
           const isFirstShippingAddress = index === 1
+          const currentStateId = addresses?.[index]?.state
 
           return (
             <div
@@ -70,7 +72,6 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                 <div className="flex items-center gap-2">
                   <h3 className="text-base font-medium text-gray-700">{address.type} Address</h3>
 
-                  {/* Copy Billing Address button only for first Shipping address */}
                   {isFirstShippingAddress && (
                     <button
                       type="button"
@@ -83,7 +84,6 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                 </div>
 
                 <div className="flex items-center space-x-1">
-                  {/* Toggle Expand Button (Only for added cards, index > 1) */}
                   {index > 1 && (
                     <button
                       type="button"
@@ -94,7 +94,6 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                       {isExpanded ? <IoIosArrowUp size={16} /> : <IoIosArrowDown size={16} />}
                     </button>
                   )}
-                  {/* Remove Button (Only for added addresses) */}
                   {index > 1 && (
                     <button
                       type="button"
@@ -108,7 +107,6 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                 </div>
               </div>
 
-              {/* Form Fields - Show only when expanded */}
               {isExpanded && (
                 <div className="mt-1">
                   {/* Attention Field */}
@@ -117,12 +115,12 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     <input
                       type="text"
                       {...register(`addresses.${index}.attention`, { required: 'Required' })}
-           style={{
-      border: get(errors, `addresses.${index}.attention`)
-        ? '1px solid #EF4444'
-        : '1px solid #D1D5DB',
-    }}
-    className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
+                      style={{
+                        border: get(errors, `addresses.${index}.attention`)
+                          ? '1px solid #EF4444'
+                          : '1px solid #D1D5DB',
+                      }}
+                      className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
                     />
                   </div>
 
@@ -133,12 +131,12 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     </label>
                     <select
                       {...register(`addresses.${index}.country`, { required: 'Required' })}
-                             style={{
-      border: get(errors, `addresses.${index}.country`)
-        ? '1px solid #EF4444'
-        : '1px solid #D1D5DB',
-    }}
-    className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
+                      style={{
+                        border: get(errors, `addresses.${index}.country`)
+                          ? '1px solid #EF4444'
+                          : '1px solid #D1D5DB',
+                      }}
+                      className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
                       defaultValue="India"
                     >
                       <option value="India">India</option>
@@ -173,12 +171,12 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     <input
                       type="text"
                       {...register(`addresses.${index}.city`, { required: 'Required' })}
-                 style={{
-      border: get(errors, `addresses.${index}.city`)
-        ? '1px solid #EF4444'
-        : '1px solid #D1D5DB',
-    }}
-    className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
+                      style={{
+                        border: get(errors, `addresses.${index}.city`)
+                          ? '1px solid #EF4444'
+                          : '1px solid #D1D5DB',
+                      }}
+                      className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
                     />
                   </div>
 
@@ -186,16 +184,20 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                   <div className="flex items-center mb-2">
                     <label className="text-xs font-medium text-gray-600 w-24 mr-2">State</label>
                     <select
-                      {...register(`addresses.${index}.state`, { required: 'Required',setValueAs: (val) => val === '' ? null : Number(val), })}
-                       style={{
-      border: get(errors, `addresses.${index}.state`)
-        ? '1px solid #EF4444'
-        : '1px solid #D1D5DB',
-    }}
-    className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
+                      {...register(`addresses.${index}.state`, {
+                        required: 'Required',
+                        setValueAs: (val) => (val === '' ? null : Number(val)),
+                      })}
+                      style={{
+                        border: get(errors, `addresses.${index}.state`)
+                          ? '1px solid #EF4444'
+                          : '1px solid #D1D5DB',
+                      }}
+                      className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
+                      value={currentStateId || ''}
                     >
                       <option value="">Select State</option>
-                      {state.map((item) => (
+                      {stateOptions.map((item) => (
                         <option key={item.id} value={item.id}>
                           {item.states}
                         </option>
@@ -209,12 +211,12 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                     <input
                       type="text"
                       {...register(`addresses.${index}.pinCode`, { required: 'Required' })}
-                              style={{
-      border: get(errors, `addresses.${index}.pinCode`)
-        ? '1px solid #EF4444'
-        : '1px solid #D1D5DB',
-    }}
-    className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
+                      style={{
+                        border: get(errors, `addresses.${index}.pinCode`)
+                          ? '1px solid #EF4444'
+                          : '1px solid #D1D5DB',
+                      }}
+                      className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
                     />
                   </div>
 
@@ -225,7 +227,6 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                       <input
                         type="tel"
                         onKeyDown={(e) => {
-                          // Allow only numbers and specific control keys
                           if (!/[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/.test(e.key)) {
                             e.preventDefault()
                           }
@@ -238,12 +239,12 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                             message: 'Phone number must be exactly 10 digits',
                           },
                         })}
-                                       style={{
-      border: get(errors, `addresses.${index}.phone`)
-        ? '1px solid #EF4444'
-        : '1px solid #D1D5DB',
-    }}
-    className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
+                        style={{
+                          border: get(errors, `addresses.${index}.phone`)
+                            ? '1px solid #EF4444'
+                            : '1px solid #D1D5DB',
+                        }}
+                        className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
                       />
                     </div>
                   </div>

@@ -97,19 +97,45 @@ const InventoryDashboard = () => {
 
   const normalize = str => str?.toLowerCase().replace(/[\s\-]/g, '');
 
+  // const inventorySummary = useMemo(() => {
+  //   const summary = {};
+  //   inventoryData.forEach(item => {  
+  //     const type = item.inventory_type || 'Unknown';  
+  //     console.log(item.inventory_type)    
+  //     const qty = parseFloat(item.quantity_available || 0);
+  //     if (!summary[type]) {
+  //       summary[type] = { total: 0 };
+  //     }
+  //     summary[type].total += qty;
+  //   });
+  //   return summary;
+  // }, [inventoryData]);
+
   const inventorySummary = useMemo(() => {
-    const summary = {};
-    inventoryData.forEach(item => {  
-      const type = item.inventory_type || 'Unknown';  
-      console.log(item.inventory_type)    
-      const qty = parseFloat(item.quantity_available || 0);
-      if (!summary[type]) {
-        summary[type] = { total: 0 };
-      }
-      summary[type].total += qty;
-    });
-    return summary;
-  }, [inventoryData]);
+  const summary = {};
+
+  inventoryData.forEach(item => {
+    const itemId = item.item_id;
+    const matchedItem = itemData.find(i => i.id === itemId);
+
+    // Skip if item not in itemData (filteredItems will be based on itemData)
+    if (!matchedItem) return;
+
+    const type = item.inventory_type || 'Unknown';
+    const qty = parseFloat(item.quantity_available || 0);
+
+    if (!summary[type]) {
+      summary[type] = { total: 0 };
+    }
+
+    summary[type].total += qty;
+  });
+
+  return summary;
+}, [inventoryData, itemData]);
+
+
+  
 
 
   
@@ -162,6 +188,8 @@ const InventoryDashboard = () => {
       const rawTypes = [
         'reels',
         'glues',
+        'pasting-glue',
+        'corrugation-glue',
         'pins',
         'finished-goods',
         'semi-finished-goods',
@@ -184,7 +212,8 @@ const InventoryDashboard = () => {
       rawMaterialsList.some(rm => rm.item_id === item.id)
     );
     console.log("check :", relatedItemData);
-    
+    console.log('inventoryData',inventoryData);
+     
 
     return (
       <div className="p-2 border border-gray-300 my-4">
@@ -193,6 +222,7 @@ const InventoryDashboard = () => {
           <thead>
             <tr className="bg-gray-200">
               <th className="p-2 text-left">Product Name</th>
+              <th className="p-2 text-left">Quantity</th>
               <th className="p-2 text-left">Min Stock Level</th>
               <th className="p-2 text-left">Reorder Level</th>
               <th className="p-2 text-left">Product Type</th>
@@ -203,8 +233,13 @@ const InventoryDashboard = () => {
           <tbody>
             {filteredItems.length > 0 ? (
               filteredItems.map(item => (
-                <tr key={item.item_id} className="border-b border-gray-300">
+                <tr key={item.id} className="border-b border-gray-300">
                   <td className="p-2">{item.item_name}</td>
+                  {/* <td className="p-2">{item.id==inventoryData.item_id?inventoryData.quantity_available:0}</td> */}
+                  <td className="p-2">{(() => {
+                    const inventoryItem = inventoryData.find(inv => inv.item_id === item.id);
+                    return inventoryItem ? inventoryItem.quantity_available : 0;
+                  })()}</td>
                   <td className="p-2">{item.min_stock_level}</td>
                   <td className="p-2">{item.reorder_level}</td>
                   <td className="p-2">{item.item_type.toUpperCase()}</td>

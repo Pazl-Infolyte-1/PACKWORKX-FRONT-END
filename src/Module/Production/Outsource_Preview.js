@@ -17,7 +17,7 @@ import ThreeDotMenu from '../../components/ThreeDotMenu'
 function Outsource_Preview({ workOrders, setWorkOrders, setVisibleSplit }) {
   const [groupVisibleIndex, setGroupVisibleIndex] = useState(null)
 
-  const toggleCollapse = (id) => {
+  const toggleCollapse = (id) => {  
     setGroupVisibleIndex((prevIndex) => (prevIndex === id ? null : id))
   }
 

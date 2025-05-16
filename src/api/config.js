@@ -1269,9 +1269,25 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  // getinventory: async () => {
+  //   try {
+  //     return await apiClient.get('/inventory')
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // },
   getinventory: async () => {
     try {
-      return await apiClient.get('/inventory')
+      return await apiClient.get('/inventory?limit=10000'
+    )
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getPurchaseReturn: async (params) => {
+    try {
+      return await apiClient.get('/purchase-order-return', { params })
     } catch (error) {
       console.error(error)
     }
@@ -1337,6 +1353,17 @@ export const apiMethods = {
   },
   
  
+  getSkuByClientId:async(client_id)=>{
+    return await apiClient.get(`sku-details/client-sku/${client_id}`)
+  },
+  postSkuValuesOptions:async(body)=>{
+    return await apiClient.post(`sku-details/options`,body)
+  },
+
+  getSkuValuesOptions:async(id)=>{
+    return await apiClient.get(`sku-details/${id}/options`,)
+  }
+
 }
 
 export default apiMethods

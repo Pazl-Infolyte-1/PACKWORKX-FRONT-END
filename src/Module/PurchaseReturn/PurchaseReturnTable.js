@@ -8,14 +8,15 @@ import {
 } from '@coreui/react'
 import React, { useState } from 'react'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilPencil, cilTrash } from '@coreui/icons'
+import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import apiMethods from '../../api/config'
 import PopUp from '../../components/New/PopUp'
+
 // import GrnView from './GrnView'
 
 const PurchaseReturnTable = ({ 
-    poData,
+    porData,
     setPoData,
     setAlerts,
     handleEdit
@@ -65,19 +66,19 @@ const PurchaseReturnTable = ({
                 PO ID
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                GRN Date
+                Return Date
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Delivery Note No.
+                Reason
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Invoice No.
+                Notes
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Invoice Date
+                Payment terms
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Received By
+                Created By
               </CTableHeaderCell>
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
                 Action
@@ -85,8 +86,8 @@ const PurchaseReturnTable = ({
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {poData && poData.length > 0 ? (
-              poData.map((item) => (
+            {porData && porData.length > 0 ? (
+              porData.map((item) => (
                 <CTableRow key={item.id} className="border-b text-center">
                   <CTableDataCell
                     onClick={() => setOpenGrnModal({ open: true, id: item.id })}
@@ -96,33 +97,34 @@ const PurchaseReturnTable = ({
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2">{item.po_id}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2">
-                    {new Date(item.grn_date).toLocaleString()}
+                    {item.return_date}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">{item.delivery_note_no}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">{item.invoice_no}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-2">{item.reason}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-2">{item.notes}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2">
-                    {new Date(item.invoice_date).toLocaleString()}
+                    {item.payment_terms}
                   </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">{item.received_by}</CTableDataCell>
+                  <CTableDataCell className="py-3 px-2">{item.created_by}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2">
-                    {/* <ThreeDotMenu
+                    <ThreeDotMenu
                       value={[
                         {
-                          label: 'Edit Grn',
+                          label: 'View',
+                          icon: cilHandPointRight,
+                          // onClick: () => setShowPopUp(row.id),
+                        },
+                        {
+                          label: 'Edit',
                           icon: cilPencil,
-                          onClick: () => {
-                            handleEdit(item)
-                          },
+                          onClick: () => handleEdit(item),
                         },
                         {
                           label: 'Delete',
                           icon: cilTrash,
-                          onClick: () => {
-                            openDeleteModal(item.id)
-                          },
+                          // onClick: () => openDeleteModal(row.id),
                         },
                       ]}
-                    /> */}
+                    />
                   </CTableDataCell>
                 </CTableRow>
               ))

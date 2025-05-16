@@ -164,8 +164,10 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
           >
             <option value="raw-materials">Raw Materials</option>
             <option value="reels">Reels</option>
-            <option value="glues">Glues</option>
+            <option value="corrugation-glue">Corrugation Glue</option>
+            <option value="pasting-glue">Pasting Glue</option>
             <option value="pins">Pins</option>
+            <option value="semi-finished-goods">Semi Finished Goods</option>
             <option value="finished-goods">Finished Goods</option>
           </select>
           {errors.item_type && <p className="text-sm text-red-600 mt-1">{errors.item_type.message}</p>}

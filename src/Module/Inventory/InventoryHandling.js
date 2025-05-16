@@ -233,7 +233,7 @@ const InventoryDashboard = () => {
           <tbody>
             {filteredItems.length > 0 ? (
               filteredItems.map(item => (
-                <tr key={item.item_id} className="border-b border-gray-300">
+                <tr key={item.id} className="border-b border-gray-300">
                   <td className="p-2">{item.item_name}</td>
                   {/* <td className="p-2">{item.id==inventoryData.item_id?inventoryData.quantity_available:0}</td> */}
                   <td className="p-2">{(() => {

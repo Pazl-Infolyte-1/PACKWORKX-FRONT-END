@@ -131,10 +131,7 @@ function ContentHeader({
               ref={menuRef}
               className="absolute right-0 mt-2 w-48 text-xs bg-white rounded-md shadow-lg z-50 border border-gray-200"
             >
-              <div className="flex items-center justify-between bg-blue-600 text-white rounded-md px-4 py-2.5 m-1">
-                <div className="font-semibold text-center">Sort by</div>
-                <RiArrowRightDoubleFill className="mr-2" />
-              </div>
+        
               <div className="py-1">
                 {menuOptions.map((option, index) => (
                   <div

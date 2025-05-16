@@ -135,22 +135,22 @@ const navigate=useNavigate()
             className="form-checkbox h-3 w-3 text-blue-600 rounded"
           />
         </CTableHeaderCell>
-        <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+        <CTableHeaderCell className="w-48 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
           Name
         </CTableHeaderCell>
-        <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+        <CTableHeaderCell className="w-32 px-4 x-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
           Id
         </CTableHeaderCell>
-        <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+        <CTableHeaderCell className="w-40 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
           Reference Id
         </CTableHeaderCell>
-        <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+        <CTableHeaderCell className="w-52 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
           Email
         </CTableHeaderCell>
-        <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+        <CTableHeaderCell className="w-36 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
           Phone
         </CTableHeaderCell>
-        <CTableHeaderCell className="px-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+        <CTableHeaderCell className="w-24 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
           Actions
         </CTableHeaderCell>
       </CTableRow>

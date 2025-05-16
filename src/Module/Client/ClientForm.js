@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Phone from '../../assets/images/phone.png'
 import Cell from '../../assets/images/mob.png'
 import OtherDetailForm from './OtherDetailForm'
@@ -35,6 +35,9 @@ const ClientForm = ({
   const [loading, setLoading] = useState(false)
   const [isGstModalOpen, setIsGstModalOpen] = useState(false)
   const [editData,setEditData]=useState(null);
+  const originalDataRef = useRef(null)
+  const [changesCount, setChangesCount] = useState(0)
+
   const tabs = ['Other Details', 'Address']
    const navigate = useNavigate();
 const location = useLocation();
@@ -87,7 +90,7 @@ console.log("params data",client)
           street1: '',
           street2: '',
           city: '',
-          state: '',
+          state: null,
           pinCode: '',
           phone: '',
         },
@@ -98,7 +101,7 @@ console.log("params data",client)
           street1: '',
           street2: '',
           city: '',
-          state: '',
+          state: null,
           pinCode: '',
           phone: '',
         },
@@ -127,52 +130,100 @@ console.log("params data",client)
     })
   }, [entity_type])
 
-  useEffect(() => {
-    if (editData) {
-      reset({
-        clientData: {
-          customer_type: editData.customer_type || '',
-          gst_number: editData.gst_number || '',
-          gst_status: editData.gst_status ? 'true' : 'false',
-          entity_type: editData.entity_type || '',
-          salutation: editData.salutation || '',
-          first_name: editData.first_name || '',
-          last_name: editData.last_name || '',
-          display_name: editData.display_name || '',
-          company_name: editData.company_name || '',
-          email: editData.email || '',
-          work_phone: editData.work_phone || '',
-          mobile: editData.mobile || '',
-          PAN: editData.PAN || '',
-          currency: editData.currency || '',
-          payment_terms: editData.payment_terms || '',
-          portal_language: editData.portal_language || '',
-          documents: JSON.parse(editData.documents || '[]'),
-          website_url: editData.website_url || '',
-          department: editData.department || '',
-          designation: editData.designation || '',
-          opening_balance: editData.opening_balance || '',
-          twitter: editData.twitter || '',
-          skype: editData.skype || '',
-          facebook: editData.facebook || '',
-          client_ref_id: editData.client_ref_id || '',
-          company_id: editData.company_id || '',
-        },
-        addresses: editData?.addresses?.map((addr, index) => ({
-          type: index === 0 ? 'Billing' : 'Shipping',
-          attention: addr.attention || '',
-          country: addr.country || '',
-          street1: addr.street1 || '',
-          street2: addr.street2 || '',
-          city: addr.city || '',
-          state: addr.state || '',
-          pinCode: addr.pinCode || '',
-          phone: addr.phone || '',
-        })),
-      })
+ useEffect(() => {
+  if (editData) {
+    const initialFormValues = {
+      clientData: {
+        customer_type: editData.customer_type || '',
+        gst_number: editData.gst_number || '',
+        gst_status: editData.gst_status ? 'true' : 'false',
+        entity_type: editData.entity_type || '',
+        salutation: editData.salutation || '',
+        first_name: editData.first_name || '',
+        last_name: editData.last_name || '',
+        display_name: editData.display_name || '',
+        company_name: editData.company_name || '',
+        email: editData.email || '',
+        work_phone: editData.work_phone || '',
+        mobile: editData.mobile || '',
+        PAN: editData.PAN || '',
+        currency: editData.currency || '',
+        payment_terms: editData.payment_terms || '',
+        portal_language: editData.portal_language || '',
+      documents: typeof editData?.documents === 'string'
+  ? JSON.parse(editData.documents || '[]')
+  : editData?.documents || [],
+        website_url: editData.website_url || '',
+        department: editData.department || '',
+        designation: editData.designation || '',
+        opening_balance: editData.opening_balance || '',
+        twitter: editData.twitter || '',
+        skype: editData.skype || '',
+        facebook: editData.facebook || '',
+        client_ref_id: editData.client_ref_id || '',
+        company_id: editData.company_id || '',
+      },
+      addresses: editData?.addresses?.map((addr, index) => ({
+        type: index === 0 ? 'Billing' : 'Shipping',
+        attention: addr.attention || '',
+        country: addr.country || '',
+        street1: addr.street1 || '',
+        street2: addr.street2 || '',
+        city: addr.city || '',
+        state: addr.state || null,
+        pinCode: addr.pinCode || '',
+        phone: addr.phone || '',
+      })),
     }
-  }, [editData, reset])
 
+    reset(initialFormValues)
+    originalDataRef.current = initialFormValues
+  }
+}, [editData, reset])
+const watchedValues = watch()
+useEffect(() => {
+  if (!originalDataRef.current) return
+
+  const changes = []
+
+  // Compare clientData
+  for (const key in watchedValues.clientData) {
+ const current = watchedValues.clientData[key]
+const original = originalDataRef.current.clientData[key]
+
+const isArray = Array.isArray(current) && Array.isArray(original)
+const isEqual = isArray
+  ? JSON.stringify(current) === JSON.stringify(original)
+  : current === original
+
+if (!isEqual) {
+  changes.push({
+    field: `clientData.${key}`,
+    oldValue: original,
+    newValue: current,
+  })
+}
+
+  }
+
+  // Compare addresses
+  watchedValues.addresses?.forEach((addr, index) => {
+    const originalAddr = originalDataRef.current.addresses?.[index] || {}
+    for (const key in addr) {
+      if (addr[key] !== originalAddr[key]) {
+        changes.push({
+          field: `addresses[${index}].${key}`,
+          oldValue: originalAddr[key],
+          newValue: addr[key],
+        })
+      }
+    }
+  })
+  setChangesCount(changes.length)
+  if (changes.length > 0) {
+    console.log("User changed the following fields:", changes)
+  }
+}, [watchedValues])
   const gstStatus = watch('clientData.gst_status')
 
   useEffect(() => {
@@ -407,7 +458,7 @@ console.log("params data",client)
       <FormProvider {...methods}>
         <div className="pr-2 pl-2 relative border-b border-gray-200 bg-white">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-auto">
-            <div className=" p-4">
+            <div className=" px-4 pt-4">
               {/* Reference ID */}
               <div className="mb-2">
                 <div className="flex items-center">
@@ -698,37 +749,46 @@ console.log("params data",client)
             </div>
           </div>
 
-          <div className="flex justify-end items-center h-6 mb-2">
-            {activeTab === 'Address' && (
-              <ActionButton label="+ Add" onClick={addShippingAddress} variant="add" size="sm" />
-            )}
+        <CCol xs={12}>
+      <div className="d-flex align-items-center">
+        <CNav variant="tabs" className="mb-2 flex-grow-1">
+          {tabs.map((tab) => (
+            <CNavItem key={tab}>
+              <CNavLink
+                active={activeTab === tab}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveTab(tab);
+                }}
+                style={{
+                  backgroundColor: activeTab === tab ? '#8761e5' : 'transparent',
+                  color: activeTab === tab ? '#ffffff' : '#8761e5',
+                  cursor: 'pointer',
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.875rem',
+                }}
+              >
+                {tab}
+              </CNavLink>
+            </CNavItem>
+          ))}
+        </CNav>
+        
+        {/* Add button positioned on the same line as tabs */}
+        {activeTab === 'Address' && (
+          <div style={{ marginBottom: '8px' }}>
+            <ActionButton 
+              label="+ Add" 
+              onClick={addShippingAddress} 
+              variant="minimal" 
+              size="sm" 
+            />
           </div>
-
-          <CCol xs={12}>
-            <CNav variant="tabs" className="mb-2">
-              {tabs.map((tab) => (
-                <CNavItem key={tab}>
-                  <CNavLink
-                    active={activeTab === tab}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setActiveTab(tab)
-                    }}
-                    style={{
-                      backgroundColor: activeTab === tab ? '#8761e5' : 'transparent',
-                      color: activeTab === tab ? '#ffffff' : '#8761e5',
-                      cursor: 'pointer',
-                      padding: '0.5rem 1rem',
-                      fontSize: '0.875rem',
-                    }}
-                  >
-                    {tab}
-                  </CNavLink>
-                </CNavItem>
-              ))}
-            </CNav>
-          </CCol>
-
+        )}
+      </div>
+      
+      {/* Content for active tab would go here */}
+    </CCol>
           <CRow className="mb-5">
             {activeTab === 'Other Details' && <OtherDetailForm />}
             {activeTab === 'Address' && (
@@ -752,15 +812,17 @@ console.log("params data",client)
 
       <div className="flex justify-between items-center w-full pt-2 bottom-0 bg-white fixed border-t-2 border-gray-100">
         <div className="text-left my-1">
-          <button
-            className="p-1.5 rounded w-20 mr-3 text-white bg-purple-600 hover:bg-purple-700 text-sm"
-            onClick={() => {
-              checkValdation()
-              handleSubmit(onSubmit)()
-            }}
-          >
-            Save
-          </button>
+         <button
+  className="p-1.5 rounded w-20 mr-3 text-white bg-purple-600 hover:bg-purple-700 text-sm disabled:bg-gray-400"
+  disabled={!!editData && changesCount === 0}
+  onClick={() => {
+    checkValdation()
+    handleSubmit(onSubmit)()
+  }}
+>
+  Save
+</button>
+
           <button
             className="p-1.5 border border-gray-300 rounded w-20 text-sm"
             onClick={handleCancel}

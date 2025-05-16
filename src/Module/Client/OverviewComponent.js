@@ -181,9 +181,6 @@ Add Additional Address
 		 <span
           className={`text-[#438efc] text-xs ml-[140px]`}
         >
-  {/*<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-</svg>*/}
 
         </span>
         <span
@@ -252,7 +249,7 @@ Add Additional Address
 
 
       {/* Vertical divider */}
-      <div className="w-[1px] h-[700px] bg-gray-300 -mt-[25px]"></div>
+      <div className="w-[1px] bg-gray-300 self-stretch min-h-[700px]"></div>
 
       {/* Right section - 65% */}
       <div className="w-[65%] p-4 rounded">

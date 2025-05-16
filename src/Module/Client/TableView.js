@@ -34,79 +34,73 @@ useEffect(() => {
 }, [selectedRowData?.client_id]);
 
 	return (  <>
-  <div className="relative p-3 h-full bg-[#fbfbfb]">
-    {/* Top section with display name and close button */}
-    <div className="flex justify-between items-start mb-4 -mt-2">
-  {tableData && (
-    <h2 className="text-2xl font-[450] text-gray-800 mb-1">
-      {tableData.display_name}
-    </h2>
-  )}
+<div className="relative h-[calc(100vh-74px)] bg-[#fbfbfb] flex flex-col p-3">
+  {/* Header (shrink-0 ensures it doesn't stretch) */}
+  <div className="flex justify-between items-start mb-4 -mt-2 shrink-0">
+    {tableData && (
+      <h2 className="text-2xl font-[450] text-gray-800 mb-1">
+        {tableData.display_name}
+      </h2>
+    )}
 
-  {/* Close button */}
-   <div className="flex items-center gap-2">
-    <button className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300" onClick={ ()=>  navigate("/clients/clientForm", { state: { client } })}>
-      Edit
-    </button>
-    <button className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">
-  <CIcon icon={cilLink} />
-    </button>
-
-    {/* New Transaction dropdown */}
-    <div className="relative">
-      <button className="px-3 py-1 text-sm text-white bg-[#408ffb] rounded ">
-        New Transaction ▾
+    <div className="flex items-center gap-2">
+      <button
+        className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
+        onClick={() => navigate("/clients/clientForm", { state: { client } })}
+      >
+        Edit
       </button>
-      {/* Dropdown content here if needed */}
-    </div>
-
-    {/* More dropdown */}
-    <div className="relative">
       <button className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">
-        More ▾
+        <CIcon icon={cilLink} />
       </button>
-      {/* Dropdown content here if needed */}
-    </div>
 
-    {/* Close button */}
-    <button
-      onClick={onClose}
-      className="text-gray-500 hover:text-red-600 text-3xl font-bold leading-none"
-    >
-      ×
-    </button>
-  </div>
-</div>
-
-
-    {/* Tabs */}
-<nav>
-  <ul className="flex space-x-10 text-gray-700 text-sm font-normal mb-0">
-    {tabs.map((tab, index) => (
-      <li key={index}>
-        <button
-          onClick={() => setActiveTab(index)}
-          className={`pb-1 border-b-2 transition-all duration-300 ${
-            activeTab === index
-              ? 'border-blue-500 text-black'
-              : 'border-transparent text-gray-500 hover:text-black'
-          }`}
-        >
-          {tab}
+      <div className="relative">
+        <button className="px-3 py-1 text-sm text-white bg-[#408ffb] rounded">
+          New Transaction ▾
         </button>
-      </li>
-    ))}
-  </ul>
-</nav>
+      </div>
+      <div className="relative">
+        <button className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">
+          More ▾
+        </button>
+      </div>
 
-<div className="max-h-[70%] overflow-y-auto border-t border-gray-300 scrollbar-hide"   style={{
-    scrollbarWidth: 'none',          // Firefox
-    msOverflowStyle: 'none',         // IE/Edge
-  }}>
-  {activeTab === 0 && <OverviewComponent tableData={tableData} />}
-  {activeTab === 1 && <Comments />}
-</div>
+      <button
+        onClick={onClose}
+        className="text-gray-500 hover:text-red-600 text-3xl font-bold leading-none"
+      >
+        ×
+      </button>
+    </div>
   </div>
+
+  {/* Tabs */}
+  <nav className="shrink-0">
+    <ul className="flex space-x-10 text-gray-700 text-sm font-normal mb-0">
+      {tabs.map((tab, index) => (
+        <li key={index}>
+          <button
+            onClick={() => setActiveTab(index)}
+            className={`pb-1 border-b-2 transition-all duration-300 ${
+              activeTab === index
+                ? 'border-blue-500 text-black'
+                : 'border-transparent text-gray-500 hover:text-black'
+            }`}
+          >
+            {tab}
+          </button>
+        </li>
+      ))}
+    </ul>
+  </nav>
+
+  {/* Scrollable content */}
+  <div className="flex-1 overflow-y-auto border-t border-gray-300">
+    {activeTab === 0 && <OverviewComponent tableData={tableData} />}
+    {activeTab === 1 && <Comments />}
+  </div>
+</div>
+
 </>
 )
 }

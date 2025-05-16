@@ -474,7 +474,6 @@ function SkuList() {
       },
     })
     dispatch({ type: 'RESET_DIECUT_CALCULATIONS' })
-
     setDrawerOpen(true)
     setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
   }
@@ -563,8 +562,21 @@ function SkuList() {
 
         {/* Filters */}
         {!isMinimized && (
-          <div className="flex items-center justify-end flex-wrap gap-2 my-4 p-2 w-full bg-white border border-gray-200 border-b-transparent">
+          <div className="flex items-center justify-between flex-wrap gap-2 my-4 p-2 w-full bg-white border border-gray-200 border-b-transparent">
             {/* <SearchBar text="SKU" data={skudata} ref={searchBarRef} /> */}
+            <div
+              className={`w-full sm:w-[150px] flex items-center justify-between  font-bold rounded-lg  text-white border p-1`}
+            >
+              <div className="flex  gap-2 items-center">
+                <h2 className="text-xl text-white">
+                  <AiFillCarryOut className="text-white text-1xl" />
+                </h2>
+                <h2 className="text-sm font-bold text-black mt-1 ">Total Count</h2>
+              </div>
+              <div className="h-[30px] w-[30px] flex items-center justify-center rounded-lg text-black ">
+                {pagination?.totalCount}
+              </div>
+            </div>
 
             <div className="flex justify-between gap-2 w-full sm:w-auto text-xs">
               <select

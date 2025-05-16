@@ -26,6 +26,7 @@ function ClientList() {
   const [reloadData, setReloadData] = useState(false);
   const [entityType, setEntityType] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+    const [totalRecords, setTotalRecords] = useState(null);
   const [totalPage, setTotalPage] = useState(1);
   const [data, setData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,6 +61,7 @@ function ClientList() {
         const response = await apiMethods.getClients(queryParams);
         setData(response?.data || []);
         setTotalPage(response.totalPages || 1);
+        setTotalRecords(response?.totalRecords || 0);
       } catch (error) {
         console.error('Error fetching client data:', error);
       } finally {
@@ -204,8 +206,9 @@ function ClientList() {
             clientdata={data}
           />
         </div>
-  <div className="flex justify-end items-center gap-4 mt-3">
+  <div className="flex justify-end items-center gap-4 mt-[60px]">
           <CompactPagination
+          totalRecords={totalRecords}
             count={totalPage}
             page={currentPage}
             onPageChange={handlePageChange}

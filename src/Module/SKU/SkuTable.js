@@ -175,7 +175,7 @@ function SkuTable({
                       >
                         {isMinimized ? (
                           <>
-                            <CTableDataCell className="py-3 text-center">
+                            <CTableDataCell className="w-10 py-3 text-center">
                               <input
                                 type="checkbox"
                                 checked={selectedRows.includes(cell.id)}
@@ -187,7 +187,7 @@ function SkuTable({
                                 className="form-checkbox h-3 w-3 text-blue-600 rounded mx-auto"
                               />
                             </CTableDataCell>
-                            <CTableDataCell className="text-center py-3 text-sm !text-blue-600 font-semibold">
+                            <CTableDataCell className="text-start py-3 text-sm !text-blue-600 font-semibold">
                               {cell.sku_name || 'N/A'}
                             </CTableDataCell>
                           </>

@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 
 
-const tabs = ["Overview", "Comments", "Transaction", "Mails", "Statements"];
+const tabs = ["Overview"];
 const TableView=({ onClose ,selectedRowData,setSelectedRowData})=>{
 
 	console.log("row data",selectedRowData)
@@ -97,7 +97,7 @@ useEffect(() => {
   {/* Scrollable content */}
   <div className="flex-1 overflow-y-auto border-t border-gray-300">
     {activeTab === 0 && <OverviewComponent tableData={tableData} />}
-    {activeTab === 1 && <Comments />}
+    {/* {activeTab === 1 && <Comments />} */}
   </div>
 </div>
 

@@ -1,168 +1,168 @@
-import { useEffect, useState, useRef } from 'react';
-import apiMethods from '../../api/config';
-import ClientTable from './ClientTable';
-import ClientForm from './ClientForm';
-import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup';
-import vendorImg from '../../assets/images/vendor.png';
-import clientImg from '../../assets/images/client.jpg';
-import { FaUserCheck, FaUserSlash } from 'react-icons/fa';
-import Loader from '../../components/New/Loader';
-import Drawer1 from '../../components/Drawer/Drawer1';
-import TableView from './TableView';
-import CIcon from '@coreui/icons-react';
-import { cilOptions } from '@coreui/icons';
-import { FiDownload, FiUpload } from 'react-icons/fi';
-import { FaUserGroup } from 'react-icons/fa6';
-import ActionButton from '../../components/New/ActionButton';
-import ContentHeader from '../../components/New/ContentHeader';
-import { useNavigate } from 'react-router-dom';
-import CompactPagination from '../../components/New/CompactPagination';
+import { useEffect, useState, useRef } from 'react'
+import apiMethods from '../../api/config'
+import ClientTable from './ClientTable'
+import ClientForm from './ClientForm'
+import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'
+import vendorImg from '../../assets/images/vendor.png'
+import clientImg from '../../assets/images/client.jpg'
+import { FaUserCheck, FaUserSlash } from 'react-icons/fa'
+import Loader from '../../components/New/Loader'
+import Drawer1 from '../../components/Drawer/Drawer1'
+import TableView from './TableView'
+import CIcon from '@coreui/icons-react'
+import { cilOptions } from '@coreui/icons'
+import { FiDownload, FiUpload } from 'react-icons/fi'
+import { FaUserGroup } from 'react-icons/fa6'
+import ActionButton from '../../components/New/ActionButton'
+import ContentHeader from '../../components/New/ContentHeader'
+import { useNavigate } from 'react-router-dom'
+import CompactPagination from '../../components/New/CompactPagination'
 
 function ClientList() {
-  const [selected, setSelected] = useState('vendor');
-  const [triggerSelection, setTriggerSelection] = useState(false);
-  const [isPopupOpen, setPopupOpen] = useState(false);
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const [reloadData, setReloadData] = useState(false);
-  const [entityType, setEntityType] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-    const [totalRecords, setTotalRecords] = useState(null);
-  const [totalPage, setTotalPage] = useState(1);
-  const [data, setData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [entriesPerPage, setEntriesPerPage] = useState(5);
-  const [selectedFilter, setSelectedFilter] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [selectedRowData, setSelectedRowData] = useState(null);
-  const clientListRef = useRef(null);
- const navigate = useNavigate();
+  const [selected, setSelected] = useState('vendor')
+  const [triggerSelection, setTriggerSelection] = useState(false)
+  const [isPopupOpen, setPopupOpen] = useState(false)
+  const [isDrawerOpen, setDrawerOpen] = useState(false)
+  const [reloadData, setReloadData] = useState(false)
+  const [entityType, setEntityType] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalRecords, setTotalRecords] = useState(null)
+  const [totalPage, setTotalPage] = useState(1)
+  const [data, setData] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [entriesPerPage, setEntriesPerPage] = useState(5)
+  const [selectedFilter, setSelectedFilter] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
+  const [selectedRowData, setSelectedRowData] = useState(null)
+  const clientListRef = useRef(null)
+  const navigate = useNavigate()
   const selectionFrame = {
     vendor: { id: 1, name: 'vendor', image: vendorImg },
     client: { id: 2, name: 'client', image: clientImg },
-  };
+  }
 
   useEffect(() => {
     if (clientListRef.current) {
-      console.log('ClientList width:', clientListRef.current.offsetWidth, 'px');
+      console.log('ClientList width:', clientListRef.current.offsetWidth, 'px')
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     const fetchClientData = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
         const queryParams = {
           ...(searchQuery && { search: searchQuery }),
           limit: entriesPerPage,
           page: currentPage,
           entity_type: selectedFilter,
-        };
-        const response = await apiMethods.getClients(queryParams);
-        setData(response?.data || []);
-        setTotalPage(response.totalPages || 1);
-        setTotalRecords(response?.totalRecords || 0);
+        }
+        const response = await apiMethods.getClients(queryParams)
+        setData(response?.data || [])
+        setTotalPage(response.totalPages || 1)
+        setTotalRecords(response?.totalRecords || 0)
       } catch (error) {
-        console.error('Error fetching client data:', error);
+        console.error('Error fetching client data:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchClientData();
-  }, [reloadData, searchQuery, entriesPerPage, currentPage, selectedFilter]);
+    }
+    fetchClientData()
+  }, [reloadData, searchQuery, entriesPerPage, currentPage, selectedFilter])
 
   const handleEntriesChange = (newEntries) => {
-    setEntriesPerPage(newEntries);
-    setCurrentPage(1);
-  };
+    setEntriesPerPage(newEntries)
+    setCurrentPage(1)
+  }
 
   const handlePageChange = (event, newPage) => {
-    setCurrentPage(newPage);
-  };
+    setCurrentPage(newPage)
+  }
 
   const handleResetFilters = () => {
-    setSearchQuery('');
-    setCurrentPage(1);
-    setEntriesPerPage(5);
-    setSelectedFilter('');
-    setReloadData((prev) => !prev);
-  };
+    setSearchQuery('')
+    setCurrentPage(1)
+    setEntriesPerPage(5)
+    setSelectedFilter('')
+    setReloadData((prev) => !prev)
+  }
 
   const refreshClients = () => {
-    setReloadData((prev) => !prev);
-  };
+    setReloadData((prev) => !prev)
+  }
 
   const handleSelection = (selection) => {
-    const optionValue = selectionFrame[selection].id;
+    const optionValue = selectionFrame[selection].id
     if (optionValue === 2) {
-      setEntityType('Client');
+      setEntityType('Client')
     } else if (optionValue === 1) {
-      setEntityType('Vendor');
+      setEntityType('Vendor')
     }
-    setPopupOpen(false);
-    setDrawerOpen(true);
-  };
+    setPopupOpen(false)
+    setDrawerOpen(true)
+  }
 
   const handleSelectAction = (selection) => {
-    setSelected(selection);
-    setTriggerSelection(true);
-  };
+    setSelected(selection)
+    setTriggerSelection(true)
+  }
 
   const handleKeyDown = (event) => {
-    if (!isPopupOpen) return;
+    if (!isPopupOpen) return
     if (event.key === 'ArrowRight') {
-      handleSelectAction('client');
-      setEntityType('Client');
+      handleSelectAction('client')
+      setEntityType('Client')
     } else if (event.key === 'ArrowLeft') {
-      handleSelectAction('vendor');
-      setEntityType('Vendor');
+      handleSelectAction('vendor')
+      setEntityType('Vendor')
     } else if (event.key === 'Enter') {
-      setTriggerSelection(true);
+      setTriggerSelection(true)
     }
-  };
+  }
 
   useEffect(() => {
     if (triggerSelection) {
-      handleSelection(selected);
-      setTriggerSelection(false);
+      handleSelection(selected)
+      setTriggerSelection(false)
     }
-  }, [selected, triggerSelection]);
+  }, [selected, triggerSelection])
 
   useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const downloadClientExcelSheet = async () => {
     try {
       const queryParams = {
         ...(searchQuery && { search: searchQuery }),
         entity_type: selectedFilter,
-      };
-      const response = await apiMethods.downloadClientExcel(queryParams);
+      }
+      const response = await apiMethods.downloadClientExcel(queryParams)
       const blob = new Blob([response], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'clients.xlsx';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'clients.xlsx'
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
     } catch (error) {
-      console.error('Error downloading Excel:', error);
+      console.error('Error downloading Excel:', error)
     }
-  };
+  }
 
   return (
     <div className="flex">
       <div ref={clientListRef} className={isMinimized ? 'w-[320px] border-r' : 'w-full'}>
-
         <ContentHeader
-        isMinimized={isMinimized}
+          isMinimized={isMinimized}
           heading="Client/Vendor"
+          onAddClick={() => navigate('/clients/clientForm')}
           menuOptions={[
             {
               icon: <FiUpload className="mr-2 text-blue-500" />,
@@ -175,7 +175,6 @@ function ClientList() {
               onClick: downloadClientExcelSheet,
             },
           ]}
-         onAddClick={() => navigate('/clients/clientForm')}
           headingOptions={[
             {
               label: 'All Clients',
@@ -206,14 +205,20 @@ function ClientList() {
             clientdata={data}
           />
         </div>
-  <div className="flex justify-end items-center gap-4 mt-[60px]">
+        <div className={`${isMinimized ? 'flex-col ' : 'flex justify-between '} items-center gap-4 m-2`}>
+          <div className=" flex w-32 items-center gap-1 font-normal text-sm">
+            <span>Total Count:</span>
+            <span className='font-medium'>{totalRecords}</span>
+          </div>
+
           <CompactPagination
-          totalRecords={totalRecords}
+            totalRecords={totalRecords}
             count={totalPage}
             page={currentPage}
             onPageChange={handlePageChange}
             entriesPerPage={entriesPerPage}
             onEntriesChange={handleEntriesChange}
+            isMinimized={isMinimized}
           />
         </div>
         {!isDrawerOpen && (
@@ -264,15 +269,12 @@ function ClientList() {
 
       {isMinimized && (
         <div className="flex-1 transition-all duration-300">
-          <TableView
-            selectedRowData={selectedRowData}
-            onClose={() => setIsMinimized(false)}
-          />
+          <TableView selectedRowData={selectedRowData} onClose={() => setIsMinimized(false)} />
         </div>
       )}
-         {/*<Outlet />*/}
+      {/*<Outlet />*/}
     </div>
-  );
+  )
 }
 
-export default ClientList;
+export default ClientList

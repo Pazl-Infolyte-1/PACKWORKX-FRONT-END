@@ -14,10 +14,7 @@ import { CRow, CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
 import { useFieldArray } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
-const ClientForm = ({
-  resetForm,
-  setReloadData,
-}) => {
+const ClientForm = ({ resetForm, setReloadData }) => {
   const [activeTab, setActiveTab] = useState('Other Details')
   const [alerts, setAlerts] = useState([])
   const [gstNumber, setGstNumber] = useState('')
@@ -30,7 +27,7 @@ const ClientForm = ({
   const tabs = ['Other Details', 'Address']
   const navigate = useNavigate()
   const location = useLocation()
-  const {entityType} = useParams()
+  const entityType = location.state?.entityType
   const client = location.state?.client
   useEffect(() => {
     if (client) {
@@ -425,7 +422,10 @@ const ClientForm = ({
       </div>
       <FormProvider {...methods}>
         <div className="pr-2 pl-2 relative border-b border-gray-200 bg-white">
-          <h5 className='px-4 capitalize'>Add {entityType}</h5>
+          <h5 className="px-4 capitalize">
+            {editData ? `Edit ${editData.entity_type}` : `Add ${entityType}`}
+          </h5>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-auto">
             <div className=" px-4">
               {/* Reference ID */}

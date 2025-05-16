@@ -124,7 +124,9 @@ function ClientList() {
     setEntityType(type)
     setShowAddDropdown(false)
     setDrawerOpen(true)
-    navigate(`/clients/clientForm/${type}`)
+    navigate(`/clients/clientForm`, {
+    state: { entityType: type },
+  });
   }
 
   const handleSelection = (selection) => {

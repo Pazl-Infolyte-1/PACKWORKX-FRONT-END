@@ -51,7 +51,7 @@ const routes = [
     ],
   },
 
-  { path: '/clients/clientForm/:entityType', name: 'Add Client', element: ClientForm, key: '10-1' },
+  { path: '/clients/clientForm', name: 'Add Client', element: ClientForm, key: '10-1' },
   { path: '/SKU', name: 'SKU', element: SKU, key: 23 },
   {
     path: '/sku/add',

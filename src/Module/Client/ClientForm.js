@@ -12,42 +12,28 @@ import ActionButton from '../../components/New/ActionButton'
 import Loader from '../../components/New/Loader'
 import { CRow, CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
 import { useFieldArray } from 'react-hook-form'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
-const ClientForm = ({
-  //editData,
-  closeDrawer,
-  refreshClients,
-  closeDrawerDuringAdd,
-  refreshClientsEdit,
-  entity_type,
-  resetForm,
-  setDrawerOpen,
-  isDrawerOpen,
-  setMessage,
-  setReloadData,
-}) => {
+const ClientForm = ({ resetForm, setReloadData }) => {
   const [activeTab, setActiveTab] = useState('Other Details')
   const [alerts, setAlerts] = useState([])
   const [gstNumber, setGstNumber] = useState('')
   const [gstData, setGstData] = useState(null)
-  const [entityName, setEntityName] = useState('Client')
   const [loading, setLoading] = useState(false)
   const [isGstModalOpen, setIsGstModalOpen] = useState(false)
-  const [editData,setEditData]=useState(null);
+  const [editData, setEditData] = useState(null)
   const originalDataRef = useRef(null)
   const [changesCount, setChangesCount] = useState(0)
-
   const tabs = ['Other Details', 'Address']
-   const navigate = useNavigate();
-const location = useLocation();
-const client = location.state?.client;
-useEffect(() => {
-  if (client) {
-    setEditData(client);
-  }
-}, [client]);
-console.log("params data",client)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const entityType = location.state?.entityType
+  const client = location.state?.client
+  useEffect(() => {
+    if (client) {
+      setEditData(client)
+    }
+  }, [client])
   const handleClose = () => {
     setAlerts([])
   }
@@ -58,7 +44,7 @@ console.log("params data",client)
       clientData: {
         customer_type: '',
         client_ref_id: '',
-        entity_type: entityName,
+        entity_type: entityType,
         gst_number: '',
         gst_status: false,
         salutation: '',
@@ -120,110 +106,107 @@ console.log("params data",client)
   } = methods
 
   useEffect(() => {
-    methods.setValue('clientData.entity_type', entity_type)
+    methods.setValue('clientData.entity_type', entityType)
     reset({
       ...methods.getValues(),
       clientData: {
         ...methods.getValues().clientData,
-        entity_type: entity_type,
+        entity_type: entityType,
       },
     })
-  }, [entity_type])
+  }, [entityType])
 
- useEffect(() => {
-  if (editData) {
-    const initialFormValues = {
-      clientData: {
-        customer_type: editData.customer_type || '',
-        gst_number: editData.gst_number || '',
-        gst_status: editData.gst_status ? 'true' : 'false',
-        entity_type: editData.entity_type || '',
-        salutation: editData.salutation || '',
-        first_name: editData.first_name || '',
-        last_name: editData.last_name || '',
-        display_name: editData.display_name || '',
-        company_name: editData.company_name || '',
-        email: editData.email || '',
-        work_phone: editData.work_phone || '',
-        mobile: editData.mobile || '',
-        PAN: editData.PAN || '',
-        currency: editData.currency || '',
-        payment_terms: editData.payment_terms || '',
-        portal_language: editData.portal_language || '',
-      documents: typeof editData?.documents === 'string'
-  ? JSON.parse(editData.documents || '[]')
-  : editData?.documents || [],
-        website_url: editData.website_url || '',
-        department: editData.department || '',
-        designation: editData.designation || '',
-        opening_balance: editData.opening_balance || '',
-        twitter: editData.twitter || '',
-        skype: editData.skype || '',
-        facebook: editData.facebook || '',
-        client_ref_id: editData.client_ref_id || '',
-        company_id: editData.company_id || '',
-      },
-      addresses: editData?.addresses?.map((addr, index) => ({
-        type: index === 0 ? 'Billing' : 'Shipping',
-        attention: addr.attention || '',
-        country: addr.country || '',
-        street1: addr.street1 || '',
-        street2: addr.street2 || '',
-        city: addr.city || '',
-        state: addr.state || null,
-        pinCode: addr.pinCode || '',
-        phone: addr.phone || '',
-      })),
+  useEffect(() => {
+    if (editData) {
+      const initialFormValues = {
+        clientData: {
+          customer_type: editData.customer_type || '',
+          gst_number: editData.gst_number || '',
+          gst_status: editData.gst_status ? 'true' : 'false',
+          entity_type: editData.entity_type || '',
+          salutation: editData.salutation || '',
+          first_name: editData.first_name || '',
+          last_name: editData.last_name || '',
+          display_name: editData.display_name || '',
+          company_name: editData.company_name || '',
+          email: editData.email || '',
+          work_phone: editData.work_phone || '',
+          mobile: editData.mobile || '',
+          PAN: editData.PAN || '',
+          currency: editData.currency || '',
+          payment_terms: editData.payment_terms || '',
+          portal_language: editData.portal_language || '',
+          documents:
+            typeof editData?.documents === 'string'
+              ? JSON.parse(editData.documents || '[]')
+              : editData?.documents || [],
+          website_url: editData.website_url || '',
+          department: editData.department || '',
+          designation: editData.designation || '',
+          opening_balance: editData.opening_balance || '',
+          twitter: editData.twitter || '',
+          skype: editData.skype || '',
+          facebook: editData.facebook || '',
+          client_ref_id: editData.client_ref_id || '',
+          company_id: editData.company_id || '',
+        },
+        addresses: editData?.addresses?.map((addr, index) => ({
+          type: index === 0 ? 'Billing' : 'Shipping',
+          attention: addr.attention || '',
+          country: addr.country || '',
+          street1: addr.street1 || '',
+          street2: addr.street2 || '',
+          city: addr.city || '',
+          state: addr.state || null,
+          pinCode: addr.pinCode || '',
+          phone: addr.phone || '',
+        })),
+      }
+
+      reset(initialFormValues)
+      originalDataRef.current = initialFormValues
     }
+  }, [editData, reset])
+  const watchedValues = watch()
+  useEffect(() => {
+    if (!originalDataRef.current) return
 
-    reset(initialFormValues)
-    originalDataRef.current = initialFormValues
-  }
-}, [editData, reset])
-const watchedValues = watch()
-useEffect(() => {
-  if (!originalDataRef.current) return
+    const changes = []
 
-  const changes = []
+    // Compare clientData
+    for (const key in watchedValues.clientData) {
+      const current = watchedValues.clientData[key]
+      const original = originalDataRef.current.clientData[key]
 
-  // Compare clientData
-  for (const key in watchedValues.clientData) {
- const current = watchedValues.clientData[key]
-const original = originalDataRef.current.clientData[key]
+      const isArray = Array.isArray(current) && Array.isArray(original)
+      const isEqual = isArray
+        ? JSON.stringify(current) === JSON.stringify(original)
+        : current === original
 
-const isArray = Array.isArray(current) && Array.isArray(original)
-const isEqual = isArray
-  ? JSON.stringify(current) === JSON.stringify(original)
-  : current === original
-
-if (!isEqual) {
-  changes.push({
-    field: `clientData.${key}`,
-    oldValue: original,
-    newValue: current,
-  })
-}
-
-  }
-
-  // Compare addresses
-  watchedValues.addresses?.forEach((addr, index) => {
-    const originalAddr = originalDataRef.current.addresses?.[index] || {}
-    for (const key in addr) {
-      if (addr[key] !== originalAddr[key]) {
+      if (!isEqual) {
         changes.push({
-          field: `addresses[${index}].${key}`,
-          oldValue: originalAddr[key],
-          newValue: addr[key],
+          field: `clientData.${key}`,
+          oldValue: original,
+          newValue: current,
         })
       }
     }
-  })
-  setChangesCount(changes.length)
-  if (changes.length > 0) {
-    console.log("User changed the following fields:", changes)
-  }
-}, [watchedValues])
+
+    // Compare addresses
+    watchedValues.addresses?.forEach((addr, index) => {
+      const originalAddr = originalDataRef.current.addresses?.[index] || {}
+      for (const key in addr) {
+        if (addr[key] !== originalAddr[key]) {
+          changes.push({
+            field: `addresses[${index}].${key}`,
+            oldValue: originalAddr[key],
+            newValue: addr[key],
+          })
+        }
+      }
+    })
+    setChangesCount(changes.length)
+  }, [watchedValues])
   const gstStatus = watch('clientData.gst_status')
 
   useEffect(() => {
@@ -334,10 +317,6 @@ if (!isEqual) {
   }
 
   const onSubmit = async (data) => {
-    console.log('Form data:', data)
-    console.log('Form errors:', errors)
-    console.log('Is form valid:', isValid)
-
     setLoading(true)
     try {
       const filteredData = {
@@ -388,23 +367,14 @@ if (!isEqual) {
       if (editData) {
         setTimeout(() => {
           setAlerts([])
-          //refreshClientsEdit()
-          //closeDrawer()
           reset()
-                    navigate("/clients")
+          navigate('/clients')
         }, 3000)
       }
-
-      //if (isDrawerOpen) {
-      //  setDrawerOpen(false)
-      //  setMessage(response.message)
-      //}
       setTimeout(() => {
         setAlerts([])
-        //refreshClients()
-        //closeDrawerDuringAdd()
         reset()
-                  navigate("/clients")
+        navigate('/clients')
       }, 3000)
     } catch (error) {
       console.error('Error processing client:', error)
@@ -420,11 +390,6 @@ if (!isEqual) {
   }
 
   const handleCancel = () => {
-    //if (typeof closeDrawer === 'function') {
-    //  closeDrawer()
-    //} else if (typeof closeDrawerDuringAdd === 'function') {
-    //  closeDrawerDuringAdd()
-    //}
     reset()
     navigate('/clients')
   }
@@ -457,8 +422,12 @@ if (!isEqual) {
       </div>
       <FormProvider {...methods}>
         <div className="pr-2 pl-2 relative border-b border-gray-200 bg-white">
+          <h5 className="px-4 capitalize">
+            {editData ? `Edit ${editData.entity_type}` : `Add ${entityType}`}
+          </h5>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-auto">
-            <div className=" px-4 pt-4">
+            <div className=" px-4">
               {/* Reference ID */}
               <div className="mb-2">
                 <div className="flex items-center">
@@ -690,105 +659,105 @@ if (!isEqual) {
 
               {/* GST Status */}
               <div className="flex items-start space-x-8 mb-4">
-              <div className="mb-2">
-                <div className="flex items-center">
-                  <label className="text-sm w-32 after:content-['*'] after:text-red-500 after:ml-1">
-                    Do you have GST?
-                  </label>
-                  <div className="flex items-center space-x-4 h-8">
-                    <label className="flex items-center space-x-1 text-sm">
-                      <input
-                        type="radio"
-                        {...register('clientData.gst_status', { required: true })}
-                        value="true"
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setIsGstModalOpen(true)
-                          }
-                        }}
-                      />
-                      <span>Yes</span>
+                <div className="mb-2">
+                  <div className="flex items-center">
+                    <label className="text-sm w-32 after:content-['*'] after:text-red-500 after:ml-1">
+                      Do you have GST?
                     </label>
-                    <label className="flex items-center space-x-1 text-sm">
-                      <input
-                        type="radio"
-                        {...register('clientData.gst_status', { required: true })}
-                        value="false"
-                      />
-                      <span>No</span>
-                    </label>
+                    <div className="flex items-center space-x-4 h-8">
+                      <label className="flex items-center space-x-1 text-sm">
+                        <input
+                          type="radio"
+                          {...register('clientData.gst_status', { required: true })}
+                          value="true"
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setIsGstModalOpen(true)
+                            }
+                          }}
+                        />
+                        <span>Yes</span>
+                      </label>
+                      <label className="flex items-center space-x-1 text-sm">
+                        <input
+                          type="radio"
+                          {...register('clientData.gst_status', { required: true })}
+                          value="false"
+                        />
+                        <span>No</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {gstStatus === 'true' && (
-                <div className="mb-4 h-10">
-                  {/*<label className="text-sm w-32 after:content-['*'] after:text-red-500 after:ml-1">
+                {gstStatus === 'true' && (
+                  <div className="mb-4 h-10">
+                    {/*<label className="text-sm w-32 after:content-['*'] after:text-red-500 after:ml-1">
                     GST Number
                   </label>*/}
-                  <input
-                    type="text"
-                    placeholder="Enter GST Number"
-                    {...register('clientData.gst_number', {
-                      required: gstStatus === 'true' ? 'GST number is required' : false,
-                    })}
-                    className="border p-1 rounded w-[295px]"
-                    readOnly={!!gstData} // Make read-only only after data is fetched
-                  />
-                  {errors.clientData?.gst_number && (
-                    <div className="flex">
-                      <div className="w-40" /> {/* empty space to align with label */}
-                      <p className="text-red-500 text-xs">
-                        ⊛ {errors.clientData.gst_number.message}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
+                    <input
+                      type="text"
+                      placeholder="Enter GST Number"
+                      {...register('clientData.gst_number', {
+                        required: gstStatus === 'true' ? 'GST number is required' : false,
+                      })}
+                      className="border p-1 rounded w-[295px]"
+                      readOnly={!!gstData} // Make read-only only after data is fetched
+                    />
+                    {errors.clientData?.gst_number && (
+                      <div className="flex">
+                        <div className="w-40" /> {/* empty space to align with label */}
+                        <p className="text-red-500 text-xs">
+                          ⊛ {errors.clientData.gst_number.message}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
-        <CCol xs={12}>
-      <div className="d-flex align-items-center">
-        <CNav variant="tabs" className="mb-2 flex-grow-1">
-          {tabs.map((tab) => (
-            <CNavItem key={tab}>
-              <CNavLink
-                active={activeTab === tab}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveTab(tab);
-                }}
-                style={{
-                  backgroundColor: activeTab === tab ? '#8761e5' : 'transparent',
-                  color: activeTab === tab ? '#ffffff' : '#8761e5',
-                  cursor: 'pointer',
-                  padding: '0.5rem 1rem',
-                  fontSize: '0.875rem',
-                }}
-              >
-                {tab}
-              </CNavLink>
-            </CNavItem>
-          ))}
-        </CNav>
-        
-        {/* Add button positioned on the same line as tabs */}
-        {activeTab === 'Address' && (
-          <div style={{ marginBottom: '8px' }}>
-            <ActionButton 
-              label="+ Add" 
-              onClick={addShippingAddress} 
-              variant="minimal" 
-              size="sm" 
-            />
-          </div>
-        )}
-      </div>
-      
-      {/* Content for active tab would go here */}
-    </CCol>
+          <CCol xs={12}>
+            <div className="d-flex align-items-center">
+              <CNav variant="tabs" className="mb-2 flex-grow-1">
+                {tabs.map((tab) => (
+                  <CNavItem key={tab}>
+                    <CNavLink
+                      active={activeTab === tab}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setActiveTab(tab)
+                      }}
+                      style={{
+                        backgroundColor: activeTab === tab ? '#8761e5' : 'transparent',
+                        color: activeTab === tab ? '#ffffff' : '#8761e5',
+                        cursor: 'pointer',
+                        padding: '0.5rem 1rem',
+                        fontSize: '0.875rem',
+                      }}
+                    >
+                      {tab}
+                    </CNavLink>
+                  </CNavItem>
+                ))}
+              </CNav>
+
+              {/* Add button positioned on the same line as tabs */}
+              {activeTab === 'Address' && (
+                <div style={{ marginBottom: '8px' }}>
+                  <ActionButton
+                    label="+ Add"
+                    onClick={addShippingAddress}
+                    variant="minimal"
+                    size="sm"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Content for active tab would go here */}
+          </CCol>
           <CRow className="mb-5">
             {activeTab === 'Other Details' && <OtherDetailForm />}
             {activeTab === 'Address' && (
@@ -812,16 +781,16 @@ if (!isEqual) {
 
       <div className="flex justify-between items-center w-full pt-2 bottom-0 bg-white fixed border-t-2 border-gray-100">
         <div className="text-left my-1">
-         <button
-  className="p-1.5 rounded w-20 mr-3 text-white bg-purple-600 hover:bg-purple-700 text-sm disabled:bg-gray-400"
-  disabled={!!editData && changesCount === 0}
-  onClick={() => {
-    checkValdation()
-    handleSubmit(onSubmit)()
-  }}
->
-  Save
-</button>
+          <button
+            className="p-1.5 rounded w-20 mr-3 text-white bg-purple-600 hover:bg-purple-700 text-sm disabled:bg-gray-400"
+            disabled={!!editData && changesCount === 0}
+            onClick={() => {
+              checkValdation()
+              handleSubmit(onSubmit)()
+            }}
+          >
+            Save
+          </button>
 
           <button
             className="p-1.5 border border-gray-300 rounded w-20 text-sm"

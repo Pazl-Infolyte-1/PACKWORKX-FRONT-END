@@ -4,6 +4,7 @@ const SettingsLayout = React.lazy(() => import('./Module/Settings/SettingsLayout
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Client = React.lazy(() => import('./Module/Client/ClientList.js'))
+const TableView = React.lazy(() => import('./Module/Client/TableView.js'))
 const OverviewComponent = React.lazy(() => import('./Module/Client/OverviewComponent'))
 const ClientForm = React.lazy(() => import('./Module/Client/ClientForm.js'))
 const SKU = React.lazy(() => import('./Module/SKU/SkuList.js'))
@@ -39,26 +40,31 @@ const Items = React.lazy(() => import('./Module/Inventory/Items/items.js'))
 const GRN = React.lazy(() => import('./Module/GRN/Grn.js'))
 const Products = React.lazy(() => import('./Module/Products/Products.js'))
 
-
-
-
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },
-  { path: '/clients', name: 'Clients', element: Client, key: 10 },
+  {
+    path: '/clients',
+    name: 'Clients',
+    element: Client,
+    key: 10,
+    children: [
+      { path: ':id', element: TableView, key: 'Client_view' }, 
+    ],
+  },
 
   { path: '/clients/clientForm', name: 'Add Client', element: ClientForm, key: '10-1' },
   { path: '/SKU', name: 'SKU', element: SKU, key: 23 },
   {
     path: '/sku/add',
     name: 'Add SKU',
-    element: SkuAddEdit ,
+    element: SkuAddEdit,
     key: 'SKU_ADD',
   },
   {
     path: '/sku/edit/:id',
     name: 'Edit SKU',
-    element: SkuAddEdit ,
+    element: SkuAddEdit,
     key: 'SKU_EDIT',
   },
   { path: '/employeelist', name: 'Employee List', element: EmployeeList, key: 21 },
@@ -114,10 +120,9 @@ const routes = [
     key: 5462,
     children: settingsRoutes,
   },
-  {path:'/inventory/items',name:'inventory',element:Items,key:''},
-  {path:'/stockmanagement',name:'stockmanagement',element:StockManagement,key:''},
-  {path:'/products',name:'products',element:Products,key:''}, 
-
+  { path: '/inventory/items', name: 'inventory', element: Items, key: '' },
+  { path: '/stockmanagement', name: 'stockmanagement', element: StockManagement, key: '' },
+  { path: '/products', name: 'products', element: Products, key: '' },
 ]
 
 export default routes

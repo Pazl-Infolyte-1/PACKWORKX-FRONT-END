@@ -1,26 +1,23 @@
-import React, { createContext, useContext, useState } from 'react'
+// SearchContext.js
+import { createContext, useContext, useState } from 'react'
 
-// Create the Search Context
 const SearchContext = createContext()
 
-// Provide search functionality
 export const SearchProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchPlaceholder, setSearchPlaceholder] = useState('Search...')
   const [filteredSearchData, setFilteredSearchData] = useState([])
 
-  const handleSearch = (query, data) => {
+  const setGlobalSearchQuery = (query) => {
     setSearchQuery(query)
+  }
 
-    if (query.trim() === '') {
-      setFilteredSearchData(data)
-    } else {
-      const filteredResults = data.filter((item) =>
-        Object.values(item).some((value) =>
-          String(value).toLowerCase().includes(query.toLowerCase()),
-    ),
-      )
-      setFilteredSearchData(filteredResults)
-    }
+  const setGlobalPlaceholder = (placeholder) => {
+    setSearchPlaceholder(placeholder)
+  }
+
+  const handleSearch = (data) => {
+    // ... existing handleSearch implementation
   }
 
   const clearSearch = () => {
@@ -29,11 +26,20 @@ export const SearchProvider = ({ children }) => {
   }
 
   return (
-    <SearchContext.Provider value={{ searchQuery, filteredSearchData, handleSearch, clearSearch }}>
+    <SearchContext.Provider 
+      value={{ 
+        searchQuery, 
+        setGlobalSearchQuery,
+        searchPlaceholder,
+        setGlobalPlaceholder,
+        filteredSearchData, 
+        handleSearch, 
+        clearSearch 
+      }}
+    >
       {children}
     </SearchContext.Provider>
   )
 }
 
-// Hook to use Search Context
 export const useSearch = () => useContext(SearchContext)

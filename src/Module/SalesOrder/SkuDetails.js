@@ -192,6 +192,7 @@ import { Controller } from "react-hook-form";
     }, [skuDetailsForm, reset, getValues, IsIgstApplicable]);
     
     useEffect(() => {
+
       const recalculateTotals = () => {
         if (!skusData || skusData.length === 0) return;
     
@@ -203,8 +204,10 @@ import { Controller } from "react-hook-form";
         let sgst = 0, cgst = 0, igst = 0;
     
         if (IsIgstApplicable) {
+          alert('hi')
           igst = skusData.reduce((sum, item) => sum + (parseFloat(item.igstAmount) || 0), 0);
         } else {
+          alert('hello')
           sgst = skusData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0);
           cgst = skusData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
         }
@@ -311,12 +314,23 @@ import { Controller } from "react-hook-form";
     
       if (IsIgstApplicable) {
         const igstPercentage = parseFloat(values.igst) || 0;
+
         igstAmount = totalAmount * (igstPercentage / 100);
         gstAmount = igstAmount;
         total = totalAmount + igstAmount;
     
         setValue(`skus[${index}].igstAmount`, igstAmount.toFixed(2));
         setValue(`skus[${index}].totalGst`, igstAmount.toFixed(2));
+
+        console.log(`Row ${index + 1} GST Details:`, {
+          sku: values.sku,
+          quantity,
+          rate,
+          totalAmount,
+          igstPercentage: `${igstPercentage}%`,
+          igstAmount,
+          total
+        });
       } else {
         const sgstPercentage = parseFloat(values.sgst) || 0;
         const cgstPercentage = parseFloat(values.cgst) || 0;
@@ -329,6 +343,19 @@ import { Controller } from "react-hook-form";
         setValue(`skus[${index}].sgstAmount`, sgstAmount.toFixed(2));
         setValue(`skus[${index}].cgstAmount`, cgstAmount.toFixed(2));
         setValue(`skus[${index}].totalGst`, gstAmount.toFixed(2));
+
+        console.log(`Row ${index + 1} GST Details:`, {
+          sku: values.sku,
+          quantity,
+          rate,
+          totalAmount,
+          sgstPercentage: `${sgstPercentage}%`,
+          cgstPercentage: `${cgstPercentage}%`,
+          sgstAmount,
+          cgstAmount,
+          totalGst: gstAmount,
+          total
+        });
       }
     
       setValue(`skus[${index}].totalAmount`, totalAmount.toFixed(2));

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Children, useEffect, useRef, useState } from 'react'
 import SkuDetails from './SkuDetails'
 import WorkOrders from './WorkOrders'
 import { CButton, CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
@@ -52,11 +52,13 @@ const AddSalesOrder = () => {
 
 
   const handleParentSubmit = () => {
+
     if (childRef.current) {
       // Call validation method first
       const isValid = childRef.current.validateForm();
       
       if (isValid) {
+        console.log(childRef.current,'fkasdfkasdfkaskdf ')
         handleFormSubmit(childRef.current.getCompleteFormData);
       }
     }
@@ -327,7 +329,7 @@ const AddSalesOrder = () => {
 
 
   return (
-    <div className=" pt-2 p-1">
+    <div className=" pt-2 pb-12">
       <CCol xs={12}>
   <div className="flex justify-content-between">
    <CNav variant="tabs" className="flex-grow-1">

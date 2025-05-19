@@ -26,11 +26,8 @@ const OrderForm = forwardRef(({
   const [errors, setErrors] = useState({});
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const [selectedClient,setSelectedClient] = useState('')
-  const stateID = useSelector(state => state.auth);
-  const [isIgstApplicable,setIsIgstApplicable] = useState(false)
-
-
-
+  const stateID = localStorage.getItem('company_state_id');
+  const [isIgstApplicable,setIsIgstApplicable] = useState(true)
 
 
 
@@ -65,33 +62,57 @@ const OrderForm = forwardRef(({
     const event = { target: { name: 'client', value: clientName } };
     const company_state_id = localStorage.getItem('company_state_id')
 
-    if(company_state_id == client_state_id){
-      setIsIgstApplicable(false)
-    }
-
-
-
-    setSelectedClient(client_id)
-    handleInputChange(event);
-    setIsOpen(false);
-  };
-
-  useEffect(() => {
 
     const selectedClient = clients.find(
-      (client) => client.company_name === localFormData.client
+      (client) => client.company_name == clientName
     );
-  
+
     if (selectedClient) {
-      if(selectedClient.stateID == stateID){
-      alert('cgst and sgst ')
-      }else{
-        alert('igst')
+      const isSameState = selectedClient?.addresses[0]?.state == stateID;
+
+      if (isSameState) {
+        console.log('State Match: applying cgst and sgst ', selectedClient.addresses[0].state, stateID);
+      setIsIgstApplicable(false)
+      } else {
+        console.log('State Mismatch: applying igst', selectedClient.addresses[0].state, stateID);
+      setIsIgstApplicable(true)
       }
 
       setSelectedClient(selectedClient?.client_id)
     }
-  }, [localFormData.client,clients]);
+
+    // if(company_state_id == client_state_id){
+    //   setIsIgstApplicable(false)
+    // }
+
+
+
+    // setSelectedClient(client_id)
+    handleInputChange(event);
+    setIsOpen(false);
+  };
+
+  // useEffect(() => {
+
+  //   const selectedClient = clients.find(
+  //     (client) => client.company_name === localFormData.client
+  //   );
+
+  
+  //   if (selectedClient) {
+  //     const isSameState = selectedClient.addresses[0].state == stateID;
+
+  //     if (isSameState) {
+  //       console.log('State Match: applying cgst and sgst ', selectedClient.addresses[0].state, stateID);
+  //     setIsIgstApplicable(false)
+  //     } else {
+  //       console.log('State Mismatch: applying igst', selectedClient.addresses[0].state, stateID);
+  //     setIsIgstApplicable(true)
+  //     }
+
+  //     setSelectedClient(selectedClient?.client_id)
+  //   }
+  // }, [localFormData.client,clients]);
   
 
   useImperativeHandle(ref, () => ({
@@ -159,7 +180,7 @@ const OrderForm = forwardRef(({
 // };
 
 const handleSkuForm = (skuData) =>{
-  console.log(skuData)
+  console.log(skuData,'vedan with words')
 }
 
   useEffect(() => {
@@ -284,6 +305,7 @@ const handleSkuForm = (skuData) =>{
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+
 
     // Combine order form data with SKU details
     const completeFormData = {
@@ -559,7 +581,7 @@ const handleSkuForm = (skuData) =>{
         
 
         <div className="mt-8 mb-4">
-          <SkuDetails
+          {/* <SkuDetails
             skuDetailsForm={skuDetailsForm}
             setFormData={handleSkuForm} 
             showSubmitButton={false}
@@ -570,12 +592,12 @@ const handleSkuForm = (skuData) =>{
             setErrors={setErrors}
             selectedClient={selectedClient}
             setIsIgstApplicable={setIsIgstApplicable}
-          />
-          {/* <SalesOrderSkuform
+          /> */}
+          <SalesOrderSkuform
           isIgstApplicable={isIgstApplicable}
           onSkuTableChange={handleSkuForm}
           selectedClient={selectedClient}
-          /> */}
+          />
         </div>
 
         {/* Submit Buttons Section */}
@@ -592,7 +614,7 @@ const handleSkuForm = (skuData) =>{
               </button>
 
               <ActionButton
-                onClick={handleSubmit1}
+                onClick={handleSubmit}
                 className="px-4 py-2 bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
                 label={"Submit Order"}
               >

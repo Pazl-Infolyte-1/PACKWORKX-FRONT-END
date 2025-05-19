@@ -27,8 +27,7 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
   const [selectedClientId, setSelectedClientId] = useState(null)
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
   const [singleData, setSingleData] = useState(null)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [selectedClientDeleteId, setSelectedClientDeleteId] = useState(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState({ open: false, id: null })
   const [selectedRows, setSelectedRows] = useState([])
   const [alerts, setAlerts] = useState([])
   const navigate = useNavigate()
@@ -42,22 +41,16 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
     setSingleData(data)
   }
 
-  const openDeleteModal = (clientId) => {
-    setSelectedClientDeleteId(clientId)
-    setIsDeleteModalOpen(true)
-  }
-
   const closeDeleteModal = () => {
-    setIsDeleteModalOpen(false)
-    setSelectedClientDeleteId(null)
+    setIsDeleteModalOpen({ open: false, id: null })
   }
   // Handle delete confirmation
 
   const deleteClient = async () => {
-    if (!selectedClientDeleteId) return
+    if (!isDeleteModalOpen.id) return
 
     try {
-      const response = await apiMethods.deleteClient(selectedClientDeleteId)
+      const response = await apiMethods.deleteClient(isDeleteModalOpen.id)
       if (!response?.status) {
         throw new Error(response?.message || 'Failed to delete client')
       }
@@ -74,6 +67,7 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
       }, 3000)
 
       closeDeleteModal()
+      refreshClients()
     }
   }
 
@@ -230,7 +224,10 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
                                 {
                                   label: 'Delete',
                                   icon: cilTrash,
-                                  onClick: () => console.log('Delete', client),
+                                  onClick: () => setIsDeleteModalOpen({
+                                    open: true,
+                                    id: client.client_id,
+                                  }),
                                 },
                               ]}
                             />
@@ -273,12 +270,11 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
           <ClientSingleViewCard
             clientData={singleData}
             handleEdit={handleEdit}
-            openDeleteModal={openDeleteModal}
           />
         </PopUp>
 
         <ConfirmationModale
-          isOpen={isDeleteModalOpen}
+          isOpen={isDeleteModalOpen.open}
           onClose={closeDeleteModal}
           onConfirm={deleteClient}
           title="Delete Confirmation"

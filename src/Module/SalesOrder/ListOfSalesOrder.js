@@ -38,7 +38,7 @@ function ListOfSalesOrder() {
   const [isMinimiseTable, setIsminimiseTable] = useState(false)
   const naviagte = useNavigate()
   const location = useLocation()
-  
+
   const searchBarRef = useRef(null)
 
 
@@ -200,45 +200,45 @@ function ListOfSalesOrder() {
 
 
         <CustomAlert alerts={alerts} handleClose={handleClose} />
-        <div className={`${isMinimiseTable ? 'w-1/4' : 'w-full'} !h-[90vh] ` }>
-        <ContentHeader
+        <div className={`${isMinimiseTable ? 'w-1/4' : 'w-full'} !h-[90vh] `}>
+          <ContentHeader
             heading={"Sales Order"}
             isMinimized={isMinimiseTable}
             onAddClick={() => {
-              setIsEditMode(false)
-              setDrawerOpen(true)
+              naviagte('form?tab=salesOrder'); // ← added query param
             }}
           />
-          <div className='flex flex-col justify-between'>
-          <SalesOrderTable
-            data={filteredSearchData.length ? filteredSearchData : data}
-            setActionDrawerOpen={setActionDrawerOpen}
-            setVersionDrawerOpen={setVersionDrawerOpen}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-            handleView={handleView}
-            loading={loading}
-            handleStatusChange={handleStatusChange}
-            isMinimiseTable={isMinimiseTable}
-            handleRowClick={handleRowClick}
-            
-          />
 
-          <div className="flex justify-end items-center gap-4  mt-2">
-            <CompactPagination
-              count={ApiResponse?.totalPages}
-              page={paginationParams?.currentPage || 1}
-              onPageChange={handlePageChange}
-              onEntriesChange={handleLimitChange}
-              entriesPerPage={paginationParams.pageSize}
+          <div className='flex flex-col justify-between'>
+            <SalesOrderTable
+              data={filteredSearchData.length ? filteredSearchData : data}
+              setActionDrawerOpen={setActionDrawerOpen}
+              setVersionDrawerOpen={setVersionDrawerOpen}
+              handleEdit={handleEdit}
+              handleDelete={handleDelete}
+              handleView={handleView}
+              loading={loading}
+              handleStatusChange={handleStatusChange}
+              isMinimiseTable={isMinimiseTable}
+              handleRowClick={handleRowClick}
+
             />
-          </div>
+
+            <div className="flex justify-end items-center gap-4  mt-2">
+              <CompactPagination
+                count={ApiResponse?.totalPages}
+                page={paginationParams?.currentPage || 1}
+                onPageChange={handlePageChange}
+                onEntriesChange={handleLimitChange}
+                entriesPerPage={paginationParams.pageSize}
+              />
+            </div>
           </div>
 
 
         </div>
+        <Outlet />
 
-        <Outlet/>
 
         {/* {isMinimiseTable &&  (
             <SalesOrderView
@@ -258,7 +258,7 @@ function ListOfSalesOrder() {
 
         </div>
 
-        {isDrawerOpen && (
+        {/* {isDrawerOpen && (
           <Drawer isOpen={isDrawerOpen} onClose={() => handleCloseDrawer()} maxWidth="1280px">
             <AddSalesOrder
               currentTab={'salesOrder'}
@@ -271,7 +271,7 @@ function ListOfSalesOrder() {
               handleCloseDrawer={handleCloseDrawer}
             />
           </Drawer>
-        )}
+        )} */}
 
       </div>
 
@@ -318,7 +318,7 @@ export default ListOfSalesOrder
 
 
 
-          {/* <div className="flex justify-between items-center">
+{/* <div className="flex justify-between items-center">
             <div className='flex gap-1 '>
               <SearchBar text="sales order" data={data} ref={searchBarRef} />
               <select

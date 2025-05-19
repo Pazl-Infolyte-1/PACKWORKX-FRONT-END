@@ -17,7 +17,7 @@ export default function ReusableTable({
   isMinimiseTable,
   handleRowClick,
   miniScreenFields = [],
-  minHeight = '300px', // Default minimum height
+  minHeight = '70vh', // Default minimum height
 }) {
   const [selectedRow, setSelectedRow] = useState(null);
 

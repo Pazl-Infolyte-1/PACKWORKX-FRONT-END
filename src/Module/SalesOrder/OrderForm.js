@@ -153,7 +153,7 @@ const OrderForm = forwardRef(({
 //   );
 
 //   // Also pass the data up to the parent (AddSalesOrder)
-//   if (handleSkuFormUpdate) {
+//   if (handleSkuFormUpdate) { 
 //     handleSkuFormUpdate(skuData);
 //   }
 // };
@@ -264,7 +264,7 @@ const handleSkuForm = (skuData) =>{
     const skuErrors = [];
     let hasSkuError = false;
 
-    skuFormData.skuDetails?.forEach((skuItem, index) => {
+    skuFormData?.skuDetails?.forEach((skuItem, index) => {
       if (!skuItem.sku || skuItem.sku.trim() === "") {
         skuErrors[index] = "Required";
         hasSkuError = true;
@@ -318,7 +318,10 @@ const handleSkuForm = (skuData) =>{
                   </label>
                   <div className="relative" ref={dropdownRef}>
                     <div
-                      className="flex h-9 w-[30rem] items-center justify-between rounded-l border border-gray-300 px-3 text-sm cursor-pointer bg-white"
+  className={`flex h-9 w-[30rem] items-center justify-between rounded-l border px-3 text-sm cursor-pointer bg-white ${
+    attemptedSubmit && errors.client ? "ring-1 ring-red-600" : "border-gray-300"
+  }`}
+  
                       onClick={() => {
                         setIsOpen(!isOpen);
                         errors.client = "";
@@ -339,16 +342,6 @@ const handleSkuForm = (skuData) =>{
                         }
                       </span>
                     </div>
-                    {attemptedSubmit && errors.client && (
-                      <div className="text-red-500 text-xs mt-1 flex items-center absolute">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <line x1="12" y1="8" x2="12" y2="12"></line>
-                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                        </svg>
-                        {errors.client}
-                      </div>
-                    )}
 
                     {isOpen && (
                       <div className="absolute z-10 mt-1 max-h-60 w-96 overflow-y-auto rounded border border-gray-200 bg-white shadow-md">
@@ -415,24 +408,17 @@ const handleSkuForm = (skuData) =>{
                       name="sales_ui_id"
                       value={localFormData.sales_ui_id || ""}
                       onChange={handleInputChange}
-                      className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                    />
+                      className={`h-9 w-96 rounded border px-3 text-sm ${
+                        attemptedSubmit && errors.sales_ui_id ? " ring-1 ring-red-600" : "border-gray-300"
+                      }`} 
+                                         />
                     <button type='button' className="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-500">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="12" r="3" />
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
                       </svg>
                     </button>
-                    {attemptedSubmit && errors.sales_ui_id && (
-                      <div className="text-red-500 text-xs mt-1 flex items-center absolute">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <line x1="12" y1="8" x2="12" y2="12"></line>
-                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                        </svg>
-                        {errors.sales_ui_id}
-                      </div>
-                    )}
+
                   </div>
                 </div>
 
@@ -449,18 +435,10 @@ const handleSkuForm = (skuData) =>{
                       placeholder="dd/MM/yyyy"
                       value={localFormData.estimated || ""}
                       onChange={handleInputChange}
-                      className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                    />
-                    {attemptedSubmit && errors.estimated && (
-                      <div className="text-red-500 text-xs mt-1 flex items-center absolute">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <line x1="12" y1="8" x2="12" y2="12"></line>
-                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                        </svg>
-                        {errors.estimated}
-                      </div>
-                    )}
+                      className={`h-9 w-96 rounded border px-3 text-sm ${
+                        attemptedSubmit && errors.estimated ? " ring-1 ring-red-600" : "border-gray-300"
+                      }`}
+                                        />
                   </div>
                 </div>
 
@@ -476,18 +454,9 @@ const handleSkuForm = (skuData) =>{
                     name="credit_period"
                     value={localFormData.credit_period || ""}
                     onChange={handleInputChange}
-                    className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                  />
-                  {attemptedSubmit && errors.credit_period && (
-                    <div className="text-red-500 text-xs mt-1 flex items-center absolute">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                      </svg>
-                      {errors.credit_period}
-                    </div>
-                  )}
+                    className={`h-9 w-96 rounded border px-3 text-sm ${
+                      attemptedSubmit && errors.credit_period ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
+                    }`}                  />
                 </div>
               </div>
 
@@ -590,7 +559,7 @@ const handleSkuForm = (skuData) =>{
         
 
         <div className="mt-8 mb-4">
-          {/* <SkuDetails
+          <SkuDetails
             skuDetailsForm={skuDetailsForm}
             setFormData={handleSkuForm} 
             showSubmitButton={false}
@@ -601,12 +570,12 @@ const handleSkuForm = (skuData) =>{
             setErrors={setErrors}
             selectedClient={selectedClient}
             setIsIgstApplicable={setIsIgstApplicable}
-          /> */}
-          <SalesOrderSkuform
+          />
+          {/* <SalesOrderSkuform
           isIgstApplicable={isIgstApplicable}
           onSkuTableChange={handleSkuForm}
           selectedClient={selectedClient}
-          />
+          /> */}
         </div>
 
         {/* Submit Buttons Section */}

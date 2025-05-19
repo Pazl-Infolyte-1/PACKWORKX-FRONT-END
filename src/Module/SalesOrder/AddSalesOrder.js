@@ -7,9 +7,15 @@ import Loader from '../../components/New/Loader'
 import apiMethods from '../../api/config'
 import CustomAlert from '../../components/New/CustomAlert'
 import ActionButton from '../../components/New/ActionButton'
+import { useLocation, useParams } from 'react-router-dom'
 
-const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, setisEdit, fetchData,setIsFormTouched,handleCloseDrawer }) => {
-  const [activeTab, setActiveTab] = useState(currentTab)
+const AddSalesOrder = () => {
+
+ const [formTouched,setIsFormTouched] = useState(false)
+  const location = useLocation()
+  const { id: selectedSalesOrderID } = useParams();
+  const [isEdit, setIsEdit] = useState(false);
+  const [activeTab, setActiveTab] = useState()
   const [loading, setLoading] = useState(false)
   const [existingSalesOrderData, setExistingSalesOrderData] = useState('')
   const [alerts, setAlerts] = useState([]);
@@ -34,6 +40,16 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
   //     handleFormSubmit(childRef.current.getCompleteFormData)
   //   }
   // };
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const tab = queryParams.get('tab');
+
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, [location.search]);
+
 
   const handleParentSubmit = () => {
     if (childRef.current) {
@@ -194,16 +210,15 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
         response = await apiMethods.editSalesOrder(selectedSalesOrderID, payload);
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
         setTimeout(() => {
-          setDrawer(false)
+          // setDrawer(false)
         }, 1000);
       } else {
 
         response = await apiMethods.addSalesOrder(payload);
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
         setTimeout(() => {
-          setDrawer(false)
+          // setDrawer(false)
         }, 1000);
-        await fetchData()
       }
 
 
@@ -232,7 +247,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       const response = await apiMethods.createWorkOrder(formData);
       console.log('Response:', response);
       setTimeout(() => {
-        setDrawer(false)
+        // setDrawer(false)
       }, 1000);
       await fetchData(fetchData)
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
@@ -285,17 +300,15 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
         response = await apiMethods.editSalesOrder(selectedSalesOrderID, finalSalesOrder);
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
         setTimeout(() => {
-          setDrawer(false)
+          // setDrawer(false)
         }, 1000);
-        await fetchData()
       } else {
          response = await apiMethods.addSalesOrder(finalSalesOrder);
          setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
          setTimeout(() => {
-           setDrawer(false)
+          //  setDrawer(false)
          }, 1000);        
-         await fetchData()
-      }
+       }
     } catch (error) {
       console.error("Error submitting sales order:", error);
       setAlerts([{ severity: "error", message: error?.response?.data?.message ||"Failed To Update WorkOrder " }]);
@@ -305,11 +318,16 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
     }
   };
 
+  useEffect(() => {
+    setIsEdit(!!selectedSalesOrderID); // ✅ if id exists → edit mode
+  }, [selectedSalesOrderID]);
+
+
 
 
 
   return (
-    <div className="screen p-1">
+    <div className=" pt-2 p-1">
       <CCol xs={12}>
   <div className="flex justify-content-between">
    <CNav variant="tabs" className="flex-grow-1">
@@ -319,6 +337,8 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       onClick={(e) => {
         e.preventDefault()
         setActiveTab('salesOrder')
+        const params = new URLSearchParams(location.search);
+        params.set('tab', 'salesOrder');
       }}
       style={{
         backgroundColor: activeTab === 'salesOrder' ? '#8761e5' : 'transparent',
@@ -484,7 +504,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
       <div className="bg-white">
         {activeTab === 'salesOrder' && (
             <OrderForm
-            setDrawer={setDrawer}
+            // setDrawer={setDrawer}
             formData={salesDetailsForm}
             setFormData={handleSalesDetailsUpdate}
             skuDetailsForm={skuDetailsForm}
@@ -500,7 +520,7 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
         {activeTab === 'skuDetails' && (
           <div className="p-1 bg-white rounded-lg h-full">
             <WorkOrders
-              setDrawer={setDrawer}
+              // setDrawer={setDrawer}
               setWorkOrders={setWorkOrders}
               workOrders={workOrders}
               setFormData={handleWorkOrderFormUpdate}
@@ -513,7 +533,6 @@ const AddSalesOrder = ({ currentTab, isEdit, selectedSalesOrderID, setDrawer, se
               setSkuVersionsMap={setSkuVersionsMap}
               workOrderListSubmit={workOrderListSubmit}
               setIsFormTouched={setIsFormTouched}
-              handleCloseDrawer={handleCloseDrawer}
             />
           </div>
         )}

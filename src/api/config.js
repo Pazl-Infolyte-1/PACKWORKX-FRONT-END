@@ -442,7 +442,7 @@ export const apiMethods = {
 
   singleclients: async (id) => { 
   try {
-    const response = await apiClient.get(`clients/${id}`);
+    const response = await apiClient.get(`/clients/${id}`);
     return response.data;
   } catch (error) {
     console.error(error);

@@ -262,7 +262,7 @@ const removeFile = (indexToRemove) => {
 
               {/* Skype */}
               <div className="flex items-center mb-3">
-                <label className="text-xs w-32">Skype Name/Number</label>
+                <label className="text-xs w-32">Advance Payment</label>
                 <input
                   {...register('clientData.skype')}
                   type="text"

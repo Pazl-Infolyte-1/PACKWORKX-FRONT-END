@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import ContentHeader from '../../components/New/ContentHeader'
 import { FiDownload, FiUpload } from 'react-icons/fi'
 import SkuView from './SkuView'
+import CommonPagination from '../../components/New/Pagination'
 
 function SkuList() {
   const [skuType, setSkuType] = useState([])
@@ -66,7 +67,7 @@ function SkuList() {
     select_dies: null,
     no_of_parts: null,
     composite_type: null,
-    inner_outer_dimension: null,
+    inner_outer_dimension: 'Inner',
     flap_width: null,
     flap_tolerance: null,
     length_trimming_tolerance: 20,
@@ -87,6 +88,8 @@ function SkuList() {
     estimate_composite_item: null,
     description: null,
     default_sku_details: null,
+    documents:[],
+    print_type:null,
     tags: {},
     gst_percentage: null,
     sku_values: [
@@ -263,7 +266,7 @@ function SkuList() {
       if (!addNewSkuData.height) newErrors.height = 'Required'
       if (!addNewSkuData.joints) newErrors.joints = 'Required'
       if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
-      if (!addNewSkuData.inner_outer_dimension) newErrors.inner_outer_dimension = 'Required'
+      //if (!addNewSkuData.inner_outer_dimension) newErrors.inner_outer_dimension = 'Required'
       if (!addNewSkuData.flap_width) newErrors.flap_width = 'Required'
       if (!addNewSkuData.length_trimming_tolerance) newErrors.length_trimming_tolerance = 'Required'
       if (!addNewSkuData.width_trimming_tolerance) newErrors.width_trimming_tolerance = 'Required'
@@ -303,6 +306,9 @@ function SkuList() {
         length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
         deckle_size: Number(addNewSkuData.deckle_size),
         gst_percentage: Number(addNewSkuData.gst_percentage),
+            length: Number(addNewSkuData.length),
+             width: Number(addNewSkuData.width),
+             height: Number(addNewSkuData.height)
       }
       try {
         let response
@@ -380,6 +386,8 @@ function SkuList() {
       estimate_composite_item: selectedSku.estimate_composite_item || null,
       description: selectedSku.description || null,
       default_sku_details: selectedSku.default_sku_details || null,
+          documents: selectedSku.documents || [],
+    print_type:selectedSku.documents || null,
       tags: selectedSku.tags || {},
       gst_percentage: selectedSku.gst_percentage || null,
       sku_values: selectedSku.sku_values || [
@@ -643,7 +651,7 @@ function SkuList() {
         </div>
 
         {/* Pagination Section */}
-        {/* <div className="flex justify-end items-center gap-4 mt-[40px]">
+        <div className="flex justify-end items-center gap-4 mt-[40px]">
         <CommonPagination
           count={pagination?.totalPages || 1}
           page={pagination?.currentPage || 1}
@@ -665,13 +673,13 @@ function SkuList() {
           }}
           limit={limit}
         />
-      </div> */}
+      </div>
         <div>
           <SkuPopup visible={visible} setVisible={setVisible} />
         </div>
         {/*{isDrawerOpen || editTag && (*/}
         <Drawer
-          maxWidth="1280px"
+          maxWidth="1340px"
           isOpen={isDrawerOpen || editTag}
           title={editTag ? 'Edit SKU Details' : 'Add SKU Details'}
           onClose={() => {

@@ -18,6 +18,7 @@ import RoutePopup from './RoutePopup'
 import apiMethods from '../../api/config'
 import { useDispatch, useSelector } from 'react-redux'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
+import { setRscDeckleSize } from '../../action';
 function RSCBox({
   dropdownRef,
   addNewSkuData,
@@ -44,6 +45,7 @@ function RSCBox({
   setMessage,
   errors,
   setErrors,
+  setRscUnits
 }) {
   const [alerts, setAlerts] = useState([])
   const [unitTooltip, setUnitTooltip] = useState('Enter Millimeter')
@@ -65,6 +67,9 @@ function RSCBox({
   const [selectedRoutesVal, setSelectedRoutesVal] = useState([])
   const [fullRouteResponse, setFullRouteResponse] = useState(null)
   const [displayAsChips, setDisplayAsChips] = useState([])
+  
+const deckleSize = useSelector(state => state.deckleSize);
+  
   const dispatch = useDispatch()
 
   const selectionFrame = {
@@ -92,10 +97,10 @@ function RSCBox({
     const lengthBoardSize = (length + width) * 2 + lengthTrimmingTolerance + flapWidth
     const widthBoardSize = width + height + widthTrimmingTolerance
     const totalBoardSize = lengthBoardSize * widthBoardSize
-    const deckleSizeVal = widthBoardSize * upsval
+    //const deckleSizeVal = widthBoardSize * upsval
     const EPSILON = 0.001
-    const deckleSize = parseFloat(data.deckle_size) || deckleSizeVal
-
+    //const deckleSize = parseFloat(data.deckle_size) || deckleSizeVal
+    const deckleSize = parseFloat(data.deckle_size) 
     if (lengthBoardSize && widthBoardSize) {
       setErrors((prev) => {
         const newErrors = { ...prev }
@@ -105,23 +110,23 @@ function RSCBox({
       })
     }
 
-    if (deckleSize + EPSILON <= deckleSizeVal) {
-      // throw error only if clearly smaller, allowing minor float diff
-      return {
-        length_board_size_cm2: Number(lengthBoardSize.toFixed(2)),
-        width_board_size_cm2: Number(widthBoardSize.toFixed(2)),
-        board_size_cm2: Number(totalBoardSize.toFixed(2)),
-        deckle_size: Number(deckleSizeVal),
-        ups: Number(upsval.toFixed()),
-        error: `Deckle size must be greater than or equal to ${deckleSizeVal.toFixed(2)}.`,
-      }
-    }
+    //if (deckleSize + EPSILON <= deckleSizeVal) {
+    //  // throw error only if clearly smaller, allowing minor float diff
+    //  return {
+    //    length_board_size_cm2: Number(lengthBoardSize.toFixed(2)),
+    //    width_board_size_cm2: Number(widthBoardSize.toFixed(2)),
+    //    board_size_cm2: Number(totalBoardSize.toFixed(2)),
+    //    deckle_size: Number(deckleSizeVal),
+    //    ups: Number(upsval.toFixed()),
+    //    error: `Deckle size must be greater than or equal to ${deckleSizeVal.toFixed(2)}.`,
+    //  }
+    //}
 
     return {
       length_board_size_cm2: Number(lengthBoardSize.toFixed(2)),
       width_board_size_cm2: Number(widthBoardSize.toFixed(2)),
       board_size_cm2: Number(totalBoardSize.toFixed(2)),
-      deckle_size: Number(deckleSize),
+      //deckle_size: Number(deckleSize),
       ups: Number(upsval.toFixed()),
       error: '',
     }
@@ -196,7 +201,11 @@ function RSCBox({
   }
 
   const handleUnitChange = (e) => {
+
     const newUnit = e.target.value
+          console.log("Unit changed to:", newUnit);
+          setRscUnits(newUnit);
+  console.log("Previous unit:", addNewSkuData.unit);
     setUnitTooltip(
       newUnit === 'mm'
         ? 'Enter Millimeter'
@@ -482,18 +491,112 @@ function RSCBox({
     }
   }, [selectedRouteIds2])
 
-  useEffect(() => {
-    const { length, width, height } = addNewSkuData
+  //useEffect(() => {
+  //  const { length, width, height } = addNewSkuData
 
-    // Check all three values are present and not null
-    if (length && width && height) {
-      const lwhValue = `${length}X${width}X${height}`
-      setAddNewSkuData((prev) => ({
+  //  // Check all three values are present and not null
+  //  if (length && width && height) {
+  //    const lwhValue = `${length}X${width}X${height}`
+  //    setAddNewSkuData((prev) => ({
+  //      ...prev,
+  //      lwh: lwhValue,
+  //    }))
+  //  }
+  //}, [addNewSkuData.length, addNewSkuData.width, addNewSkuData.height])
+
+
+  console.log("length height",addNewSkuData.length)
+    console.log("length height",addNewSkuData.height)
+     console.log("ups",addNewSkuData.ups)
+    useEffect(() => {
+  let { length, height, ups } = addNewSkuData;
+
+  // Convert to numbers if they are strings
+  length = typeof length === 'string' ? Number(length) : length;
+  height = typeof height === 'string' ? Number(height) : height;
+  ups = typeof ups === 'string' ? Number(ups) : ups;
+
+  // Dispatch only if all are valid numbers
+  if (!isNaN(length) && !isNaN(height) && !isNaN(ups)) {
+    dispatch(setRscDeckleSize({ length, height, ups }));
+  }
+}, [addNewSkuData.length, addNewSkuData.height, addNewSkuData.ups]);
+
+
+  useEffect(() => {
+    if (deckleSize !== undefined && deckleSize !== null) {
+      setAddNewSkuData(prev => ({
         ...prev,
-        lwh: lwhValue,
-      }))
+        deckle_size: deckleSize,
+      }));
     }
-  }, [addNewSkuData.length, addNewSkuData.width, addNewSkuData.height])
+  }, [deckleSize]);
+console.log("deckle size",deckleSize)
+useEffect(() => {
+  if (
+    addNewSkuData.inner_outer_dimension === null ||
+    addNewSkuData.inner_outer_dimension === undefined ||
+    addNewSkuData.inner_outer_dimension === ""
+  ) {
+    setAddNewSkuData(prev => ({
+      ...prev,
+      inner_outer_dimension: "Inner",
+    }));
+  }
+}, [addNewSkuData.inner_outer_dimension]);
+
+const [isUploading, setIsUploading] = useState(false);
+const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
+const [fileNames, setFileNames] = useState([]); 
+const handleFileUpload = async (event) => {
+  const selectedFiles = event.target.files;
+  if (!selectedFiles || selectedFiles.length === 0) return;
+
+  setIsUploading(true);
+
+  const urls = [...uploadedFiles];
+  const names = [...fileNames];
+
+  for (let i = 0; i < selectedFiles.length; i++) {
+    const file = selectedFiles[i];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await apiMethods.uploadFile(formData);
+      const fileUrl = response?.data?.data?.file_url;
+
+      if (fileUrl) {
+        urls.push(fileUrl);
+        names.push(file.name);
+      }
+    } catch (err) {
+      console.error('File upload failed:', err);
+    }
+  }
+
+  setUploadedFiles(urls);
+    setAddNewSkuData(prev => ({
+    ...prev,
+    documents: urls
+  }));
+  setFileNames(names);
+
+  setIsUploading(false);
+  event.target.value = '';
+};
+
+// Add this function to handle file removal
+const removeFile = (indexToRemove) => {
+  const updatedUrls = uploadedFiles.filter((_, index) => index !== indexToRemove);
+  const updatedNames = fileNames.filter((_, index) => index !== indexToRemove);
+
+  setUploadedFiles(updatedUrls);
+  setFileNames(updatedNames);
+};
+
+
+  
   return (
     <div className="rounded-lg ">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -619,7 +722,7 @@ function RSCBox({
         <Tooltip title={unitTooltip}>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Dimensions <span className="text-gray-500 text-xs">(W × L × H)</span>
+              Dimensions <span className="text-gray-500 text-xs">(L × W × H)</span>
               <span className="text-red-500 ml-1">*</span>
               {errors.width === 'Required' &&
                 errors.length === 'Required' &&
@@ -709,11 +812,6 @@ function RSCBox({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Deckle Size
                 <span className="text-red-500 ml-1">*</span>
-                {errors.deckle_size && (
-                  <span className="text-red-500 text-xs ml-2 align-middle">
-                    {errors.deckle_size}
-                  </span>
-                )}
               </label>
               <input
                 id="deckle_size"
@@ -746,7 +844,8 @@ function RSCBox({
                 type="radio"
                 name="inner_outer_dimension"
                 value="Inner"
-                checked={addNewSkuData.inner_outer_dimension === 'Inner'}
+            // checked={addNewSkuData.inner_outer_dimension ? addNewSkuData.inner_outer_dimension === 'Inner' : true}
+              checked={addNewSkuData.inner_outer_dimension === 'Inner'}
                 onChange={handleChange}
                 readOnly={editTag}
                 className="mr-1 h-3.5 w-3.5 text-blue-600 focus:ring-blue-500"
@@ -968,6 +1067,65 @@ function RSCBox({
             <option value={15}>15%</option>
           </select>
         </div>
+
+      <div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">Print Type</label>
+  <select
+    id="print_type"
+    name="print_type"
+    value={addNewSkuData?.print_type || ''}
+    onChange={handleChange}
+    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+  >
+    <option value="">Select Type</option>
+    <option value="None">None</option>
+    <option value="Offset">Offset</option>
+    <option value="Flexo">Flexo</option>
+  </select>
+</div>
+
+{(addNewSkuData?.print_type === 'Offset' || addNewSkuData?.print_type === 'Flexo') && (
+    <div className="flex items-center mb-3">
+  <div className="flex flex-col w-full">
+    <input
+      type="file"
+      className="w-64 border border-gray-300 p-1.5 rounded text-sm ml-6"
+      accept="application/pdf"
+      onChange={handleFileUpload}
+      multiple
+    />
+    
+    {isUploading && (
+      <div className="text-sm text-blue-600 mt-1">Uploading files...</div>
+    )}
+    
+    {/* Display uploaded files */}
+    {uploadedFiles.length > 0 && (
+      <div className="mt-2">
+        <p className="text-xs text-gray-600 mb-1">Uploaded files:</p>
+        <ul className="space-y-1">
+          {uploadedFiles.map((file, index) => (
+            <li key={index} className="flex items-center text-sm w-[300px]">
+              <div className="flex-1 truncate">
+                {file.name || (typeof file === 'string' ? file.split('/').pop() : file.url.split('/').pop())}
+              </div>
+              <button
+                type="button"
+                onClick={() => removeFile(index)}
+                className="ml-2 text-red-500 hover:text-red-700"
+              >
+                {/* You can use an X icon from your icon library */}
+                <span>✕</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+</div>
+)}
+
       </div>
 
       {!isDrawerOpen && (

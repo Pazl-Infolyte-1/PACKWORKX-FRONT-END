@@ -7,6 +7,7 @@ import CustomAlert from "../../components/New/CustomAlert";
 const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, fetchData }) => {
   const [loading, setLoading] = useState(false);
   const [alerts, setAlerts] = useState([]);
+  const [clientData,setClientData]=useState([]);
   const [orderData, setOrderData] = useState({
     po_date: new Date().toISOString().split("T")[0],
     valid_till: "",
@@ -20,6 +21,32 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, fetchDat
   });
   const [itemsData, setItemsData] = useState([]);
 
+
+useEffect(() => {
+  const fetchVendors = async () => {
+    try {
+      const initial = await apiMethods.getClients(); 
+      const count = initial?.length || 100; 
+
+      const fullData = await apiMethods.getClients({ limit: count });
+      const clientsArray = fullData.data;
+
+      if (Array.isArray(clientsArray)) {
+        const vendorList = clientsArray.filter(client => client.entity_type === "Vendor");
+        console.log('vendorList:', vendorList);
+        setClientData(vendorList);
+      } else {
+        console.error('Expected an array but received:', clientsArray);
+      }
+    } catch (error) {
+      console.error('Error in useEffect:', error);
+    }
+  };
+
+  fetchVendors();
+}, []);
+
+ 
 
   useEffect(() => {
     if (!isEdit) {
@@ -152,6 +179,7 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, fetchDat
           onSubmit={handleFormSubmit}
           isEdit={isEdit}
           isSubmitting={loading}
+          clientData={clientData}
         />
       )}
     </div>

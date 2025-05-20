@@ -645,7 +645,7 @@ function SkuAddEdit({
                   <th className="p-2">Color</th>
                   <th className="p-2">Flute Type</th>
                   {/*<th className="p-2">Flute Ratio</th>*/}
-                  <th className="p-2">Material</th>
+                  <th className="p-2">Mills</th>
                   <th className="p-2">Weight (Kg)</th>
                   <th className="p-2">
                     Bursting Strength <br />{' '}
@@ -746,7 +746,7 @@ function SkuAddEdit({
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
                       <input
                         type="text"
-                        placeholder="Material"
+                        placeholder="Mills"
                         className="p-1 border rounded w-full"
                         value={item.material}
                         onChange={(e) => handleSkuValuesChange(index, 'material', e.target.value)}
@@ -926,7 +926,7 @@ function SkuAddEdit({
                         <td className="p-2 text-center w-full sm:w-1/12">
                           <input
                             type="text"
-                            placeholder="Material"
+                            placeholder="Mill"
                             className="p-1 border rounded w-full"
                             value={item.material}
                             onChange={(e) =>

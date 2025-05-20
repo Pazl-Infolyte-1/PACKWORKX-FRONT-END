@@ -40,6 +40,8 @@ const OrderForm = forwardRef(({
     console.log("Search term:", e.target.value);
   };
 
+ 
+
 
 
   useEffect(() => {
@@ -78,8 +80,10 @@ const OrderForm = forwardRef(({
       setIsIgstApplicable(true)
       }
 
-      setSelectedClient(selectedClient?.client_id)
     }
+    
+    setSelectedClient(selectedClient?.client_id)
+
 
     // if(company_state_id == client_state_id){
     //   setIsIgstApplicable(false)
@@ -91,6 +95,7 @@ const OrderForm = forwardRef(({
     handleInputChange(event);
     setIsOpen(false);
   };
+
 
   // useEffect(() => {
 
@@ -161,27 +166,31 @@ const OrderForm = forwardRef(({
   // This function receives data from the SkuDetails component
 // This function receives data from the SkuDetails component
 
+  useEffect(() => {
+    console.log(localFormData,'selected clientttttttttttttttttttttttr')
+  }, [selectedClient]);
 
-// const handleSkuForm = (skuData) => {
-//   setSkuFormData(skuData);
+
+const handleSkuForm = (skuData) => {
+  setSkuFormData(skuData);
   
-//   // Add console logging here ↓
-//   console.log("SKU data updated:", skuData);
-//   console.log("Tax type applied:", isIgstApplicable ? "IGST" : "CGST+SGST");
-//   console.log("Tax totals:", isIgstApplicable ? 
-//     `IGST: ${skuData.totalGst}` : 
-//     `CGST: ${skuData.totalCGST}, SGST: ${skuData.totalSGST}`
-//   );
+  // Add console logging here ↓
+  console.log("SKU data updated:", skuData);
+  console.log("Tax type applied:", isIgstApplicable ? "IGST" : "CGST+SGST");
+  console.log("Tax totals:", isIgstApplicable ? 
+    `IGST: ${skuData.totalGst}` : 
+    `CGST: ${skuData.totalCGST}, SGST: ${skuData.totalSGST}`
+  );
 
-//   // Also pass the data up to the parent (AddSalesOrder)
-//   if (handleSkuFormUpdate) { 
-//     handleSkuFormUpdate(skuData);
-//   }
-// };
+  // Also pass the data up to the parent (AddSalesOrder)
+  if (handleSkuFormUpdate) { 
+    handleSkuFormUpdate(skuData);
+  }
+};
 
-const handleSkuForm = (skuData) =>{
-  console.log(skuData,'vedan with words')
-}
+// const handleSkuForm = (skuData) =>{
+//   console.log(skuData,'vedan with words')
+// }
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -450,18 +459,17 @@ const handleSkuForm = (skuData) =>{
                   <label className="text-sm text-red-600 w-40">
                     Expected Shipment
                   </label>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      name="estimated"
-                      placeholder="dd/MM/yyyy"
-                      value={localFormData.estimated || ""}
-                      onChange={handleInputChange}
-                      className={`h-9 w-96 rounded border px-3 text-sm ${
-                        attemptedSubmit && errors.estimated ? " ring-1 ring-red-600" : "border-gray-300"
-                      }`}
-                                        />
-                  </div>
+                  <input
+  type="date"
+  name="estimated"
+  placeholder="dd/MM/yyyy"
+  value={localFormData.estimated ? localFormData.estimated.slice(0, 10) : ""}
+  onChange={handleInputChange}
+  className={`h-9 w-96 rounded border px-3 text-sm ${
+    attemptedSubmit && errors.estimated ? " ring-1 ring-red-600" : "border-gray-300"
+  }`}
+/>
+
                 </div>
 
 
@@ -499,7 +507,7 @@ const handleSkuForm = (skuData) =>{
                 </div>
               </div>
 
-        <div className="border-t border-gray-100 mt-2 pb-2 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div>
+        {/* <div className="border-t border-gray-100 mt-2 pb-2 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div> */}
 
 
               {/* Confirmation By */}
@@ -576,7 +584,7 @@ const handleSkuForm = (skuData) =>{
           </div>
         </div>
 
-        <div className="border-t border-gray-100 mt-10 pb-6 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div>
+        {/* <div className="border-t border-gray-100 mt-10 pb-6 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div> */}
 
         
 
@@ -596,7 +604,15 @@ const handleSkuForm = (skuData) =>{
           <SalesOrderSkuform
           isIgstApplicable={isIgstApplicable}
           onSkuTableChange={handleSkuForm}
-          selectedClient={selectedClient}
+          selectedClient={localFormData.client_id}
+          skuDetailsForm={skuDetailsForm}
+          setFormData={handleSkuForm} 
+             showSubmitButton={false}
+            totals={totals}
+            setTotals={setTotals}
+            setIsFormTouched={setIsFormTouched}
+            errors={errors}
+            setErrors={setErrors}
           />
         </div>
 
@@ -606,9 +622,8 @@ const handleSkuForm = (skuData) =>{
             <div className="flex gap-4">
               <button
                 type="button"
-                onClick={() => setDrawer(false)}
+                onClick={() =>''}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-all"
-                
               >
                 Cancel
               </button>

@@ -166,10 +166,13 @@ function ListOfSalesOrder() {
     handleView(row.id)
   }
 
-  const handleEdit = (id) => {
-    setSelectedSalesOrder(id)
-    setIsEditMode(true)
-    setDrawerOpen(true)
+  const handleEdit = (row) => {
+
+    naviagte(`form/${row}?tab=${'salesOrder'}`);
+    setSelectedSalesOrder(row)
+
+    // setIsEditMode(true)
+    // setDrawerOpen(true)
   }
 
   const handleStatus = (e) => {

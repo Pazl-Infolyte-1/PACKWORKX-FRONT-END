@@ -204,10 +204,8 @@ import { Controller } from "react-hook-form";
         let sgst = 0, cgst = 0, igst = 0;
     
         if (IsIgstApplicable) {
-          alert('hi')
           igst = skusData.reduce((sum, item) => sum + (parseFloat(item.igstAmount) || 0), 0);
         } else {
-          alert('hello')
           sgst = skusData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0);
           cgst = skusData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
         }

@@ -15,6 +15,7 @@ const AddSalesOrder = () => {
   const location = useLocation()
   const { id: selectedSalesOrderID } = useParams();
   const [isEdit, setIsEdit] = useState(false);
+const { id } = useParams(); // assuming the route has a parameter like /edit/:id
   const [activeTab, setActiveTab] = useState()
   const [loading, setLoading] = useState(false)
   const [existingSalesOrderData, setExistingSalesOrderData] = useState('')
@@ -50,6 +51,15 @@ const AddSalesOrder = () => {
     }
   }, [location.search]);
 
+  useEffect(() => {
+    if (id) {
+      setIsEdit(true);
+    } else {
+      setIsEdit(false);
+    }
+  }, [id]);
+  
+
 
   const handleParentSubmit = () => {
 
@@ -58,7 +68,7 @@ const AddSalesOrder = () => {
       const isValid = childRef.current.validateForm();
       
       if (isValid) {
-        console.log(childRef.current,'fkasdfkasdfkaskdf ')
+        console.log(childRef.current,'fkasdfkasdfk')
         handleFormSubmit(childRef.current.getCompleteFormData);
       }
     }

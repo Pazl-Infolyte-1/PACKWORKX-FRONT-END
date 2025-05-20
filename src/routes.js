@@ -100,6 +100,8 @@ const routes = [
         key: "", // Give it a proper key
       },
      ] },
+
+     { path: '/salesorder/form/:id', name: 'salesOrderEditForm', element: salesOrderForm, key: '' },
      { path: '/salesorder/form', name: 'salesorderform', element: salesOrderForm, key: '' },
 
   { path: '/attendance', name: 'Attendance', element: Attendance, key: '' },

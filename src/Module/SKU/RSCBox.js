@@ -45,7 +45,9 @@ function RSCBox({
   setMessage,
   errors,
   setErrors,
-  setRscUnits
+  setRscUnits,
+     uploadedFiles,
+          setUploadedFiles
 }) {
   const [alerts, setAlerts] = useState([])
   const [unitTooltip, setUnitTooltip] = useState('Enter Millimeter')
@@ -67,7 +69,10 @@ function RSCBox({
   const [selectedRoutesVal, setSelectedRoutesVal] = useState([])
   const [fullRouteResponse, setFullRouteResponse] = useState(null)
   const [displayAsChips, setDisplayAsChips] = useState([])
-  
+  const [isUploading, setIsUploading] = useState(false);
+//const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
+const [fileNames, setFileNames] = useState([]); 
+
 const deckleSize = useSelector(state => state.deckleSize);
   
   const dispatch = useDispatch()
@@ -545,9 +550,8 @@ useEffect(() => {
   }
 }, [addNewSkuData.inner_outer_dimension]);
 
-const [isUploading, setIsUploading] = useState(false);
-const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
-const [fileNames, setFileNames] = useState([]); 
+
+
 const handleFileUpload = async (event) => {
   const selectedFiles = event.target.files;
   if (!selectedFiles || selectedFiles.length === 0) return;
@@ -592,11 +596,44 @@ const removeFile = (indexToRemove) => {
   const updatedNames = fileNames.filter((_, index) => index !== indexToRemove);
 
   setUploadedFiles(updatedUrls);
+    setAddNewSkuData((prev) => ({
+    ...prev,
+    documents: updatedUrls, // Keep documents in sync
+  }));
   setFileNames(updatedNames);
 };
 
+//document edit
+useEffect(() => {
+  // Clear files only if print_type is 'None' and documents are not already empty
+  if (addNewSkuData.print_type === 'None') {
+    if (uploadedFiles.length > 0 || addNewSkuData.documents.length > 0) {
+      setUploadedFiles([]);
+      setFileNames([]);
 
-  
+      // Only update documents if not already empty
+      if (addNewSkuData.documents.length > 0) {
+        setAddNewSkuData((prev) => ({
+          ...prev,
+          documents: [],
+        }));
+      }
+    }
+    return;
+  }
+
+  // Load files only if editing and there are documents to load
+  if (editTag && addNewSkuData.documents?.length > 0 && uploadedFiles.length === 0) {
+    setUploadedFiles([...addNewSkuData.documents]);
+    setFileNames(
+      addNewSkuData.documents.map((file) =>
+        typeof file === 'string' ? file.split('/').pop() : file.name
+      )
+    );
+  }
+}, [editTag, addNewSkuData.print_type]); // <- remove addNewSkuData.documents from deps
+
+
   return (
     <div className="rounded-lg ">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -639,29 +676,31 @@ const removeFile = (indexToRemove) => {
           </div>
         </div>
 
-        <div className="w-[200px]">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            SKU Name
-            <span className="text-red-500 ml-1">*</span>
-            {errors.sku_name && (
-              <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
-            )}
-          </label>
-          <input
-            id="sku_name"
-            name="sku_name"
-            value={addNewSkuData?.sku_name}
-            onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          />
-        </div>
+       <div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    SKU Name
+    <span className="text-red-500 ml-1">*</span>
+    {/*{errors.sku_name && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
+    )}*/}
+  </label>
+  <input
+    id="sku_name"
+    name="sku_name"
+    value={addNewSkuData?.sku_name}
+    onChange={handleChange}
+    className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.sku_name ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
+  />
+</div>
         <div className="w-[200px]">
           <label className="block text-sm  font-medium text-gray-700 mb-2">
             Client Name
             <span className="text-red-500 ml-1">*</span>
-            {errors.client_id && (
+            {/*{errors.client_id && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
-            )}
+            )}*/}
           </label>
           <select
             name="client"
@@ -669,7 +708,9 @@ const removeFile = (indexToRemove) => {
             disabled={clientDiasble}
             value={addNewSkuData.client_id}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+         className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.client_id ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           >
             <option value="" hidden>
               Select
@@ -794,9 +835,9 @@ const removeFile = (indexToRemove) => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Joints
                 <span className="text-red-500 ml-1">*</span>
-                {errors.joints && (
+                {/*{errors.joints && (
                   <span className="text-red-500 text-xs ml-2 align-middle">{errors.joints}</span>
-                )}
+                )}*/}
               </label>
               <input
                 id="joints"
@@ -804,7 +845,10 @@ const removeFile = (indexToRemove) => {
                 value={Number(addNewSkuData.joints) || ''}
                 onChange={handleChange}
                 readOnly={editTag}
-                className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                //className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className={`w-full h-8 p-1 text-sm rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
               />
             </div>
 
@@ -819,7 +863,10 @@ const removeFile = (indexToRemove) => {
                 value={Number(toThreeDecimalFixed(addNewSkuData.deckle_size)) || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
-                className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                //className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            className={`w-full h-8 p-1 text-sm rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
               />
               <p className="text-[10px] text-gray-500 mt-1">
                 Deckle should be greater than (BW × UPS)
@@ -872,9 +919,9 @@ const removeFile = (indexToRemove) => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Flap Width
               <span className="text-red-500 ml-1">*</span>
-              {errors.flap_width && (
+              {/*{errors.flap_width && (
                 <span className="text-red-500 text-sm ml-2 align-middle">{errors.flap_width}</span>
-              )}
+              )}*/}
             </label>
             <input
               id="flap_width"
@@ -882,7 +929,9 @@ const removeFile = (indexToRemove) => {
               value={Number(addNewSkuData.flap_width) || null}
               onChange={modifiedHandleChange}
               readOnly={editTag}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.flap_width ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </Tooltip>
@@ -891,9 +940,9 @@ const removeFile = (indexToRemove) => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Internal Id
             <span className="text-red-500 ml-1">*</span>
-            {errors.internal_id && (
+            {/*{errors.internal_id && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.internal_id}</span>
-            )}
+            )}*/}
           </label>
           <input
             id="internal_id"
@@ -901,7 +950,9 @@ const removeFile = (indexToRemove) => {
             value={Number(addNewSkuData.internal_id) || null}
             onChange={handleChange}
             readOnly={editTag}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.internal_id ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
         </div>
 
@@ -965,9 +1016,9 @@ const removeFile = (indexToRemove) => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             UPS
             <span className="text-red-500 ml-1">*</span>
-            {errors.ups && (
+            {/*{errors.ups && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.ups}</span>
-            )}
+            )}*/}
           </label>
           <input
             id="ups"
@@ -975,7 +1026,9 @@ const removeFile = (indexToRemove) => {
             value={Number(addNewSkuData?.ups) || null}
             onChange={modifiedHandleChange}
             readOnly={editTag}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.ups ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
         </div>
 
@@ -984,11 +1037,11 @@ const removeFile = (indexToRemove) => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Length Trimming Tolereance
               <span className="text-red-500 ml-1">*</span>
-              {errors.length_trimming_tolerance && (
+              {/*{errors.length_trimming_tolerance && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.length_trimming_tolerance}
                 </span>
-              )}
+              )}*/}
             </label>
             <input
               id="length_trimming_tolerance"
@@ -996,7 +1049,9 @@ const removeFile = (indexToRemove) => {
               value={Number(addNewSkuData.length_trimming_tolerance) || null}
               onChange={modifiedHandleChange}
               readOnly={editTag}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                    className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.length_trimming_tolerance ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </Tooltip>
@@ -1006,11 +1061,11 @@ const removeFile = (indexToRemove) => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Width Trimming Tolereance
               <span className="text-red-500 ml-1">*</span>
-              {errors.width_trimming_tolerance && (
+              {/*{errors.width_trimming_tolerance && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.width_trimming_tolerance}
                 </span>
-              )}
+              )}*/}
             </label>
             <input
               id="width_trimming_tolerance"
@@ -1018,7 +1073,9 @@ const removeFile = (indexToRemove) => {
               value={Number(addNewSkuData.width_trimming_tolerance) || null}
               onChange={modifiedHandleChange}
               readOnly={editTag}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.width_trimming_tolerance ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </Tooltip>
@@ -1027,11 +1084,11 @@ const removeFile = (indexToRemove) => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Minimum Order Level
             <span className="text-red-500 ml-1">*</span>
-            {errors.minimum_order_level && (
+            {/*{errors.minimum_order_level && (
               <span className="text-red-500 text-sm ml-2 align-middle">
                 {errors.minimum_order_level}
               </span>
-            )}
+            )}*/}
           </label>
           <input
             id="minimum_order_level"
@@ -1039,7 +1096,9 @@ const removeFile = (indexToRemove) => {
             type="number"
             value={Number(addNewSkuData.minimum_order_level) || null}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                       className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
         </div>
         <ChipSelectorWithBrowse
@@ -1085,45 +1144,55 @@ const removeFile = (indexToRemove) => {
 </div>
 
 {(addNewSkuData?.print_type === 'Offset' || addNewSkuData?.print_type === 'Flexo') && (
-    <div className="flex items-center mb-3">
-  <div className="flex flex-col w-full">
-    <input
-      type="file"
-      className="w-64 border border-gray-300 p-1.5 rounded text-sm ml-6"
-      accept="application/pdf"
-      onChange={handleFileUpload}
-      multiple
-    />
-    
-    {isUploading && (
-      <div className="text-sm text-blue-600 mt-1">Uploading files...</div>
-    )}
-    
-    {/* Display uploaded files */}
-    {uploadedFiles.length > 0 && (
-      <div className="mt-2">
-        <p className="text-xs text-gray-600 mb-1">Uploaded files:</p>
-        <ul className="space-y-1">
-          {uploadedFiles.map((file, index) => (
-            <li key={index} className="flex items-center text-sm w-[300px]">
-              <div className="flex-1 truncate">
-                {file.name || (typeof file === 'string' ? file.split('/').pop() : file.url.split('/').pop())}
-              </div>
-              <button
-                type="button"
-                onClick={() => removeFile(index)}
-                className="ml-2 text-red-500 hover:text-red-700"
-              >
-                {/* You can use an X icon from your icon library */}
-                <span>✕</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+  <div className="flex w-[200px]">
+    <div className="flex flex-col flex w-[200px]">
+      {/* Custom styled file input */}
+         <label className="block text-sm font-medium text-gray-700 mb-2">Documents</label>
+      <label
+        htmlFor="file-upload"
+        className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
+      >
+        Upload Files
+      </label>
+      <input
+        id="file-upload"
+        type="file"
+        accept="application/pdf"
+        onChange={handleFileUpload}
+        multiple
+        className="hidden"
+      />
+
+      {/* Uploading text */}
+      {isUploading && (
+        <div className="text-sm text-blue-600 mt-2">Uploading files...</div>
+      )}
+
+      {/* Display uploaded files */}
+      {uploadedFiles.length > 0 && (
+        <div className="mt-2">
+          <p className="text-xs text-gray-600 mb-1">Uploaded files:</p>
+       <ul className="space-y-0.5">
+  {uploadedFiles.map((file, index) => (
+    <li key={index} className="flex items-center text-xs w-full max-w-[240px]">
+      <div className="flex-1 truncate text-gray-700">
+        {file.name || (typeof file === 'string' ? file.split('/').pop() : file.url.split('/').pop())}
       </div>
-    )}
+      <button
+        type="button"
+        onClick={() => removeFile(index)}
+        className="ml-1 text-red-500 hover:text-red-700 text-sm"
+      >
+        ✕
+      </button>
+    </li>
+  ))}
+</ul>
+
+        </div>
+      )}
+    </div>
   </div>
-</div>
 )}
 
       </div>

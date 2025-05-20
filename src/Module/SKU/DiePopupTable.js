@@ -165,6 +165,9 @@ const DiePopupTable = ({ setSelectedDiePopup, selectedDiePopup, setisSingleViewP
         <CTableHeaderCell className="py-2 px-1 text-gray-600 font-medium text-start">
           Client
         </CTableHeaderCell>
+         <CTableHeaderCell className="py-2 px-1 text-gray-600 font-medium text-start">
+          L x W
+        </CTableHeaderCell>
         <CTableHeaderCell className="py-2 px-1 text-gray-600 font-medium text-start">
            Board Size
         </CTableHeaderCell>
@@ -200,6 +203,7 @@ const DiePopupTable = ({ setSelectedDiePopup, selectedDiePopup, setisSingleViewP
             <CTableDataCell className="py-2 px-1 text-gray-700">{item.die_id}</CTableDataCell>
             <CTableDataCell className="py-2 px-1 text-gray-700">{item.name}</CTableDataCell>
             <CTableDataCell className="py-2 px-1 text-gray-700">{item.client}</CTableDataCell>
+                    <CTableDataCell className="py-2 px-1 text-gray-700">{item.board_length} x {item.board_width}</CTableDataCell>
             <CTableDataCell className="py-2 px-1 text-gray-700">{item.board_size}</CTableDataCell>
             <CTableDataCell className="py-2 px-1 text-gray-700">{item.ups}</CTableDataCell>
             {/*<CTableDataCell className="py-2 px-1 text-gray-700">

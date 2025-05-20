@@ -4,7 +4,7 @@ import { ChevronUp, ChevronDown, Mail, MoreHorizontal } from 'lucide-react'
 const SkuView = ({ setIsMinimized, selectedSku, handleSkuEdit }) => {
   const [activeTab, setActiveTab] = useState('Overview')
   const [addressExpanded, setAddressExpanded] = useState(true)
-  const [detailsExpanded, setDetailsExpanded] = useState(false)
+  const [detailsExpanded, setDetailsExpanded] = useState(true)
   const [contentHeight, setContentHeight] = useState('580px')
   const containerRef = useRef(null)
 
@@ -121,56 +121,38 @@ const SkuView = ({ setIsMinimized, selectedSku, handleSkuEdit }) => {
               <div className="text-sm">
                 <div className="mb-4">
                   <div className="text-gray-600 m-0">
-                    <p className="m-1">
-                      Length Trimming{' '}
-                      <span className="font-semibold">
-                        {' '}
-                        - {selectedSku.length_trimming_tolerance || 'N/A'}
-                      </span>
-                    </p>
-                    <p className="m-1">
-                      Width Trimming{' '}
-                      <span className="font-semibold">
-                        {' '}
-                        - {selectedSku.width_trimming_tolerance || 'N/A'}
-                      </span>
-                    </p>
-                    <p className="m-1">
-                      Board Size Length
-                      <span className="font-semibold">
-                        {' '}
-                        - {selectedSku.length_board_size_cm2 || 'N/A'}
-                      </span>
-                    </p>
-                    <p className="m-1">
-                      Board Size Width{' '}
-                      <span className="font-semibold">
-                        {' '}
-                        - {selectedSku.width_board_size_cm2 || 'N/A'}
-                      </span>
-                    </p>
-                    <p className="m-1">
-                      Board Size(cm²){' '}
-                      <span className="font-semibold">
-                        {' '}
-                        - {selectedSku.board_size_cm2 || 'N/A'}
-                      </span>
-                    </p>
-                    <p className="m-1">
-                      Deckle Size{' '}
-                      <span className="font-semibold"> - {selectedSku.deckle_size || 'N/A'}</span>
-                    </p>
-                    <p className="m-1">
-                      Flap width{' '}
-                      <span className="font-semibold"> - {selectedSku.flap_width || 'N/A'}</span>
-                    </p>
-                    <p className="m-1">
-                      Flap Tolerance{' '}
-                      <span className="font-semibold">
-                        {' '}
-                        - {selectedSku.flap_tolerance || 'N/A'}
-                      </span>
-                    </p>
+                        <div className="flex justify-between py-1">
+                  <span className="text-gray-600">Length Trimming</span>
+                  <span className="font-medium">{selectedSku.length_trimming_tolerance || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-gray-600"> Width Trimming</span>
+                  <span className="font-medium">{selectedSku.width_trimming_tolerance || 'N/A'}</span>
+                </div>
+                     <div className="flex justify-between py-1">
+                  <span className="text-gray-600">  Board Size Length</span>
+                  <span className="font-medium">{selectedSku.length_board_size_cm2  || 'N/A'}</span>
+                </div>
+                        <div className="flex justify-between py-1">
+                  <span className="text-gray-600">  Board Size Width</span>
+                  <span className="font-medium">{selectedSku.width_board_size_cm2  || 'N/A'}</span>
+                </div>
+                         <div className="flex justify-between py-1">
+                  <span className="text-gray-600"> Board Size(cm²)</span>
+                  <span className="font-medium">{selectedSku.board_size_cm2 || 'N/A'}</span>
+                </div>
+                         <div className="flex justify-between py-1">
+                  <span className="text-gray-600"> Deckle Size</span>
+                  <span className="font-medium">{selectedSku.deckle_size || 'N/A'}</span>
+                </div>
+                       <div className="flex justify-between py-1">
+                  <span className="text-gray-600">   Flap width</span>
+                  <span className="font-medium">{selectedSku.flap_width || 'N/A'}</span>
+                </div>
+                   <div className="flex justify-between py-1">
+                  <span className="text-gray-600"> Flap Tolerance</span>
+                  <span className="font-medium">{selectedSku.flap_tolerance || 'N/A'}</span>
+                </div>
                   </div>
                 </div>
               </div>

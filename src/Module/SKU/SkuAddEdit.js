@@ -42,6 +42,8 @@ function SkuAddEdit({
   errors,
   setErrors,
   setSkuVariant,
+     uploadedFiles,
+          setUploadedFiles
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
@@ -325,6 +327,8 @@ console.log("into msquare",meterSquareData)
   const skuComponents = {
     'RSC box': (
       <RSCBox
+         uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
       setRscUnits={setRscUnits}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
@@ -357,6 +361,8 @@ console.log("into msquare",meterSquareData)
     //'Corrugated Sheet': (
     Board: (
       <CorrugatedSheet
+        uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -382,6 +388,8 @@ console.log("into msquare",meterSquareData)
     ),
     'Die Cut box': (
       <DieCutBox
+              uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}

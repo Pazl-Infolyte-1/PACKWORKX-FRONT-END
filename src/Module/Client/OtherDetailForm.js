@@ -7,71 +7,69 @@ const OtherDetailForm = () => {
     register,
     formState: { errors },
     setValue,
-    watch
+    watch,
   } = useFormContext()
 
   const [showMore, setShowMore] = useState(false)
-const [isUploading, setIsUploading] = useState(false);
-const uploadedFiles = watch('clientData.documents') || [];
-const [fileNames, setFileNames] = useState([]);
-const handleFileUpload = async (event) => {
-  const selectedFiles = event.target.files;
-  if (!selectedFiles || selectedFiles.length === 0) return;
-  
-  setIsUploading(true);
-  
-  // Get current URLs
-  const currentDocs = watch('clientData.documents');
-  const urls = Array.isArray(currentDocs) ? [...currentDocs] : [];
-  
-  // Keep track of file names for display
-  const names = [...fileNames];
-  
-  // Process each selected file
-  for (let i = 0; i < selectedFiles.length; i++) {
-    const file = selectedFiles[i];
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    try {
-      const response = await apiMethods.uploadFile(formData);
-      const fileUrl = response?.data?.data?.file_url;
-      
-      if (fileUrl) {
-        // Store only the URL in form data
-        urls.push(fileUrl);
-        
-        // Store name for display purposes
-        names.push(file.name);
-      }
-    } catch (err) {
-      console.error('File upload failed:', err);
-    }
-  }
-  
-  // Update form with URLs only
-  setValue('clientData.documents', urls);
-  setFileNames(names);
-  
-  setIsUploading(false);
-  event.target.value = '';
-};
-// Add this function to handle file removal
-const removeFile = (indexToRemove) => {
-  // Remove URL from form data
-  const urls = Array.isArray(watch('clientData.documents')) 
-    ? [...watch('clientData.documents')] 
-    : [];
-  
-  const updatedUrls = urls.filter((_, index) => index !== indexToRemove);
-  setValue('clientData.documents', updatedUrls);
-  
-  // Remove from display names
-  const updatedNames = fileNames.filter((_, index) => index !== indexToRemove);
-  setFileNames(updatedNames);
-};
+  const [isUploading, setIsUploading] = useState(false)
+  const uploadedFiles = watch('clientData.documents') || []
+  const [fileNames, setFileNames] = useState([])
+  const handleFileUpload = async (event) => {
+    const selectedFiles = event.target.files
+    if (!selectedFiles || selectedFiles.length === 0) return
 
-  
+    setIsUploading(true)
+
+    // Get current URLs
+    const currentDocs = watch('clientData.documents')
+    const urls = Array.isArray(currentDocs) ? [...currentDocs] : []
+
+    // Keep track of file names for display
+    const names = [...fileNames]
+
+    // Process each selected file
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i]
+      const formData = new FormData()
+      formData.append('file', file)
+
+      try {
+        const response = await apiMethods.uploadFile(formData)
+        const fileUrl = response?.data?.data?.file_url
+
+        if (fileUrl) {
+          // Store only the URL in form data
+          urls.push(fileUrl)
+
+          // Store name for display purposes
+          names.push(file.name)
+        }
+      } catch (err) {
+        console.error('File upload failed:', err)
+      }
+    }
+
+    // Update form with URLs only
+    setValue('clientData.documents', urls)
+    setFileNames(names)
+
+    setIsUploading(false)
+    event.target.value = ''
+  }
+  // Add this function to handle file removal
+  const removeFile = (indexToRemove) => {
+    // Remove URL from form data
+    const urls = Array.isArray(watch('clientData.documents'))
+      ? [...watch('clientData.documents')]
+      : []
+
+    const updatedUrls = urls.filter((_, index) => index !== indexToRemove)
+    setValue('clientData.documents', updatedUrls)
+
+    // Remove from display names
+    const updatedNames = fileNames.filter((_, index) => index !== indexToRemove)
+    setFileNames(updatedNames)
+  }
 
   return (
     <div className="bg-white px-4 py-2 w-full">
@@ -86,13 +84,29 @@ const removeFile = (indexToRemove) => {
               </label>
               <input
                 type="text"
-                {...register('clientData.PAN', { required: 'Required' })}
+                {...register('clientData.PAN', {
+                  required: true,
+                  pattern: {
+                    value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
+                    message: 'Invalid PAN format',
+                  },
+                })}
                 style={{
                   border: errors.clientData?.PAN ? '1px solid #EF4444' : '1px solid #D1D5DB',
                 }}
                 className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
+                onChange={(e) => {
+                  // Auto-uppercase PAN input
+                  const value = e.target.value.toUpperCase()
+                  setValue('clientData.PAN', value)
+                }}
               />
             </div>
+            {errors.clientData?.PAN && (
+              <div className="ml-32 mt-1">
+                <p className="text-red-500 text-xs">{errors.clientData.PAN.message}</p>
+              </div>
+            )}
           </div>
 
           {/* Currency */}
@@ -114,7 +128,7 @@ const removeFile = (indexToRemove) => {
           <div className="flex items-center mb-3">
             <label className="text-xs w-32">Opening Balance</label>
             <input
-              type="text"
+              type="number"
               placeholder="INR"
               {...register('clientData.opening_balance')}
               className="border border-gray-300 p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
@@ -167,46 +181,47 @@ const removeFile = (indexToRemove) => {
           </div>
 
           {/* Documents */}
-         <div className="flex items-center mb-3">
-  <label className="text-xs w-32">ID Proof</label>
-  <div className="flex flex-col w-full">
-    <input
-      type="file"
-      className="w-64 border border-gray-300 p-1.5 rounded text-sm ml-6"
-      accept="application/pdf"
-      onChange={handleFileUpload}
-      multiple
-    />
-    
-    {isUploading && (
-      <div className="text-sm text-blue-600 mt-1">Uploading files...</div>
-    )}
-    
-    {/* Display uploaded files */}
-    {uploadedFiles.length > 0 && (
-      <div className="mt-2">
-        <p className="text-xs text-gray-600 mb-1">Uploaded files:</p>
-        <ul className="space-y-1">
-          {uploadedFiles.map((file, index) => (
-            <li key={index} className="flex items-center text-sm w-[300px]">
-              <div className="flex-1 truncate">
-                {file.name || (typeof file === 'string' ? file.split('/').pop() : file.url.split('/').pop())}
-              </div>
-              <button
-                type="button"
-                onClick={() => removeFile(index)}
-                className="ml-2 text-red-500 hover:text-red-700"
-              >
-                {/* You can use an X icon from your icon library */}
-                <span>✕</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
-  </div>
-</div>
+          <div className="flex items-center mb-3">
+            <label className="text-xs w-32">ID Proof</label>
+            <div className="flex flex-col w-full">
+              <input
+                type="file"
+                className="w-64 border border-gray-300 p-1.5 rounded text-sm ml-6"
+                accept="application/pdf"
+                onChange={handleFileUpload}
+                multiple
+              />
+
+              {isUploading && <div className="text-sm text-blue-600 mt-1">Uploading files...</div>}
+
+              {/* Display uploaded files */}
+              {uploadedFiles.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-xs text-gray-600 mb-1">Uploaded files:</p>
+                  <ul className="space-y-1">
+                    {uploadedFiles.map((file, index) => (
+                      <li key={index} className="flex items-center text-sm w-[300px]">
+                        <div className="flex-1 truncate">
+                          {file.name ||
+                            (typeof file === 'string'
+                              ? file.split('/').pop()
+                              : file.url.split('/').pop())}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(index)}
+                          className="ml-2 text-red-500 hover:text-red-700"
+                        >
+                          {/* You can use an X icon from your icon library */}
+                          <span>✕</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
 
           {!showMore && (
             <p

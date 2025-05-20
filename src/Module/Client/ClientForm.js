@@ -324,8 +324,10 @@ const ClientForm = ({ resetForm, setReloadData }) => {
         addresses: data.addresses.map(({ type, ...rest }) => rest),
       }
 
+      const requiredFields = ['attention', 'city', 'phone', 'pinCode', 'state']
+
       const isAddressEmpty = filteredData.addresses.every((address) =>
-        Object.values(address).every((value) => value.trim() === ''),
+        requiredFields.every((field) => address[field]?.trim() === ''),
       )
 
       if (isAddressEmpty) {

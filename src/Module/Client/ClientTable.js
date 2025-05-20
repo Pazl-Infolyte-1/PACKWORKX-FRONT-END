@@ -22,17 +22,12 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import PopUp from '../../components/New/PopUp'
 import { TiFlowSwitch } from 'react-icons/ti'
 
-function ClientTable({
-  clientdata,
-  refreshClients,
-  isMinimized,
-}) {
+function ClientTable({ clientdata, refreshClients, isMinimized }) {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [selectedClientId, setSelectedClientId] = useState(null)
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
   const [singleData, setSingleData] = useState(null)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [selectedClientDeleteId, setSelectedClientDeleteId] = useState(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState({ open: false, id: null })
   const [selectedRows, setSelectedRows] = useState([])
   const [alerts, setAlerts] = useState([])
   const navigate = useNavigate()
@@ -46,33 +41,19 @@ function ClientTable({
     setSingleData(data)
   }
 
-  const openDeleteModal = (clientId) => {
-    console.log('del id', clientId)
-    setSelectedClientDeleteId(clientId)
-    setIsDeleteModalOpen(true)
-  }
-
   const closeDeleteModal = () => {
-    setIsDeleteModalOpen(false)
-    setSelectedClientDeleteId(null)
+    setIsDeleteModalOpen({ open: false, id: null })
   }
   // Handle delete confirmation
 
   const deleteClient = async () => {
-    if (!selectedClientDeleteId) return
+    if (!isDeleteModalOpen.id) return
 
     try {
-      console.log('Attempting to delete client:', selectedClientDeleteId)
-      //const clientId = selectedClientDeleteId.replace(/\D/g, "");
-
-      const response = await apiMethods.deleteClient(selectedClientDeleteId)
-
+      const response = await apiMethods.deleteClient(isDeleteModalOpen.id)
       if (!response?.status) {
-        // If API responds with { "status": false }, treat it as an error
         throw new Error(response?.message || 'Failed to delete client')
       }
-
-      console.log('Client deleted successfully:', response)
 
       setAlerts([{ severity: 'success', message: response?.message }])
     } catch (error) {
@@ -86,6 +67,7 @@ function ClientTable({
       }, 3000)
 
       closeDeleteModal()
+      refreshClients()
     }
   }
 
@@ -153,45 +135,19 @@ function ClientTable({
             )}
 
             <CTableBody>
-              {clientdata.map((client) => (
-                <CTableRow
-                  key={client.client_id}
-                  onClick={() => navigate(`/clients/${client.client_id}`)}
-                  className={`${
-                    selectedRows.includes(client.client_id) ? 'bg-blue-50' : 'hover:bg-gray-50'
-                  } border-b cursor-pointer`}
-                >
-                  {/* When minimized: Only render checkbox and display name */}
-                  {isMinimized ? (
-                    <>
-                      <CTableDataCell className="px-4 py-3 flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={selectedRows.includes(client.client_id)}
-                          onChange={(e) => {
-                            e.stopPropagation()
-                            handleRowSelect(client.client_id)
-                          }}
-                          className="form-checkbox h-4 w-4 text-blue-600 rounded mb-2"
-                        />
-                        <div
-                          onClick={(e) => {
-                            openViewCard(client)
-                          }}
-                          className="cursor-pointer flex flex-col"
-                        >
-                          <span className="text-sm text-black font-semibold">
-                            {client.display_name || 'N/A'}
-                          </span>
-                          <span className="text-xs text-gray-500">₹ {client.opening_balance}</span>
-                        </div>
-                      </CTableDataCell>
-                    </>
-                  ) : (
-                    <>
-                      <CTableDataCell>{''}</CTableDataCell>
-                      <CTableDataCell className="px-4 py-3">
-                        <div onClick={(e) => e.stopPropagation()}>
+              {clientdata.length > 0 ? (
+                clientdata.map((client) => (
+                  <CTableRow
+                    key={client.client_id}
+                    onClick={() => navigate(`/clients/${client.client_id}`)}
+                    className={`${
+                      selectedRows.includes(client.client_id) ? 'bg-blue-50' : 'hover:bg-gray-50'
+                    } border-b cursor-pointer`}
+                  >
+                    {/* When minimized: Only render checkbox and display name */}
+                    {isMinimized ? (
+                      <>
+                        <CTableDataCell className="px-4 py-3 flex items-center gap-2">
                           <input
                             type="checkbox"
                             checked={selectedRows.includes(client.client_id)}
@@ -199,56 +155,95 @@ function ClientTable({
                               e.stopPropagation()
                               handleRowSelect(client.client_id)
                             }}
-                            className="form-checkbox h-3 w-3 text-blue-600 rounded"
+                            className="form-checkbox h-4 w-4 text-blue-600 rounded mb-2"
                           />
-                        </div>
-                      </CTableDataCell>
-                      <CTableDataCell
-                        onClick={(e) => {
-                          //e.stopPropagation();
-                          openViewCard(client)
-                        }}
-                        className="px-4 py-3 text-sm !text-blue-600 font-semibold"
-                      >
-                        {client.display_name || 'N/A'}
-                      </CTableDataCell>
-                      <CTableDataCell className="px-4 py-3 text-sm text-gray-900">
-                        {client.client_ui_id || 'N/A'}
-                      </CTableDataCell>
-                      <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
-                        {client.client_ref_id || 'N/A'}
-                      </CTableDataCell>
-                      <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
-                        {client.email || 'N/A'}
-                      </CTableDataCell>
-                      <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
-                        {client.mobile || 'N/A'}
-                      </CTableDataCell>
-                      <CTableDataCell className="px-4 py-3">
-                        <div onClick={(e) => e.stopPropagation()}>
-                          <ThreeDotMenu
-                            value={[
-                              {
-                                label: 'Edit',
-                                icon: cilPencil,
-                                onClick: () => {
-                                  console.log('Edit', client)
-                                  navigate('/clients/clientForm', { state: { client } })
+                          <div
+                            onClick={(e) => {
+                              openViewCard(client)
+                            }}
+                            className="cursor-pointer flex flex-col"
+                          >
+                            <span className="text-sm text-black font-semibold">
+                              {client.display_name || 'N/A'}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              ₹ {client.opening_balance}
+                            </span>
+                          </div>
+                        </CTableDataCell>
+                      </>
+                    ) : (
+                      <>
+                        <CTableDataCell>{''}</CTableDataCell>
+                        <CTableDataCell className="px-4 py-3">
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={selectedRows.includes(client.client_id)}
+                              onChange={(e) => {
+                                e.stopPropagation()
+                                handleRowSelect(client.client_id)
+                              }}
+                              className="form-checkbox h-3 w-3 text-blue-600 rounded"
+                            />
+                          </div>
+                        </CTableDataCell>
+                        <CTableDataCell
+                          onClick={(e) => {
+                            //e.stopPropagation();
+                            openViewCard(client)
+                          }}
+                          className="px-4 py-3 text-sm !text-blue-600 font-semibold"
+                        >
+                          {client.display_name || 'N/A'}
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-900">
+                          {client.client_ui_id || 'N/A'}
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
+                          {client.client_ref_id || 'N/A'}
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
+                          {client.email || 'N/A'}
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
+                          {client.mobile || 'N/A'}
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3">
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <ThreeDotMenu
+                              value={[
+                                {
+                                  label: 'Edit',
+                                  icon: cilPencil,
+                                  onClick: () => {
+                                    console.log('Edit', client)
+                                    navigate('/clients/clientForm', { state: { client } })
+                                  },
                                 },
-                              },
-                              {
-                                label: 'Delete',
-                                icon: cilTrash,
-                                onClick: () => console.log('Delete', client),
-                              },
-                            ]}
-                          />
-                        </div>
-                      </CTableDataCell>
-                    </>
-                  )}
+                                {
+                                  label: 'Delete',
+                                  icon: cilTrash,
+                                  onClick: () => setIsDeleteModalOpen({
+                                    open: true,
+                                    id: client.client_id,
+                                  }),
+                                },
+                              ]}
+                            />
+                          </div>
+                        </CTableDataCell>
+                      </>
+                    )}
+                  </CTableRow>
+                ))
+              ) : (
+                <CTableRow>
+                  <CTableDataCell colSpan={isMinimized ? 2 : 8} className="text-center text-sm !text-red-600">
+                    No Data Found
+                  </CTableDataCell>
                 </CTableRow>
-              ))}
+              )}
             </CTableBody>
           </CTable>
         </div>
@@ -275,12 +270,11 @@ function ClientTable({
           <ClientSingleViewCard
             clientData={singleData}
             handleEdit={handleEdit}
-            openDeleteModal={openDeleteModal}
           />
         </PopUp>
 
         <ConfirmationModale
-          isOpen={isDeleteModalOpen}
+          isOpen={isDeleteModalOpen.open}
           onClose={closeDeleteModal}
           onConfirm={deleteClient}
           title="Delete Confirmation"

@@ -33,19 +33,9 @@ const OverviewComponent = ({ tableData }) => {
             </p>
             <p className="text-sm m-0">{tableData?.email}</p>
             <p className="text-sm m-0 flex items-center gap-1">
-              <CIcon icon={cilPhone} className="w-3 h-3 text-gray-600" />
+              <CIcon icon={cilPhone} className="w-3 h-3 text-gray-600 rotate-90" />
               {tableData?.work_phone}
             </p>
-            <p className="text-xs m-0">
-              <span className="text-[#3e8efd]">Invite to Portal</span>
-              <span className="mx-0.5 text-gray-400">|</span>
-              <span className="text-[#3e8efd]">Send Email</span>
-            </p>
-          </div>
-
-          {/* Settings icon on the top-right corner */}
-          <div className="absolute top-1 right-2 text-gray-500">
-            <CIcon icon={cilSettings} className="w-3 h-3" />
           </div>
         </div>
         <div className="border-b border-gray-200 pt-3">
@@ -234,7 +224,6 @@ const OverviewComponent = ({ tableData }) => {
               </tbody>
             </table>
           </div>
-          <p className="text-sm m-0 text-[#3e8efd] mt-2">Enter Opening Balance</p>
         </div>
       </div>
     </div>

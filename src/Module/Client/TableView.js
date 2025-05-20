@@ -46,21 +46,6 @@ const TableView = () => {
             >
               Edit
             </button>
-            <button className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">
-              <CIcon icon={cilLink} />
-            </button>
-
-            <div className="relative">
-              <button className="px-3 py-1 text-sm text-white bg-[#408ffb] rounded">
-                New Transaction ▾
-              </button>
-            </div>
-            <div className="relative">
-              <button className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">
-                More ▾
-              </button>
-            </div>
-
             <button
               onClick={() => navigate('/clients')}
               className="text-gray-500 hover:text-red-600 text-3xl font-bold leading-none"

@@ -337,25 +337,25 @@ const SalesOrderSkuForm = ({
 
   return (
     <div>
-      <div className="mt-2 bg-white rounded-lg w-full">
+      <div className="mt-2 bg-white rounded-md w-full">
         <div className="w-[100%] mt-4">
-          <div className="overflow-x-auto w-[85%]">
+          <div className="overflow-x-auto w-[75%]">
             <div className="custom-scrollbar rounded-lg">
               <table className="w-full bg-white border-collapse">
                 {/* Table Head */}
                 <thead className="bg-white z-10">
                   <tr className="bg-gray-100 p-2">
-                    <th className="py-3 px-2 text-sm font-bold text-left rounded-tl-2xl">Item Table</th>
+                    <th className="py-2 px-2 text-sm font-bold text-left rounded-tl-xl">Item Table</th>
                     <th className=""></th>
                     <th className=""></th>
-                    <th className="rounded-tr-2xl"></th>
+                    <th className="rounded-tr-xl"></th>
                   </tr>
 
                   <tr>
                     <th className="py-2 pl-2 border-r border-b text-xs font-medium text-left">ITEM DETAILS</th>
-                    <th className="py-2 border-r text-xs font-medium text-right">QUANTITY</th>
-                    <th className="py-2 border-r text-xs font-medium text-right">RATE</th>
-                    <th className="py-2 border-b text-xs font-medium text-right">AMOUNT</th>
+                    <th className="p-2 border-r text-xs font-medium text-right">QUANTITY</th>
+                    <th className="p-2 border-r text-xs font-medium text-right">RATE</th>
+                    <th className="p-2 border-b text-xs font-medium text-right">AMOUNT</th>
                     <th className="py-2 w-10"></th> {/* Empty header for delete button */}
                   </tr>
                 </thead>
@@ -504,7 +504,7 @@ const SalesOrderSkuForm = ({
 
                       {/* GST Info Row - optional for detailed view */}
                       {skusData[index]?.sku && (
-                        <tr className="bg-gray-50 text-xs">
+                        <tr className="bg-gray-50 text-xs w-full">
                           <td colSpan={2} className="border-b pl-4 py-1 italic text-gray-500">
                             GST Details ({skusData[index]?.sku})
                           </td>
@@ -527,9 +527,7 @@ const SalesOrderSkuForm = ({
                                   </span>
                                 </>
                               )}
-                              <span className="font-semibold">
-                                Total: ₹{skusData[index]?.total || '0.00'}
-                              </span>
+                              
                             </div>
                           </td>
                         </tr>

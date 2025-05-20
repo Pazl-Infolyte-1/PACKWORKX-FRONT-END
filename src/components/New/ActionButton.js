@@ -4,11 +4,11 @@ const ActionButton = ({
   label, 
   onClick, 
   variant = 'primary',
-  height = 10,
-  width = 30,
+  height = 8,
+  width ='',
   className = '',
   customColor = '',
-  borderRadius = 'lg',
+  borderRadius = 'md',
   icon: Icon,
   type = 'button' // ✅ Add type with a default value
 }) => {
@@ -29,7 +29,7 @@ const ActionButton = ({
             case 'secondary':
               return 'bg-[#6b7785] text-white'; 
              case 'save':
-                return 'bg-[#28a745] text-white '; 
+                return 'bg-[#28a745] text-white  '; 
               case 'minimal':
                   return 'border border-[#8167e5] rounded-lg bg-transparent text-[#8167e5] text-[14px] leading-[20px] font-lato shadow-none  ';                 
           default:
@@ -48,7 +48,7 @@ const ActionButton = ({
   return (
     <button
     type={type}
-      className={`${heightClass} ${widthClass} ${radiusClass} flex  items-center justify-center px-3 py-1 shadow-md border-none cursor-pointer reoun   ${getButtonStyle()} ${className}`}
+      className={`${heightClass} ${widthClass} ${radiusClass} flex text-xs  items-center justify-center px-2 py-1 shadow-md border-none cursor-pointer reoun    ${getButtonStyle()} ${className}`}
       onClick={onClick}
     >
        {Icon && <Icon className="me-2" />} 

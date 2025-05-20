@@ -87,6 +87,7 @@ const routes = [
   { path: '/companies', name: 'Companies', element: Companies, key: 5002 },
 
   { path: '/workorderlist', name: 'Workorderlist', element: WorkOrderList, key: 25 },
+  { path: '/workorderlist/form', name: 'WorkorderlistAddform', element: salesOrderForm, key: 25 },
 
   { path: '/salesorder',
      name: 'SalesOrder',

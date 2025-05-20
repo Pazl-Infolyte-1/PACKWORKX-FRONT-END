@@ -14,6 +14,8 @@ import WorkOrderEditForm from './WorkOrderEditForm'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import ContentHeader from '../../components/New/ContentHeader'
+import { useNavigate } from 'react-router-dom'
+import { FiDownload, FiUpload } from 'react-icons/fi'
 
 const WorkOrders = () => {
   const [data, setData] = useState([])
@@ -32,6 +34,7 @@ const WorkOrders = () => {
   const searchBarRef = useRef(null)
   const [canDeactivate,setCanDeactivate] = useState(false);
   const [isTouched,setIsTouched] = useState(false)
+  const navigate = useNavigate()
 
 
 
@@ -127,6 +130,41 @@ const WorkOrders = () => {
     }
   }
 
+
+   const downloadWorkOrderExcelSheet = async () => {
+    try {
+      const response = await apiMethods.downloadWorkOrder();
+      if (response?.status === 200) {
+        
+        const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' });
+        const url = window.URL.createObjectURL(blob);
+  
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'sales_order.xlsx');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      } else {
+        console.error('Unexpected response status:', response?.status);
+        alert('Failed to download file. Please try again later.');
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error('API Error:', error.response.data?.message || error.message);
+        alert(`Error: ${error.response.data?.message || 'Failed to download file.'}`);
+      } else if (error.request) {
+        console.error('No response received:', error.request);
+        alert('No response from server. Please check your network connection.');
+      } else {
+        console.error('Error', error.message);
+        alert(`Error: ${error.message}`);
+      }
+    }
+  };
+  
+
   return (
     <div className="w-full mb-3 ">
       {/* Header Section */}
@@ -140,8 +178,20 @@ const WorkOrders = () => {
       <ContentHeader
       heading={"Work Order"}
       onAddClick={() => {
-        setDrawerOpen(true)
+        navigate('form?tab=skuDetails')
       }}
+      menuOptions={[
+        {
+          icon: <FiUpload className="mr-2 text-blue-500" />,
+          label: 'Import',
+          onClick: () => console.log('Import clicked'),
+        },
+        {
+          icon: <FiDownload className="mr-2 text-blue-500" />,
+          label: 'Export',
+          onClick: downloadWorkOrderExcelSheet,
+        },
+      ]}
       />
 
               <div className="flex flex-col justify-between  ">

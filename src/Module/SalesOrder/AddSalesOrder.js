@@ -7,7 +7,7 @@ import Loader from '../../components/New/Loader'
 import apiMethods from '../../api/config'
 import CustomAlert from '../../components/New/CustomAlert'
 import ActionButton from '../../components/New/ActionButton'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 const AddSalesOrder = () => {
 
@@ -22,6 +22,8 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
   const [alerts, setAlerts] = useState([]);
   const [workOrdersData, setWorkOrdersData] = useState([])
   const [workOrdersDummy, setWorkOrdersDummy] = useState([])
+  const navigate = useNavigate()
+
   const [totals, setTotals] = useState({
     total_amount:0,
     total_incl_gst:0,
@@ -220,23 +222,16 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
 
       if (isEdit) {
         response = await apiMethods.editSalesOrder(selectedSalesOrderID, payload);
-        setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
-        setTimeout(() => {
-          // setDrawer(false)
-        }, 1000);
+        setAlerts([{ severity: "success", message: response?.data?.message || "Successfully updated" }]);
       } else {
-
         response = await apiMethods.addSalesOrder(payload);
-        setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
-        setTimeout(() => {
-          // setDrawer(false)
-        }, 1000);
+        setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
       }
-
-
-      // fetchSalesOrderData()
-
-    } catch (error) {
+    
+      // ✅ Redirect after success
+      navigate('/sales-orders'); // Change '/sales-orders' to your actual route
+    
+    }catch (error) {
       // console.log(error)
       setAlerts([{ severity: "error", message: error?.response?.data?.error ||"Failed To Update SalesOrder  " }]);
       console.error(error);

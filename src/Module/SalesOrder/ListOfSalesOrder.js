@@ -16,6 +16,7 @@ import SalesOrderView from './viewSalesOrder'
 import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { FiDownload, FiUpload } from 'react-icons/fi'
 
 function ListOfSalesOrder() {
   const [data, setData] = useState([])
@@ -36,6 +37,7 @@ function ListOfSalesOrder() {
   const [canDeactivate, setCanDeactivate] = useState(false);
   const [isTouched, setIsTouched] = useState(false)
   const [isMinimiseTable, setIsminimiseTable] = useState(false)
+  const {setGlobalPlaceholder} = useSearch()
   const naviagte = useNavigate()
   const location = useLocation()
 
@@ -52,6 +54,15 @@ function ListOfSalesOrder() {
     }
   }, [location.pathname]);
 
+
+  useEffect(() => {
+    setGlobalPlaceholder('Search Sales Order...')
+
+    return () => {
+      setGlobalPlaceholder('Search...');
+    }
+  }, []);
+
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       await apiMethods.updateSalesOrderStatus(orderId, { sales_status: newStatus });
@@ -65,6 +76,40 @@ function ListOfSalesOrder() {
 
     }
   };
+  const downloadSalesOrderExcelSheet = async () => {
+    try {
+      const response = await apiMethods.downloadSalesOrder();
+  
+      if (response?.status === 200) {
+        const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' });
+        const url = window.URL.createObjectURL(blob);
+  
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'sales_order.xlsx');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      } else {
+        console.error('Unexpected response status:', response?.status);
+        alert('Failed to download file. Please try again later.');
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error('API Error:', error.response.data?.message || error.message);
+        alert(`Error: ${error.response.data?.message || 'Failed to download file.'}`);
+      } else if (error.request) {
+        console.error('No response received:', error.request);
+        alert('No response from server. Please check your network connection.');
+      } else {
+        console.error('Error', error.message);
+        alert(`Error: ${error.message}`);
+      }
+    }
+  };
+  
+  
 
 
 
@@ -210,6 +255,19 @@ function ListOfSalesOrder() {
             onAddClick={() => {
               naviagte('form?tab=salesOrder'); // ← added query param
             }}
+            menuOptions={[
+              {
+                icon: <FiUpload className="mr-2 text-blue-500" />,
+                label: 'Import',
+                onClick: () => console.log('Import clicked'),
+              },
+              {
+                icon: <FiDownload className="mr-2 text-blue-500" />,
+                label: 'Export',
+                onClick: downloadSalesOrderExcelSheet,
+
+              },
+            ]}
           />
 
           <div className='flex flex-col justify-between'>

@@ -62,10 +62,13 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
       if (purchaseOrder) {
         const fields = [
           'supplier_id', 'supplier_name', 'supplier_contact', 'supplier_email',
-          'supplier_address', 'payment_terms', 'po_date', 'valid_till',
+          'shipping_address', 'payment_terms', 'po_date', 'valid_till',
           'freight_terms', 'decision', 'reason', 'notes'
         ]
         fields.forEach(field => setValue(field, purchaseOrder[field] || ''))
+
+        console.log("purchaseOrder",fields);
+        
       }
 
       if (Array.isArray(purchaseOrderItemDetails)) {
@@ -272,20 +275,15 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
         addressObj.phone
       ].filter(Boolean).join(', ');
 
-      setValue('supplier_address', addressString);
+      setValue('shipping_address', addressString);
     } else {
       setSupplierAddresses([]);
       setSelectedAddressIndex(0);
-      setValue('supplier_address', '');
+      setValue('shipping_address', '');
     }
   };
 
-  // When address dropdown changes, update supplier_address field
-  // const handleAddressChange = (e) => {
-  //   const idx = parseInt(e.target.value, 10);
-  //   setSelectedAddressIndex(idx);
-  //   setValue('supplier_address', supplierAddresses[idx]?.pinCode || '');
-  // };
+
 
   const handleAddressChange = (e) => {
   const idx = parseInt(e.target.value, 10);
@@ -304,7 +302,7 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
       addressObj.phone
     ].filter(Boolean).join(', ');
 
-    setValue('supplier_address', addressString);
+    setValue('shipping_address', addressString);
   };
 
 
@@ -338,7 +336,7 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
       addressObj.pinCode,
       addressObj.phone
     ].filter(Boolean).join(', ');
-    setValue('supplier_address', addressString);
+    setValue('shipping_address', addressString);
     setShowAddressModal(false);
   };
 
@@ -357,6 +355,7 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
           <div className="form-group">
             <label className="block text-sm font-medium text-gray-700 mb-1">Supplier ID <span className="text-red-500"> *</span></label>
             <select
+            disabled
               {...register('supplier_id', { required: 'required' })}
               onChange={handleSupplierChange}
               className="w-full p-2 border border-gray-300 rounded-md"
@@ -392,7 +391,7 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
               type="number"
               {...register('supplier_contact', { required: 'required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
-              // readOnly
+               readOnly
             />
             {errors.supplier_contact && (
               <p className="text-red-500 text-sm mt-1">{errors.supplier_contact.message}</p>
@@ -412,55 +411,28 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
             )}
           </div>
 
-          {/* Address Dropdown */}
-          {/* <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Address</label>
-            {supplierAddresses.length > 1 && (
-              <select
-                value={selectedAddressIndex}
-                onChange={handleAddressChange}
-                className="w-full p-2 border border-gray-300 rounded-md mb-2"
-              >
-                {supplierAddresses.map((address, idx) => (
-                  <option key={idx} value={idx}>
-                    {address.pinCode}
-                  </option>
-                ))}
-              </select>
-            )}
-            <input
-              type="text"
-              {...register('supplier_address')}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              value={supplierAddresses[selectedAddressIndex]?.pinCode || ''}
-              readOnly
-            />
-          </div> */}
-
-
-      
-
+          
           <div className="form-group">
             <label className="block text-sm font-medium text-gray-700 mb-1">Payment Terms <span className="text-red-500"> *</span> </label>
             <input
               type="text"
               {...register('payment_terms', { required: 'required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
-              // readOnly
+              //readOnly
             />
             {errors.payment_terms && (
               <p className="text-red-500 text-sm mt-1">{errors.payment_terms.message}</p>
             )}
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label className="block text-sm font-medium text-gray-700 mb-1">PO Date</label>
             <input
               type="date"
               {...register('po_date')}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
-          </div>
+          </div> */}
 
           <div className="form-group">
             <label className="block text-sm font-medium text-gray-700 mb-1">Valid Till <span className="text-red-500"> *</span> </label>
@@ -486,6 +458,7 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
           <div className="form-group">
             <label className="block text-sm font-medium text-gray-700 mb-1">Decision</label>
             <select
+            disabled
               {...register('decision')}
               defaultValue="approve"
               className="w-full p-2 border border-gray-300 rounded-md"
@@ -511,11 +484,19 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
               </label>
 
               <div className="border rounded p-3 bg-gray-50 mb-2">
-                {formatAddress(supplierAddresses[selectedAddressIndex])}
+                  {isEdit ? (
+                    <textarea
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                      {...register('billing_address')}
+                      rows={3}
+                    />
+                  ) : (
+                    formatAddress(supplierAddresses[selectedAddressIndex])
+                  )}      
               </div>
                   <input
                     type="hidden"
-                    {...register('supplier_address')}
+                    {...register('billing_address')}
                     value={
                       [
                         supplierAddresses[selectedAddressIndex]?.attention,
@@ -545,11 +526,19 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
               </label>
 
               <div className="border rounded p-3 bg-gray-50 mb-2">
-                {formatAddress(supplierAddresses[selectedAddressIndex])}
+                  {isEdit ? (
+                    <textarea
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                      {...register('shipping_address')}
+                      rows={3}
+                    />
+                  ) : (
+                    formatAddress(supplierAddresses[selectedAddressIndex])
+                  )}      
               </div>
                   <input
                     type="hidden"
-                    {...register('supplier_address')}
+                    {...register('shipping_address')}
                     value={
                       [
                         supplierAddresses[selectedAddressIndex]?.attention,

@@ -19,6 +19,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, setDr
   });
 
   const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm({
+
     defaultValues: orderData || {
       po_date: new Date().toISOString().split("T")[0],
       valid_till: "",
@@ -26,19 +27,23 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, setDr
       supplier_name: "",
       supplier_contact: "",
       supplier_email: "",
-      supplier_address: "",
+      billing_address:"",
+      shipping_address: "",
       payment_terms: "",
       freight_terms: "",
+      decision: 'approve',
     }
   });
 
   useEffect(() => {
-    console.log('clientdata',clientData);
     
     if (orderData) {
       Object.keys(orderData).forEach(key => {
         setValue(key, orderData[key]);
       });
+       if (orderData.billing_addresses) {
+        setSupplierAddresses(orderData.supplier_addresses);
+      }
     }
   }, [orderData, setValue]);
 
@@ -63,8 +68,23 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, setDr
       setSupplierAddresses(addresses);
       setSelectedAddressIndex(0);
 
+// billing_address:"",
+    const address_billing = addresses[0] || {};
+      const billingString = [
+        address_billing.attention,
+        address_billing.address_line,
+        address_billing.mobile,
+        address_billing.work_phone,
+        address_billing.city,
+        address_billing.state,
+        address_billing.country,
+        address_billing.pinCode,
+        address_billing.phone
+      ].filter(Boolean).join(', ');
 
-    const addressObj = addresses[0] || {};
+      setValue('billing_address', billingString);
+
+    const addressObj = addresses[1] || {};
       const addressString = [
         addressObj.attention,
         addressObj.address_line,
@@ -77,20 +97,15 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, setDr
         addressObj.phone
       ].filter(Boolean).join(', ');
 
-      setValue('supplier_address', addressString);
+      setValue('shipping_address', addressString);
+      
     } else {
       setSupplierAddresses([]);
       setSelectedAddressIndex(0);
-      setValue('supplier_address', '');
+      setValue('shipping_address', '');
     }
   };
 
-  // When address dropdown changes, update supplier_address field
-  // const handleAddressChange = (e) => {
-  //   const idx = parseInt(e.target.value, 10);
-  //   setSelectedAddressIndex(idx);
-  //   setValue('supplier_address', supplierAddresses[idx]?.pinCode || '');
-  // };
 
   const handleAddressChange = (e) => {
   const idx = parseInt(e.target.value, 10);
@@ -109,7 +124,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, setDr
       addressObj.phone
     ].filter(Boolean).join(', ');
 
-    setValue('supplier_address', addressString);
+    setValue('shipping_address', addressString);
   };
 
   const handleFormSubmit = (data) => {
@@ -130,8 +145,14 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, setDr
   };
 
 
+
+
+
+  
+
+
   const formatAddress = (addressObj) => {
-  if (!addressObj) return '';
+  if (!addressObj) return '-';
   return (
     <>
       {addressObj.attention && <strong>{addressObj.attention}</strong>}<br />
@@ -160,7 +181,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, setDr
       addressObj.pinCode,
       addressObj.phone
     ].filter(Boolean).join(', ');
-    setValue('supplier_address', addressString);
+    setValue('shipping_address', addressString);
     setShowAddressModal(false);
   };
 
@@ -230,30 +251,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, setDr
             )}
           </div>
 
-          {/* Address Dropdown */}
-          {/* <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Address</label>
-            {supplierAddresses.length > 1 && (
-              <select
-                value={selectedAddressIndex}
-                onChange={handleAddressChange}
-                className="w-full p-2 border border-gray-300 rounded-md mb-2"
-              >
-                {supplierAddresses.map((address, idx) => (
-                  <option key={idx} value={idx}>
-                    {address.pinCode}
-                  </option>
-                ))}
-              </select>
-            )}
-            <input
-              type="text"
-              {...register('supplier_address')}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              value={supplierAddresses[selectedAddressIndex]?.pinCode || ''}
-              readOnly
-            />
-          </div> */}
+          
 
 
       
@@ -329,11 +327,19 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, setDr
               </label>
 
               <div className="border rounded p-3 bg-gray-50 mb-2">
-                {formatAddress(supplierAddresses[selectedAddressIndex])}
+               {isEdit ? (
+                    <textarea
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                      {...register('billing_address')}
+                      rows={3}
+                    />
+                  ) : (
+                    formatAddress(supplierAddresses[selectedAddressIndex])
+                  )}
               </div>
                   <input
                     type="hidden"
-                    {...register('supplier_address')}
+                    {...register('billing_address')}
                     value={
                       [
                         supplierAddresses[selectedAddressIndex]?.attention,
@@ -363,11 +369,19 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, setDr
               </label>
 
               <div className="border rounded p-3 bg-gray-50 mb-2">
-                {formatAddress(supplierAddresses[selectedAddressIndex])}
+                  {isEdit ? (
+                    <textarea
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                      {...register('shipping_address')}
+                      rows={3}
+                    />
+                  ) : (
+                    formatAddress(supplierAddresses[selectedAddressIndex])
+                  )}      
               </div>
                   <input
                     type="hidden"
-                    {...register('supplier_address')}
+                    {...register('shipping_address')}
                     value={
                       [
                         supplierAddresses[selectedAddressIndex]?.attention,

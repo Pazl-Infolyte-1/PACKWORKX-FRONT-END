@@ -15,7 +15,8 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, fetchDat
     supplier_name: "",
     supplier_contact: "",
     supplier_email: "",
-    supplier_address: "",
+    billing_address:"",
+    shipping_address: "",
     payment_terms: "",
     freight_terms: "",
   });
@@ -57,7 +58,8 @@ useEffect(() => {
         supplier_name: "",
         supplier_contact: "",
         supplier_email: "",
-        supplier_address: "",
+        billing_address:"",
+        shipping_address: "",
         payment_terms: "",
         freight_terms: "",
       });

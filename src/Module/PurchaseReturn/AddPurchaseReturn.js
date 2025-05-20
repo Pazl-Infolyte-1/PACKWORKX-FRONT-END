@@ -7,6 +7,11 @@ import ReturnItemForm from './ReturnItemForm'
 const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
   const [items, setItems] = useState([])
   const [grnId, setGrnId] = useState(null)
+  const [clientData,setClientData]=useState([]);
+  const [supplierAddresses, setSupplierAddresses] = useState([]);
+  const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  
 
   const [poTotals, setPoTotals] = useState({
     total_qty: 0,
@@ -57,10 +62,13 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
       if (purchaseOrder) {
         const fields = [
           'supplier_id', 'supplier_name', 'supplier_contact', 'supplier_email',
-          'supplier_address', 'payment_terms', 'po_date', 'valid_till',
+          'shipping_address', 'payment_terms', 'po_date', 'valid_till',
           'freight_terms', 'decision', 'reason', 'notes'
         ]
         fields.forEach(field => setValue(field, purchaseOrder[field] || ''))
+
+        console.log("purchaseOrder",fields);
+        
       }
 
       if (Array.isArray(purchaseOrderItemDetails)) {
@@ -210,43 +218,247 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
     }
   }
 
+
+  useEffect(() => {
+    const fetchVendors = async () => {
+      try {
+        const initial = await apiMethods.getClients(); 
+        const count = initial?.length || 100; 
+  
+        const fullData = await apiMethods.getClients({ limit: count });
+        const clientsArray = fullData.data;
+  
+        if (Array.isArray(clientsArray)) {
+          const vendorList = clientsArray.filter(client => client.entity_type === "Vendor");
+          console.log('vendorList:', vendorList);
+          setClientData(vendorList);
+        } else {
+          console.error('Expected an array but received:', clientsArray);
+        }
+      } catch (error) {
+        console.error('Error in useEffect:', error);
+      }
+    };
+  
+    fetchVendors();
+  }, []);
+
+
+
+  // change address 
+  const handleSupplierChange = (e) => {
+    const selectedId = parseInt(e.target.value);
+    const selectedClient = clientData.find(client => client.client_id === selectedId);
+
+    if (selectedClient) {
+      setValue('supplier_name', selectedClient.display_name || '');
+      setValue('supplier_email', selectedClient.email || '');
+      setValue('supplier_contact', selectedClient.mobile || selectedClient.work_phone || '');
+      setValue('payment_terms', selectedClient.payment_terms || '');
+
+      // Handle addresses
+      const addresses = selectedClient.addresses || [];
+      setSupplierAddresses(addresses);
+      setSelectedAddressIndex(0);
+
+
+    const addressObj = addresses[0] || {};
+      const addressString = [
+        addressObj.attention,
+        addressObj.address_line,
+        addressObj.mobile,
+        addressObj.work_phone,
+        addressObj.city,
+        addressObj.state,
+        addressObj.country,
+        addressObj.pinCode,
+        addressObj.phone
+      ].filter(Boolean).join(', ');
+
+      setValue('shipping_address', addressString);
+    } else {
+      setSupplierAddresses([]);
+      setSelectedAddressIndex(0);
+      setValue('shipping_address', '');
+    }
+  };
+
+
+
+  const handleAddressChange = (e) => {
+  const idx = parseInt(e.target.value, 10);
+  setSelectedAddressIndex(idx);
+
+  const addressObj = supplierAddresses[idx] || {};
+    const addressString = [
+      addressObj.attention,
+      addressObj.address_line,
+      addressObj.mobile,
+      addressObj.work_phone,
+      addressObj.city,
+      addressObj.state,
+      addressObj.country,
+      addressObj.pinCode,
+      addressObj.phone
+    ].filter(Boolean).join(', ');
+
+    setValue('shipping_address', addressString);
+  };
+
+
+  const formatAddress = (addressObj) => {
+  if (!addressObj) return '';
+  return (
+    <>
+      {addressObj.attention && <strong>{addressObj.attention}</strong>}<br />
+      {addressObj.street1 && <>{addressObj.street1}<br /></>}
+      {addressObj.street2 && <>{addressObj.street2}<br /></>}
+      {addressObj.city && <>{addressObj.city}, </>}
+      {addressObj.state && <>{addressObj.state} </>}
+      {addressObj.pinCode && <>{addressObj.pinCode}<br /></>}
+      {addressObj.country && <>{addressObj.country}<br /></>}
+      {addressObj.phone && <>Phone : {addressObj.phone}</>}
+    </>
+  );
+};
+
+// When confirming address selection in modal
+  const handleAddressSelect = () => {
+    const addressObj = supplierAddresses[selectedAddressIndex] || {};
+    const addressString = [
+      addressObj.attention,
+      addressObj.address_line,
+      addressObj.mobile,
+      addressObj.work_phone,
+      addressObj.city,
+      addressObj.state,
+      addressObj.country,
+      addressObj.pinCode,
+      addressObj.phone
+    ].filter(Boolean).join(', ');
+    setValue('shipping_address', addressString);
+    setShowAddressModal(false);
+  };
+
+
+
+
+
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <h2 className="text-lg font-semibold mb-4">Purchase Order Details</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { label: 'Supplier ID', name: 'supplier_id', type: 'number', required: true },
-            { label: 'Supplier Name', name: 'supplier_name', type: 'text', required: true },
-            { label: 'Supplier Contact', name: 'supplier_contact', type: 'number', required: true },
-            { label: 'Supplier E-mail', name: 'supplier_email', type: 'email', required: true },
-            { label: 'Supplier Address', name: 'supplier_address', type: 'text' },
-            { label: 'Payment Terms', name: 'payment_terms', type: 'text', required: true },
-            { label: 'PO Date', name: 'po_date', type: 'date' },
-            { label: 'Valid Till', name: 'valid_till', type: 'date', required: true },
-            { label: 'Freight Terms', name: 'freight_terms', type: 'text' },
-            { label: 'Reason', name: 'reason', type: 'text' },
-            { label: 'Notes', name: 'notes', type: 'text' }
-          ].map(({ label, name, type, required }) => (
-            <div className="form-group" key={name}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {label} {required && <span className="text-red-500">*</span>}
-              </label>
-              <input
-                type={type}
-                {...register(name, required ? { required: 'Required' } : {})}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-              {errors[name] && (
-                <p className="text-red-500 text-sm mt-1">{errors[name]?.message}</p>
-              )}
-            </div>
-          ))}
 
+          {/* Supplier Dropdown */}
+          <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier ID <span className="text-red-500"> *</span></label>
+            <select
+            disabled
+              {...register('supplier_id', { required: 'required' })}
+              onChange={handleSupplierChange}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              <option value="">-- Select Supplier --</option>
+              {clientData?.map((client) => (
+                <option key={client.client_id} value={client.client_id}>
+                  {client.client_ui_id} - {client.display_name}
+                </option>
+              ))}
+            </select>
+            {errors.supplier_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.supplier_id.message}</p>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Name <span className="text-red-500"> *</span></label>
+            <input
+              type="text"
+              {...register('supplier_name', { required: 'required' })}
+              className="w-full p-2 border border-gray-300 rounded-md"
+              readOnly
+            />
+            {errors.supplier_name && (
+              <p className="text-red-500 text-sm mt-1">{errors.supplier_name.message}</p>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Contact <span className="text-red-500"> *</span></label>
+            <input
+              type="number"
+              {...register('supplier_contact', { required: 'required' })}
+              className="w-full p-2 border border-gray-300 rounded-md"
+               readOnly
+            />
+            {errors.supplier_contact && (
+              <p className="text-red-500 text-sm mt-1">{errors.supplier_contact.message}</p>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier E-mail <span className="text-red-500"> *</span></label>
+            <input
+              type="email"
+              {...register('supplier_email', { required: 'required' })}
+              className="w-full p-2 border border-gray-300 rounded-md"
+              readOnly
+            />
+            {errors.supplier_email && (
+              <p className="text-red-500 text-sm mt-1">{errors.supplier_email.message}</p>
+            )}
+          </div>
+
+          
+          <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Terms <span className="text-red-500"> *</span> </label>
+            <input
+              type="text"
+              {...register('payment_terms', { required: 'required' })}
+              className="w-full p-2 border border-gray-300 rounded-md"
+              //readOnly
+            />
+            {errors.payment_terms && (
+              <p className="text-red-500 text-sm mt-1">{errors.payment_terms.message}</p>
+            )}
+          </div>
+
+          {/* <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">PO Date</label>
+            <input
+              type="date"
+              {...register('po_date')}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div> */}
+
+          <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Valid Till <span className="text-red-500"> *</span> </label>
+            <input
+              type="date"
+              {...register('valid_till', { required: 'required' })}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+            {errors.valid_till && (
+              <p className="text-red-500 text-sm mt-1">{errors.valid_till.message}</p>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Freight Terms</label>
+            <input
+              type="text"
+              {...register('freight_terms')}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          
           <div className="form-group">
             <label className="block text-sm font-medium text-gray-700 mb-1">Decision</label>
             <select
+            disabled
               {...register('decision')}
               defaultValue="approve"
               className="w-full p-2 border border-gray-300 rounded-md"
@@ -254,6 +466,92 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
               <option value="approve">Approve</option>
               <option value="disapprove">Disapprove</option>
             </select>
+          </div>
+          </div>
+
+          {/* Address */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
+          <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Billing Address
+                <span
+                  className="text-blue-600 cursor-pointer float-right text-sm"
+                  onClick={() => setShowAddressModal(true)}
+                  style={{ textDecoration: 'underline' }}
+                >
+                  Change Address
+                </span>
+              </label>
+
+              <div className="border rounded p-3 bg-gray-50 mb-2">
+                  {isEdit ? (
+                    <textarea
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                      {...register('billing_address')}
+                      rows={3}
+                    />
+                  ) : (
+                    formatAddress(supplierAddresses[selectedAddressIndex])
+                  )}      
+              </div>
+                  <input
+                    type="hidden"
+                    {...register('billing_address')}
+                    value={
+                      [
+                        supplierAddresses[selectedAddressIndex]?.attention,
+                        supplierAddresses[selectedAddressIndex]?.address_line,
+                        supplierAddresses?.[selectedAddressIndex]?.work_phones,
+                        supplierAddresses[selectedAddressIndex]?.city,
+                        supplierAddresses[selectedAddressIndex]?.state,
+                        supplierAddresses[selectedAddressIndex]?.country,
+                        supplierAddresses[selectedAddressIndex]?.pinCode,
+                        supplierAddresses[selectedAddressIndex]?.phone
+                      ].filter(Boolean).join(', ')
+                    }
+                />
+          </div>
+
+
+          <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Destination to Deliver
+                <span
+                  className="text-blue-600 cursor-pointer float-right text-sm"
+                  onClick={() => setShowAddressModal(true)}
+                  style={{ textDecoration: 'underline' }}
+                >
+                  Change Address
+                </span>
+              </label>
+
+              <div className="border rounded p-3 bg-gray-50 mb-2">
+                  {isEdit ? (
+                    <textarea
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                      {...register('shipping_address')}
+                      rows={3}
+                    />
+                  ) : (
+                    formatAddress(supplierAddresses[selectedAddressIndex])
+                  )}      
+              </div>
+                  <input
+                    type="hidden"
+                    {...register('shipping_address')}
+                    value={
+                      [
+                        supplierAddresses[selectedAddressIndex]?.attention,
+                        supplierAddresses[selectedAddressIndex]?.address_line,
+                        supplierAddresses?.[selectedAddressIndex]?.work_phones,
+                        supplierAddresses[selectedAddressIndex]?.city,
+                        supplierAddresses[selectedAddressIndex]?.state,
+                        supplierAddresses[selectedAddressIndex]?.country,
+                        supplierAddresses[selectedAddressIndex]?.pinCode,
+                        supplierAddresses[selectedAddressIndex]?.phone
+                      ].filter(Boolean).join(', ')
+                    }
+                />
           </div>
         </div>
 

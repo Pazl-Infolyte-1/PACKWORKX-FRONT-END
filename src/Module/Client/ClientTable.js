@@ -95,7 +95,7 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className=" overflow-y-auto custom-scrollbar ">
-        <div className="bg-white shadow-sm border border-gray-200 rounded-lg h-[530px]">
+        <div className="bg-white shadow-sm border border-gray-200 rounded-lg h-[calc(83vh-74px)]">
           <CTable hover className="w-full">
             {/* Render table headers only if not minimized */}
             {!isMinimized && (

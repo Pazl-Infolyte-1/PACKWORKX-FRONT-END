@@ -16,7 +16,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
   } = useFormContext()
 
   const [stateOptions, setStateOptions] = useState([])
-  
+
   // Watch all address values to handle state display properly
   const addresses = watch('addresses')
 
@@ -208,17 +208,45 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                   {/* Pin Code */}
                   <div className="flex items-center mb-2">
                     <label className="text-xs font-medium text-gray-600 w-24 mr-2">Pin Code</label>
+                    <div>
                     <input
                       type="text"
-                      {...register(`addresses.${index}.pinCode`, { required: 'Required' })}
+                      {...register(`addresses.${index}.pinCode`, {
+                        required: true,
+                        pattern: {
+                          value: /^[1-9][0-9]{5}$/,
+                          message: 'Invalid PIN code',
+                        },
+                        maxLength: {
+                          value: 6,
+                          message: 'Must be 6 digits',
+                        },
+                        minLength: {
+                          value: 6,
+                          message: 'Must be 6 digits',
+                        },
+                      })}
+                      onKeyDown={(e) => {
+                        // Allow only numbers and control keys
+                        if (!/[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/.test(e.key)) {
+                          e.preventDefault()
+                        }
+                      }}
                       style={{
                         border: get(errors, `addresses.${index}.pinCode`)
                           ? '1px solid #EF4444'
                           : '1px solid #D1D5DB',
                       }}
                       className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
-                    />
-                  </div>
+                      maxLength={6}
+                      />
+                    {get(errors, `addresses.${index}.pinCode`) && (
+                      <p className="text-red-500 text-xs ml-2">
+                        {get(errors, `addresses.${index}.pinCode.message`)}
+                      </p>
+                    )}
+                    </div>
+                    </div>
 
                   {/* Phone */}
                   <div className="flex items-center mb-2">
@@ -233,10 +261,10 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                         }}
                         maxLength={10}
                         {...register(`addresses.${index}.phone`, {
-                          required: 'Phone number is required',
+                          required: true,
                           pattern: {
                             value: /^\d{10}$/,
-                            message: 'Phone number must be exactly 10 digits',
+                            message: 'Invalid phone number',
                           },
                         })}
                         style={{
@@ -246,8 +274,14 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                         }}
                         className="p-1.5 rounded w-64 focus:ring-1 focus:ring-indigo-400 text-sm"
                       />
+                      {get(errors, `addresses.${index}.phone`) && (
+                    <p className="text-red-500 text-xs ml-2">
+                      {get(errors, `addresses.${index}.phone.message`)}
+                    </p>
+                  )}
                     </div>
                   </div>
+                  
                 </div>
               )}
             </div>

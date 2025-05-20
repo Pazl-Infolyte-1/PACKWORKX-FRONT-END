@@ -237,8 +237,12 @@ const InventoryDashboard = () => {
                   <td className="p-2">{item.item_name}</td>
                   {/* <td className="p-2">{item.id==inventoryData.item_id?inventoryData.quantity_available:0}</td> */}
                   <td className="p-2">{(() => {
-                    const inventoryItem = inventoryData.find(inv => inv.item_id === item.id);
-                    return inventoryItem ? inventoryItem.quantity_available : 0;
+                    // const inventoryItem = inventoryData.find(inv => inv.item_id === item.id);
+                    // return inventoryItem ? inventoryItem.quantity_available : 0;
+
+                    const inventoryItems = inventoryData.filter(inv => inv.item_id === item.id);
+                    const totalQuantity = inventoryItems.reduce((sum, inv) => sum + Number(inv.quantity_available || 0), 0);
+                    return totalQuantity;
                   })()}</td>
                   <td className="p-2">{item.min_stock_level}</td>
                   <td className="p-2">{item.reorder_level}</td>

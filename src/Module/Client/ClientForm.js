@@ -319,20 +319,56 @@ const ClientForm = ({ resetForm, setReloadData }) => {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
+      // Check for form errors first
+      const formErrors = Object.keys(errors)
+      if (formErrors.length > 0) {
+        setAlerts([
+          { severity: 'error', message: 'Please fix all validation errors before submitting' },
+        ])
+        return
+      }
+
       const filteredData = {
         ...data,
         addresses: data.addresses.map(({ type, ...rest }) => rest),
       }
 
-      const isAddressEmpty = filteredData.addresses.every((address) =>
-        Object.values(address).every((value) => value.trim() === ''),
-      )
+      // Address validation
+      const addressErrors = []
+      filteredData.addresses.forEach((address, index) => {
+        const requiredFields = ['attention', 'city', 'phone', 'pinCode', 'state']
+        const hasEmptyFields = requiredFields.some((field) => {
+          const value = address[field]
+          // Handle different field types
+          if (field === 'state') {
+            return value === null || value === undefined
+          }
+          return !value || (typeof value === 'string' && value.trim() === '')
+        })
 
-      if (isAddressEmpty) {
-        setAlerts([{ severity: 'error', message: 'Fill the Addresses' }])
-        setTimeout(() => {
-          setAlerts([])
-        }, 3000)
+        if (hasEmptyFields) {
+          addressErrors.push(
+            `Please fill all required fields in ${index === 0 ? 'Billing' : 'Shipping'} Address`,
+          )
+        }
+
+        // Validate phone number format if provided
+        if (address.phone && !/^\d{10}$/.test(address.phone.toString())) {
+          addressErrors.push(
+            `Phone number must be 10 digits in ${index === 0 ? 'Billing' : 'Shipping'} Address`,
+          )
+        }
+      })
+
+      if (addressErrors.length > 0) {
+        setAlerts(addressErrors.map((message) => ({ severity: 'error', message })))
+        setLoading(false)
+        return
+      }
+
+      // PAN validation
+      if (data.clientData.PAN && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(data.clientData.PAN)) {
+        setAlerts([{ severity: 'error', message: 'Invalid PAN format' }])
         return
       }
 
@@ -454,7 +490,7 @@ const ClientForm = ({ resetForm, setReloadData }) => {
                     <label className="flex items-center space-x-1 text-sm">
                       <input
                         type="radio"
-                        {...register('clientData.customer_type', { required: true })}
+                        {...register('clientData.customer_type', { required: 'Required' })}
                         value="Business"
                       />
                       <span>Business</span>
@@ -462,11 +498,17 @@ const ClientForm = ({ resetForm, setReloadData }) => {
                     <label className="flex items-center space-x-1 text-sm">
                       <input
                         type="radio"
-                        {...register('clientData.customer_type', { required: true })}
+                        {...register('clientData.customer_type', { required: 'Required' })}
                         value="Individual"
                       />
                       <span>Individual</span>
                     </label>
+
+                    {errors.clientData?.customer_type && (
+                      <span className="text-red-500 text-xs">
+                        {errors.clientData.customer_type.message}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -481,7 +523,7 @@ const ClientForm = ({ resetForm, setReloadData }) => {
                     <select
                       {...register('clientData.salutation', { required: true })}
                       style={getInputStyle(errors.clientData?.salutation)}
-                      className="p-1.5 text-sm rounded w-20"
+                      className="p-1.5 text-sm rounded w-28"
                     >
                       <option value="" disabled>
                         Salutation
@@ -532,7 +574,9 @@ const ClientForm = ({ resetForm, setReloadData }) => {
                   <input
                     type="text"
                     placeholder="Enter display name"
-                    {...register('clientData.display_name', { required: true })}
+                    {...register('clientData.display_name', {
+                      required: 'Please fill the display name',
+                    })}
                     style={getInputStyle(errors.clientData?.display_name)}
                     className="p-1.5 text-sm rounded flex-1"
                   />
@@ -549,11 +593,20 @@ const ClientForm = ({ resetForm, setReloadData }) => {
                     disabled={editData}
                     type="text"
                     placeholder="Email Address"
-                    {...register('clientData.email', { required: true })}
+                    {...register('clientData.email', {
+                      required: true,
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Invalid email address',
+                      },
+                    })}
                     style={getInputStyle(errors.clientData?.email)}
                     className="p-1.5 text-sm rounded flex-1"
                   />
                 </div>
+                {errors.clientData?.email && (
+                  <p className="text-red-500 text-xs ml-32">{errors.clientData.email.message}</p>
+                )}
               </div>
 
               {/* Phone Numbers */}
@@ -562,99 +615,98 @@ const ClientForm = ({ resetForm, setReloadData }) => {
                   <label className="text-sm w-32 after:content-['*'] after:text-red-500 after:ml-1">
                     Phone
                   </label>
-                  <div className="flex gap-5">
-                    {/* Work Phone Input */}
-                    <div
-                      className="flex items-center p-1.5 rounded w-1/2"
-                      style={getInputStyle(errors.clientData?.work_phone)}
-                    >
-                      <img src={Phone} alt="Work Phone" className="mr-1 h-4 w-4" />
-                      <input
-                        type="tel"
-                        placeholder="Work"
-                        maxLength={10}
-                        {...register('clientData.work_phone', {
-                          pattern: {
-                            value: /^\d{10}$/,
-                            message: 'Invalid phone number',
-                          },
-                        })}
-                        onKeyDown={(e) => {
-                          if (
-                            !(
-                              /[0-9]/.test(e.key) ||
-                              ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(
-                                e.key,
-                              ) ||
-                              e.ctrlKey ||
-                              e.metaKey // Allow Ctrl/Cmd + key (e.g., Ctrl+V)
-                            )
-                          ) {
-                            e.preventDefault()
-                          }
-                        }}
-                        onPaste={(e) => {
-                          const pasteData = e.clipboardData.getData('text')
-                          if (!/^\d*$/.test(pasteData)) {
-                            e.preventDefault()
-                          }
-                        }}
-                        className="outline-none w-full text-sm bg-transparent"
-                      />
-                    </div>
+                  <div>
+                    <div className="flex gap-5">
+                      {/* Work Phone Input */}
+                      <div
+                        className="flex items-center p-1.5 rounded w-1/2"
+                        style={getInputStyle(errors.clientData?.work_phone)}
+                      >
+                        <img src={Phone} alt="Work Phone" className="mr-1 h-4 w-4" />
+                        <input
+                          type="tel"
+                          placeholder="Work"
+                          maxLength={10}
+                          {...register('clientData.work_phone', {
+                            required: true,
+                            pattern: {
+                              value: /^\d{10}$/,
+                              message: 'Invalid phone number',
+                            },
+                          })}
+                          onKeyDown={(e) => {
+                            if (
+                              !(
+                                /[0-9]/.test(e.key) ||
+                                ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(
+                                  e.key,
+                                ) ||
+                                e.ctrlKey ||
+                                e.metaKey // Allow Ctrl/Cmd + key (e.g., Ctrl+V)
+                              )
+                            ) {
+                              e.preventDefault()
+                            }
+                          }}
+                          onPaste={(e) => {
+                            const pasteData = e.clipboardData.getData('text')
+                            if (!/^\d*$/.test(pasteData)) {
+                              e.preventDefault()
+                            }
+                          }}
+                          className="outline-none w-full text-sm bg-transparent"
+                        />
+                      </div>
 
-                    {/* Mobile Input */}
-                    <div
-                      className="flex items-center p-1.5 rounded w-1/2"
-                      style={getInputStyle(errors.clientData?.mobile)}
-                    >
-                      <img src={Cell} alt="Mobile" className="mr-1 h-4 w-4" />
-                      <input
-                        type="tel"
-                        placeholder="Mobile"
-                        maxLength={10}
-                        {...register('clientData.mobile', {
-                          pattern: {
-                            value: /^\d{10}$/,
-                            message: 'Invalid phone number',
-                          },
-                        })}
-                        onKeyDown={(e) => {
-                          if (
-                            !(
-                              /[0-9]/.test(e.key) ||
-                              ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(
-                                e.key,
-                              ) ||
-                              e.ctrlKey ||
-                              e.metaKey // Allow Ctrl/Cmd + key (e.g., Ctrl+V)
-                            )
-                          ) {
-                            e.preventDefault()
-                          }
-                        }}
-                        onPaste={(e) => {
-                          const pasteData = e.clipboardData.getData('text')
-                          if (!/^\d*$/.test(pasteData)) {
-                            e.preventDefault()
-                          }
-                        }}
-                        className="outline-none w-full text-sm bg-transparent"
-                      />
+                      {/* Mobile Input */}
+                      <div
+                        className="flex items-center p-1.5 rounded w-1/2"
+                        style={getInputStyle(errors.clientData?.mobile)}
+                      >
+                        <img src={Cell} alt="Mobile" className="mr-1 h-4 w-4" />
+                        <input
+                          type="tel"
+                          placeholder="Mobile"
+                          maxLength={10}
+                          {...register('clientData.mobile', {
+                            required: true,
+                            pattern: {
+                              value: /^\d{10}$/,
+                              message: 'Invalid phone number',
+                            },
+                          })}
+                          onKeyDown={(e) => {
+                            if (
+                              !(
+                                /[0-9]/.test(e.key) ||
+                                ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(
+                                  e.key,
+                                ) ||
+                                e.ctrlKey ||
+                                e.metaKey // Allow Ctrl/Cmd + key (e.g., Ctrl+V)
+                              )
+                            ) {
+                              e.preventDefault()
+                            }
+                          }}
+                          onPaste={(e) => {
+                            const pasteData = e.clipboardData.getData('text')
+                            if (!/^\d*$/.test(pasteData)) {
+                              e.preventDefault()
+                            }
+                          }}
+                          className="outline-none w-full text-sm bg-transparent"
+                        />
+                      </div>
                     </div>
+                    {(errors.clientData?.work_phone || errors.clientData?.mobile) && (
+                      <p className="text-red-500 text-xs">
+                        {errors.clientData?.work_phone?.message ||
+                          errors.clientData?.mobile?.message}
+                      </p>
+                    )}
                   </div>
                 </div>
-
-                {/* Error Messages */}
-                {(errors.clientData?.work_phone || errors.clientData?.mobile) && (
-                  <div className="flex mt-0.5">
-                    <div className="w-32" />
-                    <p className="text-red-500 text-xs">
-                      ⊛
-                      {errors.clientData?.work_phone?.message || errors.clientData?.mobile?.message}
-                    </p>
-                  </div>
-                )}
               </div>
 
               {/* GST Status */}
@@ -668,7 +720,7 @@ const ClientForm = ({ resetForm, setReloadData }) => {
                       <label className="flex items-center space-x-1 text-sm">
                         <input
                           type="radio"
-                          {...register('clientData.gst_status', { required: true })}
+                          {...register('clientData.gst_status', { required: 'Required' })}
                           value="true"
                           onChange={(e) => {
                             if (e.target.checked) {
@@ -681,11 +733,16 @@ const ClientForm = ({ resetForm, setReloadData }) => {
                       <label className="flex items-center space-x-1 text-sm">
                         <input
                           type="radio"
-                          {...register('clientData.gst_status', { required: true })}
+                          {...register('clientData.gst_status', { required: 'Required' })}
                           value="false"
                         />
                         <span>No</span>
                       </label>
+                      {errors.clientData?.gst_status && (
+                        <span className="text-red-500 text-xs">
+                          {errors.clientData.gst_status.message}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -789,7 +846,7 @@ const ClientForm = ({ resetForm, setReloadData }) => {
               handleSubmit(onSubmit)()
             }}
           >
-            Save
+            {loading ? 'Saving...' : 'Save'}
           </button>
 
           <button

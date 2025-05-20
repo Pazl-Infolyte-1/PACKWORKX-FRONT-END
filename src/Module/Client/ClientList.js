@@ -31,7 +31,7 @@ function ClientList() {
   const [totalPage, setTotalPage] = useState(1)
   const [data, setData] = useState([])
   // const [searchQuery, setSearchQuery] = useState('')
-  const [entriesPerPage, setEntriesPerPage] = useState(5)
+  const [entriesPerPage, setEntriesPerPage] = useState(50)
   const [selectedFilter, setSelectedFilter] = useState('')
   const [loading, setLoading] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)

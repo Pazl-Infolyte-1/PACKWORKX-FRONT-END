@@ -1,6 +1,7 @@
 import axios from 'axios'
+import {API_BASE_URL} from './constant'
 
-const BASE_URL = 'https://packworkx.pazl.info/api/'
+const BASE_URL = API_BASE_URL
 const GST_URL = 'http://sheet.gstincheck.co.in/check/9ee24120971acd5c17dc6cad239d99fa'
 // Create axios instance with default config
 const apiClient = axios.create({

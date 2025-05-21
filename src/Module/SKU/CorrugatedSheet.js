@@ -38,6 +38,8 @@ function CorrugatedSheet({
   setMessage,
   errors,
   setErrors,
+       uploadedFiles,
+          setUploadedFiles
 }) {
   const [alerts, setAlerts] = useState([])
   const filteredClient = locationvalue
@@ -57,6 +59,9 @@ function CorrugatedSheet({
   const [isSingleViewPopupRoute, setisSingleViewPopupRoute] = useState(false)
   const [fullRouteResponse, setFullRouteResponse] = useState(null)
   const [deckleError, setDeckleError] = useState('')
+  const [isUploading, setIsUploading] = useState(false);
+//const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
+const [fileNames, setFileNames] = useState([]); 
 
   const selectionFrame = {
     vendor: {
@@ -383,6 +388,90 @@ function CorrugatedSheet({
     }
   }, [selectedRouteIds2])
 
+
+
+  const handleFileUpload = async (event) => {
+    const selectedFiles = event.target.files;
+    if (!selectedFiles || selectedFiles.length === 0) return;
+  
+    setIsUploading(true);
+  
+    const urls = [...uploadedFiles];
+    const names = [...fileNames];
+  
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      const formData = new FormData();
+      formData.append('file', file);
+  
+      try {
+        const response = await apiMethods.uploadFile(formData);
+        const fileUrl = response?.data?.data?.file_url;
+  
+        if (fileUrl) {
+          urls.push(fileUrl);
+          names.push(file.name);
+        }
+      } catch (err) {
+        console.error('File upload failed:', err);
+      }
+    }
+  
+    setUploadedFiles(urls);
+      setAddNewSkuData(prev => ({
+      ...prev,
+      documents: urls
+    }));
+    setFileNames(names);
+  
+    setIsUploading(false);
+    event.target.value = '';
+  };
+  
+  // Add this function to handle file removal
+  const removeFile = (indexToRemove) => {
+    const updatedUrls = uploadedFiles.filter((_, index) => index !== indexToRemove);
+    const updatedNames = fileNames.filter((_, index) => index !== indexToRemove);
+  
+    setUploadedFiles(updatedUrls);
+      setAddNewSkuData((prev) => ({
+      ...prev,
+      documents: updatedUrls, // Keep documents in sync
+    }));
+    setFileNames(updatedNames);
+  };
+  
+  //document edit
+ useEffect(() => {
+  // Clear files only if print_type is 'None' and documents are not already empty
+  if (addNewSkuData.print_type === 'None') {
+    if (uploadedFiles.length > 0 || addNewSkuData.documents.length > 0) {
+      setUploadedFiles([]);
+      setFileNames([]);
+
+      // Only update documents if not already empty
+      if (addNewSkuData.documents.length > 0) {
+        setAddNewSkuData((prev) => ({
+          ...prev,
+          documents: [],
+        }));
+      }
+    }
+    return;
+  }
+
+  // Load files only if editing and there are documents to load
+  if (editTag && addNewSkuData.documents?.length > 0 && uploadedFiles.length === 0) {
+    setUploadedFiles([...addNewSkuData.documents]);
+    setFileNames(
+      addNewSkuData.documents.map((file) =>
+        typeof file === 'string' ? file.split('/').pop() : file.name
+      )
+    );
+  }
+}, [editTag, addNewSkuData.print_type]); // <- remove addNewSkuData.documents from deps
+
+
   return (
     <div className="rounded-lg">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -429,16 +518,18 @@ function CorrugatedSheet({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             SKU Name
             <span className="text-red-500 ml-1">*</span>
-            {errors.sku_name && (
+            {/*{errors.sku_name && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
-            )}
+            )}*/}
           </label>
           <input
             id="sku_name"
             name="sku_name"
             value={addNewSkuData.sku_name}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                                 className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.sku_name ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
         </div>
 
@@ -446,9 +537,9 @@ function CorrugatedSheet({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Client Name
             <span className="text-red-500 ml-1">*</span>
-            {errors.client_id && (
+            {/*{errors.client_id && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
-            )}
+            )}*/}
           </label>
           <select
             name="client"
@@ -456,7 +547,9 @@ function CorrugatedSheet({
             disabled={clientDiasble}
             value={addNewSkuData.client_id || null}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.client_id ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           >
             <option value="" hidden>
               Select
@@ -533,9 +626,9 @@ function CorrugatedSheet({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Joints
               <span className="text-red-500 ml-1">*</span>
-              {errors.joints && (
+              {/*{errors.joints && (
                 <span className="text-red-500 text-sm ml-2 align-middle">{errors.joints}</span>
-              )}
+              )}*/}
             </label>
             <input
               id="joints"
@@ -545,7 +638,9 @@ function CorrugatedSheet({
               value={addNewSkuData.joints}
               onChange={handleChange}
               readOnly={editTag}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </Tooltip>
@@ -555,9 +650,9 @@ function CorrugatedSheet({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               UPS
               <span className="text-red-500 ml-1">*</span>
-              {errors.ups && (
+              {/*{errors.ups && (
                 <span className="text-red-500 text-sm ml-2 align-middle">{errors.ups}</span>
-              )}
+              )}*/}
             </label>
             <input
               id="ups"
@@ -567,7 +662,9 @@ function CorrugatedSheet({
               min="0"
               onChange={handleChange}
               readOnly={editTag}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.ups ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </Tooltip>
@@ -577,9 +674,9 @@ function CorrugatedSheet({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Flap Width
               <span className="text-red-500 ml-1">*</span>
-              {errors.flap_width && (
+              {/*{errors.flap_width && (
                 <span className="text-red-500 text-sm ml-2 align-middle">{errors.flap_width}</span>
-              )}
+              )}*/}
             </label>
             <input
               id="flap_width"
@@ -589,7 +686,9 @@ function CorrugatedSheet({
               onChange={handleChange}
               type="number"
               readOnly={editTag}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+               className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.flap_width ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </Tooltip>
@@ -599,11 +698,11 @@ function CorrugatedSheet({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Flap Tolerance
               <span className="text-red-500 ml-1">*</span>
-              {errors.flap_tolerance && (
+              {/*{errors.flap_tolerance && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.flap_tolerance}
                 </span>
-              )}
+              )}*/}
             </label>
             <input
               id="flap_tolerance"
@@ -613,7 +712,9 @@ function CorrugatedSheet({
               min="0"
               type="number"
               readOnly={editTag}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+               className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.flap_tolerance ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </Tooltip>
@@ -623,11 +724,11 @@ function CorrugatedSheet({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Trimming Tolereance
               <span className="text-red-500 ml-1">*</span>
-              {errors.length_trimming_tolerance && (
+              {/*{errors.length_trimming_tolerance && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.length_trimming_tolerance}
                 </span>
-              )}
+              )}*/}
             </label>
             <input
               id="length_trimming_tolerance"
@@ -637,7 +738,9 @@ function CorrugatedSheet({
               min="0"
               type="number"
               readOnly={editTag}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.length_trimming_tolerance ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </Tooltip>
@@ -646,9 +749,9 @@ function CorrugatedSheet({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Internal Id
             <span className="text-red-500 ml-1">*</span>
-            {errors.internal_id && (
+            {/*{errors.internal_id && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.internal_id}</span>
-            )}
+            )}*/}
           </label>
           <input
             id="internal_id"
@@ -656,7 +759,9 @@ function CorrugatedSheet({
             value={addNewSkuData.internal_id}
             onChange={handleChange}
             readOnly={editTag}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.internal_id ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
         </div>
 
@@ -702,9 +807,9 @@ function CorrugatedSheet({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Deckle Size
               <span className="text-red-500 ml-1">*</span>
-              {errors.deckle_size && (
+              {/*{errors.deckle_size && (
                 <span className="text-red-500 text-sm ml-2 align-middle">{errors.deckle_size}</span>
-              )}
+              )}*/}
             </label>
             <input
               id="deckle_size"
@@ -714,11 +819,12 @@ function CorrugatedSheet({
               min="0"
               onChange={handleChange}
               readOnly={editTag}
-              className={`w-full p-1 border rounded-md focus:ring-2 transition-colors ${
-                diecutCalculations.deckleError
-                  ? 'border-red-500 ring-red-400'
-                  : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-              }`}
+     className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+  errors.deckle_size || diecutCalculations.deckleError
+    ? 'border-2 border-red-500'
+    : 'border border-gray-300'
+}`}
+
             />
             {diecutCalculations.deckleError && (
               <p className="mt-1 text-sm text-red-600">{diecutCalculations.deckleError}</p>
@@ -742,7 +848,9 @@ function CorrugatedSheet({
             type="number"
             value={addNewSkuData.minimum_order_level}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
         </div>
 
@@ -771,6 +879,75 @@ function CorrugatedSheet({
             <option value={15}>15%</option>
           </select>
         </div>
+
+        
+      <div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">Print Type</label>
+  <select
+    id="print_type"
+    name="print_type"
+    value={addNewSkuData?.print_type || ''}
+    onChange={handleChange}
+    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+  >
+    <option value="">Select Type</option>
+    <option value="None">None</option>
+    <option value="Offset">Offset</option>
+    <option value="Flexo">Flexo</option>
+  </select>
+</div>
+
+{(addNewSkuData?.print_type === 'Offset' || addNewSkuData?.print_type === 'Flexo') && (
+  <div className="flex w-[200px]">
+    <div className="flex flex-col flex w-[200px]">
+      {/* Custom styled file input */}
+         <label className="block text-sm font-medium text-gray-700 mb-2">Documents</label>
+      <label
+        htmlFor="file-upload"
+        className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
+      >
+        Upload Files
+      </label>
+      <input
+        id="file-upload"
+        type="file"
+        accept="application/pdf"
+        onChange={handleFileUpload}
+        multiple
+        className="hidden"
+      />
+
+      {/* Uploading text */}
+      {isUploading && (
+        <div className="text-sm text-blue-600 mt-2">Uploading files...</div>
+      )}
+
+      {/* Display uploaded files */}
+      {uploadedFiles.length > 0 && (
+        <div className="mt-2">
+          <p className="text-xs text-gray-600 mb-1">Uploaded files:</p>
+       <ul className="space-y-0.5">
+  {uploadedFiles.map((file, index) => (
+    <li key={index} className="flex items-center text-xs w-full max-w-[240px]">
+      <div className="flex-1 truncate text-gray-700">
+        {file.name || (typeof file === 'string' ? file.split('/').pop() : file.url.split('/').pop())}
+      </div>
+      <button
+        type="button"
+        onClick={() => removeFile(index)}
+        className="ml-1 text-red-500 hover:text-red-700 text-sm"
+      >
+        ✕
+      </button>
+    </li>
+  ))}
+</ul>
+
+        </div>
+      )}
+    </div>
+  </div>
+)}
       </div>
 
       {/*client create drop down option popup*/}

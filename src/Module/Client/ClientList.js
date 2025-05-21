@@ -206,7 +206,7 @@ function ClientList() {
   }
 
   return (
-    <div className="flex">
+    <div className="flex ">
       <div ref={clientListRef} className={isMinimized ? 'w-[320px] border-r' : 'w-full'}>
         <div className="relative">
           <ContentHeader
@@ -279,7 +279,7 @@ function ClientList() {
           />
         </div>
         <div
-          className={`${isMinimized ? 'flex-col ' : 'flex justify-between '} items-center gap-4 m-2`}
+          className={`${isMinimized ? 'flex-col ' : 'flex justify-between '} items-center gap-4 m-2 px-2`}
         >
           <div className=" flex w-32 items-center gap-1 font-normal text-sm">
             <span>Total Count:</span>

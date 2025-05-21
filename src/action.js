@@ -11,3 +11,7 @@ export const setCompositeArray = (payload) => ({
 	payload,
   });
   
+  export const setRscDeckleSize = (payload) => ({
+  type: 'SET_RSC_DECKLE_SIZE',
+  payload, // should be an object like { length, height, ups }
+});

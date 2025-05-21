@@ -95,7 +95,7 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className=" overflow-y-auto custom-scrollbar ">
-        <div className="bg-white shadow-sm border border-gray-200 rounded-lg h-[calc(83vh-74px)]">
+        <div className="bg-white shadow-sm border border-gray-200 rounded-lg h-[calc(82vh-74px)]">
           <CTable hover className="w-full">
             {/* Render table headers only if not minimized */}
             {!isMinimized && (
@@ -239,7 +239,7 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
                 ))
               ) : (
                 <CTableRow>
-                  <CTableDataCell colSpan={isMinimized ? 2 : 8} className="text-center text-sm !text-red-600">
+                  <CTableDataCell colSpan={isMinimized ? 2 : 8} className="text-center text-sm !text-red-600  py-3">
                     No Data Found
                   </CTableDataCell>
                 </CTableRow>

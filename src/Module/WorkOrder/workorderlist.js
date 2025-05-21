@@ -20,7 +20,7 @@ import CompactPagination from '../../components/New/CompactPagination'
 
 const WorkOrders = () => {
   const [data, setData] = useState([])
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(50)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { filteredSearchData, searchQuery, } = useSearch()
   const [showPopUp, setShowPopUp] = useState(null)
@@ -193,7 +193,7 @@ const WorkOrders = () => {
 
       <div className="flex w-full">
 
-       <div className={`${isMinimiseTable ? 'w-1/4' : 'w-full'} !h-[90vh] `}>
+       <div className={`${isMinimiseTable ? 'w-2/6' : 'w-full'} !h-[90vh] `}>
          <ContentHeader
             heading={"Work Order"}
             isMinimized={isMinimiseTable}

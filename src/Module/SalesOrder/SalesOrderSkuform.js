@@ -113,43 +113,86 @@ const SalesOrderSkuForm = ({
   }, [selectedClient]);
 
   // Load initial data from skuDetailsForm if available
-  useEffect(() => {
-    if (skuDetailsForm && skuDetailsForm.length > 0) {
-      const formattedData = skuDetailsForm.map(item => {
-        const baseFields = {
-          sku: item.sku || '',
-          quantity: item.quantity_required || '',
-          rate: item.rate_per_sku || '',
-          acceptableUnits: item.acceptable_sku_units || '',
-          totalAmount: item.total_amount || '',
-          totalGst: item.totalGst || '',
-          total: item.total_incl__gst || ''
+// Load initial data from skuDetailsForm if available
+useEffect(() => {
+  if (skuDetailsForm && skuDetailsForm.length > 0 && skuList.length > 0) {
+    const formattedData = skuDetailsForm.map(item => {
+      const baseFields = {
+        sku: item.sku || '',
+        quantity: item.quantity_required || '',
+        rate: item.rate_per_sku || '',
+        acceptableUnits: item.acceptable_sku_units || '',
+        totalAmount: item.total_amount || '',
+        totalGst: item.totalGst || '',
+        total: item.total_incl__gst || ''
+      };
+
+      return isIgstApplicable
+        ? {
+          ...baseFields,
+          igst: item.igst || '',
+          igstAmount: item.igst_amount || ''
+        }
+        : {
+          ...baseFields,
+          sgst: item.sgst || '',
+          cgst: item.cgst || '',
+          sgstAmount: item.sgst_amount || '',
+          cgstAmount: item.cgst_amount || ''
         };
+    });
 
-        return isIgstApplicable
-          ? {
-            ...baseFields,
-            igst: item.igst || '',
-            igstAmount: item.igst_amount || ''
+    // Set form values
+    setValue('skus', formattedData);
+    
+    // Force calculations for all rows immediately 
+    formattedData.forEach((item, idx) => {
+      if (item.sku) {
+        // For each item with an SKU, force calculate values
+        const selectedSku = skuList.find(sku => sku.sku_name === item.sku);
+        
+        // Make sure quantity and rate are numeric
+        const quantity = parseFloat(item.quantity) || 0;
+        const rate = parseFloat(item.rate) || 0;
+        
+        // Calculate totalAmount directly (don't wait for the function)
+        const totalAmount = quantity * rate;
+        
+        // Set totalAmount first
+        setValue(`skus[${idx}].totalAmount`, totalAmount.toFixed(2));
+        
+        // Then calculate GST based on GST percentage
+        if (selectedSku) {
+          const gstPercentage = selectedSku.gst_percentage || 0;
+          
+          if (isIgstApplicable) {
+            // IGST calculation
+            setValue(`skus[${idx}].igst`, gstPercentage);
+            const igstAmount = totalAmount * (gstPercentage / 100);
+            setValue(`skus[${idx}].igstAmount`, igstAmount.toFixed(2));
+            setValue(`skus[${idx}].totalGst`, igstAmount.toFixed(2));
+            setValue(`skus[${idx}].total`, (totalAmount + igstAmount).toFixed(2));
+          } else {
+            // CGST/SGST calculation
+            const halfGst = gstPercentage / 2;
+            setValue(`skus[${idx}].sgst`, halfGst);
+            setValue(`skus[${idx}].cgst`, halfGst);
+            
+            const sgstAmount = totalAmount * (halfGst / 100);
+            const cgstAmount = totalAmount * (halfGst / 100);
+            setValue(`skus[${idx}].sgstAmount`, sgstAmount.toFixed(2));
+            setValue(`skus[${idx}].cgstAmount`, cgstAmount.toFixed(2));
+            setValue(`skus[${idx}].totalGst`, (sgstAmount + cgstAmount).toFixed(2));
+            setValue(`skus[${idx}].total`, (totalAmount + sgstAmount + cgstAmount).toFixed(2));
           }
-          : {
-            ...baseFields,
-            sgst: item.sgst || '',
-            cgst: item.cgst || '',
-            sgstAmount: item.sgst_amount || '',
-            cgstAmount: item.cgst_amount || ''
-          };
-      });
-
-      const currentFormData = JSON.stringify(getValues('skus'));
-      const newFormData = JSON.stringify(formattedData);
-
-      if (currentFormData !== newFormData) {
-        setValue('skus', formattedData);
-        recalculateAllTotals(formattedData);
+        }
       }
-    }
-  }, [skuDetailsForm, setValue, getValues, isIgstApplicable]);
+    });
+    
+    // Finally recalculate all totals
+    recalculateAllTotals();
+  }
+}, [skuDetailsForm, skuList, setValue, getValues, isIgstApplicable]);
 
   // Function to recalculate all totals based on current form data
   const recalculateAllTotals = (data = null) => {
@@ -259,73 +302,67 @@ const SalesOrderSkuForm = ({
   };
 
   // Calculate row values when quantity, rate, or GST changes
-  const calculateRowValues = (index) => {
-    const values = getValues(`skus[${index}]`);
-    const quantity = parseFloat(values.quantity) || 0;
-    const rate = parseFloat(values.rate) || 0;
+// Calculate row values when quantity, rate, or GST changes
+const calculateRowValues = (index) => {
+  const values = getValues(`skus[${index}]`);
+  const quantity = parseFloat(values.quantity) || 0;
+  const rate = parseFloat(values.rate) || 0;
 
-    const totalAmount = quantity * rate;
+  const totalAmount = quantity * rate;
 
-    let gstAmount = 0;
-    let total = 0;
-    let sgstAmount = 0;
-    let cgstAmount = 0;
-    let igstAmount = 0;
+  let gstAmount = 0;
+  let total = 0;
+  let sgstAmount = 0;
+  let cgstAmount = 0;
+  let igstAmount = 0;
 
-    // Find selected SKU to get GST percentage if available
-    const selectedSku = skuList.find(sku => sku.sku_name === values.sku);
+  // Find selected SKU to get GST percentage if available
+  const selectedSku = skuList.find(sku => sku.sku_name === values.sku);
+  
+  if (isIgstApplicable) {
+    // Use SKU's GST percentage if available, otherwise use the form value
+    const igstPercentage = selectedSku?.gst_percentage || parseFloat(values.igst) || 0;
     
-    if (isIgstApplicable) {
-      // Use SKU's GST percentage if available, otherwise use the form value
-      const igstPercentage = selectedSku?.gst_percentage || parseFloat(values.igst) || 0;
-      
-      // Set the IGST percentage from SKU if available
-      if (selectedSku?.gst_percentage) {
-        setValue(`skus[${index}].igst`, igstPercentage);
-      }
-
-      igstAmount = totalAmount * (igstPercentage / 100);
-      gstAmount = igstAmount;
-      total = totalAmount + igstAmount;
-
-      setValue(`skus[${index}].igstAmount`, igstAmount.toFixed(2));
-      setValue(`skus[${index}].totalGst`, igstAmount.toFixed(2));
-    } else {
-      // Use SKU's GST percentage if available, otherwise use the form values
-      const gstPercentage = selectedSku?.gst_percentage || 0;
-      const sgstPercentage = gstPercentage ? gstPercentage / 2 : parseFloat(values.sgst) || 0;
-      const cgstPercentage = gstPercentage ? gstPercentage / 2 : parseFloat(values.cgst) || 0;
-      
-      // Set the SGST/CGST percentages from SKU if available
-      if (selectedSku?.gst_percentage) {
-        setValue(`skus[${index}].sgst`, sgstPercentage);
-        setValue(`skus[${index}].cgst`, cgstPercentage);
-      }
-
-      sgstAmount = totalAmount * (sgstPercentage / 100);
-      cgstAmount = totalAmount * (cgstPercentage / 100);
-      gstAmount = sgstAmount + cgstAmount;
-      total = totalAmount + sgstAmount + cgstAmount;
-
-      setValue(`skus[${index}].sgstAmount`, sgstAmount.toFixed(2));
-      setValue(`skus[${index}].cgstAmount`, cgstAmount.toFixed(2));
-      setValue(`skus[${index}].totalGst`, gstAmount.toFixed(2));
+    // Set the IGST percentage from SKU if available
+    if (selectedSku?.gst_percentage) {
+      setValue(`skus[${index}].igst`, igstPercentage);
     }
 
-    setValue(`skus[${index}].totalAmount`, totalAmount.toFixed(2));
-    setValue(`skus[${index}].total`, total.toFixed(2));
+    igstAmount = totalAmount * (igstPercentage / 100);
+    gstAmount = igstAmount;
+    total = totalAmount + igstAmount;
 
-    // Update the form with new calculated values
-    const updatedValues = { ...getValues(`skus[${index}]`) };
-    setValue(`skus[${index}]`, updatedValues);
+    setValue(`skus[${index}].igstAmount`, igstAmount.toFixed(2));
+    setValue(`skus[${index}].totalGst`, igstAmount.toFixed(2));
+  } else {
+    // Use SKU's GST percentage if available, otherwise use the form values
+    const gstPercentage = selectedSku?.gst_percentage || 0;
+    const sgstPercentage = gstPercentage ? gstPercentage / 2 : parseFloat(values.sgst) || 0;
+    const cgstPercentage = gstPercentage ? gstPercentage / 2 : parseFloat(values.cgst) || 0;
     
-    // Immediately recalculate all totals after updating a row
-    // This ensures the totals update even when modifying the last row
-    setTimeout(() => {
-      recalculateAllTotals();
-      updateParentFormData();
-    }, 0);
-  };
+    // Set the SGST/CGST percentages from SKU if available
+    if (selectedSku?.gst_percentage) {
+      setValue(`skus[${index}].sgst`, sgstPercentage);
+      setValue(`skus[${index}].cgst`, cgstPercentage);
+    }
+
+    sgstAmount = totalAmount * (sgstPercentage / 100);
+    cgstAmount = totalAmount * (cgstPercentage / 100);
+    gstAmount = sgstAmount + cgstAmount;
+    total = totalAmount + sgstAmount + cgstAmount;
+
+    setValue(`skus[${index}].sgstAmount`, sgstAmount.toFixed(2));
+    setValue(`skus[${index}].cgstAmount`, cgstAmount.toFixed(2));
+    setValue(`skus[${index}].totalGst`, gstAmount.toFixed(2));
+  }
+
+  setValue(`skus[${index}].totalAmount`, totalAmount.toFixed(2));
+  setValue(`skus[${index}].total`, total.toFixed(2));
+
+  // Immediately recalculate all totals after updating a row
+  recalculateAllTotals();
+  updateParentFormData();
+};
 
   // Remove a SKU row
   const removeSku = (index) => {
@@ -369,86 +406,103 @@ const SalesOrderSkuForm = ({
                       <tr className="h-[70px]">
                         {/* Item Details */}
                         <td className="border-b text-left w-[350px]">
-                          <Controller
-                            control={control}
-                            name={`skus[${index}].sku`}
-                            render={({ field }) => {
-                              const selectedSkus = watch("skus")
-                                .map((s, idx) => idx !== index && s.sku)
-                                .filter(Boolean);
+                        <Controller
+  control={control}
+  name={`skus[${index}].sku`}
+  render={({ field }) => {
+    const selectedSkus = watch("skus")
+      .map((s, idx) => idx !== index && s.sku)
+      .filter(Boolean);
 
-                              // Options for dropdown
-                              const options = skuList.map((skuItem) => ({
-                                label: `${skuItem.sku_name} (GST: ${skuItem.gst_percentage}%)`,
-                                value: skuItem.sku_name,
-                                gstPercentage: skuItem.gst_percentage,
-                                isDisabled: selectedSkus.includes(skuItem.sku_name),
-                              }));
+    // Options for dropdown
+    const options = skuList.map((skuItem) => ({
+      label: `${skuItem.sku_name} (GST: ${skuItem.gst_percentage}%)`,
+      value: skuItem.sku_name,
+      gstPercentage: skuItem.gst_percentage,
+      isDisabled: selectedSkus.includes(skuItem.sku_name),
+    }));
 
-                              // Current value
-                              const selectedValue = options.find(
-                                (option) => option.value === field.value
-                              );
+    // Current value
+    const selectedValue = options.find(
+      (option) => option.value === field.value
+    );
 
-                              return (
-                                <div className="w-full">
-                                  <Select
-                                    {...field}
-                                    value={selectedValue || null}
-                                    options={options}
-                                    isLoading={isLoading}
-                                    isClearable
-                                    isSearchable
-                                    menuPortalTarget={document.body}
-                                    onChange={(selectedOption) => {
-                                      field.onChange(selectedOption?.value || "");
+    // This useEffect will immediately calculate values if there's already a SKU selected
+    // Important for edit mode
+    useEffect(() => {
+      if (field.value && selectedValue) {
+        // Get current row data
+        const rowData = getValues(`skus[${index}]`);
+        
+        // If we have a SKU selected and either quantity or rate has a value
+        // we should calculate the row values immediately
+        if (parseFloat(rowData.quantity) > 0 || parseFloat(rowData.rate) > 0) {
+          calculateRowValues(index);
+        }
+      }
+    }, [field.value, selectedValue]);
 
-                                      if (selectedOption?.value && errors?.skuDetails?.[index]) {
-                                        const newErrors = { ...errors };
-                                        if (newErrors.skuDetails) {
-                                          newErrors.skuDetails[index] = undefined;
-                                          setErrors(newErrors);
-                                        }
-                                      }
-                                      calculateRowValues(index);
-                                    }}
-                                    styles={{
-                                      control: (base, state) => ({
-                                        ...base,
-                                        minHeight: 32,
-                                        height: 32,
-                                        fontSize: 14,
-                                        borderColor: errors?.skuDetails?.[index] ? 'red' : state.isFocused ? '#6366f1' : 'transparent',
-                                        boxShadow: state.isFocused ? '0 0 0 1px #6366f1' : 'none',
-                                        '&:hover': {
-                                          borderColor: state.isFocused ? '#6366f1' : '#c2c2c2',
-                                        },
-                                      }),
-                                      valueContainer: (base) => ({
-                                        ...base,
-                                        padding: "0 6px",
-                                        textAlign: "left",
-                                      }),
-                                      indicatorsContainer: (base) => ({
-                                        ...base,
-                                        height: 32,
-                                      }),
-                                      dropdownIndicator: (base) => ({
-                                        ...base,
-                                        padding: 4,
-                                      }),
-                                      clearIndicator: (base) => ({
-                                        ...base,
-                                        padding: 4,
-                                      }),
-                                      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                                    }}
-                                    placeholder="Type or click to select an item."
-                                  />
-                                </div>
-                              );
-                            }}
-                          />
+    return (
+      <div className="w-full">
+        <Select
+          {...field}
+          value={selectedValue || null}
+          options={options}
+          isLoading={isLoading}
+          isClearable
+          isSearchable
+          menuPortalTarget={document.body}
+          onChange={(selectedOption) => {
+            field.onChange(selectedOption?.value || "");
+
+            if (selectedOption?.value && errors?.skuDetails?.[index]) {
+              const newErrors = { ...errors };
+              if (newErrors.skuDetails) {
+                newErrors.skuDetails[index] = undefined;
+                setErrors(newErrors);
+              }
+            }
+            
+            // Always calculate row values when the SKU changes
+            calculateRowValues(index);
+          }}
+          styles={{
+            control: (base, state) => ({
+              ...base,
+              minHeight: 32,
+              height: 32,
+              fontSize: 14,
+              borderColor: errors?.skuDetails?.[index] ? 'red' : state.isFocused ? '#6366f1' : 'transparent',
+              boxShadow: state.isFocused ? '0 0 0 1px #6366f1' : 'none',
+              '&:hover': {
+                borderColor: state.isFocused ? '#6366f1' : '#c2c2c2',
+              },
+            }),
+            valueContainer: (base) => ({
+              ...base,
+              padding: "0 6px",
+              textAlign: "left",
+            }),
+            indicatorsContainer: (base) => ({
+              ...base,
+              height: 32,
+            }),
+            dropdownIndicator: (base) => ({
+              ...base,
+              padding: 4,
+            }),
+            clearIndicator: (base) => ({
+              ...base,
+              padding: 4,
+            }),
+            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+          }}
+          placeholder="Type or click to select an item."
+        />
+      </div>
+    );
+  }}
+/>
                         </td>
 
                         {/* Quantity Input */}

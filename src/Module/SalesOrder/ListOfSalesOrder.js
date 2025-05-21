@@ -24,7 +24,7 @@ function ListOfSalesOrder() {
   const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
   const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
   const [ApiResponse, setApiResponse] = useState([])
-  const [paginationParams, setPaginationParams] = useState({ currentPage: 1, pageSize: 10 });
+  const [paginationParams, setPaginationParams] = useState({ currentPage: 1, pageSize: 50 });
   const [isConfirmationModaleOpen, setIsConfirmationModaleOpen] = useState(false)
   const [selectedSalesOrder, setSelectedSalesOrder] = useState("")
   const [status, setStatus] = useState('')
@@ -248,7 +248,7 @@ function ListOfSalesOrder() {
 
 
         <CustomAlert alerts={alerts} handleClose={handleClose} />
-        <div className={`${isMinimiseTable ? 'w-1/4' : 'w-full'} !h-[90vh] `}>
+        <div className={`${isMinimiseTable ? 'w-2/6' : 'w-full'} !h-[90vh] `}>
           <ContentHeader
             heading={"Sales Order"}
             isMinimized={isMinimiseTable}

@@ -129,7 +129,7 @@ function ContentHeader({
           {showMenu && (
             <div
               ref={menuRef}
-              className="absolute right-0 mt-2 w-48 text-xs bg-white rounded-md shadow-lg z-50 border border-gray-200"
+              className="absolute right-0 mt-2 w-32 text-xs bg-white rounded-md shadow-lg z-50 border border-gray-200"
             >
         
               <div className="py-1">

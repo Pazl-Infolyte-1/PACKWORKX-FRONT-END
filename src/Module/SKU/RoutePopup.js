@@ -48,41 +48,54 @@ const RoutePopup=({setisSingleViewPopupRoute,fullRouteResponse})=>{
   
 	return (<>
     <div className="h-[300px] overflow-y-auto border border-gray-200 custom-scrollbar">
-    <CTable striped hover className="w-full m-0">
-      <CTableHead className="bg-gray-100 sticky top-0 z-10">
-        <CTableRow className="text-center">
-          <CTableHeaderCell>Select Route</CTableHeaderCell>
-          <CTableHeaderCell>Route Name</CTableHeaderCell>
-          <CTableHeaderCell>Created Date</CTableHeaderCell>
+   <CTable striped hover className="w-full m-0">
+  <CTableHead className="bg-gray-100 sticky top-0 z-10">
+    <CTableRow className="text-center">
+      <CTableHeaderCell>Select Route</CTableHeaderCell>
+      <CTableHeaderCell>Route Name</CTableHeaderCell>
+      <CTableHeaderCell>Created Date</CTableHeaderCell>
+    </CTableRow>
+  </CTableHead>
+  <CTableBody>
+    {routes.length > 0 ? (
+      routes.map((route) => (
+        <CTableRow
+          key={route.id}
+          className={`text-center cursor-pointer ${
+            selectedRouteIds2.includes(route.id) ? 'bg-blue-50' : ''
+          }`}
+          onClick={(e) => {
+            if (!e.target.closest('input[type="checkbox"]')) {
+              handleCheckboxChange(route.id);
+            }
+          }}
+        >
+          <CTableDataCell>
+            <input
+              type="checkbox"
+              checked={selectedRouteIds2.includes(route.id)}
+              onChange={(e) => {
+                e.stopPropagation();
+                handleCheckboxChange(route.id);
+              }}
+            />
+          </CTableDataCell>
+          <CTableDataCell>{route.route_name}</CTableDataCell>
+          <CTableDataCell>
+            {new Date(route.created_at).toLocaleDateString()}
+          </CTableDataCell>
         </CTableRow>
-      </CTableHead>
-      <CTableBody>
-        {routes.length > 0 ? (
-          routes.map((route) => (
-            <CTableRow key={route.id} className="text-center">
-              <CTableDataCell>
-                <input
-                  type="checkbox"
-                  checked={route?.id != null && selectedRouteIds2.includes(route.id)}
-                  onChange={() => handleCheckboxChange(route?.id)}
-                />
-              </CTableDataCell>
-              <CTableDataCell>{route.route_name}</CTableDataCell>
-              <CTableDataCell>
-                {new Date(route.created_at).toLocaleDateString()}
-              </CTableDataCell>
-            </CTableRow>
-          ))
-        ) : (
-          <CTableRow>
-            <CTableDataCell colSpan={3} className="text-center text-gray-500">
-              No route data found.
-            </CTableDataCell>
-          </CTableRow>
-        )}
-      </CTableBody>
-    </CTable>
-	
+      ))
+    ) : (
+      <CTableRow>
+        <CTableDataCell colSpan={3} className="text-center text-gray-500">
+          No route data found.
+        </CTableDataCell>
+      </CTableRow>
+    )}
+  </CTableBody>
+</CTable>
+
 
     </div>
 	<div className="flex justify-end gap-2 mt-2">

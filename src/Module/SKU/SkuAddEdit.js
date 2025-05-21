@@ -13,6 +13,7 @@ import CustomItem from './CustomItem'
 import { useDispatch } from 'react-redux'
 import updown from '../../assets/images/updown.png'
 import { version } from 'core-js'
+import { setRscDeckleSize } from '../../action';
 
 function SkuAddEdit({
   isopenval,
@@ -41,6 +42,8 @@ function SkuAddEdit({
   errors,
   setErrors,
   setSkuVariant,
+     uploadedFiles,
+          setUploadedFiles
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
@@ -53,6 +56,8 @@ function SkuAddEdit({
   const [version, setVersion] = useState([])
   const [selectedVersion, setSelectedVersion] = useState(null)
   const [defaultSkuValues, setDefaultSkuValues] = useState([])
+  const [color,setColor]=useState([])
+  const [rscUnits,setRscUnits] = useState("mm")
   const createInitialSkuData = () => ({
     client_id: null,
     sku_name: null,
@@ -65,7 +70,7 @@ function SkuAddEdit({
     unit: null,
     joints: null,
     ups: null,
-    inner_outer_dimension: null,
+    inner_outer_dimension: 'Inner',
     flap_width: null,
     flap_tolerance: null,
     length_trimming_tolerance: 20,
@@ -86,6 +91,8 @@ function SkuAddEdit({
     estimate_composite_item: null,
     description: null,
     default_sku_details: null,
+    documents:[],
+    print_type:null,
     tags: {},
     gst_percentage: null,
     sku_values: [
@@ -150,6 +157,8 @@ function SkuAddEdit({
     fetchData()
   }, [])
   const handleSelect = (option) => {
+dispatch(setRscDeckleSize({ length: null, height: null, ups: null }));
+
     dispatch({
       type: 'SET_SELECTED_ROUTE_IDS',
       payload: [],
@@ -162,7 +171,7 @@ function SkuAddEdit({
       },
     })
     dispatch({ type: 'RESET_DIECUT_CALCULATIONS' })
-
+ 
     setErrors({})
     if (option.value === 'addMore') {
       // Handle add more procedure logic if needed
@@ -191,11 +200,26 @@ function SkuAddEdit({
       if (field === 'gsm' || field === 'bf' || field === 'layer') {
         const gsm = field === 'gsm' ? value : updatedItem.gsm
         const bf = field === 'bf' ? value : updatedItem.bf
+console.log("units rsc",rscUnits)
+console.log("into msquare",meterSquareData)
+
+  // Convert area to square meters
+  let areaInSquareMeters = 0;
+
+  if (rscUnits === 'mm') {
+    areaInSquareMeters = meterSquareData * 1e-6; // mm² → m²
+  } else if (rscUnits === 'cm') {
+    areaInSquareMeters = meterSquareData * 1e-4; // cm² → m²
+  } else if (rscUnits === 'in') {
+    areaInSquareMeters = meterSquareData * 0.00064516; // in² → m²
+  } else {
+    console.warn("Unknown rscUnit:", rscUnits);
+  }
 
         if (isCorrugated && gsm && bf) {
-          updatedItem.weight = gsm * bf * meterSquareData
+          updatedItem.weight = gsm * bf * areaInSquareMeters
         } else if (gsm) {
-          updatedItem.weight = gsm * meterSquareData
+          updatedItem.weight = gsm * areaInSquareMeters
         }
       }
 
@@ -303,6 +327,9 @@ function SkuAddEdit({
   const skuComponents = {
     'RSC box': (
       <RSCBox
+         uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
+      setRscUnits={setRscUnits}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -334,6 +361,8 @@ function SkuAddEdit({
     //'Corrugated Sheet': (
     Board: (
       <CorrugatedSheet
+        uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -359,6 +388,8 @@ function SkuAddEdit({
     ),
     'Die Cut box': (
       <DieCutBox
+              uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -589,6 +620,22 @@ function SkuAddEdit({
       }))
     }
   }
+
+useEffect(() => {
+  const colorData = async () => {
+    try {
+      const response = await apiMethods.getColors();
+      setColor(response.data.data); // ✅ use response.data.data
+      console.log("color data", response.data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  colorData();
+}, []);
+
+console.log("shared unitr form rsc",rscUnits)
+
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
@@ -706,14 +753,20 @@ function SkuAddEdit({
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <input
-                        type="text"
-                        placeholder="Color"
-                        className="p-1 border rounded w-full"
-                        value={item.color}
-                        onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
-                        readOnly={editTag}
-                      />
+<select
+  className="p-1 border rounded w-full"
+  value={item.color}
+  onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
+  disabled={editTag} // use disabled for select instead of readOnly
+>
+  <option value="">Select Color</option>
+  {color.map((c) => (
+    <option key={c.id} value={c.color_name}>
+      {c.color_name}
+    </option>
+  ))}
+</select>
+
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
                       {item?.layer?.toLowerCase().includes('corrugated') ? (

@@ -881,6 +881,13 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  getColors: async () => {
+    try {
+      return await apiClient.get(`/common-service/colors`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
   getProcessValues: async () => {
     try {
@@ -1364,6 +1371,7 @@ export const apiMethods = {
   getSkuValuesOptions:async(id)=>{
     return await apiClient.get(`sku-details/${id}/options`,)
   }
+
 
 }
 

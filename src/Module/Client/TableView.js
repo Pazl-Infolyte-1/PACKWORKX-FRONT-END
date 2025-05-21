@@ -32,7 +32,7 @@ const TableView = () => {
 
   return (
     <>
-      <div className="relative h-[calc(100vh-74px)] bg-[#fbfbfb] flex flex-col p-3">
+      <div className="relative h-[calc(100vh-74px)]  flex flex-col py-3 px-2">
         {/* Header (shrink-0 ensures it doesn't stretch) */}
         <div className="flex justify-between items-start mb-4 -mt-2 shrink-0">
           {tableData && (

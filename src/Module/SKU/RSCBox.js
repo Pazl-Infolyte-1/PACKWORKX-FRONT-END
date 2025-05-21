@@ -18,6 +18,7 @@ import RoutePopup from './RoutePopup'
 import apiMethods from '../../api/config'
 import { useDispatch, useSelector } from 'react-redux'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
+import { setRscDeckleSize } from '../../action';
 function RSCBox({
   dropdownRef,
   addNewSkuData,
@@ -44,6 +45,9 @@ function RSCBox({
   setMessage,
   errors,
   setErrors,
+  setRscUnits,
+     uploadedFiles,
+          setUploadedFiles
 }) {
   const [alerts, setAlerts] = useState([])
   const [unitTooltip, setUnitTooltip] = useState('Enter Millimeter')
@@ -65,6 +69,12 @@ function RSCBox({
   const [selectedRoutesVal, setSelectedRoutesVal] = useState([])
   const [fullRouteResponse, setFullRouteResponse] = useState(null)
   const [displayAsChips, setDisplayAsChips] = useState([])
+  const [isUploading, setIsUploading] = useState(false);
+//const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
+const [fileNames, setFileNames] = useState([]); 
+
+const deckleSize = useSelector(state => state.deckleSize);
+  
   const dispatch = useDispatch()
 
   const selectionFrame = {
@@ -92,10 +102,10 @@ function RSCBox({
     const lengthBoardSize = (length + width) * 2 + lengthTrimmingTolerance + flapWidth
     const widthBoardSize = width + height + widthTrimmingTolerance
     const totalBoardSize = lengthBoardSize * widthBoardSize
-    const deckleSizeVal = widthBoardSize * upsval
+    //const deckleSizeVal = widthBoardSize * upsval
     const EPSILON = 0.001
-    const deckleSize = parseFloat(data.deckle_size) || deckleSizeVal
-
+    //const deckleSize = parseFloat(data.deckle_size) || deckleSizeVal
+    const deckleSize = parseFloat(data.deckle_size) 
     if (lengthBoardSize && widthBoardSize) {
       setErrors((prev) => {
         const newErrors = { ...prev }
@@ -105,23 +115,23 @@ function RSCBox({
       })
     }
 
-    if (deckleSize + EPSILON <= deckleSizeVal) {
-      // throw error only if clearly smaller, allowing minor float diff
-      return {
-        length_board_size_cm2: Number(lengthBoardSize.toFixed(2)),
-        width_board_size_cm2: Number(widthBoardSize.toFixed(2)),
-        board_size_cm2: Number(totalBoardSize.toFixed(2)),
-        deckle_size: Number(deckleSizeVal),
-        ups: Number(upsval.toFixed()),
-        error: `Deckle size must be greater than or equal to ${deckleSizeVal.toFixed(2)}.`,
-      }
-    }
+    //if (deckleSize + EPSILON <= deckleSizeVal) {
+    //  // throw error only if clearly smaller, allowing minor float diff
+    //  return {
+    //    length_board_size_cm2: Number(lengthBoardSize.toFixed(2)),
+    //    width_board_size_cm2: Number(widthBoardSize.toFixed(2)),
+    //    board_size_cm2: Number(totalBoardSize.toFixed(2)),
+    //    deckle_size: Number(deckleSizeVal),
+    //    ups: Number(upsval.toFixed()),
+    //    error: `Deckle size must be greater than or equal to ${deckleSizeVal.toFixed(2)}.`,
+    //  }
+    //}
 
     return {
       length_board_size_cm2: Number(lengthBoardSize.toFixed(2)),
       width_board_size_cm2: Number(widthBoardSize.toFixed(2)),
       board_size_cm2: Number(totalBoardSize.toFixed(2)),
-      deckle_size: Number(deckleSize),
+      //deckle_size: Number(deckleSize),
       ups: Number(upsval.toFixed()),
       error: '',
     }
@@ -196,7 +206,11 @@ function RSCBox({
   }
 
   const handleUnitChange = (e) => {
+
     const newUnit = e.target.value
+          console.log("Unit changed to:", newUnit);
+          setRscUnits(newUnit);
+  console.log("Previous unit:", addNewSkuData.unit);
     setUnitTooltip(
       newUnit === 'mm'
         ? 'Enter Millimeter'
@@ -482,18 +496,144 @@ function RSCBox({
     }
   }, [selectedRouteIds2])
 
-  useEffect(() => {
-    const { length, width, height } = addNewSkuData
+  //useEffect(() => {
+  //  const { length, width, height } = addNewSkuData
 
-    // Check all three values are present and not null
-    if (length && width && height) {
-      const lwhValue = `${length}X${width}X${height}`
-      setAddNewSkuData((prev) => ({
+  //  // Check all three values are present and not null
+  //  if (length && width && height) {
+  //    const lwhValue = `${length}X${width}X${height}`
+  //    setAddNewSkuData((prev) => ({
+  //      ...prev,
+  //      lwh: lwhValue,
+  //    }))
+  //  }
+  //}, [addNewSkuData.length, addNewSkuData.width, addNewSkuData.height])
+
+
+  console.log("length height",addNewSkuData.length)
+    console.log("length height",addNewSkuData.height)
+     console.log("ups",addNewSkuData.ups)
+    useEffect(() => {
+  let { length, height, ups } = addNewSkuData;
+
+  // Convert to numbers if they are strings
+  length = typeof length === 'string' ? Number(length) : length;
+  height = typeof height === 'string' ? Number(height) : height;
+  ups = typeof ups === 'string' ? Number(ups) : ups;
+
+  // Dispatch only if all are valid numbers
+  if (!isNaN(length) && !isNaN(height) && !isNaN(ups)) {
+    dispatch(setRscDeckleSize({ length, height, ups }));
+  }
+}, [addNewSkuData.length, addNewSkuData.height, addNewSkuData.ups]);
+
+
+  useEffect(() => {
+    if (deckleSize !== undefined && deckleSize !== null) {
+      setAddNewSkuData(prev => ({
         ...prev,
-        lwh: lwhValue,
-      }))
+        deckle_size: deckleSize,
+      }));
     }
-  }, [addNewSkuData.length, addNewSkuData.width, addNewSkuData.height])
+  }, [deckleSize]);
+console.log("deckle size",deckleSize)
+useEffect(() => {
+  if (
+    addNewSkuData.inner_outer_dimension === null ||
+    addNewSkuData.inner_outer_dimension === undefined ||
+    addNewSkuData.inner_outer_dimension === ""
+  ) {
+    setAddNewSkuData(prev => ({
+      ...prev,
+      inner_outer_dimension: "Inner",
+    }));
+  }
+}, [addNewSkuData.inner_outer_dimension]);
+
+
+
+const handleFileUpload = async (event) => {
+  const selectedFiles = event.target.files;
+  if (!selectedFiles || selectedFiles.length === 0) return;
+
+  setIsUploading(true);
+
+  const urls = [...uploadedFiles];
+  const names = [...fileNames];
+
+  for (let i = 0; i < selectedFiles.length; i++) {
+    const file = selectedFiles[i];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await apiMethods.uploadFile(formData);
+      const fileUrl = response?.data?.data?.file_url;
+
+      if (fileUrl) {
+        urls.push(fileUrl);
+        names.push(file.name);
+      }
+    } catch (err) {
+      console.error('File upload failed:', err);
+    }
+  }
+
+  setUploadedFiles(urls);
+    setAddNewSkuData(prev => ({
+    ...prev,
+    documents: urls
+  }));
+  setFileNames(names);
+
+  setIsUploading(false);
+  event.target.value = '';
+};
+
+// Add this function to handle file removal
+const removeFile = (indexToRemove) => {
+  const updatedUrls = uploadedFiles.filter((_, index) => index !== indexToRemove);
+  const updatedNames = fileNames.filter((_, index) => index !== indexToRemove);
+
+  setUploadedFiles(updatedUrls);
+    setAddNewSkuData((prev) => ({
+    ...prev,
+    documents: updatedUrls, // Keep documents in sync
+  }));
+  setFileNames(updatedNames);
+};
+
+//document edit
+useEffect(() => {
+  // Clear files only if print_type is 'None' and documents are not already empty
+  if (addNewSkuData.print_type === 'None') {
+    if (uploadedFiles.length > 0 || addNewSkuData.documents.length > 0) {
+      setUploadedFiles([]);
+      setFileNames([]);
+
+      // Only update documents if not already empty
+      if (addNewSkuData.documents.length > 0) {
+        setAddNewSkuData((prev) => ({
+          ...prev,
+          documents: [],
+        }));
+      }
+    }
+    return;
+  }
+
+  // Load files only if editing and there are documents to load
+  if (editTag && addNewSkuData.documents?.length > 0 && uploadedFiles.length === 0) {
+    setUploadedFiles([...addNewSkuData.documents]);
+    setFileNames(
+      addNewSkuData.documents.map((file) =>
+        typeof file === 'string' ? file.split('/').pop() : file.name
+      )
+    );
+  }
+}, [editTag, addNewSkuData.print_type]); // <- remove addNewSkuData.documents from deps
+
+
   return (
     <div className="rounded-lg ">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -536,29 +676,31 @@ function RSCBox({
           </div>
         </div>
 
-        <div className="w-[200px]">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            SKU Name
-            <span className="text-red-500 ml-1">*</span>
-            {errors.sku_name && (
-              <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
-            )}
-          </label>
-          <input
-            id="sku_name"
-            name="sku_name"
-            value={addNewSkuData?.sku_name}
-            onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          />
-        </div>
+       <div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    SKU Name
+    <span className="text-red-500 ml-1">*</span>
+    {/*{errors.sku_name && (
+      <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
+    )}*/}
+  </label>
+  <input
+    id="sku_name"
+    name="sku_name"
+    value={addNewSkuData?.sku_name}
+    onChange={handleChange}
+    className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.sku_name ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
+  />
+</div>
         <div className="w-[200px]">
           <label className="block text-sm  font-medium text-gray-700 mb-2">
             Client Name
             <span className="text-red-500 ml-1">*</span>
-            {errors.client_id && (
+            {/*{errors.client_id && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
-            )}
+            )}*/}
           </label>
           <select
             name="client"
@@ -566,7 +708,9 @@ function RSCBox({
             disabled={clientDiasble}
             value={addNewSkuData.client_id}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+         className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.client_id ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           >
             <option value="" hidden>
               Select
@@ -619,7 +763,7 @@ function RSCBox({
         <Tooltip title={unitTooltip}>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Dimensions <span className="text-gray-500 text-xs">(W × L × H)</span>
+              Dimensions <span className="text-gray-500 text-xs">(L × W × H)</span>
               <span className="text-red-500 ml-1">*</span>
               {errors.width === 'Required' &&
                 errors.length === 'Required' &&
@@ -691,9 +835,9 @@ function RSCBox({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Joints
                 <span className="text-red-500 ml-1">*</span>
-                {errors.joints && (
+                {/*{errors.joints && (
                   <span className="text-red-500 text-xs ml-2 align-middle">{errors.joints}</span>
-                )}
+                )}*/}
               </label>
               <input
                 id="joints"
@@ -701,7 +845,10 @@ function RSCBox({
                 value={Number(addNewSkuData.joints) || ''}
                 onChange={handleChange}
                 readOnly={editTag}
-                className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                //className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className={`w-full h-8 p-1 text-sm rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
               />
             </div>
 
@@ -709,11 +856,6 @@ function RSCBox({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Deckle Size
                 <span className="text-red-500 ml-1">*</span>
-                {errors.deckle_size && (
-                  <span className="text-red-500 text-xs ml-2 align-middle">
-                    {errors.deckle_size}
-                  </span>
-                )}
               </label>
               <input
                 id="deckle_size"
@@ -721,7 +863,10 @@ function RSCBox({
                 value={Number(toThreeDecimalFixed(addNewSkuData.deckle_size)) || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
-                className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                //className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            className={`w-full h-8 p-1 text-sm rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
               />
               <p className="text-[10px] text-gray-500 mt-1">
                 Deckle should be greater than (BW × UPS)
@@ -746,7 +891,8 @@ function RSCBox({
                 type="radio"
                 name="inner_outer_dimension"
                 value="Inner"
-                checked={addNewSkuData.inner_outer_dimension === 'Inner'}
+            // checked={addNewSkuData.inner_outer_dimension ? addNewSkuData.inner_outer_dimension === 'Inner' : true}
+              checked={addNewSkuData.inner_outer_dimension === 'Inner'}
                 onChange={handleChange}
                 readOnly={editTag}
                 className="mr-1 h-3.5 w-3.5 text-blue-600 focus:ring-blue-500"
@@ -773,9 +919,9 @@ function RSCBox({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Flap Width
               <span className="text-red-500 ml-1">*</span>
-              {errors.flap_width && (
+              {/*{errors.flap_width && (
                 <span className="text-red-500 text-sm ml-2 align-middle">{errors.flap_width}</span>
-              )}
+              )}*/}
             </label>
             <input
               id="flap_width"
@@ -783,7 +929,9 @@ function RSCBox({
               value={Number(addNewSkuData.flap_width) || null}
               onChange={modifiedHandleChange}
               readOnly={editTag}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.flap_width ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </Tooltip>
@@ -792,9 +940,9 @@ function RSCBox({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Internal Id
             <span className="text-red-500 ml-1">*</span>
-            {errors.internal_id && (
+            {/*{errors.internal_id && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.internal_id}</span>
-            )}
+            )}*/}
           </label>
           <input
             id="internal_id"
@@ -802,7 +950,9 @@ function RSCBox({
             value={Number(addNewSkuData.internal_id) || null}
             onChange={handleChange}
             readOnly={editTag}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.internal_id ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
         </div>
 
@@ -866,9 +1016,9 @@ function RSCBox({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             UPS
             <span className="text-red-500 ml-1">*</span>
-            {errors.ups && (
+            {/*{errors.ups && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.ups}</span>
-            )}
+            )}*/}
           </label>
           <input
             id="ups"
@@ -876,7 +1026,9 @@ function RSCBox({
             value={Number(addNewSkuData?.ups) || null}
             onChange={modifiedHandleChange}
             readOnly={editTag}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.ups ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
         </div>
 
@@ -885,11 +1037,11 @@ function RSCBox({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Length Trimming Tolereance
               <span className="text-red-500 ml-1">*</span>
-              {errors.length_trimming_tolerance && (
+              {/*{errors.length_trimming_tolerance && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.length_trimming_tolerance}
                 </span>
-              )}
+              )}*/}
             </label>
             <input
               id="length_trimming_tolerance"
@@ -897,7 +1049,9 @@ function RSCBox({
               value={Number(addNewSkuData.length_trimming_tolerance) || null}
               onChange={modifiedHandleChange}
               readOnly={editTag}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                    className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.length_trimming_tolerance ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </Tooltip>
@@ -907,11 +1061,11 @@ function RSCBox({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Width Trimming Tolereance
               <span className="text-red-500 ml-1">*</span>
-              {errors.width_trimming_tolerance && (
+              {/*{errors.width_trimming_tolerance && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.width_trimming_tolerance}
                 </span>
-              )}
+              )}*/}
             </label>
             <input
               id="width_trimming_tolerance"
@@ -919,7 +1073,9 @@ function RSCBox({
               value={Number(addNewSkuData.width_trimming_tolerance) || null}
               onChange={modifiedHandleChange}
               readOnly={editTag}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.width_trimming_tolerance ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </Tooltip>
@@ -928,11 +1084,11 @@ function RSCBox({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Minimum Order Level
             <span className="text-red-500 ml-1">*</span>
-            {errors.minimum_order_level && (
+            {/*{errors.minimum_order_level && (
               <span className="text-red-500 text-sm ml-2 align-middle">
                 {errors.minimum_order_level}
               </span>
-            )}
+            )}*/}
           </label>
           <input
             id="minimum_order_level"
@@ -940,7 +1096,9 @@ function RSCBox({
             type="number"
             value={Number(addNewSkuData.minimum_order_level) || null}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                       className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
         </div>
         <ChipSelectorWithBrowse
@@ -968,6 +1126,75 @@ function RSCBox({
             <option value={15}>15%</option>
           </select>
         </div>
+
+      <div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">Print Type</label>
+  <select
+    id="print_type"
+    name="print_type"
+    value={addNewSkuData?.print_type || ''}
+    onChange={handleChange}
+    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+  >
+    <option value="">Select Type</option>
+    <option value="None">None</option>
+    <option value="Offset">Offset</option>
+    <option value="Flexo">Flexo</option>
+  </select>
+</div>
+
+{(addNewSkuData?.print_type === 'Offset' || addNewSkuData?.print_type === 'Flexo') && (
+  <div className="flex w-[200px]">
+    <div className="flex flex-col flex w-[200px]">
+      {/* Custom styled file input */}
+         <label className="block text-sm font-medium text-gray-700 mb-2">Documents</label>
+      <label
+        htmlFor="file-upload"
+        className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
+      >
+        Upload Files
+      </label>
+      <input
+        id="file-upload"
+        type="file"
+        accept="application/pdf"
+        onChange={handleFileUpload}
+        multiple
+        className="hidden"
+      />
+
+      {/* Uploading text */}
+      {isUploading && (
+        <div className="text-sm text-blue-600 mt-2">Uploading files...</div>
+      )}
+
+      {/* Display uploaded files */}
+      {uploadedFiles.length > 0 && (
+        <div className="mt-2">
+          <p className="text-xs text-gray-600 mb-1">Uploaded files:</p>
+       <ul className="space-y-0.5">
+  {uploadedFiles.map((file, index) => (
+    <li key={index} className="flex items-center text-xs w-full max-w-[240px]">
+      <div className="flex-1 truncate text-gray-700">
+        {file.name || (typeof file === 'string' ? file.split('/').pop() : file.url.split('/').pop())}
+      </div>
+      <button
+        type="button"
+        onClick={() => removeFile(index)}
+        className="ml-1 text-red-500 hover:text-red-700 text-sm"
+      >
+        ✕
+      </button>
+    </li>
+  ))}
+</ul>
+
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
       </div>
 
       {!isDrawerOpen && (

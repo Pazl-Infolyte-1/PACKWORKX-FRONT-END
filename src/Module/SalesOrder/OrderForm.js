@@ -375,7 +375,7 @@ const OrderForm = forwardRef(({
                   </div>
 
                   {isOpen && (
-                    <div className="absolute z-10 mt-1 max-h-60 w-80 overflow-y-auto rounded border border-gray-200 bg-white shadow-md">
+                    <div className="absolute z-50 mt-1 max-h-60 w-80 overflow-y-auto rounded border border-gray-200 bg-white shadow-md">
                       <div className="sticky top-0 bg-white p-2 border-b border-gray-200">
                         <div className="relative">
                           <input

@@ -96,7 +96,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
             setSkuOptions((await apiMethods.getSkuValuesOptions(skuID))?.data?.options || {});
             setSkuversionLimit(skuResponse.data.sku_version_limit);
             setSkuInitalData(versionResponse?.data?.sku_values || []);
-            const skuversionID = `V${versionResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+            const skuversionID = `V${versionResponse?.data?.data?.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
             setSkuVersion(skuversionID);
           }
 

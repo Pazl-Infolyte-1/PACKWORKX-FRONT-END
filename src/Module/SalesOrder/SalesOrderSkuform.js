@@ -114,8 +114,26 @@ const SalesOrderSkuForm = ({
 
   // Load initial data from skuDetailsForm if available
 // Load initial data from skuDetailsForm if available
+// Add this event listener in your component
 useEffect(() => {
-  if (skuDetailsForm && skuDetailsForm.length > 0 && skuList.length > 0) {
+  // This handler will process the calculation without causing render loops
+  const handleCalculateRow = (event) => {
+    const { index } = event.detail;
+    calculateRowValues(index);
+  };
+  
+  // Add event listener
+  document.addEventListener('calculateRow', handleCalculateRow);
+  
+  // Clean up
+  return () => {
+    document.removeEventListener('calculateRow', handleCalculateRow);
+  };
+}, []);
+
+// Load initial data from skuDetailsForm if available
+useEffect(() => {
+  if (skuDetailsForm && skuDetailsForm.length > 0) {
     const formattedData = skuDetailsForm.map(item => {
       const baseFields = {
         sku: item.sku || '',
@@ -142,38 +160,53 @@ useEffect(() => {
         };
     });
 
-    // Set form values
-    setValue('skus', formattedData);
-    
-    // Force calculations for all rows immediately 
-    formattedData.forEach((item, idx) => {
-      if (item.sku) {
-        // For each item with an SKU, force calculate values
-        const selectedSku = skuList.find(sku => sku.sku_name === item.sku);
+    const currentFormData = JSON.stringify(getValues('skus'));
+    const newFormData = JSON.stringify(formattedData);
+
+    if (currentFormData !== newFormData) {
+      setValue('skus', formattedData);
+      
+      // We won't call calculateRowValues directly here to avoid loops
+      // Instead, we'll trigger a separate processing step after this render completes
+      requestAnimationFrame(() => {
+        // This will run after the current render cycle completes
+        recalculateAllTotals(formattedData);
+      });
+    }
+  }
+}, [skuDetailsForm, setValue, getValues, isIgstApplicable]);
+
+// Function to recalculate all totals based on current form data
+const recalculateAllTotals = (data = null) => {
+  const currentData = data || getValues('skus') || [];
+  if (!currentData || currentData.length === 0) return;
+
+  // Process each row data directly from the form
+  currentData.forEach((rowData, idx) => {
+    // Only process rows with SKU
+    if (rowData.sku) {
+      const quantity = parseFloat(rowData.quantity) || 0;
+      const rate = parseFloat(rowData.rate) || 0;
+      const totalAmount = quantity * rate;
+      
+      // Only do the calculation if we need to (values changed)
+      if (parseFloat(rowData.totalAmount) !== totalAmount) {
+        // Find the SKU to get the correct GST percentage
+        const selectedSku = skuList.find(sku => sku.sku_name === rowData.sku);
         
-        // Make sure quantity and rate are numeric
-        const quantity = parseFloat(item.quantity) || 0;
-        const rate = parseFloat(item.rate) || 0;
-        
-        // Calculate totalAmount directly (don't wait for the function)
-        const totalAmount = quantity * rate;
-        
-        // Set totalAmount first
-        setValue(`skus[${idx}].totalAmount`, totalAmount.toFixed(2));
-        
-        // Then calculate GST based on GST percentage
         if (selectedSku) {
+          // Set calculated values directly without calling calculateRowValues
+          setValue(`skus[${idx}].totalAmount`, totalAmount.toFixed(2));
+          
           const gstPercentage = selectedSku.gst_percentage || 0;
           
           if (isIgstApplicable) {
-            // IGST calculation
-            setValue(`skus[${idx}].igst`, gstPercentage);
             const igstAmount = totalAmount * (gstPercentage / 100);
+            setValue(`skus[${idx}].igst`, gstPercentage);
             setValue(`skus[${idx}].igstAmount`, igstAmount.toFixed(2));
             setValue(`skus[${idx}].totalGst`, igstAmount.toFixed(2));
             setValue(`skus[${idx}].total`, (totalAmount + igstAmount).toFixed(2));
           } else {
-            // CGST/SGST calculation
             const halfGst = gstPercentage / 2;
             setValue(`skus[${idx}].sgst`, halfGst);
             setValue(`skus[${idx}].cgst`, halfGst);
@@ -187,61 +220,56 @@ useEffect(() => {
           }
         }
       }
-    });
-    
-    // Finally recalculate all totals
-    recalculateAllTotals();
+    }
+  });
+
+  // Calculate summary totals
+  const qty = currentData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
+  const amount = currentData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0);
+  const withGST = currentData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+  const totalGst = currentData.reduce((sum, item) => sum + (parseFloat(item.totalGst) || 0), 0);
+
+  let sgst = 0, cgst = 0, igst = 0;
+
+  if (isIgstApplicable) {
+    igst = currentData.reduce((sum, item) => sum + (parseFloat(item.igstAmount) || 0), 0);
+  } else {
+    sgst = currentData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0);
+    cgst = currentData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
   }
-}, [skuDetailsForm, skuList, setValue, getValues, isIgstApplicable]);
 
-  // Function to recalculate all totals based on current form data
-  const recalculateAllTotals = (data = null) => {
-    const currentData = data || getValues('skus') || [];
-    if (!currentData || currentData.length === 0) return;
+  // Update state
+  setTotalQuantity(qty);
+  setTotalAmount(amount);
+  setTotalWithGST(withGST);
+  setTotalGst(totalGst);
 
-    const qty = currentData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
-    const amount = currentData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0);
-    const withGST = currentData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
-    const totalGst = currentData.reduce((sum, item) => sum + (parseFloat(item.totalGst) || 0), 0);
-
-    let sgst = 0, cgst = 0, igst = 0;
-
-    if (isIgstApplicable) {
-      igst = currentData.reduce((sum, item) => sum + (parseFloat(item.igstAmount) || 0), 0);
-    } else {
-      sgst = currentData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0);
-      cgst = currentData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
-    }
-
-    // Update state
-    setTotalQuantity(qty);
-    setTotalAmount(amount);
-    setTotalWithGST(withGST);
-    setTotalGst(totalGst);
-
-    if (isIgstApplicable) {
-      setTotals(prev => ({
-        ...prev,
-        total_qty: qty,
-        igst: igst,
-        total_incl_gst: withGST,
-        total_amount: amount,
-        totalGst: totalGst
-      }));
-    } else {
-      setTotalSGST(sgst);
-      setTotalCGST(cgst);
-      setTotals(prev => ({
-        ...prev,
-        total_qty: qty,
-        cgst: cgst,
-        sgst: sgst,
-        total_incl_gst: withGST,
-        total_amount: amount,
-        totalGst: totalGst
-      }));
-    }
-  };
+  if (isIgstApplicable) {
+    setTotals(prev => ({
+      ...prev,
+      total_qty: qty,
+      igst: igst,
+      total_incl_gst: withGST,
+      total_amount: amount,
+      totalGst: totalGst
+    }));
+  } else {
+    setTotalSGST(sgst);
+    setTotalCGST(cgst);
+    setTotals(prev => ({
+      ...prev,
+      total_qty: qty,
+      cgst: cgst,
+      sgst: sgst,
+      total_incl_gst: withGST,
+      total_amount: amount,
+      totalGst: totalGst
+    }));
+  }
+  
+  // Update parent form data
+  updateParentFormData();
+};
 
   // Update totals when skusData changes
   useEffect(() => {
@@ -426,21 +454,18 @@ const calculateRowValues = (index) => {
     const selectedValue = options.find(
       (option) => option.value === field.value
     );
-
-    // This useEffect will immediately calculate values if there's already a SKU selected
-    // Important for edit mode
+    
+    // Use a ref to track if calculation has been done
+    const calculationDoneRef = useRef(false);
+    
+    // Effect to handle initial calculation
     useEffect(() => {
-      if (field.value && selectedValue) {
-        // Get current row data
-        const rowData = getValues(`skus[${index}]`);
-        
-        // If we have a SKU selected and either quantity or rate has a value
-        // we should calculate the row values immediately
-        if (parseFloat(rowData.quantity) > 0 || parseFloat(rowData.rate) > 0) {
-          calculateRowValues(index);
-        }
+      if (!calculationDoneRef.current && field.value && selectedValue && skuList.length > 0) {
+        calculationDoneRef.current = true;
+        // Direct calculation instead of using custom event
+        calculateRowValues(index);
       }
-    }, [field.value, selectedValue]);
+    }, [field.value, selectedValue, skuList.length, index]);
 
     return (
       <div className="w-full">
@@ -462,8 +487,6 @@ const calculateRowValues = (index) => {
                 setErrors(newErrors);
               }
             }
-            
-            // Always calculate row values when the SKU changes
             calculateRowValues(index);
           }}
           styles={{

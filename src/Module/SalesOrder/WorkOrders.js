@@ -57,9 +57,9 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
 
 
 
-  // useEffect(() => {
-  //   console.log(skuDetailsForm, 'skudetailsform in workorderform')
-  // }, [skuDetailsForm])
+  useEffect(() => {
+    console.log(skuDetailsForm, 'skudetailsform in workorderform')
+  }, [skuDetailsForm])
 
 
 

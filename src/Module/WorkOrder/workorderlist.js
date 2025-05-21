@@ -13,6 +13,7 @@ import WorkOrderDetails from './WorkOrderDetails'
 import WorkOrderEditForm from './WorkOrderEditForm'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
+import ContentHeader from '../../components/New/ContentHeader'
 
 const WorkOrders = () => {
   const [data, setData] = useState([])
@@ -129,15 +130,26 @@ const WorkOrders = () => {
   return (
     <div className="w-full mb-3 ">
       {/* Header Section */}
-      <div className="w-full h-[40px]">
+      {/* <div className="w-full h-[40px]">
           <div className="flex justify-between items-center">
             <h4>Work Order</h4>
           </div>
-        </div>
-              <div className="flex flex-col justify-between p-3 border">
+        </div> */
+        }
+
+      <ContentHeader
+      heading={"Work Order"}
+      onAddClick={() => {
+        setDrawerOpen(true)
+      }}
+      />
+
+              <div className="flex flex-col justify-between  ">
+
+ 
 
       {/* Button section with Search */}
-      <div className="flex justify-between items-center gap-2 h-10 ">
+      {/* <div className="flex justify-between items-center gap-2 h-10 ">
         <div className='flex  gap-1'>
         <SearchBar text="workorder" data={data} ref={searchBarRef} />
         <select
@@ -165,11 +177,9 @@ const WorkOrders = () => {
         </div>
 
         <div className="flex gap-2">
-          {/* <FilterButton  /> */}
-          {/* <AddButton text="Work Order" onClick={() => setDrawerOpen(true)} /> */}
           <ActionButton label={'Work Order'} variant="add" onClick={() => setDrawerOpen(true)} />
         </div>
-      </div>
+      </div> */}
 
       {/* Table Container */}
       {/* <div> */}

@@ -65,7 +65,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
                       </div>
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-gray-500">Address</span>
-                        <span className="text-gray-800 mt-1">{cell.supplier_address}</span>
+                        <span className="text-gray-800 mt-1">{cell.shipping_address}</span>
                       </div>
                     </div>
                   </div>

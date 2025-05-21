@@ -14,7 +14,7 @@ import ThreeDotMenu from '../../components/ThreeDotMenu'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 
-function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, loading }) {
+function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, handlePurchaseDetails, loading }) {
   const [showPopUp, setShowPopUp] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -23,7 +23,55 @@ function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, loadi
 
 
   // Optional: if local state update is needed after delete
+  // const handlePurchaseDetails = async (po_id) => {
+  //   try {
+  //     console.log('PO ID:', po_id);
+  
+  //     const response = await apiMethods.getinventory();
+  //     console.log('Full inventory response:', response);
+  
+  //     const inventoryList = Array.isArray(response?.data.data) ? response.data.data : [];
+  
+  //     const matchedInventory = inventoryList.find(item => item.po_id === po_id);
+  
+  //     if (matchedInventory) {
+  //       const grn_id = matchedInventory.grn_id;
+  //       console.log('Matched GRN ID:', grn_id);
+  
+  //       await handlePurchaseReturnDetails(po_id, grn_id);
+  //     } else {
+  //       console.warn('No inventory found for PO ID:', po_id);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error in handlePurchaseDetails:', error);
+  //   }
+  // };
+  
 
+
+
+  // const handlePurchaseReturnDetails = async (po_id, grn_id) => {
+  //   try {
+  //     console.log('PO ID:', po_id);
+
+  //     // Check if grn_id is available
+
+
+  //     console.log('GRN is a ID:', grn_id);
+      
+  //     const response = await apiMethods.getPurchaseOrderDetails({ po_id, grn_id });
+  //     const { purchaseOrder, purchaseOrderItemDetails } = response.data;
+  
+  //     // Set this data to state, form, or navigate to edit page
+  //     console.log('PO Data:', purchaseOrder);
+  //     console.log('Items:', purchaseOrderItemDetails);
+  //   } catch (error) {
+  //     console.error('Failed to fetch PO details:', error);
+  //   }
+  // };
+
+  
+  
   
 
   const handlePoDelete = async () => { 
@@ -160,6 +208,11 @@ function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, loadi
                           label: 'Delete',
                           icon: cilTrash,
                           onClick: () => openDeleteModal(row.id),
+                        },
+                        {
+                          label: 'Purchase Return',
+                          icon: cilPencil,
+                          onClick: () => handlePurchaseDetails(row.id),
                         },
                       ]}
                     />

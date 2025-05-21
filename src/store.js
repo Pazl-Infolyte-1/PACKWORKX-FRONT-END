@@ -138,6 +138,36 @@ case 'SET_COMPOSITE_ARRAY':
     ...state,
     compositeArray: payload,
   };
+case 'SET_RSC_DECKLE_SIZE': {
+  const { length, height, ups } = payload;
+
+  // If all three are null or undefined, reset deckleSize to null (or 0 if you prefer)
+  if (length == null && height == null && ups == null) {
+    return {
+      ...state,
+      deckleSize: null,  // reset value
+    };
+  }
+
+  // Calculate only if all three are valid numbers
+  if (
+    typeof length === 'number' &&
+    typeof height === 'number' &&
+    typeof ups === 'number' &&
+    !isNaN(length) &&
+    !isNaN(height) &&
+    !isNaN(ups)
+  ) {
+    const deckleSize = ((length + height) * ups) + 20;
+    return {
+      ...state,
+      deckleSize,
+    };
+  }
+
+  // For any other cases, do not change state
+  return state;
+}
 
   
     default:

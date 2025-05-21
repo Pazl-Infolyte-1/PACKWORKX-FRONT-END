@@ -1,11 +1,12 @@
 import axios from 'axios'
+import {API_BASE_URL} from './constant'
 
-const BASE_URL = 'https://packworkx.pazl.info/api/'
+const BASE_URL = API_BASE_URL
 const GST_URL = 'http://sheet.gstincheck.co.in/check/9ee24120971acd5c17dc6cad239d99fa'
 // Create axios instance with default config
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 20000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -442,7 +443,7 @@ export const apiMethods = {
 
   singleclients: async (id) => { 
   try {
-    const response = await apiClient.get(`clients/${id}`);
+    const response = await apiClient.get(`/clients/${id}`);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -880,6 +881,13 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  getColors: async () => {
+    try {
+      return await apiClient.get(`/common-service/colors`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
   getProcessValues: async () => {
     try {
@@ -1269,9 +1277,25 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  // getinventory: async () => {
+  //   try {
+  //     return await apiClient.get('/inventory')
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // },
   getinventory: async () => {
     try {
-      return await apiClient.get('/inventory')
+      return await apiClient.get('/inventory?limit=10000'
+    )
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getPurchaseReturn: async (params) => {
+    try {
+      return await apiClient.get('/purchase-order-return', { params })
     } catch (error) {
       console.error(error)
     }
@@ -1312,6 +1336,43 @@ export const apiMethods = {
   getState: async () => {
     return await apiClient.get('/common-service/states')
   },
+  
+  getPurchaseOrderDetails: async ({ po_id, grn_id }) => {
+    try {
+      return await apiClient.get('/purchase-order/details/po', {
+        params: {
+          po_id,
+          grn_id,
+        },
+      })
+    } catch (error) {
+      console.error('Error fetching purchase order details:', error.response?.data || error.message)
+      throw error
+    }
+  },
+  
+  submitPurchaseOrderReturn: async (payload) => {
+    try {
+      return await apiClient.post('/purchase-order/return/gst/po', payload)
+    } catch (error) {
+      console.error('Error submitting PO return:', error.response?.data || error.message)
+      throw error
+    }
+  },
+  
+ 
+  getSkuByClientId:async(client_id)=>{
+    return await apiClient.get(`sku-details/client-sku/${client_id}`)
+  },
+  postSkuValuesOptions:async(body)=>{
+    return await apiClient.post(`sku-details/options`,body)
+  },
+
+  getSkuValuesOptions:async(id)=>{
+    return await apiClient.get(`sku-details/${id}/options`,)
+  }
+
+
 }
 
 export default apiMethods

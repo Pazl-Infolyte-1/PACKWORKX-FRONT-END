@@ -25,7 +25,8 @@ const createInitialSkuData = ({ user_id, strictAdherence }) => ({
   deckle_size: '',
   minimum_order_level: '',
   sku_type: 'RSC box',
-  part_value: [],
+  documents:[],
+  part_value: '',
   part_count: '',
   sku_values: [
     {

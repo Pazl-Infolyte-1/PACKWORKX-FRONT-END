@@ -5,7 +5,7 @@ import ActionButton from '../../components/New/ActionButton'
 function SkuDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
   return (
     <PopUp
-      visible={showPopUp === cell.id && !editTag}
+      visible={showPopUp === cell?.id && !editTag}
       showCloseButton={true}
       setVisible={() => setShowPopUp(null)}
       height={'95vh'}

@@ -11,6 +11,7 @@ function ContentHeader({
   addLabel = 'New',
   menuOptions = [],
   headingOptions = [],
+  isMinimized,
 }) {
   const [showMenu, setShowMenu] = useState(false)
   const [showHeadingDropdown, setShowHeadingDropdown] = useState(false)
@@ -66,13 +67,15 @@ function ContentHeader({
   }
 
   return (
-    <div className="flex justify-between items-center py-1 relative">
+    <div className="flex justify-between items-center p-1 px-3 relative">
       {/* Heading with Dropdown */}
       <div className="relative">
         <div
           ref={headingRef}
           onClick={headingOptions.length > 0 ? handleHeadingClick : undefined}
-          className={`text-lg font-semibold flex items-center  cursor-${headingOptions.length > 0 ? 'pointer' : 'default'}`}
+   className={`text-lg font-semibold flex items-center px-2 py-1 rounded cursor-${headingOptions.length > 0 ? 'pointer' : 'default'} ${
+    headingOptions.length > 0 ? 'hover:bg-[#f1f2f7] active:bg-[#e4e6ed]' : ''
+  }`}
         >
           {heading}
           {headingOptions.length > 0 && (
@@ -110,9 +113,11 @@ function ContentHeader({
       <div className="flex items-center gap-3">
         <button
           onClick={onAddClick}
-          className="flex items-center bg-blue-500 text-white py-1.5 px-3 rounded-md"
+          className={`flex items-center justify-center rounded-md transition-all duration-200
+    ${isMinimized ? 'w-8 h-8 text-xl bg-blue-600 text-white' : 'bg-blue-500 text-white py-1.5 px-3'}
+  `}
         >
-          + {addLabel}
+          {isMinimized ? '+' : `+ ${addLabel}`}
         </button>
 
         {/* Three Dot Menu */}
@@ -126,10 +131,7 @@ function ContentHeader({
               ref={menuRef}
               className="absolute right-0 mt-2 w-48 text-xs bg-white rounded-md shadow-lg z-50 border border-gray-200"
             >
-              <div className="flex items-center justify-between bg-blue-600 text-white rounded-md px-4 py-2.5 m-1">
-                <div className="font-semibold text-center">Sort by</div>
-                <RiArrowRightDoubleFill className="mr-2" />
-              </div>
+        
               <div className="py-1">
                 {menuOptions.map((option, index) => (
                   <div
@@ -147,9 +149,9 @@ function ContentHeader({
         </div>
 
         {/* Help Button */}
-        <button onClick={onHelpClick} className="bg-orange-400 p-2 rounded-md text-white">
+        {/*<button onClick={onHelpClick} className="bg-orange-400 p-2 rounded-md text-white">
           <BiHelpCircle className="text-xl" />
-        </button>
+        </button>*/}
       </div>
     </div>
   )

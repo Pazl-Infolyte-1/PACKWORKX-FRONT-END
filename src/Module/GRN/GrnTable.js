@@ -34,7 +34,7 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit }) => {
       if (response.status === 200) {
         setConfirmModal(false)
         setGrnData((prev) => prev.filter((item) => item.id !== deleteId))
-        setAlerts([{ severity: 'error', message: 'Route deleted successfully!' }])
+        setAlerts([{ severity: 'error', message: 'GRN deleted successfully!' }])
       }
     } catch (error) {
       console.error(error)

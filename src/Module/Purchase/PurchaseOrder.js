@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import PurchaseOrderTable from "./PurchaseOrderTable";
 import AddPurchaseOrder from "./AddPurchaseOrder";
+import AddPurchaseOrderReturn from "../PurchaseReturn/AddPurchaseReturn";
 import Drawer from "../../components/Drawer/Drawer";
 import CustomAlert from "../../components/New/CustomAlert";
 import SearchBar from "../../components/New/SearchBar";
@@ -14,6 +15,8 @@ import { useSearch } from '../../components/New/SearchContext'
 const PurchaseOrder = () => {
   const [data, setData] = useState([]);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [isReturnDrawerOpen, setReturnDrawerOpen] = useState(false);
+
   const [isEdit, setIsEdit] = useState(false);
   const [selectedPoId, setSelectedPoId] = useState(null);
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
@@ -87,6 +90,14 @@ const PurchaseOrder = () => {
     setDrawerOpen(true);
   };
 
+  const handlePurchaseDetails = (id) => {    
+    setSelectedPoId(id);
+    setIsEdit(true);
+    setReturnDrawerOpen(true);
+  };
+
+
+
   const handleSuccess = (message) => {
     fetchData();
     setAlert({ show: true, message, type: "success" });
@@ -158,6 +169,7 @@ const PurchaseOrder = () => {
               <PurchaseOrderTable
                 data={filteredSearchData.length ? filteredSearchData : data}
                 handleEdit={handleEdit}
+                handlePurchaseDetails = {handlePurchaseDetails}
                 // handleDelete={handleDelete}
                 />
 
@@ -188,6 +200,25 @@ const PurchaseOrder = () => {
             fetchData={fetchData}
           />
         </Drawer>
+
+
+
+
+        <Drawer
+            isOpen={isReturnDrawerOpen}
+            onClose={() => setReturnDrawerOpen(false)}
+            maxWidth={"1270px"}
+            title={isEdit ? "Purchase Order Return" : "Edit Purchase Order Return"}
+          >
+            
+            <AddPurchaseOrderReturn
+              isEdit={isEdit}
+              selectedPoId={selectedPoId}
+              setDrawer={setReturnDrawerOpen}
+              onSuccess={handleSuccess}
+              fetchData={fetchData}
+            />
+          </Drawer>
       </div>
     </div>
   );

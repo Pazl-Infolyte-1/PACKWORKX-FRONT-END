@@ -1,213 +1,197 @@
-import React from 'react'
-import PopUp from '../../components/New/PopUp'
+import { cilDollar, cilEnvelopeOpen, cilPencil, cilPrint } from "@coreui/icons";
+import CIcon from "@coreui/icons-react";
+import { useState } from "react";
 
-function SalesOrderView({ viewSalesOrder, SetviewSalesOrder, salesOrderData }) {
-  if (!salesOrderData) return null;
-  
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  };
-
+export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIsminimiseTable}) {
   return (
-    <PopUp
-      visible={viewSalesOrder}
-      showCloseButton={true}
-      setVisible={() => SetviewSalesOrder(false)}
-      height={'95vh'}
-      width={'70vw'}
-      header={"Sales Order Details"}
-    >
-      <div className="bg-gray-100 p-6 rounded-lg shadow-md h-full overflow-y-auto">
-        {/* Header */}
-        <div className="border-b border-gray-200 pb-4 mb-6">
-          <div className="flex justify-between items-center">
-         <div className="mt-2 flex items-center">
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-              salesOrderData?.sales_status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 
-              salesOrderData?.sales_status === 'In-progress' ? 'bg-blue-100 text-blue-800' : 
-              salesOrderData?.sales_status === 'Rejected' ? 'bg-red-200 text-red-800' : 
-              'bg-green-100 text-green-800'
-            }`}>
-              {salesOrderData?.sales_status}
-            </span>
-            <span className="mx-2 text-gray-400">•</span>
-            <span className="text-gray-600">Created on {formatDate(salesOrderData?.created_at)}</span>
-          </div>            <div className="bg-gray-300 px-4 py-2 rounded-full">
-              <span className="font-semibold text-gray-800">Order ID: #{salesOrderData?.id}</span>
+    <div className="bg-white w-full font-sans flex flex-col" style={{height: '90vh'}}>
+      {/* Header */}
+      <div className="w-full bg-white z-50">
+        <div className="flex justify-between items-top p-2">
+          <h1 className="text-lg font-semibold">Sales Order # {salesOrderData.sales_generate_id}</h1>
+          <div className="flex items-start space-x-4">
+            <button className="text-black text-xs">Upload Files</button>
+            <button className="text-black text-xs">Comments & History</button>
+            <button className="text-gray-500 text-sm items-start" onClick={()=>{SetviewSalesOrder(false),setIsminimiseTable(false)}}>✕</button>
+          </div>
+        </div>
+        <div className="flex bg-gray-50 px-3 border-t text-xs">
+          <button className="flex items-centergap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
+            <CIcon icon={cilPencil} className="h-3 w-3" />
+            <span>Edit</span>
+          </button>
+          <button className="flex items-center gap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
+            <CIcon icon={cilEnvelopeOpen} className="h-3 w-3" />
+            <span>Email</span>
+          </button>
+          <button className="flex items-center gap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
+            <CIcon icon={cilPrint} className="h-3 w-3" />
+            <span>Print</span>
+          </button>
+          <button className="flex items-center gap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
+            <CIcon icon={cilDollar} className="h-3 w-3" />
+            <span>To Invoice</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main content area with scrolling */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Next steps banner */}
+        <div className="px-3 flex flex-col mt-4">
+          <div className="bg-blue-50 border border-blue-100 rounded p-1 mb-3 text-xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <div className="bg-blue-100 p-0.5 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-blue-800 text-xs">WHAT'S NEXT?</h3>
+                  <p className="text-blue-700 text-xs">Convert to packages, shipments, or invoices.</p>
+                </div>
+              </div>
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded shadow-sm text-xs">
+                Convert to Invoice
+              </button>
             </div>
           </div>
- 
+
+          {/* Invoices section */}
+          <div className="bg-white border border-gray-200 rounded mb-3 hover:shadow-sm text-xs">
+            <div className="p-2 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+              <div className="flex items-center gap-1.5">
+                <div className="bg-gray-100 p-0.5 rounded">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900 text-xs">Invoices</h3>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <span className="bg-blue-100 text-blue-800 px-1 py-0.5 rounded-full text-xs">1</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 text-gray-400 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Client Information */}
-          <div className="bg-white p-5 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-              <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-              </svg>
-              Client Information
-            </h3>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <p className="text-xl font-medium text-gray-900">{salesOrderData?.client}</p>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <div>
-                  <p className="text-sm text-gray-500">Credit Period</p>
-                  <p className="font-medium">{salesOrderData?.credit_period} days</p>
+        {/* Main form content */}
+        <div className="flex flex-col mx-auto font-sans px-4 md:px-44 pt-4 pb-8">
+          <div className="flex flex-col md:flex-row justify-between">
+            <div className="flex flex-col gap-0 mb-4 md:mb-0">
+              <span className="text-xl">SALES ORDER</span>
+              <span className="text-xs text-gray-600">Sales Order# <span className="font-bold">SO-00002</span></span>
+            </div>
+
+            <div className="flex flex-col gap-0 items-start">
+              <span className="text-xs font-semibold">Billing Address</span>
+              <span className="text-xs text-gray-600">Sales Order# <span className="font-bold">SO-00002</span></span>
+            </div>
+          </div>
+
+          <div className="flex justify-between text-sm mb-6 mt-3">
+            <div>
+              <h2 className="font-semibold text-xs text-gray-700 mb-2">STATUS</h2>
+              <div className="flex flex-col border-l-2 pl-2 gap-2 border-yellow-500 text-xs w-[170px]">
+                <div className="flex justify-between text-green-600">
+                  <span className="text-black">Invoice:</span>
+                  <span>Partially Invoiced</span>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Confirmation</p>
-                  <p className="font-medium">{salesOrderData?.confirmation}</p>
+                <div className="flex justify-between text-green-600">
+                  <span className="text-black">Invoice:</span>
+                  <span>Partially Invoiced</span>
+                </div>
+                <div className="flex justify-between text-green-600">
+                  <span className="text-black">Payment:</span>
+                  <span>Unpaid</span>
+                </div>
+                <div className="flex justify-between text-orange-500">
+                  <span className="text-black">Shipment:</span>
+                  <span>Pending</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Order Details */}
-          <div className="bg-white p-5 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-              <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-              </svg>
-              Order Details
-            </h3>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Estimated Delivery</p>
-                  <p className="font-medium">{formatDate(salesOrderData?.estimated)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Status</p>
-                  <p className="font-medium">{salesOrderData?.status}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Company ID</p>
-                  <p className="font-medium">{salesOrderData?.company_id}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Freight Paid</p>
-                  <p className="font-medium">₹{salesOrderData?.freight_paid}</p>
-                </div>
-              </div>
-            </div>
+          <div className="text-xs space-y-2 mb-6">
+            <p className="flex flex-col md:flex-row md:gap-[118px]">
+              <span>ORDER DATE</span>
+              <span>13/05/2025</span>
+            </p>
+            <p className="flex flex-col md:flex-row md:gap-24">
+              <span>PAYMENT TERMS</span>
+              <span>Due on Receipt</span>
+            </p>
           </div>
 
-          {/* Financial Summary */}
-          <div className="bg-white p-5 rounded-lg shadow-sm md:col-span-2">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-              <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-              </svg>
-              Financial Summary
-            </h3>
-            <div className="flex flex-col md:flex-row md:justify-between">
-              <div className="grid grid-cols-2 gap-4 mb-4 md:mb-0">
-                <div className="bg-gray-100  p-3 rounded-lg">
-                  <p className="text-sm text-gray-500">SGST</p>
-                  <p className="font-medium text-gray-900">{salesOrderData?.sgst}</p>
-                </div>
-                <div className="bg-gray-100 p-3 rounded-lg">
-                  <p className="text-sm text-gray-500">CGST</p>
-                  <p className="font-medium text-gray-900">{salesOrderData?.cgst}</p>
-                </div>
-                <div className="bg-gray-100 p-3 rounded-lg">
-                  <p className="text-sm text-gray-500">Subtotal</p>
-                  <p className="font-medium text-gray-900">₹{salesOrderData?.total_amount}</p>
-                </div>
-                <div className="bg-gray-100 p-3 rounded-lg">
-                  <p className="text-sm text-gray-500">Freight</p>
-                  <p className="font-medium text-gray-900">₹{salesOrderData?.freight_paid}</p>
-                </div>
-              </div>
-              <div className="bg-gray-100 text-white p-6 rounded-lg flex flex-col items-center justify-center">
-                <p className="text-sm opacity-80 text-gray-500">Total (Incl. GST)</p>
-                <p className="text-2xl font-bold text-gray-900">₹{salesOrderData?.total_incl_gst}</p>
-              </div>
+          <div className="border rounded overflow-hidden">
+            <div className="bg-gray-100 grid grid-cols-6 text-xs font-semibold text-gray-600 px-4 py-2">
+              <div className="col-span-2">ITEMS & DESCRIPTION</div>
+              <div>ORDERED</div>
+              <div>STATUS</div>
+              <div>RATE</div>
+              <div>AMOUNT</div>
             </div>
-          </div>
 
-          {/* Work Orders & SKU Section */}
-          {salesOrderData?.workOrders && salesOrderData?.workOrders.length > 0 ? (
-            <div className="bg-white p-5 rounded-lg shadow-sm md:col-span-2">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Work Orders</h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Manufacture</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sku</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {salesOrderData?.workOrders.map((order, index) => (
-                      <tr key={index}>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">#{order?.id}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{order.manufacture}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{order.progress}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{order.sku_name}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-gray-50 p-5 rounded-lg shadow-sm md:col-span-2 text-center">
-              <p className="text-gray-500">No work orders associated with this sales order</p>
-            </div>
-          )}
-
-          {/* Created/Updated By Section */}
-          <div className="bg-white p-5 rounded-lg shadow-sm md:col-span-2">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-              <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-              </svg>
-              Record Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="flex items-center mb-2">
-                  <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-gray-800 font-bold">{salesOrderData?.creator_sales?.name?.charAt(0) || '?'}</span>
+            {[1, 0].map((status, idx) => (
+              <div key={idx} className="grid grid-cols-6 items-center px-4 py-4 border-t text-sm">
+                <div className="col-span-2 flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gray-200 flex items-center justify-center rounded">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6 text-gray-400"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5V5.25C3 4.00736 4.00736 3 5.25 3h13.5C19.9926 3 21 4.00736 21 5.25V16.5M3 16.5l2.25-2.25M3 16.5l2.25 2.25M21 16.5l-2.25-2.25M21 16.5l-2.25 2.25M9 21h6" />
+                    </svg>
                   </div>
                   <div>
-                    <p className="font-medium">{salesOrderData?.creator_sales?.name}</p>
-                    <p className="text-sm text-gray-500">{salesOrderData?.creator_sales?.email}</p>
+                    <p className="text-blue-600 underline cursor-pointer">60ml</p>
+                    <p className="text-gray-600 text-xs">SKU: 60ml</p>
                   </div>
                 </div>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500">Created at</p>
-                  <p className="font-medium">{formatDate(salesOrderData?.created_at)}</p>
-                </div>
+                <div>1</div>
+                <div>{status} Invoiced</div>
+                <div>₹100.00</div>
+                <div>₹100.00</div>
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="flex items-center mb-2">
-                  <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-gray-800 font-bold">{salesOrderData?.updater_sales?.name?.charAt(0) || '?'}</span>
-                  </div>
-                  <div>
-                    <p className="font-medium">{salesOrderData?.updater_sales?.name}</p>
-                    <p className="text-sm text-gray-500">{salesOrderData?.updater_sales?.email}</p>
-                  </div>
-                </div>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500">Last updated at</p>
-                  <p className="font-medium">{formatDate(salesOrderData?.updated_at)}</p>
-                </div>
-              </div>
+            ))}
+          </div>
+          
+          <div className="w-full flex flex-col items-end text-sm text-gray-900 mt-4">
+            <div className="w-full max-w-xs">
+              <table className="w-full text-right">
+                <tbody>
+                  <tr>
+                    <td className="text-base font-medium">Sub Total</td>
+                    <td className="text-base font-bold">₹200.00</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={2} className="text-xs text-gray-600 pt-1">Total Quantity : 2</td>
+                  </tr>
+                  <tr>
+                    <td className="text-gray-600 pt-3">Discount</td>
+                    <td className="text-gray-600 pt-3">₹0.00</td>
+                  </tr>
+                  <tr>
+                    <td className="text-lg font-bold pt-4">Total</td>
+                    <td className="text-lg font-bold pt-4">₹200.00</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
-    </PopUp>
-  ) 
+    </div>
+  );
 }
-
-export default SalesOrderView

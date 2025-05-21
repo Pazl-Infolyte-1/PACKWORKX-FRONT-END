@@ -97,19 +97,45 @@ const InventoryDashboard = () => {
 
   const normalize = str => str?.toLowerCase().replace(/[\s\-]/g, '');
 
+  // const inventorySummary = useMemo(() => {
+  //   const summary = {};
+  //   inventoryData.forEach(item => {  
+  //     const type = item.inventory_type || 'Unknown';  
+  //     console.log(item.inventory_type)    
+  //     const qty = parseFloat(item.quantity_available || 0);
+  //     if (!summary[type]) {
+  //       summary[type] = { total: 0 };
+  //     }
+  //     summary[type].total += qty;
+  //   });
+  //   return summary;
+  // }, [inventoryData]);
+
   const inventorySummary = useMemo(() => {
-    const summary = {};
-    inventoryData.forEach(item => {  
-      const type = item.inventory_type || 'Unknown';  
-      console.log(item.inventory_type)    
-      const qty = parseFloat(item.quantity_available || 0);
-      if (!summary[type]) {
-        summary[type] = { total: 0 };
-      }
-      summary[type].total += qty;
-    });
-    return summary;
-  }, [inventoryData]);
+  const summary = {};
+
+  inventoryData.forEach(item => {
+    const itemId = item.item_id;
+    const matchedItem = itemData.find(i => i.id === itemId);
+
+    // Skip if item not in itemData (filteredItems will be based on itemData)
+    if (!matchedItem) return;
+
+    const type = item.inventory_type || 'Unknown';
+    const qty = parseFloat(item.quantity_available || 0);
+
+    if (!summary[type]) {
+      summary[type] = { total: 0 };
+    }
+
+    summary[type].total += qty;
+  });
+
+  return summary;
+}, [inventoryData, itemData]);
+
+
+  
 
 
   
@@ -156,18 +182,38 @@ const InventoryDashboard = () => {
 
   const MaterialTable = ({ data, selectedType }) => {
     const filteredItems = useMemo(() => {
-      const normalizedType = normalize(selectedType);
-      return data.filter(item => normalize(item.item_type) === normalizedType);
-    }, [data, selectedType]);
+    const normalizedType = normalize(selectedType);
 
-    const rawMaterialsList = inventoryData.filter(item => 
-      normalize(item.inventory_type) === "rawmaterials");
+    if (normalizedType === 'rawmaterials') {
+      const rawTypes = [
+        'reels',
+        'glues',
+        'pasting-glue',
+        'corrugation-glue',
+        'pins',
+        'finished-goods',
+        'semi-finished-goods',
+        'rawmaterials'
+      ].map(normalize); // Normalize once
+
+      return data.filter(item => rawTypes.includes(normalize(item.item_type)));
+    }
+
+    return data.filter(item => normalize(item.item_type) === normalizedType);
+  }, [data, selectedType]);
+
+
+    const rawMaterialsList = inventoryData.filter(item =>
+      normalize(item.inventory_type) === "rawmaterials"
+    );
+
 
     const relatedItemData = itemData.filter(item =>
       rawMaterialsList.some(rm => rm.item_id === item.id)
     );
     console.log("check :", relatedItemData);
-    
+    console.log('inventoryData',inventoryData);
+     
 
     return (
       <div className="p-2 border border-gray-300 my-4">
@@ -175,9 +221,11 @@ const InventoryDashboard = () => {
         <table className="w-full border-collapse shadow-md border border-gray-300">
           <thead>
             <tr className="bg-gray-200">
-              <th className="p-2 text-left">Item Name</th>
+              <th className="p-2 text-left">Product Name</th>
+              <th className="p-2 text-left">Quantity</th>
               <th className="p-2 text-left">Min Stock Level</th>
               <th className="p-2 text-left">Reorder Level</th>
+              <th className="p-2 text-left">Product Type</th>
               <th className="p-2 text-left">Standard Cost</th>
               <th className="p-2 text-left">Manufacturer</th>
             </tr>
@@ -185,10 +233,20 @@ const InventoryDashboard = () => {
           <tbody>
             {filteredItems.length > 0 ? (
               filteredItems.map(item => (
-                <tr key={item.item_id} className="border-b border-gray-300">
+                <tr key={item.id} className="border-b border-gray-300">
                   <td className="p-2">{item.item_name}</td>
+                  {/* <td className="p-2">{item.id==inventoryData.item_id?inventoryData.quantity_available:0}</td> */}
+                  <td className="p-2">{(() => {
+                    // const inventoryItem = inventoryData.find(inv => inv.item_id === item.id);
+                    // return inventoryItem ? inventoryItem.quantity_available : 0;
+
+                    const inventoryItems = inventoryData.filter(inv => inv.item_id === item.id);
+                    const totalQuantity = inventoryItems.reduce((sum, inv) => sum + Number(inv.quantity_available || 0), 0);
+                    return totalQuantity;
+                  })()}</td>
                   <td className="p-2">{item.min_stock_level}</td>
                   <td className="p-2">{item.reorder_level}</td>
+                  <td className="p-2">{item.item_type.toUpperCase()}</td>
                   <td className="p-2">{item.standard_cost}</td>
                   <td className="p-2">{item.manufacturer}</td>
                 </tr>
@@ -206,8 +264,8 @@ const InventoryDashboard = () => {
     )
   }
 
-  const StockCard = ({ title, quantity, status, bgColor, textColor, buttonColor, icon, modalname }) => (
-    <div onClick={() => setSelectedType(title)} className={`flex justify-between p-2 rounded-lg shadow-md ${bgColor} ${textColor} min-h-[130px]`}>
+  const StockCard = ({ title, quantity, status, bgColor, textColor, buttonColor, icon, modalname, hoverBgColor  }) => (
+    <div onClick={() => setSelectedType(title)} className={`flex justify-between p-2 rounded-lg shadow-md ${bgColor} ${textColor} min-h-[130px] ${hoverBgColor} transition`} >
       <div>
         <h6>{title}</h6>
         <p>Total Quantity: {quantity}</p>
@@ -229,11 +287,11 @@ const InventoryDashboard = () => {
       {console.log('inventorySummary', inventorySummary)}
 
         {/* <StockCard title="Raw Materials" quantity={inventorySummary["raw-materials"]?.total || 0} status={getStatus("Raw Materials")} bgColor="bg-indigo-100" textColor="text-indigo-700" buttonColor="bg-indigo-700" icon={<FaUsers />} modalname="raw_material" /> */}
-        <StockCard title="Reels" quantity={inventorySummary["reels"]?.total || 0} status={getStatus("Reels")} bgColor="bg-green-100" textColor="text-green-800" buttonColor="bg-green-700" icon={<BiDollarCircle />} modalname="reels_details" />
-        <StockCard title="Corrugation Glue" quantity={inventorySummary["Corrugation Glue"]?.total || 0} status={getStatus("Corrugation Glue")} bgColor="bg-yellow-100" textColor="text-yellow-800" buttonColor="bg-yellow-700" icon={<FaStar />} modalname="corrugation_glue" />
-        <StockCard title="Pasting Glue" quantity={inventorySummary["Pasting Glue"]?.total || 0} status={getStatus("Pasting Glue")} bgColor="bg-red-100" textColor="text-red-800" buttonColor="bg-red-700" icon={<CgWorkAlt />} modalname="pasting_glue" />
-        <StockCard title="Finished Goods" quantity={inventorySummary["Finished Goods"]?.total || 0} status={getStatus("Finished Goods")} bgColor="bg-gray-200" textColor="text-gray-700" buttonColor="bg-gray-700" icon={<FaShieldAlt />} modalname="finished_goods" />
-        <StockCard title="Semi Finished Goods" quantity={inventorySummary["Semi Finished Goods"]?.total || 0} status={getStatus("Semi Finished Goods")} bgColor="bg-indigo-100" textColor="text-indigo-700" buttonColor="bg-indigo-700" icon={<FaUsers />} modalname="finished_goods" />
+        <StockCard title="Reels" quantity={inventorySummary["reels"]?.total || 0} status={getStatus("Reels")} bgColor="bg-green-100" textColor="text-green-800" buttonColor="bg-green-700" hoverBgColor="hover:bg-green-200" icon={<BiDollarCircle />} modalname="reels_details" />
+        <StockCard title="Corrugation Glue" quantity={inventorySummary["Corrugation Glue"]?.total || 0} status={getStatus("Corrugation Glue")} bgColor="bg-yellow-100" textColor="text-yellow-800" buttonColor="bg-yellow-700" hoverBgColor="hover:bg-yellow-200" icon={<FaStar />} modalname="corrugation_glue" />
+        <StockCard title="Pasting Glue" quantity={inventorySummary["Pasting Glue"]?.total || 0} status={getStatus("Pasting Glue")} bgColor="bg-red-100" textColor="text-red-800" buttonColor="bg-red-700" hoverBgColor="hover:bg-red-200" icon={<CgWorkAlt />} modalname="pasting_glue" />
+        <StockCard title="Semi Finished Goods" quantity={inventorySummary["Semi Finished Goods"]?.total || 0} status={getStatus("Semi Finished Goods")} bgColor="bg-indigo-100" textColor="text-indigo-700" buttonColor="bg-indigo-700" hoverBgColor="hover:bg-indigo-200" icon={<FaUsers />} modalname="finished_goods" />
+        <StockCard title="Finished Goods" quantity={inventorySummary["Finished Goods"]?.total || 0} status={getStatus("Finished Goods")} bgColor="bg-gray-200" textColor="text-gray-700" buttonColor="bg-gray-700" hoverBgColor="hover:bg-gray-300" icon={<FaShieldAlt />} modalname="finished_goods" />
         <div className="flex flex-col items-center justify-center p-2 bg-white rounded-lg shadow-md">
           <h6 className="text-blue-800">Total Stock Value</h6>
           <h5 className="text-2xl font-bold text-blue-800">${totalStockValue}</h5>

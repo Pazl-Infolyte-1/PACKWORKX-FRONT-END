@@ -35,6 +35,7 @@ const Department = React.lazy(() => import('./Module/Department/Department.js'))
 const RouteProcess = React.lazy(() => import('./Module/RouteProcess/RouteProcess.js'))
 const Role = React.lazy(() => import('./Module/Role/Role.js'))
 const StockManagement = React.lazy(() => import('./Module/StockManagement/StockManagement.js'))
+const wordOrderView = React.lazy(()=> import('./Module/WorkOrder/ViewWorkOrder.js'))
 
 const Items = React.lazy(() => import('./Module/Inventory/Items/items.js'))
 const GRN = React.lazy(() => import('./Module/GRN/Grn.js'))
@@ -86,7 +87,20 @@ const routes = [
   { path: '/billing', name: 'Billing', element: Billing, key: 5003 },
   { path: '/companies', name: 'Companies', element: Companies, key: 5002 },
 
-  { path: '/workorderlist', name: 'Workorderlist', element: WorkOrderList, key: 25 },
+  {
+    path: '/workorderlist',
+    name: 'Workorderlist',
+    element:WorkOrderList, // Make sure to use JSX here if you're rendering a component
+    key: 25,
+    children: [
+      {
+        path: 'view/:id',
+        name: 'WorkOrdersView',
+        element: wordOrderView,
+        key: 26 // Assigned a proper unique key
+      }
+    ]
+  },  
   { path: '/workorderlist/form', name: 'WorkorderlistAddform', element: salesOrderForm, key: 25 },
 
   { path: '/salesorder',

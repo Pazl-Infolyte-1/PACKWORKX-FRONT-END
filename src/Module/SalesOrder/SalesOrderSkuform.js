@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Select from 'react-select';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form';
 import apiMethods from '../../api/config';
 
 const SalesOrderSkuForm = ({ 
@@ -205,6 +205,8 @@ const SalesOrderSkuForm = ({
     recalculateAllTotals();
     updateParentFormData();
   }, [skusData, isIgstApplicable]);
+
+  
 
   // Function to update parent component with current SKU data
   const updateParentFormData = () => {

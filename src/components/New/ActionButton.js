@@ -48,7 +48,7 @@ const ActionButton = ({
   return (
     <button
     type={type}
-      className={`${heightClass} ${widthClass} ${radiusClass} flex text-xs  items-center justify-center px-2 py-1 shadow-md border-none cursor-pointer reoun    ${getButtonStyle()} ${className}`}
+      className={`${heightClass} ${widthClass} ${radiusClass} flex text-xs  items-center justify-center px-4 py-2 shadow-md border-none cursor-pointer reoun    ${getButtonStyle()} ${className}`}
       onClick={onClick}
     >
        {Icon && <Icon className="me-2" />} 

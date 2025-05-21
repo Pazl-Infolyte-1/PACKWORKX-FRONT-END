@@ -14,8 +14,9 @@ import WorkOrderEditForm from './WorkOrderEditForm'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import ContentHeader from '../../components/New/ContentHeader'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { FiDownload, FiUpload } from 'react-icons/fi'
+import CompactPagination from '../../components/New/CompactPagination'
 
 const WorkOrders = () => {
   const [data, setData] = useState([])
@@ -34,7 +35,20 @@ const WorkOrders = () => {
   const searchBarRef = useRef(null)
   const [canDeactivate,setCanDeactivate] = useState(false);
   const [isTouched,setIsTouched] = useState(false)
+  const [isMinimiseTable, setIsminimiseTable ]  = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+
+
+
+  useEffect(() => {
+    // Check if current route includes "/salesorder/view/"
+    if (location.pathname.includes('/workorderlist/view/')) {
+      setIsminimiseTable(true);
+    } else {
+      setIsminimiseTable(false);
+    }
+  }, [location.pathname]);
 
 
 
@@ -141,7 +155,7 @@ const WorkOrders = () => {
   
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'sales_order.xlsx');
+        link.setAttribute('download', 'work_order.xlsx');
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -166,7 +180,7 @@ const WorkOrders = () => {
   
 
   return (
-    <div className="w-full mb-3 ">
+    <div className=" flex flex- w-full mb-3 ">
       {/* Header Section */}
       {/* <div className="w-full h-[40px]">
           <div className="flex justify-between items-center">
@@ -174,31 +188,123 @@ const WorkOrders = () => {
           </div>
         </div> */
         }
+        
+      
 
-      <ContentHeader
-      heading={"Work Order"}
-      onAddClick={() => {
-        navigate('form?tab=skuDetails')
-      }}
-      menuOptions={[
-        {
-          icon: <FiUpload className="mr-2 text-blue-500" />,
-          label: 'Import',
-          onClick: () => console.log('Import clicked'),
-        },
-        {
-          icon: <FiDownload className="mr-2 text-blue-500" />,
-          label: 'Export',
-          onClick: downloadWorkOrderExcelSheet,
-        },
-      ]}
-      />
+      <div className="flex w-full">
 
-              <div className="flex flex-col justify-between  ">
+       <div className={`${isMinimiseTable ? 'w-1/4' : 'w-full'} !h-[90vh] `}>
+         <ContentHeader
+            heading={"Work Order"}
+            isMinimized={isMinimiseTable}
+            onAddClick={() => {
+              navigate('form?tab=skuDetails')
+            }}
+            menuOptions={[
+              {
+                icon: <FiUpload className="mr-2 text-blue-500" />,
+                label: 'Import',
+                onClick: () => console.log('Import clicked'),
+              },
+              {
+                icon: <FiDownload className="mr-2 text-blue-500" />,
+                label: 'Export',
+                onClick: downloadWorkOrderExcelSheet,
+              },
+            ]}
+          />
 
- 
+          <WorkOrderTable
+            // cellData={filteredSearchData.length ? filteredSearchData :data}
+            cellData={data}
+            setCellData={setData}
+            showPopUp={showPopUp}
+            setShowPopUp={setShowPopUp}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+            loading={loading}
+            setAlerts={setAlerts}
+            isMinimiseTable={isMinimiseTable}
+          />
 
-      {/* Button section with Search */}
+
+
+          {/* Pagination Section */}
+          <div className="flex justify-end items-center gap-4 mt-4">
+            <CompactPagination
+              count={pagination?.totalPages}
+              page={pagination?.page}
+              onPageChange={(event, value) =>
+                setPagination((prev) => ({
+                  ...prev,
+                  page: value,
+                }))
+              }
+              onEntriesChange={(newLimit) => {
+                setLimit(newLimit)
+                // Reset to first page when changing limit
+                setPagination((prev) => ({
+                  ...prev,
+                  page: 1,
+                }))
+              }}
+              entriesPerPage={limit}
+            />
+          </div>
+        </div>
+          <Outlet></Outlet>
+        {/* </div> */}
+        <Drawer isOpen={drawerOpen} maxWidth="1280px" onClose={() => handleCloseDrawer()}>
+          {drawerOpen && (
+            <AddSalesOrder currentTab={'skuDetails'} setDrawer={setDrawerOpen} fetchData={fetchData} setIsFormTouched={setIsTouched} handleCloseDrawer={handleCloseDrawer} />
+          )}
+        </Drawer>
+
+
+
+        {isEditFormVisible && (
+          <WorkOrderEditForm
+            isEditFormVisible={isEditFormVisible}
+            selectedWorkOrderId={selectedWorkOrderId}
+            setIsEditFormVisible={setIsFormVisible}
+            fetchData={fetchData}
+          />
+        )}
+
+        <ConfirmationModale
+          isOpen={canDeactivate}
+          onClose={() => setCanDeactivate(false)}
+          onConfirm={() => {
+            setDrawerOpen(false);
+            setCanDeactivate(false);
+          }}
+          variant="unsavedChanges"
+        />
+
+
+
+        <ConfirmationModale
+          isOpen={isConfirmationModaleOpen}
+          onClose={() => setIsConfirmationModaleOpen(false)}
+          onConfirm={ConfirmDelete}
+        />
+
+
+        <CustomAlert
+          alerts={alerts}
+          handleClose={handleClose}
+        />
+      </div>
+    </div>
+
+  )
+}
+
+export default WorkOrders
+
+
+
+     {/* Button section with Search */}
       {/* <div className="flex justify-between items-center gap-2 h-10 ">
         <div className='flex  gap-1'>
         <SearchBar text="workorder" data={data} ref={searchBarRef} />
@@ -230,90 +336,3 @@ const WorkOrders = () => {
           <ActionButton label={'Work Order'} variant="add" onClick={() => setDrawerOpen(true)} />
         </div>
       </div> */}
-
-      {/* Table Container */}
-      {/* <div> */}
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap mt-2">
-          <WorkOrderTable
-            // cellData={filteredSearchData.length ? filteredSearchData :data}
-            cellData={data}
-            setCellData = {setData}
-            showPopUp={showPopUp}
-            setShowPopUp={setShowPopUp}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-            loading={loading}
-            setAlerts={setAlerts}
-          />
-        </div>
-
-        {/* Pagination Section */}
-        <div className="flex justify-end items-center gap-4 mt-4">
-          <CommonPagination
-            count={pagination?.totalPages}
-            page={pagination?.page}
-            onChange={(event, value) =>
-              setPagination((prev) => ({
-                ...prev,
-                page: value,
-              }))
-            }
-            onLimitChange={(newLimit) => {
-              setLimit(newLimit)
-              // Reset to first page when changing limit
-              setPagination((prev) => ({
-                ...prev,
-                page: 1,
-              }))
-            }}
-            limit={limit}
-          />
-        </div>
-      {/* </div> */}
-      <Drawer isOpen={drawerOpen} maxWidth="1280px" onClose={() => handleCloseDrawer()}>
-      {drawerOpen && (
-        <AddSalesOrder currentTab={'skuDetails'} setDrawer={setDrawerOpen} fetchData={fetchData} setIsFormTouched = {setIsTouched} handleCloseDrawer={handleCloseDrawer} />
-      )}
-      </Drawer>
-
-
-
-      {isEditFormVisible && (
-  <WorkOrderEditForm
-    isEditFormVisible={isEditFormVisible}
-    selectedWorkOrderId={selectedWorkOrderId}
-    setIsEditFormVisible={setIsFormVisible}
-    fetchData={fetchData}
-  />
-)}
-
-<ConfirmationModale 
-  isOpen={canDeactivate}
-  onClose={() => setCanDeactivate(false)}
-  onConfirm={() => {
-    setDrawerOpen(false);
-    setCanDeactivate(false);
-  }}
-  variant="unsavedChanges"
-/>
-
-
-
-<ConfirmationModale
-  isOpen={isConfirmationModaleOpen}
-  onClose={() => setIsConfirmationModaleOpen(false)}
-  onConfirm={ConfirmDelete}
-/>
-
-
-<CustomAlert
-alerts={alerts}
-handleClose={handleClose}
-/>
-    </div>
-    </div>
-
-  )
-}
-
-export default WorkOrders

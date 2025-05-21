@@ -409,6 +409,7 @@ const OrderForm = forwardRef(({
                           <div
                             key={index}
                             className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
+                            onChange={() => selectClient(client.company_name, client.client_id, client?.addresses?.[0]?.state)}
                             onClick={() => selectClient(client.company_name, client.client_id, client?.addresses?.[0]?.state)}
                           >
                             {client.company_name}

@@ -229,7 +229,10 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
       }
     
       // ✅ Redirect after success
-      navigate('/sales-orders'); // Change '/sales-orders' to your actual route
+      setTimeout(() => {
+        navigate('/salesorder'); // Change '/sales-orders' to your actual route
+
+      }, 500);
     
     }catch (error) {
       // console.log(error)

@@ -23,52 +23,112 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
 
 
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       if (IsEditVersion && skuVersionID) {
+  //         // Fetch specific SKU version data when in edit mode
+  //         const versionResponse = await apiMethods.getSingleSkuVersion(skuVersionID);
+
+  //         if (versionResponse?.data) {
+
+  //           setSkuValues(versionResponse?.data?.sku_values || []);
+  //           setClientID(versionResponse?.data?.client_id || "");
+  //           setSkuVersion(versionResponse?.data?.sku_version || "");
+  //         }
+  //       } else  {
+  //         // Fetch SKU Data
+  //         const response = await apiMethods.getSingleSkuData(skuID);
+  //         const OptionResponse = await apiMethods.getSkuValuesOptions(skuID)
+  //         setSkuOptions(OptionResponse?.data?.options || {});
+
+
+
+
+  //         if (response?.data?.sku_values && Array.isArray(response.data.sku_values)) {
+  //           setSkuValues(response.data.sku_values);
+  //           setSkuInitalData(response.data.sku_values)
+  //           setClientID(response.data.client_id);
+  //           setSkuversionLimit(response.data.sku_version_limit)
+  //         }
+
+  //         // Fetch SKU Versions
+  //         const versionsResponse = await apiMethods.getSkuVersions(skuID);
+  //         const skuversionID = `V${versionsResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+  //         setSkuVersion(skuversionID);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching SKU data or versions:", error);
+  //     }
+  //   };
+
+  //   if (skuID) {
+  //     fetchData();
+  //   }
+  // }, [skuID, IsEditVersion, skuVersionID, setSkuVersionsMap]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (IsEditVersion && skuVersionID) {
-          // Fetch specific SKU version data when in edit mode
+          // Case 1: Edit Mode with Version ID
           const versionResponse = await apiMethods.getSingleSkuVersion(skuVersionID);
-
+  
           if (versionResponse?.data) {
-
             setSkuValues(versionResponse?.data?.sku_values || []);
             setClientID(versionResponse?.data?.client_id || "");
             setSkuVersion(versionResponse?.data?.sku_version || "");
           }
-        } else {
-          // Fetch SKU Data
-          const response = await apiMethods.getSingleSkuData(skuID);
-          const OptionResponse = await apiMethods.getSkuValuesOptions(skuID)
-          setSkuOptions(OptionResponse?.data?.options || {});
-          console.log(OptionResponse?.data?.options, 'fffffffffffffffffffffff')
-
-
-
-
-          if (response?.data?.sku_values && Array.isArray(response.data.sku_values)) {
-            setSkuValues(response.data.sku_values);
-            setSkuInitalData(response.data.sku_values)
-            setClientID(response.data.client_id);
-            setSkuversionLimit(response.data.sku_version_limit)
+  
+        } else if (skuID && skuVersionID) {
+          // 🔹 Case 2: Both skuID and skuVersionID are available (but not in edit mode)
+          console.log("Handling skuID + skuVersionID case (not edit mode)");
+          // Add your custom logic here for this case
+          // Example:
+          const [skuResponse, versionResponse] = await Promise.all([
+            apiMethods.getSingleSkuData(skuID),
+            apiMethods.getSingleSkuVersion(skuVersionID)
+          ]);
+  
+          if (skuResponse?.data && versionResponse?.data) {
+            setSkuValues(versionResponse?.data?.sku_values || []);
+            setClientID(skuResponse?.data?.client_id || "");
+            setSkuOptions((await apiMethods.getSkuValuesOptions(skuID))?.data?.options || {});
+            setSkuversionLimit(skuResponse.data.sku_version_limit);
+            setSkuInitalData(versionResponse?.data?.sku_values || []);
+            const skuversionID = `V${versionResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+            setSkuVersion(skuversionID);
           }
 
-          // Fetch SKU Versions
+  
+        } else {
+          // Case 3: Only skuID is available (create new)
+          const response = await apiMethods.getSingleSkuData(skuID);
+          const OptionResponse = await apiMethods.getSkuValuesOptions(skuID);
+          setSkuOptions(OptionResponse?.data?.options || {});
+  
+          if (response?.data?.sku_values && Array.isArray(response.data.sku_values)) {
+            setSkuValues(response.data.sku_values);
+            setSkuInitalData(response.data.sku_values);
+            setClientID(response.data.client_id);
+            setSkuversionLimit(response.data.sku_version_limit);
+          }
+  
+          // Generate new SKU version ID
           const versionsResponse = await apiMethods.getSkuVersions(skuID);
-          const skuversionID = `V${versionsResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+          const skuversionID = `V${versionsResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
           setSkuVersion(skuversionID);
         }
       } catch (error) {
         console.error("Error fetching SKU data or versions:", error);
       }
     };
-
-    if (skuID) {
+  
+    if(skuID){
       fetchData();
     }
   }, [skuID, IsEditVersion, skuVersionID, setSkuVersionsMap]);
-
-
+  
 
   const handleValueChange = (index, field, value) => {
     const updatedValues = [...skuValues];

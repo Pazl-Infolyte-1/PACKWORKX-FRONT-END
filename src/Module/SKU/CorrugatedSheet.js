@@ -770,13 +770,17 @@ className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Board Size <span className="text-gray-500 text-sm">(W × L)</span>
               <span className="text-red-500 ml-1">*</span>
-              {errors.width_board_size_cm2 && errors.length_board_size_cm2 && (
+              {/*{errors.width_board_size_cm2 && errors.length_board_size_cm2 && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.width_board_size_cm2}
                 </span>
-              )}
+              )}*/}
             </label>
-            <div className="h-8 border border-gray-300 rounded-md flex items-center bg-white">
+            <div  className={`h-8 rounded-md flex items-center bg-white ${
+      errors.width_board_size_cm2 || errors.length_board_size_cm2
+        ? 'border-2 border-red-500'
+        : 'border border-gray-300'
+    }`}>
               <input
                 id="width_board_size_cm2"
                 name="width_board_size_cm2"
@@ -836,11 +840,11 @@ className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Minimum Order Level
             <span className="text-red-500 ml-1">*</span>
-            {errors.minimum_order_level && (
+            {/*{errors.minimum_order_level && (
               <span className="text-red-500 text-sm ml-2 align-middle">
                 {errors.minimum_order_level}
               </span>
-            )}
+            )}*/}
           </label>
           <input
             id="minimum_order_level"

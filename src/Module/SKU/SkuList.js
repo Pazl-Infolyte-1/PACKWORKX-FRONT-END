@@ -20,6 +20,7 @@ import ContentHeader from '../../components/New/ContentHeader'
 import { FiDownload, FiUpload } from 'react-icons/fi'
 import SkuView from './SkuView'
 import CommonPagination from '../../components/New/Pagination'
+import CompactPagination from '../../components/New/CompactPagination'
 
 function SkuList() {
   const [skuType, setSkuType] = useState([])
@@ -53,6 +54,8 @@ function SkuList() {
   const [skuVariant, setSkuVariant] = useState('RSC Box')
   const [isMinimized, setIsMinimized] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
+  const [validationErrors, setValidationErrors] = useState({})
+
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
     client_id: null,
@@ -213,6 +216,18 @@ function SkuList() {
       if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
         newErrors.route = 'Required'
       }
+ const partValueErrors = addNewSkuData.part_value.map((part) => {
+  const errors = {}
+  if (!part.sku_id || !part.sku_name) errors.sku = 'SKU is required'
+  if (!part.ratio) errors.ratio = 'Ratio is required'
+  return Object.keys(errors).length > 0 ? errors : undefined
+})
+
+// Only assign part_value errors if there are any non-undefined entries
+if (partValueErrors.some((entry) => entry !== undefined)) {
+  newErrors.part_value = partValueErrors
+}
+
     } else if (addNewSkuData.sku_type === 'Die Cut box') {
       // Validate only for Composite
       if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
@@ -498,7 +513,7 @@ const clientResponse = await apiMethods.getClients({ limit: 10000 })
   }
 
   console.log("edittag",editTag)
-
+console.log("pagination",pagination)
   return (
     <div className="flex  h-full">
       <div className={`${isMinimized ? 'w-[28%]' : 'w-full'}`}>
@@ -662,7 +677,7 @@ const clientResponse = await apiMethods.getClients({ limit: 10000 })
 
         {/* Pagination Section */}
         <div className="flex justify-end items-center gap-4 mt-[40px]">
-        <CommonPagination
+        {/*<CommonPagination
           count={pagination?.totalPages || 1}
           page={pagination?.currentPage || 1}
           onChange={(event, value) => {
@@ -682,7 +697,31 @@ const clientResponse = await apiMethods.getClients({ limit: 10000 })
             setRefresh((prev) => !prev)
           }}
           limit={limit}
-        />
+        />*/}
+
+            <CompactPagination
+                    totalRecords={pagination?.totalCount}
+                    count={pagination?.totalPages || 1}
+                    page={pagination?.currentPage || 1}
+                    onPageChange={(event, value) => {
+            setPagination((prev) => ({
+              ...prev,
+              currentPage: value,
+            }))
+            setRefresh((prev) => !prev)
+          }}
+                    entriesPerPage={limit}
+                    onEntriesChange={(newLimit) => {
+            setLimit(newLimit)
+            // Reset to first page when changing limit
+            setPagination((prev) => ({
+              ...prev,
+              currentPage: 1,
+            }))
+            setRefresh((prev) => !prev)
+          }}
+                    isMinimized={isMinimized}
+                  />
       </div>
         <div>
           <SkuPopup visible={visible} setVisible={setVisible} />
@@ -701,6 +740,7 @@ const clientResponse = await apiMethods.getClients({ limit: 10000 })
           }}
         >
           <SkuAddEdit
+          validationErrors={validationErrors.part_value || []}
           uploadedFiles={uploadedFiles}
           setUploadedFiles={setUploadedFiles}
             isopenval={isDrawerOpen || editTag}

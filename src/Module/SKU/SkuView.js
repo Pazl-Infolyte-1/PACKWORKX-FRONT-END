@@ -46,10 +46,10 @@ const SkuView = ({ setIsMinimized, selectedSku, handleSkuEdit }) => {
           >
             Edit
           </button>
-          <button className="px-4 py-1 bg-blue-500 text-white rounded text-sm">
+          {/*<button className="px-4 py-1 bg-blue-500 text-white rounded text-sm">
             New Transaction ▾
           </button>
-          <button className="px-4 py-1 border rounded text-sm">More ▾</button>
+          <button className="px-4 py-1 border rounded text-sm">More ▾</button>*/}
           <button
             onClick={() => setIsMinimized(false)}
             className="px-2 py-1 border rounded text-sm"
@@ -71,9 +71,9 @@ const SkuView = ({ setIsMinimized, selectedSku, handleSkuEdit }) => {
           </button>
         ))}
         <div className="flex-grow"></div>
-        <button className="px-4">
+        {/*<button className="px-4">
           <Mail size={16} />
-        </button>
+        </button>*/}
       </div>
 
       {/* Content area with dynamic height */}
@@ -94,7 +94,7 @@ const SkuView = ({ setIsMinimized, selectedSku, handleSkuEdit }) => {
                 <p className="text-sm font-semibold my-0">{selectedSku.sku_name}</p>
                 <p className="text-sm my-0">{selectedSku.sku_ui_id}</p>
 
-                <div className="flex text-blue-500 text-xs mt-2 gap-2">
+                {/*<div className="flex text-blue-500 text-xs mt-2 gap-2">
                   <a href="#" className="hover:underline">
                     Invite to Portal
                   </a>
@@ -102,7 +102,7 @@ const SkuView = ({ setIsMinimized, selectedSku, handleSkuEdit }) => {
                   <a href="#" className="hover:underline">
                     Send Email
                   </a>
-                </div>
+                </div>*/}
               </div>
             </div>
           </div>
@@ -196,7 +196,7 @@ const SkuView = ({ setIsMinimized, selectedSku, handleSkuEdit }) => {
 
         {/* Right Column */}
         <div className="w-2/3 px-2 py-1 overflow-y-auto">
-          <div className="flex bg-gray-50 p-2 justify-between items-center rounded">
+          {/*<div className="flex bg-gray-50 p-2 justify-between items-center rounded">
             <div className="flex items-start mb-2">
               <div className="mr-2 text-blue-500">
                 <Mail size={16} />
@@ -220,7 +220,7 @@ const SkuView = ({ setIsMinimized, selectedSku, handleSkuEdit }) => {
                 <MoreHorizontal size={16} />
               </button>
             </div>
-          </div>
+          </div>*/}
 
           <div className="mb-8">
             <h3 className="text-lg font-medium">SKU Values</h3>

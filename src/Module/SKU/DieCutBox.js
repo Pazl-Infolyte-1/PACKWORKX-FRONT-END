@@ -634,9 +634,9 @@ const [fileNames, setFileNames] = useState([]);
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 UPS
                 <span className="text-red-500 ml-1">*</span>
-                {errors.ups && (
+                {/*{errors.ups && (
                   <span className="text-red-500 text-sm ml-2 align-middle">{errors.ups}</span>
-                )}
+                )}*/}
               </label>
               <input
                 id="ups"
@@ -657,9 +657,9 @@ const [fileNames, setFileNames] = useState([]);
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Die
             <span className="text-red-500 ml-1">*</span>
-            {errors.select_dies && (
+            {/*{errors.select_dies && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.select_dies}</span>
-            )}
+            )}*/}
           </label>
           <div className="flex items-center gap-2">
             <input
@@ -668,7 +668,9 @@ const [fileNames, setFileNames] = useState([]);
               id="select_dies"
               value={addNewSkuData.select_dies || ''}
               onChange={handleChange}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+    errors?.select_dies ? 'border-2 border-red-500' : 'border border-gray-300'
+  }`}
               placeholder="Select"
               readOnly={true}
             />
@@ -687,9 +689,9 @@ const [fileNames, setFileNames] = useState([]);
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Internal ID
               <span className="text-red-500 ml-1">*</span>
-              {errors.internal_id && (
+              {/*{errors.internal_id && (
                 <span className="text-red-500 text-sm ml-2 align-middle">{errors.internal_id}</span>
-              )}
+              )}*/}
             </label>
             <input
               id="internal_id"
@@ -709,13 +711,17 @@ const [fileNames, setFileNames] = useState([]);
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Board Size <span className="text-gray-500 text-sm">(L × W)</span>
               <span className="text-red-500 ml-1">*</span>
-              {errors.width_board_size_cm2 && errors.length_board_size_cm2 && (
+              {/*{errors.width_board_size_cm2 && errors.length_board_size_cm2 && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.width_board_size_cm2}
                 </span>
-              )}
+              )}*/}
             </label>
-            <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
+            <div className={`h-8 rounded-md flex items-center bg-white ${
+      errors.width_board_size_cm2 || errors.length_board_size_cm2
+        ? 'border-2 border-red-500'
+        : 'border border-gray-300'
+    }`}>
     <input
                 id="length_board_size_cm2"
                 name="length_board_size_cm2"
@@ -748,11 +754,11 @@ const [fileNames, setFileNames] = useState([]);
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Deckle Size
                 <span className="text-red-500 ml-1">*</span>
-                {errors.deckle_size && (
+                {/*{errors.deckle_size && (
                   <span className="text-red-500 text-sm ml-2 align-middle">
                     {errors.deckle_size}
                   </span>
-                )}
+                )}*/}
               </label>
               <input
                 id="deckle_size"
@@ -762,11 +768,14 @@ const [fileNames, setFileNames] = useState([]);
                 min="0"
                 readOnly={editTag}
                 onChange={handleChange}
-                className={`w-full p-1 border rounded-md focus:ring-2 transition-colors ${
-                  diecutCalculations.deckleError
-                    ? 'border-red-500 ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                }`}
+                //className={`w-full p-1 border rounded-md focus:ring-2 transition-colors ${
+                //  diecutCalculations.deckleError
+                //    ? 'border-red-500 ring-red-400'
+                //    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                //}`}
+                           className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.deckle_size|| diecutCalculations.deckleError ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
                 
               />
               {diecutCalculations.deckleError && (
@@ -781,18 +790,20 @@ const [fileNames, setFileNames] = useState([]);
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Minimum Order Level
               <span className="text-red-500 ml-1">*</span>
-              {errors.minimum_order_level && (
+              {/*{errors.minimum_order_level && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.minimum_order_level}
                 </span>
-              )}
+              )}*/}
             </label>
             <input
               id="minimum_order_level"
               name="minimum_order_level"
               value={addNewSkuData.minimum_order_level}
               onChange={handleChange}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </div>

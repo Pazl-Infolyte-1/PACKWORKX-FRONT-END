@@ -343,16 +343,18 @@ function CustomItem({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             SKU Name
             <span className="text-red-500 ml-1">*</span>
-            {errors.sku_name && (
+            {/*{errors.sku_name && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
-            )}
+            )}*/}
           </label>
           <input
             id="sku_name"
             name="sku_name"
             value={addNewSkuData.sku_name}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.sku_name ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
         </div>
 
@@ -360,9 +362,9 @@ function CustomItem({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Client Name
             <span className="text-red-500 ml-1">*</span>
-            {errors.client_id && (
+            {/*{errors.client_id && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
-            )}
+            )}*/}
           </label>
           <select
             name="client"
@@ -370,7 +372,9 @@ function CustomItem({
             disabled={clientDiasble}
             value={addNewSkuData.client_id || null}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                     className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.client_id ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           >
             <option value="" hidden>
               Select
@@ -387,48 +391,67 @@ function CustomItem({
 
       {/* Main content */}
       <div className="p-3 mt-6 border border-gray-200 rounded-lg">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          <Input
-            className="w-[200px]"
-            skuName="Estimate"
+       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3 border border-gray-200 rounded-lg">
+  <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+       Estimate
+            <span className="text-red-500 ml-1">*</span>
+            {/*{errors.sku_name && (
+              <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
+            )}*/}
+          </label>
+          <input
             id="estimate_composite_item"
             name="estimate_composite_item"
-            value={addNewSkuData?.estimate_composite_item}
-            onChange={handleChange}
+            value={addNewSkuData.estimate_composite_item}
             readOnly={editTag}
-            requiredSymbol={true}
-            errorMessage={
-              errors.estimate_composite_item === 'Required'
-                ? 'Required'
-                : errors.estimate_composite_item
-            }
+            onChange={handleChange}
+                                                className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.estimate_composite_item ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
+        </div>
 
-          <Input
-            className="w-[200px]"
-            skuName="Default SKU Details"
+
+            <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+    Default SKU Details
+            <span className="text-red-500 ml-1">*</span>
+            {/*{errors.sku_name && (
+              <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
+            )}*/}
+          </label>
+          <input
             id="default_sku_details"
             name="default_sku_details"
-            value={addNewSkuData?.default_sku_details}
-            onChange={handleChange}
+            value={addNewSkuData.default_sku_details}
             readOnly={editTag}
-            requiredSymbol={true}
-            errorMessage={
-              errors.default_sku_details === 'Required' ? 'Required' : errors.default_sku_details
-            }
+            onChange={handleChange}
+                                                className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.default_sku_details ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
+        </div>
 
-          <Input
-            className="w-[200px]"
-            skuName="Description"
+      <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+    Description
+            <span className="text-red-500 ml-1">*</span>
+            {/*{errors.sku_name && (
+              <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
+            )}*/}
+          </label>
+          <input
             id="description"
             name="description"
             value={addNewSkuData.description}
-            onChange={handleChange}
             readOnly={editTag}
-            requiredSymbol={true}
-            errorMessage={errors.description === 'Required' ? 'Required' : errors.description}
+            onChange={handleChange}
+                                                className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.description ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
+        </div>
 
           <div className="w-[200px]">
             <label className="block text-sm font-medium text-gray-700 mb-2">Tax Master</label>

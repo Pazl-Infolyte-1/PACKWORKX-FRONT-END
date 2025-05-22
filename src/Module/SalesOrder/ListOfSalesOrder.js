@@ -15,6 +15,8 @@ import CustomAlert from '../../components/New/CustomAlert'
 import SalesOrderView from './viewSalesOrder'
 import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { FiDownload, FiUpload } from 'react-icons/fi'
 
 function ListOfSalesOrder() {
   const [data, setData] = useState([])
@@ -22,7 +24,7 @@ function ListOfSalesOrder() {
   const [isActionDrawerOpen, setActionDrawerOpen] = useState(false)
   const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
   const [ApiResponse, setApiResponse] = useState([])
-  const [paginationParams, setPaginationParams] = useState({ currentPage: 1, pageSize: 10 });
+  const [paginationParams, setPaginationParams] = useState({ currentPage: 1, pageSize: 50 });
   const [isConfirmationModaleOpen, setIsConfirmationModaleOpen] = useState(false)
   const [selectedSalesOrder, setSelectedSalesOrder] = useState("")
   const [status, setStatus] = useState('')
@@ -35,13 +37,31 @@ function ListOfSalesOrder() {
   const [canDeactivate, setCanDeactivate] = useState(false);
   const [isTouched, setIsTouched] = useState(false)
   const [isMinimiseTable, setIsminimiseTable] = useState(false)
-
-
+  const {setGlobalPlaceholder} = useSearch()
+  const naviagte = useNavigate()
+  const location = useLocation()
 
   const searchBarRef = useRef(null)
 
 
 
+  useEffect(() => {
+    // Check if current route includes "/salesorder/view/"
+    if (location.pathname.includes('/salesorder/view/')) {
+      setIsminimiseTable(true);
+    } else {
+      setIsminimiseTable(false);
+    }
+  }, [location.pathname]);
+
+
+  useEffect(() => {
+    setGlobalPlaceholder('Search Sales Order...')
+
+    return () => {
+      setGlobalPlaceholder('Search...');
+    }
+  }, []);
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
@@ -56,6 +76,40 @@ function ListOfSalesOrder() {
 
     }
   };
+  const downloadSalesOrderExcelSheet = async () => {
+    try {
+      const response = await apiMethods.downloadSalesOrder();
+  
+      if (response?.status === 200) {
+        const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' });
+        const url = window.URL.createObjectURL(blob);
+  
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'sales_order.xlsx');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      } else {
+        console.error('Unexpected response status:', response?.status);
+        alert('Failed to download file. Please try again later.');
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error('API Error:', error.response.data?.message || error.message);
+        alert(`Error: ${error.response.data?.message || 'Failed to download file.'}`);
+      } else if (error.request) {
+        console.error('No response received:', error.request);
+        alert('No response from server. Please check your network connection.');
+      } else {
+        console.error('Error', error.message);
+        alert(`Error: ${error.message}`);
+      }
+    }
+  };
+  
+  
 
 
 
@@ -128,12 +182,25 @@ function ListOfSalesOrder() {
     }
   }
 
+  // const handleView = async (id) => {
+  //   try {
+  //     const response = await apiMethods.getSaleOrderData(id)
+  //     SetselectedSalesOrderData(response?.data)
+  //     setIsminimiseTable(true)
+  //     SetviewSalesOrder(true)
+  //   } catch (error) {
+  //     console.error('Error viewing sales order:', error)
+  //     setAlerts([{ severity: "error", message: error?.response?.data?.message || "Error viewing sales order" }]);
+  //   }
+  // }
+
   const handleView = async (id) => {
     try {
       const response = await apiMethods.getSaleOrderData(id)
       SetselectedSalesOrderData(response?.data)
-      setIsminimiseTable(true)
-      SetviewSalesOrder(true)
+      // setIsminimiseTable(true)
+      naviagte(`view/${id}`)
+      // SetviewSalesOrder(true)
     } catch (error) {
       console.error('Error viewing sales order:', error)
       setAlerts([{ severity: "error", message: error?.response?.data?.message || "Error viewing sales order" }]);
@@ -144,10 +211,13 @@ function ListOfSalesOrder() {
     handleView(row.id)
   }
 
-  const handleEdit = (id) => {
-    setSelectedSalesOrder(id)
-    setIsEditMode(true)
-    setDrawerOpen(true)
+  const handleEdit = (row) => {
+
+    naviagte(`form/${row}?tab=${'salesOrder'}`);
+    setSelectedSalesOrder(row)
+
+    // setIsEditMode(true)
+    // setDrawerOpen(true)
   }
 
   const handleStatus = (e) => {
@@ -178,99 +248,78 @@ function ListOfSalesOrder() {
 
 
         <CustomAlert alerts={alerts} handleClose={handleClose} />
-        <div className={`${isMinimiseTable ? 'w-1/4' : 'w-full'} !h-[90vh] ` }>
-        <ContentHeader
+        <div className={`${isMinimiseTable ? 'w-2/6' : 'w-full'} !h-[90vh] `}>
+          <ContentHeader
             heading={"Sales Order"}
             isMinimized={isMinimiseTable}
             onAddClick={() => {
-              setIsEditMode(false)
-              setDrawerOpen(true)
+              naviagte('form?tab=salesOrder'); // ← added query param
             }}
-          />
-          <div className='flex flex-col justify-between'>
-          <SalesOrderTable
-            data={filteredSearchData.length ? filteredSearchData : data}
-            setActionDrawerOpen={setActionDrawerOpen}
-            setVersionDrawerOpen={setVersionDrawerOpen}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-            handleView={handleView}
-            loading={loading}
-            handleStatusChange={handleStatusChange}
-            isMinimiseTable={isMinimiseTable}
-            handleRowClick={handleRowClick}
-            
+            menuOptions={[
+              {
+                icon: <FiUpload className="mr-2 text-blue-500" />,
+                label: 'Import',
+                onClick: () => console.log('Import clicked'),
+              },
+              {
+                icon: <FiDownload className="mr-2 text-blue-500" />,
+                label: 'Export',
+                onClick: downloadSalesOrderExcelSheet,
+
+              },
+            ]}
           />
 
-          <div className="flex justify-end items-center gap-4  mt-2">
-            <CompactPagination
-              count={ApiResponse?.totalPages}
-              page={paginationParams?.currentPage || 1}
-              onPageChange={handlePageChange}
-              onEntriesChange={handleLimitChange}
-              entriesPerPage={paginationParams.pageSize}
+          <div className='flex flex-col justify-between'>
+            <SalesOrderTable
+              data={filteredSearchData.length ? filteredSearchData : data}
+              setActionDrawerOpen={setActionDrawerOpen}
+              setVersionDrawerOpen={setVersionDrawerOpen}
+              handleEdit={handleEdit}
+              handleDelete={handleDelete}
+              handleView={handleView}
+              loading={loading}
+              handleStatusChange={handleStatusChange}
+              isMinimiseTable={isMinimiseTable}
+              handleRowClick={handleRowClick}
+
             />
-          </div>
+
+            <div className="flex justify-end items-center gap-4  mt-2">
+              <CompactPagination
+                count={ApiResponse?.totalPages}
+                page={paginationParams?.currentPage || 1}
+                onPageChange={handlePageChange}
+                onEntriesChange={handleLimitChange}
+                entriesPerPage={paginationParams.pageSize}
+              />
+            </div>
           </div>
 
 
         </div>
-        {isMinimiseTable &&  (
+        <Outlet />
+
+
+        {/* {isMinimiseTable &&  (
             <SalesOrderView
-              viewSalesOrder={viewSalesOrder}
-              SetviewSalesOrder={SetviewSalesOrder}
-              salesOrderData={selectedSalesOrderData}
-              setIsminimiseTable={setIsminimiseTable}
+            viewSalesOrder={viewSalesOrder}
+            SetviewSalesOrder={SetviewSalesOrder}
+            salesOrderData={selectedSalesOrderData}
+            setIsminimiseTable={setIsminimiseTable}
             />
-          )}
+            )} */}
       </div>
 
       <div className="h-full  w-full flex flex-col" >
         <div className="overflow-x-auto h-full  rounded-md">
-          {/* <div className="flex justify-between items-center">
-            <div className='flex gap-1 '>
-              <SearchBar text="sales order" data={data} ref={searchBarRef} />
-              <select
-                id="status-filter"
-                className="border border-[#e7e5e4] py-[2px] px-[6px] h-[35px] rounded-md"
-                value={status}
-                onChange={handleStatus}
-              >
-                <option value="" disabled>
-                  Filter
-                </option>
-                <option value="Pending">Pending</option>
-                <option value="Completed">Completed</option>
-                <option value="Rejected">Rejected</option>
-                <option value="In-progress">In-progress</option>
-              </select>
-              <button
-                className="border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition flex items-center gap-1"
-                onClick={clearFilters}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Clear
-              </button>
-            </div>
-            <div className="flex justify-center items-center gap-2">
-              <ActionButton
-                label={"Add Sales Order"}
-                onClick={() => {
-                  setIsEditMode(false)
-                  setDrawerOpen(true)
-                }}
-                variant='add'
-              />
-            </div>
-          </div> */}
+
 
 
 
         </div>
 
-        {isDrawerOpen && (
+        {/* {isDrawerOpen && (
           <Drawer isOpen={isDrawerOpen} onClose={() => handleCloseDrawer()} maxWidth="1280px">
             <AddSalesOrder
               currentTab={'salesOrder'}
@@ -283,7 +332,7 @@ function ListOfSalesOrder() {
               handleCloseDrawer={handleCloseDrawer}
             />
           </Drawer>
-        )}
+        )} */}
 
       </div>
 
@@ -322,4 +371,49 @@ function ListOfSalesOrder() {
   )
 }
 
+
 export default ListOfSalesOrder
+
+
+
+
+
+
+{/* <div className="flex justify-between items-center">
+            <div className='flex gap-1 '>
+              <SearchBar text="sales order" data={data} ref={searchBarRef} />
+              <select
+                id="status-filter"
+                className="border border-[#e7e5e4] py-[2px] px-[6px] h-[35px] rounded-md"
+                value={status}
+                onChange={handleStatus}
+              >
+                <option value="" disabled>
+                  Filter
+                </option>
+                <option value="Pending">Pending</option>
+                <option value="Completed">Completed</option>
+                <option value="Rejected">Rejected</option>
+                <option value="In-progress">In-progress</option>
+              </select>
+              <button
+                className="border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition flex items-center gap-1"
+                onClick={clearFilters}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Clear
+              </button>
+            </div>
+            <div className="flex justify-center items-center gap-2">
+              <ActionButton
+                label={"Add Sales Order"}
+                onClick={() => {
+                  setIsEditMode(false)
+                  setDrawerOpen(true)
+                }}
+                variant='add'
+              />
+            </div>
+          </div> */}

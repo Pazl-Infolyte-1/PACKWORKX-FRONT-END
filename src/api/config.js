@@ -294,6 +294,7 @@ export const apiMethods = {
     }
   },
   getClients: async (queryParams = {}) => {
+    console.log(queryParams)
     try {
       const token = localStorage.getItem('token') // Retrieve token
       // const token = await getToken()
@@ -1370,7 +1371,25 @@ export const apiMethods = {
 
   getSkuValuesOptions:async(id)=>{
     return await apiClient.get(`sku-details/${id}/options`,)
+  },
+  downloadSalesOrder: async () => {
+    return await apiClient.get('sale-order/download/excel', {
+      responseType: 'blob', // for binary files like Excel
+      headers: {
+        'Accept': 'application/octet-stream'
+      }
+    });
+  },
+  downloadWorkOrder: async () => {
+    return await apiClient.get('work-order/download/excel', {
+      responseType: 'blob', // for binary files like Excel
+      headers: {
+        'Accept': 'application/octet-stream'
+      }
+    });
   }
+  
+  
 
 
 }

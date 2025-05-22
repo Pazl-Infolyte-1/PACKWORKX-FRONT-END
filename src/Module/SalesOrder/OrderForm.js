@@ -3,6 +3,8 @@ import SkuDetails from './SkuDetails'
 import apiMethods from '../../api/config';
 import ActionButton from '../../components/New/ActionButton';
 import { useSelector } from 'react-redux';
+import SalesOrderSkuform from './SalesOrderSkuform';
+import { useSearch } from '../../components/New/SearchContext';
 
 const OrderForm = forwardRef(({
   formData,
@@ -24,8 +26,10 @@ const OrderForm = forwardRef(({
   const [searchTerm, setSearchTerm] = useState('');
   const [errors, setErrors] = useState({});
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
-  const [selectedClient,setSelectedClient] = useState('')
-  const stateID = useSelector(state => state.auth)
+  const [selectedClient, setSelectedClient] = useState('')
+  const stateID = localStorage.getItem('company_state_id');
+  const [isIgstApplicable, setIsIgstApplicable] = useState(true)
+  const { searchQuery, setGlobalPlaceholder } = useSearch()
 
 
 
@@ -37,7 +41,6 @@ const OrderForm = forwardRef(({
     setSearchTerm(e.target.value);
     console.log("Search term:", e.target.value);
   };
-
 
 
   useEffect(() => {
@@ -54,32 +57,67 @@ const OrderForm = forwardRef(({
   }, []);
 
   // Handle client selection
-  const selectClient = (clientName,client_id) => {
+  const selectClient = (clientName, client_id, client_state_id) => {
 
     // Update form with selected client
     const event = { target: { name: 'client', value: clientName } };
-    setSelectedClient(client_id)
+    const company_state_id = localStorage.getItem('company_state_id')
+
+
+    const selectedClient = clients.find(
+      (client) => client.company_name == clientName
+    );
+
+    if (selectedClient) {
+      const isSameState = selectedClient?.addresses[0]?.state == stateID;
+
+      if (isSameState) {
+        console.log('State Match: applying cgst and sgst ', selectedClient.addresses[0].state, stateID);
+        setIsIgstApplicable(false)
+      } else {
+        console.log('State Mismatch: applying igst', selectedClient.addresses[0].state, stateID);
+        setIsIgstApplicable(true)
+      }
+
+    }
+
+    setSelectedClient(selectedClient?.client_id)
+
+
+    // if(company_state_id == client_state_id){
+    //   setIsIgstApplicable(false)
+    // }
+
+
+
+    // setSelectedClient(client_id)
     handleInputChange(event);
     setIsOpen(false);
   };
 
-  useEffect(() => {
 
-    const selectedClient = clients.find(
-      (client) => client.company_name === localFormData.client
-    );
-  
-    if (selectedClient) {
-      if(selectedClient.stateID == stateID){
-      alert('cgst and sgst ')
-      }else{
-        // alert('igst')
-      }
+  // useEffect(() => {
 
-      setSelectedClient(selectedClient?.client_id)
-    }
-  }, [localFormData.client,clients]);
-  
+  //   const selectedClient = clients.find(
+  //     (client) => client.company_name === localFormData.client
+  //   );
+
+
+  //   if (selectedClient) {
+  //     const isSameState = selectedClient.addresses[0].state == stateID;
+
+  //     if (isSameState) {
+  //       console.log('State Match: applying cgst and sgst ', selectedClient.addresses[0].state, stateID);
+  //     setIsIgstApplicable(false)
+  //     } else {
+  //       console.log('State Mismatch: applying igst', selectedClient.addresses[0].state, stateID);
+  //     setIsIgstApplicable(true)
+  //     }
+
+  //     setSelectedClient(selectedClient?.client_id)
+  //   }
+  // }, [localFormData.client,clients]);
+
 
   useImperativeHandle(ref, () => ({
     getCompleteFormData: {
@@ -92,6 +130,7 @@ const OrderForm = forwardRef(({
       totalGst: skuFormData ? skuFormData.totalGst : 0,
       totalWithGST: skuFormData ? skuFormData.totalWithGST : 0
     },
+    
     validateForm: () => {
       setAttemptedSubmit(true);
       return validateForm();
@@ -125,8 +164,21 @@ const OrderForm = forwardRef(({
   }, [skuDetailsForm]);
 
   // This function receives data from the SkuDetails component
+  // This function receives data from the SkuDetails component
+
+
+
+
   const handleSkuForm = (skuData) => {
     setSkuFormData(skuData);
+
+    // Add console logging here ↓
+    console.log("SKU data updated:", skuData);
+    console.log("Tax type applied:", isIgstApplicable ? "IGST" : "CGST+SGST");
+    console.log("Tax totals:", isIgstApplicable ?
+      `IGST: ${skuData.totalGst}` :
+      `CGST: ${skuData.totalCGST}, SGST: ${skuData.totalSGST}`
+    );
 
     // Also pass the data up to the parent (AddSalesOrder)
     if (handleSkuFormUpdate) {
@@ -134,11 +186,19 @@ const OrderForm = forwardRef(({
     }
   };
 
+  // const handleSkuForm = (skuData) =>{
+  //   console.log(skuData,'vedan with words')
+  // }
+
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       const fetchClients = async () => {
         try {
-          const params = searchTerm ? { search: searchTerm } : {};
+          const params = {
+            ...(searchQuery && { search: searchQuery }),
+            limit: 25,
+          };
+
           const response = await apiMethods.getClients(params);
           setClients(response.data); // Assuming response.data contains the client list
         } catch (error) {
@@ -232,7 +292,7 @@ const OrderForm = forwardRef(({
     const skuErrors = [];
     let hasSkuError = false;
 
-    skuFormData.skuDetails?.forEach((skuItem, index) => {
+    skuFormData?.skuDetails?.forEach((skuItem, index) => {
       if (!skuItem.sku || skuItem.sku.trim() === "") {
         skuErrors[index] = "Required";
         hasSkuError = true;
@@ -253,6 +313,11 @@ const OrderForm = forwardRef(({
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    setAttemptedSubmit(true)
+      const isValid = validateForm();
+  if (!isValid) {
+    return; // Stop submission if validation fails
+  }
     // Combine order form data with SKU details
     const completeFormData = {
       ...localFormData,
@@ -265,177 +330,151 @@ const OrderForm = forwardRef(({
       totalWithGST: skuFormData ? skuFormData.totalWithGST : 0
     };
 
-    // Only update the parent when the form is submitted
-    // Call the separate submit handler in the parent
+ 
     if (handleFormSubmit) {
       handleFormSubmit(completeFormData);
     }
   };
 
   return (
-      <form onSubmit={handleSubmit} className="pl-2">
-        <div className="relative">
+    <form onSubmit={handleSubmit} className="pl-2">
+      <div className="relative">
+        <div className="w-full">
+          {/* Form Content */}
           <div className="w-full">
-            {/* Form Content */}
-            <div className="w-full">
-              <div className="flex flex-col gap-4">
-                {/* Customer Name */}
-                <div className="flex items-center bg-gray-50 py-4">
-                  <label className="text-sm text-red-600 w-40">
-                    Customer Name*
-                  </label>
-                  <div className="relative" ref={dropdownRef}>
-                    <div
-                      className="flex h-9 w-[30rem] items-center justify-between rounded-l border border-gray-300 px-3 text-sm cursor-pointer bg-white"
-                      onClick={() => {
-                        setIsOpen(!isOpen);
-                        errors.client = "";
-                      }}
-                    >
-                      <span className="truncate text-sm text-gray-500">
-                        {localFormData.client || "Select or add a customer"}
-                      </span>
-                      <span className="text-gray-500">
-                        {isOpen ?
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="m18 15-6-6-6 6" />
-                          </svg>
-                          :
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="m6 9 6 6 6-6" />
-                          </svg>
-                        }
-                      </span>
-                    </div>
-                    {attemptedSubmit && errors.client && (
-                      <div className="text-red-500 text-xs mt-1 flex items-center absolute">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <line x1="12" y1="8" x2="12" y2="12"></line>
-                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            <div className="flex flex-col gap-3">
+              {/* Customer Name */}
+              <div className="flex items-center bg-gray-50 py-4">
+                <label className="text-xs text-red-600 w-40">
+                  Customer Name*
+                </label>
+                <div className="relative" ref={dropdownRef}>
+                  <div
+                    className={`flex h-7 w-[25rem] items-center justify-between rounded-l border px-3 text-sm cursor-pointer bg-white ${attemptedSubmit && errors.client ? "ring-1 ring-red-600" : "border-gray-300"
+                      }`}
+
+                    onClick={() => {
+                      setIsOpen(!isOpen);
+                      errors.client = "";
+                    }}
+                  >
+                    <span className="truncate text-sm text-gray-500">
+                      {localFormData.client || "Select or add a customer"}
+                    </span>
+                    <span className="text-gray-500">
+                      {isOpen ?
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="m18 15-6-6-6 6" />
                         </svg>
-                        {errors.client}
-                      </div>
-                    )}
-
-                    {isOpen && (
-                      <div className="absolute z-10 mt-1 max-h-60 w-96 overflow-y-auto rounded border border-gray-200 bg-white shadow-md">
-                        <div className="sticky top-0 bg-white p-2 border-b border-gray-200">
-                          <div className="relative">
-                            <input
-                              type="text"
-                              placeholder="Search clients..."
-                              value={searchTerm}
-                              onChange={handleSearchChange}
-                              className="h-9 w-full rounded border border-gray-300 bg-gray-50 pl-8 pr-2 text-sm"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="12"
-                              height="12"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                            >
-                              <circle cx="11" cy="11" r="8" />
-                              <path d="m21 21-4.3-4.3" />
-                            </svg>
-                          </div>
-                        </div>
-
-                        {clients.length > 0 ? (
-                          clients.map((client, index) => (
-                            <div
-                              key={index}
-                              className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
-                              onClick={() => selectClient(client.company_name,client.client_id)}
-                            >
-                              {client.company_name}
-                            </div>
-                          ))
-                        ) : (
-                          <div className="px-3 py-2 text-xs text-gray-500">No results found</div>
-                        )}
-                      </div>
-                    )}
+                        :
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      }
+                    </span>
                   </div>
-                  <button type='button' className=" h-9 w-9 flex items-center justify-center bg-blue-500 text-white rounded-r">
+
+                  {isOpen && (
+                    <div className="absolute z-50 mt-1 max-h-60 w-80 overflow-y-auto rounded border border-gray-200 bg-white shadow-md">
+                      <div className="sticky top-0 bg-white p-2 border-b border-gray-200">
+                        <div className="relative">
+                          <input
+                            type="text"
+                            placeholder="Search clients..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            className="h-9 w-full rounded border border-gray-300 bg-gray-50 pl-8 pr-2 text-sm"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                          >
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.3-4.3" />
+                          </svg>
+                        </div>
+                      </div>
+
+                      {clients.length > 0 ? (
+                        clients.map((client, index) => (
+                          <div
+                            key={index}
+                            className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
+                            onChange={() => selectClient(client.company_name, client.client_id, client?.addresses?.[0]?.state)}
+                            onClick={() => selectClient(client.company_name, client.client_id, client?.addresses?.[0]?.state)}
+                          >
+                            {client.company_name}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-xs text-gray-500">No results found</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <button type='button' className=" h-7 w-9 flex items-center justify-center bg-blue-500 text-white rounded-r">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Sales Order Id */}
+              <div className="flex items-center mt-1">
+                <label className="text-xs text-red-600 w-40">
+                  Sales Order#*
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="sales_ui_id"
+                    value={localFormData.sales_ui_id || ""}
+                    onChange={handleInputChange}
+                    className={`h-7 w-80 rounded border px-3 text-sm ${attemptedSubmit && errors.sales_ui_id ? " ring-1 ring-red-600" : "border-gray-300"
+                      }`}
+                  />
+                  <button type='button' className="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="11" cy="11" r="8" />
-                      <path d="m21 21-4.3-4.3" />
+                      <circle cx="12" cy="12" r="3" />
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
                     </svg>
                   </button>
-                </div>
 
-                {/* Sales Order Id */}
-                <div className="flex items-center mt-3">
-                  <label className="text-sm text-red-600 w-40">
-                    Sales Order#*
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      name="sales_ui_id"
-                      value={localFormData.sales_ui_id || ""}
-                      onChange={handleInputChange}
-                      className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                    />
-                    <button type='button' className="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="3" />
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                      </svg>
-                    </button>
-                    {attemptedSubmit && errors.sales_ui_id && (
-                      <div className="text-red-500 text-xs mt-1 flex items-center absolute">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <line x1="12" y1="8" x2="12" y2="12"></line>
-                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                        </svg>
-                        {errors.sales_ui_id}
-                      </div>
-                    )}
-                  </div>
                 </div>
+              </div>
 
 
-                {/* Expected Shipment */}
-                <div className="flex items-center">
-                  <label className="text-sm text-red-600 w-40">
-                    Expected Shipment
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      name="estimated"
-                      placeholder="dd/MM/yyyy"
-                      value={localFormData.estimated || ""}
-                      onChange={handleInputChange}
-                      className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                    />
-                    {attemptedSubmit && errors.estimated && (
-                      <div className="text-red-500 text-xs mt-1 flex items-center absolute">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <line x1="12" y1="8" x2="12" y2="12"></line>
-                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                        </svg>
-                        {errors.estimated}
-                      </div>
-                    )}
-                  </div>
-                </div>
+              {/* Expected Shipment */}
+              <div className="flex items-center">
+                <label className="text-xs text-red-600 w-40">
+                  Expected Shipment
+                </label>
+                <input
+                  type="date"
+                  name="estimated"
+                  placeholder="dd/MM/yyyy"
+                  value={localFormData.estimated ? localFormData.estimated.slice(0, 10) : ""}
+                  onChange={handleInputChange}
+                  className={`h-7 w-80 rounded border px-3 text-sm ${attemptedSubmit && errors.estimated ? " ring-1 ring-red-600" : "border-gray-300"
+                    }`}
+                />
+
+              </div>
 
 
               {/* Credit Period */}
               <div className="flex items-center">
-                <label className="text-sm text-red-600 w-40">
+                <label className="text-xs text-red-600 w-40">
                   Client Period
                 </label>
                 <div className="relative">
@@ -444,24 +483,14 @@ const OrderForm = forwardRef(({
                     name="credit_period"
                     value={localFormData.credit_period || ""}
                     onChange={handleInputChange}
-                    className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                  />
-                  {attemptedSubmit && errors.credit_period && (
-                    <div className="text-red-500 text-xs mt-1 flex items-center absolute">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                      </svg>
-                      {errors.credit_period}
-                    </div>
-                  )}
+                    className={`h-7 w-80 rounded border px-3 text-sm ${attemptedSubmit && errors.credit_period ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
+                      }`} />
                 </div>
               </div>
 
               {/* Freight Paid */}
               <div className="flex items-center">
-                <label className="text-sm text-gray-700 w-40">
+                <label className="text-xs text-gray-700 w-40">
                   Freight Paid
                 </label>
                 <div className="relative">
@@ -471,22 +500,22 @@ const OrderForm = forwardRef(({
                     min="0"
                     value={localFormData.freight_paid || ""}
                     onChange={handleInputChange}
-                    className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
+                    className="h-7 w-80 rounded border border-gray-300 px-3 text-sm"
                   />
                 </div>
               </div>
 
-        <div className="border-t border-gray-100 mt-2 pb-2 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div>
+              {/* <div className="border-t border-gray-100 mt-2 pb-2 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div> */}
 
 
               {/* Confirmation By */}
               <div className="flex items-center">
-                <label className="text-sm text-gray-700 w-40">
+                <label className="text-xs text-gray-700 w-40">
                   Confirmation By <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div
-                    className="relative flex h-8 w-48 cursor-pointer items-center justify-between rounded border border-[#8761e5] px-2"
+                    className="relative flex h-7 w-48 cursor-pointer items-center justify-between rounded border border-[#8761e5] px-2"
                     onClick={handleToggleChange}
                   >
                     {/* Email Text */}
@@ -516,7 +545,7 @@ const OrderForm = forwardRef(({
               {/* Dynamic Input Fields */}
               {confirmationMethod === "Email" && (
                 <div className="flex items-center">
-                  <label className="text-sm text-gray-700 w-40">
+                  <label className="text-xs text-gray-700 w-40">
                     Confirmation Email
                   </label>
                   <div className="relative z-1">
@@ -525,7 +554,7 @@ const OrderForm = forwardRef(({
                       name="confirmation_email"
                       value={localFormData.confirmation_email || ""}
                       onChange={handleInputChange}
-                      className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
+                      className="h-7 w-80 rounded border border-gray-300 px-3 text-sm"
                     />
                   </div>
                 </div>
@@ -534,7 +563,7 @@ const OrderForm = forwardRef(({
               {confirmationMethod === "Oral" && (
                 <>
                   <div className="flex items-center">
-                    <label className="text-sm text-gray-700 w-40">
+                    <label className="text-xs text-gray-700 w-40">
                       Confirmation Name
                     </label>
                     <div className="relative">
@@ -543,7 +572,7 @@ const OrderForm = forwardRef(({
                         name="confirmation_name"
                         value={localFormData.confirmation_name || ""}
                         onChange={handleInputChange}
-                        className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
+                        className="h-7 w-80 rounded border border-gray-300 px-3 text-sm"
                       />
                     </div>
                   </div>
@@ -553,12 +582,12 @@ const OrderForm = forwardRef(({
           </div>
         </div>
 
-        <div className="border-t border-gray-100 mt-10 pb-6 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div>
+        {/* <div className="border-t border-gray-100 mt-10 pb-6 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div> */}
 
-        
+
 
         <div className="mt-8 mb-4">
-          <SkuDetails
+          {/* <SkuDetails
             skuDetailsForm={skuDetailsForm}
             setFormData={handleSkuForm} 
             showSubmitButton={false}
@@ -568,6 +597,20 @@ const OrderForm = forwardRef(({
             errors={errors}
             setErrors={setErrors}
             selectedClient={selectedClient}
+            setIsIgstApplicable={setIsIgstApplicable}
+          /> */}
+          <SalesOrderSkuform
+            isIgstApplicable={isIgstApplicable}
+            onSkuTableChange={handleSkuForm}
+            selectedClient={localFormData.client_id}
+            skuDetailsForm={skuDetailsForm}
+            setFormData={handleSkuForm}
+            showSubmitButton={false}
+            totals={totals}
+            setTotals={setTotals}
+            setIsFormTouched={setIsFormTouched}
+            errors={errors}
+            setErrors={setErrors}
           />
         </div>
 
@@ -575,21 +618,20 @@ const OrderForm = forwardRef(({
         <div className="fixed bottom-0 bg-white border-t border-gray-200 z-10 flex p-1 py-2 w-full">
           <div className="flex-1 justify-start">
             <div className="flex gap-4">
-              <button
+              <ActionButton
                 type="button"
-                onClick={() => setDrawer(false)}
+                onClick={() => ''}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-all"
-                
+                label={'Cancel'}
               >
-                Cancel
-              </button>
+              </ActionButton>
 
               <ActionButton
-                onClick={handleSubmit1}
-                className="px-4 py-2 bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
+                onClick={handleSubmit}
+                variant='save'
+                className=" bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
                 label={"Submit Order"}
               >
-                
               </ActionButton>
             </div>
           </div>

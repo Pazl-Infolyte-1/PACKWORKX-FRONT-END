@@ -102,7 +102,7 @@ function SalesOrderTable({
               {
                 label: 'Edit',
                 icon: cilPencil,
-                onClick: () => handleEdit(row.id, row.user_id),
+                onClick: () => handleEdit(row.id),
               },
               {
                 label: 'Delete',

@@ -20,6 +20,8 @@ const Billing = React.lazy(() => import('./Module/Admin/Billing/Billing.js'))
 const Companies = React.lazy(() => import('./Module/Admin/Companies/Companies.js'))
 const WorkOrderList = React.lazy(() => import('./Module/WorkOrder/workorderlist.js'))
 const SalesOrder = React.lazy(() => import('./Module/SalesOrder/ListOfSalesOrder.js'))
+const SalesOrderView = React.lazy(() => import('./Module/SalesOrder/viewSalesOrder.js'))
+const salesOrderForm = React.lazy(()=>import('./Module/SalesOrder/AddSalesOrder.js'))
 const DropDownController = React.lazy(() => import('./Module/User/DropDownController.js'))
 const Attendance = React.lazy(() => import('./Module/Attendance/Attendance.js'))
 const SalesReturn = React.lazy(() => import('./Module/SalesReturn/SalesReturn.js'))
@@ -33,6 +35,7 @@ const Department = React.lazy(() => import('./Module/Department/Department.js'))
 const RouteProcess = React.lazy(() => import('./Module/RouteProcess/RouteProcess.js'))
 const Role = React.lazy(() => import('./Module/Role/Role.js'))
 const StockManagement = React.lazy(() => import('./Module/StockManagement/StockManagement.js'))
+const wordOrderView = React.lazy(()=> import('./Module/WorkOrder/ViewWorkOrder.js'))
 
 const Items = React.lazy(() => import('./Module/Inventory/Items/items.js'))
 const GRN = React.lazy(() => import('./Module/GRN/Grn.js'))
@@ -84,9 +87,38 @@ const routes = [
   { path: '/billing', name: 'Billing', element: Billing, key: 5003 },
   { path: '/companies', name: 'Companies', element: Companies, key: 5002 },
 
-  { path: '/workorderlist', name: 'Workorderlist', element: WorkOrderList, key: 25 },
+  {
+    path: '/workorderlist',
+    name: 'Workorderlist',
+    element:WorkOrderList, // Make sure to use JSX here if you're rendering a component
+    key: 25,
+    children: [
+      {
+        path: 'view/:id',
+        name: 'WorkOrdersView',
+        element: wordOrderView,
+        key: 26 // Assigned a proper unique key
+      }
+    ]
+  },  
+  { path: '/workorderlist/form', name: 'WorkorderlistAddform', element: salesOrderForm, key: 25 },
 
-  { path: '/salesorder', name: 'SalesOrder', element: SalesOrder, key: 24 },
+  { path: '/salesorder',
+     name: 'SalesOrder',
+     element: SalesOrder,
+     key: 24,
+     children:[
+      {
+        path: 'view/:id',
+        name: 'SalesOrderView',
+        element: SalesOrderView,
+        key: "", // Give it a proper key
+      },
+     ] },
+
+     { path: '/salesorder/form/:id', name: 'salesOrderEditForm', element: salesOrderForm, key: '' },
+     { path: '/salesorder/form', name: 'salesorderform', element: salesOrderForm, key: '' },
+
   { path: '/attendance', name: 'Attendance', element: Attendance, key: '' },
   { path: '/salesReturn', name: 'Sales Return', element: SalesReturn, key: '' },
   { path: '/purchase-return', name: 'Purchase Return', element: PurchaseReturn, key: '' },

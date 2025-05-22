@@ -120,21 +120,14 @@ const MachineDashboardTable = ({
         <ThreeDotMenu
           value={[
             {
-              label: 'View',
-              icon: cilHandPointRight,
-              onClick: () => {
-                onView(row)
-              },
-            },
-            {
-              label: 'Assign Process',
+              label: 'Assign Process & Values',
               icon: cilPlus,
               onClick: () => {
                 onAddProcess && onAddProcess(row.id, row.machine_name)
               },
             },
             {
-              label: 'Values',
+              label: 'Edit Values',
               icon: cilFlipToBack,
               onClick: () => {
                 setOpenFieldValuesModal({ show: true, id: row.id })

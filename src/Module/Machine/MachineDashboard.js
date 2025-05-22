@@ -370,7 +370,7 @@ export default function MachineMaster() {
       <PopUp
         visible={openFieldValuesModal.show}
         setVisible={setOpenFieldValuesModal}
-        header={'Values'}
+        header={' '}
         width={800}
         showCloseButton={true}
       >

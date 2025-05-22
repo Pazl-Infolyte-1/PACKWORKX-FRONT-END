@@ -43,7 +43,8 @@ function SkuAddEdit({
   setErrors,
   setSkuVariant,
      uploadedFiles,
-          setUploadedFiles
+          setUploadedFiles,
+          validationErrors
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
@@ -415,6 +416,7 @@ console.log("into msquare",meterSquareData)
     ),
     Composite: (
       <Composite
+      validationErrors={validationErrors}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -834,17 +836,18 @@ console.log("shared unitr form rsc",rscUnits)
         </tr>
       )}
 
-      <div className="sticky bottom-[-20px] bg-white border-t pt-4 pb-6 px-4 flex justify-end space-x-4">
-        <button className="p-1 border border-gray-300 rounded w-20" onClick={handleCancel}>
-          Cancel
-        </button>
-        <ActionButton
-          onClick={handleAddSkuSubmit}
-          label={editTag ? 'Update' : 'Submit'}
-          variant="save"
-          className="bg-[#079b54] text-white px-2 py-1 rounded-md"
-        />
-      </div>
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 pb-6 px-4 flex justify-end space-x-4 z-20">
+  <button className="p-1 border border-gray-300 rounded w-20" onClick={handleCancel}>
+    Cancel
+  </button>
+  <ActionButton
+    onClick={handleAddSkuSubmit}
+    label={editTag ? 'Update' : 'Submit'}
+    variant="save"
+    className="bg-[#079b54] text-white px-2 py-1 rounded-md"
+  />
+</div>
+
       <PopUp
         visible={isSingleViewPopup}
         setVisible={handleCloseSingleViewPopup}
@@ -860,7 +863,7 @@ console.log("shared unitr form rsc",rscUnits)
         visible={isSingleViewPopupForType}
         setVisible={setisSingleViewPopupForType}
         showCloseButton={true}
-        width="70vw"
+        width="80vw"
       >
         <div className="max-h-[70vh] overflow-y-auto pr-2">
           {skuComponents[compositeSelect] || (

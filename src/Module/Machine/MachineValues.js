@@ -20,6 +20,8 @@ function MachineValues({
 
   // Get the current process ID from the modal
   const currentProcessId = openMachineValuesModal?.id
+  console.log(currentProcessId);
+  
 
   const fetchMachineValue = async () => {
     if (!currentProcessId) return
@@ -46,6 +48,7 @@ function MachineValues({
       setIsLoading(false)
     }
   }
+console.log(machineValue);
 
   useEffect(() => {
     fetchMachineValue()

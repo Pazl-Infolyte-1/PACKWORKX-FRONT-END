@@ -748,7 +748,31 @@ useEffect(() => {
           />
         </div>
       </div>
-
+  <div className="w-full flex justify-end mt-4">
+        <div className="flex items-center space-x-2">
+          <label className="text-sm text-gray-700 font-medium">Select Units:</label>
+          <div className="relative w-28">
+            <select
+              value={addNewSkuData.unit || 'mm'}
+              onChange={handleUnitChange}
+              className="w-full appearance-none bg-gray-700 text-white py-1.5 px-2 pr-7 rounded-md text-sm hover:bg-gray-400 transition-colors focus:outline-none"
+            >
+              <option value="mm" className="bg-white text-gray-800">
+                mm
+              </option>
+              <option value="cm" className="bg-white text-gray-800">
+                cm
+              </option>
+              <option value="in" className="bg-white text-gray-800">
+                in
+              </option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-1.5 flex items-center text-white">
+              <CIcon icon={cilChevronCircleDownAlt} size="sm" />
+            </div>
+          </div>
+        </div>
+      </div>
       {/* Main content */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3 mt-6 border border-gray-200 rounded-lg">
         <div>
@@ -765,14 +789,20 @@ useEffect(() => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Dimensions <span className="text-gray-500 text-xs">(L × W × H)</span>
               <span className="text-red-500 ml-1">*</span>
-              {errors.width === 'Required' &&
+              {/*{errors.width === 'Required' &&
                 errors.length === 'Required' &&
                 errors.height === 'Required' && (
                   <span className="text-red-500 text-xs ml-2 align-middle">Required</span>
-                )}
+                )}*/}
             </label>
 
-            <div className="h-8 w-[260px] border border-gray-300 rounded-md flex items-center bg-white">
+            <div     className={`h-8 w-[200px] rounded-md flex items-center bg-white ${
+      errors.width === 'Required' ||
+      errors.length === 'Required' ||
+      errors.height === 'Required'
+        ? 'border-2 border-red-500'
+        : 'border border-gray-300'
+    }`}>
               <input
                 id="length"
                 name="length"
@@ -780,7 +810,7 @@ useEffect(() => {
                 value={Number(addNewSkuData.length) || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
-                className="w-[60px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-l-md"
+                className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-l-md"
               />
               <span className="text-gray-500 px-1">x</span>
               <input
@@ -790,7 +820,7 @@ useEffect(() => {
                 value={Number(addNewSkuData.width) || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
-                className="w-[60px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <span className="text-gray-500 px-1">x</span>
               <input
@@ -800,31 +830,8 @@ useEffect(() => {
                 value={Number(addNewSkuData.height) || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
-                className="w-[60px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-
-              <div className="w-[70px] relative">
-                <select
-                  value={addNewSkuData.unit || 'mm'}
-                  onChange={handleUnitChange}
-                  className="w-full appearance-none bg-blue-600 text-white py-1 px-2 text-sm rounded-r-md hover:bg-blue-700 focus:outline-none"
-                  title="Select unit of measurement"
-                  disabled={editTag}
-                >
-                  <option value="mm" className="bg-white text-gray-800">
-                    mm
-                  </option>
-                  <option value="cm" className="bg-white text-gray-800">
-                    cm
-                  </option>
-                  <option value="in" className="bg-white text-gray-800">
-                    in
-                  </option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-white">
-                  <CIcon icon={cilChevronCircleDownAlt} size="sm" />
-                </div>
-              </div>
             </div>
           </div>
         </Tooltip>
@@ -961,19 +968,24 @@ useEffect(() => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Board Size <span className="text-gray-500 text-xs">(W × L)</span>
               <span className="text-red-500 ml-1">*</span>
-              {errors.width_board_size_cm2 && errors.length_board_size_cm2 && (
+              {/*{errors.width_board_size_cm2 && errors.length_board_size_cm2 && (
                 <span className="text-red-500 text-xs ml-2 align-middle">
                   {errors.width_board_size_cm2}
                 </span>
-              )}
+              )}*/}
             </label>
-            <div className="h-8 w-[200px] border border-gray-300 rounded-md flex items-center bg-white">
+            <div     className={`h-8 w-[200px] rounded-md flex items-center bg-white ${
+      errors.width_board_size_cm2 || errors.length_board_size_cm2
+        ? 'border-2 border-red-500'
+        : 'border border-gray-300'
+    }`}
+  >
               <input
                 id="width_board_size_cm2"
                 name="width_board_size_cm2"
                 value={Number(toThreeDecimalFixed(addNewSkuData.width_board_size_cm2)) || ''}
                 onChange={modifiedHandleChange}
-                className="w-[30%] p-[2px] text-center text-sm focus:outline-none rounded-l-md bg-gray-50"
+                className="w-[50%] p-[2px] text-center text-sm focus:outline-none rounded-l-md bg-gray-50"
                 title={unitTooltip}
                 readOnly
               />
@@ -983,31 +995,10 @@ useEffect(() => {
                 name="length_board_size_cm2"
                 value={Number(toThreeDecimalFixed(addNewSkuData.length_board_size_cm2)) || ''}
                 onChange={modifiedHandleChange}
-                className="w-[30%] p-[2px] text-center text-sm focus:outline-none bg-gray-50"
+                className="w-[50%] p-[2px] text-center text-sm focus:outline-none bg-gray-50"
                 title={unitTooltip}
                 readOnly
               />
-              <div className="w-[40%] flex justify-end relative">
-                <select
-                  value={addNewSkuData.unit || 'mm'}
-                  onChange={handleUnitChange}
-                  disabled={editTag}
-                  className="w-full text-sm appearance-none bg-blue-600 text-white py-[6px] px-2 rounded-r-md hover:bg-blue-700 focus:outline-none"
-                >
-                  <option value="mm" className="bg-white text-gray-800">
-                    mm
-                  </option>
-                  <option value="cm" className="bg-white text-gray-800">
-                    cm
-                  </option>
-                  <option value="in" className="bg-white text-gray-800">
-                    in
-                  </option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
-                  <CIcon icon={cilChevronCircleDownAlt} size="sm" />
-                </div>
-              </div>
             </div>
           </div>
         </Tooltip>

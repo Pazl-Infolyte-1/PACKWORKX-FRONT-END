@@ -64,6 +64,11 @@ const RouteProcessTable = ({
       field: 'route_name',
     },
     {
+      key: 'NA',
+      header: 'Number of Process ',
+      field: 'NA',
+    },
+    {
       key: 'created_at',
       header: (
         <>
@@ -71,6 +76,16 @@ const RouteProcessTable = ({
         </>
       ),
       field: 'created_at',
+      type: 'date',
+    },
+    {
+      key: 'updated_at',
+      header: (
+        <>
+          Updated at <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'updated_at',
       type: 'date',
     },
     {
@@ -100,9 +115,17 @@ const RouteProcessTable = ({
       ),
     },
   ]
+  const RowClick = (row) => {
+    setOpenRouteModal({ open: true, id: row.id })
+  }
   return (
     <>
-      <ReusableTable data={routeProcessData} columns={columns} minHeight='74vh'/>
+      <ReusableTable
+        data={routeProcessData}
+        columns={columns}
+        minHeight="74vh"
+        handleRowClick={RowClick}
+      />
       {/* <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar rounded-lg p-2">
         <CTable striped hover className="w-full m-0 table-fixed">
           <CTableHead className="bg-gray-100 sticky -top-2 z-10">

@@ -55,8 +55,6 @@ function ProcessIntegrartionTable({
   }
 
   const openDeleteModal = (id) => {
-    console.log(id)
-
     setDeleteId(id)
     setConfirmModal(true)
   }
@@ -73,13 +71,21 @@ function ProcessIntegrartionTable({
       field: 'process_name',
     },
     {
+      key: 'Parameters',
+      header: 'Parameters',
+      field: 'NA',
+      type: 'date',
+    },
+    {
       key: 'created_at',
-      header: (
-        <>
-          Created at <span className="text-gray-500">⌕</span>
-        </>
-      ),
+      header: 'Created at',
       field: 'created_at',
+      type: 'date',
+    },
+    {
+      key: 'updated_at',
+      header: 'Updated at',
+      field: 'updated_at',
       type: 'date',
     },
     {
@@ -136,9 +142,12 @@ function ProcessIntegrartionTable({
     },
   ]
 
+  const rowClick = (row) => {
+    setOpenFieldModal({ open: true, id: row.id })
+  }
   return (
     <div className=''>
-      <ReusableTable data={processData} columns={columns} />
+      <ReusableTable data={processData} columns={columns} handleRowClick={rowClick}/>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <ConfirmationModale
         isOpen={confirmModal}

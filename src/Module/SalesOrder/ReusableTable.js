@@ -155,7 +155,7 @@ export default function ReusableTable({
                         return (
                           <CTableDataCell 
                             key={col.key} 
-                            className="px-3 py-3 text-left" 
+                            className="px-3 py-3 text-center" 
                             onClick={(e) => e.stopPropagation()} // Prevent row click if needed
                           >
                             {col.render(row)}

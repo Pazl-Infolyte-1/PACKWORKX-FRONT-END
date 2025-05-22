@@ -65,7 +65,6 @@ const Process = () => {
   const [formData, setFormData] = useState({
     process_name: '',
   })
-  console.log(openFieldModal)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,32 +103,64 @@ const Process = () => {
     setAlerts([])
   }
 
-  const handleProcessSubmit = async (data) => {
-    try {
-      if (isEdit) {
-        const response = await apiMethods.EditProcess(data)
-        setAlerts([
-          { severity: 'success', message: response.data.message || 'Process Updated Successfully' },
-        ])
-      } else {
-        const response = await apiMethods.AddProcess(data)
-        setAlerts([
-          { severity: 'success', message: response.data.message || 'Process Added Successfully' },
-        ])
-      }
-    } catch (error) {
-      setAlerts([
-        { severity: 'error', message: error?.response?.data?.message || 'Something went wrong' },
-      ])
-      console.error(error)
+const handleProcessSubmit = async (data) => {
+  try {
+    let processResponse;
+    if (isEdit) {
+      processResponse = await apiMethods.EditProcess({
+        id: data.id,
+        process_name: data.process_name
+      });
+    } else {
+      processResponse = await apiMethods.AddProcess({
+        process_name: data.process_name
+      });
     }
-    setShowAddProcessModal(false)
+
+    // Get the process ID (for new processes, it comes from the response)
+    const processId = isEdit ? data.id : processResponse.data.data.id;
+
+    // Then add the fields - check if fields exist and have at least one item
+    if (data.fields && Array.isArray(data.fields) && data.fields.length > 0) {
+      // Process each field individually
+      for (const field of data.fields) {
+        const payload = {
+          process_name_id: processId,
+          label: field.label,
+          field_type: field.field_type.charAt(0).toUpperCase() + field.field_type.slice(1),
+          required: field.required
+        };
+        
+        try {
+          const res = await apiMethods.addFields(payload);
+        } catch (error) {
+          console.error('Error saving individual field:', error);
+          throw error;
+        }
+      }
+    }
+
+    setAlerts([
+      { severity: 'success', message: isEdit ? 
+        'Process and fields updated successfully' : 
+        'Process and fields added successfully' }
+    ]);
+    
+    setShowAddProcessModal(false);
     setFormData({
       process_name: '',
-    })
-    setRefresh((prev) => !prev)
+    });
+    setRefresh((prev) => !prev);
+  } catch (error) {
+    console.error('Error in handleProcessSubmit:', error);
+    setAlerts([
+      { 
+        severity: 'error', 
+        message: error?.response?.data?.message || 'Something went wrong while saving process or fields' 
+      },
+    ]);
   }
-
+};
   const handleAddField = (id) => {
     const process = id ? processData.find((p) => p.id === id) : null
 
@@ -212,14 +243,15 @@ const Process = () => {
         <PopUp
           visible={showAddProcessModal}
           setVisible={setShowAddProcessModal}
-          width="500px"
+          width="800px"
+          maxHeight="80vh"
           header={isEdit ? 'Edit Process' : 'Add Process'}
           showCloseButton={true}
         >
           <ProcessForm
             isEdit={isEdit}
             initialData={formData}
-            onCancel={() => setShowAddProcessModal(false)}
+            onCancel={() => {setShowAddProcessModal(false), setFormData(initialData)}}
             onSubmit={handleProcessSubmit}
           />
         </PopUp>

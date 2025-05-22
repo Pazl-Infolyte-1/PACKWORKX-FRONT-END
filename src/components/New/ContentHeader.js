@@ -110,7 +110,7 @@ function ContentHeader({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <button
           onClick={onAddClick}
           className={`flex items-center justify-center rounded-md transition-all duration-200
@@ -129,7 +129,7 @@ function ContentHeader({
           {showMenu && (
             <div
               ref={menuRef}
-              className="absolute right-0 mt-2 w-32 text-xs bg-white rounded-md shadow-lg z-50 border border-gray-200"
+              className="absolute right-0 mt-2 w-44 text-xs bg-white rounded-md shadow-lg z-50 border border-gray-200"
             >
         
               <div className="py-1">

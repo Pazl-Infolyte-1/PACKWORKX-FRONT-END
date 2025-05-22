@@ -35,6 +35,7 @@ const defaultValues = {
 function AddEditMachine({}) {
   const [isLoading, setIsLoading] = useState(false)
   const [alerts, setAlerts] = useState([])
+  const [isSubmitted, setIsSubmitted] = useState(false) // Track if form was submitted
   const location = useLocation()
   const { Id, isEdit } = location.state || {}
   const navigate = useNavigate()
@@ -43,7 +44,7 @@ function AddEditMachine({}) {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     reset,
   } = useForm({
     defaultValues,
@@ -73,6 +74,7 @@ function AddEditMachine({}) {
   }, [reset])
 
   const onSubmit = async (data) => {
+    setIsSubmitted(true) // Set submitted to true when form is submitted
     try {
       setIsLoading(true)
       const apiCall = isEdit ? apiMethods.editMachine(Id, data) : apiMethods.AddMachine(data)
@@ -108,274 +110,209 @@ function AddEditMachine({}) {
     setValue('machine_status', !machineStatus)
   }
 
+  const getInputStyle = (fieldName) => {
+    const hasError = errors[fieldName] || (isSubmitted && !watch(fieldName))
+    return {
+      border: hasError ? '1px solid #EF4444' : '1px solid #D1D5DB',
+    }
+  }
+
   return (
-    <div className="max-w-6xl mx-auto my-3">
-      <div className="text-xl font-semibold mb-4">{isEdit ? 'Edit Machine' : 'Add Machine'}</div>
+    <div className="mx-auto my-3 relative flex flex-col">
+      <div className="text-xl font-semibold px-2">{isEdit ? 'Edit Machine' : 'Add Machine'}</div>
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-gray-50 p-6 rounded-lg shadow-sm gap-6">
-          {/* Column 1 */}
-          <div className="space-y-4">
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
+
+      {/* Form container with scroll */}
+      <div className="flex-1 overflow-y-auto">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-6 rounded-lg gap-6">
+            {/* Column 1 */}
+            <div className="space-y-4">
+              <div>
                 <RequiredFieldLabel label="Machine Name" isRequired={true} />
-                {errors.machine_name && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.machine_name.message}
-                  </span>
-                )}
-              </div>
-              <input
-                {...register('machine_name', { required: 'required' })}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="text"
-              />
-            </div>
-
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Machine Type" isRequired={true} />
-                {errors.machine_type && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.machine_type.message}
-                  </span>
-                )}
-              </div>
-              <input
-                {...register('machine_type', { required: 'required' })}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="text"
-              />
-            </div>
-
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Model Number" isRequired={true} />
-                {errors.model_number && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.model_number.message}
-                  </span>
-                )}
-              </div>
-              <input
-                {...register('model_number', { required: 'required' })}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="text"
-              />
-            </div>
-
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Serial Number" isRequired={true} />
-                {errors.serial_number && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.serial_number.message}
-                  </span>
-                )}
-              </div>
-              <input
-                {...register('serial_number', { required: 'required' })}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="text"
-              />
-            </div>
-
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Manufacturer" isRequired={true} />
-                {errors.manufacturer && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.manufacturer.message}
-                  </span>
-                )}
-              </div>
-              <input
-                {...register('manufacturer', { required: 'required' })}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="text"
-              />
-            </div>
-          </div>
-
-          {/* Column 2 */}
-          <div className="space-y-4">
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Location" isRequired={true} />
-                {errors.location && (
-                  <span className="text-red-500 text-xs text-start">{errors.location.message}</span>
-                )}
-              </div>
-              <input
-                {...register('location', { required: 'required' })}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="text"
-              />
-            </div>
-
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Power Rating" isRequired={true} />
-                {errors.power_rating && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.power_rating.message}
-                  </span>
-                )}
-              </div>
-              <input
-                {...register('power_rating', { required: 'required' })}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="text"
-              />
-            </div>
-
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="IP Address" />
-                {errors.ip_address && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.ip_address.message}
-                  </span>
-                )}
-              </div>
-              <input
-                {...register('ip_address')}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="text"
-              />
-            </div>
-
-            {/* Status toggles centered vertically */}
-            <div className='py-9'>
-              <div className="flex items-center space-x-2">
-                <RequiredFieldLabel label="Connectivity Status" isRequired={true} />
                 <input
-                  {...register('connectivity_status')}
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
-                  id="connectivity"
+                  {...register('machine_name', { required: 'required' })}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="text"
+                  style={getInputStyle('machine_name')}
+                />
+              </div>
+
+              <div>
+                <RequiredFieldLabel label="Machine Type" isRequired={true} />
+                <input
+                  {...register('machine_type', { required: 'required' })}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="text"
+                  style={getInputStyle('machine_type')}
+                />
+              </div>
+
+              <div>
+                <RequiredFieldLabel label="Model Number" isRequired={true} />
+                <input
+                  {...register('model_number', { required: 'required' })}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="text"
+                  style={getInputStyle('model_number')}
+                />
+              </div>
+
+              <div>
+                <RequiredFieldLabel label="Serial Number" isRequired={true} />
+                <input
+                  {...register('serial_number', { required: 'required' })}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="text"
+                  style={getInputStyle('serial_number')}
+                />
+              </div>
+
+              <div>
+                <RequiredFieldLabel label="Manufacturer" isRequired={true} />
+                <input
+                  {...register('manufacturer', { required: 'required' })}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="text"
+                  style={getInputStyle('manufacturer')}
                 />
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <RequiredFieldLabel label="Machine Status" isRequired={true} />
-              <div
-                onClick={toggleMachineStatus}
-                className={`relative w-12 h-6 transition-colors duration-200 ease-in-out rounded-full cursor-pointer ${machineStatus ? 'bg-green-500' : 'bg-gray-300'}`}
-              >
-                <input type="checkbox" className="sr-only" {...register('machine_status')} />
-                <span
-                  className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out ${machineStatus ? 'transform translate-x-6' : ''}`}
-                ></span>
+
+            {/* Column 2 */}
+            <div className="space-y-4">
+              <div>
+                <RequiredFieldLabel label="Location" isRequired={true} />
+                <input
+                  {...register('location', { required: 'required' })}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="text"
+                  style={getInputStyle('location')}
+                />
+              </div>
+
+              <div>
+                <RequiredFieldLabel label="Power Rating" isRequired={true} />
+                <input
+                  {...register('power_rating', { required: 'required' })}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="text"
+                  style={getInputStyle('power_rating')}
+                />
+              </div>
+
+              <div>
+                <RequiredFieldLabel label="IP Address" />
+                <input
+                  {...register('ip_address')}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="text"
+                  style={getInputStyle('ip_address')}
+                />
+              </div>
+
+              {/* Status toggles centered vertically */}
+              <div className="py-9">
+                <div className="flex items-center space-x-2">
+                  <RequiredFieldLabel label="Connectivity Status" isRequired={true} />
+                  <input
+                    {...register('connectivity_status')}
+                    type="checkbox"
+                    className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                    id="connectivity"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RequiredFieldLabel label="Machine Status" isRequired={true} />
+                <div
+                  onClick={toggleMachineStatus}
+                  className={`relative w-12 h-6 transition-colors duration-200 ease-in-out rounded-full cursor-pointer ${machineStatus ? 'bg-green-500' : 'bg-gray-300'}`}
+                >
+                  <input type="checkbox" className="sr-only" {...register('machine_status')} />
+                  <span
+                    className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out ${machineStatus ? 'transform translate-x-6' : ''}`}
+                  ></span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Column 3 */}
-          <div className="space-y-4">
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
+            {/* Column 3 */}
+            <div className="space-y-4">
+              <div>
                 <RequiredFieldLabel label="Purchase Date" />
-                {errors.purchase_date && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.purchase_date.message}
-                  </span>
-                )}
+                <input
+                  {...register('purchase_date')}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="date"
+                  style={getInputStyle('purchase_date')}
+                />
               </div>
-              <input
-                {...register('purchase_date')}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="date"
-              />
-            </div>
 
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Installation Date"/>
-                {errors.installation_date && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.installation_date.message}
-                  </span>
-                )}
+              <div>
+                <RequiredFieldLabel label="Installation Date" />
+                <input
+                  {...register('installation_date')}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="date"
+                  style={getInputStyle('installation_date')}
+                />
               </div>
-              <input
-                {...register('installation_date')}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="date"
-              />
-            </div>
 
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Last Maintenance"/>
-                {errors.last_maintenance && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.last_maintenance.message}
-                  </span>
-                )}
+              <div>
+                <RequiredFieldLabel label="Last Maintenance" />
+                <input
+                  {...register('last_maintenance')}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="date"
+                  style={getInputStyle('last_maintenance')}
+                />
               </div>
-              <input
-                {...register('last_maintenance')}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="date"
-              />
-            </div>
 
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Next Maintenance Due"/>
-                {errors.next_maintenance_due && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.next_maintenance_due.message}
-                  </span>
-                )}
+              <div>
+                <RequiredFieldLabel label="Next Maintenance Due" />
+                <input
+                  {...register('next_maintenance_due')}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="date"
+                  style={getInputStyle('next_maintenance_due')}
+                />
               </div>
-              <input
-                {...register('next_maintenance_due')}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="date"
-              />
-            </div>
 
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1 mr-2">
-                <RequiredFieldLabel label="Warranty Expiry"/>
-                {errors.warranty_expiry && (
-                  <span className="text-red-500 text-xs text-start">
-                    {errors.warranty_expiry.message}
-                  </span>
-                )}
+              <div>
+                <RequiredFieldLabel label="Warranty Expiry" />
+                <input
+                  {...register('warranty_expiry')}
+                  className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="date"
+                  style={getInputStyle('warranty_expiry')}
+                />
               </div>
-              <input
-                {...register('warranty_expiry')}
-                className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                type="date"
-              />
             </div>
           </div>
-        </div>
-        {/* Remarks - Full Width, moved outside the grid */}
-        <div className="w-full bg-gray-50 p-6 rounded-lg shadow-sm">
-          <RequiredFieldLabel label="Notes & Remarks" isRequired={true} />
-          <textarea
-            {...register('remarks_notes', { required: 'required' })}
-            rows="3"
-            className="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          ></textarea>
-        </div>
+          {/* Remarks - Full Width, moved outside the grid */}
+          <div className="w-full px-4 rounded-lg mb-5">
+            <RequiredFieldLabel label="Notes & Remarks"  />
+            <textarea
+              {...register('remarks_notes')}
+              rows="3"
+              className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              style={getInputStyle('remarks_notes')}
+            ></textarea>
+          </div>
+        </form>
+      </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap justify-end gap-3 mt-6">
-          <ActionButton type="button" label="Cancel" variant="cancel" onClick={handleCancel} />
-          <ActionButton
-            type="submit"
-            label={
-              isEdit ? (isLoading ? 'Updating...' : 'Update') : isLoading ? 'Saving...' : 'Save'
-            }
-            variant="add"
-          />
-        </div>
-      </form>
+      {/* Fixed action buttons at the bottom */}
+      <div className="fixed bottom-0 right-0 left-0 bg-white border-t border-gray-200 py-2 px-4 flex justify-end gap-3">
+        <ActionButton type="button" label="Cancel" variant="cancel" onClick={handleCancel} />
+        <ActionButton
+          type="submit"
+          label={isEdit ? (isLoading ? 'Updating...' : 'Update') : isLoading ? 'Saving...' : 'Save'}
+          variant="add"
+          onClick={handleSubmit(onSubmit)}
+        />
+      </div>
     </div>
   )
 }

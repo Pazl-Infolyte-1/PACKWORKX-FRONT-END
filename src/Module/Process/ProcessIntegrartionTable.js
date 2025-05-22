@@ -103,7 +103,8 @@ function ProcessIntegrartionTable({
                   {/*{apiMethods.formatDate(item.created_at)}*/}
                   {new Date(item.created_at).toLocaleString()}
                 </CTableDataCell>
-                <CTableDataCell className="py-3 px-2">
+                <CTableDataCell className="py-3 px-2 text-center">
+                   <div className="flex justify-center">
                   <ThreeDotMenu
                     value={[
                       {
@@ -139,15 +140,16 @@ function ProcessIntegrartionTable({
                           setOpenFieldModal({ open: true, id: item.id })
                         },
                       },
-                      {
-                        label: 'Values',
-                        icon: cilFlipToBack,
-                        onClick: () => {
-                          setOpenValuesModal({ open: true, id: item.id })
-                        },
-                      },
+                      // {
+                      //   label: 'Values',
+                      //   icon: cilFlipToBack,
+                      //   onClick: () => {
+                      //     setOpenValuesModal({ open: true, id: item.id })
+                      //   },
+                      // },
                     ]}
                   />
+                  </div>
                 </CTableDataCell>
               </CTableRow>
             ))

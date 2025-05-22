@@ -7,7 +7,8 @@ export default function VersionChoicePopup({
   handleAddVersion,
   handleAddOption,
   skuversionLimit,
-  currentVersionCount
+  currentVersionCount,
+  handleOneTimeUse
 }) {
     const [selectedOption, setSelectedOption] = useState(null);
     const isVersionLimitReached = skuversionLimit && currentVersionCount >= skuversionLimit;
@@ -22,7 +23,7 @@ export default function VersionChoicePopup({
       <PopUp
         visible={isOpen}
         setVisible={setIsOpen}
-        width={"40%"}
+        width={"60%"}
         height={"350px"}
         showCloseButton={true}
       >
@@ -33,7 +34,7 @@ export default function VersionChoicePopup({
               <p className="text-sm text-gray-500">Select how you want to add this item</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               {/* Version Option or Limit Reached UI */}
               {isVersionLimitReached ? (
                 <div className="flex cursor-not-allowed hover:bg-red-100 flex-col items-center justify-center p-4 rounded-lg bg-gray-50  transition-all transform">
@@ -129,6 +130,35 @@ export default function VersionChoicePopup({
                 </span>
                 <span className={`text-xs mt-1 ${selectedOption === 'option' ? 'text-indigo-200' : 'text-gray-500'}`}>
                   Create alternative choice
+                </span>
+              </button>
+
+              {/* One Time Use Option */}
+              <button 
+                onClick={handleOneTimeUse}
+                className={`flex flex-col items-center justify-center p-4 rounded-lg transition-all transform ${
+                  selectedOption === 'oneTimeUse' 
+                  ? 'bg-indigo-600 text-white shadow-md scale-105' 
+                  : 'bg-gray-50 hover:bg-indigo-50 hover:shadow-md'
+                }`}
+              >
+                <div className="mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" viewBox="0 0 64 64" fill="none">
+                    <circle cx="32" cy="32" r="24" 
+                      className={selectedOption === 'oneTimeUse' ? 'fill-white' : 'fill-indigo-100'} 
+                      stroke={selectedOption === 'oneTimeUse' ? 'white' : 'indigo'} 
+                      strokeWidth="2" />
+                    <path d="M32 16v32M16 32h32" 
+                      stroke={selectedOption === 'oneTimeUse' ? 'indigo' : 'white'} 
+                      strokeWidth="2" 
+                      strokeLinecap="round" />
+                  </svg>
+                </div>
+                <span className={`font-medium text-lg ${selectedOption === 'oneTimeUse' ? 'text-white' : 'text-gray-800'}`}>
+                  One Time Use
+                </span>
+                <span className={`text-xs mt-1 ${selectedOption === 'oneTimeUse' ? 'text-indigo-200' : 'text-gray-500'}`}>
+                  Single use item
                 </span>
               </button>
             </div>

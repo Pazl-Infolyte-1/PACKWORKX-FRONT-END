@@ -226,6 +226,11 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     }
   }
 
+  const handleOneTimeUse = ()=>{
+    // setEditedMap({});
+    setVersionChoiceOpen(false);
+  }
+
   return (
     <>
       {skuValues.length > 0 && (
@@ -491,6 +496,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
         handleAddOption={handleAddOption}
         skuversionLimit={skuversionLimit}
         currentVersionCount={currentVersionCount}
+        handleOneTimeUse={handleOneTimeUse}
       />
     </>
   );

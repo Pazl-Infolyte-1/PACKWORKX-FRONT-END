@@ -124,6 +124,9 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
 
       console.log(response);
 
+      const optionResponse = await apiMethods.getSkuValuesOptions(skuID);
+      setSkuOptions(optionResponse?.data?.options || {});
+            
       setTimeout(() => {
         setAlerts([{ severity: "success", message: response?.data?.message || "SKU Options Added Successfully" }]);
       }, 1000);

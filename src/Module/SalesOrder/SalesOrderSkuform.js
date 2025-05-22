@@ -415,12 +415,14 @@ const calculateRowValues = (index) => {
                     <th className="py-2 px-2 text-sm font-bold text-left rounded-tl-xl">Item Table</th>
                     <th className=""></th>
                     <th className=""></th>
+                    <th className=""></th>
                     <th className="rounded-tr-xl"></th>
                   </tr>
 
                   <tr>
                     <th className="py-2 pl-2 border-r border-b text-xs font-medium text-left">ITEM DETAILS</th>
                     <th className="p-2 border-r text-xs font-medium text-right">QUANTITY</th>
+                    <th className="p-2 border-r text-xs font-medium text-right uppercase">Acceptable Units</th>
                     <th className="p-2 border-r text-xs font-medium text-right">RATE</th>
                     <th className="p-2 border-b text-xs font-medium text-right">AMOUNT</th>
                     <th className="py-2 w-10"></th> {/* Empty header for delete button */}
@@ -538,6 +540,18 @@ const calculateRowValues = (index) => {
                             })}
                             type="number"
                             placeholder="1.00"
+                            min="0"
+                            onWheel={(e) => e.target.blur()}
+                            className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none no-spinner"
+                          />
+                        </td>
+
+                        {/* Acceptable Units Input */}
+                        <td className="p-1 border items-start">
+                          <input
+                            {...register(`skus[${index}].acceptableUnits`)}
+                            type="number"
+                            placeholder="0"
                             min="0"
                             onWheel={(e) => e.target.blur()}
                             className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none no-spinner"

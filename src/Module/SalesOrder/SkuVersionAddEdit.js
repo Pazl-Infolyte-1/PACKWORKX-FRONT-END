@@ -127,7 +127,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     if(skuID){
       fetchData();
     }
-  }, [skuID, IsEditVersion, skuVersionID, setSkuVersionsMap]);
+  }, [skuID, IsEditVersion, skuVersionID, setSkuVersionsMap,]);
   
 
   const handleValueChange = (index, field, value) => {
@@ -142,8 +142,10 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
       return { ...prev, [index]: updatedFields };
     });
   };
+
   const handleAddOption = async () => {
     try {
+      console.log(editedMap)
       const field_options = Object.entries(editedMap).flatMap(([index, fields]) => {
         return Object.entries(fields).map(([fieldName, fieldValue]) => ({
           field_path: `sku_values.${index}.${fieldName}`,
@@ -283,22 +285,22 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
 
       {skuValues.length > 0 && (
         <div className="p-4">
-          <h2 className="text-xl font-semibold mb-4">SKU Version Details</h2>
+          <h2 className="text-sm font-semibold mb-4">SKU Version Details</h2>
           <CustomAlert alerts={alerts} handleClose={handleClose} />
 
           <div className="mt-6">
             <div className="border rounded-lg overflow-auto">
               <table className="w-full">
                 <thead className="bg-gray-100">
-                  <tr className="text-gray-500 text-center">
-                    <th className="p-2">Layer</th>
-                    <th className="p-2">GSM</th>
-                    <th className="p-2">BF</th>
-                    <th className="p-2">Color</th>
-                    <th className="p-2">Flute Type</th>
-                    <th className="p-2">Material</th>
-                    <th className="p-2">Weight (Kg)</th>
-                    <th className="p-2">
+                  <tr className="text-gray-500 text-sm text-center">
+                    <th className="p-1">Layer</th>
+                    <th className="p-1">GSM</th>
+                    <th className="p-1">BF</th>
+                    <th className="p-1">Color</th>
+                    <th className="p-1">Flute Type</th>
+                    <th className="p-1">Material</th>
+                    <th className="p-1">Weight (Kg)</th>
+                    <th className="p-1">
                       Bursting Strength <br />
                       <span className="text-xs">
                         (Kg Per Cm<sup>2</sup>)
@@ -494,20 +496,43 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
 
               </table>
               <div className="p-2 flex w-[100%]  justify-end">
-                <button
-                  className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
-                  onClick={handleSubmit}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <FaSpinner className="animate-spin mr-2" />
-                      {IsEditVersion ? "Updating..." : "Processing..."}
-                    </>
-                  ) : (
-                    IsEditVersion ? "Update Version" : "Add As Version"
-                  )}
-                </button>
+              <button
+  className={`
+    inline-flex items-center gap-1.5
+    bg-gray-400 hover:bg-gray-700 
+    text-white text-xs font-medium
+    px-3 py-1.5
+    rounded border
+    transition-colors duration-150
+    ${isLoading ? 'opacity-75 cursor-not-allowed' : 'cursor-pointer'}
+  `}
+  onClick={handleSubmit}
+  disabled={isLoading}
+>
+  {isLoading ? (
+    <>
+      <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      {IsEditVersion ? "Updating..." : "Adding..."}
+    </>
+  ) : (
+    <>
+      {IsEditVersion ? (
+        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      ) : (
+        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+      )}
+      {IsEditVersion ? "Update" : "Add"}
+    </>
+  )}
+</button>
               </div>
             </div>
 

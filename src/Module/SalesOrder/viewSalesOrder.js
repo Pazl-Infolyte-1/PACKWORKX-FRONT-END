@@ -8,6 +8,8 @@ import apiMethods from "../../api/config";
 export default function SalesOrderView({ }) {
   const navigate = useNavigate();
   const [salesOrderData, setSalesOrderData] = useState(null);
+  const [workOrdersExpanded, setWorkOrdersExpanded] = useState(false);
+
   const { id } = useParams();
 
 
@@ -39,7 +41,7 @@ export default function SalesOrderView({ }) {
   };
 
   return (
-    <div className="bg-white w-full font-sans flex flex-col" style={{height: '90vh'}}>
+<div className="bg-white w-full font-sans flex flex-col" style={{height: '90vh'}}>
       {/* Header */}
       <div className="w-full bg-white z-50">
         <div className="flex justify-between items-top p-2">
@@ -51,7 +53,10 @@ export default function SalesOrderView({ }) {
           </div>
         </div>
         <div className="flex bg-gray-50 px-3 border-t text-xs">
-          <button className="flex items-centergap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
+          <button
+           className="flex items-centergap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600"
+           onClick={()=>navigate(`/salesorder/form/${salesOrderData?.id}?tab=salesOrder`)}
+           >
             <CIcon icon={cilPencil} className="h-3 w-3" />
             <span>Edit</span>
           </button>
@@ -93,8 +98,8 @@ export default function SalesOrderView({ }) {
             </div>
           </div>
 
-          {/* Invoices section */}
-          <div className="bg-white border border-gray-200 rounded mb-3 hover:shadow-sm text-xs">
+               {/* Invoices section */}
+               <div className="bg-white border border-gray-200 rounded mb-3 hover:shadow-sm text-xs">
             <div className="p-2 flex items-center justify-between cursor-pointer hover:bg-gray-50">
               <div className="flex items-center gap-1.5">
                 <div className="bg-gray-100 p-0.5 rounded">
@@ -108,7 +113,7 @@ export default function SalesOrderView({ }) {
               </div>
               <div className="flex items-center">
                 <span className="bg-blue-100 text-blue-800 px-1 py-0.5 rounded-full text-xs">
-                  {salesOrderData?.workOrders ? salesOrderData?.workOrders?.length : 0}
+                  0
                 </span>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 text-gray-400 ml-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
@@ -116,6 +121,162 @@ export default function SalesOrderView({ }) {
               </div>
             </div>
           </div>
+
+          {/* Work Orders section */}
+          {salesOrderData?.workOrders && salesOrderData?.workOrders?.length > 0 ? (
+            <div className="bg-white border border-gray-200 rounded-lg mb-3 overflow-hidden text-xs">
+              <div 
+                className="p-3 flex items-center justify-between cursor-pointer border-b border-gray-100"
+                onClick={() => setWorkOrdersExpanded(!workOrdersExpanded)}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="bg-gradient-to-br from-green-100 to-green-50 p-1.5 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h.01a1 1 0 100-2H7zm2 0a1 1 0 100 2h.01a1 1 0 100-2H9zm2 0a1 1 0 100 2h.01a1 1 0 100-2H11z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-xs">Work Orders</h3>
+                    <p className="text-gray-500 text-xs">Production orders generated from this sales order</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                    {salesOrderData?.workOrders?.length}
+                  </span>
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className={`h-3.5 w-3.5 text-gray-400 transition-transform duration-200 ${workOrdersExpanded ? 'rotate-90' : ''}`} 
+                    viewBox="0 0 20 20" 
+                    fill="currentColor"
+                  >
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Expandable Work Orders Content */}
+              {workOrdersExpanded && (
+                <div className="border-t bg-gradient-to-b from-gray-50 to-white">
+                  <div className="p-3 space-y-3">
+                    {salesOrderData?.workOrders?.map((workOrder, idx) => (
+                      <div 
+                        key={idx} 
+                        className="bg-white border border-gray-200 rounded-lg p-3"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="font-semibold text-blue-600 text-xs hover:text-blue-800 transition-colors cursor-pointer">
+                                {workOrder?.work_generate_id}
+                              </span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium shadow-sm ${
+                                workOrder?.progress === "Completed" ? "bg-gradient-to-r from-green-100 to-green-50 text-green-800" :
+                                workOrder?.progress === "In-progress" ? "bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800" :
+                                workOrder?.progress === "Pending" ? "bg-gradient-to-r from-yellow-100 to-yellow-50 text-yellow-800" :
+                                "bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800"
+                              }`}>
+                                {workOrder?.progress}
+                              </span>
+                              <span className={`px-2 py-1 rounded-full text-xs shadow-sm ${
+                                workOrder?.priority === "High" ? "bg-gradient-to-r from-red-100 to-red-50 text-red-800" :
+                                workOrder?.priority === "Medium" ? "bg-gradient-to-r from-orange-100 to-orange-50 text-orange-800" :
+                                "bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800"
+                              }`}>
+                                {workOrder?.priority}
+                              </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-3 text-xs text-gray-600 bg-gray-50 p-2 rounded-lg">
+                              <div className="flex items-center gap-1">
+                                <span className="font-medium">SKU:</span> 
+                                <span className="text-blue-600">{workOrder?.sku_name}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span className="font-medium">Quantity:</span> 
+                                <span className="text-gray-800">{workOrder?.qty}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span className="font-medium">Manufacture:</span> 
+                                <span className="capitalize text-gray-800">{workOrder?.manufacture}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span className="font-medium">EDD:</span> 
+                                <span className="text-gray-800">{formatDate(workOrder?.edd)}</span>
+                              </div>
+                            </div>
+                            
+                            {workOrder?.description && (
+                              <div className="mt-2 text-xs text-gray-600 bg-gray-50 p-2 rounded-lg">
+                                <span className="font-medium">Description:</span> {workOrder?.description}
+                              </div>
+                            )}
+                            
+                            <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                              <div className="flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                                </svg>
+                                <span>Planned: {formatDate(workOrder?.planned_start_date)} - {formatDate(workOrder?.planned_end_date)}</span>
+                              </div>
+                              {workOrder?.acceptable_excess_units && (
+                                <div className="flex items-center gap-1">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                                  </svg>
+                                  <span>Excess Units: {workOrder?.acceptable_excess_units}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col items-end gap-2 ml-4">
+                            {workOrder?.qr_code_url && (
+                              <button className="text-blue-600 hover:text-blue-800 text-xs font-medium flex items-center gap-1 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                                </svg>
+                                View QR
+                              </button>
+                            )}
+                            <button className="text-blue-600 hover:text-blue-800 text-xs font-medium flex items-center gap-1 transition-colors">
+                              View Details
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="bg-white border border-gray-200 rounded-lg mb-3 overflow-hidden text-xs">
+              <div className="p-3 flex items-center justify-between cursor-pointer border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <div className="bg-gradient-to-br from-gray-100 to-gray-50 p-1.5 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h.01a1 1 0 100-2H7zm2 0a1 1 0 100 2h.01a1 1 0 100-2H9zm2 0a1 1 0 100 2h.01a1 1 0 100-2H11z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-xs">Work Orders</h3>
+                    <p className="text-gray-500 text-xs">No work orders have been created yet</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                    0
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+     
         </div>
 
         {/* Main form content */}

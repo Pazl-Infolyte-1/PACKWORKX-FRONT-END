@@ -631,10 +631,10 @@ const calculateRowValues = (index) => {
                       updateParentFormData();
                     }, 0);
                   }} 
-                  className="flex items-center h-8 w-36 text-xs bg-gray-100 hover:bg-gray-200 text-blue-600 py-2 px-3 rounded mr-2"
+                  className="flex items-center h-8 w-28 text-xs bg-gray-100 hover:bg-gray-200 text-blue-600 py-2 px-3 rounded mr-2"
                 >
                   <span className="mr-1">+</span>
-                  Add New Row
+                  Add Sku
                 </button>
                 <div className="pr-9">
                   <table className="bg-gray-100 rounded w-full border-collapse">

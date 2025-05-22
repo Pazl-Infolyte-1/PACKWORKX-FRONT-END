@@ -337,7 +337,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
 
 
   return (
-    <div className=" pt-2 pb-12">
+    <div className=" pt-2 pb-12 ">
       <CCol xs={12}>
   <div className="flex justify-content-between">
    <CNav variant="tabs" className="flex-grow-1">

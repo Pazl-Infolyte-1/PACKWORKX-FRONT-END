@@ -17,55 +17,12 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   const [editedMap, setEditedMap] = useState({});
   const [skuOptions, setSkuOptions] = useState({});
   const [focusedField, setFocusedField] = useState(null);
+  const [currentVersionCount, setCurrentVersionCount] = useState(0);
 
-
-
-
-
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       if (IsEditVersion && skuVersionID) {
-  //         // Fetch specific SKU version data when in edit mode
-  //         const versionResponse = await apiMethods.getSingleSkuVersion(skuVersionID);
-
-  //         if (versionResponse?.data) {
-
-  //           setSkuValues(versionResponse?.data?.sku_values || []);
-  //           setClientID(versionResponse?.data?.client_id || "");
-  //           setSkuVersion(versionResponse?.data?.sku_version || "");
-  //         }
-  //       } else  {
-  //         // Fetch SKU Data
-  //         const response = await apiMethods.getSingleSkuData(skuID);
-  //         const OptionResponse = await apiMethods.getSkuValuesOptions(skuID)
-  //         setSkuOptions(OptionResponse?.data?.options || {});
-
-
-
-
-  //         if (response?.data?.sku_values && Array.isArray(response.data.sku_values)) {
-  //           setSkuValues(response.data.sku_values);
-  //           setSkuInitalData(response.data.sku_values)
-  //           setClientID(response.data.client_id);
-  //           setSkuversionLimit(response.data.sku_version_limit)
-  //         }
-
-  //         // Fetch SKU Versions
-  //         const versionsResponse = await apiMethods.getSkuVersions(skuID);
-  //         const skuversionID = `V${versionsResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`
-  //         setSkuVersion(skuversionID);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching SKU data or versions:", error);
-  //     }
-  //   };
-
-  //   if (skuID) {
-  //     fetchData();
-  //   }
-  // }, [skuID, IsEditVersion, skuVersionID, setSkuVersionsMap]);
+  // Helper function to check if any changes have been made
+  const hasChanges = () => {
+    return Object.keys(editedMap).length > 0;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -116,6 +73,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   
           // Generate new SKU version ID
           const versionsResponse = await apiMethods.getSkuVersions(skuID);
+          setCurrentVersionCount(versionsResponse?.data?.data?.length || 0);
           const skuversionID = `V${versionsResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
           setSkuVersion(skuversionID);
         }
@@ -180,12 +138,11 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     }
   };
 
-
-
-
-
   const handleSubmit = async () => {
-    // setIsLoading(true);
+    // Don't proceed if no changes have been made
+    if (!hasChanges()) {
+      return;
+    }
 
     const requestBody = {
       sku_id: skuID,
@@ -217,14 +174,8 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     } else {
       // Create mode
       setVersionChoiceOpen(true)
-
     }
   };
-
-
-
-
-
 
   const handleClose = () => {
     setAlerts([]);
@@ -237,14 +188,6 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   const handleAddVersion = async () => {
     try {
       // Get the current versions before submitting
-
-      const requestBody = {
-        sku_id: skuID,
-        sku_version: skuVersion,
-        client_id: clientID,
-        sku_values: skuValues
-      };
-
       const versionsResponse = await apiMethods.getSkuVersions(skuID);
       const currentVersionCount = versionsResponse?.data?.data?.length || 0;
 
@@ -253,7 +196,12 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
         return; // Exit early, do not proceed
       }
 
-      requestBody.sku_version = `v${currentVersionCount + 1}_${Date.now()}`;
+      const requestBody = {
+        sku_id: skuID,
+        sku_version: `v${currentVersionCount + 1}_${Date.now()}`,
+        client_id: clientID,
+        sku_values: skuValues
+      };
 
       const response = await apiMethods.addSkuVersion(requestBody);
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
@@ -265,6 +213,10 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
           [orderId]: updatedVersionsResponse.data.data
         }));
       }
+
+      // Clear edited map and close popup
+      setEditedMap({});
+      setVersionChoiceOpen(false);
     } catch (error) {
       setAlerts([{ severity: "error", message: error?.response?.data?.message || "Failed to add SKU Version" }]);
       console.error("Error submitting data:", error);
@@ -274,15 +226,8 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     }
   }
 
-
-
-
-
-
   return (
     <>
-
-
       {skuValues.length > 0 && (
         <div className="p-4">
           <h2 className="text-sm font-semibold mb-4">SKU Version Details</h2>
@@ -492,51 +437,49 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
 ))}
 
                 </tbody>
-
-
               </table>
-              <div className="p-2 flex w-[100%]  justify-end">
-              <button
-  className={`
-    inline-flex items-center gap-1.5
-    bg-gray-400 hover:bg-gray-700 
-    text-white text-xs font-medium
-    px-3 py-1.5
-    rounded border
-    transition-colors duration-150
-    ${isLoading ? 'opacity-75 cursor-not-allowed' : 'cursor-pointer'}
-  `}
-  onClick={handleSubmit}
-  disabled={isLoading}
->
-  {isLoading ? (
-    <>
-      <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      {IsEditVersion ? "Updating..." : "Adding..."}
-    </>
-  ) : (
-    <>
-      {IsEditVersion ? (
-        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
-      ) : (
-        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-      )}
-      {IsEditVersion ? "Update" : "Add"}
-    </>
-  )}
-</button>
+              <div className="p-2 flex w-[100%] justify-end">
+                <button
+                  className={`
+                    inline-flex items-center gap-1.5
+                    text-white text-xs font-medium
+                    px-3 py-1.5
+                    rounded border
+                    transition-colors duration-150
+                    ${hasChanges() && !isLoading 
+                      ? 'bg-gray-400 hover:bg-gray-700 cursor-pointer' 
+                      : 'bg-gray-300 cursor-not-allowed opacity-50'
+                    }
+                  `}
+                  onClick={handleSubmit}
+                  disabled={!hasChanges() || isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      {IsEditVersion ? "Updating..." : "Adding..."}
+                    </>
+                  ) : (
+                    <>
+                      {IsEditVersion ? (
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      ) : (
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                      )}
+                      {IsEditVersion ? "Update" : "Add"}
+                    </>
+                  )}
+                </button>
               </div>
             </div>
-
-
           </div>
         </div>
       )}
@@ -546,8 +489,9 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
         setIsOpen={setVersionChoiceOpen}
         handleAddVersion={handleAddVersion}
         handleAddOption={handleAddOption}
-      >
-      </VersionChoicePopup>
+        skuversionLimit={skuversionLimit}
+        currentVersionCount={currentVersionCount}
+      />
     </>
   );
 }
@@ -558,3 +502,5 @@ export default SkuVersionAddEdit;
 
 
 
+// In handleSubmit success cases
+// setEditedMap({}); // This will disable the button again

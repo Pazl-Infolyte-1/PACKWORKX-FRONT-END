@@ -23,6 +23,12 @@ import ProcessForm from '../Process/AddProcessNameForm'
 import FieldValues from './FieldValues'
 import MachineField from './MachineField'
 import { useNavigate } from 'react-router-dom'
+import ContentHeader from '../../components/New/ContentHeader'
+import { FaEye } from 'react-icons/fa'
+import ReusableTable from '../SalesOrder/ReusableTable'
+import ThreeDotMenu from '../../components/ThreeDotMenu'
+import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
+import CompactPagination from '../../components/New/CompactPagination'
 
 export default function MachineMaster() {
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
@@ -35,11 +41,11 @@ export default function MachineMaster() {
   const [viewDataId, setViewDataId] = useState(null)
   const [isViewMode, setIsViewMode] = useState(false)
   const [statusCounts, setStatusCounts] = useState([])
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(50)
   const [isEdit, setIsEdit] = useState(false)
   const [refresh, setRefresh] = useState(false)
   const [alerts, setAlerts] = useState([])
-  const { searchQuery } = useSearch()
+  const { searchQuery, setGlobalPlaceholder } = useSearch()
   const searchBarRef = useRef(null)
   const navigate = useNavigate()
   //process
@@ -56,41 +62,49 @@ export default function MachineMaster() {
     {
       label: 'Total Machine',
       count: pagination?.total,
-      color: '#4a03fa',
-      bgColor: '#c7c7f1',
-      icon: <MdPrecisionManufacturing className="w-[40px] h-[40px] md:w-[50px] md:h-[50px]" />,
+      color: '#286eb1',
+      bgColor: '#2e2d6d',
+      icon: <MdPrecisionManufacturing className="w-[30px] h-[30px] md:w-[25px] md:h-[25px]" />,
     },
     {
       label: 'Active',
       count: statusCounts?.Active,
-      color: '#155724',
-      bgColor: '#c3f2cb',
-      icon: <MdEmojiObjects className="w-[40px] h-[40px] md:w-[50px] md:h-[50px]" />,
+      color: '#8000c0',
+      bgColor: '#67009a',
+      icon: <MdEmojiObjects className="w-[30px] h-[30px] md:w-[25px] md:h-[25px]" />,
     },
     {
       label: 'Under Maintenance',
       count: statusCounts?.['Under Maintenance'],
-      color: '#0000ff',
-      bgColor: '#aad3ff',
-      icon: <MdEngineering className="w-[40px] h-[40px] md:w-[50px] md:h-[50px]" />,
+      color: '#077A7D',
+      bgColor: '#005a4d',
+      icon: <MdEngineering className="w-[30px] h-[30px] md:w-[25px] md:h-[25px]" />,
     },
     {
       label: 'Disabled',
       count: statusCounts?.Inactive,
-      color: '#ff2d55',
-      bgColor: '#ffb9c6',
-      icon: <MdDoDisturbOn className="w-[40px] h-[40px] md:w-[50px] md:h-[50px]" />,
+      color: '#F28CA3',
+      bgColor: '#EC5C76',
+      icon: <MdDoDisturbOn className="w-[30px] h-[30px] md:w-[25px] md:h-[25px]" />,
     },
   ]
 
-  const handleView = (Id) => {
-    setViewDataId(Id)
+  const handleView = (row) => {
+    setViewDataId(row.id)
     setIsViewMode(true)
   }
 
   const handleEdit = (id) => {
     navigate('/machinedashboard/form', { state: { Id: id, isEdit: true } })
   }
+
+  useEffect(() => {
+    setGlobalPlaceholder('Search Machines...')
+
+    return () => {
+      setGlobalPlaceholder('Search...')
+    }
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -181,203 +195,206 @@ export default function MachineMaster() {
     setIsEdit(false)
     setRefresh((prev) => !prev)
   }
+
+  const handleStatusChange = async (Id, newStatus) => {
+    try {
+      const response = await apiMethods.updateMachineStatus(Id, { machine_status: newStatus })
+      setAlerts([
+        {
+          severity: 'success',
+          message: response.data.message || 'Status updated successfully',
+        },
+      ])
+      setRefresh((prev) => !prev)
+    } catch (error) {
+      setAlerts([
+        {
+          severity: 'error',
+          message: error?.response?.data?.message || 'Failed to update status',
+        },
+      ])
+      console.error('Failed to update status:', error)
+    }
+  }
+
   return (
     <div className="m-0 p-0">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
-      <div className="flex flex-col md:flex-row justify-between px-2 ">
-        <h1 className="text-black text-xl font-bold">Machine Master Dashboard</h1>
-        <div className="flex gap-3">
-          <ActionButton
-            label={'View Process'}
-            icon={RiEyeLine}
-            className="!bg-[#00000052]"
-            onClick={() => setAssignModal(true)}
-          />
-          <ActionButton
-            label={'+ Add Machine'}
-            onClick={() => navigate('/machinedashboard/form', { state: { isEdit: false } })}
-            // onClick={() => {
-            //   setdrawopen({ show: true }), setIsEdit(false)
-            // }}
-          />
-        </div>
-      </div>
+      <ContentHeader
+        heading={'Machine Master Dashboard'}
+        onAddClick={() => navigate('/machinedashboard/form', { state: { isEdit: false } })}
+        menuOptions={[
+          {
+            icon: <FaEye className="mr-2 text-blue-500" />,
+            label: 'View Process',
+            onClick: () => setAssignModal(true),
+          },
+        ]}
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 gap-3 mt-2">
+      <div className="flex flex-wrap justify-between gap-2 mt-2">
         {machineData.map((item, index) => (
           <div
             key={index}
-            className=" h-[90%] w-[full] rounded-[10px] shadow-md p-3 flex items-center "
+            className={`w-full sm:w-[235px] flex items-center justify-between  font-bold rounded-lg shadow-md text-white border p-2`}
             style={{ backgroundColor: item.bgColor }}
           >
-            <div className="text-center flex-1 whitespace-wrap">
-              <p className="text-[18px]  " style={{ color: item.color }}>
-                {item.label}
-              </p>
-              <p className="text-[23px] " style={{ color: item.color }}>
-                {item.count}
-              </p>
+            <div className="flex  gap-2 items-center">
+              <h2 className="text-xl text-white">{item.icon}</h2>
+              <h2 className="text-sm font-bold text-white ">{item.label}</h2>
             </div>
-            <div style={{ color: item.color }}>{item.icon}</div>
+            <div
+              className="h-[40px] w-[40px] flex items-center justify-center rounded-lg  "
+              style={{ backgroundColor: item.color }}
+            >
+              {item.count}
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="border h-[70%] p-2 mt-3 overflow-auto ">
-        <div className="flex flex-col md:flex-row items-center justify-between ">
-          <h3 className="text-xl text-black font-bold">Machine Table</h3>
-          <div className="flex flex-wrap gap-2 my-2">
-            <ActionButton
-              variant="add"
-              label={'Add Process'}
-              onClick={() => {
-                setIsEdit(false)
-                setShowAddProcessModal(true)
-              }}
-            />
-            <SearchBar text="Machine" data={tableData} ref={searchBarRef} />
+      <MachineDashboardTable
+        cellData={tableData}
+        onView={handleView}
+        onEdit={handleEdit}
+        onAddProcess={handleAddProcess}
+        setRefresh={setRefresh}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
+        setAlerts={setAlerts}
+        setOpenFieldValuesModal={setOpenFieldValuesModal}
+        setOpenFieldModal={setOpenFieldModal}
+      />
+
+      <div className="flex justify-center md:justify-end items-center gap-4 mt-2 ">
+         <div className=" flex w-32 items-center gap-1 font-normal text-sm">
+            <span>Total Count:</span>
+            <span className="font-medium">{pagination.total}</span>
           </div>
-        </div>
-
-        <PopUp
-          visible={isViewMode}
-          setVisible={setIsViewMode}
-          width={800}
-          height={500}
-          header="Machine Details"
-          showCloseButton={true}
-        >
-          <ViewMachineData Id={viewDataId} />
-        </PopUp>
-
-        <MachineDashboardTable
-          cellData={tableData}
-          onView={handleView}
-          onEdit={handleEdit}
-          onAddProcess={handleAddProcess}
-          setRefresh={setRefresh}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
-          setAlerts={setAlerts}
-          setOpenFieldValuesModal={setOpenFieldValuesModal}
-          setOpenFieldModal={setOpenFieldModal}
+        <CompactPagination
+          count={pagination.totalPages || 1}
+          page={pagination.page || 1}
+          onPageChange={(event, value) => {
+            setPagination((prev) => ({
+              ...prev,
+              page: value,
+            }))
+          }}
+          onEntriesChange={(newLimit) => {
+            setLimit(newLimit)
+            // Reset to first page when changing limit
+            setPagination((prev) => ({
+              ...prev,
+              page: 1,
+            }))
+          }}
+          entriesPerPage={limit}
         />
-
-        <div className="flex justify-center md:justify-end items-center gap-4 mt-2 ">
-          <CommonPagination
-            count={pagination.totalPages || 1}
-            page={pagination.page || 1}
-            onChange={(event, value) => {
-              setPagination((prev) => ({
-                ...prev,
-                page: value,
-              }))
-            }}
-            onLimitChange={(newLimit) => {
-              setLimit(newLimit)
-              // Reset to first page when changing limit
-              setPagination((prev) => ({
-                ...prev,
-                page: 1,
-              }))
-            }}
-            limit={limit}
-          />
-        </div>
-
-        <PopUp
-          visible={assignModal}
-          setVisible={setAssignModal}
-          width={800}
-          height={500}
-          header="Assign Process"
-          showCloseButton={true}
-        >
-          <AssignProcess
-            refresh={refresh}
-            setRefresh={setRefresh}
-            setAlerts={setAlerts}
-            isEdit={isEdit}
-            setIsEdit={setIsEdit}
-            preSelectedMachineId={preSelectedMachineId}
-          />
-        </PopUp>
-
-        <PopUp
-          visible={addProcessModal.show}
-          setVisible={setAddProcessModal}
-          width={800}
-          height={300}
-          header="Add Process to Machine"
-          showCloseButton={true}
-        >
-          <AddAssign
-            isAddModalOpen={{ show: true, id: addProcessModal.machineId }}
-            setIsAddModalOpen={setAddProcessModal}
-            setRefresh={setRefresh}
-            setAlerts={setAlerts}
-            isEdit={false}
-            disableMachineSelection={true}
-          />
-        </PopUp>
-
-        <PopUp
-          visible={showAddProcessModal}
-          setVisible={setShowAddProcessModal}
-          width="500px"
-          header={isEdit ? 'Edit Process' : 'Add Process'}
-          showCloseButton={true}
-        >
-          <ProcessForm
-            isEdit={isEdit}
-            initialData={formData}
-            onCancel={() => {
-              setShowAddProcessModal(false)
-              setIsEdit(false)
-              setFormData({
-                process_name: '',
-                id: null,
-              })
-            }}
-            onSubmit={handleProcessSubmit}
-          />
-        </PopUp>
-
-        <PopUp
-          visible={openFieldValuesModal.show}
-          setVisible={setOpenFieldValuesModal}
-          header={'Field, Values'}
-          width={800}
-          showCloseButton={true}
-        >
-          <FieldValues
-            openFieldValuesModal={openFieldValuesModal}
-            setOpenFieldModal={setOpenFieldModal}
-            setOpenMachineFieldModal={setOpenMachineFieldModal}
-            setOpenMachineValuesModal={setOpenMachineValuesModal}
-            openMachineValuesModal={openMachineValuesModal}
-            setShowAddProcessModal={setShowAddProcessModal}
-            handleEditProcess={handleEditProcess}
-            setIsEdit={setIsEdit}
-          />
-        </PopUp>
-
-        <PopUp
-          visible={openMachineFieldModal.open}
-          setVisible={() => setOpenMachineFieldModal({ open: false, id: null })}
-          width={800}
-          height={600}
-          header="Add Field"
-          showCloseButton={true}
-        >
-          <MachineField
-            openMachineFieldModal={openMachineFieldModal}
-            isEdit={isEdit}
-            setIsEdit={setIsEdit}
-            setAlerts={setAlerts}
-          />
-        </PopUp>
       </div>
+
+      <PopUp
+        visible={isViewMode}
+        setVisible={setIsViewMode}
+        width={900}
+        height={600}
+        header="Machine Details"
+        showCloseButton={true}
+      >
+        <ViewMachineData Id={viewDataId} />
+      </PopUp>
+
+      <PopUp
+        visible={assignModal}
+        setVisible={setAssignModal}
+        width={800}
+        height={500}
+        header="Assign Process"
+        showCloseButton={true}
+      >
+        <AssignProcess
+          refresh={refresh}
+          setRefresh={setRefresh}
+          setAlerts={setAlerts}
+          isEdit={isEdit}
+          setIsEdit={setIsEdit}
+          preSelectedMachineId={preSelectedMachineId}
+        />
+      </PopUp>
+
+      <PopUp
+        visible={addProcessModal.show}
+        setVisible={setAddProcessModal}
+        width={800}
+        height={300}
+        header="Add Process to Machine"
+        showCloseButton={true}
+      >
+        <AddAssign
+          isAddModalOpen={{ show: true, id: addProcessModal.machineId }}
+          setIsAddModalOpen={setAddProcessModal}
+          setRefresh={setRefresh}
+          setAlerts={setAlerts}
+          isEdit={false}
+          disableMachineSelection={true}
+        />
+      </PopUp>
+
+      <PopUp
+        visible={showAddProcessModal}
+        setVisible={setShowAddProcessModal}
+        width="500px"
+        header={isEdit ? 'Edit Process' : 'Add Process'}
+        showCloseButton={true}
+      >
+        <ProcessForm
+          isEdit={isEdit}
+          initialData={formData}
+          onCancel={() => {
+            setShowAddProcessModal(false)
+            setIsEdit(false)
+            setFormData({
+              process_name: '',
+              id: null,
+            })
+          }}
+          onSubmit={handleProcessSubmit}
+        />
+      </PopUp>
+
+      <PopUp
+        visible={openFieldValuesModal.show}
+        setVisible={setOpenFieldValuesModal}
+        header={'Field, Values'}
+        width={800}
+        showCloseButton={true}
+      >
+        <FieldValues
+          openFieldValuesModal={openFieldValuesModal}
+          setOpenFieldModal={setOpenFieldModal}
+          setOpenMachineFieldModal={setOpenMachineFieldModal}
+          setOpenMachineValuesModal={setOpenMachineValuesModal}
+          openMachineValuesModal={openMachineValuesModal}
+          setShowAddProcessModal={setShowAddProcessModal}
+          handleEditProcess={handleEditProcess}
+          setIsEdit={setIsEdit}
+        />
+      </PopUp>
+
+      <PopUp
+        visible={openMachineFieldModal.open}
+        setVisible={() => setOpenMachineFieldModal({ open: false, id: null })}
+        width={800}
+        height={600}
+        header="Add Field"
+        showCloseButton={true}
+      >
+        <MachineField
+          openMachineFieldModal={openMachineFieldModal}
+          isEdit={isEdit}
+          setIsEdit={setIsEdit}
+          setAlerts={setAlerts}
+        />
+      </PopUp>
     </div>
   )
 }

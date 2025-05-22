@@ -13,6 +13,8 @@ import ProcessForm from './AddProcessNameForm'
 import Field from './Field'
 import ProcessDetails from './ProcessDetails'
 import Values from './Values'
+import ContentHeader from '../../components/New/ContentHeader'
+import CompactPagination from '../../components/New/CompactPagination'
 
 const Process = () => {
   const [showAddProcessModal, setShowAddProcessModal] = useState(false)
@@ -32,7 +34,7 @@ const Process = () => {
   const [openValuesModal, setOpenValuesModal] = useState({ open: false, id: null })
   const [allprocessValue, setAllprocessValue] = useState([])
   const [showEditModal, setShowEditModal] = useState(false)
-  const { searchQuery } = useSearch()
+  const { searchQuery, setGlobalPlaceholder } = useSearch()
   const searchBarRef = useRef(null)
 
   const fetchData = async () => {
@@ -48,6 +50,13 @@ const Process = () => {
       console.error(error)
     }
   }
+  useEffect(() => {
+    setGlobalPlaceholder('Search Process...')
+
+    return () => {
+      setGlobalPlaceholder('Search...')
+    }
+  })
 
   useEffect(() => {
     fetchData()
@@ -56,6 +65,7 @@ const Process = () => {
   const [formData, setFormData] = useState({
     process_name: '',
   })
+  console.log(openFieldModal)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -147,25 +157,16 @@ const Process = () => {
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <div className="flex flex-col lg:flex-row item-center gap-5 relative my-3">
-        <h3 className="text-xl font-semibold mb-3">Process Integration</h3>
-      </div>
+      <ContentHeader
+        heading={'Process Integration'}
+        onAddClick={() => {
+          setIsEdit(false)
+          setShowAddProcessModal(true)
+        }}
+      />
 
-      <div className="bg-white p-3 rounded-lg w-full h-full">
-        <div className="flex items-center">
-          <SearchBar data={processData} text={'Process Integration'} ref={searchBarRef} />
-          <div className="flex-grow flex justify-end gap-3">
-            <ActionButton
-              variant="add"
-              label={'Add Process Name'}
-              onClick={() => {
-                setIsEdit(false)
-                setShowAddProcessModal(true)
-              }}
-            />
-          </div>
-        </div>
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap my-4">
+      <div className="bg-white  rounded-lg w-full h-full">
+        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap">
           <ProcessIntegrartionTable
             processData={processData}
             setProcessData={setProcessData}
@@ -186,17 +187,17 @@ const Process = () => {
           />
         </div>
 
-        <div>
-          <CommonPagination
+        <div className='mt-4'>
+          <CompactPagination
             count={pagination?.totalPages || 1}
             page={pagination?.page || 1}
-            onChange={(event, value) => {
+            onPageChange={(event, value) => {
               setPagination((prev) => ({
                 ...prev,
                 page: value,
               }))
             }}
-            onLimitChange={(newLimit) => {
+            onEntriesChange={(newLimit) => {
               setLimit(newLimit)
               // Reset to first page when changing limit
               setPagination((prev) => ({
@@ -204,7 +205,7 @@ const Process = () => {
                 page: 1,
               }))
             }}
-            limit={limit}
+            entriesPerPage={limit}
           />
         </div>
 
@@ -290,7 +291,7 @@ const Process = () => {
           }}
           showCloseButton={true}
           width={'70vw'}
-          header={'Fields'}
+          header={'Process & Fields'}
         >
           <Field
             AllfieldData={fieldData}

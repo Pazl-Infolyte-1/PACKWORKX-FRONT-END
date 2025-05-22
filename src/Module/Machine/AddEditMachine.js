@@ -118,8 +118,8 @@ function AddEditMachine({}) {
   }
 
   return (
-    <div className="mx-auto my-3 relative flex flex-col">
-      <div className="text-xl font-semibold px-2">{isEdit ? 'Edit Machine' : 'Add Machine'}</div>
+    <div className="mx-auto mt-3 relative flex flex-col">
+      <div className="text-xl font-semibold p-2 fixed bg-white w-full -my-4">{isEdit ? 'Edit Machine' : 'Add Machine'}</div>
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
 
       {/* Form container with scroll */}

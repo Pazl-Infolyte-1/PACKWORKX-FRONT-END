@@ -161,8 +161,8 @@ const MachineDashboardTable = ({
   ]
 
   return (
-    <div className="py-2 h-[calc(100vh-240px)]">
-      <ReusableTable data={cellData} columns={columns} handleRowClick={onView} />
+    <>
+      <ReusableTable data={cellData} columns={columns} handleRowClick={onView} height={'65vh'} />
       <ConfirmationModale
         isOpen={isConfirmationModalOpen}
         onClose={handleCancel}
@@ -172,7 +172,7 @@ const MachineDashboardTable = ({
         confirmText={isLoading ? 'Deleting...' : 'Delete'}
         cancelText="Cancel"
       />
-    </div>
+    </>
   )
 }
 

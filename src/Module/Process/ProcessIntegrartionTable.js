@@ -12,6 +12,7 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilFlipToBack, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
+import ReusableTable from '../SalesOrder/ReusableTable'
 
 function ProcessIntegrartionTable({
   processData,
@@ -54,114 +55,90 @@ function ProcessIntegrartionTable({
   }
 
   const openDeleteModal = (id) => {
+    console.log(id)
+
     setDeleteId(id)
     setConfirmModal(true)
   }
 
+  const columns = [
+    { key: 'process_generate_id', header: 'ID', field: 'process_generate_id' },
+    {
+      key: 'process_name',
+      header: (
+        <>
+          Process Name <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'process_name',
+    },
+    {
+      key: 'created_at',
+      header: (
+        <>
+          Created at <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'created_at',
+      type: 'date',
+    },
+    {
+      key: 'actions',
+      header: 'action',
+      field: 'actions',
+      type: 'custom',
+      render: (row) => (
+        <ThreeDotMenu
+          value={[
+            // {
+            //   label: 'View',
+            //   icon: cilHandPointRight,
+            //   onClick: () => {
+            //     const matchingProcess = processValues.find(
+            //       (process) => process.ProcessName.id === item.id,
+            //     )
+            //     const idToPass = matchingProcess ? matchingProcess.id : item.id
+
+            //     setOpenProcessModal({ open: true, id: idToPass })
+            //   },
+            // },
+            {
+              label: 'Edit Process',
+              icon: cilPencil,
+              onClick: () => {
+                handleEditProcess(row)
+              },
+            },
+            {
+              label: 'Delete',
+              icon: cilTrash,
+              onClick: () => {
+                openDeleteModal(row.id)
+              },
+            },
+            // {
+            //   label: 'Field',
+            //   icon: cilPlus,
+            //   onClick: () => {
+            //     setOpenFieldModal({ open: true, id: item.id })
+            //   },
+            // },
+            // {
+            //   label: 'Values',
+            //   icon: cilFlipToBack,
+            //   onClick: () => {
+            //     setOpenValuesModal({ open: true, id: item.id })
+            //   },
+            // },
+          ]}
+        />
+      ),
+    },
+  ]
+
   return (
-    <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar rounded-lg p-2">
-      <CTable striped hover className="w-full m-0 table-fixed">
-        <CTableHead className="bg-gray-100 sticky -top-2 z-10">
-          <CTableRow className="text-center">
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">
-              Id
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Process Name
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Created Date
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-              Action
-            </CTableHeaderCell>
-          </CTableRow>
-        </CTableHead>
-        <CTableBody>
-          {processData && processData.length > 0 ? (
-            processData.map((item) => (
-              <CTableRow key={item.id} className="border-b text-center">
-                <CTableDataCell
-                  onClick={() => {
-                    const matchingProcess =
-                      processValues && processValues.find
-                        ? processValues.find((process) => process.ProcessName.id === item.id)
-                        : null
-
-                    const idToPass = matchingProcess ? matchingProcess.id : item.id
-
-                    setOpenProcessModal({ open: true, id: idToPass })
-                  }}
-                  className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start"
-                >
-                  {item.process_generate_id}
-                </CTableDataCell>
-                <CTableDataCell className="py-3 px-2  font-semibold">
-                  {item.process_name}
-                </CTableDataCell>
-                <CTableDataCell className="py-3 px-2  font-semibold">
-                  {/*{apiMethods.formatDate(item.created_at)}*/}
-                  {new Date(item.created_at).toLocaleString()}
-                </CTableDataCell>
-                <CTableDataCell className="py-3 px-2 text-center">
-                   <div className="flex justify-center">
-                  <ThreeDotMenu
-                    value={[
-                      {
-                        label: 'View',
-                        icon: cilHandPointRight,
-                        onClick: () => {
-                          const matchingProcess = processValues.find(
-                            (process) => process.ProcessName.id === item.id,
-                          )
-                          const idToPass = matchingProcess ? matchingProcess.id : item.id
-
-                          setOpenProcessModal({ open: true, id: idToPass })
-                        },
-                      },
-                      {
-                        label: 'Edit Process',
-                        icon: cilPencil,
-                        onClick: () => {
-                          handleEditProcess(item)
-                        },
-                      },
-                      {
-                        label: 'Delete',
-                        icon: cilTrash,
-                        onClick: () => {
-                          openDeleteModal(item.id)
-                        },
-                      },
-                      {
-                        label: 'Field',
-                        icon: cilPlus,
-                        onClick: () => {
-                          setOpenFieldModal({ open: true, id: item.id })
-                        },
-                      },
-                      // {
-                      //   label: 'Values',
-                      //   icon: cilFlipToBack,
-                      //   onClick: () => {
-                      //     setOpenValuesModal({ open: true, id: item.id })
-                      //   },
-                      // },
-                    ]}
-                  />
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-            ))
-          ) : (
-            <CTableRow>
-              <CTableDataCell colSpan={4} className="py-3 px-2 text-center !text-red-500 ">
-                No Records Found
-              </CTableDataCell>
-            </CTableRow>
-          )}
-        </CTableBody>
-      </CTable>
+    <div className=''>
+      <ReusableTable data={processData} columns={columns} />
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <ConfirmationModale
         isOpen={confirmModal}
@@ -169,6 +146,112 @@ function ProcessIntegrartionTable({
         onConfirm={handleDelete}
       />
     </div>
+    // <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar rounded-lg p-2">
+    //   <CTable striped hover className="w-full m-0 table-fixed">
+    //     <CTableHead className="bg-gray-100 sticky -top-2 z-10">
+    //       <CTableRow className="text-center">
+    //         <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">
+    //           Id
+    //         </CTableHeaderCell>
+    //         <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+    //           Process Name
+    //         </CTableHeaderCell>
+    //         <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+    //           Created Date
+    //         </CTableHeaderCell>
+    //         <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+    //           Action
+    //         </CTableHeaderCell>
+    //       </CTableRow>
+    //     </CTableHead>
+    //     <CTableBody>
+    //       {processData && processData.length > 0 ? (
+    //         processData.map((item) => (
+    //           <CTableRow key={item.id} onClick={() => setOpenFieldModal({ open: true, id: item.id })} className="border-b text-center">
+    //             <CTableDataCell
+    //               onClick={() => {
+    //                 // const matchingProcess =
+    //                 //   processValues && processValues.find
+    //                 //     ? processValues.find((process) => process.ProcessName.id === item.id)
+    //                 //     : null
+
+    //                 // const idToPass = matchingProcess ? matchingProcess.id : item.id
+    //                 // console.log(idToPass);
+
+    //                 setOpenFieldModal({ open: true, id: idToPass })
+    //               }}
+    //               className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start"
+    //             >
+    //               {item.process_generate_id}
+    //             </CTableDataCell>
+    //             <CTableDataCell className="py-3 px-2  font-semibold">
+    //               {item.process_name}
+    //             </CTableDataCell>
+    //             <CTableDataCell className="py-3 px-2  font-semibold">
+    //               {/*{apiMethods.formatDate(item.created_at)}*/}
+    //               {new Date(item.created_at).toLocaleString()}
+    //             </CTableDataCell>
+    //             <CTableDataCell className="py-3 px-2 text-center">
+    //                <div className="flex justify-center">
+    //               <ThreeDotMenu
+    //                 value={[
+    //                   // {
+    //                   //   label: 'View',
+    //                   //   icon: cilHandPointRight,
+    //                   //   onClick: () => {
+    //                   //     const matchingProcess = processValues.find(
+    //                   //       (process) => process.ProcessName.id === item.id,
+    //                   //     )
+    //                   //     const idToPass = matchingProcess ? matchingProcess.id : item.id
+
+    //                   //     setOpenProcessModal({ open: true, id: idToPass })
+    //                   //   },
+    //                   // },
+    //                   {
+    //                     label: 'Edit Process',
+    //                     icon: cilPencil,
+    //                     onClick: () => {
+    //                       handleEditProcess(item)
+    //                     },
+    //                   },
+    //                   {
+    //                     label: 'Delete',
+    //                     icon: cilTrash,
+    //                     onClick: () => {
+    //                       openDeleteModal(item.id)
+    //                     },
+    //                   },
+    //                   // {
+    //                   //   label: 'Field',
+    //                   //   icon: cilPlus,
+    //                   //   onClick: () => {
+    //                   //     setOpenFieldModal({ open: true, id: item.id })
+    //                   //   },
+    //                   // },
+    //                   // {
+    //                   //   label: 'Values',
+    //                   //   icon: cilFlipToBack,
+    //                   //   onClick: () => {
+    //                   //     setOpenValuesModal({ open: true, id: item.id })
+    //                   //   },
+    //                   // },
+    //                 ]}
+    //               />
+    //               </div>
+    //             </CTableDataCell>
+    //           </CTableRow>
+    //         ))
+    //       ) : (
+    //         <CTableRow>
+    //           <CTableDataCell colSpan={4} className="py-3 px-2 text-center !text-red-500 ">
+    //             No Records Found
+    //           </CTableDataCell>
+    //         </CTableRow>
+    //       )}
+    //     </CTableBody>
+    //   </CTable>
+
+    // </div>
   )
 }
 

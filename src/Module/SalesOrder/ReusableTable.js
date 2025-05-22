@@ -17,7 +17,7 @@ export default function ReusableTable({
   isMinimiseTable,
   handleRowClick,
   miniScreenFields = [],
-  minHeight = '70vh', // Default minimum height
+  height = '75vh',
 }) {
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -51,16 +51,8 @@ export default function ReusableTable({
     }
   };
 
-  // Calculate minimum height based on data length
-  const calculateTableHeight = () => {
-    if (!data || data.length === 0) return minHeight;
-    if (data.length < 5) return minHeight;
-    return '75vh';
-  };
-
   const tableContainerStyle = {
-    minHeight: calculateTableHeight(),
-    maxHeight: '75vh',
+    height: height,
   };
 
   return (

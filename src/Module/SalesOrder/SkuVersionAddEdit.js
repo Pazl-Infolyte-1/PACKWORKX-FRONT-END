@@ -5,7 +5,7 @@ import CustomAlert from "../../components/New/CustomAlert";
 import PopUp from "../../components/New/PopUp";
 import VersionChoicePopup from "./VersionChoicePopup";
 
-function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, skuVersionID, visible, setVisible }) {
+function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, skuVersionID, visible, setVisible,currentVersionCount }) {
   const [skuValues, setSkuValues] = useState([]);
   const [clientID, setClientID] = useState("");
   const [skuVersion, setSkuVersion] = useState("");
@@ -17,14 +17,14 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   const [editedMap, setEditedMap] = useState({});
   const [skuOptions, setSkuOptions] = useState({});
   const [focusedField, setFocusedField] = useState(null);
-  const [currentVersionCount, setCurrentVersionCount] = useState(0);
+  // const [currentVersionCount, setCurrentVersionCount] = useState(0);
 
   // Helper function to check if any changes have been made
   const hasChanges = () => {
     return Object.keys(editedMap).length > 0;
   };
 
-  useEffect(() => {
+ useEffect(() => {
     const fetchData = async () => {
       try {
         if (IsEditVersion && skuVersionID) {
@@ -73,7 +73,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   
           // Generate new SKU version ID
           const versionsResponse = await apiMethods.getSkuVersions(skuID);
-          setCurrentVersionCount(versionsResponse?.data?.data?.length || 0);
+          // setCurrentVersionCount(versionsResponse?.data?.data?.length || 0);
           const skuversionID = `V${versionsResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
           setSkuVersion(skuversionID);
         }
@@ -122,7 +122,6 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
 
       const response = await apiMethods.postSkuValuesOptions(requestBody);
 
-      console.log(response);
 
       const optionResponse = await apiMethods.getSkuValuesOptions(skuID);
       setSkuOptions(optionResponse?.data?.options || {});
@@ -215,6 +214,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
           ...prev,
           [orderId]: updatedVersionsResponse.data.data
         }));
+        // setCurrentVersionCount(updatedVersionsResponse.data.data.length)
       }
 
       // Clear edited map and close popup

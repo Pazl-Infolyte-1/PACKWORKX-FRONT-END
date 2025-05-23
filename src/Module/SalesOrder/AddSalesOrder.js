@@ -259,7 +259,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
       setTimeout(() => {
         // setDrawer(false)
       }, 1000);
-      await fetchData(fetchData)
+      // await fetchData()
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
 
     } catch (error) {

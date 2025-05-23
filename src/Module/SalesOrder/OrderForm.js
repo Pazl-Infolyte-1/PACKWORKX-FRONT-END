@@ -5,6 +5,7 @@ import ActionButton from '../../components/New/ActionButton';
 import { useSelector } from 'react-redux';
 import SalesOrderSkuform from './SalesOrderSkuform';
 import { useSearch } from '../../components/New/SearchContext';
+import { useNavigate } from 'react-router-dom';
 
 const OrderForm = forwardRef(({
   formData,
@@ -30,6 +31,7 @@ const OrderForm = forwardRef(({
   const stateID = localStorage.getItem('company_state_id');
   const [isIgstApplicable, setIsIgstApplicable] = useState(true)
   const { searchQuery, setGlobalPlaceholder } = useSearch()
+  const navigate = useNavigate()
 
 
 
@@ -615,7 +617,7 @@ const OrderForm = forwardRef(({
             <div className="flex gap-2">
               <ActionButton
                 type="button"
-                onClick={() => ''}
+                onClick={() => navigate('/salesorder')}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-all"
                 label={'Cancel'}
               >

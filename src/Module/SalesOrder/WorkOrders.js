@@ -52,6 +52,8 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
   const [canDeactivate, setCanDeactivate] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [versionChoiceOpen,setVersionChoiceOpen] = useState(false)
+  const [SkuVersionRefreshTrigger, setSkuVersionRefreshTrigger] = useState(0);
+
   
 
 
@@ -490,6 +492,9 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
           [selectedWorkOrderForVersions]: updatedVersionsResponse.data.data
         }))
       }
+
+      setSkuVersionRefreshTrigger(prev => prev + 1);
+
     } catch (error) {
       console.error("Error deleting version:", error)
       // alert("Failed to delete the version. Please try again.")
@@ -768,7 +773,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
         </div>
 
         {workOrders.length > 0 && (
-    <div className="max-h-[600px] overflow-y-auto rounded-md border border-gray-200 shadow-sm min-h-[350px]">
+    <div className=" rounded-md border border-gray-200 shadow-sm min-h-[350px]">
       {workOrders.map((order, index) => (
         <div
           key={order.id}
@@ -1017,6 +1022,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
                     <input
                       type="date"
                       value={order.planned_start_date}
+                      max={formatDate(order.planned_end_date?order.planned_end_date:'')}
                       onChange={(e) => handleWorkOrderChange(order.id, 'planned_start_date', e.target.value)}
                       className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
                         validationErrors.planned_start_date 
@@ -1041,7 +1047,9 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
                         validationErrors.planned_end_date 
                           ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
                           : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
-                      }`}                    />
+                      }`}
+                      disabled={!order.planned_start_date}
+                    />
                   </div>
                 </div>
 
@@ -1054,12 +1062,15 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
                     <input
                       type="date"
                       value={order.edd}
+                      min={formatDate(order.planned_end_date)}
                       onChange={(e) => handleWorkOrderChange(order.id, 'edd', e.target.value)}
                       className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
                         validationErrors.edd 
                           ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
                           : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
-                      }`}                    />
+                      }`}
+                      disabled={!order.planned_start_date}
+                    />
 
                   </div>
                 </div>
@@ -1087,6 +1098,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
                     setSkuVersionsMap={setSkuVersionsMap}
                     orderId={order.id}
                     skuVersionID={order.sku_version}
+                    currentVersionCount={skuVersionsMap[order.id]?.length || 0}
                   />
                 </div>
               )}

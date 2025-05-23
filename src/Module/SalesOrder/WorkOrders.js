@@ -45,9 +45,6 @@ const WorkOrders = ({
   skuValuesMap,
   setSkuValuesMap
 }) => {
-  const [selectedOption, setSelectedOption] = useState('inhouse')
-  const [openIndices, setOpenIndices] = useState([])
-  const [openAccordions, setOpenAccordions] = useState({})
   const [openCreateAccordion, setCreateOpenAccordion] = useState([1])
   const [openCreateAccordion1, setCreateOpenAccordion1] = useState([])
   const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
@@ -66,37 +63,14 @@ const WorkOrders = ({
   const [salesOrderSkus, setSalesOrderSkus] = useState([])
   const [canDeactivate, setCanDeactivate] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-  const [versionChoiceOpen,setVersionChoiceOpen] = useState(false)
-  const [SkuVersionRefreshTrigger, setSkuVersionRefreshTrigger] = useState(0);
+
 
   
-
-
-
 
   useEffect(() => {
     console.log(skuDetailsForm, 'skudetailsform in workorderform')
   }, [skuDetailsForm])
 
-
-
-
-
-  // useEffect(()=>{
-
-  //   item.skun
-  //   workOrders.map(item=>{
-  //     const response = await getskuversions(item.sku_name)
-
-  //     //then add response to the specific id response similar to this
-
-  //     setSkuVersionsMap(prev=>({
-  //       ...prev,
-  //       [item.id]:[]
-  //     }))
-  //   }
-  //   )
-  // },[])
 
   useEffect(() => {
     const fetchSalesOrders = async () => {
@@ -508,7 +482,6 @@ const WorkOrders = ({
         }))
       }
 
-      setSkuVersionRefreshTrigger(prev => prev + 1);
 
     } catch (error) {
       console.error("Error deleting version:", error)

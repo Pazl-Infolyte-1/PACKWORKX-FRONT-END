@@ -5,8 +5,19 @@ import CustomAlert from "../../components/New/CustomAlert";
 import PopUp from "../../components/New/PopUp";
 import VersionChoicePopup from "./VersionChoicePopup";
 
-function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, skuVersionID, visible, setVisible,currentVersionCount }) {
-  const [skuValues, setSkuValues] = useState([]);
+function SkuVersionAddEdit({
+  skuID,
+  setSkuVersionsMap,
+  orderId,
+  IsEditVersion,
+  skuVersionID,
+  visible,
+  setVisible,
+  currentVersionCount,
+  setWorkOrders ,
+  skuvaluesFromParent
+      }) {
+  const [skuValues, setSkuValues] = useState([skuvaluesFromParent]);
   const [clientID, setClientID] = useState("");
   const [skuVersion, setSkuVersion] = useState("");
   const [alerts, setAlerts] = useState([]);
@@ -46,7 +57,15 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
             apiMethods.getSingleSkuData(skuID),
             apiMethods.getSingleSkuVersion(skuVersionID)
           ]);
-  
+
+          setWorkOrders(prevOrders =>
+            prevOrders.map(order =>
+              order.id === orderId
+                ? { ...order, ["work_order_sku_values"]: versionResponse?.data?.sku_values || []  }
+                : order
+            )
+          )
+
           if (skuResponse?.data && versionResponse?.data) {
             setSkuValues(versionResponse?.data?.sku_values || []);
             setClientID(skuResponse?.data?.client_id || "");
@@ -65,6 +84,14 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
           setSkuOptions(OptionResponse?.data?.options || {});
   
           if (response?.data?.sku_values && Array.isArray(response.data.sku_values)) {
+
+            setWorkOrders(prevOrders =>
+              prevOrders.map(order =>
+                order.id === orderId
+                  ? { ...order, ["work_order_sku_values"]: response.data.sku_values || []  }
+                  : order
+              )
+            )
             setSkuValues(response.data.sku_values);
             setSkuInitalData(response.data.sku_values);
             setClientID(response.data.client_id);
@@ -89,9 +116,18 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   
 
   const handleValueChange = (index, field, value) => {
-    const updatedValues = [...skuValues];
+
+    const updatedValues = [...skuvaluesFromParent];
     updatedValues[index][field] = value;
     setSkuValues(updatedValues);
+
+    setWorkOrders(prevOrders =>
+      prevOrders.map(order =>
+        order.id === orderId
+          ? { ...order, ["work_order_sku_values"]: updatedValues || []  }
+          : order
+      )
+    )
 
     // Track changed field per index
     setEditedMap(prev => {
@@ -150,7 +186,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
       sku_id: skuID,
       sku_version: skuVersion,
       client_id: clientID,
-      sku_values: skuValues
+      sku_values: skuvaluesFromParent
     };
 
     if (IsEditVersion && skuVersionID) {
@@ -202,7 +238,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
         sku_id: skuID,
         sku_version: `v${currentVersionCount + 1}_${Date.now()}`,
         client_id: clientID,
-        sku_values: skuValues
+        sku_values: skuvaluesFromParent
       };
 
       const response = await apiMethods.addSkuVersion(requestBody);
@@ -236,7 +272,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
 
   return (
     <>
-      {skuValues.length > 0 && (
+      {skuvaluesFromParent?.length > 0 && (
         <div className="p-4">
           <h2 className="text-sm font-semibold mb-4">SKU Version Details</h2>
           <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -262,7 +298,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
                   </tr>
                 </thead>
                 <tbody>
-                {skuValues.map((item, index) => (
+                {skuvaluesFromParent.map((item, index) => (
   <tr key={index} className="flex-wrap">
     <td className="p-2 text-center w-full sm:w-2/12 md:w-2/12 lg:w-2/12 relative">
       <div className="relative w-full">

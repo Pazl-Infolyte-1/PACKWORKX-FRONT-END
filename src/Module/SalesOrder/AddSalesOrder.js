@@ -34,6 +34,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
   });
 
   const [skuVersionsMap, setSkuVersionsMap] = useState({})
+  const [skuValuesMap, setSkuValuesMap] = useState({})
 
   const childRef = useRef();
 
@@ -104,7 +105,8 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
       planned_end_date: "",
       manufacture: "inhouse",
       priority:"Low",
-      progress:"Pending"
+      progress:"Pending",
+      work_order_sku_values:[]
     }
   ])
 
@@ -530,7 +532,6 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
         {activeTab === 'skuDetails' && (
           <div className="p-1 bg-white rounded-lg h-full">
             <WorkOrders
-              // setDrawer={setDrawer}
               setWorkOrders={setWorkOrders}
               workOrders={workOrders}
               setFormData={handleWorkOrderFormUpdate}
@@ -543,6 +544,8 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
               setSkuVersionsMap={setSkuVersionsMap}
               workOrderListSubmit={workOrderListSubmit}
               setIsFormTouched={setIsFormTouched}
+              skuValuesMap={skuValuesMap}
+              setSkuValuesMap={setSkuValuesMap}
             />
           </div>
         )}

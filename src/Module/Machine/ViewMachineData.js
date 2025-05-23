@@ -35,7 +35,7 @@ function ViewMachineData({ Id }) {
               (processValue) => processValue.process_name_id === machineProcess.process_id,
             )
           })
-          .filter(Boolean) // Remove undefined values if no match found
+          .filter(Boolean)
 
         setValues(matchedValues)
       } catch (error) {
@@ -168,7 +168,7 @@ function ViewMachineData({ Id }) {
                   {Object.entries(value.process_value).map(([key, val]) => (
                     <div key={key} className=" p-2 rounded">
                       <span className="text-gray-600 text-sm">{key}: </span>
-                      <span className="font-medium">{val}</span>
+                      <span className="font-medium">{val || <span className='text-xs'>N/A</span>}</span>
                     </div>
                   ))}
                 </div>

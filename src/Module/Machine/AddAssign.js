@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Select from 'react-select'
 import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
-import { FiEdit } from 'react-icons/fi'
+import { FiEdit, FiPlus, FiSave, FiX } from 'react-icons/fi'
 import CustomAlert from '../../components/New/CustomAlert'
 import Loading from '../../components/New/Loading'
 
@@ -21,7 +21,7 @@ function AddAssign({
   const [assignedProcesses, setAssignedProcesses] = useState([])
   const [machineProcesses, setMachineProcesses] = useState([])
   const [loading, setLoading] = useState(false)
-  
+
   // Values management state
   const [machineValues, setMachineValues] = useState(null)
   const [processFields, setProcessFields] = useState([])
@@ -142,47 +142,49 @@ function AddAssign({
   // Fetch process fields and values
   const fetchProcessFieldsAndValues = async (processId) => {
     if (!processId) return
-    
+
     setFieldsLoading(true)
     try {
       // First fetch the fields for this process
       const fieldsResponse = await apiMethods.getProcessFields(processId)
       const fields = fieldsResponse.data.data || []
       setProcessFields(fields)
-      
+
       if (fields.length === 0) {
-        setLocalAlerts([{ 
-          severity: 'error', 
-          message: 'No fields defined for this process. Please define fields first.' 
-        }])
+        setLocalAlerts([
+          {
+            severity: 'error',
+            message: 'No fields defined for this process. Please define fields first.',
+          },
+        ])
         setShowValuesSection(false)
         return
       }
-      
+
       // Then fetch the values
       const valuesResponse = await apiMethods.getProcessValues()
       const allValues = valuesResponse.data.data
-      
-      const matchingProcess = allValues.find(
-        (process) => process.process_name_id === processId,
-      )
-      
+
+      const matchingProcess = allValues.find((process) => process.process_name_id === processId)
+
       setMachineValues(matchingProcess)
-      
+
       // Initialize form data with existing values or empty object with field names
       const initialFormData = {}
-      fields.forEach(field => {
+      fields.forEach((field) => {
         initialFormData[field.label] = matchingProcess?.process_value?.[field.label] || ''
       })
       setValuesFormData(initialFormData)
-      
+
       setShowValuesSection(true)
     } catch (error) {
       console.error('Error fetching process fields/values:', error)
-      setLocalAlerts([{ 
-        severity: 'error', 
-        message: 'Failed to fetch process data' 
-      }])
+      setLocalAlerts([
+        {
+          severity: 'error',
+          message: 'Failed to fetch process data',
+        },
+      ])
     } finally {
       setFieldsLoading(false)
     }
@@ -246,9 +248,9 @@ function AddAssign({
 
   // Handle form field changes for values
   const handleValueChange = (field, value) => {
-    setValuesFormData(prev => ({
+    setValuesFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }))
   }
 
@@ -292,9 +294,9 @@ function AddAssign({
         const valuesPayload = {
           id: machineValues?.id,
           process_name_id: selectedProcess.value,
-          process_value: valuesFormData
+          process_value: valuesFormData,
         }
-        
+
         if (machineValues) {
           await apiMethods.updateProcessValues(valuesPayload)
         } else {
@@ -375,12 +377,14 @@ function AddAssign({
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4 max-h-[600px] overflow-y-scroll">
       <CustomAlert alerts={localAlerts} handleClose={() => setLocalAlerts([])} />
-      
+
       <div className="flex justify-between gap-3 p-2">
         <div className="w-1/2">
-          <label className="my-2 font-semibold">Machine <span className='text-red-500'>*</span></label>
+          <label className="my-2 font-semibold">
+            Machine <span className="text-red-500">*</span>
+          </label>
           <Select
             options={machineOptions}
             value={selectedMachine}
@@ -394,7 +398,9 @@ function AddAssign({
           />
         </div>
         <div className="w-1/2">
-          <label className="my-2 font-semibold">Process <span className='text-red-500'>*</span></label>
+          <label className="my-2 font-semibold">
+            Process <span className="text-red-500">*</span>
+          </label>
           <Select
             options={processOptions}
             value={selectedProcess}
@@ -424,60 +430,100 @@ function AddAssign({
       </div>
 
       {/* Values Section */}
-      {fieldsLoading ? (
-        <div className="flex justify-center py-8">
-          <Loading isLoading={true} />
-        </div>
-      ) : showValuesSection && processFields.length > 0 ? (
-        <div className="mt-6 border-t pt-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Process Values</h3>
-            <button
-              onClick={() => setIsEditingValues(true)}
-              className="flex items-center text-blue-500 hover:text-blue-700"
-              disabled={isEditingValues}
-            >
-              <FiEdit className="mr-1" /> 
-              {machineValues ? 'Edit Values' : 'Add Values'}
-            </button>
+      <div className="p-2">
+        {fieldsLoading ? (
+          <div className="flex justify-center py-12">
+            <Loading isLoading={true} />
           </div>
-
-          {isEditingValues ? (
-            <div className="space-y-4">
-              {processFields.map((field) => (
-                <div key={field.id} className="flex items-center gap-4">
-                  <label className="w-1/4 capitalize">
-                    {field.label}
-                  </label>
-                  <input
-                    type="text"
-                    value={valuesFormData[field.label] || ''}
-                    onChange={(e) => handleValueChange(field.label, e.target.value)}
-                    className="flex-1 border rounded px-3 py-2"
-                    placeholder={`Enter ${field.label}`}
-                  />
+        ) : showValuesSection && processFields.length > 0 ? (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {/* Header */}
+            <div className=" px-6 py-2 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-base font-semibold text-gray-800">Process Values</h3>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Monitor and adjust your process parameters
+                  </p>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              {processFields.map((field) => {
-                const value = machineValues?.process_value?.[field.label]
-                return (
-                  <div key={field.id} className="bg-gray-50 p-3 rounded border">
-                    <div className="text-sm font-medium capitalize text-gray-600">
-                      {field.label}
-                    </div>
-                    <div className="text-lg font-semibold">
-                      {value || <span className="text-gray-400">Not set</span>}
-                    </div>
+
+                {!isEditingValues ? (
+                  <button
+                    onClick={() => setIsEditingValues(true)}
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm"
+                  >
+                    {machineValues ? (
+                      <FiEdit className="mr-2 h-4 w-4" />
+                    ) : (
+                      <FiPlus className="mr-2 h-4 w-4" />
+                    )}
+                    {machineValues ? 'Edit Values' : 'Add Values'}
+                  </button>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setIsEditingValues(false)}
+                      className="inline-flex items-center px-3 py-2 text-black text-sm font-medium rounded-lg"
+                    >
+                      <FiX className="mr-1 h-4 w-4" />
+                    </button>
                   </div>
-                )
-              })}
+                )}
+              </div>
             </div>
-          )}
-        </div>
-      ) : null}
+
+            {/* Content */}
+            <div className="p-6">
+              {isEditingValues ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {processFields.map((field) => (
+                    <div key={field.id} className="space-y-1">
+                      <label className="block text-sm font-medium text-gray-700 capitalize">
+                        {field.label.replace('_', ' ')}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={valuesFormData[field.label] || ''}
+                          onChange={(e) => handleValueChange(field.label, e.target.value)}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                          placeholder={`Enter ${field.label.replace('_', ' ')}`}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {processFields.map((field) => {
+                    const value = machineValues?.process_value?.[field.label]
+                    const hasValue = value !== null && value !== undefined
+
+                    return (
+                      <div
+                        key={field.id}
+                        className={`relative p-2 rounded-lg border-2 transition-all duration-200`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            {field.label.replace('_', ' ')}
+                          </div>
+                          {hasValue && <div className="w-2 h-2 bg-green-400 rounded-full"></div>}
+                        </div>
+                        <div
+                          className={`text-sm font-semibold ${hasValue ? 'text-gray-800' : 'text-gray-400'}`}
+                        >
+                          {hasValue ? value : 'No data'}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        ) : null}
+      </div>
 
       <div className="flex justify-end gap-3 my-4">
         <ActionButton

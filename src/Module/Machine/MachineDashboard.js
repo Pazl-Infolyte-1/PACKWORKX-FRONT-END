@@ -331,7 +331,6 @@ export default function MachineMaster() {
         visible={addProcessModal.show}
         setVisible={setAddProcessModal}
         width={800}
-        height={300}
         header="Add Process to Machine"
         showCloseButton={true}
       >

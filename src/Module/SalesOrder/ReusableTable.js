@@ -52,7 +52,8 @@ export default function ReusableTable({
   };
 
   const tableContainerStyle = {
-    minHeight: calculateTableHeight(),
+    // minHeight: calculateTableHeight(),
+    minHeight: height,
     maxHeight: '72vh',
   };
 

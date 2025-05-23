@@ -879,9 +879,10 @@ function RSCBox({
                   errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
                 }`}
               />
-              <p className="text-[10px] text-gray-500 mt-1">
-                Deckle should be greater than (BW × UPS)
-              </p>
+         <p className="text-[10px] text-gray-500 mt-1">
+  Deckle should be greater than (({Math.round(Number(addNewSkuData?.length) * 100) / 100 || ''} + {Math.round(Number(addNewSkuData?.height) * 100) / 100 || ''}) × {Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}) + 20
+</p>
+
             </div>
           </div>
         </Tooltip>
@@ -1019,7 +1020,7 @@ function RSCBox({
           <input
             id="ups"
             name="ups"
-            value={Number(addNewSkuData?.ups) || null}
+                value={Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}
             onChange={modifiedHandleChange}
             readOnly={editTag}
             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${

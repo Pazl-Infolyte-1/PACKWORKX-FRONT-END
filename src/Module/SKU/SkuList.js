@@ -100,6 +100,8 @@ function SkuList() {
     print_type:null,
     tags: {},
     gst_percentage: null,
+    total_weight:null,
+total_bursting_strength:null,
     sku_values: [
       {
         layer: null,
@@ -473,6 +475,8 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
     print_type:selectedSku.print_type || null,
       tags: selectedSku.tags || {},
       gst_percentage: selectedSku.gst_percentage || null,
+      total_weight:selectedSku.total_weight || null,
+total_bursting_strength:selectedSku.total_bursting_strength ||null,
       sku_values: selectedSku.sku_values || [
         {
           layer: null,

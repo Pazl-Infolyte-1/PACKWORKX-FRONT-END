@@ -97,6 +97,8 @@ function SkuAddEdit({
     print_type:null,
     tags: {},
     gst_percentage: null,
+        total_weight:null,
+total_bursting_strength:null,
     sku_values: [
       {
         layer: null,
@@ -219,9 +221,9 @@ console.log("into msquare",meterSquareData)
   }
 
         if (isCorrugated && gsm && bf) {
-          updatedItem.weight = gsm * bf * areaInSquareMeters
+          updatedItem.weight = (gsm*0.001)* bf * areaInSquareMeters
         } else if (gsm) {
-          updatedItem.weight = gsm * areaInSquareMeters
+          updatedItem.weight = (gsm*0.001) * areaInSquareMeters
         }
       }
 
@@ -642,6 +644,24 @@ useEffect(() => {
 console.log("shared unitr form rsc",rscUnits)
 console.log("composite",compositeSelect)
 console.log("sku values...",JSON.stringify(addNewSkuData.sku_values))
+useEffect(() => {
+  const totalWeight = addNewSkuData.sku_values.reduce(
+    (acc, item) => acc + (Number(item.weight) || 0),
+    0
+  )
+
+  const totalBurstingStrength = addNewSkuData.sku_values.reduce(
+    (acc, item) => acc + ((item.gsm && item.bf) ? (item.gsm * item.bf) / 1000 : 0),
+    0
+  )
+
+  setAddNewSkuData((prevData) => ({
+    ...prevData,
+    total_weight: Math.round(totalWeight * 1000) / 1000,
+    total_bursting_strength: Math.round(totalBurstingStrength * 1000) / 1000,
+  }))
+}, [addNewSkuData.sku_values])
+
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
@@ -687,7 +707,7 @@ console.log("sku values...",JSON.stringify(addNewSkuData.sku_values))
       )}
 
       {addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
-        <div className="mt-6">
+        <div className="mt-6 mb-6">
           <div className="border rounded-lg overflow-auto">
             <table className="w-full">
               <thead className="bg-gray-100">
@@ -841,15 +861,22 @@ console.log("sku values...",JSON.stringify(addNewSkuData.sku_values))
                 ))}
               </tbody>
             </table>
+
           </div>
         </div>
       )}
 {addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
-<p className="p-2 text-left">
-  Total Weight: {toThreeDecimalFixed(
-    addNewSkuData.sku_values?.reduce((acc, item) => acc + (Number(item.weight) || 0), 0),
-  )}
-</p>)}
+  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-4 mt-4 mb-6">
+    <p className="text-sm font-medium text-gray-700 mb-10">
+      Total Weight:{' '}
+ {addNewSkuData.total_weight}
+    </p>
+    <p className="text-sm font-medium text-gray-700 mb-10">
+      Total Bursting Strength:{' '}
+{addNewSkuData.total_bursting_strength}
+    </p>
+  </div>
+)}
 
 
       {/*{addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (

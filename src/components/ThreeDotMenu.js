@@ -9,7 +9,6 @@ function ThreeDotMenu({ value }) {
       ref={ref}
       onClick={(e) => {
          e.stopPropagation()
-        e.preventDefault();
         onClick(e);
       }}
       style={{ cursor: 'pointer' }}
@@ -27,7 +26,6 @@ function ThreeDotMenu({ value }) {
             className="hover:!bg-blue-600 py-2 hover:!text-white text-xs"
             key={index}
             onClick={(e) => {
-              e.stopPropagation();
               item.onClick(e);
             }}
           >

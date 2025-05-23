@@ -7,7 +7,7 @@ const SalesOrderSkuForm = ({
   isIgstApplicable = false, 
   formData, 
   setFormData, 
-  selectedClient = '1',
+  selectedClient = '',
   skuDetailsForm = [], 
   showSubmitButton = true, 
   totals = {}, 
@@ -474,7 +474,7 @@ const calculateRowValues = (index) => {
         <Select
           {...field}
           value={selectedValue || null}
-          options={options}
+          options={selectedClient ? options : []}
           isLoading={isLoading}
           isClearable
           isSearchable
@@ -522,7 +522,8 @@ const calculateRowValues = (index) => {
             }),
             menuPortal: (base) => ({ ...base, zIndex: 9999 }),
           }}
-          placeholder="Type or click to select an item."
+          placeholder={selectedClient ? "Type or click to select an item." : "Please select a client first."}
+          isDisabled={!selectedClient}
         />
       </div>
     );

@@ -476,6 +476,7 @@ const OrderForm = forwardRef(({
                     type="number"
                     name="credit_period"
                     value={localFormData.credit_period || ""}
+                    min="0"
                     onChange={handleInputChange}
                     className={`h-7 w-80 rounded border px-3 text-sm ${attemptedSubmit && errors.credit_period ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
                       }`} />
@@ -505,7 +506,7 @@ const OrderForm = forwardRef(({
               {/* Confirmation By */}
               <div className="flex items-center">
                 <label className="text-xs text-gray-700 w-40">
-                  Confirmation By <span className="text-red-500">*</span>
+                  Confirmation By
                 </label>
                 <div className="relative">
                   <div
@@ -611,7 +612,7 @@ const OrderForm = forwardRef(({
         {/* Submit Buttons Section */}
         <div className="fixed bottom-0 bg-white border-t border-gray-200 z-10 flex p-1 py-2 w-full">
           <div className="flex-1 justify-start">
-            <div className="flex gap-4">
+            <div className="flex gap-2">
               <ActionButton
                 type="button"
                 onClick={() => ''}

@@ -7,7 +7,7 @@ const SalesOrderSkuForm = ({
   isIgstApplicable = false, 
   formData, 
   setFormData, 
-  selectedClient = '1',
+  selectedClient = '',
   skuDetailsForm = [], 
   showSubmitButton = true, 
   totals = {}, 
@@ -415,12 +415,14 @@ const calculateRowValues = (index) => {
                     <th className="py-2 px-2 text-sm font-bold text-left rounded-tl-xl">Item Table</th>
                     <th className=""></th>
                     <th className=""></th>
+                    <th className=""></th>
                     <th className="rounded-tr-xl"></th>
                   </tr>
 
                   <tr>
                     <th className="py-2 pl-2 border-r border-b text-xs font-medium text-left">ITEM DETAILS</th>
                     <th className="p-2 border-r text-xs font-medium text-right">QUANTITY</th>
+                    <th className="p-2 border-r text-xs font-medium text-right uppercase">Acceptable Units</th>
                     <th className="p-2 border-r text-xs font-medium text-right">RATE</th>
                     <th className="p-2 border-b text-xs font-medium text-right">AMOUNT</th>
                     <th className="py-2 w-10"></th> {/* Empty header for delete button */}
@@ -472,7 +474,7 @@ const calculateRowValues = (index) => {
         <Select
           {...field}
           value={selectedValue || null}
-          options={options}
+          options={selectedClient ? options : []}
           isLoading={isLoading}
           isClearable
           isSearchable
@@ -520,7 +522,8 @@ const calculateRowValues = (index) => {
             }),
             menuPortal: (base) => ({ ...base, zIndex: 9999 }),
           }}
-          placeholder="Type or click to select an item."
+          placeholder={selectedClient ? "Type or click to select an item." : "Please select a client first."}
+          isDisabled={!selectedClient}
         />
       </div>
     );
@@ -538,6 +541,18 @@ const calculateRowValues = (index) => {
                             })}
                             type="number"
                             placeholder="1.00"
+                            min="0"
+                            onWheel={(e) => e.target.blur()}
+                            className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none no-spinner"
+                          />
+                        </td>
+
+                        {/* Acceptable Units Input */}
+                        <td className="p-1 border items-start">
+                          <input
+                            {...register(`skus[${index}].acceptableUnits`)}
+                            type="number"
+                            placeholder="0"
                             min="0"
                             onWheel={(e) => e.target.blur()}
                             className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none no-spinner"
@@ -631,10 +646,10 @@ const calculateRowValues = (index) => {
                       updateParentFormData();
                     }, 0);
                   }} 
-                  className="flex items-center h-8 w-36 text-xs bg-gray-100 hover:bg-gray-200 text-blue-600 py-2 px-3 rounded mr-2"
+                  className="flex items-center h-8 w-28 text-xs bg-gray-100 hover:bg-gray-200 text-blue-600 py-2 px-3 rounded mr-2"
                 >
                   <span className="mr-1">+</span>
-                  Add New Row
+                  Add Sku
                 </button>
                 <div className="pr-9">
                   <table className="bg-gray-100 rounded w-full border-collapse">

@@ -137,7 +137,7 @@ console.log(machineValue);
                           {key.replace(/_/g, ' ')}
                         </p>
                         <div className="px-3 py-1 bg-gray-100 rounded-md">
-                          <p className="text-sm font-semibold text-gray-800">{value}</p>
+                          <p className="text-sm font-semibold text-gray-800">{value ||<span className='text-xs'>N/A</span>}</p>
                         </div>
                       </div>
                     ))}

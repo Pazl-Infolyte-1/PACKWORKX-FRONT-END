@@ -11,6 +11,8 @@ import {
 import { cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CIcon from '@coreui/icons-react'
+import ReusableTable from '../SalesOrder/ReusableTable'
+import ThreeDotMenu from '../../components/ThreeDotMenu'
 
 const RouteProcessTable = ({
   routeProcessData,
@@ -49,9 +51,82 @@ const RouteProcessTable = ({
       ])
     }
   }
+
+  const columns = [
+    { key: 'route_generate_id', header: 'ID', field: 'route_generate_id' },
+    {
+      key: 'route_name',
+      header: (
+        <>
+          Route Name <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'route_name',
+    },
+    {
+      key: 'NA',
+      header: 'Number of Process ',
+      field: 'NA',
+    },
+    {
+      key: 'created_at',
+      header: (
+        <>
+          Created at <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'created_at',
+      type: 'date',
+    },
+    {
+      key: 'updated_at',
+      header: (
+        <>
+          Updated at <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'updated_at',
+      type: 'date',
+    },
+    {
+      key: 'actions',
+      header: 'action',
+      field: 'actions',
+      type: 'custom',
+      render: (row) => (
+        <ThreeDotMenu
+          value={[
+            {
+              label: 'Edit',
+              icon: cilPencil,
+              onClick: () => {
+                handleEdit(row)
+              },
+            },
+            {
+              label: 'Delete',
+              icon: cilTrash,
+              onClick: () => {
+                openDeleteModal(row.id)
+              },
+            },
+          ]}
+        />
+      ),
+    },
+  ]
+  const RowClick = (row) => {
+    setOpenRouteModal({ open: true, id: row.id })
+  }
   return (
     <>
-      <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar rounded-lg p-2">
+      <ReusableTable
+        data={routeProcessData}
+        columns={columns}
+        minHeight="74vh"
+        handleRowClick={RowClick}
+      />
+      {/* <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar rounded-lg p-2">
         <CTable striped hover className="w-full m-0 table-fixed">
           <CTableHead className="bg-gray-100 sticky -top-2 z-10">
             <CTableRow className="text-center">
@@ -117,7 +192,7 @@ const RouteProcessTable = ({
           onClose={closeDeleteModal}
           onConfirm={handleDelete}
         />
-      </div>
+      </div> */}
     </>
   )
 }

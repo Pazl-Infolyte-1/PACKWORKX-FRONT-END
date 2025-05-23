@@ -29,10 +29,22 @@ const accordionCardSummary = {
 }
 
 
-const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleCloseDrawer, workOrders, setWorkOrders, setDrawer, setIsFormTouched, skuVersionsMap, setSkuVersionsMap, workOrderListSubmit, skuDetailsForm }) => {
-  const [selectedOption, setSelectedOption] = useState('inhouse')
-  const [openIndices, setOpenIndices] = useState([])
-  const [openAccordions, setOpenAccordions] = useState({})
+const WorkOrders = ({
+  setFormData,
+  workOrdersData,
+  setworkOrdersData,
+  handleCloseDrawer,
+  workOrders,
+  setWorkOrders,
+  setDrawer,
+  setIsFormTouched,
+  skuVersionsMap,
+  setSkuVersionsMap,
+  workOrderListSubmit,
+  skuDetailsForm,
+  skuValuesMap,
+  setSkuValuesMap
+}) => {
   const [openCreateAccordion, setCreateOpenAccordion] = useState([1])
   const [openCreateAccordion1, setCreateOpenAccordion1] = useState([])
   const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
@@ -51,35 +63,14 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
   const [salesOrderSkus, setSalesOrderSkus] = useState([])
   const [canDeactivate, setCanDeactivate] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-  const [versionChoiceOpen,setVersionChoiceOpen] = useState(false)
+
+
   
-
-
-
 
   useEffect(() => {
     console.log(skuDetailsForm, 'skudetailsform in workorderform')
   }, [skuDetailsForm])
 
-
-
-
-
-  // useEffect(()=>{
-
-  //   item.skun
-  //   workOrders.map(item=>{
-  //     const response = await getskuversions(item.sku_name)
-
-  //     //then add response to the specific id response similar to this
-
-  //     setSkuVersionsMap(prev=>({
-  //       ...prev,
-  //       [item.id]:[]
-  //     }))
-  //   }
-  //   )
-  // },[])
 
   useEffect(() => {
     const fetchSalesOrders = async () => {
@@ -159,6 +150,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
       'planned_end_date',
       'edd',
       'qty',
+      'work_order_sku_values'
     ];
 
     const errors = {};
@@ -249,6 +241,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
         planned_start_date,
         acceptable_excess_units,
         planned_end_date,
+        work_order_sku_values
       } = selectedWorkOrder;
 
       // Check if any of the fields are empty
@@ -328,8 +321,6 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
     const selectedId = parseInt(e.target.value); // since option values are string
 
     const selectedSku = skuList.find((sku) => sku.id === selectedId);
-
-
 
     SetselectedSkuID(selectedId)
 
@@ -440,8 +431,8 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
         planned_end_date: '',
         manufacture: 'inhouse',
         priority: "Low",
-        progress: "Pending"
-
+        progress: "Pending",
+        work_order_sku_values:[]
       },
     ])
   }
@@ -473,7 +464,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
     )
   }
 
-  const handleDeleteVersion = async (versionId) => {
+  const handleDeleteVersion = async (versionId,skuid) => {
     try {
       const response = await apiMethods.deleteSkuVersion(versionId)
       // console.log("Version deleted successfully:", response)
@@ -490,6 +481,8 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
           [selectedWorkOrderForVersions]: updatedVersionsResponse.data.data
         }))
       }
+
+
     } catch (error) {
       console.error("Error deleting version:", error)
       // alert("Failed to delete the version. Please try again.")
@@ -518,7 +511,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
         {/* Header Section */}
         <CustomAlert alerts={alerts} handleClose={handleClose} />
 
-        <div className="flex justify-between items-center mb ">
+        <div className="flex justify-between items-center mb-4 ">
           {/* <h2 className="text-md font-semibold text-[15px] mb-2">Work Orders</h2> */}
           <div></div>
 
@@ -768,7 +761,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
         </div>
 
         {workOrders.length > 0 && (
-    <div className="max-h-[600px] overflow-y-auto rounded-md border border-gray-200 shadow-sm min-h-[350px]">
+    <div className=" rounded-md border border-gray-200 shadow-sm min-h-[350px]">
       {workOrders.map((order, index) => (
         <div
           key={order.id}
@@ -984,6 +977,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
 <input
   type="number"
   value={order.qty}
+  min={0}
   onChange={(e) => handleWorkOrderChange(order.id, 'qty', e.target.value)}
   className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
     validationErrors.qty 
@@ -1002,6 +996,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
                     <input
                       type="number"
                       value={order.acceptable_excess_units}
+                      min={0}
                       onChange={(e) => handleWorkOrderChange(order.id, 'acceptable_excess_units', e.target.value)}
                       className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
                     />
@@ -1017,6 +1012,7 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
                     <input
                       type="date"
                       value={order.planned_start_date}
+                      max={formatDate(order.planned_end_date?order.planned_end_date:'')}
                       onChange={(e) => handleWorkOrderChange(order.id, 'planned_start_date', e.target.value)}
                       className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
                         validationErrors.planned_start_date 
@@ -1041,7 +1037,9 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
                         validationErrors.planned_end_date 
                           ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
                           : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
-                      }`}                    />
+                      }`}
+                      disabled={!order.planned_start_date}
+                    />
                   </div>
                 </div>
 
@@ -1054,12 +1052,15 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
                     <input
                       type="date"
                       value={order.edd}
+                      min={formatDate(order.planned_end_date)}
                       onChange={(e) => handleWorkOrderChange(order.id, 'edd', e.target.value)}
                       className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
                         validationErrors.edd 
                           ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
                           : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
-                      }`}                    />
+                      }`}
+                      disabled={!order.planned_start_date}
+                    />
 
                   </div>
                 </div>
@@ -1080,19 +1081,24 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
 
               {/* SkuVersionAddEdit section */}
               {order.sku_id && (
-                <div className="border-t border-gray-200 px-4 py-3">
+                <div className=" border-gray-200 px-4 py-2">
                   <SkuVersionAddEdit
                     handleDeleteVersion={handleDeleteVersion}
                     skuID={order.sku_id}
                     setSkuVersionsMap={setSkuVersionsMap}
                     orderId={order.id}
                     skuVersionID={order.sku_version}
+                    currentVersionCount={skuVersionsMap[order.id]?.length || 0}
+                    skuValues={skuValuesMap[order.id]}
+                    setSkuValuesMap={setSkuValuesMap}
+                    setWorkOrders={setWorkOrders}
+                    skuvaluesFromParent = {order.work_order_sku_values}
                   />
                 </div>
               )}
               
               {/* Action buttons */}
-              <div className="w-full flex justify-end pb-3 pt-1 pr-4 border-t border-gray-200 bg-gray-50">
+              <div className="w-full flex justify-end pb-3 pt-1 pr-4">
                 {!isWorkOrderList && (
                   <ActionButton
                     label={"Add Work Order"}

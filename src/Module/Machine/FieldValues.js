@@ -10,7 +10,7 @@ import AddMachineField from './AddMachineField'
 
 function FieldValues({
   openFieldValuesModal,
-  setOpenMachineFieldModal,
+  // setOpenMachineFieldModal,
   setOpenMachineValuesModal,
   openMachineValuesModal,
   handleEditProcess,
@@ -52,7 +52,6 @@ function FieldValues({
       console.error('Error fetching process fields:', error)
     }
   }
-  console.log('assignProcess', processFields);
 
   useEffect(() => {
     fetchData()
@@ -195,12 +194,12 @@ function FieldValues({
               />
             </div>
             <div className="flex gap-2 mt-2">
-              <ActionButton
+              {/* <ActionButton
                 label={'Fields'}
                 variant="minimal"
                 className="w-1/2"
                 onClick={() => setOpenMachineFieldModal({ open: true, id: process.process_id })}
-              />
+              /> */}
               <ActionButton
                 label={'Values'}
                 variant="minimal"

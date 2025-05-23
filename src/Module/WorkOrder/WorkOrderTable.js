@@ -14,8 +14,10 @@ import apiMethods from '../../api/config'
 import WorkOrderDetails from './WorkOrderDetails'
 import Loading from '../../components/New/Loading'
 import ReusableTable from '../SalesOrder/ReusableTable'
+import { useNavigate } from 'react-router-dom'
 
-const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellData,handleDelete,loading,setloading,setAlerts }) => {
+const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellData,handleDelete,loading,setloading,setAlerts,isMinimiseTable }) => {
+  const navigate = useNavigate()
 
   const handlePriorityChange = async (e, id) => {
     const newValue = e;
@@ -58,8 +60,11 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellDa
   finally{
     // setloading(false)
   }
-};
+}
 
+const handleView = (row) => {
+  navigate(`view/${row.id}`);
+};
 const columns = [
   {
     key: 'select',
@@ -114,7 +119,7 @@ const columns = [
                 label: 'View',
                 icon: cilHandPointRight,
                 onClick: () => {
-                  setShowPopUp(row.id)
+                   handleView(row)
                 },
                             },
               {
@@ -143,6 +148,8 @@ const columns = [
     columns={columns}
     data={cellData}
     miniScreenFields={["select","work_generate_id"]}
+    isMinimiseTable={isMinimiseTable}
+    handleRowClick={handleView}
     />
   )
 }

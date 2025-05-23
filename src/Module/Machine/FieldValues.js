@@ -38,6 +38,7 @@ function FieldValues({
     }
   }
 
+  
   const fetchProcessFields = async (processId) => {
     if (!processId) return
 
@@ -51,6 +52,7 @@ function FieldValues({
       console.error('Error fetching process fields:', error)
     }
   }
+  console.log('assignProcess', processFields);
 
   useEffect(() => {
     fetchData()

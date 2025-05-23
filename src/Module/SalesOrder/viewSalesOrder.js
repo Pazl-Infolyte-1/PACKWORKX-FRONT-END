@@ -1,18 +1,53 @@
 import { cilDollar, cilEnvelopeOpen, cilPencil, cilPrint } from "@coreui/icons";
+import { useParams } from "react-router-dom"; // to extract `id` from the URL
 import CIcon from "@coreui/icons-react";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import apiMethods from "../../api/config";
 
-export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIsminimiseTable}) {
+export default function SalesOrderView({ }) {
+  const navigate = useNavigate();
+  const [salesOrderData, setSalesOrderData] = useState(null);
+  const { id } = useParams();
+
+
+  useEffect(() => {
+    const fetchSalesOrderData = async () => {
+      try {
+        const response = await apiMethods.getSaleOrderData(id);
+        setSalesOrderData(response?.data);
+      } catch (error) {
+        console.error("Error viewing sales order:", error);
+        // setAlerts([{
+        //   severity: "error",
+        //   message: error?.response?.data?.message || "Error viewing sales order"
+        // }]);
+      }
+    };
+  
+    if (id) {
+      fetchSalesOrderData();
+    }
+  }, [id]);
+  
+
+  // Format date function
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB"); // DD/MM/YYYY format
+  };
+
   return (
     <div className="bg-white w-full font-sans flex flex-col" style={{height: '90vh'}}>
       {/* Header */}
       <div className="w-full bg-white z-50">
         <div className="flex justify-between items-top p-2">
-          <h1 className="text-lg font-semibold">Sales Order # {salesOrderData.sales_generate_id}</h1>
+          <h1 className="text-lg font-semibold">Sales Order # {salesOrderData?.sales_generate_id}</h1>
           <div className="flex items-start space-x-4">
             <button className="text-black text-xs">Upload Files</button>
             <button className="text-black text-xs">Comments & History</button>
-            <button className="text-gray-500 text-sm items-start" onClick={()=>{SetviewSalesOrder(false),setIsminimiseTable(false)}}>✕</button>
+            <button className="text-gray-500 text-sm items-start" onClick={()=>{navigate('/salesorder')}}>✕</button>
           </div>
         </div>
         <div className="flex bg-gray-50 px-3 border-t text-xs">
@@ -72,7 +107,9 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
                 </div>
               </div>
               <div className="flex items-center">
-                <span className="bg-blue-100 text-blue-800 px-1 py-0.5 rounded-full text-xs">1</span>
+                <span className="bg-blue-100 text-blue-800 px-1 py-0.5 rounded-full text-xs">
+                  {salesOrderData?.workOrders ? salesOrderData?.workOrders?.length : 0}
+                </span>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 text-gray-400 ml-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
@@ -86,12 +123,16 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
           <div className="flex flex-col md:flex-row justify-between">
             <div className="flex flex-col gap-0 mb-4 md:mb-0">
               <span className="text-xl">SALES ORDER</span>
-              <span className="text-xs text-gray-600">Sales Order# <span className="font-bold">SO-00002</span></span>
+              <span className="text-xs text-gray-600">Sales Order# <span className="font-bold">{salesOrderData?.sales_generate_id}</span></span>
             </div>
 
             <div className="flex flex-col gap-0 items-start">
               <span className="text-xs font-semibold">Billing Address</span>
-              <span className="text-xs text-gray-600">Sales Order# <span className="font-bold">SO-00002</span></span>
+              <span className="text-xs text-gray-600">{salesOrderData?.client}</span>
+              <span className="text-xs text-gray-600">{salesOrderData?.confirmation_email}</span>
+              {salesOrderData?.confirmation_mobile && (
+                <span className="text-xs text-gray-600">{salesOrderData?.confirmation_mobile}</span>
+              )}
             </div>
           </div>
 
@@ -99,21 +140,24 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
             <div>
               <h2 className="font-semibold text-xs text-gray-700 mb-2">STATUS</h2>
               <div className="flex flex-col border-l-2 pl-2 gap-2 border-yellow-500 text-xs w-[170px]">
-                <div className="flex justify-between text-green-600">
-                  <span className="text-black">Invoice:</span>
-                  <span>Partially Invoiced</span>
+                <div className="flex justify-between">
+                  <span className="text-black">Sales Status:</span>
+                  <span className={`${
+                    salesOrderData?.sales_status === "Pending" ? "text-orange-500" : 
+                    salesOrderData?.sales_status === "Completed" ? "text-green-600" : "text-blue-600"
+                  }`}>
+                    {salesOrderData?.sales_status}
+                  </span>
                 </div>
-                <div className="flex justify-between text-green-600">
-                  <span className="text-black">Invoice:</span>
-                  <span>Partially Invoiced</span>
+                <div className="flex justify-between">
+                  <span className="text-black">Confirmation:</span>
+                  <span className="text-blue-600">{salesOrderData?.confirmation || "N/A"}</span>
                 </div>
-                <div className="flex justify-between text-green-600">
+                <div className="flex justify-between">
                   <span className="text-black">Payment:</span>
-                  <span>Unpaid</span>
-                </div>
-                <div className="flex justify-between text-orange-500">
-                  <span className="text-black">Shipment:</span>
-                  <span>Pending</span>
+                  <span className="text-orange-500">
+                    {salesOrderData?.credit_period ? `${salesOrderData?.credit_period} days credit` : "Unpaid"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -122,24 +166,30 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
           <div className="text-xs space-y-2 mb-6">
             <p className="flex flex-col md:flex-row md:gap-[118px]">
               <span>ORDER DATE</span>
-              <span>13/05/2025</span>
+              <span>{formatDate(salesOrderData?.created_at)}</span>
             </p>
             <p className="flex flex-col md:flex-row md:gap-24">
               <span>PAYMENT TERMS</span>
-              <span>Due on Receipt</span>
+              <span>{salesOrderData?.credit_period ? `${salesOrderData?.credit_period} days credit` : "Due on Receipt"}</span>
             </p>
+            {salesOrderData?.freight_paid && (
+              <p className="flex flex-col md:flex-row md:gap-24">
+                <span>FREIGHT PAID</span>
+                <span>₹{parseFloat(salesOrderData?.freight_paid).toFixed(2)}</span>
+              </p>
+            )}
           </div>
 
           <div className="border rounded overflow-hidden">
             <div className="bg-gray-100 grid grid-cols-6 text-xs font-semibold text-gray-600 px-4 py-2">
               <div className="col-span-2">ITEMS & DESCRIPTION</div>
-              <div>ORDERED</div>
-              <div>STATUS</div>
+              <div>QUANTITY</div>
+              <div>ACCEPTABLE UNITS</div>
               <div>RATE</div>
               <div>AMOUNT</div>
             </div>
 
-            {[1, 0].map((status, idx) => (
+            {salesOrderData?.SalesSkuDetails?.map((item, idx) => (
               <div key={idx} className="grid grid-cols-6 items-center px-4 py-4 border-t text-sm">
                 <div className="col-span-2 flex items-center gap-3">
                   <div className="w-10 h-10 bg-gray-200 flex items-center justify-center rounded">
@@ -155,16 +205,22 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
                     </svg>
                   </div>
                   <div>
-                    <p className="text-blue-600 underline cursor-pointer">60ml</p>
-                    <p className="text-gray-600 text-xs">SKU: 60ml</p>
+                    <p className="text-blue-600 underline cursor-pointer">{item?.sku}</p>
+                    <p className="text-gray-600 text-xs">SKU: {item?.sku}</p>
                   </div>
                 </div>
-                <div>1</div>
-                <div>{status} Invoiced</div>
-                <div>₹100.00</div>
-                <div>₹100.00</div>
+                <div>{item?.quantity_required}</div>
+                <div>{item?.acceptable_sku_units}</div>
+                <div>₹{parseFloat(item?.rate_per_sku)?.toFixed(2)}</div>
+                <div>₹{parseFloat(item?.total_amount)?.toFixed(2)}</div>
               </div>
             ))}
+            
+            {(!salesOrderData?.SalesSkuDetails || salesOrderData?.SalesSkuDetails?.length === 0) && (
+              <div className="px-4 py-4 text-sm text-gray-500 text-center">
+                No items found
+              </div>
+            )}
           </div>
           
           <div className="w-full flex flex-col items-end text-sm text-gray-900 mt-4">
@@ -173,22 +229,43 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
                 <tbody>
                   <tr>
                     <td className="text-base font-medium">Sub Total</td>
-                    <td className="text-base font-bold">₹200.00</td>
+                    <td className="text-base font-bold">₹{parseFloat(salesOrderData?.total_amount)?.toFixed(2)}</td>
                   </tr>
                   <tr>
-                    <td colSpan={2} className="text-xs text-gray-600 pt-1">Total Quantity : 2</td>
+                    <td colSpan={2} className="text-xs text-gray-600 pt-1">
+                      Total Quantity : {salesOrderData?.SalesSkuDetails ? 
+                        salesOrderData?.SalesSkuDetails?.reduce((total, item) => total + parseInt(item?.quantity_required), 0) : 0}
+                    </td>
                   </tr>
-                  <tr>
-                    <td className="text-gray-600 pt-3">Discount</td>
-                    <td className="text-gray-600 pt-3">₹0.00</td>
-                  </tr>
+                  {(parseFloat(salesOrderData?.sgst) > 0 || parseFloat(salesOrderData?.cgst) > 0) && (
+                    <>
+                      {parseFloat(salesOrderData?.sgst) > 0 && (
+                        <tr>
+                          <td className="text-gray-600 pt-3">SGST</td>
+                          <td className="text-gray-600 pt-3">₹{parseFloat(salesOrderData?.sgst)?.toFixed(2)}</td>
+                        </tr>
+                      )}
+                      {parseFloat(salesOrderData?.cgst) > 0 && (
+                        <tr>
+                          <td className="text-gray-600 pt-3">CGST</td>
+                          <td className="text-gray-600 pt-3">₹{parseFloat(salesOrderData?.cgst)?.toFixed(2)}</td>
+                        </tr>
+                      )}
+                    </>
+                  )}
                   <tr>
                     <td className="text-lg font-bold pt-4">Total</td>
-                    <td className="text-lg font-bold pt-4">₹200.00</td>
+                    <td className="text-lg font-bold pt-4">₹{parseFloat(salesOrderData?.total_incl_gst)?.toFixed(2)}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+          </div>
+          
+          {/* Created/Updated by information */}
+          <div className="text-xs text-gray-500 mt-8">
+            <p>Created by: {salesOrderData?.creator_sales?.name || 'Unknown'} on {formatDate(salesOrderData?.created_at)}</p>
+            <p>Last updated by: {salesOrderData?.updater_sales?.name || 'Unknown'} on {formatDate(salesOrderData?.updated_at)}</p>
           </div>
         </div>
       </div>

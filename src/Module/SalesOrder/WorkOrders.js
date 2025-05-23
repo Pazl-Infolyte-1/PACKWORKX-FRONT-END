@@ -57,9 +57,9 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
 
 
 
-  // useEffect(() => {
-  //   console.log(skuDetailsForm, 'skudetailsform in workorderform')
-  // }, [skuDetailsForm])
+  useEffect(() => {
+    console.log(skuDetailsForm, 'skudetailsform in workorderform')
+  }, [skuDetailsForm])
 
 
 
@@ -513,526 +513,122 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
   }
 
   return (
-    <div className=' w-full mt-6'>
-      {/* Header Section */}
-      <CustomAlert alerts={alerts} handleClose={handleClose} />
+    <div className="relative min-h-screen pb-20"> {/* Add padding bottom to account for fixed buttons */}
+      <div className='w-full mt-2'>
+        {/* Header Section */}
+        <CustomAlert alerts={alerts} handleClose={handleClose} />
 
-      <div className="flex justify-between items-center mt-2 mb-4">
-        <h2 className="text-lg font-semibold text-[20px]">Work Orders</h2>
+        <div className="flex justify-between items-center mb ">
+          {/* <h2 className="text-md font-semibold text-[15px] mb-2">Work Orders</h2> */}
+          <div></div>
 
-        {!isWorkOrderList && (
-          <ActionButton
-            label={" + Create Work Order"}
-            onClick={addWorkOrder}
-            variant='add'
-          />
-        )}
+          {!isWorkOrderList && (
+            <ActionButton
+              label={" + Create Work Order"}
+              onClick={addWorkOrder}
+              variant='add'
+            />
+          )}
 
-      </div>
-
-      {/* Work Order Card */}
-      <div>
-        {workOrdersData && workOrdersData?.length > 0 ? (
-          workOrdersData?.map((item) => (
-            <div
-              key={item?.id}
-              className=" rounded-[10px] border border-gray-700 p-3 mb-2 "
-            >
-              {/* Accordion Header (Clickable) */}
-              <div
-                className="w-full items-start flex flex-col justify-between cursor-pointer"
-                onClick={() => toggleCreateAccordion1(item.id, item.sku_id)}
-              >
-                {/* Left Section - Title */}
-                <p className="text-[#030303] text-[15px] font-lato font-bold leading-[26px] text-justify">
-                  {item?.sku_name}
-                </p>
-
-                {/* Middle Section - Details aligned horizontally with buttons */}
-                <div className="flex items-center w-full flex-grow justify-between">
-                  {/* Details */}
-                  <div className="flex">
-                    <span
-                      className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
-                      title="Quantity"
-                    >
-                      {item?.qty}
-                    </span>
-                    <span
-                      className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
-                      title="SKU Version"
-                    >
-                      {item?.sku_version}
-                    </span>
-                    <span
-                      className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
-                      title="Acceptable Excess Units"
-                    >
-                      {item?.acceptable_excess_units}
-                    </span>
-                    <span
-                      className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
-                      title="Planned Start Date"
-                    >
-                      {item?.planned_start_date && new Date(item.planned_start_date).toLocaleDateString('en-US', {
-                        year: '2-digit',
-                        month: 'long',
-                        day: '2-digit'
-                      })}
-                    </span>
-                    <span
-                      className="text-black text-[15px] font-[500] leading-[28px] px-2 py-2"
-                      title="Planned End Date"
-                    >
-                      {item?.planned_end_date && new Date(item.planned_end_date).toLocaleDateString('en-US', {
-                        year: '2-digit',
-                        month: 'long',
-                        day: '2-digit'
-                      })}
-                    </span>
-                  </div>
-
-                  {/* Status Buttons */}
-                  <div className="flex justify-end flex-1 gap-4 ">
-                    {accordionCardSummary.data[0]?.buttons?.map((button) => (
-                      <button
-                        key={button?.id}
-                        className="cursor-pointer w-[120px] h-[22px] px-2 border-0 rounded-[6px] text-sm font-mulish font-bold leading-[22px] outline-none"
-                        style={{ backgroundColor: button?.bgColor, color: button?.textColor }}
-                      >
-                        {button?.name}
-                      </button>
-                    ))}
-                  </div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    className={`w-[40px] h-[30px] text-[#8167e5] fill-[#8167e5] transition-transform duration-300 ${openCreateAccordion1.includes(item.id) ? 'rotate-180' : ''}`}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-              {openCreateAccordion1.includes(item.id) && (
-                <div className="mt-2 p-3 border-t border-gray-300">
-                  <div className="w-full flex flex-col gap-12 py-4 px-24">
-                    {/* <div className="flex flex-col md:flex-row gap-8"> */}
-                    {/* <div className="flex">
-          <label className="text-sm text-gray-800 w-40 ">Sales Order</label>
-          <select
-            className=" h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-            value={item.sales_order_id || ''}
-            onChange={(e) => handleSalesOrderChange(order.id, e.target.value)}
-          >
-            <option value="" disabled>
-              Select Sales Order
-            </option>
-            {salesOrder?.map((so) => (
-              <option key={so.id} value={so.id}>
-                {`SO-${so.id}`}
-              </option>
-            ))}
-          </select>
         </div>
-        <div></div>
-      </div> */}
-                    {/* First row */}
-                    <div className="grid grid-cols-1 md:flex-row gap-8">
-                      <div className="flex-1 min-w-0">
-                        <label className="text-sm text-gray-800 w-40 ">SKU <span className='text-red-500'>*</span></label>
-                        <select
-                            className="flex h-9 w-[30rem] items-center justify-between rounded-l border border-gray-300 px-3 text-sm cursor-pointer bg-white"
-                          value={item.sku_id}
-                          onChange={(e) => handleSkuChange1(e, item.id)}
+
+        {/* Work Order Card */}
+        <div>
+          {workOrdersData && workOrdersData?.length > 0 ? (
+            workOrdersData?.map((item) => (
+              <div
+                key={item?.id}
+                className="rounded-[10px] border border-gray-700 p-3 mb-2"
+              >
+                {/* Accordion Header (Clickable) */}
+                <div
+                  className="w-full items-start flex flex-col justify-between cursor-pointer"
+                  onClick={() => toggleCreateAccordion1(item.id, item.sku_id)}
+                >
+                  {/* Left Section - Title */}
+                  <p className="text-[#464646] text-xs font-medium">
+                    {item?.sku_name}
+                  </p>
+
+                  {/* Middle Section - Details aligned horizontally with buttons */}
+                  <div className="flex items-center w-full flex-grow justify-between">
+                    {/* Details */}
+                    <div className="flex">
+                      <span
+                        className="text-[#464646] text-xs font-medium px-2 py-2"
+                        title="Quantity"
+                      >
+                        {item?.qty}
+                      </span>
+                      <span
+                        className="text-[#464646] text-xs font-medium px-2 py-2"
+                        title="SKU Version"
+                      >
+                        {item?.sku_version}
+                      </span>
+                      <span
+                        className="text-[#464646] text-xs font-medium px-2 py-2"
+                        title="Acceptable Excess Units"
+                      >
+                        {item?.acceptable_excess_units}
+                      </span>
+                      <span
+                        className="text-[#464646] text-xs font-medium px-2 py-2"
+                        title="Planned Start Date"
+                      >
+                        {item?.planned_start_date && new Date(item.planned_start_date).toLocaleDateString('en-US', {
+                          year: '2-digit',
+                          month: 'long',
+                          day: '2-digit'
+                        })}
+                      </span>
+                      <span
+                        className="text-[#464646] text-xs font-medium px-2 py-2"
+                        title="Planned End Date"
+                      >
+                        {item?.planned_end_date && new Date(item.planned_end_date).toLocaleDateString('en-US', {
+                          year: '2-digit',
+                          month: 'long',
+                          day: '2-digit'
+                        })}
+                      </span>
+                    </div>
+
+                    {/* Status Buttons */}
+                    <div className="flex justify-end flex-1 gap-4">
+                      {accordionCardSummary.data[0]?.buttons?.map((button) => (
+                        <button
+                          key={button?.id}
+                          className="cursor-pointer w-[120px] h-[22px] px-2 border-0 rounded-[6px] text-xs font-medium leading-[22px] outline-none"
+                          style={{ backgroundColor: button?.bgColor, color: button?.textColor }}
                         >
-                          <option value="" disabled>Select SKU</option>
-                          {skuList
-                            .filter((skuItem) =>
-                              skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
-                            )
-                            .map((skuItem) => (
-                              <option key={skuItem.id} value={skuItem.id}>
-                                {skuItem.sku_name}
-                              </option>
-                            ))}
-                        </select>
-                        {/* <select
-                              className="flex h-9 w-[30rem] items-center justify-between rounded-l border border-gray-300 px-3 text-sm cursor-pointer bg-white"
-                            value={item.sku_name}
+                          {button?.name}
+                        </button>
+                      ))}
+                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      className={`w-4 h-4 text-[#8167e5] transition-transform duration-300 ${openCreateAccordion1.includes(item.id) ? 'rotate-180' : ''}`}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+
+                {openCreateAccordion1.includes(item.id) && (
+                  <div className="mt-2 p-3 border-t border-gray-300">
+                    <div className="w-full flex flex-col gap-3 px-4 py-3">
+                      {/* First row */}
+                      <div className="flex items-center">
+                        <label className="text-xs text-gray-600 font-medium w-24">SKU <span className='text-red-500'>*</span></label>
+                        <div className="flex-1">
+                          <select
+                            className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                            value={item.sku_id}
                             onChange={(e) => handleSkuChange1(e, item.id)}
                           >
-                            <option value="" disabled>
-                              Select SKU
-                            </option>
-                            {skuList.map((sku) => (
-                              <option key={sku.id} value={sku.id}>
-                                {sku.sku_name}
-                              </option>
-                            ))}
-                          </select> */}
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <label className="text-sm text-gray-800 w-40 ">SKU Version</label>
-                        <div className="flex flex-col sm:flex-row gap-2">
-                          <select
-                            value={item.sku_version || ''}
-                            onChange={(e) => handleWorkOrderChange1(item.id, 'sku_version', e.target.value)}
-                            className="flex-1 min-w-0 h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none"
-                          >
-                            <option value="" disabled>Select Version</option>
-                            <option value="0">Default Master</option>
-
-                            {skuVersionsMap[item.id] ? (
-                              [skuVersionsMap[item.id]].flat().map((version) => (
-                                <option key={version.id} value={version.id}>
-                                  {version.sku_version}
-                                </option>
-                              ))
-                            ) : (
-                              <option value="" disabled>Select a SKU first</option>
-                            )}
-                          </select>
-
-                          <div className="shrink-0">
-                            <ActionButton
-                              label={"Version History"}
-                              variant='minimal'
-                              onClick={() => handleVersionHistoryClick(item.id)}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Second row */}
-                    <div className="flex flex-col md:flex-row gap-8">
-                      <div className="flex-1 min-w-0">
-                        <label className="text-sm text-gray-800 w-40 ">Quantity  <span className='text-red-500'>*</span></label>
-                        <input
-                          type="number"
-                          // placeholder="100"
-                          value={item.qty || ''}
-                          onChange={(e) => handleWorkOrderChange1(item.id, 'qty', e.target.value)}
-                          className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
-                        />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <label className="text-sm text-gray-800 w-40 ">Acceptable Excess Units</label>
-                        <input
-                          type="number"
-                          // placeholder="Enter units"
-                          value={item.acceptable_excess_units || ''}
-                          onChange={(e) => handleWorkOrderChange1(item.id, 'acceptable_excess_units', e.target.value)}
-                          className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Third row */}
-                    <div className="flex flex-col md:flex-row gap-8">
-                      <div className="flex-1 min-w-0">
-                        <label className="text-sm text-gray-800 w-40 ">Planned Start Date <span className='text-red-500'>*</span></label>
-                        <input
-                          type="date"
-                            className="flex h-9 w-[30rem] items-center justify-between rounded-l border border-gray-300 px-3 text-sm cursor-pointer bg-white"
-                          value={formatDate(item.planned_start_date)}
-                          onChange={(e) => handleWorkOrderChange1(item.id, 'planned_start_date', e.target.value)}
-                        />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <label className="text-sm text-gray-800 w-40 ">Planned End Date <span className='text-red-500'>*</span></label>
-                        <input
-                          type="date"
-                            className="flex h-9 w-[30rem] items-center justify-between rounded-l border border-gray-300 px-3 text-sm cursor-pointer bg-white"
-                          min={formatDate(item.planned_start_date)} // ⬅️ This prevents invalid selection
-                          value={formatDate(item.planned_end_date)}
-                          onChange={(e) => handleWorkOrderChange1(item.id, 'planned_end_date', e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Fourth row */}
-                    <div className="flex flex-col md:flex-row gap-8">
-                      <div className="flex-1 min-w-0">
-                        <label className="text-sm text-gray-800 w-40 ">Estimated Delivery Date <span className='text-red-500'>*</span></label>
-                        <input
-                          type="date"
-                          value={formatDate(item.edd)}
-                          onChange={(e) => handleWorkOrderChange1(item.id, 'edd', e.target.value)}
-                          className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none"
-                        />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <label className="text-sm text-gray-800 w-40 ">Description</label>
-                        <input
-                          // placeholder="Description"
-                          value={item.description || ''}
-                          onChange={(e) => handleWorkOrderChange1(item.id, 'description', e.target.value)}
-                          className="w-full h-10 px-2 border border-gray-300 rounded-md bg-white text-gray-900 outline-none placeholder:text-sm"
-                        />
-                      </div>
-
-                    </div>
-
-                    <SkuVersionAddEdit
-                      handleDeleteVersion={handleDeleteVersion}
-                      skuID={item.sku_id}
-                      setSkuVersionsMap={setSkuVersionsMap}
-                      orderId={item.id} // Pass the orderId of the work order being edited
-                    />
-
-
-                    {/* Submit Button */}
-                    {/* <div className="w-full flex justify-end"> */}
-                    {/* Button commented out in original code */}
-                    {/* <button
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-          onClick={() => handleUpdateExistingWorkOrder(item.id)}
-        >
-          Save Work Order
-        </button> */}
-                    {/* </div> */}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))
-        ) : (
-          // Show a message when no work orders are available
-          <div></div>
-        )}
-      </div>
-
-      {workOrders.length > 0 && (
-        <div className="max-h-[600px]  overflow-y-auto rounded-md pb-4 border  min-h-[400px] border-gray-700">
-          {workOrders.map((order, index) => (
-            <div
-              key={order.id}
-              className="mt-4 rounded-md border-b-2 relative">
-              {/* Work Order Number */}
-              <div
-                className="flex justify-between items-center px-3 w-full cursor-pointer"
-                onClick={() => toggleCreateAccordion(order.id)}
-
-              >
-                {/* Work Order Number */}
-                <p className="text-[#030303] text-[15px] font-lato font-bold leading-[26px]">
-                  Work Order-#WO-{order.id}
-                </p>
-
-                {/* Button & Icon Container */}
-                <div className="flex items-center  gap-2">
-                  {/* Button */}
-                  {/* <ActionButton
-                    label={"Download Work Order"}
-                    variant='minimal'
-                  /> */}
-
-                  {workOrders.length > 1 && (
-                    <TrashIcon
-                      onClick={() => deleteWorkOrder(order.id)}
-                      className="text-[#ff2d55] w-6 h-6 cursor-pointer"
-                    />
-                  )}
-                  {/* Icon */}
-
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    className={`w-[35px] h-[full] text-[#8167e5] fill-[#8167e5] transition-transform duration-300 ${openCreateAccordion.includes(order.id) ? 'rotate-180' : ''}`}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-              <div className="p-2 rounded-lg flex flex-row gap-4">
-                <p className="px-3 text-[14px]']">How do you want to manufacture</p>
-
-                <div
-                  className="relative w-[400px] h-[30px] bg-white border border-[#8167E5] rounded-[10px] shadow-md cursor-pointer flex items-center justify-between "
-                // onClick={() => {
-                // handleToggle(order.id, order.manufacture)                     
-                // const newType = order.manufacture === 'inhouse' ? 'outsource' : 'inhouse'
-                // handleWorkOrderChange(order.id, 'manufacture', newType)
-                // }}
-                >
-                  {/* Inhouse */}
-                  {/* Inhouse */}
-                  <span
-                    className={`text-[13px]  leading-[18px] text-center w-1/3 z-10 transition-all ${(order.manufacture || 'inhouse') === 'inhouse' ? 'text-white' : 'text-black'
-                      }`}
-                    onClick={() => { handleToggle(order.id, "inhouse") }}
-                  >
-                    Inhouse
-                  </span>
-
-                  {/* Outsource */}
-                  <span
-                    className={`text-[13px]  leading-[18px] text-center w-1/3 z-10 transition-all ${(order.manufacture || 'inhouse') === 'outsource' ? 'text-white' : 'text-black'
-                      }`}
-                    onClick={() => { handleToggle(order.id, "outsource") }}
-
-                  >
-                    OutSource
-                  </span>
-
-                  {/* Purchase Order */}
-                  <span
-                    className={`text-[13px]  leading-[18px] text-center w-1/3 z-10 transition-all ${(order.manufacture || 'inhouse') === 'purchaseOrder' ? 'text-white' : 'text-black'
-                      }`}
-                    onClick={() => { handleToggle(order.id, "purchaseOrder") }}
-
-                  >
-                    Purchase Order
-                  </span>
-
-                  {/* Toggle Indicator */}
-                  <div
-                    className={`absolute top-1/2 w-[33.33%] h-[100%] bg-[#8167E5] rounded-[10px] transform -translate-y-1/2 transition-all duration-300 ${(order.manufacture || 'inhouse') === 'inhouse'
-                      ? 'left-0'
-                      : (order.manufacture || 'inhouse') === 'outsource'
-                        ? 'left-1/3'
-                        : 'left-2/3'
-                      }`}
-                  />
-
-
-                  {/* </div> */}
-                </div>
-              </div>
-
-              {/*accordion content below*/}
-              {/* Fields Row 1 */}
-              {openCreateAccordion.includes(order.id) && (
-                <div className="border-t border-gray-300 ">
-                  {/* Add Sales Order Dropdown if on workorderlist page */}
-                  {isWorkOrderList && (
-                    // <div className="w-full mt-4 mb-2">
-                    //   <div className="flex-1 min-w-0">
-                    //     <label className="text-sm text-gray-800 w-40 ">Sales Order</label>
-                    //     <select
-                    //       className="w-1/2 h-10 px-2 border border-gray-300 text-sm rounded-md bg-white text-gray-900 outline-none"
-                    //       value={order.sales_order_id || ''}
-                    //       onChange={(e) => {
-                    //         const selectedSalesOrderId = e.target.value;
-                    //         const selectedSalesOrder = salesOrder.find((so) => so.id.toString() === selectedSalesOrderId);
-                    //         const clientId = selectedSalesOrder?.client_id;
-                    //         handleSalesOrderChange(order.id, selectedSalesOrderId, clientId);
-                    //       }}
-                    //     >
-                    //       <option value="" disabled>
-                    //         Select Sales Order
-                    //       </option>
-                    //       {salesOrder?.map((so) => (
-                    //         <option key={so.id} value={so.id}>
-                    //           {`SO-${so.id}`}
-                    //         </option>
-                    //       ))}
-                    //     </select>
-
-                    //   </div>
-                    // </div>
-                    <div className="flex flex-col py-4 px-2 bg-gray-50">
-                      <div className="flex  items-center">
-                        <label className="text-sm text-gray-800 w-40 ">Sales Order</label>
-                        <select
-                      className="flex h-9 w-[30rem] items-center justify-between rounded-l border border-gray-300 px-3 text-sm cursor-pointer bg-white"
-                      value={order.sales_order_id || ''}
-                          onChange={(e) => {
-                            const selectedSalesOrderId = e.target.value;
-                            const selectedSalesOrder = salesOrder.find((so) => so.id.toString() === selectedSalesOrderId);
-                            const clientId = selectedSalesOrder?.client_id;
-                            handleSalesOrderChange(order.id, selectedSalesOrderId, clientId);
-                          }}
-                        >
-                          <option value="" disabled>
-                            Select Sales Order
-                          </option>
-                          {salesOrder?.map((so) => (
-                            <option key={so.id} value={so.id}>
-                              {`SO-${so.id}`}
-                            </option>
-                          ))}
-                        </select>
-                        {validationErrors.sales_order_id && (
-                          <div className="text-red-500 text-xs mt-1 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <line x1="12" y1="8" x2="12" y2="12"></line>
-                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                            {validationErrors.sales_order_id}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Empty column to maintain consistent layout */}
-                      <div className="flex-1 min-w-0" />
-                    </div>
-
-
-                  )}
-
-                  <div className="w-full flex flex-col mt-4 gap-4 px-2 ">
-                    {/* First row */}
-                    <div className="flex flex-col gap-4">
-                    <div className="flex  items-center">
-                    <label className="text-sm text-gray-800 w-40 ">SKU <span className='text-red-500'>*</span></label>
-
-                        {isWorkOrderList ? (
-                          // SKU Dropdown shown only in workorderlist
-                          <div>
-                            <select
-                          className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                          value={order.sku_id || ''}
-                              onChange={(e) => handleSkuChange(e, order.id)}
-                            >
-                              <option value="" disabled>
-                                {skuList.filter((skuItem) =>
-                                  (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
-                                ).length === 0 ? "No SKU Available" : "Select SKU"}
-                              </option>
-
-                              {skuList
-                                .filter((skuItem) =>
-                                  (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
-                                )
-                                .map((skuItem) => (
-                                  <option key={skuItem.id} value={skuItem.id}>
-                                    {skuItem.sku_name}
-                                  </option>
-                                ))}
-                            </select>
-                            {validationErrors.sku_id && (
-                              <div className="text-red-500 text-xs mt-1 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                                  <circle cx="12" cy="12" r="10"></circle>
-                                  <line x1="12" y1="8" x2="12" y2="12"></line>
-                                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                                </svg>
-                                {validationErrors.sku_id}
-                              </div>
-                            )}
-
-                          </div>
-
-                        ) : (
-                          // Original SKU dropdown
-                          <select
-                          className="flex h-9 w-[30rem] items-center justify-between rounded-l border border-gray-300 px-3 text-sm cursor-pointer bg-white"
-                          value={order.sku_id || ''}
-                            onChange={(e) => handleSkuChange(e, order.id)}
-                          >
-                            <option value="" disabled>
-                              {skuList.filter((skuItem) =>
-                                skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
-                              ).length === 0 ? "No SKU Available" : "Select SKU"}
-                            </option>
-
+                            <option value="" disabled>Select SKU</option>
                             {skuList
                               .filter((skuItem) =>
                                 skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
@@ -1043,24 +639,22 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
                                 </option>
                               ))}
                           </select>
-                        )}
+                        </div>
                       </div>
 
-
-
-                      <div className="flex  items-center">
-                        <label className="text-sm text-gray-800 w-40 ">SKU Version</label>
-                        <div className="flex flex-col sm:flex-row gap-1">
+                      {/* SKU Version Section */}
+                      <div className="flex items-center">
+                        <label className="text-xs text-gray-600 font-medium w-24">SKU Version</label>
+                        <div className="flex gap-2 flex-1">
                           <select
-                            value={order.sku_version}
-                            onChange={(e) => handleWorkOrderChange(order.id, 'sku_version', e.target.value)}
-                            className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                            disabled={!skuVersionsMap[order.id]}
+                            value={item.sku_version || ''}
+                            onChange={(e) => handleWorkOrderChange1(item.id, 'sku_version', e.target.value)}
+                            className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
                           >
                             <option value="" disabled>Select Version</option>
-                            <option value="0" >Default Master</option>
-                            {skuVersionsMap[order.id] ? (
-                              [skuVersionsMap[order.id]].flat().map((version) => (
+                            <option value="0">Default Master</option>
+                            {skuVersionsMap[item.id] ? (
+                              [skuVersionsMap[item.id]].flat().map((version) => (
                                 <option key={version.id} value={version.id}>
                                   {version.sku_version}
                                 </option>
@@ -1069,269 +663,524 @@ const WorkOrders = ({ setFormData, workOrdersData, setworkOrdersData, handleClos
                               <option value="" disabled>Select a SKU first</option>
                             )}
                           </select>
+                          <ActionButton
+                            label={"Version History"}
+                            variant='minimal'
+                            onClick={() => handleVersionHistoryClick(item.id)}
+                            className={"h-6 text-xs text-[#8167e5] hover:bg-[#f0edfb]"}
+                          />
+                        </div>
+                      </div>
 
-                          <div className="">
-                            <ActionButton
-                              label={" Version History"}
-                              variant='minimal'
-                              onClick={() => handleVersionHistoryClick(order.id)}
-                              className={"h-9"}
+                      {/* Quantity Section */}
+                      <div className="flex items-center">
+                        <label className="text-xs text-gray-600 font-medium w-24">Quantity <span className='text-red-500'>*</span></label>
+                        <div className="flex-1">
+                          <input
+                            type="number"
+                            value={item.qty || ''}
+                            onChange={(e) => handleWorkOrderChange1(item.id, 'qty', e.target.value)}
+                            className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                          />
+                        </div>
+                      </div>
 
-                            />
-                          </div>
+                      {/* Acceptable Excess Units Section */}
+                      <div className="flex items-center">
+                        <label className="text-xs text-gray-600 font-medium w-24">Acceptable Excess</label>
+                        <div className="flex-1">
+                          <input
+                            type="number"
+                            value={item.acceptable_excess_units || ''}
+                            onChange={(e) => handleWorkOrderChange1(item.id, 'acceptable_excess_units', e.target.value)}
+                            className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Planned Start Date Section */}
+                      <div className="flex items-center">
+                        <label className="text-xs text-gray-600 font-medium w-24">Start Date <span className='text-red-500'>*</span></label>
+                        <div className="flex-1">
+                          <input
+                            type="date"
+                            value={formatDate(item.planned_start_date)}
+                            onChange={(e) => handleWorkOrderChange1(item.id, 'planned_start_date', e.target.value)}
+                            className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Planned End Date Section */}
+                      <div className="flex items-center">
+                        <label className="text-xs text-gray-600 font-medium w-24">End Date <span className='text-red-500'>*</span></label>
+                        <div className="flex-1">
+                          <input
+                            type="date"
+                            min={formatDate(item.planned_start_date)}
+                            value={formatDate(item.planned_end_date)}
+                            onChange={(e) => handleWorkOrderChange1(item.id, 'planned_end_date', e.target.value)}
+                            className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Estimated Delivery Date Section */}
+                      <div className="flex items-center">
+                        <label className="text-xs text-gray-600 font-medium w-24">Delivery Date <span className='text-red-500'>*</span></label>
+                        <div className="flex-1">
+                          <input
+                            type="date"
+                            value={formatDate(item.edd)}
+                            onChange={(e) => handleWorkOrderChange1(item.id, 'edd', e.target.value)}
+                            className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Description Section */}
+                      <div className="flex items-center">
+                        <label className="text-xs text-gray-600 font-medium w-24">Description</label>
+                        <div className="flex-1">
+                          <input
+                            value={item.description || ''}
+                            onChange={(e) => handleWorkOrderChange1(item.id, 'description', e.target.value)}
+                            className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                            placeholder="Enter description"
+                          />
                         </div>
                       </div>
                     </div>
 
-        <div className="border-t border-gray-100 mt-2 pb-2 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div>
-
-
-                    {/* Second row */}
-                    <div className="flex flex-col gap-4 ">
-                      <div className="flex min-w-0">
-                        <label
-                         className="text-sm text-gray-800 w-40 ">
-                          Quantity <span className='text-red-500'>*</span></label>
-                        <input
-                          type="number"
-                          // placeholder="100"
-                          value={order.qty}
-                          onChange={(e) => handleWorkOrderChange(order.id, 'qty', e.target.value)}
-                          className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                          />
-                        {validationErrors.qty && (
-                          <div className="text-red-500 text-xs mt-1 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <line x1="12" y1="8" x2="12" y2="12"></line>
-                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                            {validationErrors.qty}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex ">
-                        <label className="text-sm text-gray-800 w-40 ">Acceptable Excess Units</label>
-                        <input
-                          type="number"
-                          // placeholder="Enter units"
-                          value={order.acceptable_excess_units}
-                          onChange={(e) => handleWorkOrderChange(order.id, 'acceptable_excess_units', e.target.value)}
-                          className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                          />
-                      </div>
-
-                    </div>
-
-        <div className="border-t border-gray-100 mt-2 pb-2 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div>
-
-
-                    {/* Third row */}
-                    <div className="flex flex-col gap-4 ">
-                      <div className="flex">
-                        <label className="text-sm text-gray-800 w-40 ">Planned Start Date <span className='text-red-500'>*</span></label>
-                      <div>
-
-
-                        <input
-                          type="date"
-                          value={order.planned_start_date}
-                          onChange={(e) => handleWorkOrderChange(order.id, 'planned_start_date', e.target.value)}
-                          className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                        />
-                        {validationErrors.planned_start_date && (
-                          <div className="text-red-500 text-xs mt-1 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <line x1="12" y1="8" x2="12" y2="12"></line>
-                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                            {validationErrors.planned_start_date}
-                          </div>
-                        )}
-                        </div>
-                      </div>
-
-                      <div className="flex">
-                        <label className="text-sm text-gray-800 w-40 ">Planned End Date <span className='text-red-500'>*</span></label>
-                        <div>
-
-                        <input
-                          type="date"
-                          min={formatDate(order.planned_start_date)} // ⬅️ This prevents invalid selection
-                          value={order.planned_end_date}
-                          onChange={(e) => handleWorkOrderChange(order.id, 'planned_end_date', e.target.value)}
-                          className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                          />
-                        {validationErrors.planned_end_date && (
-                          <div className="text-red-500 text-xs mt-1 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <line x1="12" y1="8" x2="12" y2="12"></line>
-                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                            {validationErrors.planned_end_date}
-                          </div>
-                        )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Fourth row */}
-                    <div className="flex flex-col gap-4 ">
-                      <div className="flex">
-                        <label className="text-sm text-gray-800 w-40 ">Estimated Delivery Date <span className='text-red-500'>*</span></label>
-                        
-                        <div>
-
-                        <input
-                          type="date"
-                          value={order.edd}
-                          onChange={(e) => handleWorkOrderChange(order.id, 'edd', e.target.value)}
-                          className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                          />
-                                           {validationErrors.edd && (
-                          <div className="text-red-500 text-xs mt-1 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <line x1="12" y1="8" x2="12" y2="12"></line>
-                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                            {validationErrors.edd}
-                          </div>
-                        )}
-                          </div>
-       
-                      </div>
-
-        <div className="border-t border-gray-100 mt-2 pb-2 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div>
-
-
-                      <div className="flex">
-                        <label className="text-sm text-gray-800 w-40 ">Description</label>
-                        <input
-                          // placeholder="Description"
-                          value={order.description}
-                          onChange={(e) => handleWorkOrderChange(order.id, 'description', e.target.value)}
-                          className="h-9 w-96 rounded border border-gray-300 px-3 text-sm"
-                        />
-                      </div>
-
-                    </div>
-
-
-                    {/* Submit Button */}
-
-                  </div>
-                  {order.sku_id && (
                     <SkuVersionAddEdit
                       handleDeleteVersion={handleDeleteVersion}
-                      skuID={order.sku_id}
+                      skuID={item.sku_id}
                       setSkuVersionsMap={setSkuVersionsMap}
-                      orderId={order.id} // Pass the orderId of the work order being edited
+                      orderId={item.id}
                     />
-                  )}
-                  <div className="w-full flex justify-end pb-3">
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <div></div>
+          )}
+        </div>
 
-                    {!isWorkOrderList && (
-                      <ActionButton
-                        label={"Add Work Order"}
+        {workOrders.length > 0 && (
+    <div className="max-h-[600px] overflow-y-auto rounded-md border border-gray-200 shadow-sm min-h-[350px]">
+      {workOrders.map((order, index) => (
+        <div
+          key={order.id}
+          className="relative border-b border-gray-200 last:border-b-0">
+          {/* Work Order Header */}
+          <div
+            className="flex justify-between items-center px-4 py-2.5 bg-gray-50 transition-colors cursor-pointer"
+            onClick={() => toggleCreateAccordion(order.id)}
+          >
+            {/* Work Order Number */}
+            <p className="text-[#464646] text-xs font-medium">
+              Work Order-#WO-{order.id}
+            </p>
 
-                        variant=''
-                        onClick={() => { handleSubmitWorkOrderForm(order.id) }}
-                      />
-                    )}
+            {/* Button & Icon Container */}
+            <div className="flex items-center gap-2">
+              {workOrders.length > 1 && (
+                <TrashIcon
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteWorkOrder(order.id);
+                  }}
+                  className="text-[#ff2d55] w-3.5 h-3.5 cursor-pointer hover:text-red-700 transition-colors"
+                />
+              )}
+              {/* Icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                className={`w-4 h-4 text-[#8167e5] transition-transform duration-300 ${openCreateAccordion.includes(order.id) ? 'rotate-180' : ''}`}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+          
+          {/* Manufacture Toggle */}
+          <div className="px-4 py-2 bg-white flex flex-row items-center gap-3">
+            <p className="text-xs text-gray-600 font-medium">How do you want to manufacture</p>
+
+            <div
+              className="relative w-[220px] h-[22px] bg-white border border-[#8167E5] rounded-md shadow-sm cursor-pointer flex items-center justify-between overflow-hidden"
+            >
+              {/* Inhouse */}
+              <span
+                className={`text-[10px] leading-[14px] text-center w-1/3 z-10 transition-all font-medium ${(order.manufacture || 'inhouse') === 'inhouse' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => { handleToggle(order.id, "inhouse") }}
+              >
+                Inhouse
+              </span>
+
+              {/* Outsource */}
+              <span
+                className={`text-[10px] leading-[14px] text-center w-1/3 z-10 transition-all font-medium ${(order.manufacture || 'inhouse') === 'outsource' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => { handleToggle(order.id, "outsource") }}
+              >
+                OutSource
+              </span>
+
+              {/* Purchase Order */}
+              <span
+                className={`text-[10px] leading-[14px] text-center w-1/3 z-10 transition-all font-medium ${(order.manufacture || 'inhouse') === 'purchaseOrder' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => { handleToggle(order.id, "purchaseOrder") }}
+              >
+                Purchase Order
+              </span>
+
+              {/* Toggle Indicator */}
+              <div
+                className={`absolute top-1/2 w-[33.33%] h-[100%] bg-[#8167E5] rounded-sm transform -translate-y-1/2 transition-all duration-300 ${(order.manufacture || 'inhouse') === 'inhouse'
+                  ? 'left-0'
+                  : (order.manufacture || 'inhouse') === 'outsource'
+                    ? 'left-1/3'
+                    : 'left-2/3'
+                  }`}
+              />
+            </div>
+          </div>
+
+          {/*accordion content below*/}
+          {openCreateAccordion.includes(order.id) && (
+            <div className="border-t border-gray-200 bg-white">
+              {/* Add Sales Order Dropdown if on workorderlist page */}
+              {isWorkOrderList && (
+                <div className="flex flex-col py-3 px-4 border-gray-200">
+                  <div className="flex items-center">
+                    <label className="text-xs text-gray-600 font-medium w-24">Sales Order</label>
+                    <div className="flex-1">
+                      <select
+  className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
+    validationErrors.sales_order_id 
+      ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
+      : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
+  }`}                        value={order.sales_order_id || ''}
+                        onChange={(e) => {
+                          const selectedSalesOrderId = e.target.value;
+                          const selectedSalesOrder = salesOrder.find((so) => so.id.toString() === selectedSalesOrderId);
+                          const clientId = selectedSalesOrder?.client_id;
+                          handleSalesOrderChange(order.id, selectedSalesOrderId, clientId);
+                        }}
+                      >
+                        <option value="" disabled>
+                          Select Sales Order
+                        </option>
+                        {salesOrder?.map((so) => (
+                          <option key={so.id} value={so.id}>
+                            {`SO-${so.id}`}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
               )}
+
+              <div className="w-full flex flex-col gap-3 px-4 py-3">
+                {/* SKU Section */}
+                <div className="flex items-center">
+                  <label className="text-xs text-gray-600 font-medium w-24">SKU <span className='text-red-500'>*</span></label>
+                  <div className="flex-1">
+                    {isWorkOrderList ? (
+                      // SKU Dropdown shown only in workorderlist
+                      <div>
+                        <select
+  className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
+    validationErrors.sku_id 
+      ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
+      : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
+  }`}                          value={order.sku_id || ''}
+                          onChange={(e) => handleSkuChange(e, order.id)}
+                        >
+                          <option value="" disabled>
+                            {skuList.filter((skuItem) =>
+                              (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
+                            ).length === 0 ? "No SKU Available" : "Select SKU"}
+                          </option>
+
+                          {skuList
+                            .filter((skuItem) =>
+                              (salesOrderSkus || []).some((soSku) => soSku.sku === skuItem.sku_name)
+                            )
+                            .map((skuItem) => (
+                              <option key={skuItem.id} value={skuItem.id}>
+                                {skuItem.sku_name}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+                    ) : (
+                      // Original SKU dropdown
+                      <select
+                        className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs cursor-pointer bg-white focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                        value={order.sku_id || ''}
+                        onChange={(e) => handleSkuChange(e, order.id)}
+                      >
+                        <option value="" disabled>
+                          {skuList.filter((skuItem) =>
+                            skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
+                          ).length === 0 ? "No SKU Available" : "Select SKU"}
+                        </option>
+
+                        {skuList
+                          .filter((skuItem) =>
+                            skuDetailsForm.some((detail) => detail.sku === skuItem.sku_name)
+                          )
+                          .map((skuItem) => (
+                            <option key={skuItem.id} value={skuItem.id}>
+                              {skuItem.sku_name}
+                            </option>
+                          ))}
+                      </select>
+                    )}
+                  </div>
+                </div>
+
+                {/* SKU Version Section */}
+                <div className="flex items-center">
+                  <label className="text-xs text-gray-600 font-medium w-24">SKU Version</label>
+                  <div className="flex gap-2 flex-1">
+                    <select
+                      value={order.sku_version}
+                      onChange={(e) => handleWorkOrderChange(order.id, 'sku_version', e.target.value)}
+                      className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                      disabled={!skuVersionsMap[order.id]}
+                    >
+                      <option value="" disabled>Select Version</option>
+                      <option value="0">Default Master</option>
+                      {skuVersionsMap[order.id] ? (
+                        [skuVersionsMap[order.id]].flat().map((version) => (
+                          <option key={version.id} value={version.id}>
+                            {version.sku_version}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="" disabled>Select a SKU first</option>
+                      )}
+                    </select>
+                    <ActionButton
+                      label={"Version History"}
+                      variant='minimal'
+                      onClick={() => handleVersionHistoryClick(order.id)}
+                      className={"h-6 text-xs text-[#8167e5] hover:bg-[#f0edfb]"}
+                    />
+                  </div>
+                </div>
+
+                {/* Quantity Section */}
+                <div className="flex items-center">
+                  <label className="text-xs text-gray-600 font-medium w-24">
+                    Quantity <span className='text-red-500'>*</span>
+                  </label>
+                  <div className="flex-1">
+<input
+  type="number"
+  value={order.qty}
+  onChange={(e) => handleWorkOrderChange(order.id, 'qty', e.target.value)}
+  className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
+    validationErrors.qty 
+      ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
+      : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
+  }`}
+/>
+              
+                  </div>
+                </div>
+
+                {/* Acceptable Excess Units Section */}
+                <div className="flex items-center">
+                  <label className="text-xs text-gray-600 font-medium w-24">Acceptable Excess</label>
+                  <div className="flex-1">
+                    <input
+                      type="number"
+                      value={order.acceptable_excess_units}
+                      onChange={(e) => handleWorkOrderChange(order.id, 'acceptable_excess_units', e.target.value)}
+                      className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                    />
+                  </div>
+                </div>
+
+                {/* Planned Start Date Section */}
+                <div className="flex items-center">
+                  <label className="text-xs text-gray-600 font-medium w-24">
+                    Start Date <span className='text-red-500'>*</span>
+                  </label>
+                  <div className="flex-1">
+                    <input
+                      type="date"
+                      value={order.planned_start_date}
+                      onChange={(e) => handleWorkOrderChange(order.id, 'planned_start_date', e.target.value)}
+                      className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
+                        validationErrors.planned_start_date 
+                          ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
+                          : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
+                      }`}                    />
+                  </div>
+                </div>
+
+                {/* Planned End Date Section */}
+                <div className="flex items-center">
+                  <label className="text-xs text-gray-600 font-medium w-24">
+                    End Date <span className='text-red-500'>*</span>
+                  </label>
+                  <div className="flex-1">
+                    <input
+                      type="date"
+                      min={formatDate(order.planned_start_date)}
+                      value={order.planned_end_date}
+                      onChange={(e) => handleWorkOrderChange(order.id, 'planned_end_date', e.target.value)}
+                      className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
+                        validationErrors.planned_end_date 
+                          ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
+                          : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
+                      }`}                    />
+                  </div>
+                </div>
+
+                {/* Estimated Delivery Date Section */}
+                <div className="flex items-center">
+                  <label className="text-xs text-gray-600 font-medium w-24">
+                    Delivery Date <span className='text-red-500'>*</span>
+                  </label>
+                  <div className="flex-1">
+                    <input
+                      type="date"
+                      value={order.edd}
+                      onChange={(e) => handleWorkOrderChange(order.id, 'edd', e.target.value)}
+                      className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
+                        validationErrors.edd 
+                          ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
+                          : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
+                      }`}                    />
+
+                  </div>
+                </div>
+
+                {/* Description Section */}
+                <div className="flex items-center">
+                  <label className="text-xs text-gray-600 font-medium w-24">Description</label>
+                  <div className="flex-1">
+                    <input
+                      value={order.description}
+                      onChange={(e) => handleWorkOrderChange(order.id, 'description', e.target.value)}
+                      className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                      placeholder="Enter description"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SkuVersionAddEdit section */}
+              {order.sku_id && (
+                <div className="border-t border-gray-200 px-4 py-3">
+                  <SkuVersionAddEdit
+                    handleDeleteVersion={handleDeleteVersion}
+                    skuID={order.sku_id}
+                    setSkuVersionsMap={setSkuVersionsMap}
+                    orderId={order.id}
+                    skuVersionID={order.sku_version}
+                  />
+                </div>
+              )}
+              
+              {/* Action buttons */}
+              <div className="w-full flex justify-end pb-3 pt-1 pr-4 border-t border-gray-200 bg-gray-50">
+                {!isWorkOrderList && (
+                  <ActionButton
+                    label={"Add Work Order"}
+                    variant=''
+                    onClick={() => { handleSubmitWorkOrderForm(order.id) }}
+                    className="text-xs h-7 px-4 bg-[#8167e5] hover:bg-[#6f55d0] text-white font-medium rounded-md"
+                  />
+                )}
+              </div>
             </div>
-          ))}
-          <div>
-            {isFormVisible && (
-              <PopUp
-                visible={isFormVisible}
-                setVisible={() => setIsFormVisible(false)}
-                width="70%"
-                height="500px"
-                size="xl"
-                header=""
-                showCloseButton={true}
-              >
-                <SkuVersionAddEdit
-                  handleDeleteVersion={handleDeleteVersion}
-                  skuID={selectedSkuID}
-                  setSkuVersionsMap={setSkuVersionsMap}
-                  orderId={selectedWorkOrderForVersions} // Pass the orderId of the work order being edited
-                  IsEditVersion={IsEditVersion}
-                  skuVersionID={selectedSkuVersionID}
-                  visible={isFormVisible}
-                  setVisible={setIsFormVisible}
-                />
-              </PopUp>
+          )}
+        </div>
+      ))}
+      <div>
+        {isFormVisible && (
+          <PopUp
+            visible={isFormVisible}
+            setVisible={() => setIsFormVisible(false)}
+            width="60%"
+            height="450px"
+            size="lg"
+            header=""
+            showCloseButton={true}
+          >
+            <SkuVersionAddEdit
+              handleDeleteVersion={handleDeleteVersion}
+              skuID={selectedSkuID}
+              setSkuVersionsMap={setSkuVersionsMap}
+              orderId={selectedWorkOrderForVersions}
+              IsEditVersion={IsEditVersion}
+              skuVersionID={selectedSkuVersionID}
+              visible={isFormVisible}
+              setVisible={setIsFormVisible}
+            />
+          </PopUp>
+        )}
+      </div>
+    </div>
+  )}
 
-            )}
-            {/* <SkuVersionAddEdit
-                handleDeleteVersion={handleDeleteVersion}
-                skuID={selectedSkuID}
-                setSkuVersionsMap={setSkuVersionsMap}
-                orderId={selectedWorkOrderForVersions} // Pass the orderId of the work order being edited
-              /> */}
+        {/* Fixed button container at the bottom */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-2 z-10">
+          <div className="pr-3 mx-auto flex justify-end">
+            <div className='flex gap-2'>
+              <ActionButton
+                onClick={() => {
+                  handleCloseDrawer()
+                }}
+                variant="cancel"
+                label={"cancel"}
+              />
 
-
+              <ActionButton
+                label={"Submit"}
+                variant=''
+                onClick={handleSubmit}
+              />
+            </div>
           </div>
         </div>
 
-      )}
-      <div className="flex justify-end mt-4">
-        <div className='flex gap-4'>
-          <ActionButton
-            onClick={() => {
-              // setCanDeactivate(true)
-              // setDrawer(false)
-              handleCloseDrawer()
+        {/* Your existing modals */}
+        {canDeactivate && (
+          <ConfirmationModale
+            isOpen={canDeactivate}
+            onClose={() => setCanDeactivate(false)}
+            onConfirm={() => {
+              setDrawer(false)
+              setCanDeactivate(false);
             }}
-            variant="cancel"
-            label={"cancel"}
+            variant="unsavedChanges"
           />
+        )}
 
-          <ActionButton
-            label={"Submit"}
-            variant=''
-            onClick={handleSubmit}
-          />
-        </div>
-
-      </div>
-
-      {canDeactivate && (
-        <ConfirmationModale
-          isOpen={canDeactivate}
-          onClose={() => setCanDeactivate(false)}
-          onConfirm={() => {
-            setDrawer(false)
-            setCanDeactivate(false);
-          }
-          }
-          variant="unsavedChanges"
+        <VersionsPopup
+          visible={isVersionDrawerOpen}
+          setVisible={() => setVersionDrawerOpen(false)}
+          versionData={selectedWorkOrderForVersions ? skuVersionsMap[selectedWorkOrderForVersions] : []}
+          skuName={selectedWorkOrderForVersions && workOrders.find(order => order.id === selectedWorkOrderForVersions)?.sku_name}
+          getskuversions={getskuversions}
+          handleDeleteVersion={handleDeleteVersion}
+          setSelectedSkuVersionID={setSelectedSkuVersionID}
+          setIsEdit={setIsEditVersion}
+          formVisibility={setIsFormVisible}
+          alerts={versionAlerts}
+          setAlerts={setVersionAlerts}
         />
-      )}
-
-
-
-      <VersionsPopup
-        visible={isVersionDrawerOpen}
-        setVisible={() => setVersionDrawerOpen(false)}
-        versionData={selectedWorkOrderForVersions ? skuVersionsMap[selectedWorkOrderForVersions] : []}
-        skuName={selectedWorkOrderForVersions && workOrders.find(order => order.id === selectedWorkOrderForVersions)?.sku_name}
-        getskuversions={getskuversions}
-        handleDeleteVersion={handleDeleteVersion}
-        setSelectedSkuVersionID={setSelectedSkuVersionID}
-        setIsEdit={setIsEditVersion}
-        formVisibility={setIsFormVisible}
-        alerts={versionAlerts}
-        setAlerts={setVersionAlerts}
-      />
+      </div>
     </div>
   )
 }

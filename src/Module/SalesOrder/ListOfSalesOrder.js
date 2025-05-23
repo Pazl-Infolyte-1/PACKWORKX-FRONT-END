@@ -299,8 +299,6 @@ function ListOfSalesOrder() {
 
         </div>
         <Outlet />
-
-
         {/* {isMinimiseTable &&  (
             <SalesOrderView
             viewSalesOrder={viewSalesOrder}

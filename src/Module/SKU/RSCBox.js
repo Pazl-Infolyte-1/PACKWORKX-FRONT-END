@@ -813,7 +813,6 @@ function RSCBox({
                 value={Math.round(Number(addNewSkuData.length) * 100) / 100 || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
-                min="0"
                 className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-l-md"
               />
               <span className="text-gray-500 px-1">x</span>

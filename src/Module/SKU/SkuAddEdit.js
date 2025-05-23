@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux'
 import updown from '../../assets/images/updown.png'
 import { version } from 'core-js'
 import { setRscDeckleSize } from '../../action';
+import { setSkuPartValue } from '../../action'
 
 function SkuAddEdit({
   isopenval,
@@ -251,40 +252,40 @@ console.log("into msquare",meterSquareData)
 
   const plyLayerConfigurations = {
     2: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer', type: 'Corrugated Layer' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer', type: 'Corrugated Layer' },
     ],
     3: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
     ],
     5: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { id:2,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { id:3,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
     ],
     7: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { layer: 'Liner Layer 2', type: 'Liner Layer 2' },
-      { layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
-      { layer: 'Liner Layer 3', type: 'Liner Layer 3' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { id:2,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { id:3,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { id:2,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
+      { id:3,layer: 'Liner Layer 3', type: 'Liner Layer 3' },
     ],
     9: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { layer: 'Liner Layer 2', type: 'Liner Layer 2' },
-      { layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
-      { layer: 'Liner Layer 3', type: 'Liner Layer 3' },
-      { layer: 'Corrugated Layer 4', type: 'Corrugated Layer 4' },
-      { layer: 'Liner Layer 4', type: 'Liner Layer 4' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { id:2,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { id:3,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { id:2,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
+      { id:3,layer: 'Liner Layer 3', type: 'Liner Layer 3' },
+      { id:2,layer: 'Corrugated Layer 4', type: 'Corrugated Layer 4' },
+      { id:3,layer: 'Liner Layer 4', type: 'Liner Layer 4' },
     ],
   }
 
@@ -477,7 +478,9 @@ console.log("into msquare",meterSquareData)
     setisSingleViewPopup(false)
   }
 
+
   const handleCancel = () => {
+  dispatch(setSkuPartValue([]))
     setAddNewSkuData(createInitialSkuData())
     handleClose()
   }
@@ -637,7 +640,8 @@ useEffect(() => {
 }, []);
 
 console.log("shared unitr form rsc",rscUnits)
-
+console.log("composite",compositeSelect)
+console.log("sku values...",JSON.stringify(addNewSkuData.sku_values))
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
@@ -733,21 +737,30 @@ console.log("shared unitr form rsc",rscUnits)
                     </td>
 
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <input
-                        type="number"
-                        className="p-1 border rounded text-center w-full"
-                        value={item.gsm || ''}
-                        placeholder="gsm"
-                        onChange={(e) =>
-                          handleSkuValuesChange(index, 'gsm', Number(e.target.value))
-                        }
-                        readOnly={editTag}
-                      />
+                    <input
+  type="number"
+  className={`p-1 rounded text-center w-full transition-colors ${
+    errors.sku_values?.[index]?.gsm
+      ? 'border-2 border-red-500'
+      : 'border border-gray-300'
+  }`}
+  value={item.gsm || ''}
+  placeholder="gsm"
+  onChange={(e) =>
+    handleSkuValuesChange(index, 'gsm', Number(e.target.value))
+  }
+  readOnly={editTag}
+/>
+
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
                       <input
                         type="number"
-                        className="p-1 border rounded text-center w-full"
+                      className={`p-1 rounded text-center w-full transition-colors ${
+    errors.sku_values?.[index]?.bf
+      ? 'border-2 border-red-500'
+      : 'border border-gray-300'
+  }`}
                         value={item.bf || ''}
                         placeholder="bf"
                         onChange={(e) => handleSkuValuesChange(index, 'bf', Number(e.target.value))}
@@ -756,7 +769,11 @@ console.log("shared unitr form rsc",rscUnits)
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
 <select
-  className="p-1 border rounded w-full"
+     className={`p-1 rounded w-full transition-colors ${
+      errors.sku_values?.[index]?.color
+        ? 'border-2 border-red-500'
+        : 'border border-gray-300'
+    }`}
   value={item.color}
   onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
   disabled={editTag} // use disabled for select instead of readOnly
@@ -774,7 +791,11 @@ console.log("shared unitr form rsc",rscUnits)
                       {item?.layer?.toLowerCase().includes('corrugated') ? (
                         <div className="relative w-full flex items-center">
                           <select
-                            className="p-1 border rounded w-full pr-8 appearance-none"
+                              className={`p-1 rounded w-full pr-8 appearance-none transition-colors ${
+          errors.sku_values?.[index]?.flute_type
+            ? 'border-2 border-red-500'
+            : 'border border-gray-300'
+        }`}
                             value={item.flute_type}
                             onChange={(e) =>
                               handleSkuValuesChange(index, 'flute_type', e.target.value)
@@ -796,6 +817,8 @@ console.log("shared unitr form rsc",rscUnits)
                       ) : (
                         <p className="text-gray-500">--</p>
                       )}
+
+
                     </td>
 
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
@@ -821,8 +844,15 @@ console.log("shared unitr form rsc",rscUnits)
           </div>
         </div>
       )}
+{addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
+<p className="p-2 text-left">
+  Total Weight: {toThreeDecimalFixed(
+    addNewSkuData.sku_values?.reduce((acc, item) => acc + (Number(item.weight) || 0), 0),
+  )}
+</p>)}
 
-      {addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
+
+      {/*{addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
         <tr className="bg-gray-100 font-semibold text-center">
           <td colSpan={6} className="p-2 text-right">
             Total Weight:
@@ -832,20 +862,35 @@ console.log("shared unitr form rsc",rscUnits)
               addNewSkuData.sku_values?.reduce((acc, item) => acc + (Number(item.weight) || 0), 0),
             )}
           </td>
-          <td></td> {/* Empty cell to align with the columns */}
+          <td></td> 
         </tr>
-      )}
+      )}*/}
 
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 pb-6 px-4 flex justify-end space-x-4 z-20">
-  <button className="p-1 border border-gray-300 rounded w-20" onClick={handleCancel}>
-    Cancel
-  </button>
+{/*<button   className="p-1.5 border border-gray-300 rounded w-20 text-sm" onClick={handleCancel}>
+  Cancel
+</button>
+
   <ActionButton
     onClick={handleAddSkuSubmit}
     label={editTag ? 'Update' : 'Submit'}
     variant="save"
-    className="bg-[#079b54] text-white px-2 py-1 rounded-md"
-  />
+    className="bg-[#079b54] text-white px-1 py-1 rounded-md"
+  />*/}
+        <button
+            className="p-1.5 border border-gray-300 rounded w-20 text-sm"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
+     <button
+            className="p-1.5 rounded w-20 mr-3 text-white bg-purple-600 hover:bg-purple-700 text-sm disabled:bg-gray-400"
+      onClick={handleAddSkuSubmit}
+          >
+           {editTag ? 'Update' : 'Submit'}
+          </button>
+
+  
 </div>
 
       <PopUp

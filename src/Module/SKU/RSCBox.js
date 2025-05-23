@@ -19,6 +19,7 @@ import apiMethods from '../../api/config'
 import { useDispatch, useSelector } from 'react-redux'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
 import { setRscDeckleSize } from '../../action';
+import { cilCloudUpload } from '@coreui/icons';
 function RSCBox({
   dropdownRef,
   addNewSkuData,
@@ -240,6 +241,11 @@ const deckleSize = useSelector(state => state.deckleSize);
 
       const length_board_size_cm2 = convertValue(prev.length_board_size_cm2)
       const width_board_size_cm2 = convertValue(prev.width_board_size_cm2)
+
+      console.log("convert value", parseInt(convertValue(prev.length)))
+            console.log("convert value",  parseInt(convertValue(prev.width)))
+                        console.log("convert value",  parseInt(convertValue(prev.height)))
+
 
       return {
         ...prev,
@@ -810,6 +816,7 @@ useEffect(() => {
                 value={Number(addNewSkuData.length) || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
+                min="0"
                 className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-l-md"
               />
               <span className="text-gray-500 px-1">x</span>
@@ -820,6 +827,7 @@ useEffect(() => {
                 value={Number(addNewSkuData.width) || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
+                min="0"
                 className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <span className="text-gray-500 px-1">x</span>
@@ -827,6 +835,7 @@ useEffect(() => {
                 id="height"
                 name="height"
                 type="number"
+                min="0"
                 value={Number(addNewSkuData.height) || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
@@ -1085,6 +1094,7 @@ useEffect(() => {
             id="minimum_order_level"
             name="minimum_order_level"
             type="number"
+            min="0"
             value={Number(addNewSkuData.minimum_order_level) || null}
             onChange={handleChange}
                                                        className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
@@ -1143,7 +1153,7 @@ useEffect(() => {
         htmlFor="file-upload"
         className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
       >
-        Upload Files
+        <CIcon icon={cilCloudUpload} size="sm" className="text-gray-700" /> Upload Files
       </label>
       <input
         id="file-upload"

@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import RoutePopup from './RoutePopup'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
 import { setCompositeArray } from '../../action'
+import { setSkuPartValue } from '../../action'
 
 const compositeTypes = [
   { id: '1', name: 'Partition' },
@@ -474,6 +475,43 @@ useEffect(() => {
   console.log("part valjue",JSON.stringify(addNewSkuData.part_value))
 
   console.log("errors",errors)
+
+
+  useEffect(() => {
+  const part_value = skuFields.map((field) => {
+    const selectedSku = skuList.find((sku) => sku.id === parseInt(field.id))
+
+    return {
+      sku_id: selectedSku?.id ?? null,
+      sku_name: selectedSku?.sku_name ?? '',
+      ratio:
+        field.ratio !== undefined && field.ratio !== null && field.ratio !== ''
+          ? parseFloat(field.ratio)
+          : null,
+    }
+  })
+
+  dispatch(setSkuPartValue(part_value)) // ✅ Push to Redux
+  setAddNewSkuData((prev) => ({
+    ...prev,
+    part_value,
+    part_count: part_value.length,
+  }))
+}, [skuFields, skuList])
+
+const reduxSkuFields = useSelector((state) => state.skuBuilder?.part_value || [])
+
+useEffect(() => {
+  if (reduxSkuFields.length > 0) {
+    const restoredFields = reduxSkuFields.map((item) => ({
+      id: item.sku_id,
+      sku_name: item.sku_name,
+      ratio: item.ratio,
+      key: Date.now() + Math.random(), // Ensure unique keys
+    }))
+    setSkuFields(restoredFields)
+  }
+}, [])
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
@@ -731,9 +769,6 @@ useEffect(() => {
 
 
                       )}
-      {/*{errors?.part_value?.[index]?.sku && (
-  <p className="text-red-500 text-xs mt-1">{errors.part_value[index].sku}</p>
-)}*/}
 
                     </td>
                     <td className="border border-gray-300 px-3 py-2">
@@ -748,9 +783,7 @@ useEffect(() => {
       : 'border border-gray-300'
   }`}
                       />
-    {/*{errors?.part_value?.[index]?.ratio && (
-  <p className="text-red-500 text-xs mt-1">{errors.part_value[index].ratio}</p>
-)}*/}
+
 
                     </td>
                     <td className="border border-gray-300 px-3 py-2 text-center">

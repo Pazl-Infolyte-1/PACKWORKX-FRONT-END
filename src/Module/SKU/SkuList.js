@@ -21,6 +21,8 @@ import { FiDownload, FiUpload } from 'react-icons/fi'
 import SkuView from './SkuView'
 import CommonPagination from '../../components/New/Pagination'
 import CompactPagination from '../../components/New/CompactPagination'
+import Loader from '../../components/New/Loader'
+import { setSkuPartValue } from '../../action'
 
 function SkuList() {
   const [skuType, setSkuType] = useState([])
@@ -39,7 +41,7 @@ function SkuList() {
   const [dashboard, setDashboard] = useState(null)
   const [refresh, setRefresh] = useState(false)
   const [clientDiasble, setClientDisable] = useState(false)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(50)
   const [alerts, setAlerts] = useState([])
   const { user } = useContext(AuthContext)
   const { searchQuery, filteredSearchData } = useSearch()
@@ -55,6 +57,8 @@ function SkuList() {
   const [isMinimized, setIsMinimized] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
   const [validationErrors, setValidationErrors] = useState({})
+    const [loading, setLoading] = useState(false)
+      const [totalRecords, setTotalRecords] = useState(0)
 
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
@@ -246,6 +250,26 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
         newErrors.route = 'Required'
       }
+            if (Array.isArray(addNewSkuData.sku_values)) {
+    addNewSkuData.sku_values.forEach((layer, index) => {
+      const layerErrors = {}
+
+      if (!layer.gsm) layerErrors.gsm = 'GSM is required'
+      if (!layer.bf) layerErrors.bf = 'BF is required'
+      if (!layer.color) layerErrors.color = 'Color is required'
+      if (
+        layer.layer.toLowerCase().includes('corrugated') &&
+        !layer.flute_type
+      ) {
+        layerErrors.flute_type = 'Flute Type is required'
+      }
+
+      if (Object.keys(layerErrors).length > 0) {
+        if (!newErrors.sku_values) newErrors.sku_values = {}
+        newErrors.sku_values[index] = layerErrors
+      }
+    })
+  }
     } else if (addNewSkuData.sku_type === 'Board') {
       // Validate only for Composite
       if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
@@ -267,6 +291,26 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
         newErrors.route = 'Required'
       }
+            if (Array.isArray(addNewSkuData.sku_values)) {
+    addNewSkuData.sku_values.forEach((layer, index) => {
+      const layerErrors = {}
+
+      if (!layer.gsm) layerErrors.gsm = 'GSM is required'
+      if (!layer.bf) layerErrors.bf = 'BF is required'
+      if (!layer.color) layerErrors.color = 'Color is required'
+      if (
+        layer.layer.toLowerCase().includes('corrugated') &&
+        !layer.flute_type
+      ) {
+        layerErrors.flute_type = 'Flute Type is required'
+      }
+
+      if (Object.keys(layerErrors).length > 0) {
+        if (!newErrors.sku_values) newErrors.sku_values = {}
+        newErrors.sku_values[index] = layerErrors
+      }
+    })
+  }
     }
     //if (!addNewSkuData.gst_percentage) newErrors.gst_percentage = 'Required'
     else if (addNewSkuData.sku_type === 'RSC box') {
@@ -296,6 +340,26 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
         newErrors.route = 'Required'
       }
+      if (Array.isArray(addNewSkuData.sku_values)) {
+    addNewSkuData.sku_values.forEach((layer, index) => {
+      const layerErrors = {}
+
+      if (!layer.gsm) layerErrors.gsm = 'GSM is required'
+      if (!layer.bf) layerErrors.bf = 'BF is required'
+      if (!layer.color) layerErrors.color = 'Color is required'
+      if (
+        layer.layer.toLowerCase().includes('corrugated') &&
+        !layer.flute_type
+      ) {
+        layerErrors.flute_type = 'Flute Type is required'
+      }
+
+      if (Object.keys(layerErrors).length > 0) {
+        if (!newErrors.sku_values) newErrors.sku_values = {}
+        newErrors.sku_values[index] = layerErrors
+      }
+    })
+  }
     } else {
       newErrors = {}
     }
@@ -344,6 +408,9 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
             setDrawerOpen(false)
           }
           setEditTag(false)
+          if(addNewSkuData.sku_type==="Composite"){
+           dispatch(setSkuPartValue([]))
+          }
         }
       } catch (error) {
         console.error('Error adding SKU:', error)
@@ -424,6 +491,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
     setStrictAdherence(selectedSku.strict_adherence || false)
   }
   const fetchData = async () => {
+    setLoading(true)
     // skip sku get call
     if (location.state?.skipInitialFetch && !refresh) {
       return
@@ -441,10 +509,14 @@ const clientResponse = await apiMethods.getClients({ limit: 10000 })
       setSkuData(response.data)
       setClient(clientResponse.data)
       setPagination(response.pagination)
+      setTotalRecords(response?.pagination?.totalCount)
       setDashboard(response.dashboard)
+      console.log("jsonres",response?.pagination?.totalCount)
     } catch (error) {
       console.error('Error fetching data:', error)
-    }
+    }finally {
+    setLoading(false); // Always called, even if error occurs or early return
+  }
   }
   useEffect(() => {
     fetchData()
@@ -514,9 +586,10 @@ const clientResponse = await apiMethods.getClients({ limit: 10000 })
 
   console.log("edittag",editTag)
 console.log("pagination",pagination)
+console.log("sku type",addNewSkuData.sku_type)
   return (
-    <div className="flex  h-full">
-      <div className={`${isMinimized ? 'w-[28%]' : 'w-full'}`}>
+    <div className="flex">
+      <div className={`${isMinimized ? 'w-[28%]' : 'w-full'} pb-3`}>
         {/* Header */}
         <ContentHeader
           heading={'SKU'}
@@ -603,9 +676,9 @@ console.log("pagination",pagination)
           <div className="w-full sm:w-[150px] flex items-center justify-between bg-white border border-gray-300 rounded-lg px-3 py-2">
   <div className="flex items-center gap-2 whitespace-nowrap">
     <AiFillCarryOut className="text-blue-600 text-xl" />
-    <span className="text-sm font-semibold text-gray-800">Total Count: </span>
+    <span className="text-sm font-semibold text-gray-800 pr-1">Total Count: </span>
   </div>
-  <div className="h-7 w-7 flex items-center justify-center rounded-md bg-gray-100 text-gray-800 font-bold text-sm">
+  <div className="h-7 w-7 flex items-center justify-center text-gray-800 font-bold text-sm">
     {pagination?.totalCount ?? 0}
   </div>
 </div>
@@ -657,6 +730,7 @@ console.log("pagination",pagination)
             </div>
           </div>
         )}
+            <Loader isLoading={loading} />
         <div className={`${isMinimized ? 'mt-1' : '-my-6'}`}>
           <div className="flex overflow-x-auto overflow-y-auto whitespace-nowrap ">
             <SkuTable
@@ -677,30 +751,8 @@ console.log("pagination",pagination)
 
         {/* Pagination Section */}
         <div className="flex justify-end items-center gap-4 mt-[40px]">
-        {/*<CommonPagination
-          count={pagination?.totalPages || 1}
-          page={pagination?.currentPage || 1}
-          onChange={(event, value) => {
-            setPagination((prev) => ({
-              ...prev,
-              currentPage: value,
-            }))
-            setRefresh((prev) => !prev)
-          }}
-          onLimitChange={(newLimit) => {
-            setLimit(newLimit)
-            // Reset to first page when changing limit
-            setPagination((prev) => ({
-              ...prev,
-              currentPage: 1,
-            }))
-            setRefresh((prev) => !prev)
-          }}
-          limit={limit}
-        />*/}
-
             <CompactPagination
-                    totalRecords={pagination?.totalCount}
+                        totalRecords={totalRecords}
                     count={pagination?.totalPages || 1}
                     page={pagination?.currentPage || 1}
                     onPageChange={(event, value) => {
@@ -736,6 +788,7 @@ console.log("pagination",pagination)
             setEditTag(false)
             setClientDisable(false)
             setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
+             dispatch(setSkuPartValue([]))
             //navigate('/SKU')
           }}
         >
@@ -783,7 +836,7 @@ console.log("pagination",pagination)
       {isMinimized && (
         <div className="flex w-[75%] transition-all duration-300 ">
           <SkuView
-            selectedSku={selectedSku}
+            selectedSkuData={selectedSku}
             setIsMinimized={setIsMinimized}
             handleSkuEdit={handleSkuEdit}
           />

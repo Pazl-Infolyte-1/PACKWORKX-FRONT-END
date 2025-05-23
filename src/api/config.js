@@ -450,6 +450,17 @@ export const apiMethods = {
   }
 },
 
+singlesku: async (id) => {
+  try {
+    const response = await apiClient.get(`/sku-details/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('API error in singlesku:', error);
+    throw error; // Optional: rethrow for handling at the call site
+  }
+},
+
+
   getSkuType: async () => {
     try {
       const response = await apiClient.get('/sku-details/sku-type/get')

@@ -513,7 +513,7 @@ function AddAssign({
                         <div
                           className={`text-sm font-semibold ${hasValue ? 'text-gray-800' : 'text-gray-400'}`}
                         >
-                          {hasValue ? value : 'No data'}
+                          {hasValue ? value : 'N/A'}
                         </div>
                       </div>
                     )

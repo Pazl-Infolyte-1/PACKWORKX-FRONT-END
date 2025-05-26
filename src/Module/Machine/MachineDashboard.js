@@ -30,12 +30,14 @@ import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import CompactPagination from '../../components/New/CompactPagination'
 import { FiDownload, FiUpload } from 'react-icons/fi'
+import ProcessRoutes from './ProcessRoutes'
 
 export default function MachineMaster() {
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
   const [preSelectedMachineId, setPreSelectedMachineId] = useState(null)
   const [isdrawopen, setdrawopen] = useState({ show: false, id: null })
   const [addProcessModal, setAddProcessModal] = useState({ show: false, machineId: null })
+  const [openRoutes, setOpenRoutes] = useState({ show: false, id: null })
   const [assignModal, setAssignModal] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [tableData, setTableData] = useState([])
@@ -270,6 +272,7 @@ export default function MachineMaster() {
         setAlerts={setAlerts}
         setOpenFieldValuesModal={setOpenFieldValuesModal}
         setOpenFieldModal={setOpenFieldModal}
+        setOpenRoutes={setOpenRoutes}
       />
 
       <div className="flex justify-center md:justify-end items-center gap-4 mt-2 ">
@@ -399,6 +402,15 @@ export default function MachineMaster() {
           setIsEdit={setIsEdit}
           setAlerts={setAlerts}
         />
+      </PopUp>
+       <PopUp
+        visible={openRoutes.show}
+        setVisible={() => setOpenRoutes({ show: false, id: null })}
+        width={800}
+        header="Process Routes"
+        showCloseButton={true}
+      >
+        <ProcessRoutes openRoutes={openRoutes} setOpenRoutes={setOpenRoutes}/>
       </PopUp>
     </div>
   )

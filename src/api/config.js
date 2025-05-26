@@ -1387,8 +1387,21 @@ export const apiMethods = {
         'Accept': 'application/octet-stream'
       }
     });
-  }
-  
+  },
+  getRouteList: async () => {
+    return await apiClient.get('mapping/machine-route-process')
+  },
+  saveRouteProcesses: async (payload) => {
+    return await apiClient.post('mapping/machine-route-process', payload)
+  },
+
+  updateRouteProcesses: async (id, payload) => {
+    return await apiClient.put(`mapping/machine-route-process/${id}`, payload)
+  },
+
+  deleteRoute: async (id) => {
+    return await apiClient.delete(`mapping/machine-route-process/${id}`)
+  },
   
 
 

@@ -1133,32 +1133,42 @@ console.log("addnedwskudata unit",rscUnits)
                             onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
                           />
                         </td>
-                        <td className="p-2 text-center w-full sm:w-1/12 relative">
-                          {item?.layer?.toLowerCase().includes('corrugated') ? (
-                            <div className="relative w-full flex items-center">
-                              <select
-                                className="p-1 border rounded w-full pr-8 appearance-none"
-                                value={item.flute_type}
-                                onChange={(e) =>
-                                  handleSkuValuesChange(index, 'flute_type', e.target.value)
-                                }
-                              >
-                                <option hidden>Select</option>
-                                <option value="A">A</option>
-                                <option value="B">B</option>
-                                <option value="C">C</option>
-                                <option value="E">E</option>
-                                <option value="F,G,N">F,G,N</option>
-                              </select>
-                              <FaEye
-                                className="absolute right-2 text-gray-500 cursor-pointer"
-                                onClick={openViewCard}
-                              />
-                            </div>
-                          ) : (
-                            <p className="text-gray-500">--</p>
-                          )}
-                        </td>
+                         <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
+                      {item?.layer?.toLowerCase().includes('corrugated') ? (
+                        <div className="relative w-full flex items-center">
+                          <select
+                              className={`p-1 rounded w-full pr-8 appearance-none transition-colors ${
+          errors.sku_values?.[index]?.flute_type
+            ? 'border-2 border-red-500'
+            : 'border border-gray-300'
+        }`}
+                            value={item.flute_type}
+                            onChange={(e) =>
+                              handleSkuValuesChange(index, 'flute_type', e.target.value)
+                            }
+                            disabled={editTag}
+                          >
+                            <option hidden>Select</option>
+  {fluteDropdown.map((flute) => (
+    <option key={flute.id} value={flute.name} disabled>
+      {flute.name}
+    </option>
+  ))}
+                          </select>
+                          <FaEye
+                            className="absolute right-2 text-gray-500 cursor-pointer"
+                           onClick={() => {
+    setSelectedFluteIndex(index);
+    setisSingleViewPopup(true);
+  }}
+                          />
+                        </div>
+                      ) : (
+                        <p className="text-gray-500">--</p>
+                      )}
+
+
+                    </td>
                         <td className="p-2 text-center w-full sm:w-1/12">
                           <input
                             type="text"

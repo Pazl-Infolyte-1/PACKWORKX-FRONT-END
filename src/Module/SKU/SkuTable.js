@@ -127,9 +127,8 @@ const navigate = useNavigate()
   <CTableRow className='sticky top-0 z-10 bg-gray-100'>
     {!isMinimized && (
       <>
-        <CTableHeaderCell style={{ width: '20px' }} className="text-center">
-          <TiFlowSwitch className="rotate-90 text-blue-600 mx-auto" size={20} />
-        </CTableHeaderCell>
+        {/*<CTableHeaderCell style={{ width: '20px' }} className="text-center">
+        </CTableHeaderCell>*/}
         <CTableHeaderCell style={{ width: '120px' }} className="text-center font-semibold">SKU Id</CTableHeaderCell>
         <CTableHeaderCell style={{ width: '140px' }} className="text-center font-semibold">SKU Name</CTableHeaderCell>
         <CTableHeaderCell style={{ width: '130px' }} className="text-center font-semibold">SKU Type <span className="text-gray-500">⌕</span></CTableHeaderCell>
@@ -176,9 +175,8 @@ const navigate = useNavigate()
   </>
 ) : (
   <>
-    <CTableDataCell style={{ width: '20px' }} className="text-center">
-      {/* Icon column */}
-    </CTableDataCell>
+    {/*<CTableDataCell style={{ width: '20px' }} className="text-center">
+    </CTableDataCell>*/}
     <CTableDataCell style={{ width: '120px' }} className="text-center text-gray-700">
       {cell.sku_ui_id}
     </CTableDataCell>

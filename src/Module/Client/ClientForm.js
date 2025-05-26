@@ -669,7 +669,7 @@ const ClientForm = ({ resetForm, setReloadData }) => {
                           placeholder="Mobile"
                           maxLength={10}
                           {...register('clientData.mobile', {
-                            required: true,
+                            // required: true,
                             pattern: {
                               value: /^\d{10}$/,
                               message: 'Invalid phone number',
@@ -698,6 +698,8 @@ const ClientForm = ({ resetForm, setReloadData }) => {
                           className="outline-none w-full text-sm bg-transparent"
                         />
                       </div>
+
+                      
                     </div>
                     {(errors.clientData?.work_phone || errors.clientData?.mobile) && (
                       <p className="text-red-500 text-xs">

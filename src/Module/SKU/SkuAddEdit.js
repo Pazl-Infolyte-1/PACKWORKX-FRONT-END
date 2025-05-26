@@ -13,6 +13,8 @@ import CustomItem from './CustomItem'
 import { useDispatch } from 'react-redux'
 import updown from '../../assets/images/updown.png'
 import { version } from 'core-js'
+import { setRscDeckleSize } from '../../action';
+import { setSkuPartValue } from '../../action'
 
 function SkuAddEdit({
   isopenval,
@@ -41,6 +43,9 @@ function SkuAddEdit({
   errors,
   setErrors,
   setSkuVariant,
+     uploadedFiles,
+          setUploadedFiles,
+          validationErrors
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
@@ -53,6 +58,8 @@ function SkuAddEdit({
   const [version, setVersion] = useState([])
   const [selectedVersion, setSelectedVersion] = useState(null)
   const [defaultSkuValues, setDefaultSkuValues] = useState([])
+  const [color,setColor]=useState([])
+  const [rscUnits,setRscUnits] = useState("mm")
   const createInitialSkuData = () => ({
     client_id: null,
     sku_name: null,
@@ -65,7 +72,7 @@ function SkuAddEdit({
     unit: null,
     joints: null,
     ups: null,
-    inner_outer_dimension: null,
+    inner_outer_dimension: 'Inner',
     flap_width: null,
     flap_tolerance: null,
     length_trimming_tolerance: 20,
@@ -86,8 +93,12 @@ function SkuAddEdit({
     estimate_composite_item: null,
     description: null,
     default_sku_details: null,
+    documents:[],
+    print_type:null,
     tags: {},
     gst_percentage: null,
+        total_weight:null,
+total_bursting_strength:null,
     sku_values: [
       {
         layer: null,
@@ -150,6 +161,8 @@ function SkuAddEdit({
     fetchData()
   }, [])
   const handleSelect = (option) => {
+dispatch(setRscDeckleSize({ length: null, height: null, ups: null }));
+
     dispatch({
       type: 'SET_SELECTED_ROUTE_IDS',
       payload: [],
@@ -162,7 +175,7 @@ function SkuAddEdit({
       },
     })
     dispatch({ type: 'RESET_DIECUT_CALCULATIONS' })
-
+ 
     setErrors({})
     if (option.value === 'addMore') {
       // Handle add more procedure logic if needed
@@ -191,11 +204,26 @@ function SkuAddEdit({
       if (field === 'gsm' || field === 'bf' || field === 'layer') {
         const gsm = field === 'gsm' ? value : updatedItem.gsm
         const bf = field === 'bf' ? value : updatedItem.bf
+console.log("units rsc",rscUnits)
+console.log("into msquare",meterSquareData)
+
+  // Convert area to square meters
+  let areaInSquareMeters = 0;
+
+  if (rscUnits === 'mm') {
+    areaInSquareMeters = meterSquareData * 1e-6; // mm² → m²
+  } else if (rscUnits === 'cm') {
+    areaInSquareMeters = meterSquareData * 1e-4; // cm² → m²
+  } else if (rscUnits === 'in') {
+    areaInSquareMeters = meterSquareData * 0.00064516; // in² → m²
+  } else {
+    console.warn("Unknown rscUnit:", rscUnits);
+  }
 
         if (isCorrugated && gsm && bf) {
-          updatedItem.weight = gsm * bf * meterSquareData
+          updatedItem.weight = (gsm*0.001)* bf * areaInSquareMeters
         } else if (gsm) {
-          updatedItem.weight = gsm * meterSquareData
+          updatedItem.weight = (gsm*0.001) * areaInSquareMeters
         }
       }
 
@@ -226,40 +254,40 @@ function SkuAddEdit({
 
   const plyLayerConfigurations = {
     2: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer', type: 'Corrugated Layer' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer', type: 'Corrugated Layer' },
     ],
     3: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
     ],
     5: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { id:2,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { id:3,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
     ],
     7: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { layer: 'Liner Layer 2', type: 'Liner Layer 2' },
-      { layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
-      { layer: 'Liner Layer 3', type: 'Liner Layer 3' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { id:2,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { id:3,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { id:2,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
+      { id:3,layer: 'Liner Layer 3', type: 'Liner Layer 3' },
     ],
     9: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { layer: 'Liner Layer 2', type: 'Liner Layer 2' },
-      { layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
-      { layer: 'Liner Layer 3', type: 'Liner Layer 3' },
-      { layer: 'Corrugated Layer 4', type: 'Corrugated Layer 4' },
-      { layer: 'Liner Layer 4', type: 'Liner Layer 4' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { id:2,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { id:3,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { id:2,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
+      { id:3,layer: 'Liner Layer 3', type: 'Liner Layer 3' },
+      { id:2,layer: 'Corrugated Layer 4', type: 'Corrugated Layer 4' },
+      { id:3,layer: 'Liner Layer 4', type: 'Liner Layer 4' },
     ],
   }
 
@@ -303,6 +331,9 @@ function SkuAddEdit({
   const skuComponents = {
     'RSC box': (
       <RSCBox
+         uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
+      setRscUnits={setRscUnits}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -334,6 +365,8 @@ function SkuAddEdit({
     //'Corrugated Sheet': (
     Board: (
       <CorrugatedSheet
+        uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -359,6 +392,8 @@ function SkuAddEdit({
     ),
     'Die Cut box': (
       <DieCutBox
+              uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -384,6 +419,7 @@ function SkuAddEdit({
     ),
     Composite: (
       <Composite
+      validationErrors={validationErrors}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -444,7 +480,9 @@ function SkuAddEdit({
     setisSingleViewPopup(false)
   }
 
+
   const handleCancel = () => {
+  dispatch(setSkuPartValue([]))
     setAddNewSkuData(createInitialSkuData())
     handleClose()
   }
@@ -589,6 +627,41 @@ function SkuAddEdit({
       }))
     }
   }
+
+useEffect(() => {
+  const colorData = async () => {
+    try {
+      const response = await apiMethods.getColors();
+      setColor(response.data.data); // ✅ use response.data.data
+      console.log("color data", response.data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  colorData();
+}, []);
+
+console.log("shared unitr form rsc",rscUnits)
+console.log("composite",compositeSelect)
+console.log("sku values...",JSON.stringify(addNewSkuData.sku_values))
+useEffect(() => {
+  const totalWeight = addNewSkuData.sku_values.reduce(
+    (acc, item) => acc + (Number(item.weight) || 0),
+    0
+  )
+
+  const totalBurstingStrength = addNewSkuData.sku_values.reduce(
+    (acc, item) => acc + ((item.gsm && item.bf) ? (item.gsm * item.bf) / 1000 : 0),
+    0
+  )
+
+  setAddNewSkuData((prevData) => ({
+    ...prevData,
+    total_weight: Math.round(totalWeight * 1000) / 1000,
+    total_bursting_strength: Math.round(totalBurstingStrength * 1000) / 1000,
+  }))
+}, [addNewSkuData.sku_values])
+
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
@@ -634,7 +707,7 @@ function SkuAddEdit({
       )}
 
       {addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
-        <div className="mt-6">
+        <div className="mt-6 mb-6">
           <div className="border rounded-lg overflow-auto">
             <table className="w-full">
               <thead className="bg-gray-100">
@@ -684,21 +757,30 @@ function SkuAddEdit({
                     </td>
 
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <input
-                        type="number"
-                        className="p-1 border rounded text-center w-full"
-                        value={item.gsm || ''}
-                        placeholder="gsm"
-                        onChange={(e) =>
-                          handleSkuValuesChange(index, 'gsm', Number(e.target.value))
-                        }
-                        readOnly={editTag}
-                      />
+                    <input
+  type="number"
+  className={`p-1 rounded text-center w-full transition-colors ${
+    errors.sku_values?.[index]?.gsm
+      ? 'border-2 border-red-500'
+      : 'border border-gray-300'
+  }`}
+  value={item.gsm || ''}
+  placeholder="gsm"
+  onChange={(e) =>
+    handleSkuValuesChange(index, 'gsm', Number(e.target.value))
+  }
+  readOnly={editTag}
+/>
+
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
                       <input
                         type="number"
-                        className="p-1 border rounded text-center w-full"
+                      className={`p-1 rounded text-center w-full transition-colors ${
+    errors.sku_values?.[index]?.bf
+      ? 'border-2 border-red-500'
+      : 'border border-gray-300'
+  }`}
                         value={item.bf || ''}
                         placeholder="bf"
                         onChange={(e) => handleSkuValuesChange(index, 'bf', Number(e.target.value))}
@@ -706,20 +788,34 @@ function SkuAddEdit({
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <input
-                        type="text"
-                        placeholder="Color"
-                        className="p-1 border rounded w-full"
-                        value={item.color}
-                        onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
-                        readOnly={editTag}
-                      />
+<select
+     className={`p-1 rounded w-full transition-colors ${
+      errors.sku_values?.[index]?.color
+        ? 'border-2 border-red-500'
+        : 'border border-gray-300'
+    }`}
+  value={item.color}
+  onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
+  disabled={editTag} // use disabled for select instead of readOnly
+>
+  <option value="">Select Color</option>
+  {color.map((c) => (
+    <option key={c.id} value={c.color_name}>
+      {c.color_name}
+    </option>
+  ))}
+</select>
+
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
                       {item?.layer?.toLowerCase().includes('corrugated') ? (
                         <div className="relative w-full flex items-center">
                           <select
-                            className="p-1 border rounded w-full pr-8 appearance-none"
+                              className={`p-1 rounded w-full pr-8 appearance-none transition-colors ${
+          errors.sku_values?.[index]?.flute_type
+            ? 'border-2 border-red-500'
+            : 'border border-gray-300'
+        }`}
                             value={item.flute_type}
                             onChange={(e) =>
                               handleSkuValuesChange(index, 'flute_type', e.target.value)
@@ -741,6 +837,8 @@ function SkuAddEdit({
                       ) : (
                         <p className="text-gray-500">--</p>
                       )}
+
+
                     </td>
 
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
@@ -763,11 +861,25 @@ function SkuAddEdit({
                 ))}
               </tbody>
             </table>
+
           </div>
         </div>
       )}
+{addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
+  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-4 mt-4 mb-6">
+    <p className="text-sm font-medium text-gray-700 mb-10">
+      Total Weight:{' '}
+ {addNewSkuData.total_weight}
+    </p>
+    <p className="text-sm font-medium text-gray-700 mb-10">
+      Total Bursting Strength:{' '}
+{addNewSkuData.total_bursting_strength}
+    </p>
+  </div>
+)}
 
-      {addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
+
+      {/*{addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
         <tr className="bg-gray-100 font-semibold text-center">
           <td colSpan={6} className="p-2 text-right">
             Total Weight:
@@ -777,21 +889,37 @@ function SkuAddEdit({
               addNewSkuData.sku_values?.reduce((acc, item) => acc + (Number(item.weight) || 0), 0),
             )}
           </td>
-          <td></td> {/* Empty cell to align with the columns */}
+          <td></td> 
         </tr>
-      )}
+      )}*/}
 
-      <div className="sticky bottom-[-20px] bg-white border-t pt-4 pb-6 px-4 flex justify-end space-x-4">
-        <button className="p-1 border border-gray-300 rounded w-20" onClick={handleCancel}>
-          Cancel
-        </button>
-        <ActionButton
-          onClick={handleAddSkuSubmit}
-          label={editTag ? 'Update' : 'Submit'}
-          variant="save"
-          className="bg-[#079b54] text-white px-2 py-1 rounded-md"
-        />
-      </div>
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 pb-6 px-4 flex justify-end space-x-4 z-20">
+{/*<button   className="p-1.5 border border-gray-300 rounded w-20 text-sm" onClick={handleCancel}>
+  Cancel
+</button>
+
+  <ActionButton
+    onClick={handleAddSkuSubmit}
+    label={editTag ? 'Update' : 'Submit'}
+    variant="save"
+    className="bg-[#079b54] text-white px-1 py-1 rounded-md"
+  />*/}
+        <button
+            className="p-1.5 border border-gray-300 rounded w-20 text-sm"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
+     <button
+            className="p-1.5 rounded w-20 mr-3 text-white bg-purple-600 hover:bg-purple-700 text-sm disabled:bg-gray-400"
+      onClick={handleAddSkuSubmit}
+          >
+           {editTag ? 'Update' : 'Submit'}
+          </button>
+
+  
+</div>
+
       <PopUp
         visible={isSingleViewPopup}
         setVisible={handleCloseSingleViewPopup}
@@ -807,7 +935,7 @@ function SkuAddEdit({
         visible={isSingleViewPopupForType}
         setVisible={setisSingleViewPopupForType}
         showCloseButton={true}
-        width="70vw"
+        width="80vw"
       >
         <div className="max-h-[70vh] overflow-y-auto pr-2">
           {skuComponents[compositeSelect] || (

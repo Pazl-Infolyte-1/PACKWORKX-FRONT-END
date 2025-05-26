@@ -1,7 +1,7 @@
 import Input from '../../components/New/Input'
 import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
-import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash } from '@coreui/icons'
+import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilCloudUpload, cilPencil, cilTrash } from '@coreui/icons'
 import DiePopupTable from './DiePopupTable'
 import PopUp from '../../components/New/PopUp'
 import { useEffect, useState } from 'react'
@@ -37,6 +37,8 @@ function DieCutBox({
   setMessage,
   errors,
   setErrors,
+         uploadedFiles,
+          setUploadedFiles
 }) {
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
   const [selectedDiePopup, setSelectedDiePopup] = useState(null)
@@ -50,6 +52,10 @@ function DieCutBox({
   const [isSingleViewPopupRoute, setisSingleViewPopupRoute] = useState(false)
   const [fullRouteResponse, setFullRouteResponse] = useState(null)
   const [unitTooltip, setUnitTooltip] = useState('Enter Millimeter')
+    const [isUploading, setIsUploading] = useState(false);
+//const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
+const [fileNames, setFileNames] = useState([]); 
+
 
   const selectionFrame = {
     vendor: {
@@ -387,6 +393,90 @@ function DieCutBox({
     }
   }, [selectedRouteIds2])
 
+
+
+    const handleFileUpload = async (event) => {
+      const selectedFiles = event.target.files;
+      if (!selectedFiles || selectedFiles.length === 0) return;
+    
+      setIsUploading(true);
+    
+      const urls = [...uploadedFiles];
+      const names = [...fileNames];
+    
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        const formData = new FormData();
+        formData.append('file', file);
+    
+        try {
+          const response = await apiMethods.uploadFile(formData);
+          const fileUrl = response?.data?.data?.file_url;
+    
+          if (fileUrl) {
+            urls.push(fileUrl);
+            names.push(file.name);
+          }
+        } catch (err) {
+          console.error('File upload failed:', err);
+        }
+      }
+    
+      setUploadedFiles(urls);
+        setAddNewSkuData(prev => ({
+        ...prev,
+        documents: urls
+      }));
+      setFileNames(names);
+    
+      setIsUploading(false);
+      event.target.value = '';
+    };
+    
+    // Add this function to handle file removal
+    const removeFile = (indexToRemove) => {
+      const updatedUrls = uploadedFiles.filter((_, index) => index !== indexToRemove);
+      const updatedNames = fileNames.filter((_, index) => index !== indexToRemove);
+    
+      setUploadedFiles(updatedUrls);
+        setAddNewSkuData((prev) => ({
+        ...prev,
+        documents: updatedUrls, // Keep documents in sync
+      }));
+      setFileNames(updatedNames);
+    };
+    
+    //document edit
+   useEffect(() => {
+    // Clear files only if print_type is 'None' and documents are not already empty
+    if (addNewSkuData.print_type === 'None') {
+      if (uploadedFiles.length > 0 || addNewSkuData.documents.length > 0) {
+        setUploadedFiles([]);
+        setFileNames([]);
+  
+        // Only update documents if not already empty
+        if (addNewSkuData.documents.length > 0) {
+          setAddNewSkuData((prev) => ({
+            ...prev,
+            documents: [],
+          }));
+        }
+      }
+      return;
+    }
+  
+    // Load files only if editing and there are documents to load
+    if (editTag && addNewSkuData.documents?.length > 0 && uploadedFiles.length === 0) {
+      setUploadedFiles([...addNewSkuData.documents]);
+      setFileNames(
+        addNewSkuData.documents.map((file) =>
+          typeof file === 'string' ? file.split('/').pop() : file.name
+        )
+      );
+    }
+  }, [editTag, addNewSkuData.print_type]); // <- remove addNewSkuData.documents from deps
+  
+
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
@@ -430,16 +520,18 @@ function DieCutBox({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             SKU Name
             <span className="text-red-500 ml-1">*</span>
-            {errors.sku_name && (
+            {/*{errors.sku_name && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
-            )}
+            )}*/}
           </label>
           <input
             id="sku_name"
             name="sku_name"
             value={addNewSkuData.sku_name}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.sku_name ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
         </div>
 
@@ -447,9 +539,9 @@ function DieCutBox({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Client Name
             <span className="text-red-500 ml-1">*</span>
-            {errors.client_id && (
+            {/*{errors.client_id && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
-            )}
+            )}*/}
           </label>
           <select
             name="client"
@@ -457,7 +549,9 @@ function DieCutBox({
             disabled={clientDiasble}
             value={addNewSkuData.client_id}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.client_id ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           >
             <option value="" hidden>
               Select
@@ -540,9 +634,9 @@ function DieCutBox({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 UPS
                 <span className="text-red-500 ml-1">*</span>
-                {errors.ups && (
+                {/*{errors.ups && (
                   <span className="text-red-500 text-sm ml-2 align-middle">{errors.ups}</span>
-                )}
+                )}*/}
               </label>
               <input
                 id="ups"
@@ -552,7 +646,9 @@ function DieCutBox({
                 value={addNewSkuData.ups}
                 onChange={handleChange}
                 readOnly={editTag}
-                className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.ups ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
               />
             </div>
           </div>
@@ -561,9 +657,9 @@ function DieCutBox({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Die
             <span className="text-red-500 ml-1">*</span>
-            {errors.select_dies && (
+            {/*{errors.select_dies && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.select_dies}</span>
-            )}
+            )}*/}
           </label>
           <div className="flex items-center gap-2">
             <input
@@ -572,7 +668,9 @@ function DieCutBox({
               id="select_dies"
               value={addNewSkuData.select_dies || ''}
               onChange={handleChange}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+    errors?.select_dies ? 'border-2 border-red-500' : 'border border-gray-300'
+  }`}
               placeholder="Select"
               readOnly={true}
             />
@@ -591,9 +689,9 @@ function DieCutBox({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Internal ID
               <span className="text-red-500 ml-1">*</span>
-              {errors.internal_id && (
+              {/*{errors.internal_id && (
                 <span className="text-red-500 text-sm ml-2 align-middle">{errors.internal_id}</span>
-              )}
+              )}*/}
             </label>
             <input
               id="internal_id"
@@ -601,7 +699,9 @@ function DieCutBox({
               value={addNewSkuData.internal_id}
               onChange={handleChange}
               readOnly={editTag}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+               className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.internal_id ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </div>
@@ -609,27 +709,20 @@ function DieCutBox({
         <Tooltip title={unitTooltip}>
           <div className="w-[200px]">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Board Size <span className="text-gray-500 text-sm">(W × L)</span>
+              Board Size <span className="text-gray-500 text-sm">(L × W)</span>
               <span className="text-red-500 ml-1">*</span>
-              {errors.width_board_size_cm2 && errors.length_board_size_cm2 && (
+              {/*{errors.width_board_size_cm2 && errors.length_board_size_cm2 && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.width_board_size_cm2}
                 </span>
-              )}
+              )}*/}
             </label>
-            <div className="h-10 border border-gray-300 rounded-md flex items-center bg-white">
-              <input
-                id="width_board_size_cm2"
-                name="width_board_size_cm2"
-                value={addNewSkuData.width_board_size_cm2 || null}
-                onChange={handleChange}
-                readOnly
-                type="number"
-                className="w-[50%] p-[2px] text-center focus:outline-none rounded-l-md bg-gray-50"
-                min="0"
-              />
-              <span className="flex items-center justify-center text-gray-500">x</span>
-              <input
+            <div className={`h-8 rounded-md flex items-center bg-white ${
+      errors.width_board_size_cm2 || errors.length_board_size_cm2
+        ? 'border-2 border-red-500'
+        : 'border border-gray-300'
+    }`}>
+    <input
                 id="length_board_size_cm2"
                 name="length_board_size_cm2"
                 value={addNewSkuData.length_board_size_cm2 || null}
@@ -639,6 +732,18 @@ function DieCutBox({
                 className="w-[50%] p-[2px] text-center focus:outline-none bg-gray-50"
                 min="0"
               />
+              <span className="flex items-center justify-center text-gray-500">x</span>
+                            <input
+                id="width_board_size_cm2"
+                name="width_board_size_cm2"
+                value={addNewSkuData.width_board_size_cm2 || null}
+                onChange={handleChange}
+                readOnly
+                type="number"
+                className="w-[50%] p-[2px] text-center focus:outline-none rounded-l-md bg-gray-50"
+                min="0"
+              />
+          
             </div>
           </div>
         </Tooltip>
@@ -649,11 +754,11 @@ function DieCutBox({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Deckle Size
                 <span className="text-red-500 ml-1">*</span>
-                {errors.deckle_size && (
+                {/*{errors.deckle_size && (
                   <span className="text-red-500 text-sm ml-2 align-middle">
                     {errors.deckle_size}
                   </span>
-                )}
+                )}*/}
               </label>
               <input
                 id="deckle_size"
@@ -663,11 +768,15 @@ function DieCutBox({
                 min="0"
                 readOnly={editTag}
                 onChange={handleChange}
-                className={`w-full p-1 border rounded-md focus:ring-2 transition-colors ${
-                  diecutCalculations.deckleError
-                    ? 'border-red-500 ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                }`}
+                //className={`w-full p-1 border rounded-md focus:ring-2 transition-colors ${
+                //  diecutCalculations.deckleError
+                //    ? 'border-red-500 ring-red-400'
+                //    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                //}`}
+                           className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.deckle_size|| diecutCalculations.deckleError ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
+                
               />
               {diecutCalculations.deckleError && (
                 <p className="mt-1 text-sm text-red-600">{diecutCalculations.deckleError}</p>
@@ -681,18 +790,20 @@ function DieCutBox({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Minimum Order Level
               <span className="text-red-500 ml-1">*</span>
-              {errors.minimum_order_level && (
+              {/*{errors.minimum_order_level && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.minimum_order_level}
                 </span>
-              )}
+              )}*/}
             </label>
             <input
               id="minimum_order_level"
               name="minimum_order_level"
               value={addNewSkuData.minimum_order_level}
               onChange={handleChange}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </div>
@@ -727,6 +838,76 @@ function DieCutBox({
             <option value={15}>15%</option>
           </select>
         </div>
+
+
+        
+      <div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">Print Type</label>
+  <select
+    id="print_type"
+    name="print_type"
+    value={addNewSkuData?.print_type || ''}
+    onChange={handleChange}
+    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+  >
+    <option value="">Select Type</option>
+    <option value="None">None</option>
+    <option value="Offset">Offset</option>
+    <option value="Flexo">Flexo</option>
+  </select>
+</div>
+
+{(addNewSkuData?.print_type === 'Offset' || addNewSkuData?.print_type === 'Flexo') && (
+  <div className="flex w-[200px]">
+    <div className="flex flex-col flex w-[200px]">
+      {/* Custom styled file input */}
+         <label className="block text-sm font-medium text-gray-700 mb-2">Documents</label>
+     <label
+          htmlFor="file-upload"
+          className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
+        >
+          <CIcon icon={cilCloudUpload} size="sm" className="text-gray-700" /> Upload Files
+        </label>
+      <input
+        id="file-upload"
+        type="file"
+        accept="application/pdf"
+        onChange={handleFileUpload}
+        multiple
+        className="hidden"
+      />
+
+      {/* Uploading text */}
+      {isUploading && (
+        <div className="text-sm text-blue-600 mt-2">Uploading files...</div>
+      )}
+
+      {/* Display uploaded files */}
+      {uploadedFiles.length > 0 && (
+        <div className="mt-2">
+          <p className="text-xs text-gray-600 mb-1">Uploaded files:</p>
+       <ul className="space-y-0.5">
+  {uploadedFiles.map((file, index) => (
+    <li key={index} className="flex items-center text-xs w-full max-w-[240px]">
+      <div className="flex-1 truncate text-gray-700">
+        {file.name || (typeof file === 'string' ? file.split('/').pop() : file.url.split('/').pop())}
+      </div>
+      <button
+        type="button"
+        onClick={() => removeFile(index)}
+        className="ml-1 text-red-500 hover:text-red-700 text-sm"
+      >
+        ✕
+      </button>
+    </li>
+  ))}
+</ul>
+
+        </div>
+      )}
+    </div>
+  </div>
+)}
       </div>
 
       <PopUp

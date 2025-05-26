@@ -3,6 +3,8 @@ import apiMethods from '../../api/config'
 
 function ViewMachineData({ Id }) {
   const [machineData, setMachineData] = useState(null)
+  const [AllProcess, setAllProcess] = useState([])
+  const [values, setValues] = useState([])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -15,6 +17,35 @@ function ViewMachineData({ Id }) {
     }
     fetchData()
   }, [Id])
+
+  useEffect(() => {
+    const fetchValues = async () => {
+      try {
+        const response = await apiMethods.getProcessValues()
+        const Process = await apiMethods.getByMachineId(Id)
+        setAllProcess(Process.data.data)
+
+        const allValues = response.data.data
+        const machineProcesses = Process.data.data
+
+        // Find matching process values for each machine process
+        const matchedValues = machineProcesses
+          .map((machineProcess) => {
+            return allValues.find(
+              (processValue) => processValue.process_name_id === machineProcess.process_id,
+            )
+          })
+          .filter(Boolean)
+
+        setValues(matchedValues)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    fetchValues()
+  }, [Id])
+
+  console.log(values)
 
   if (!machineData) {
     return (
@@ -126,6 +157,28 @@ function ViewMachineData({ Id }) {
         </div>
       </div>
 
+      <div className="mt-4 bg-gray-50 p-4 rounded-lg">
+        <div className=" bg-gray-50 rounded-lg">
+          <h3 className="text-sm uppercase tracking-wide text-black mb-2">Process Values</h3>
+          {values.length > 0 ? (
+            values.map((value, index) => (
+              <div key={index} className="mb-4 bg-white p-2">
+                <h4 className="text-sm">{value.ProcessName.process_name}</h4>
+                <div className="grid grid-cols-3 gap-2 mt-2 ">
+                  {Object.entries(value.process_value).map(([key, val]) => (
+                    <div key={key} className=" p-2 rounded">
+                      <span className="text-gray-600 text-sm">{key}: </span>
+                      <span className="font-medium">{val || <span className='text-xs'>N/A</span>}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-600 text-sm text-center">No process values found.</p>
+          )}
+        </div>
+      </div>
       <div className="mt-4 bg-gray-50 p-4 rounded-lg">
         <h3 className="text-sm uppercase tracking-wide text-black mb-2">Dates & Maintenance</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

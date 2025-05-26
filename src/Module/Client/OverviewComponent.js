@@ -23,8 +23,6 @@ const OverviewComponent = ({ tableData }) => {
 
           {/* Right content */}
           <div className="ml-3">
-            {' '}
-            {/* Reduced margin */}
             {/*<p className="font-semibold text-sm m-0">Mr. Siva Shakthi Ram</p>*/}
             <p className="font-semibold text-sm m-0">
               {tableData?.salutation}
@@ -38,7 +36,7 @@ const OverviewComponent = ({ tableData }) => {
             </p>
           </div>
         </div>
-        <div className="border-b border-gray-200 pt-3">
+        <div className="pt-3">
           {/* Accordion Header */}
           <div
             onClick={() => setIsOpen(!isOpen)}
@@ -94,7 +92,7 @@ const OverviewComponent = ({ tableData }) => {
           )}
         </div>
         {/*other details*/}
-        <div className="border-b border-gray-200 pt-3">
+        <div className="pt-3">
           {/* Accordion Header */}
           <div
             onClick={() => setIsOpenDetails(!isOpenDetails)}
@@ -131,7 +129,7 @@ const OverviewComponent = ({ tableData }) => {
           )}
         </div>
         {/*contact persons*/}
-        <div className="border-b border-gray-200 pt-3">
+        <div className="pt-3">
           {/* Accordion Header */}
           <div
             onClick={() => setIsOpenContact(!isOpenContact)}
@@ -152,7 +150,7 @@ const OverviewComponent = ({ tableData }) => {
           )}
         </div>
         {/*record info*/}
-        <div className="border-b border-gray-200 pt-3">
+        <div className="pt-3">  
           {/* Accordion Header */}
           <div
             onClick={() => setIsOpenRecord(!isOpenRecord)}

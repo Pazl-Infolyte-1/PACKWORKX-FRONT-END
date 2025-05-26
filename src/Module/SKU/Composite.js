@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import RoutePopup from './RoutePopup'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
 import { setCompositeArray } from '../../action'
+import { setSkuPartValue } from '../../action'
 
 const compositeTypes = [
   { id: '1', name: 'Partition' },
@@ -59,6 +60,7 @@ function Composite({
   setMessage,
   errors,
   setErrors,
+  validationErrors
 }) {
   const [skuListTable, setSkuListTable] = useState([])
   const [skuFields, setSkuFields] = useState([])
@@ -94,6 +96,8 @@ function Composite({
   const [displayAsChips, setDisplayAsChips] = useState([])
   const [isSingleViewPopupRoute, setisSingleViewPopupRoute] = useState(false)
   const [fullRouteResponse, setFullRouteResponse] = useState(null)
+
+
 
   const selectionFrame = {
     vendor: {
@@ -177,6 +181,7 @@ function Composite({
       }
       return updatedFields // Return the updated fields
     })
+
   }
 
   const handleChangeRatio = (index, value) => {
@@ -189,24 +194,27 @@ function Composite({
     setSkuFields((prev) => prev.filter((field) => field.key !== key))
   }
 
-  useEffect(() => {
-    const part_value = skuFields
-      .filter((field) => field.id !== '')
-      .map((field) => {
-        const selectedSku = skuList.find((sku) => sku.id === parseInt(field.id))
-        return {
-          sku_id: selectedSku?.id,
-          sku_name: selectedSku?.sku_name,
-          ratio: field.ratio,
-        }
-      })
+useEffect(() => {
+  const part_value = skuFields.map((field) => {
+    const selectedSku = skuList.find((sku) => sku.id === parseInt(field.id))
 
-    setAddNewSkuData((prev) => ({
-      ...prev,
-      part_value,
-      part_count: part_value.length,
-    }))
-  }, [skuFields, skuList])
+    return {
+      sku_id: selectedSku?.id ?? null,
+      sku_name: selectedSku?.sku_name ?? null,
+      ratio:
+        field.ratio !== undefined && field.ratio !== null && field.ratio !== ''
+          ? field.ratio
+          : null,
+    }
+  })
+
+  setAddNewSkuData((prev) => ({
+    ...prev,
+    part_value,
+    part_count: part_value.length,
+  }))
+}, [skuFields, skuList])
+
 
   useEffect(() => {
     if (addNewSkuData?.part_value?.length > 0) {
@@ -464,6 +472,46 @@ function Composite({
     }
   }, [selectedRouteIds2])
 
+  console.log("part valjue",JSON.stringify(addNewSkuData.part_value))
+
+  console.log("errors",errors)
+
+
+  useEffect(() => {
+  const part_value = skuFields.map((field) => {
+    const selectedSku = skuList.find((sku) => sku.id === parseInt(field.id))
+
+    return {
+      sku_id: selectedSku?.id ?? null,
+      sku_name: selectedSku?.sku_name ?? '',
+      ratio:
+        field.ratio !== undefined && field.ratio !== null && field.ratio !== ''
+          ? parseFloat(field.ratio)
+          : null,
+    }
+  })
+
+  dispatch(setSkuPartValue(part_value)) // ✅ Push to Redux
+  setAddNewSkuData((prev) => ({
+    ...prev,
+    part_value,
+    part_count: part_value.length,
+  }))
+}, [skuFields, skuList])
+
+const reduxSkuFields = useSelector((state) => state.skuBuilder?.part_value || [])
+
+useEffect(() => {
+  if (reduxSkuFields.length > 0) {
+    const restoredFields = reduxSkuFields.map((item) => ({
+      id: item.sku_id,
+      sku_name: item.sku_name,
+      ratio: item.ratio,
+      key: Date.now() + Math.random(), // Ensure unique keys
+    }))
+    setSkuFields(restoredFields)
+  }
+}, [])
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
@@ -504,16 +552,18 @@ function Composite({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             SKU Name
             <span className="text-red-500 ml-1">*</span>
-            {errors.sku_name && (
+            {/*{errors.sku_name && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
-            )}
+            )}*/}
           </label>
           <input
             id="sku_name"
             name="sku_name"
             value={addNewSkuData.sku_name}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.sku_name ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           />
         </div>
 
@@ -521,9 +571,9 @@ function Composite({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Client Name
             <span className="text-red-500 ml-1">*</span>
-            {errors.client_id && (
+            {/*{errors.client_id && (
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
-            )}
+            )}*/}
           </label>
           <select
             name="client"
@@ -531,7 +581,9 @@ function Composite({
             disabled={clientDiasble}
             value={addNewSkuData.client_id}
             onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.client_id ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
           >
             <option value="" hidden>
               Select
@@ -552,18 +604,20 @@ function Composite({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Partition Panel
             <span className="text-red-500 ml-1">*</span>
-            {errors.composite_type && (
+            {/*{errors.composite_type && (
               <span className="text-red-500 text-sm ml-2 align-middle">
                 {errors.composite_type}
               </span>
-            )}
+            )}*/}
           </label>
           <select
             name="composite_type"
             id="composite_type"
             value={addNewSkuData?.composite_type}
             disabled={editTag}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.composite_type ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             onChange={handleCompositeTypeChange}
           >
             <option value="">Select</option>
@@ -577,18 +631,20 @@ function Composite({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Minimum Order Level
               <span className="text-red-500 ml-1">*</span>
-              {errors.minimum_order_level && (
+              {/*{errors.minimum_order_level && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.minimum_order_level}
                 </span>
-              )}
+              )}*/}
             </label>
             <input
               id="minimum_order_level"
               name="minimum_order_level"
               value={addNewSkuData.minimum_order_level}
               onChange={handleChange}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+      errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
+    }`}
             />
           </div>
         </div>
@@ -689,28 +745,31 @@ function Composite({
                           className="w-full px-1 py-[5px] text-sm bg-gray-100 border border-gray-300 rounded text-black"
                         />
                       ) : (
-                        <select
-                          className="w-full h-[30px] px-1 border border-gray-300 text-sm rounded-md bg-white text-black outline-none"
-                          value={field.id || ''}
-                          onChange={(e) => handleChangeSkuSelect(index, e.target.value)}
-                        >
-                          {addNewSkuData.part_value.length === 0 && (
-                            <option value="" disabled>
-                              Select SKU
-                            </option>
-                          )}
-                          {skuList.map((sku) => {
-                            // Check if the SKU is already selected in other fields
-                            //const isSelected = skuFields.some((f, i) => f.id === sku.id && i !== index);
-                            const isInComposite = compositeArray.includes(Number(sku.id))
-                            return (
-                              <option key={sku.id} value={sku.id} disabled={isInComposite}>
-                                {sku.sku_name}
-                              </option>
-                            )
-                          })}
-                        </select>
+                      <select
+  className={`w-full h-[30px] px-1 text-sm rounded-md bg-white text-black outline-none ${
+    errors?.part_value?.[index]?.sku
+      ? 'border-2 border-red-500'
+      : 'border border-gray-300'
+  }`}
+  value={field.id || ''}
+  onChange={(e) => handleChangeSkuSelect(index, e.target.value)}
+>
+  <option value="" disabled>
+    Select
+  </option>
+  {skuList.map((sku) => {
+    const isInComposite = compositeArray.includes(Number(sku.id))
+    return (
+      <option key={sku.id} value={sku.id} disabled={isInComposite}>
+        {sku.sku_name}
+      </option>
+    )
+  })}
+</select>
+
+
                       )}
+
                     </td>
                     <td className="border border-gray-300 px-3 py-2">
                       <input
@@ -718,8 +777,14 @@ function Composite({
                         placeholder="Ratio"
                         value={field.ratio ?? ''}
                         onChange={(e) => handleChangeRatio(index, e.target.value)}
-                        className="w-[70%] p-1 text-center focus:outline-none border border-gray-300 rounded text-sm"
+                    className={`w-[70%] p-1 text-center text-sm focus:outline-none rounded ${
+    errors?.part_value?.[index]?.ratio
+      ? 'border-2 border-red-500'
+      : 'border border-gray-300'
+  }`}
                       />
+
+
                     </td>
                     <td className="border border-gray-300 px-3 py-2 text-center">
                       <button

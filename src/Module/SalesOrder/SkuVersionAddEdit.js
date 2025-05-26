@@ -5,8 +5,19 @@ import CustomAlert from "../../components/New/CustomAlert";
 import PopUp from "../../components/New/PopUp";
 import VersionChoicePopup from "./VersionChoicePopup";
 
-function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, skuVersionID, visible, setVisible }) {
-  const [skuValues, setSkuValues] = useState([]);
+function SkuVersionAddEdit({
+  skuID,
+  setSkuVersionsMap,
+  orderId,
+  IsEditVersion,
+  skuVersionID,
+  visible,
+  setVisible,
+  currentVersionCount,
+  setWorkOrders ,
+  skuvaluesFromParent
+      }) {
+  const [skuValues, setSkuValues] = useState([skuvaluesFromParent]);
   const [clientID, setClientID] = useState("");
   const [skuVersion, setSkuVersion] = useState("");
   const [alerts, setAlerts] = useState([]);
@@ -17,63 +28,106 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   const [editedMap, setEditedMap] = useState({});
   const [skuOptions, setSkuOptions] = useState({});
   const [focusedField, setFocusedField] = useState(null);
+  // const [currentVersionCount, setCurrentVersionCount] = useState(0);
 
+  // Helper function to check if any changes have been made
+  const hasChanges = () => {
+    return Object.keys(editedMap).length > 0;
+  };
 
-
-
-
-
-  useEffect(() => {
+ useEffect(() => {
     const fetchData = async () => {
       try {
         if (IsEditVersion && skuVersionID) {
-          // Fetch specific SKU version data when in edit mode
+          // Case 1: Edit Mode with Version ID
           const versionResponse = await apiMethods.getSingleSkuVersion(skuVersionID);
-
+  
           if (versionResponse?.data) {
-
             setSkuValues(versionResponse?.data?.sku_values || []);
             setClientID(versionResponse?.data?.client_id || "");
             setSkuVersion(versionResponse?.data?.sku_version || "");
           }
-        } else {
-          // Fetch SKU Data
-          const response = await apiMethods.getSingleSkuData(skuID);
-          const OptionResponse = await apiMethods.getSkuValuesOptions(skuID)
-          setSkuOptions(OptionResponse?.data?.options || {});
-          console.log(OptionResponse?.data?.options, 'fffffffffffffffffffffff')
+  
+        } else if (skuID && skuVersionID) {
+          // 🔹 Case 2: Both skuID and skuVersionID are available (but not in edit mode)
+          console.log("Handling skuID + skuVersionID case (not edit mode)");
+          // Add your custom logic here for this case
+          // Example:
+          const [skuResponse, versionResponse] = await Promise.all([
+            apiMethods.getSingleSkuData(skuID),
+            apiMethods.getSingleSkuVersion(skuVersionID)
+          ]);
 
+          setWorkOrders(prevOrders =>
+            prevOrders.map(order =>
+              order.id === orderId
+                ? { ...order, ["work_order_sku_values"]: versionResponse?.data?.sku_values || []  }
+                : order
+            )
+          )
 
-
-
-          if (response?.data?.sku_values && Array.isArray(response.data.sku_values)) {
-            setSkuValues(response.data.sku_values);
-            setSkuInitalData(response.data.sku_values)
-            setClientID(response.data.client_id);
-            setSkuversionLimit(response.data.sku_version_limit)
+          if (skuResponse?.data && versionResponse?.data) {
+            setSkuValues(versionResponse?.data?.sku_values || []);
+            setClientID(skuResponse?.data?.client_id || "");
+            setSkuOptions((await apiMethods.getSkuValuesOptions(skuID))?.data?.options || {});
+            setSkuversionLimit(skuResponse.data.sku_version_limit);
+            setSkuInitalData(versionResponse?.data?.sku_values || []);
+            const skuversionID = `V${versionResponse?.data?.data?.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+            setSkuVersion(skuversionID);
           }
 
-          // Fetch SKU Versions
+  
+        } else {
+          // Case 3: Only skuID is available (create new)
+          const response = await apiMethods.getSingleSkuData(skuID);
+          const OptionResponse = await apiMethods.getSkuValuesOptions(skuID);
+          setSkuOptions(OptionResponse?.data?.options || {});
+  
+          if (response?.data?.sku_values && Array.isArray(response.data.sku_values)) {
+
+            setWorkOrders(prevOrders =>
+              prevOrders.map(order =>
+                order.id === orderId
+                  ? { ...order, ["work_order_sku_values"]: response.data.sku_values || []  }
+                  : order
+              )
+            )
+            setSkuValues(response.data.sku_values);
+            setSkuInitalData(response.data.sku_values);
+            setClientID(response.data.client_id);
+            setSkuversionLimit(response.data.sku_version_limit);
+          }
+  
+          // Generate new SKU version ID
           const versionsResponse = await apiMethods.getSkuVersions(skuID);
-          const skuversionID = `V${versionsResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+          // setCurrentVersionCount(versionsResponse?.data?.data?.length || 0);
+          const skuversionID = `V${versionsResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
           setSkuVersion(skuversionID);
         }
       } catch (error) {
         console.error("Error fetching SKU data or versions:", error);
       }
     };
-
-    if (skuID) {
+  
+    if(skuID){
       fetchData();
     }
-  }, [skuID, IsEditVersion, skuVersionID, setSkuVersionsMap]);
-
-
+  }, [skuID, IsEditVersion, skuVersionID, setSkuVersionsMap,]);
+  
 
   const handleValueChange = (index, field, value) => {
-    const updatedValues = [...skuValues];
+
+    const updatedValues = [...skuvaluesFromParent];
     updatedValues[index][field] = value;
     setSkuValues(updatedValues);
+
+    setWorkOrders(prevOrders =>
+      prevOrders.map(order =>
+        order.id === orderId
+          ? { ...order, ["work_order_sku_values"]: updatedValues || []  }
+          : order
+      )
+    )
 
     // Track changed field per index
     setEditedMap(prev => {
@@ -82,8 +136,10 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
       return { ...prev, [index]: updatedFields };
     });
   };
+
   const handleAddOption = async () => {
     try {
+      console.log(editedMap)
       const field_options = Object.entries(editedMap).flatMap(([index, fields]) => {
         return Object.entries(fields).map(([fieldName, fieldValue]) => ({
           field_path: `sku_values.${index}.${fieldName}`,
@@ -102,8 +158,10 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
 
       const response = await apiMethods.postSkuValuesOptions(requestBody);
 
-      console.log(response);
 
+      const optionResponse = await apiMethods.getSkuValuesOptions(skuID);
+      setSkuOptions(optionResponse?.data?.options || {});
+            
       setTimeout(() => {
         setAlerts([{ severity: "success", message: response?.data?.message || "SKU Options Added Successfully" }]);
       }, 1000);
@@ -118,18 +176,17 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     }
   };
 
-
-
-
-
   const handleSubmit = async () => {
-    // setIsLoading(true);
+    // Don't proceed if no changes have been made
+    if (!hasChanges()) {
+      return;
+    }
 
     const requestBody = {
       sku_id: skuID,
       sku_version: skuVersion,
       client_id: clientID,
-      sku_values: skuValues
+      sku_values: skuvaluesFromParent
     };
 
     if (IsEditVersion && skuVersionID) {
@@ -155,14 +212,8 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     } else {
       // Create mode
       setVersionChoiceOpen(true)
-
     }
   };
-
-
-
-
-
 
   const handleClose = () => {
     setAlerts([]);
@@ -175,14 +226,6 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
   const handleAddVersion = async () => {
     try {
       // Get the current versions before submitting
-
-      const requestBody = {
-        sku_id: skuID,
-        sku_version: skuVersion,
-        client_id: clientID,
-        sku_values: skuValues
-      };
-
       const versionsResponse = await apiMethods.getSkuVersions(skuID);
       const currentVersionCount = versionsResponse?.data?.data?.length || 0;
 
@@ -191,7 +234,12 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
         return; // Exit early, do not proceed
       }
 
-      requestBody.sku_version = `v${currentVersionCount + 1}_${Date.now()}`;
+      const requestBody = {
+        sku_id: skuID,
+        sku_version: `v${currentVersionCount + 1}_${Date.now()}`,
+        client_id: clientID,
+        sku_values: skuvaluesFromParent
+      };
 
       const response = await apiMethods.addSkuVersion(requestBody);
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
@@ -202,7 +250,12 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
           ...prev,
           [orderId]: updatedVersionsResponse.data.data
         }));
+        // setCurrentVersionCount(updatedVersionsResponse.data.data.length)
       }
+
+      // Clear edited map and close popup
+      setEditedMap({});
+      setVersionChoiceOpen(false);
     } catch (error) {
       setAlerts([{ severity: "error", message: error?.response?.data?.message || "Failed to add SKU Version" }]);
       console.error("Error submitting data:", error);
@@ -212,33 +265,31 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
     }
   }
 
-
-
-
-
+  const handleOneTimeUse = ()=>{
+    // setEditedMap({});
+    setVersionChoiceOpen(false);
+  }
 
   return (
     <>
-
-
-      {skuValues.length > 0 && (
+      {skuvaluesFromParent?.length > 0 && (
         <div className="p-4">
-          <h2 className="text-xl font-semibold mb-4">SKU Version Details</h2>
+          <h2 className="text-sm font-semibold mb-4">SKU Version Details</h2>
           <CustomAlert alerts={alerts} handleClose={handleClose} />
 
           <div className="mt-6">
             <div className="border rounded-lg overflow-auto">
               <table className="w-full">
                 <thead className="bg-gray-100">
-                  <tr className="text-gray-500 text-center">
-                    <th className="p-2">Layer</th>
-                    <th className="p-2">GSM</th>
-                    <th className="p-2">BF</th>
-                    <th className="p-2">Color</th>
-                    <th className="p-2">Flute Type</th>
-                    <th className="p-2">Material</th>
-                    <th className="p-2">Weight (Kg)</th>
-                    <th className="p-2">
+                  <tr className="text-gray-500 text-sm text-center">
+                    <th className="p-1">Layer</th>
+                    <th className="p-1">GSM</th>
+                    <th className="p-1">BF</th>
+                    <th className="p-1">Color</th>
+                    <th className="p-1">Flute Type</th>
+                    <th className="p-1">Material</th>
+                    <th className="p-1">Weight (Kg)</th>
+                    <th className="p-1">
                       Bursting Strength <br />
                       <span className="text-xs">
                         (Kg Per Cm<sup>2</sup>)
@@ -247,7 +298,7 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
                   </tr>
                 </thead>
                 <tbody>
-                {skuValues.map((item, index) => (
+                {skuvaluesFromParent.map((item, index) => (
   <tr key={index} className="flex-wrap">
     <td className="p-2 text-center w-full sm:w-2/12 md:w-2/12 lg:w-2/12 relative">
       <div className="relative w-full">
@@ -430,28 +481,49 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
 ))}
 
                 </tbody>
-
-
               </table>
-              <div className="p-2 flex w-[100%]  justify-end">
+              <div className="p-2 flex w-[100%] justify-end">
                 <button
-                  className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
+                  className={`
+                    inline-flex items-center gap-1.5
+                    text-white text-xs font-medium
+                    px-3 py-1.5
+                    rounded border
+                    transition-colors duration-150
+                    ${hasChanges() && !isLoading 
+                      ? 'bg-gray-400 hover:bg-gray-700 cursor-pointer' 
+                      : 'bg-gray-300 cursor-not-allowed opacity-50'
+                    }
+                  `}
                   onClick={handleSubmit}
-                  disabled={isLoading}
+                  disabled={!hasChanges() || isLoading}
                 >
                   {isLoading ? (
                     <>
-                      <FaSpinner className="animate-spin mr-2" />
-                      {IsEditVersion ? "Updating..." : "Processing..."}
+                      <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      {IsEditVersion ? "Updating..." : "Adding..."}
                     </>
                   ) : (
-                    IsEditVersion ? "Update Version" : "Add As Version"
+                    <>
+                      {IsEditVersion ? (
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      ) : (
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                      )}
+                      {IsEditVersion ? "Update" : "Add"}
+                    </>
                   )}
                 </button>
               </div>
             </div>
-
-
           </div>
         </div>
       )}
@@ -461,8 +533,10 @@ function SkuVersionAddEdit({ skuID, setSkuVersionsMap, orderId, IsEditVersion, s
         setIsOpen={setVersionChoiceOpen}
         handleAddVersion={handleAddVersion}
         handleAddOption={handleAddOption}
-      >
-      </VersionChoicePopup>
+        skuversionLimit={skuversionLimit}
+        currentVersionCount={currentVersionCount}
+        handleOneTimeUse={handleOneTimeUse}
+      />
     </>
   );
 }
@@ -473,3 +547,5 @@ export default SkuVersionAddEdit;
 
 
 
+// In handleSubmit success cases
+// setEditedMap({}); // This will disable the button again

@@ -1,22 +1,62 @@
 import { cilDollar, cilEnvelopeOpen, cilPencil, cilPrint } from "@coreui/icons";
+import { useParams } from "react-router-dom"; // to extract `id` from the URL
 import CIcon from "@coreui/icons-react";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import apiMethods from "../../api/config";
 
-export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIsminimiseTable}) {
+export default function SalesOrderView({ }) {
+  const navigate = useNavigate();
+  const [salesOrderData, setSalesOrderData] = useState(null);
+  const [workOrdersExpanded, setWorkOrdersExpanded] = useState(false);
+
+  const { id } = useParams();
+
+
+  useEffect(() => {
+    const fetchSalesOrderData = async () => {
+      try {
+        const response = await apiMethods.getSaleOrderData(id);
+        setSalesOrderData(response?.data);
+      } catch (error) {
+        console.error("Error viewing sales order:", error);
+        // setAlerts([{
+        //   severity: "error",
+        //   message: error?.response?.data?.message || "Error viewing sales order"
+        // }]);
+      }
+    };
+  
+    if (id) {
+      fetchSalesOrderData();
+    }
+  }, [id]);
+  
+
+  // Format date function
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB"); // DD/MM/YYYY format
+  };
+
   return (
-    <div className="bg-white w-full font-sans flex flex-col" style={{height: '90vh'}}>
+<div className="bg-white w-full font-sans flex flex-col" style={{height: '90vh'}}>
       {/* Header */}
       <div className="w-full bg-white z-50">
         <div className="flex justify-between items-top p-2">
-          <h1 className="text-lg font-semibold">Sales Order # {salesOrderData.sales_generate_id}</h1>
+          <h1 className="text-lg font-semibold">Sales Order # {salesOrderData?.sales_generate_id}</h1>
           <div className="flex items-start space-x-4">
             <button className="text-black text-xs">Upload Files</button>
             <button className="text-black text-xs">Comments & History</button>
-            <button className="text-gray-500 text-sm items-start" onClick={()=>{SetviewSalesOrder(false),setIsminimiseTable(false)}}>✕</button>
+            <button className="text-gray-500 text-sm items-start" onClick={()=>{navigate('/salesorder')}}>✕</button>
           </div>
         </div>
         <div className="flex bg-gray-50 px-3 border-t text-xs">
-          <button className="flex items-centergap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
+          <button
+           className="flex items-centergap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600"
+           onClick={()=>navigate(`/salesorder/form/${salesOrderData?.id}?tab=salesOrder`)}
+           >
             <CIcon icon={cilPencil} className="h-3 w-3" />
             <span>Edit</span>
           </button>
@@ -58,8 +98,8 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
             </div>
           </div>
 
-          {/* Invoices section */}
-          <div className="bg-white border border-gray-200 rounded mb-3 hover:shadow-sm text-xs">
+               {/* Invoices section */}
+               <div className="bg-white border border-gray-200 rounded mb-3 hover:shadow-sm text-xs">
             <div className="p-2 flex items-center justify-between cursor-pointer hover:bg-gray-50">
               <div className="flex items-center gap-1.5">
                 <div className="bg-gray-100 p-0.5 rounded">
@@ -72,13 +112,175 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
                 </div>
               </div>
               <div className="flex items-center">
-                <span className="bg-blue-100 text-blue-800 px-1 py-0.5 rounded-full text-xs">1</span>
+                <span className="bg-blue-100 text-blue-800 px-1 py-0.5 rounded-full text-xs">
+                  0
+                </span>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 text-gray-400 ml-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
             </div>
           </div>
+
+          {/* Work Orders section */}
+          {salesOrderData?.workOrders && salesOrderData?.workOrders?.length > 0 ? (
+            <div className="bg-white border border-gray-200 rounded-lg mb-3 overflow-hidden text-xs shadow-sm">
+              <div 
+                className="p-4 flex items-center justify-between cursor-pointer border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200"
+                onClick={() => setWorkOrdersExpanded(!workOrdersExpanded)}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="bg-gradient-to-br from-green-100 to-green-50 p-2 rounded-lg shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h.01a1 1 0 100-2H7zm2 0a1 1 0 100 2h.01a1 1 0 100-2H9zm2 0a1 1 0 100 2h.01a1 1 0 100-2H11z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-sm">Work Orders</h3>
+                    <p className="text-gray-500 text-xs">Production orders generated from this sales order</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm">
+                    {salesOrderData?.workOrders?.length}
+                  </span>
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className={`h-4 w-4 text-gray-400 transition-all duration-300 ${workOrdersExpanded ? 'rotate-90' : ''}`} 
+                    viewBox="0 0 20 20" 
+                    fill="currentColor"
+                  >
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Expandable Work Orders Content */}
+              <div 
+                className={`border-t bg-gradient-to-b from-gray-50 to-white transition-all duration-300 ease-in-out ${
+                  workOrdersExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+                } overflow-hidden`}
+              >
+                <div className="p-4 space-y-4">
+                  {salesOrderData?.workOrders?.map((workOrder, idx) => (
+                    <div 
+                      key={idx} 
+                      className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-200"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-3">
+                            <span className="font-semibold text-blue-600 text-sm hover:text-blue-800 transition-colors cursor-pointer">
+                              {workOrder?.work_generate_id}
+                            </span>
+                            <div className="flex gap-2">
+                              <span className={`px-3 py-1.5 rounded-full text-xs font-medium shadow-sm ${
+                                workOrder?.progress === "Completed" ? "bg-gradient-to-r from-green-100 to-green-50 text-green-800" :
+                                workOrder?.progress === "In-progress" ? "bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800" :
+                                workOrder?.progress === "Pending" ? "bg-gradient-to-r from-yellow-100 to-yellow-50 text-yellow-800" :
+                                "bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800"
+                              }`}>
+                                {workOrder?.progress}
+                              </span>
+                              <span className={`px-3 py-1.5 rounded-full text-xs font-medium shadow-sm ${
+                                workOrder?.priority === "High" ? "bg-gradient-to-r from-red-100 to-red-50 text-red-800" :
+                                workOrder?.priority === "Medium" ? "bg-gradient-to-r from-orange-100 to-orange-50 text-orange-800" :
+                                "bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800"
+                              }`}>
+                                {workOrder?.priority}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4 text-xs text-gray-600 bg-gray-50 p-3 rounded-lg shadow-sm">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-700">SKU:</span> 
+                              <span className="text-blue-600">{workOrder?.sku_name}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-700">Quantity:</span> 
+                              <span className="text-gray-800">{workOrder?.qty}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-700">Manufacture:</span> 
+                              <span className="capitalize text-gray-800">{workOrder?.manufacture}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-700">EDD:</span> 
+                              <span className="text-gray-800">{formatDate(workOrder?.edd)}</span>
+                            </div>
+                          </div>
+                          
+                          {workOrder?.description && (
+                            <div className="mt-3 text-xs text-gray-600 bg-gray-50 p-3 rounded-lg shadow-sm">
+                              <span className="font-medium text-gray-700">Description:</span> {workOrder?.description}
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
+                            <div className="flex items-center gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                              </svg>
+                              <span>Planned: {formatDate(workOrder?.planned_start_date)} - {formatDate(workOrder?.planned_end_date)}</span>
+                            </div>
+                            {workOrder?.acceptable_excess_units && (
+                              <div className="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                                </svg>
+                                <span>Excess Units: {workOrder?.acceptable_excess_units}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-col items-end gap-3 ml-6">
+                          {workOrder?.qr_code_url && (
+                            <button className="text-blue-600 hover:text-blue-800 text-xs font-medium flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-blue-50 transition-all duration-200">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                              </svg>
+                              View QR
+                            </button>
+                          )}
+                          <button className="text-blue-600 hover:text-blue-800 text-xs font-medium flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-blue-50 transition-all duration-200">
+                            View Details
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white border border-gray-200 rounded-lg mb-3 overflow-hidden text-xs">
+              <div className="p-3 flex items-center justify-between cursor-pointer border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <div className="bg-gradient-to-br from-gray-100 to-gray-50 p-1.5 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h.01a1 1 0 100-2H7zm2 0a1 1 0 100 2h.01a1 1 0 100-2H9zm2 0a1 1 0 100 2h.01a1 1 0 100-2H11z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-xs">Work Orders</h3>
+                    <p className="text-gray-500 text-xs">No work orders have been created yet</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                    0
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+     
         </div>
 
         {/* Main form content */}
@@ -86,12 +288,16 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
           <div className="flex flex-col md:flex-row justify-between">
             <div className="flex flex-col gap-0 mb-4 md:mb-0">
               <span className="text-xl">SALES ORDER</span>
-              <span className="text-xs text-gray-600">Sales Order# <span className="font-bold">SO-00002</span></span>
+              <span className="text-xs text-gray-600">Sales Order# <span className="font-bold">{salesOrderData?.sales_generate_id}</span></span>
             </div>
 
             <div className="flex flex-col gap-0 items-start">
               <span className="text-xs font-semibold">Billing Address</span>
-              <span className="text-xs text-gray-600">Sales Order# <span className="font-bold">SO-00002</span></span>
+              <span className="text-xs text-gray-600">{salesOrderData?.client}</span>
+              <span className="text-xs text-gray-600">{salesOrderData?.confirmation_email}</span>
+              {salesOrderData?.confirmation_mobile && (
+                <span className="text-xs text-gray-600">{salesOrderData?.confirmation_mobile}</span>
+              )}
             </div>
           </div>
 
@@ -99,21 +305,24 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
             <div>
               <h2 className="font-semibold text-xs text-gray-700 mb-2">STATUS</h2>
               <div className="flex flex-col border-l-2 pl-2 gap-2 border-yellow-500 text-xs w-[170px]">
-                <div className="flex justify-between text-green-600">
-                  <span className="text-black">Invoice:</span>
-                  <span>Partially Invoiced</span>
+                <div className="flex justify-between">
+                  <span className="text-black">Sales Status:</span>
+                  <span className={`${
+                    salesOrderData?.sales_status === "Pending" ? "text-orange-500" : 
+                    salesOrderData?.sales_status === "Completed" ? "text-green-600" : "text-blue-600"
+                  }`}>
+                    {salesOrderData?.sales_status}
+                  </span>
                 </div>
-                <div className="flex justify-between text-green-600">
-                  <span className="text-black">Invoice:</span>
-                  <span>Partially Invoiced</span>
+                <div className="flex justify-between">
+                  <span className="text-black">Confirmation:</span>
+                  <span className="text-blue-600">{salesOrderData?.confirmation || "N/A"}</span>
                 </div>
-                <div className="flex justify-between text-green-600">
+                <div className="flex justify-between">
                   <span className="text-black">Payment:</span>
-                  <span>Unpaid</span>
-                </div>
-                <div className="flex justify-between text-orange-500">
-                  <span className="text-black">Shipment:</span>
-                  <span>Pending</span>
+                  <span className="text-orange-500">
+                    {salesOrderData?.credit_period ? `${salesOrderData?.credit_period} days credit` : "Unpaid"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -122,25 +331,34 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
           <div className="text-xs space-y-2 mb-6">
             <p className="flex flex-col md:flex-row md:gap-[118px]">
               <span>ORDER DATE</span>
-              <span>13/05/2025</span>
+              <span>{formatDate(salesOrderData?.created_at)}</span>
             </p>
             <p className="flex flex-col md:flex-row md:gap-24">
               <span>PAYMENT TERMS</span>
-              <span>Due on Receipt</span>
+              <span>{salesOrderData?.credit_period ? `${salesOrderData?.credit_period} days credit` : "Due on Receipt"}</span>
             </p>
+            {salesOrderData?.freight_paid && (
+              <p className="flex flex-col md:flex-row md:gap-24">
+                <span>FREIGHT PAID</span>
+                <span>₹{parseFloat(salesOrderData?.freight_paid)?.toFixed(2)}</span>
+              </p>
+            )}
           </div>
 
           <div className="border rounded overflow-hidden">
-            <div className="bg-gray-100 grid grid-cols-6 text-xs font-semibold text-gray-600 px-4 py-2">
+            <div className="bg-gray-100 grid grid-cols-9 text-xs font-semibold text-gray-600 px-4 py-2">
               <div className="col-span-2">ITEMS & DESCRIPTION</div>
-              <div>ORDERED</div>
-              <div>STATUS</div>
+              <div>QUANTITY</div>
+              <div>ACCEPTABLE UNITS</div>
               <div>RATE</div>
               <div>AMOUNT</div>
+              <div>PLANNED</div>
+              <div>INVOICED</div>
+              <div>PENDING</div>
             </div>
 
-            {[1, 0].map((status, idx) => (
-              <div key={idx} className="grid grid-cols-6 items-center px-4 py-4 border-t text-sm">
+            {salesOrderData?.SalesSkuDetails?.map((item, idx) => (
+              <div key={idx} className="grid grid-cols-9 items-center px-4 py-4 border-t text-sm">
                 <div className="col-span-2 flex items-center gap-3">
                   <div className="w-10 h-10 bg-gray-200 flex items-center justify-center rounded">
                     <svg
@@ -155,16 +373,25 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
                     </svg>
                   </div>
                   <div>
-                    <p className="text-blue-600 underline cursor-pointer">60ml</p>
-                    <p className="text-gray-600 text-xs">SKU: 60ml</p>
+                    <p className="text-blue-600 underline cursor-pointer">{item?.sku}</p>
+                    <p className="text-gray-600 text-xs">SKU: {item?.sku}</p>
                   </div>
                 </div>
-                <div>1</div>
-                <div>{status} Invoiced</div>
-                <div>₹100.00</div>
-                <div>₹100.00</div>
+                <div>{item?.quantity_required}</div>
+                <div>{item?.acceptable_sku_units}</div>
+                <div>₹{parseFloat(item?.rate_per_sku)?.toFixed(2)}</div>
+                <div>₹{parseFloat(item?.total_amount)?.toFixed(2)}</div>
+                <div>{parseFloat(item?.acceptable_sku_units)?.toFixed(2) || 22}</div>
+                <div>{parseFloat(item?.quantity_required)?.toFixed(2)|| 24}</div>
+                <div>{parseFloat(item?.quantity_required -2)?.toFixed(2)|| 42}</div>
               </div>
             ))}
+            
+            {(!salesOrderData?.SalesSkuDetails || salesOrderData?.SalesSkuDetails?.length === 0) && (
+              <div className="px-4 py-4 text-sm text-gray-500 text-center">
+                No items found
+              </div>
+            )}
           </div>
           
           <div className="w-full flex flex-col items-end text-sm text-gray-900 mt-4">
@@ -173,22 +400,43 @@ export default function SalesOrderView({salesOrderData, SetviewSalesOrder, setIs
                 <tbody>
                   <tr>
                     <td className="text-base font-medium">Sub Total</td>
-                    <td className="text-base font-bold">₹200.00</td>
+                    <td className="text-base font-bold">₹{parseFloat(salesOrderData?.total_amount)?.toFixed(2)}</td>
                   </tr>
                   <tr>
-                    <td colSpan={2} className="text-xs text-gray-600 pt-1">Total Quantity : 2</td>
+                    <td colSpan={2} className="text-xs text-gray-600 pt-1">
+                      Total Quantity : {salesOrderData?.SalesSkuDetails ? 
+                        salesOrderData?.SalesSkuDetails?.reduce((total, item) => total + parseInt(item?.quantity_required), 0) : 0}
+                    </td>
                   </tr>
-                  <tr>
-                    <td className="text-gray-600 pt-3">Discount</td>
-                    <td className="text-gray-600 pt-3">₹0.00</td>
-                  </tr>
+                  {(parseFloat(salesOrderData?.sgst) > 0 || parseFloat(salesOrderData?.cgst) > 0) && (
+                    <>
+                      {parseFloat(salesOrderData?.sgst) > 0 && (
+                        <tr>
+                          <td className="text-gray-600 pt-3">SGST</td>
+                          <td className="text-gray-600 pt-3">₹{parseFloat(salesOrderData?.sgst)?.toFixed(2)}</td>
+                        </tr>
+                      )}
+                      {parseFloat(salesOrderData?.cgst) > 0 && (
+                        <tr>
+                          <td className="text-gray-600 pt-3">CGST</td>
+                          <td className="text-gray-600 pt-3">₹{parseFloat(salesOrderData?.cgst)?.toFixed(2)}</td>
+                        </tr>
+                      )}
+                    </>
+                  )}
                   <tr>
                     <td className="text-lg font-bold pt-4">Total</td>
-                    <td className="text-lg font-bold pt-4">₹200.00</td>
+                    <td className="text-lg font-bold pt-4">₹{parseFloat(salesOrderData?.total_incl_gst)?.toFixed(2)}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+          </div>
+          
+          {/* Created/Updated by information */}
+          <div className="text-xs text-gray-500 mt-8">
+            <p>Created by: {salesOrderData?.creator_sales?.name || 'Unknown'} on {formatDate(salesOrderData?.created_at)}</p>
+            <p>Last updated by: {salesOrderData?.updater_sales?.name || 'Unknown'} on {formatDate(salesOrderData?.updated_at)}</p>
           </div>
         </div>
       </div>

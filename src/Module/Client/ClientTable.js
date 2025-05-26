@@ -95,13 +95,13 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className=" overflow-y-auto custom-scrollbar ">
-        <div className="bg-white shadow-sm border border-gray-200 rounded-lg h-[calc(83vh-74px)]">
+        <div className="bg-white shadow-sm border border-gray-200 rounded-lg h-[calc(82vh-74px)]">
           <CTable hover className="w-full">
             {/* Render table headers only if not minimized */}
             {!isMinimized && (
               <CTableHead className="!bg-gray-300 sticky top-0 z-10">
                 <CTableRow>
-                  <CTableHeaderCell className="!w-3 !m-0">
+                  {/* <CTableHeaderCell className="!w-3 !m-0">
                     <TiFlowSwitch className="rotate-90 text-blue-600" size={20} />
                   </CTableHeaderCell>
                   <CTableHeaderCell className="px-4 w-10">
@@ -111,7 +111,7 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
                       onChange={handleSelectAll}
                       className="form-checkbox h-3 w-3 text-blue-600 rounded"
                     />
-                  </CTableHeaderCell>
+                  </CTableHeaderCell> */}
                   <CTableHeaderCell className="w-48 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Name
                   </CTableHeaderCell>
@@ -174,7 +174,7 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
                       </>
                     ) : (
                       <>
-                        <CTableDataCell>{''}</CTableDataCell>
+                        {/* <CTableDataCell>{''}</CTableDataCell>
                         <CTableDataCell className="px-4 py-3">
                           <div onClick={(e) => e.stopPropagation()}>
                             <input
@@ -187,7 +187,7 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
                               className="form-checkbox h-3 w-3 text-blue-600 rounded"
                             />
                           </div>
-                        </CTableDataCell>
+                        </CTableDataCell> */}
                         <CTableDataCell
                           onClick={(e) => {
                             //e.stopPropagation();
@@ -239,7 +239,7 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
                 ))
               ) : (
                 <CTableRow>
-                  <CTableDataCell colSpan={isMinimized ? 2 : 8} className="text-center text-sm !text-red-600">
+                  <CTableDataCell colSpan={isMinimized ? 2 : 8} className="text-center text-sm !text-red-600  py-3">
                     No Data Found
                   </CTableDataCell>
                 </CTableRow>

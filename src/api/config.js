@@ -294,6 +294,7 @@ export const apiMethods = {
     }
   },
   getClients: async (queryParams = {}) => {
+    console.log(queryParams)
     try {
       const token = localStorage.getItem('token') // Retrieve token
       // const token = await getToken()
@@ -449,6 +450,17 @@ export const apiMethods = {
     console.error(error);
   }
 },
+
+singlesku: async (id) => {
+  try {
+    const response = await apiClient.get(`/sku-details/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('API error in singlesku:', error);
+    throw error; // Optional: rethrow for handling at the call site
+  }
+},
+
 
   getSkuType: async () => {
     try {
@@ -877,6 +889,13 @@ export const apiMethods = {
   updateFlute: async (id, formData) => {
     try {
       return await apiClient.put(`/common-service/flute/update/${id}`, formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getColors: async () => {
+    try {
+      return await apiClient.get(`/common-service/colors`)
     } catch (error) {
       console.error(error)
     }
@@ -1363,7 +1382,26 @@ export const apiMethods = {
 
   getSkuValuesOptions:async(id)=>{
     return await apiClient.get(`sku-details/${id}/options`,)
+  },
+  downloadSalesOrder: async () => {
+    return await apiClient.get('sale-order/download/excel', {
+      responseType: 'blob', // for binary files like Excel
+      headers: {
+        'Accept': 'application/octet-stream'
+      }
+    });
+  },
+  downloadWorkOrder: async () => {
+    return await apiClient.get('work-order/download/excel', {
+      responseType: 'blob', // for binary files like Excel
+      headers: {
+        'Accept': 'application/octet-stream'
+      }
+    });
   }
+  
+  
+
 
 }
 

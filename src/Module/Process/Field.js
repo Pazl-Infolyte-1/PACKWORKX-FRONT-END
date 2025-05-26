@@ -146,7 +146,7 @@ function Field({
         {fieldData &&
           AllfieldData.find((item) => openFieldModal.id === item.process_name_id)?.ProcessName
             ?.process_name && (
-            <h3>
+            <h3 className='text-lg'>
               {
                 AllfieldData.find((item) => openFieldModal.id === item.process_name_id).ProcessName
                   .process_name

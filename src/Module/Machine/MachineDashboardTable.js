@@ -1,16 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import {
-  CTable,
-  CTableRow,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
-  CTableHead,
-} from '@coreui/react'
+import { useState } from 'react'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilFlipToBack, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 import apiMethods from '../../api/config'
+import ReusableTable from '../SalesOrder/ReusableTable'
 
 const MachineDashboardTable = ({
   cellData,
@@ -21,7 +14,7 @@ const MachineDashboardTable = ({
   setIsLoading,
   onAddProcess,
   setAlerts,
-  setOpenFieldValuesModal
+  setOpenFieldValuesModal,
 }) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -66,145 +59,103 @@ const MachineDashboardTable = ({
     }
   }
 
-  return (
-    <div>
-      <div className="h-[280px] overflow-y-auto border m-0 border-gray-200 custom-scrollbar">
-        <CTable striped hover className=" w-full">
-          <CTableHead className="bg-gray-100 sticky top-0 z-10 whitespace-nowrap ">
-            <CTableRow> 
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">ID</CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Name <span className="text-gray-500">⌕</span>
-              </CTableHeaderCell>
-              {/* <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Serial No <span className="text-gray-500">⌕</span>
-              </CTableHeaderCell> */}
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-md">
-                Model No <span className="text-gray-500">⌕</span>
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Manufacturer <span className="text-gray-500">⌕</span>
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">Power</CTableHeaderCell>
-              {/* <CTableHeaderCell className="py-3 px-0 text-gray-600 font-md">
-                Warranty Exp
-              </CTableHeaderCell> */}
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Status
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-4 text-gray-600 font-md">
-                Action
-              </CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
+  const columns = [
+    { key: 'machine_generate_id', header: 'ID', field: 'machine_generate_id' },
+    {
+      key: 'machine_name',
+      header: (
+        <>
+          Name <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'machine_name',
+    },
+    {
+      key: 'model_number',
+      header: (
+        <>
+          Model Number <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'model_number',
+    },
+    {
+      key: 'manufacturer',
+      header: (
+        <>
+          Manufacturer <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'manufacturer',
+    },
+    { key: 'power_rating', header: 'Power', field: 'power_rating' },
+    {
+      key: 'machine_status',
+      header: 'Status',
+      field: 'machine_status',
+      type: 'dropdown',
+      options: ['Under Maintenance', 'Active', 'Inactive'],
+      getOptionClass: (val) => {
+        switch (val) {
+          case 'Under Maintenance':
+            return 'bg-blue-100 text-blue-800 w-[150px] text-xs text-center'
+          case 'Active':
+            return 'bg-green-100 text-green-800 w-[150px] text-xs text-center'
+          case 'Inactive':
+            return 'bg-red-100 text-red-800 w-[150px] text-xs text-center'
+          default:
+            return 'bg-gray-100 text-gray-800 w-[150px] text-xs text-center'
+        }
+      },
+      onChange: (row, newValue) => {
+        handleStatusChange(row.id, newValue)
+      },
+    },
+    {
+      key: 'actions',
+      header: 'action',
+      field: 'actions',
+      type: 'custom',
+      render: (row) => (
+        <ThreeDotMenu
+          value={[
+            {
+              label: 'Assign Process & Values',
+              icon: cilPlus,
+              onClick: () => {
+                onAddProcess && onAddProcess(row.id, row.machine_name)
+              },
+            },
+            {
+              label: 'Edit Values',
+              icon: cilFlipToBack,
+              onClick: () => {
+                setOpenFieldValuesModal({ show: true, id: row.id })
+              },
+            },
+            {
+              label: 'Edit',
+              icon: cilPencil,
+              onClick: () => {
+                onEdit && onEdit(row.id)
+              },
+            },
+            {
+              label: 'Delete',
+              icon: cilTrash,
+              onClick: () => {
+                handledeleteClick(row.id)
+              },
+            },
+          ]}
+        />
+      ),
+    },
+  ]
 
-          <CTableBody>
-            {cellData.length > 0 ? (
-              cellData.map((cell, index) => (
-                <CTableRow key={index} className="border-b whitespace-nowrap">
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.machine_generate_id || 'N/A'}
-                  </CTableDataCell>
-                  <CTableDataCell
-                    onClick={() => onView(cell.id)}
-                    className="py-3 px-4 !text-blue-600 underline font-semibold cursor-pointer"
-                  >
-                    {cell.machine_name}
-                  </CTableDataCell>
-                  {/* <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.serial_number}
-                  </CTableDataCell> */}
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.model_number}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.manufacturer}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.power_rating}
-                  </CTableDataCell>
-                  {/* <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {cell.warranty_expiry}
-                  </CTableDataCell> */}
-                  <CTableDataCell className="py-3 px-4 text-gray-700 align-middle">
-                    <select
-                      value={cell.machine_status}
-                      onChange={(e) => handleStatusChange(cell.id, e.target.value)}
-                      className={`px-2.5 py-1 rounded-full text-sm font-medium outline-none border border-gray-300
-                      ${
-                        cell.machine_status === 'Under Maintenance'
-                          ? 'bg-blue-100 text-blue-800'
-                          : cell.machine_status === 'Active'
-                            ? 'bg-green-100 text-green-800'
-                            : cell.machine_status === 'Inactive'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      <option className="text-gray-700 bg-white" value="Active">
-                        Active
-                      </option>
-                      <option className="text-gray-700 bg-white" value="Inactive">
-                        Inactive
-                      </option>
-                      <option className="text-gray-700 bg-white" value="Under Maintenance">
-                        Under Maintance
-                      </option>
-                    </select>
-                  </CTableDataCell>
-                  <CTableDataCell className="px-2 sm:px-4 text-gray-700 align-middle">
-                    <ThreeDotMenu
-                      value={[
-                        {
-                          label: 'View',
-                          icon: cilHandPointRight,
-                          onClick: () => {
-                            onView(cell.id)
-                          },
-                        },
-                        {
-                          label: 'Assign Process',
-                          icon: cilPlus,
-                          onClick: () => {
-                            onAddProcess && onAddProcess(cell.id, cell.machine_name)
-                          },
-                        },
-                        {
-                          label: 'Field, Values',
-                          icon: cilFlipToBack,
-                          onClick: () => {
-                            setOpenFieldValuesModal({ show: true, id: cell.id })
-                          },
-                        },
-                        {
-                          label: 'Edit',
-                          icon: cilPencil,
-                          onClick: () => {
-                            onEdit && onEdit(cell.id)
-                          },
-                        },
-                        {
-                          label: 'Delete',
-                          icon: cilTrash,
-                          onClick: () => {
-                            handledeleteClick(cell.id)
-                          },
-                        },
-                      ]}
-                    />
-                  </CTableDataCell>
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow>
-                <CTableDataCell colSpan={10} className="text-center py-3">
-                  No data available
-                </CTableDataCell>
-              </CTableRow>
-            )}
-          </CTableBody>
-        </CTable>
-      </div>
+  return (
+    <>
+      <ReusableTable data={cellData} columns={columns} handleRowClick={onView} height={'65vh'} />
       <ConfirmationModale
         isOpen={isConfirmationModalOpen}
         onClose={handleCancel}
@@ -214,7 +165,7 @@ const MachineDashboardTable = ({
         confirmText={isLoading ? 'Deleting...' : 'Delete'}
         cancelText="Cancel"
       />
-    </div>
+    </>
   )
 }
 

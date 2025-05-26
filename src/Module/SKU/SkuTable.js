@@ -191,11 +191,12 @@ const navigate = useNavigate()
     <CTableDataCell style={{ width: '180px' }} className="text-center text-gray-700">
       {cell.client}
     </CTableDataCell>
-    <CTableDataCell style={{ width: '120px' }} className="text-center text-gray-700">
-      {cell.length && cell.width && cell.height
-        ? `${cell.length} x ${cell.width} x ${cell.height}`
-        : '-'}
-    </CTableDataCell>
+<CTableDataCell style={{ width: '120px' }} className="text-center text-gray-700">
+  {cell.length && cell.width && cell.height
+    ? `${Number(cell.length).toFixed(2)} x ${Number(cell.width).toFixed(2)} x ${Number(cell.height).toFixed(2)}`
+    : '-'}
+</CTableDataCell>
+
     <CTableDataCell style={{ width: '100px' }} className="text-center text-gray-700">
       {cell.deckle_size}
     </CTableDataCell>

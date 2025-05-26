@@ -438,9 +438,9 @@ function RSCBox({
   // Optional: track Redux changes
   useEffect(() => {}, [selectedRouteIds1])
 
-  const selectedChips = displayAsChips.filter((item) => selectedRouteIds1.includes(item.id))
+  const selectedChips = displayAsChips?.filter((item) => selectedRouteIds1?.includes(item.id))
 
-  const chipNames = selectedChips.map((chip) => chip.route_name).join(', ')
+  const chipNames = selectedChips?.map((chip) => chip?.route_name).join(', ')
 
   useEffect(() => {
     if (!editTag) {

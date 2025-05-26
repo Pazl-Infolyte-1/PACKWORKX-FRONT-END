@@ -34,6 +34,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
   });
 
   const [skuVersionsMap, setSkuVersionsMap] = useState({})
+  const [skuValuesMap, setSkuValuesMap] = useState({})
 
   const childRef = useRef();
 
@@ -104,7 +105,8 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
       planned_end_date: "",
       manufacture: "inhouse",
       priority:"Low",
-      progress:"Pending"
+      progress:"Pending",
+      work_order_sku_values:[]
     }
   ])
 
@@ -259,7 +261,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
       setTimeout(() => {
         // setDrawer(false)
       }, 1000);
-      await fetchData(fetchData)
+      // await fetchData()
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
 
     } catch (error) {
@@ -337,7 +339,8 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
 
 
   return (
-    <div className=" pt-2 pb-12">
+    <div className="h-screen flex flex-col">
+      <div className="flex-shrink-0 pt-2 bg-white border-b border-gray-200 sticky top-0 z-10">
       <CCol xs={12}>
   <div className="flex justify-content-between">
    <CNav variant="tabs" className="flex-grow-1">
@@ -507,7 +510,8 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
 
   </div>
 </CCol>
-
+</div>
+ <div className="flex-1 overflow-y-auto pb-12">
       {/* Content Sections */}
       <CustomAlert alerts={alerts} handleClose={handleClose} />
 
@@ -530,7 +534,6 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
         {activeTab === 'skuDetails' && (
           <div className="p-1 bg-white rounded-lg h-full">
             <WorkOrders
-              // setDrawer={setDrawer}
               setWorkOrders={setWorkOrders}
               workOrders={workOrders}
               setFormData={handleWorkOrderFormUpdate}
@@ -543,9 +546,12 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
               setSkuVersionsMap={setSkuVersionsMap}
               workOrderListSubmit={workOrderListSubmit}
               setIsFormTouched={setIsFormTouched}
+              skuValuesMap={skuValuesMap}
+              setSkuValuesMap={setSkuValuesMap}
             />
           </div>
         )}
+      </div>
       </div>
     </div>
   )

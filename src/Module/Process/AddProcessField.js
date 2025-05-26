@@ -99,6 +99,7 @@ function AddProcessField({
       if (isEditing) {
         const payload = {
           id: editData?.id || selectedProcessValue?.id,
+          machine_id: editData?.machine_id || selectedProcessValue?.machine_id,
           process_name_id: selectedProcessId,
           process_value: { ...processInputs },
         }

@@ -29,12 +29,15 @@ import ReusableTable from '../SalesOrder/ReusableTable'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import CompactPagination from '../../components/New/CompactPagination'
+import { FiDownload, FiUpload } from 'react-icons/fi'
+import ProcessRoutes from './ProcessRoutes'
 
 export default function MachineMaster() {
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
   const [preSelectedMachineId, setPreSelectedMachineId] = useState(null)
   const [isdrawopen, setdrawopen] = useState({ show: false, id: null })
   const [addProcessModal, setAddProcessModal] = useState({ show: false, machineId: null })
+  const [openRoutes, setOpenRoutes] = useState({ show: false, id: null })
   const [assignModal, setAssignModal] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [tableData, setTableData] = useState([])
@@ -229,14 +232,19 @@ export default function MachineMaster() {
             label: 'View Process',
             onClick: () => setAssignModal(true),
           },
+          // {
+          //   icon: <FiDownload className="mr-2 text-blue-500" />,
+          //   label: 'Export',
+          //   onClick: downloadClientExcelSheet,
+          // },
         ]}
       />
 
-      <div className="flex flex-wrap justify-between gap-2 mt-2">
+      <div className="flex flex-wrap justify-between gap-2 m-2 px-3">
         {machineData.map((item, index) => (
           <div
             key={index}
-            className={`w-full sm:w-[235px] flex items-center justify-between  font-bold rounded-lg shadow-md text-white border p-2`}
+            className={`w-full sm:w-[250px] flex items-center justify-between  font-bold rounded-lg shadow-md text-white border p-2`}
             style={{ backgroundColor: item.bgColor }}
           >
             <div className="flex  gap-2 items-center">
@@ -264,13 +272,14 @@ export default function MachineMaster() {
         setAlerts={setAlerts}
         setOpenFieldValuesModal={setOpenFieldValuesModal}
         setOpenFieldModal={setOpenFieldModal}
+        setOpenRoutes={setOpenRoutes}
       />
 
       <div className="flex justify-center md:justify-end items-center gap-4 mt-2 ">
-         <div className=" flex w-32 items-center gap-1 font-normal text-sm">
-            <span>Total Count:</span>
-            <span className="font-medium">{pagination.total}</span>
-          </div>
+        <div className=" flex w-32 items-center gap-1 font-normal text-sm">
+          <span>Total Count:</span>
+          <span className="font-medium">{pagination.total}</span>
+        </div>
         <CompactPagination
           count={pagination.totalPages || 1}
           page={pagination.page || 1}
@@ -325,7 +334,6 @@ export default function MachineMaster() {
         visible={addProcessModal.show}
         setVisible={setAddProcessModal}
         width={800}
-        height={300}
         header="Add Process to Machine"
         showCloseButton={true}
       >
@@ -364,14 +372,14 @@ export default function MachineMaster() {
       <PopUp
         visible={openFieldValuesModal.show}
         setVisible={setOpenFieldValuesModal}
-        header={'Field, Values'}
+        header={' '}
         width={800}
         showCloseButton={true}
       >
         <FieldValues
           openFieldValuesModal={openFieldValuesModal}
           setOpenFieldModal={setOpenFieldModal}
-          setOpenMachineFieldModal={setOpenMachineFieldModal}
+          // setOpenMachineFieldModal={setOpenMachineFieldModal}
           setOpenMachineValuesModal={setOpenMachineValuesModal}
           openMachineValuesModal={openMachineValuesModal}
           setShowAddProcessModal={setShowAddProcessModal}
@@ -392,6 +400,19 @@ export default function MachineMaster() {
           openMachineFieldModal={openMachineFieldModal}
           isEdit={isEdit}
           setIsEdit={setIsEdit}
+          setAlerts={setAlerts}
+        />
+      </PopUp>
+      <PopUp
+        visible={openRoutes.show}
+        setVisible={() => setOpenRoutes({ show: false, id: null })}
+        width={800}
+        header="Process Routes"
+        showCloseButton={true}
+      >
+        <ProcessRoutes
+          openRoutes={openRoutes}
+          setOpenRoutes={setOpenRoutes}
           setAlerts={setAlerts}
         />
       </PopUp>

@@ -180,6 +180,7 @@ function AddMachineField({
 
       const payload = {
         id: valesId?.id,
+        machine_id: selectedMachineValue?.id,
         process_name_id: actualProcessId,
         process_value: { ...machineInputs },
       }

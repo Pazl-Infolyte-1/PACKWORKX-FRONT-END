@@ -339,7 +339,8 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
 
 
   return (
-    <div className=" pt-2 pb-12 ">
+    <div className="h-screen flex flex-col">
+      <div className="flex-shrink-0 pt-2 bg-white border-b border-gray-200 sticky top-0 z-10">
       <CCol xs={12}>
   <div className="flex justify-content-between">
    <CNav variant="tabs" className="flex-grow-1">
@@ -509,7 +510,8 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
 
   </div>
 </CCol>
-
+</div>
+ <div className="flex-1 overflow-y-auto pb-12">
       {/* Content Sections */}
       <CustomAlert alerts={alerts} handleClose={handleClose} />
 
@@ -549,6 +551,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
             />
           </div>
         )}
+      </div>
       </div>
     </div>
   )

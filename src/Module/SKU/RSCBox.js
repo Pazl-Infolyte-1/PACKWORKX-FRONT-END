@@ -19,6 +19,7 @@ import apiMethods from '../../api/config'
 import { useDispatch, useSelector } from 'react-redux'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
 import { setRscDeckleSize } from '../../action';
+import { cilCloudUpload } from '@coreui/icons';
 function RSCBox({
   dropdownRef,
   addNewSkuData,
@@ -46,8 +47,8 @@ function RSCBox({
   errors,
   setErrors,
   setRscUnits,
-     uploadedFiles,
-          setUploadedFiles
+  uploadedFiles,
+  setUploadedFiles,
 }) {
   const [alerts, setAlerts] = useState([])
   const [unitTooltip, setUnitTooltip] = useState('Enter Millimeter')
@@ -69,12 +70,12 @@ function RSCBox({
   const [selectedRoutesVal, setSelectedRoutesVal] = useState([])
   const [fullRouteResponse, setFullRouteResponse] = useState(null)
   const [displayAsChips, setDisplayAsChips] = useState([])
-  const [isUploading, setIsUploading] = useState(false);
-//const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
-const [fileNames, setFileNames] = useState([]); 
+  const [isUploading, setIsUploading] = useState(false)
+  //const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
+  const [fileNames, setFileNames] = useState([])
 
-const deckleSize = useSelector(state => state.deckleSize);
-  
+  const deckleSize = useSelector((state) => state.deckleSize)
+
   const dispatch = useDispatch()
 
   const selectionFrame = {
@@ -105,7 +106,7 @@ const deckleSize = useSelector(state => state.deckleSize);
     //const deckleSizeVal = widthBoardSize * upsval
     const EPSILON = 0.001
     //const deckleSize = parseFloat(data.deckle_size) || deckleSizeVal
-    const deckleSize = parseFloat(data.deckle_size) 
+    const deckleSize = parseFloat(data.deckle_size)
     if (lengthBoardSize && widthBoardSize) {
       setErrors((prev) => {
         const newErrors = { ...prev }
@@ -137,7 +138,7 @@ const deckleSize = useSelector(state => state.deckleSize);
     }
   }
 
-  const MM_TO_INCH = 0.0393701
+  const MM_TO_INCH = 0.039370078740157
   const INCH_TO_MM = 25.4
   const MM_TO_CM = 0.1
   const CM_TO_MM = 10
@@ -206,11 +207,10 @@ const deckleSize = useSelector(state => state.deckleSize);
   }
 
   const handleUnitChange = (e) => {
-
     const newUnit = e.target.value
-          console.log("Unit changed to:", newUnit);
-          setRscUnits(newUnit);
-  console.log("Previous unit:", addNewSkuData.unit);
+    console.log('Unit changed to:', newUnit)
+    setRscUnits(newUnit)
+    console.log('Previous unit:', addNewSkuData.unit)
     setUnitTooltip(
       newUnit === 'mm'
         ? 'Enter Millimeter'
@@ -232,14 +232,19 @@ const deckleSize = useSelector(state => state.deckleSize);
         if (prev.unit === 'in') valueInMM = parsed * INCH_TO_MM
         else if (prev.unit === 'cm') valueInMM = parsed * CM_TO_MM
 
-        if (newUnit === 'in') return parseFloat((valueInMM * MM_TO_INCH).toFixed(2))
-        if (newUnit === 'cm') return parseFloat((valueInMM * MM_TO_CM).toFixed(2))
+        if (newUnit === 'in') return parseFloat(valueInMM / INCH_TO_MM)
+        if (newUnit === 'cm') return parseFloat(valueInMM * MM_TO_CM)
 
-        return parseFloat(valueInMM.toFixed(2))
+        return parseFloat(valueInMM)
       }
 
       const length_board_size_cm2 = convertValue(prev.length_board_size_cm2)
       const width_board_size_cm2 = convertValue(prev.width_board_size_cm2)
+
+      console.log("convert value", parseInt(convertValue(prev.length)))
+            console.log("convert value",  parseInt(convertValue(prev.width)))
+                        console.log("convert value",  parseInt(convertValue(prev.height)))
+
 
       return {
         ...prev,
@@ -509,130 +514,125 @@ const deckleSize = useSelector(state => state.deckleSize);
   //  }
   //}, [addNewSkuData.length, addNewSkuData.width, addNewSkuData.height])
 
+  console.log('length height', addNewSkuData.length)
+  console.log('length height', addNewSkuData.height)
+  console.log('ups', addNewSkuData.ups)
+  useEffect(() => {
+    let { length, height, ups } = addNewSkuData
 
-  console.log("length height",addNewSkuData.length)
-    console.log("length height",addNewSkuData.height)
-     console.log("ups",addNewSkuData.ups)
-    useEffect(() => {
-  let { length, height, ups } = addNewSkuData;
+    // Convert to numbers if they are strings
+    length = typeof length === 'string' ? Number(length) : length
+    height = typeof height === 'string' ? Number(height) : height
+    ups = typeof ups === 'string' ? Number(ups) : ups
 
-  // Convert to numbers if they are strings
-  length = typeof length === 'string' ? Number(length) : length;
-  height = typeof height === 'string' ? Number(height) : height;
-  ups = typeof ups === 'string' ? Number(ups) : ups;
-
-  // Dispatch only if all are valid numbers
-  if (!isNaN(length) && !isNaN(height) && !isNaN(ups)) {
-    dispatch(setRscDeckleSize({ length, height, ups }));
-  }
-}, [addNewSkuData.length, addNewSkuData.height, addNewSkuData.ups]);
-
+    // Dispatch only if all are valid numbers
+    if (!isNaN(length) && !isNaN(height) && !isNaN(ups)) {
+      dispatch(setRscDeckleSize({ length, height, ups }))
+    }
+  }, [addNewSkuData.length, addNewSkuData.height, addNewSkuData.ups])
 
   useEffect(() => {
     if (deckleSize !== undefined && deckleSize !== null) {
-      setAddNewSkuData(prev => ({
+      setAddNewSkuData((prev) => ({
         ...prev,
         deckle_size: deckleSize,
-      }));
+      }))
     }
-  }, [deckleSize]);
-console.log("deckle size",deckleSize)
-useEffect(() => {
-  if (
-    addNewSkuData.inner_outer_dimension === null ||
-    addNewSkuData.inner_outer_dimension === undefined ||
-    addNewSkuData.inner_outer_dimension === ""
-  ) {
-    setAddNewSkuData(prev => ({
-      ...prev,
-      inner_outer_dimension: "Inner",
-    }));
-  }
-}, [addNewSkuData.inner_outer_dimension]);
+  }, [deckleSize])
+  console.log('deckle size', deckleSize)
+  useEffect(() => {
+    if (
+      addNewSkuData.inner_outer_dimension === null ||
+      addNewSkuData.inner_outer_dimension === undefined ||
+      addNewSkuData.inner_outer_dimension === ''
+    ) {
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        inner_outer_dimension: 'Inner',
+      }))
+    }
+  }, [addNewSkuData.inner_outer_dimension])
 
+  const handleFileUpload = async (event) => {
+    const selectedFiles = event.target.files
+    if (!selectedFiles || selectedFiles.length === 0) return
 
+    setIsUploading(true)
 
-const handleFileUpload = async (event) => {
-  const selectedFiles = event.target.files;
-  if (!selectedFiles || selectedFiles.length === 0) return;
+    const urls = [...uploadedFiles]
+    const names = [...fileNames]
 
-  setIsUploading(true);
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i]
+      const formData = new FormData()
+      formData.append('file', file)
 
-  const urls = [...uploadedFiles];
-  const names = [...fileNames];
+      try {
+        const response = await apiMethods.uploadFile(formData)
+        const fileUrl = response?.data?.data?.file_url
 
-  for (let i = 0; i < selectedFiles.length; i++) {
-    const file = selectedFiles[i];
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const response = await apiMethods.uploadFile(formData);
-      const fileUrl = response?.data?.data?.file_url;
-
-      if (fileUrl) {
-        urls.push(fileUrl);
-        names.push(file.name);
+        if (fileUrl) {
+          urls.push(fileUrl)
+          names.push(file.name)
+        }
+      } catch (err) {
+        console.error('File upload failed:', err)
       }
-    } catch (err) {
-      console.error('File upload failed:', err);
     }
-  }
 
-  setUploadedFiles(urls);
-    setAddNewSkuData(prev => ({
-    ...prev,
-    documents: urls
-  }));
-  setFileNames(names);
-
-  setIsUploading(false);
-  event.target.value = '';
-};
-
-// Add this function to handle file removal
-const removeFile = (indexToRemove) => {
-  const updatedUrls = uploadedFiles.filter((_, index) => index !== indexToRemove);
-  const updatedNames = fileNames.filter((_, index) => index !== indexToRemove);
-
-  setUploadedFiles(updatedUrls);
+    setUploadedFiles(urls)
     setAddNewSkuData((prev) => ({
-    ...prev,
-    documents: updatedUrls, // Keep documents in sync
-  }));
-  setFileNames(updatedNames);
-};
+      ...prev,
+      documents: urls,
+    }))
+    setFileNames(names)
 
-//document edit
-useEffect(() => {
-  // Clear files only if print_type is 'None' and documents are not already empty
-  if (addNewSkuData.print_type === 'None') {
-    if (uploadedFiles.length > 0 || addNewSkuData.documents.length > 0) {
-      setUploadedFiles([]);
-      setFileNames([]);
+    setIsUploading(false)
+    event.target.value = ''
+  }
 
-      // Only update documents if not already empty
-      if (addNewSkuData.documents.length > 0) {
-        setAddNewSkuData((prev) => ({
-          ...prev,
-          documents: [],
-        }));
+  // Add this function to handle file removal
+  const removeFile = (indexToRemove) => {
+    const updatedUrls = uploadedFiles.filter((_, index) => index !== indexToRemove)
+    const updatedNames = fileNames.filter((_, index) => index !== indexToRemove)
+
+    setUploadedFiles(updatedUrls)
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      documents: updatedUrls, // Keep documents in sync
+    }))
+    setFileNames(updatedNames)
+  }
+
+  //document edit
+  useEffect(() => {
+    // Clear files only if print_type is 'None' and documents are not already empty
+    if (addNewSkuData.print_type === 'None') {
+      if (uploadedFiles.length > 0 || addNewSkuData.documents.length > 0) {
+        setUploadedFiles([])
+        setFileNames([])
+
+        // Only update documents if not already empty
+        if (addNewSkuData.documents.length > 0) {
+          setAddNewSkuData((prev) => ({
+            ...prev,
+            documents: [],
+          }))
+        }
       }
+      return
     }
-    return;
-  }
 
-  // Load files only if editing and there are documents to load
-  if (editTag && addNewSkuData.documents?.length > 0 && uploadedFiles.length === 0) {
-    setUploadedFiles([...addNewSkuData.documents]);
-    setFileNames(
-      addNewSkuData.documents.map((file) =>
-        typeof file === 'string' ? file.split('/').pop() : file.name
+    // Load files only if editing and there are documents to load
+    if (editTag && addNewSkuData.documents?.length > 0 && uploadedFiles.length === 0) {
+      setUploadedFiles([...addNewSkuData.documents])
+      setFileNames(
+        addNewSkuData.documents.map((file) =>
+          typeof file === 'string' ? file.split('/').pop() : file.name,
+        ),
       )
-    );
-  }
-}, [editTag, addNewSkuData.print_type]); // <- remove addNewSkuData.documents from deps
-
+    }
+  }, [editTag, addNewSkuData.print_type]) // <- remove addNewSkuData.documents from deps
 
   return (
     <div className="rounded-lg ">
@@ -676,24 +676,24 @@ useEffect(() => {
           </div>
         </div>
 
-       <div className="w-[200px]">
-  <label className="block text-sm font-medium text-gray-700 mb-2">
-    SKU Name
-    <span className="text-red-500 ml-1">*</span>
-    {/*{errors.sku_name && (
+        <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            SKU Name
+            <span className="text-red-500 ml-1">*</span>
+            {/*{errors.sku_name && (
       <span className="text-red-500 text-sm ml-2 align-middle">{errors.sku_name}</span>
     )}*/}
-  </label>
-  <input
-    id="sku_name"
-    name="sku_name"
-    value={addNewSkuData?.sku_name}
-    onChange={handleChange}
-    className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.sku_name ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
-  />
-</div>
+          </label>
+          <input
+            id="sku_name"
+            name="sku_name"
+            value={addNewSkuData?.sku_name}
+            onChange={handleChange}
+            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+              errors.sku_name ? 'border-2 border-red-500' : 'border border-gray-300'
+            }`}
+          />
+        </div>
         <div className="w-[200px]">
           <label className="block text-sm  font-medium text-gray-700 mb-2">
             Client Name
@@ -708,9 +708,9 @@ useEffect(() => {
             disabled={clientDiasble}
             value={addNewSkuData.client_id}
             onChange={handleChange}
-         className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.client_id ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+              errors.client_id ? 'border-2 border-red-500' : 'border border-gray-300'
+            }`}
           >
             <option value="" hidden>
               Select
@@ -748,7 +748,7 @@ useEffect(() => {
           />
         </div>
       </div>
-  <div className="w-full flex justify-end mt-4">
+      <div className="w-full flex justify-end mt-4">
         <div className="flex items-center space-x-2">
           <label className="text-sm text-gray-700 font-medium">Select Units:</label>
           <div className="relative w-28">
@@ -796,18 +796,21 @@ useEffect(() => {
                 )}*/}
             </label>
 
-            <div     className={`h-8 w-[200px] rounded-md flex items-center bg-white ${
-      errors.width === 'Required' ||
-      errors.length === 'Required' ||
-      errors.height === 'Required'
-        ? 'border-2 border-red-500'
-        : 'border border-gray-300'
-    }`}>
+            <div
+              className={`h-8 w-[200px] rounded-md flex items-center bg-white ${
+                errors.width === 'Required' ||
+                errors.length === 'Required' ||
+                errors.height === 'Required'
+                  ? 'border-2 border-red-500'
+                  : 'border border-gray-300'
+              }`}
+            >
               <input
+                min="0"
                 id="length"
                 name="length"
                 type="number"
-                value={Number(addNewSkuData.length) || ''}
+                value={Math.round(Number(addNewSkuData.length) * 100) / 100 || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
                 className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-l-md"
@@ -817,9 +820,10 @@ useEffect(() => {
                 id="width"
                 name="width"
                 type="number"
-                value={Number(addNewSkuData.width) || ''}
+                value={Math.round(Number(addNewSkuData.width) * 100) / 100 || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
+                min="0"
                 className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <span className="text-gray-500 px-1">x</span>
@@ -827,7 +831,7 @@ useEffect(() => {
                 id="height"
                 name="height"
                 type="number"
-                value={Number(addNewSkuData.height) || ''}
+                value={Math.round(Number(addNewSkuData.height) * 100) / 100 || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
                 className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -853,9 +857,9 @@ useEffect(() => {
                 onChange={handleChange}
                 readOnly={editTag}
                 //className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      className={`w-full h-8 p-1 text-sm rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+                className={`w-full h-8 p-1 text-sm rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                  errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
+                }`}
               />
             </div>
 
@@ -871,13 +875,14 @@ useEffect(() => {
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
                 //className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                            className={`w-full h-8 p-1 text-sm rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+                className={`w-full h-8 p-1 text-sm rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                  errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
+                }`}
               />
-              <p className="text-[10px] text-gray-500 mt-1">
-                Deckle should be greater than (BW × UPS)
-              </p>
+         <p className="text-[10px] text-gray-500 mt-1">
+  Deckle should be greater than (({Math.round(Number(addNewSkuData?.length) * 100) / 100 || ''} + {Math.round(Number(addNewSkuData?.height) * 100) / 100 || ''}) × {Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}) + 20
+</p>
+
             </div>
           </div>
         </Tooltip>
@@ -898,8 +903,8 @@ useEffect(() => {
                 type="radio"
                 name="inner_outer_dimension"
                 value="Inner"
-            // checked={addNewSkuData.inner_outer_dimension ? addNewSkuData.inner_outer_dimension === 'Inner' : true}
-              checked={addNewSkuData.inner_outer_dimension === 'Inner'}
+                // checked={addNewSkuData.inner_outer_dimension ? addNewSkuData.inner_outer_dimension === 'Inner' : true}
+                checked={addNewSkuData.inner_outer_dimension === 'Inner'}
                 onChange={handleChange}
                 readOnly={editTag}
                 className="mr-1 h-3.5 w-3.5 text-blue-600 focus:ring-blue-500"
@@ -936,9 +941,9 @@ useEffect(() => {
               value={Number(addNewSkuData.flap_width) || null}
               onChange={modifiedHandleChange}
               readOnly={editTag}
-                     className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.flap_width ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.flap_width ? 'border-2 border-red-500' : 'border border-gray-300'
+              }`}
             />
           </div>
         </Tooltip>
@@ -957,9 +962,9 @@ useEffect(() => {
             value={Number(addNewSkuData.internal_id) || null}
             onChange={handleChange}
             readOnly={editTag}
-                    className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.internal_id ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+              errors.internal_id ? 'border-2 border-red-500' : 'border border-gray-300'
+            }`}
           />
         </div>
 
@@ -974,12 +979,13 @@ useEffect(() => {
                 </span>
               )}*/}
             </label>
-            <div     className={`h-8 w-[200px] rounded-md flex items-center bg-white ${
-      errors.width_board_size_cm2 || errors.length_board_size_cm2
-        ? 'border-2 border-red-500'
-        : 'border border-gray-300'
-    }`}
-  >
+            <div
+              className={`h-8 w-[200px] rounded-md flex items-center bg-white ${
+                errors.width_board_size_cm2 || errors.length_board_size_cm2
+                  ? 'border-2 border-red-500'
+                  : 'border border-gray-300'
+              }`}
+            >
               <input
                 id="width_board_size_cm2"
                 name="width_board_size_cm2"
@@ -1014,12 +1020,12 @@ useEffect(() => {
           <input
             id="ups"
             name="ups"
-            value={Number(addNewSkuData?.ups) || null}
+                value={Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}
             onChange={modifiedHandleChange}
             readOnly={editTag}
-                        className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.ups ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+              errors.ups ? 'border-2 border-red-500' : 'border border-gray-300'
+            }`}
           />
         </div>
 
@@ -1037,12 +1043,14 @@ useEffect(() => {
             <input
               id="length_trimming_tolerance"
               name="length_trimming_tolerance"
-              value={Number(addNewSkuData.length_trimming_tolerance) || null}
+              value={Math.round(Number(addNewSkuData.length_trimming_tolerance) * 100) / 100 || null}
               onChange={modifiedHandleChange}
               readOnly={editTag}
-                                    className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.length_trimming_tolerance ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.length_trimming_tolerance
+                  ? 'border-2 border-red-500'
+                  : 'border border-gray-300'
+              }`}
             />
           </div>
         </Tooltip>
@@ -1061,12 +1069,14 @@ useEffect(() => {
             <input
               id="width_trimming_tolerance"
               name="width_trimming_tolerance"
-              value={Number(addNewSkuData.width_trimming_tolerance) || null}
+              value={Math.round(Number(addNewSkuData.width_trimming_tolerance) * 100) / 100 || null}
               onChange={modifiedHandleChange}
               readOnly={editTag}
-                                              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.width_trimming_tolerance ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.width_trimming_tolerance
+                  ? 'border-2 border-red-500'
+                  : 'border border-gray-300'
+              }`}
             />
           </div>
         </Tooltip>
@@ -1085,11 +1095,12 @@ useEffect(() => {
             id="minimum_order_level"
             name="minimum_order_level"
             type="number"
+            min="0"
             value={Number(addNewSkuData.minimum_order_level) || null}
             onChange={handleChange}
-                                                       className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+              errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
+            }`}
           />
         </div>
         <ChipSelectorWithBrowse
@@ -1118,21 +1129,21 @@ useEffect(() => {
           </select>
         </div>
 
-      <div className="w-[200px]">
-  <label className="block text-sm font-medium text-gray-700 mb-2">Print Type</label>
-  <select
-    id="print_type"
-    name="print_type"
-    value={addNewSkuData?.print_type || ''}
-    onChange={handleChange}
-    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-  >
-    <option value="">Select Type</option>
-    <option value="None">None</option>
-    <option value="Offset">Offset</option>
-    <option value="Flexo">Flexo</option>
-  </select>
-</div>
+        <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Print Type</label>
+          <select
+            id="print_type"
+            name="print_type"
+            value={addNewSkuData?.print_type || ''}
+            onChange={handleChange}
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          >
+            <option value="">Select Type</option>
+            <option value="None">None</option>
+            <option value="Offset">Offset</option>
+            <option value="Flexo">Flexo</option>
+          </select>
+        </div>
 
 {(addNewSkuData?.print_type === 'Offset' || addNewSkuData?.print_type === 'Flexo') && (
   <div className="flex w-[200px]">
@@ -1143,7 +1154,7 @@ useEffect(() => {
         htmlFor="file-upload"
         className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
       >
-        Upload Files
+        <CIcon icon={cilCloudUpload} size="sm" className="text-gray-700" /> Upload Files
       </label>
       <input
         id="file-upload"
@@ -1154,38 +1165,37 @@ useEffect(() => {
         className="hidden"
       />
 
-      {/* Uploading text */}
-      {isUploading && (
-        <div className="text-sm text-blue-600 mt-2">Uploading files...</div>
-      )}
+              {/* Uploading text */}
+              {isUploading && <div className="text-sm text-blue-600 mt-2">Uploading files...</div>}
 
-      {/* Display uploaded files */}
-      {uploadedFiles.length > 0 && (
-        <div className="mt-2">
-          <p className="text-xs text-gray-600 mb-1">Uploaded files:</p>
-       <ul className="space-y-0.5">
-  {uploadedFiles.map((file, index) => (
-    <li key={index} className="flex items-center text-xs w-full max-w-[240px]">
-      <div className="flex-1 truncate text-gray-700">
-        {file.name || (typeof file === 'string' ? file.split('/').pop() : file.url.split('/').pop())}
-      </div>
-      <button
-        type="button"
-        onClick={() => removeFile(index)}
-        className="ml-1 text-red-500 hover:text-red-700 text-sm"
-      >
-        ✕
-      </button>
-    </li>
-  ))}
-</ul>
-
-        </div>
-      )}
-    </div>
-  </div>
-)}
-
+              {/* Display uploaded files */}
+              {uploadedFiles.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-xs text-gray-600 mb-1">Uploaded files:</p>
+                  <ul className="space-y-0.5">
+                    {uploadedFiles.map((file, index) => (
+                      <li key={index} className="flex items-center text-xs w-full max-w-[240px]">
+                        <div className="flex-1 truncate text-gray-700">
+                          {file.name ||
+                            (typeof file === 'string'
+                              ? file.split('/').pop()
+                              : file.url.split('/').pop())}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(index)}
+                          className="ml-1 text-red-500 hover:text-red-700 text-sm"
+                        >
+                          ✕
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {!isDrawerOpen && (

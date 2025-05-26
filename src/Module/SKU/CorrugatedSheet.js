@@ -1,7 +1,7 @@
 import Input from '../../components/New/Input'
 import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
-import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash } from '@coreui/icons'
+import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilCloudUpload, cilPencil, cilTrash } from '@coreui/icons'
 import { useEffect, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import CustomAlert from '../../components/New/CustomAlert'
@@ -850,6 +850,7 @@ className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-
             id="minimum_order_level"
             name="minimum_order_level"
             type="number"
+            min="0"
             value={addNewSkuData.minimum_order_level}
             onChange={handleChange}
                      className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
@@ -906,11 +907,11 @@ className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-
     <div className="flex flex-col flex w-[200px]">
       {/* Custom styled file input */}
          <label className="block text-sm font-medium text-gray-700 mb-2">Documents</label>
-      <label
+   <label
         htmlFor="file-upload"
         className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
       >
-        Upload Files
+        <CIcon icon={cilCloudUpload} size="sm" className="text-gray-700" /> Upload Files
       </label>
       <input
         id="file-upload"

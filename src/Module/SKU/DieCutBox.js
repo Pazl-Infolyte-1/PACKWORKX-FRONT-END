@@ -1,7 +1,7 @@
 import Input from '../../components/New/Input'
 import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
-import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilTrash } from '@coreui/icons'
+import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilCloudUpload, cilPencil, cilTrash } from '@coreui/icons'
 import DiePopupTable from './DiePopupTable'
 import PopUp from '../../components/New/PopUp'
 import { useEffect, useState } from 'react'
@@ -862,12 +862,12 @@ const [fileNames, setFileNames] = useState([]);
     <div className="flex flex-col flex w-[200px]">
       {/* Custom styled file input */}
          <label className="block text-sm font-medium text-gray-700 mb-2">Documents</label>
-      <label
-        htmlFor="file-upload"
-        className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
-      >
-        Upload Files
-      </label>
+     <label
+          htmlFor="file-upload"
+          className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
+        >
+          <CIcon icon={cilCloudUpload} size="sm" className="text-gray-700" /> Upload Files
+        </label>
       <input
         id="file-upload"
         type="file"

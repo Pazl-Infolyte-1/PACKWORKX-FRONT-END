@@ -55,7 +55,16 @@ const routes = [
   },
 
   { path: '/clients/clientForm', name: 'Add Client', element: ClientForm, key: '10-1' },
-  { path: '/SKU', name: 'SKU', element: SKU, key: 23 },
+  //{ path: '/SKU', name: 'SKU', element: SKU, key: 23 },
+    {
+    path: '/SKU',
+    name: 'SKU',
+    element: SKU,
+    key: 23,
+    children: [
+      { path: ':id', element: TableView, key: 'sku_view' }, 
+    ],
+  },
   {
     path: '/sku/add',
     name: 'Add SKU',

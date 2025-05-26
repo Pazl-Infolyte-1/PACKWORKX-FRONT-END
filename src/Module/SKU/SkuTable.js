@@ -15,6 +15,7 @@ import ThreeDotMenu from '../../components/ThreeDotMenu'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 function SkuTable({
   skudata,
@@ -26,7 +27,7 @@ function SkuTable({
   setAlerts,
   onSkuDeleted,
   setErrors,
-  setSelectedSku,
+  setSelectedSku
 }) {
   const [showPopUp, setShowPopUp] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
@@ -35,7 +36,7 @@ function SkuTable({
   const [tableHeight, setTableHeight] = useState('calc(85vh - 200px)')
   const tableRef = useRef(null)
   const dispatch = useDispatch()
-
+const navigate = useNavigate()
   // Handle window resize to update table height dynamically
   useEffect(() => {
     const updateHeight = () => {
@@ -112,14 +113,18 @@ function SkuTable({
   }
 
   return (
-   <div className="border border-red-200 overflow-hidden flex flex-col" ref={tableRef}>
+   <div className="border-t border-gray-300  overflow-hidden flex flex-col" ref={tableRef}>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className="relative flex-grow">
-        <div className="overflow-hidden h-full flex flex-col">
+      <div
+  className={`overflow-hidden flex flex-col ${
+    isMinimized ? 'h-[515px]' : 'h-[375px]'
+  }`}
+>
           <div className="overflow-y-auto flex-grow" style={{ height: tableHeight }}>
             <CTable hover className="w-full m-0 table-fixed">
             <CTableHead className="!bg-gray-100">
-  <CTableRow>
+  <CTableRow className='sticky top-0 z-10 bg-gray-100'>
     {!isMinimized && (
       <>
         <CTableHeaderCell style={{ width: '20px' }} className="text-center">
@@ -144,7 +149,7 @@ function SkuTable({
           {/* Table body - scrollable with dynamic height */}
 
 
-              <CTableBody>
+              <CTableBody  className='cursor-pointer'>
                 {skudata.length > 0 ? (
                   skudata
                     .filter((item) => item.status === 'active')
@@ -155,6 +160,8 @@ function SkuTable({
                           if (!e.target.closest('.dropdown')) {
                             setIsMinimized(true)
                             setSelectedSku(cell)
+                            navigate(`/SKU/${cell?.id}`);
+
                           }
                         }}
                         className={`border-b text-sm ${
@@ -163,8 +170,8 @@ function SkuTable({
                       >
                     {isMinimized ? (
   <>
-    <CTableDataCell className="text-start py-3 text-sm !text-blue-600 font-semibold">
-      {cell.sku_name || 'N/A'}
+    <CTableDataCell className="text-start py-3 text-sm text-black-700 font-semibold">
+      {cell.sku_name || '-'}
     </CTableDataCell>
   </>
 ) : (
@@ -175,7 +182,7 @@ function SkuTable({
     <CTableDataCell style={{ width: '120px' }} className="text-center text-gray-700">
       {cell.sku_ui_id}
     </CTableDataCell>
-    <CTableDataCell style={{ width: '140px' }} className="text-center text-blue-600 font-medium">
+    <CTableDataCell style={{ width: '140px' }} className="text-center !text-blue-700 font-semibold">
       {cell.sku_name}
     </CTableDataCell>
     <CTableDataCell style={{ width: '130px' }} className="text-center text-gray-700">
@@ -187,7 +194,7 @@ function SkuTable({
     <CTableDataCell style={{ width: '120px' }} className="text-center text-gray-700">
       {cell.length && cell.width && cell.height
         ? `${cell.length} x ${cell.width} x ${cell.height}`
-        : 'NA'}
+        : '-'}
     </CTableDataCell>
     <CTableDataCell style={{ width: '100px' }} className="text-center text-gray-700">
       {cell.deckle_size}
@@ -199,11 +206,11 @@ function SkuTable({
       <div className="flex justify-center">
         <ThreeDotMenu
           value={[
-            {
-              label: 'View',
-              icon: cilHandPointRight,
-              onClick: () => setShowPopUp(cell.id),
-            },
+            //{
+            //  label: 'View',
+            //  icon: cilHandPointRight,
+            //  onClick: () => setShowPopUp(cell.id),
+            //},
             {
               label: 'Edit',
               icon: cilPencil,

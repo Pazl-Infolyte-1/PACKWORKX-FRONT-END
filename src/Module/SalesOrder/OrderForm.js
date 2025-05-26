@@ -5,6 +5,7 @@ import ActionButton from '../../components/New/ActionButton';
 import { useSelector } from 'react-redux';
 import SalesOrderSkuform from './SalesOrderSkuform';
 import { useSearch } from '../../components/New/SearchContext';
+import { useNavigate } from 'react-router-dom';
 
 const OrderForm = forwardRef(({
   formData,
@@ -30,6 +31,7 @@ const OrderForm = forwardRef(({
   const stateID = localStorage.getItem('company_state_id');
   const [isIgstApplicable, setIsIgstApplicable] = useState(true)
   const { searchQuery, setGlobalPlaceholder } = useSearch()
+  const navigate = useNavigate()
 
 
 
@@ -443,12 +445,6 @@ const OrderForm = forwardRef(({
                     className={`h-7 w-80 rounded border px-3 text-sm ${attemptedSubmit && errors.sales_ui_id ? " ring-1 ring-red-600" : "border-gray-300"
                       }`}
                   />
-                  <button type='button' className="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="3" />
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                    </svg>
-                  </button>
 
                 </div>
               </div>
@@ -475,13 +471,14 @@ const OrderForm = forwardRef(({
               {/* Credit Period */}
               <div className="flex items-center">
                 <label className="text-xs text-red-600 w-40">
-                  Client Period
+                  Credit Period
                 </label>
                 <div className="relative">
                   <input
                     type="number"
                     name="credit_period"
                     value={localFormData.credit_period || ""}
+                    min="0"
                     onChange={handleInputChange}
                     className={`h-7 w-80 rounded border px-3 text-sm ${attemptedSubmit && errors.credit_period ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
                       }`} />
@@ -511,7 +508,7 @@ const OrderForm = forwardRef(({
               {/* Confirmation By */}
               <div className="flex items-center">
                 <label className="text-xs text-gray-700 w-40">
-                  Confirmation By <span className="text-red-500">*</span>
+                  Confirmation By
                 </label>
                 <div className="relative">
                   <div
@@ -617,10 +614,10 @@ const OrderForm = forwardRef(({
         {/* Submit Buttons Section */}
         <div className="fixed bottom-0 bg-white border-t border-gray-200 z-10 flex p-1 py-2 w-full">
           <div className="flex-1 justify-start">
-            <div className="flex gap-4">
+            <div className="flex gap-2">
               <ActionButton
                 type="button"
-                onClick={() => ''}
+                onClick={() => navigate('/salesorder')}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-all"
                 label={'Cancel'}
               >

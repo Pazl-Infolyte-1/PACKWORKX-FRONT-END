@@ -19,12 +19,9 @@ import ReusableTable from './ReusableTable'
 
 function SalesOrderTable({
   data: initialData,
-  setActionDrawerOpen,
-  setVersionDrawerOpen,
   handleDelete,
   handleEdit,
   handleView,
-  loading,
   handleStatusChange,
   handleRowClick,
   isMinimiseTable
@@ -45,21 +42,21 @@ function SalesOrderTable({
     const updatedData = initialData.map((item) => ({
       ...item,
       isSelected: item.isSelected ?? false,
+      SalesSkuDetails: item.SalesSkuDetails?.length || 0,
     }));
     setData(updatedData);
   }, [initialData]);
 
   const columns = [
-    
-    {
-      key: 'select',
-      field: 'isSelected',
-      header: '', // empty header for checkbox column
-      type: 'checkbox',
-    },
+    // {
+    //   key: 'select',
+    //   field: 'isSelected',
+    //   header: '', // empty header for checkbox column
+    //   type: 'checkbox',
+    // },
       { key: 'sales_generate_id', header: 'Sales ID', field: 'sales_generate_id' },  
       { key: 'client', header: 'Client', field: 'client' },
-      { key: 'skuCount', header: 'No of SKU', type:"custom" ,render: (row) => row.SalesSkuDetails?.length || 0, },
+      { key: 'skuCount', header: 'No of SKU', field: 'SalesSkuDetails' },
       { key: 'estimated', header: 'Expected Delivery Date', type:"date", field: 'estimated'  },
       { key: 'created_at', header: 'Created Date', field: 'created_at',type:"date" },
       {

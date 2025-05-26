@@ -81,6 +81,12 @@ function AddEditMachine({}) {
       const response = await apiCall
 
       if (response.status === 200 || response.status === 201) {
+        setAlerts([
+          {
+            severity: 'success',
+            message: response.data.message,
+          },
+        ])
         reset(defaultValues)
         setAlerts([
           {
@@ -88,7 +94,10 @@ function AddEditMachine({}) {
             message: response.data.message,
           },
         ])
-        navigate('/machinedashboard')
+        setTimeout(() => {
+          navigate('/machinedashboard')
+          reset(defaultValues)
+        }, 1000)
       }
     } catch (error) {
       setAlerts([
@@ -119,7 +128,9 @@ function AddEditMachine({}) {
 
   return (
     <div className="mx-auto mt-3 relative flex flex-col">
-      <div className="text-xl font-semibold p-2 fixed bg-white w-full -my-4">{isEdit ? 'Edit Machine' : 'Add Machine'}</div>
+      <div className="text-xl font-semibold p-2 fixed bg-white w-full -my-4">
+        {isEdit ? 'Edit Machine' : 'Add Machine'}
+      </div>
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
 
       {/* Form container with scroll */}
@@ -292,7 +303,7 @@ function AddEditMachine({}) {
           </div>
           {/* Remarks - Full Width, moved outside the grid */}
           <div className="w-full px-4 rounded-lg mb-5">
-            <RequiredFieldLabel label="Notes & Remarks"  />
+            <RequiredFieldLabel label="Notes & Remarks" />
             <textarea
               {...register('remarks_notes')}
               rows="3"

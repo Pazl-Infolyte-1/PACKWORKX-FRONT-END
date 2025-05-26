@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {API_BASE_URL} from './constant'
+import { API_BASE_URL } from './constant'
 
 const BASE_URL = API_BASE_URL
 const GST_URL = 'http://sheet.gstincheck.co.in/check/9ee24120971acd5c17dc6cad239d99fa'
@@ -442,25 +442,24 @@ export const apiMethods = {
     }
   },
 
-  singleclients: async (id) => { 
-  try {
-    const response = await apiClient.get(`/clients/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(error);
-  }
-},
+  singleclients: async (id) => {
+    try {
+      const response = await apiClient.get(`/clients/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
-singlesku: async (id) => {
-  try {
-    const response = await apiClient.get(`/sku-details/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error('API error in singlesku:', error);
-    throw error; // Optional: rethrow for handling at the call site
-  }
-},
-
+  singlesku: async (id) => {
+    try {
+      const response = await apiClient.get(`/sku-details/${id}`)
+      return response.data
+    } catch (error) {
+      console.error('API error in singlesku:', error)
+      throw error // Optional: rethrow for handling at the call site
+    }
+  },
 
   getSkuType: async () => {
     try {
@@ -577,7 +576,7 @@ singlesku: async (id) => {
     }
   },
   editEmployee: async (id, body) => {
-      return await apiClient.put(`/user/employees/${id}`, body)
+    return await apiClient.put(`/user/employees/${id}`, body)
   },
   getEmployeeData: async (id) => {
     try {
@@ -1298,8 +1297,7 @@ singlesku: async (id) => {
   // },
   getinventory: async () => {
     try {
-      return await apiClient.get('/inventory?limit=10000'
-    )
+      return await apiClient.get('/inventory?limit=10000')
     } catch (error) {
       console.error(error)
     }
@@ -1313,7 +1311,7 @@ singlesku: async (id) => {
     }
   },
 
-  getDropDown: async () =>{
+  getDropDown: async () => {
     return await apiClient.get('/common-service/dropdown-name')
   },
 
@@ -1348,7 +1346,7 @@ singlesku: async (id) => {
   getState: async () => {
     return await apiClient.get('/common-service/states')
   },
-  
+
   getPurchaseOrderDetails: async ({ po_id, grn_id }) => {
     try {
       return await apiClient.get('/purchase-order/details/po', {
@@ -1362,7 +1360,7 @@ singlesku: async (id) => {
       throw error
     }
   },
-  
+
   submitPurchaseOrderReturn: async (payload) => {
     try {
       return await apiClient.post('/purchase-order/return/gst/po', payload)
@@ -1371,35 +1369,47 @@ singlesku: async (id) => {
       throw error
     }
   },
-  
- 
-  getSkuByClientId:async(client_id)=>{
+
+  getSkuByClientId: async (client_id) => {
     return await apiClient.get(`sku-details/client-sku/${client_id}`)
   },
-  postSkuValuesOptions:async(body)=>{
-    return await apiClient.post(`sku-details/options`,body)
+  postSkuValuesOptions: async (body) => {
+    return await apiClient.post(`sku-details/options`, body)
   },
 
-  getSkuValuesOptions:async(id)=>{
-    return await apiClient.get(`sku-details/${id}/options`,)
+  getSkuValuesOptions: async (id) => {
+    return await apiClient.get(`sku-details/${id}/options`)
   },
   downloadSalesOrder: async () => {
     return await apiClient.get('sale-order/download/excel', {
       responseType: 'blob', // for binary files like Excel
       headers: {
-        'Accept': 'application/octet-stream'
-      }
-    });
+        Accept: 'application/octet-stream',
+      },
+    })
   },
   downloadWorkOrder: async () => {
     return await apiClient.get('work-order/download/excel', {
       responseType: 'blob', // for binary files like Excel
       headers: {
-        'Accept': 'application/octet-stream'
-      }
-    });
+        Accept: 'application/octet-stream',
+      },
+    })
+  },
+  getMachineRoute: async () => {
+    return await apiClient.get('mapping/machine-route-process')
+  },
+  saveRouteProcesses: async (payload) => {
+    return await apiClient.post('mapping/machine-route-process', payload)
   },
 
+  updateRouteProcesses: async (id, payload) => {
+    return await apiClient.put(`mapping/machine-route-process/${id}`, payload)
+  },
+
+  deleteRoute: async (id) => {
+    return await apiClient.delete(`mapping/machine-route-process/${id}`)
+  },
   deletePoReturn: async (id) => {
     try {
       return await apiClient.delete(`/purchase-order-return/${id}`)
@@ -1407,10 +1417,6 @@ singlesku: async (id) => {
       console.error(error)
     }
   },
-  
-  
-
-
 }
 
 export default apiMethods

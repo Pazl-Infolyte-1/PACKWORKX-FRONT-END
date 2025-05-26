@@ -1,11 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
-  CTable,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
+  CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell,
 } from '@coreui/react'
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import apiMethods from '../../api/config'
@@ -14,107 +9,87 @@ import ThreeDotMenu from '../../components/ThreeDotMenu'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 
-function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, handlePurchaseDetails, loading }) {
+function PurchaseOrderTable({ data=[], handleDelete, handleEdit, handleView, handlePurchaseDetails, loading, setRefresh }) {
   const [showPopUp, setShowPopUp] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [alerts, setAlerts] = useState([])
   const [poData, setPoData] = useState([])
+  const [grnValidationMap, setGrnValidationMap] = useState({}) // ✅ for per-row validation
 
 
-  // Optional: if local state update is needed after delete
-  // const handlePurchaseDetails = async (po_id) => {
-  //   try {
-  //     console.log('PO ID:', po_id);
-  
-  //     const response = await apiMethods.getinventory();
-  //     console.log('Full inventory response:', response);
-  
-  //     const inventoryList = Array.isArray(response?.data.data) ? response.data.data : [];
-  
-  //     const matchedInventory = inventoryList.find(item => item.po_id === po_id);
-  
-  //     if (matchedInventory) {
-  //       const grn_id = matchedInventory.grn_id;
-  //       console.log('Matched GRN ID:', grn_id);
-  
-  //       await handlePurchaseReturnDetails(po_id, grn_id);
-  //     } else {
-  //       console.warn('No inventory found for PO ID:', po_id);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error in handlePurchaseDetails:', error);
-  //   }
-  // };
-  
+const handleGrnCheck = async () => {
+  try {
+    const response = await apiMethods.getGrn();
+    const grnData = response?.data?.data || [];
+
+    const poReturn = await apiMethods.getPurchaseReturn();
+    const poReturnData = [
+      ...(poReturn?.data?.approved || []),
+      ...(poReturn?.data?.disapproved || []),
+    ];
+
+    const map = {};
+
+    data.forEach((row) => {
+      const hasGrn = grnData.some(grn => grn.po_id === row.id);
+      const matchingPor = poReturnData.find(por => por.po_id === row.id);
+
+      let status = 'Created';
+
+      if (matchingPor) {
+        status = Number(row.total_amount) === Number(matchingPor.total_amount)
+          ? 'Returned'
+          : 'Amendment';
+      } else if (hasGrn) {
+        status = 'Received';
+      }
+
+      map[row.id] = status;
+    });
+
+    setGrnValidationMap(map);
+  } catch (error) {
+    console.error('Error fetching GRN or Purchase Return data:', error);
+  }
+};
 
 
 
-  // const handlePurchaseReturnDetails = async (po_id, grn_id) => {
-  //   try {
-  //     console.log('PO ID:', po_id);
+  useEffect(() => {
+    if (data?.length > 0) {
+      handleGrnCheck()
+    }
+  }, [data])
 
-  //     // Check if grn_id is available
-
-
-  //     console.log('GRN is a ID:', grn_id);
-      
-  //     const response = await apiMethods.getPurchaseOrderDetails({ po_id, grn_id });
-  //     const { purchaseOrder, purchaseOrderItemDetails } = response.data;
-  
-  //     // Set this data to state, form, or navigate to edit page
-  //     console.log('PO Data:', purchaseOrder);
-  //     console.log('Items:', purchaseOrderItemDetails);
-  //   } catch (error) {
-  //     console.error('Failed to fetch PO details:', error);
-  //   }
-  // };
-
-  
-  
-  
-
-  const handlePoDelete = async () => { 
-    
+  const handlePoDelete = async () => {
     if (!deleteId) {
       setAlerts([{ severity: 'warning', message: 'No Purchase Order selected to delete.' }])
       return
     }
-  
+
     try {
       await apiMethods.deletePurchaseOrder(deleteId)
-      setPoData(prevData => prevData.filter(po => po.id !== deleteId))
+      setPoData(prev => prev.filter(po => po.id !== deleteId))
       setAlerts([{ severity: 'success', message: 'Purchase Order deleted successfully!' }])
-      setTimeout(() => {window.location.reload() }, 100) 
+      setTimeout(() => { window.location.reload() }, 100)
     } catch (error) {
       setAlerts([{ severity: 'error', message: 'Failed to delete Purchase Order.' }])
     } finally {
       setDeleteModal(false)
     }
   }
-  
+
   const openDeleteModal = (id) => {
     setDeleteId(id)
     setDeleteModal(true)
   }
 
-
-  
-  const closeDeleteModal = () => {
-    setDeleteModal(false)
-  }
-
-
   const formatDate = (dateString) => {
     if (!dateString) return ''
     return new Date(dateString).toLocaleString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      // hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
     })
   }
 
@@ -122,124 +97,113 @@ function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, handl
     setAlerts([])
   }
 
-  const handlePoEdit = (id) => {
-    if (typeof handleEdit === 'function' && id != null) {
-      handleEdit(id);
-    }
+
+
+const handleStatusChange = async (id, newStatus) => {
+
+  const currentPo = data.find(po => po.id === id); // get full PO data
+  const payload = {
+    decision: newStatus,
+    items: currentPo.items || [] // send existing items back
+  };
+
+  try {
+    const response = await apiMethods.updatePurchaseOrder(id, payload);
+    setAlerts([{ severity: 'success', message: response.data.message }]);
+          setRefresh((prev) => !prev);
+
+  } catch (error) {
+    console.error('Error:', error);
+    setAlerts([{ severity: 'error', message: error?.response?.data?.message || 'Failed to update status' }]);
   }
+};
+
 
   return (
-  <div className="h-[400px] overflow-x-auto h-[350px] border whitespace-nowrap mt-2">      <CustomAlert alerts={alerts} handleClose={handleCloseAlert} />
+    <div className="h-[400px] overflow-x-auto border whitespace-nowrap mt-2">
+      <CustomAlert alerts={alerts} handleClose={handleCloseAlert} />
       <CTable striped hover className="w-full m-0">
         <CTableHead className="bg-gray-100 sticky top-0 z-10">
           <CTableRow className="text-center">
-            <CTableHeaderCell className="py-3 px-3 text-gray-600 font-medium">
-              PO ID
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Supplier Name
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Supplier Contact
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium text-start">
-              PO Date
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Valid Till
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Decision
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-4 text-gray-600 font-medium">
-              Payment Terms
-            </CTableHeaderCell>
-            <CTableHeaderCell className="py-3 px-3 text-gray-600 font-medium">
-              Action
-            </CTableHeaderCell>
+            {['PO ID', 'Supplier Name', 'Supplier Contact', 'PO Date', 'Valid Till', 'Status', 'Decision', 'Payment Terms', 'Action'].map(header => (
+              <CTableHeaderCell key={header} className="py-3 px-4 text-gray-600 font-medium">{header}</CTableHeaderCell>
+            ))}
           </CTableRow>
         </CTableHead>
 
         <CTableBody>
-        {data.length > 0 ? (
-                data.map((row, index) => (
-                <CTableRow key= {row.id} className="border-b text-center">
-                  <CTableDataCell
-                     onClick={() => setShowPopUp(row.id)}
-                    
-                 
-                    className="py-3 px-4 !text-blue-600 font-semibold cursor-pointer underline text-start "
-                 >
-                    {row.id}
-                  </CTableDataCell>
-                  
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {row.supplier_name}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {row.supplier_contact}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700 text-start">
-                    {formatDate(row.po_date)}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {formatDate(row.valid_till)}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {row.decision}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    {row.payment_terms}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-4 text-gray-700">
-                    <ThreeDotMenu
-                      value={[
-                        {
-                          label: 'View',
-                          icon: cilHandPointRight,
-                          onClick: () => setShowPopUp(row.id),
-                        },
-                        {
-                          label: 'Edit',
-                          icon: cilPencil,
-                          onClick: () => handleEdit(row.id),
-                        },
-                        {
-                          label: 'Delete',
-                          icon: cilTrash,
-                          onClick: () => openDeleteModal(row.id),
-                        },
-                        {
-                          label: 'Purchase Return',
-                          icon: cilPencil,
-                          onClick: () => handlePurchaseDetails(row.id),
-                        },
-                      ]}
-                    />
-                  </CTableDataCell>
+          {data.length > 0 ? (
+            data.map((row) => (
+              <CTableRow key={row.id} className="border-b text-center">
+                <CTableDataCell
+                  onClick={() => setShowPopUp(row.id)}
+                  className="py-3 px-4 !text-blue-600 font-semibold cursor-pointer underline text-start"
+                >
+                  {row.purchase_generate_id}
+                </CTableDataCell>
+                <CTableDataCell className="py-3 px-4 text-gray-700">{row.supplier_name}</CTableDataCell>
+                <CTableDataCell className="py-3 px-4 text-gray-700">{row.supplier_contact}</CTableDataCell>
+                <CTableDataCell className="py-3 px-4 text-gray-700 text-start">{formatDate(row.po_date)}</CTableDataCell>
+                <CTableDataCell className="py-3 px-4 text-gray-700">{formatDate(row.valid_till)}</CTableDataCell>
+               
+               
+                <CTableDataCell className="py-3 px-4 text-gray-700">
+                  {grnValidationMap[row.id] || 'Created'}
+                </CTableDataCell>
+                
+                <CTableDataCell className="py-3 px-4 text-gray-700 align-middle">
+                  <select
+                    value={row.decision}
+                    onChange={(e) => handleStatusChange(row.id, e.target.value)}
+                    className={`px-2.5 py-1 rounded-full text-sm font-medium outline-none border 
+                      ${
+                        row.decision === 'approve'
+                          ? 'bg-green-100 text-green-800 border-green-300'
+                          : row.decision === 'disapprove'
+                          ? 'bg-red-100 text-red-800 border-red-300'
+                          : 'bg-gray-100 text-gray-800 border-gray-300'
+                      }`}
+                  >
+                    <option className="text-gray-700 bg-white" value="approve">
+                      Active
+                    </option>
+                    <option className="text-gray-700 bg-white" value="disapprove">
+                      Inactive
+                    </option>
+                  </select>
+                </CTableDataCell>
 
-                  {/* Modals & Details */}
-                  {deleteModal && (
-                    <ConfirmationModale
-                      isOpen={deleteModal}
-                      onClose={closeDeleteModal}
-                      onConfirm={handlePoDelete}
-                      title="Delete Confirmation"
-                      message="Are you sure you want to delete this Po?"
-                    />
-                  )}
+                {/* <CTableDataCell className="py-3 px-4 text-gray-700">{row.decision}</CTableDataCell> */}
+                <CTableDataCell className="py-3 px-4 text-gray-700">{row.payment_terms}</CTableDataCell>
+                <CTableDataCell className="py-3 px-4 text-gray-700">
+                  <ThreeDotMenu
+                        value={[
+                          { label: 'View', icon: cilHandPointRight, onClick: () => setShowPopUp(row.id) },
+                          
+                          ...(grnValidationMap[row.id] === 'Created' ? [
+                            { label: 'Edit', icon: cilPencil, onClick: () => handleEdit(row.id) },
+                            { label: 'Delete', icon: cilTrash, onClick: () => openDeleteModal(row.id) },
+                          ] : []),
 
-                  {showPopUp && (
-                    <PurchaseOrderDetails
-                      showPopUp={showPopUp}
-                      cell={data.find(row => row.id === showPopUp)}
-                      editTag={false} // Changed from true to false to allow viewing
-                      setShowPopUp={setShowPopUp}
-                      handleEdit={handleEdit} // Changed from handlePoEdit to handleSkuEdit to match component prop
-                    />
-                  )}
-                </CTableRow>
-              ))
+                          ...(grnValidationMap[row.id] === 'Received' ? [
+                            { label: 'Purchase Return', icon: cilPencil, onClick: () => handlePurchaseDetails(row.id) },
+                          ] : []),
+                        ]}
+                      />
+                </CTableDataCell>
+
+                {/* Popups */}
+                {showPopUp === row.id && (
+                  <PurchaseOrderDetails
+                    showPopUp={showPopUp}
+                    cell={row}
+                    editTag={false}
+                    setShowPopUp={setShowPopUp}
+                    handleEdit={handleEdit}
+                  />
+                )}
+              </CTableRow>
+            ))
           ) : (
             <CTableRow>
               <CTableDataCell colSpan={8} className="text-center py-3">
@@ -249,6 +213,15 @@ function PurchaseOrderTable({ data , handleDelete, handleEdit, handleView, handl
           )}
         </CTableBody>
       </CTable>
+
+      {/* Delete Modal (placed once outside loop) */}
+      <ConfirmationModale
+        isOpen={deleteModal}
+        onClose={() => setDeleteModal(false)}
+        onConfirm={handlePoDelete}
+        title="Delete Confirmation"
+        message="Are you sure you want to delete this PO?"
+      />
     </div>
   )
 }

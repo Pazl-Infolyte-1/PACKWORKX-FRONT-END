@@ -1398,7 +1398,15 @@ singlesku: async (id) => {
         'Accept': 'application/octet-stream'
       }
     });
-  }
+  },
+
+  deletePoReturn: async (id) => {
+    try {
+      return await apiClient.delete(`/purchase-order-return/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
   
   
 

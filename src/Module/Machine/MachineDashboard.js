@@ -403,14 +403,18 @@ export default function MachineMaster() {
           setAlerts={setAlerts}
         />
       </PopUp>
-       <PopUp
+      <PopUp
         visible={openRoutes.show}
         setVisible={() => setOpenRoutes({ show: false, id: null })}
         width={800}
         header="Process Routes"
         showCloseButton={true}
       >
-        <ProcessRoutes openRoutes={openRoutes} setOpenRoutes={setOpenRoutes}/>
+        <ProcessRoutes
+          openRoutes={openRoutes}
+          setOpenRoutes={setOpenRoutes}
+          setAlerts={setAlerts}
+        />
       </PopUp>
     </div>
   )

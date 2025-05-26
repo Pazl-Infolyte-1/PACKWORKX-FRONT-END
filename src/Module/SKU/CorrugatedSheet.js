@@ -39,7 +39,9 @@ function CorrugatedSheet({
   errors,
   setErrors,
        uploadedFiles,
-          setUploadedFiles
+          setUploadedFiles,
+          setRscUnits,
+          onMeterDataChange
 }) {
   const [alerts, setAlerts] = useState([])
   const filteredClient = locationvalue
@@ -126,6 +128,7 @@ const [fileNames, setFileNames] = useState([]);
   }
   const handleUnitChange = (e) => {
     const newUnit = e.target.value
+      setRscUnits(newUnit);
     let tooltipMessage = ''
     switch (newUnit) {
       case 'cm':
@@ -471,6 +474,13 @@ const [fileNames, setFileNames] = useState([]);
   }
 }, [editTag, addNewSkuData.print_type]); // <- remove addNewSkuData.documents from deps
 
+
+  useEffect(() => {
+    let area = addNewSkuData.width_board_size_cm2*addNewSkuData.width_board_size_cm2
+
+    onMeterDataChange(area)
+    //setAreaInM2(convertedArea)
+  }, [addNewSkuData.width_board_size_cm2*addNewSkuData.width_board_size_cm2])
 
   return (
     <div className="rounded-lg">

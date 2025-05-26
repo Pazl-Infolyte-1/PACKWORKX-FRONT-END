@@ -59,7 +59,11 @@ function SkuAddEdit({
   const [selectedVersion, setSelectedVersion] = useState(null)
   const [defaultSkuValues, setDefaultSkuValues] = useState([])
   const [color,setColor]=useState([])
+  const [fluteDropdown,setFluteDropdown]=useState([])
   const [rscUnits,setRscUnits] = useState("mm")
+const [selectedFluteIndex, setSelectedFluteIndex] = useState(null);
+
+
   const createInitialSkuData = () => ({
     client_id: null,
     sku_name: null,
@@ -192,49 +196,116 @@ dispatch(setRscDeckleSize({ length: null, height: null, ups: null }));
     setSkuVariant(option.sku_type || option.value)
     setAddNewSkuData(baseSkuData)
   }
+const calculateWeight = ({ gsm, isCorrugated, selectedFlute, areaInSquareMeters }) => {
+  const numberOfFlutes = isCorrugated
+    ? selectedFlute?.number_of_flutes_per_meter || 0
+    : 1;
 
-  const handleSkuValuesChange = (index, field, value) => {
-    setAddNewSkuData((prevData) => {
-      const updatedSkuValues = [...prevData.sku_values]
-      const updatedItem = { ...updatedSkuValues[index], [field]: value }
+  if (!gsm || !areaInSquareMeters) return null;
+console.log("values///",((gsm * areaInSquareMeters) * 0.001) * numberOfFlutes)
+  return ((gsm * areaInSquareMeters) * 0.001) * numberOfFlutes;
+};
+const handleSkuValuesChange = (index, field, value) => {
+  setAddNewSkuData((prevData) => {
+    const updatedSkuValues = [...prevData.sku_values];
+    const updatedItem = { ...updatedSkuValues[index], [field]: value };
 
-      const isCorrugated = updatedItem.layer?.toLowerCase().includes('corrugated')
+    // Determine if layer is corrugated
+    const isCorrugated = updatedItem.layer?.toLowerCase().includes('corrugated');
 
-      // Update weight based on conditions
-      if (field === 'gsm' || field === 'bf' || field === 'layer') {
-        const gsm = field === 'gsm' ? value : updatedItem.gsm
-        const bf = field === 'bf' ? value : updatedItem.bf
-console.log("units rsc",rscUnits)
-console.log("into msquare",meterSquareData)
+    // Store selectedFlute (or update if field was 'selected_flute')
+    if (field === 'selected_flute') {
+      updatedItem.selected_flute = value;
+    }
+    const selectedFlute = updatedItem.selected_flute;
 
-  // Convert area to square meters
-  let areaInSquareMeters = 0;
+    // Set default flute info if non-corrugated
+    if (field === 'layer' && !isCorrugated) {
+      updatedItem.flute_type = '--';
+      updatedItem.selected_flute = { number_of_flutes_per_meter: 1 };
+    }
 
-  if (rscUnits === 'mm') {
-    areaInSquareMeters = meterSquareData * 1e-6; // mm² → m²
-  } else if (rscUnits === 'cm') {
-    areaInSquareMeters = meterSquareData * 1e-4; // cm² → m²
-  } else if (rscUnits === 'in') {
-    areaInSquareMeters = meterSquareData * 0.00064516; // in² → m²
-  } else {
-    console.warn("Unknown rscUnit:", rscUnits);
-  }
+    // Calculate area in square meters
+    let areaInSquareMeters = 0;
+    if (rscUnits === 'mm') areaInSquareMeters = meterSquareData * 1e-6;
+    else if (rscUnits === 'cm') areaInSquareMeters = meterSquareData * 1e-4;
+    else if (rscUnits === 'in') areaInSquareMeters = meterSquareData * 0.00064516;
 
-        if (isCorrugated && gsm && bf) {
-          updatedItem.weight = (gsm*0.001)* bf * areaInSquareMeters
-        } else if (gsm) {
-          updatedItem.weight = (gsm*0.001) * areaInSquareMeters
-        }
-      }
+    // Trigger weight recalculation
+    if (['gsm', 'layer', 'selected_flute'].includes(field)) {
+      updatedItem.weight = calculateWeight({
+        gsm: field === 'gsm' ? value : updatedItem.gsm,
+        isCorrugated,
+        selectedFlute,
+        areaInSquareMeters,
+      });
+    }
 
-      // Auto-set flute_type for corrugated layer
-      if (field === 'layer') {
-        updatedItem.flute_type = isCorrugated ? '' : 'N/A'
-      }
-      updatedSkuValues[index] = updatedItem
-      return { ...prevData, sku_values: updatedSkuValues }
-    })
-  }
+    updatedSkuValues[index] = updatedItem;
+    return { ...prevData, sku_values: updatedSkuValues };
+  });
+};
+useEffect(() => {
+  // 1. First reset weights to ensure recalculation doesn't use stale data
+  const resetWeights = addNewSkuData.sku_values.map((item) => ({
+    ...item,
+    weight: null,
+  }));
+
+  setAddNewSkuData((prevData) => ({
+    ...prevData,
+    sku_values: resetWeights,
+  }));
+
+  // 2. Now recalculate weights after a short delay to ensure reset completes
+  // This avoids race condition with batched updates
+  setTimeout(() => {
+    let areaInSquareMeters = 0;
+    if (rscUnits === 'mm') areaInSquareMeters = meterSquareData * 1e-6;
+    else if (rscUnits === 'cm') areaInSquareMeters = meterSquareData * 1e-4;
+    else if (rscUnits === 'in') areaInSquareMeters = meterSquareData * 0.00064516;
+
+    const updatedSkuValues = addNewSkuData.sku_values.map((item) => {
+      const isCorrugated = item.layer?.toLowerCase().includes('corrugated');
+      const selectedFlute = item.selected_flute;
+
+      return {
+        ...item,
+        weight: calculateWeight({
+          gsm: item.gsm,
+          isCorrugated,
+          selectedFlute,
+          areaInSquareMeters,
+        }),
+        ...(isCorrugated
+          ? {}
+          : {
+              flute_type: "--",
+              selected_flute: { number_of_flutes_per_meter: 1 },
+            }),
+      };
+    });
+
+    setAddNewSkuData((prevData) => ({
+      ...prevData,
+      sku_values: updatedSkuValues,
+    }));
+  }, 0); // Runs after reset
+}, [
+  addNewSkuData.length,
+  addNewSkuData.width,
+  addNewSkuData.height,
+  rscUnits,
+  addNewSkuData.width_board_size_cm2,
+  addNewSkuData.length_board_size_cm2,
+  meterSquareData,
+  JSON.stringify(
+    addNewSkuData.sku_values.map(
+      (item) => item.selected_flute?.number_of_flutes_per_meter || 0
+    )
+  ),
+]);
+
 
   //for updating the gsm calculations when dimension changes
   useEffect(() => {
@@ -365,6 +436,8 @@ console.log("into msquare",meterSquareData)
     //'Corrugated Sheet': (
     Board: (
       <CorrugatedSheet
+        onMeterDataChange={handleMeterDataChange}
+            setRscUnits={setRscUnits}
         uploadedFiles={uploadedFiles}
           setUploadedFiles={setUploadedFiles}
         isopenval={isopenval}
@@ -392,6 +465,8 @@ console.log("into msquare",meterSquareData)
     ),
     'Die Cut box': (
       <DieCutBox
+             onMeterDataChange={handleMeterDataChange}
+        setRscUnits={setRscUnits}
               uploadedFiles={uploadedFiles}
           setUploadedFiles={setUploadedFiles}
         isopenval={isopenval}
@@ -662,6 +737,32 @@ useEffect(() => {
   }))
 }, [addNewSkuData.sku_values])
 
+  useEffect(() => {
+    fetchFluteList()
+  }, [])
+
+  const fetchFluteList = async () => {
+    try {
+      const response = await apiMethods.getFluteType()
+      setFluteDropdown(response.data.data)
+      console.log("flute type",JSON.stringify(response.data.data))
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+
+const handleFluteSelection = (selectedFlute, fluteIndex) => {
+  console.log("selected flute",selectedFlute)
+  if (fluteIndex !== null) {
+    handleSkuValuesChange(fluteIndex, 'flute_type', selectedFlute.name);
+    handleSkuValuesChange(fluteIndex, 'selected_flute', selectedFlute);
+    setSelectedFluteIndex(null);
+    setisSingleViewPopup(false);
+  }
+};
+
+console.log("addnedwskudata unit",rscUnits)
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
@@ -823,15 +924,18 @@ useEffect(() => {
                             disabled={editTag}
                           >
                             <option hidden>Select</option>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                            <option value="E">E</option>
-                            <option value="F,G,N">F,G,N</option>
+  {fluteDropdown.map((flute) => (
+    <option key={flute.id} value={flute.name} disabled>
+      {flute.name}
+    </option>
+  ))}
                           </select>
                           <FaEye
                             className="absolute right-2 text-gray-500 cursor-pointer"
-                            onClick={openViewCard}
+                           onClick={() => {
+    setSelectedFluteIndex(index);
+    setisSingleViewPopup(true);
+  }}
                           />
                         </div>
                       ) : (
@@ -927,7 +1031,11 @@ useEffect(() => {
         width={'50vw'}
         header={'Add Flute'}
       >
-        <FluteTypeView></FluteTypeView>
+ <FluteTypeView
+    onSelect={(selectedFlute) =>
+      handleFluteSelection(selectedFlute, selectedFluteIndex)
+    }
+  />
       </PopUp>
 
       <PopUp

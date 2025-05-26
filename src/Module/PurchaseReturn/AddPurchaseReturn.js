@@ -4,14 +4,15 @@ import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
 import ReturnItemForm from './ReturnItemForm'
 
-const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
+const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer, selectedPorId, poData }) => {
   const [items, setItems] = useState([])
   const [grnId, setGrnId] = useState(null)
   const [clientData,setClientData]=useState([]);
   const [supplierAddresses, setSupplierAddresses] = useState([]);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
   const [showAddressModal, setShowAddressModal] = useState(false);
-  
+  const [selectedPoIdState, setSelectedPoIdState] = useState(null);
+
 
   const [poTotals, setPoTotals] = useState({
     total_qty: 0,
@@ -156,16 +157,76 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
     } 
   }
 
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////  
+// const handlePoChange = (e) => {
+//   const selectedId = parseInt(e.target.value);
+//   console.log("selectedId",selectedId);
+  
+//       // if(selectedId) {
+//         // selectedPoId = selectedId;
+//           handlePurchaseDetails(selectedId);
+//           setValue('po_id', e.target.value);
+//       // }else{
+//       //   selectedPoId
+//       //   console.log("selectedPoId else",selectedPoId);
+//       // }
+//   };
+
+  // const handlePoChange = (e) => {
+  //   const selectedId = parseInt(e.target.value);
+  //   handlePurchaseDetails(selectedId);
+  //   setValue('po_id', e.target.value);
+  // };
+
+  const handlePoChange = (e) => {
+  const selectedId = parseInt(e.target.value);
+  setSelectedPoIdState(selectedId);
+  handlePurchaseDetails(selectedId);
+  setValue('po_id', e.target.value);
+};
+
+
+
   useEffect(() => {
+        setValue('po_id', selectedPoId);
     if (isEdit && selectedPoId) {
-      handlePurchaseDetails(selectedPoId)
+      handlePurchaseDetails(selectedPoId);
+    } else if (selectedPorId) {
+      handlePurchaseDetails(selectedPorId);
+    }else{
+      handlePurchaseDetails(selectedPoId);
     }
-  }, [isEdit, selectedPoId])
+  }, [isEdit, selectedPoId, selectedPorId]);
 
   const handleFormSubmit = async (data) => {
+    console.log('Form submit data:', data);
+    // return;
     const checkedItems = items.filter(item => item.selected)
     const checkedItemCodes = checkedItems.map(item => item.item_code)
     
+
+const response = await apiMethods.getinventory();
+const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : [];
+let allAvailable = true;
+for (const checkedItem of checkedItems) {
+  const matchedInventory = inventoryList.find(inv => inv.item_id === checkedItem.item_id);
+
+  if (!matchedInventory || matchedInventory.quantity_available === 0) {
+    allAvailable = false;
+    console.warn(`Item ID ${checkedItem.item_id} is not available in inventory.`);
+    break;
+  }
+}
+const message = allAvailable
+  ? "Purchase return created successfully"
+  : "Some item quantities are zero or unavailable, so return not possible";
+alert(message);
+console.log(message);
+
+
     // if (checkedItems.length === 0) {
       //   alert('Please select at least one item to return.')
       //   return
@@ -190,7 +251,7 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
     // }
 
     const payload = {
-      po_id: selectedPoId,
+      po_id: data.po_id || selectedPoId,
       grn_id: grnId,
       decision: data.decision,
       reason: data.reason || 'Quality issues',
@@ -285,6 +346,10 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
 
 
 
+
+
+
+
   const handleAddressChange = (e) => {
   const idx = parseInt(e.target.value, 10);
   setSelectedAddressIndex(idx);
@@ -352,11 +417,10 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
           {/* Supplier Dropdown */}
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier ID <span className="text-red-500"> *</span></label>
+          {/* <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier ID </label>
             <select
-            disabled
-              {...register('supplier_id', { required: 'required' })}
+              {...register('supplier_id')}
               onChange={handleSupplierChange}
               className="w-full p-2 border border-gray-300 rounded-md"
             >
@@ -370,13 +434,43 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
             {errors.supplier_id && (
               <p className="text-red-500 text-sm mt-1">{errors.supplier_id.message}</p>
             )}
+          </div> */}
+
+          {/* purchase order id */}
+          <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Purchase Order ID <span className="text-red-500"> *</span>
+            </label>
+            <select
+              {...register('po_id', { required: 'required' })}
+              onChange={handlePoChange}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              <option value="">-- Select Purchase Order --</option>
+
+              {isEdit && selectedPoId && (
+                <option value={selectedPoId}>{selectedPoId}</option>
+              )}
+
+              {poData?.map((po) => (
+                <option key={po.id} value={po.id}>
+                  {po.id}
+                </option>
+              ))}
+            </select>
+
+            {errors.po_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.po_id.message}</p>
+            )}
           </div>
 
+
+
           <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Name <span className="text-red-500"> *</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Name </label>
             <input
               type="text"
-              {...register('supplier_name', { required: 'required' })}
+              {...register('supplier_name')}
               className="w-full p-2 border border-gray-300 rounded-md"
               readOnly
             />
@@ -386,23 +480,24 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
           </div>
 
           <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Contact <span className="text-red-500"> *</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Contact </label>
             <input
               type="number"
-              {...register('supplier_contact', { required: 'required' })}
+              {...register('supplier_contact')}
               className="w-full p-2 border border-gray-300 rounded-md"
                readOnly
             />
             {errors.supplier_contact && (
               <p className="text-red-500 text-sm mt-1">{errors.supplier_contact.message}</p>
             )}
+            
           </div>
 
           <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier E-mail <span className="text-red-500"> *</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier E-mail</label>
             <input
               type="email"
-              {...register('supplier_email', { required: 'required' })}
+              {...register('supplier_email')}
               className="w-full p-2 border border-gray-300 rounded-md"
               readOnly
             />
@@ -413,12 +508,12 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
 
           
           <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Terms <span className="text-red-500"> *</span> </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Terms</label>
             <input
               type="text"
-              {...register('payment_terms', { required: 'required' })}
+              {...register('payment_terms')}
               className="w-full p-2 border border-gray-300 rounded-md"
-              //readOnly
+              readOnly
             />
             {errors.payment_terms && (
               <p className="text-red-500 text-sm mt-1">{errors.payment_terms.message}</p>
@@ -470,7 +565,7 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
           </div>
 
           {/* Address */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
           <div className="form-group">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Billing Address
@@ -553,7 +648,7 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
                     }
                 />
           </div>
-        </div>
+        </div> */}
 
         <div className="mt-6">
           <ReturnItemForm
@@ -561,6 +656,7 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer }) => {
             setItems={setItems}
             formValues={poTotals}
             setFormValues={setPoTotals}
+             isEdit={isEdit}
           />
         </div>
 

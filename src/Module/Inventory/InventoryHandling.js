@@ -265,33 +265,35 @@ const InventoryDashboard = () => {
   }
 
   const StockCard = ({ title, quantity, status, bgColor, textColor, buttonColor, icon, modalname, hoverBgColor  }) => (
-    <div onClick={() => setSelectedType(title)} className={`flex justify-between p-2 rounded-lg shadow-md ${bgColor} ${textColor} min-h-[130px] ${hoverBgColor} transition`} >
+    <div onClick={() => setSelectedType(title)} className={`flex justify-between p-2 rounded-lg shadow-md ${bgColor} ${textColor} ${hoverBgColor} transition`} >
+      
       <div>
         <h6>{title}</h6>
-        <p>Total Quantity: {quantity}</p>
-        {status && <p>Status: {status}</p>}
+        {/* <p>Total Quantity: {quantity}</p> */}
+        {/* {status && <p>Status: {status}</p>}
         <button
           className={`text-white text-sm px-4 py-1 rounded ${buttonColor} mt-3`}
           onClick={() => handleCardClick(modalname, title)}
         >
           View Info
-        </button>
+        </button> */}
       </div>
-      <div className="text-3xl p-2">{icon}</div>
+      {/* <div className="text-3xl p-2">{icon}</div> */}
+      <div className="text-3xl p-2">{quantity}</div>
     </div>
   )
 
   return (
     <div className="bg-gray-100 p-2">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-6 gap-3">
       {console.log('inventorySummary', inventorySummary)}
 
         {/* <StockCard title="Raw Materials" quantity={inventorySummary["raw-materials"]?.total || 0} status={getStatus("Raw Materials")} bgColor="bg-indigo-100" textColor="text-indigo-700" buttonColor="bg-indigo-700" icon={<FaUsers />} modalname="raw_material" /> */}
         <StockCard title="Reels" quantity={inventorySummary["reels"]?.total || 0} status={getStatus("Reels")} bgColor="bg-green-100" textColor="text-green-800" buttonColor="bg-green-700" hoverBgColor="hover:bg-green-200" icon={<BiDollarCircle />} modalname="reels_details" />
-        <StockCard title="Corrugation Glue" quantity={inventorySummary["Corrugation Glue"]?.total || 0} status={getStatus("Corrugation Glue")} bgColor="bg-yellow-100" textColor="text-yellow-800" buttonColor="bg-yellow-700" hoverBgColor="hover:bg-yellow-200" icon={<FaStar />} modalname="corrugation_glue" />
-        <StockCard title="Pasting Glue" quantity={inventorySummary["Pasting Glue"]?.total || 0} status={getStatus("Pasting Glue")} bgColor="bg-red-100" textColor="text-red-800" buttonColor="bg-red-700" hoverBgColor="hover:bg-red-200" icon={<CgWorkAlt />} modalname="pasting_glue" />
-        <StockCard title="Semi Finished Goods" quantity={inventorySummary["Semi Finished Goods"]?.total || 0} status={getStatus("Semi Finished Goods")} bgColor="bg-indigo-100" textColor="text-indigo-700" buttonColor="bg-indigo-700" hoverBgColor="hover:bg-indigo-200" icon={<FaUsers />} modalname="finished_goods" />
-        <StockCard title="Finished Goods" quantity={inventorySummary["Finished Goods"]?.total || 0} status={getStatus("Finished Goods")} bgColor="bg-gray-200" textColor="text-gray-700" buttonColor="bg-gray-700" hoverBgColor="hover:bg-gray-300" icon={<FaShieldAlt />} modalname="finished_goods" />
+        <StockCard title="Corrugation Glue" quantity={inventorySummary["corrugation-glue"]?.total || 0} status={getStatus("Corrugation Glue")} bgColor="bg-yellow-100" textColor="text-yellow-800" buttonColor="bg-yellow-700" hoverBgColor="hover:bg-yellow-200" icon={<FaStar />} modalname="corrugation_glue" />
+        <StockCard title="Pasting Glue" quantity={inventorySummary["pasting-glue"]?.total || 0} status={getStatus("Pasting Glue")} bgColor="bg-red-100" textColor="text-red-800" buttonColor="bg-red-700" hoverBgColor="hover:bg-red-200" icon={<CgWorkAlt />} modalname="pasting_glue" />
+        <StockCard title="Semi Finished Goods" quantity={inventorySummary["semi-finished-goods"]?.total || 0} status={getStatus("Semi Finished Goods")} bgColor="bg-indigo-100" textColor="text-indigo-700" buttonColor="bg-indigo-700" hoverBgColor="hover:bg-indigo-200" icon={<FaUsers />} modalname="finished_goods" />
+        <StockCard title="Finished Goods" quantity={inventorySummary["finished-goods"]?.total || 0} status={getStatus("finished-goods")} bgColor="bg-gray-200" textColor="text-gray-700" buttonColor="bg-gray-700" hoverBgColor="hover:bg-gray-300" icon={<FaShieldAlt />} modalname="finished_goods" />
         <div className="flex flex-col items-center justify-center p-2 bg-white rounded-lg shadow-md">
           <h6 className="text-blue-800">Total Stock Value</h6>
           <h5 className="text-2xl font-bold text-blue-800">${totalStockValue}</h5>

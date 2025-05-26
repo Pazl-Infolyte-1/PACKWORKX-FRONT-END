@@ -23,6 +23,7 @@ const PurchaseOrder = () => {
   const [loading, setLoading] = useState(true);
   const { searchQuery, filteredSearchData } = useSearch() ///need to verify
   const [totalPages, setTotalPages] = useState(0);
+  const [refresh, setRefresh] = useState(false);
   const [paginationParams, setPaginationParams] = useState({
     currentPage: 1,
     pageSize: 10,
@@ -55,7 +56,7 @@ const PurchaseOrder = () => {
 
   useEffect(() => {
     fetchData();
-  }, [paginationParams, searchQuery]);
+  }, [paginationParams, searchQuery, refresh]);
 
   useEffect(() => {
     setPaginationParams((prev) => ({
@@ -171,6 +172,8 @@ const PurchaseOrder = () => {
                 handleEdit={handleEdit}
                 handlePurchaseDetails = {handlePurchaseDetails}
                 // handleDelete={handleDelete}
+                setRefresh={setRefresh}
+
                 />
 
               <div className="flex justify-end items-center gap-4 mt-2">

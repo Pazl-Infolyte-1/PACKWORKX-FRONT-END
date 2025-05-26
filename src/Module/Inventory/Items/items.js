@@ -26,6 +26,8 @@ function Items() {
   const [isEditMode, setIsEditMode] = useState(false);
   const { searchQuery, filteredSearchData } = useSearch();
   const [loading, setLoading] = useState(true);
+  const [refresh, setRefresh] = useState(false);
+
 
   const searchBarRef = useRef(null);
 
@@ -52,7 +54,7 @@ function Items() {
 
   useEffect(() => {
     fetchData();
-  }, [paginationParams]);
+  }, [paginationParams,refresh]);
 
   useEffect(() => {
     setPaginationParams(prev => ({
@@ -174,6 +176,7 @@ function Items() {
             handleDelete={handleDelete}
             handleView={handleView}
             loading={loading}
+            setRefresh={setRefresh}
           />
 
           <ViewItemDetails
@@ -194,7 +197,7 @@ function Items() {
         </div>
 
         {isDrawerOpen && (
-          <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth="1280px">
+          <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} maxWidth="1340px">
             <AddItemProcess 
               currentTab={'items'} 
               isEdit={isEditMode} 

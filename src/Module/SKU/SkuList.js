@@ -260,7 +260,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!layer.bf) layerErrors.bf = 'BF is required'
       if (!layer.color) layerErrors.color = 'Color is required'
       if (
-        layer.layer.toLowerCase().includes('corrugated') &&
+        layer?.layer?.toLowerCase()?.includes('corrugated') &&
         !layer.flute_type
       ) {
         layerErrors.flute_type = 'Flute Type is required'
@@ -301,7 +301,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!layer.bf) layerErrors.bf = 'BF is required'
       if (!layer.color) layerErrors.color = 'Color is required'
       if (
-        layer.layer.toLowerCase().includes('corrugated') &&
+        layer?.layer?.toLowerCase()?.includes('corrugated') &&
         !layer.flute_type
       ) {
         layerErrors.flute_type = 'Flute Type is required'

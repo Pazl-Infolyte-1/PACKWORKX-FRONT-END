@@ -273,26 +273,26 @@ function RSCBox({
 
   useEffect(() => {
     let area = addNewSkuData.board_size_cm2
-    let convertedArea
+    //let convertedArea
 
-    switch (metricSign) {
-      case 'mm':
-        convertedArea = area / 1_000_000
-        break
-      case 'cm':
-        convertedArea = area / 10_000
-        break
-      case 'in':
-        convertedArea = area * 0.00064516
-        break
-      default:
-        console.warn('Unknown metric sign:', metricSign)
-        setAreaInM2(null)
-        return
-    }
+    //switch (metricSign) {
+    //  case 'mm':
+    //    convertedArea = area / 1_000_000
+    //    break
+    //  case 'cm':
+    //    convertedArea = area / 10_000
+    //    break
+    //  case 'in':
+    //    convertedArea = area * 0.00064516
+    //    break
+    //  default:
+    //    console.warn('Unknown metric sign:', metricSign)
+    //    setAreaInM2(null)
+    //    return
+    //}
 
-    onMeterDataChange(convertedArea)
-    setAreaInM2(convertedArea)
+    onMeterDataChange(area)
+    //setAreaInM2(convertedArea)
   }, [addNewSkuData?.board_size_cm2, metricSign])
 
   useEffect(() => {
@@ -438,9 +438,9 @@ function RSCBox({
   // Optional: track Redux changes
   useEffect(() => {}, [selectedRouteIds1])
 
-  const selectedChips = displayAsChips.filter((item) => selectedRouteIds1.includes(item.id))
+  const selectedChips = displayAsChips?.filter((item) => selectedRouteIds1?.includes(item.id))
 
-  const chipNames = selectedChips.map((chip) => chip.route_name).join(', ')
+  const chipNames = selectedChips?.map((chip) => chip?.route_name).join(', ')
 
   useEffect(() => {
     if (!editTag) {

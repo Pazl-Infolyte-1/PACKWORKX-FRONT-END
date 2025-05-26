@@ -9,6 +9,41 @@ import apiMethods from '../../api/config';
 const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [itemList, setItemList] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+const [modalContent, setModalContent] = useState(null);
+
+const Modal = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded p-6 max-w-md w-full">
+        <button onClick={onClose} className="float-right">&times;</button>
+        <div>{children}</div>
+      </div>
+    </div>
+  );
+};
+
+const openItemDetails = (index) => {
+  const item = getValues(`items.${index}`);
+  console.log('Item Details:',  getValues(`items.${index}`));
+  
+  setModalContent(
+    <>
+      <h3>Item Details</h3>
+      <p>Item ID: {item.item_id || "N/A"}</p>
+        <p>Item Code: {item.item_code || "N/A"}</p>
+        <p>Quantity: {item.quantity}</p>
+        <p>Standard Cost: {item.standard_cost}</p>
+        <p>CGST: {item.cgst}% (Amount: {item.cgst_amount})</p>
+        <p>SGST: {item.sgst}% (Amount: {item.sgst_amount})</p>
+        <p>Tax Amount: {item.tax_amount}</p>
+        <p>Total Amount: {item.total_amount}</p>
+        <p>Unit Price: {item.unit_price}</p>
+    </>
+  );
+  setIsModalOpen(true);
+};
 
   // Form with both items and PO totals
   const { control, register, setValue, getValues, reset, watch } = useForm({
@@ -294,6 +329,9 @@ useEffect(() => {
     });
   };
 
+
+  
+
   return (
     <div className="mt-2 p-4 bg-white rounded-lg border border-[#c2c2c2] w-full max-h-[600px]">
       <div className="flex justify-between items-center">
@@ -307,6 +345,7 @@ useEffect(() => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-2">Item</th>
+                <td></td>
                 <th className="px-4 py-2">Item Code</th>
                 <th className="px-4 py-2">Quantity</th>
                 <th className="px-4 py-2">Rate</th>
@@ -335,7 +374,9 @@ useEffect(() => {
                         </option>
                       ))}
                     </select>
+                   
                   </td>
+                  <td onClick={() => openItemDetails(index)} className="cursor-pointer text-blue-600">ℹ️</td>
                   <td className="px-4 py-2">
                     <input
                       {...register(`items.${index}.item_code`)}
@@ -417,6 +458,10 @@ useEffect(() => {
               ))}
             </tbody>
           </table>
+
+          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+  {modalContent}
+</Modal>
         </div>
       </div>
 

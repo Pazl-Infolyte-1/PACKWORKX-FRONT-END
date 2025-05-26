@@ -1,8 +1,47 @@
-import React from 'react'
+// import React from 'react'
 import PopUp from '../../components/New/PopUp'
 import ActionButton from '../../components/New/ActionButton'
+import React, { useState, useEffect, useMemo } from 'react';
 
 function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState(null);
+  
+  const Modal = ({ isOpen, onClose, children }) => {
+    if (!isOpen) return null;
+    return (
+      <div className="fixed inset-0  bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded p-6 max-w-md w-full">
+          <button onClick={onClose} className="float-right">&times;</button>
+          <div>{children}</div>
+        </div>
+      </div>
+    );
+  };
+  
+  const openItemDetails = (index) => {
+    // const item = getValues(`items.${index}`);
+    // console.log('Item Details:',  getValues(`items.${index}`));
+    
+    setModalContent(
+      <>
+        <h3>Item Details</h3>
+        <p>Item ID: {cell.item_id || "N/A"}</p>
+          <p>Item Code: {cell.item_code || "N/A"}</p>
+          <p>Quantity: {cell.quantity}</p>
+          <p>Standard Cost: {cell.standard_cost}</p>
+          <p>CGST: {cell.cgst}% (Amount: {cell.cgst_amount})</p>
+          <p>SGST: {cell.sgst}% (Amount: {cell.sgst_amount})</p>
+          <p>Tax Amount: {cell.tax_amount}</p>
+          <p>Total Amount: {cell.total_amount}</p>
+          <p>Unit Price: {cell.unit_price}</p>
+      </>
+    );
+    setIsModalOpen(true);
+  };
+
+
   return (
     <PopUp
     visible={showPopUp && !editTag} // This ensures proper visibility
@@ -123,6 +162,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
                           <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Item Code
                           </th>
+                          <th></th>
                           <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Quantity
                           </th>
@@ -152,6 +192,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                               {item.item_code}
                             </td>
+                            <td onClick={() => openItemDetails(index)} className="cursor-pointer text-blue-600">ℹ️</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                               {item.quantity}
                             </td>
@@ -181,6 +222,9 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
                 
                 
                 <div className="flex mt-4">
+                  <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+            {modalContent}
+          </Modal>
         <table className="flex-1">
           <tbody className='gap-4'>
             <tr>
@@ -211,6 +255,8 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
             </tr>
           </tbody>
         </table>
+
+          
       </div>
 
 

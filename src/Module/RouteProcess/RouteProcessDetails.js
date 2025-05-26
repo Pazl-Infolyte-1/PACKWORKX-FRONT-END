@@ -85,9 +85,11 @@ const RouteProcessDetails = ({ id, handleEdit, setOpenRouteModal }) => {
                               {process.process_name}
                             </div>
                           </div>
-                          {index !== routeProcessDetails.route_process.length - 1 && (
-                            <FaArrowDown className="text-muted my-1" />
-                          )}
+                          <div className='flex justify-center'>
+                            {index !== routeProcessDetails.route_process.length - 1 && (
+                              <FaArrowDown className="text-muted my-1" />
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>

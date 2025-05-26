@@ -11,7 +11,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
   const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
     return (
-      <div className="fixed inset-0  bg-opacity-50 flex items-center justify-center z-50">
+      <div className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded p-6 max-w-md w-full">
           <button onClick={onClose} className="float-right">&times;</button>
           <div>{children}</div>
@@ -57,7 +57,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
             <div className="flex justify-between items-center">
               <div>
                 <h1 className="text-3xl font-bold text-gray-800">Purchase Order Details</h1>
-                <p className="text-gray-500 mt-1">PO #{cell.id}</p>
+                <p className="text-gray-500 mt-1">Purchase Order - #{cell.purchase_generate_id}</p>
               </div>
               <div className="flex items-center space-x-3">
                 <span
@@ -67,7 +67,9 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
-                  {cell.status}
+                  {cell.status === 'active'
+                      ? 'Approved'
+                      : 'Rejected'}
                 </span>
                 {/* <ActionButton
                   label={'Edit'}
@@ -116,7 +118,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
               <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
                 <div className="p-6">
                   <h2 className="text-xl font-semibold text-gray-800">Purchase Order Details</h2>
-                  <p className="text-gray-500">PO #{cell.id}</p>
+                  <p className="text-gray-500">Purchase Order - #{cell.purchase_generate_id}</p>
 
                   <div className="bg-indigo-50 p-4 rounded-lg mt-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -222,9 +224,10 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
                 
                 
                 <div className="flex mt-4">
-                  <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                  <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false) }>
             {modalContent}
           </Modal>
+         
         <table className="flex-1">
           <tbody className='gap-4'>
             <tr>

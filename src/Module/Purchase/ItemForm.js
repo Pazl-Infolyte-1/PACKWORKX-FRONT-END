@@ -24,25 +24,31 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-const openItemDetails = (index) => {
-  const item = getValues(`items.${index}`);
-  console.log('Item Details:',  getValues(`items.${index}`));
-  
-  setModalContent(
-    <>
-      <h3>Item Details</h3>
-      <p>Item ID: {item.item_id || "N/A"}</p>
-        <p>Item Code: {item.item_code || "N/A"}</p>
-        <p>Quantity: {item.quantity}</p>
-        <p>Standard Cost: {item.standard_cost}</p>
-        <p>CGST: {item.cgst}% (Amount: {item.cgst_amount})</p>
-        <p>SGST: {item.sgst}% (Amount: {item.sgst_amount})</p>
-        <p>Tax Amount: {item.tax_amount}</p>
-        <p>Total Amount: {item.total_amount}</p>
-        <p>Unit Price: {item.unit_price}</p>
-    </>
-  );
-  setIsModalOpen(true);
+const openItemDetails = async (item_id) => {
+  try {
+    const response = await apiMethods.getItemList();
+    const items = response?.data?.data || [];
+    const item = items.find(i => i.id === parseInt(item_id));
+    const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {};
+
+    setModalContent(
+      <>
+        <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
+        {Object.entries(customFields).length > 0 ? (
+          Object.entries(customFields).map(([key, value], idx) => (
+            <p key={idx}>
+              <strong>{key}:</strong> {value}
+            </p>
+          ))
+        ) : (
+          <p>No custom fields available.</p>
+        )}
+      </>
+    );
+    setIsModalOpen(true);
+  } catch (error) {
+    console.error('Error fetching item details:', error);
+  }
 };
 
   // Form with both items and PO totals
@@ -376,7 +382,7 @@ useEffect(() => {
                     </select>
                    
                   </td>
-                  <td onClick={() => openItemDetails(index)} className="cursor-pointer text-blue-600">ℹ️</td>
+                  <td onClick={() => openItemDetails(getValues(`items.${index}.item_id`))} className="cursor-pointer text-blue-600">ℹ️</td>                  
                   <td className="px-4 py-2">
                     <input
                       {...register(`items.${index}.item_code`)}

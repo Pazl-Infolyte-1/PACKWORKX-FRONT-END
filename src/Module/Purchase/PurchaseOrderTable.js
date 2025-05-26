@@ -16,6 +16,29 @@ function PurchaseOrderTable({ data=[], handleDelete, handleEdit, handleView, han
   const [alerts, setAlerts] = useState([])
   const [poData, setPoData] = useState([])
   const [grnValidationMap, setGrnValidationMap] = useState({}) // ✅ for per-row validation
+const [expandedRowId, setExpandedRowId] = useState(null);
+const [itemData, setItemData] = useState([]); // State to hold item data
+
+const openItemDetails = (id) => {
+  setExpandedRowId((prevId) => (prevId === id ? null : id));
+};
+// getItemData
+const getItemData = async () => {
+  try {
+    const response = await apiMethods.getItemList();
+    const productData = response || [];
+    console.log('Fetched Item Data:', productData);
+    setItemData(productData);
+    
+  }
+  catch (error) {
+    console.error('Error fetching Purchase Order data:', error);
+  }
+}
+useEffect(() => {
+  getItemData();
+}, []);
+
 
 
 const handleGrnCheck = async () => {
@@ -53,6 +76,8 @@ const handleGrnCheck = async () => {
     console.error('Error fetching GRN or Purchase Return data:', error);
   }
 };
+
+
 
 
 
@@ -125,7 +150,7 @@ const handleStatusChange = async (id, newStatus) => {
       <CTable striped hover className="w-full m-0">
         <CTableHead className="bg-gray-100 sticky top-0 z-10">
           <CTableRow className="text-center">
-            {['PO ID', 'Supplier Name', 'Supplier Contact', 'PO Date', 'Valid Till', 'Status', 'Decision', 'Payment Terms', 'Action'].map(header => (
+            {['Purchase Order ID', 'Supplier Name', 'Supplier Contact', 'PO Date', 'Valid Till', 'Status', 'Decision', 'Payment Terms', 'Action'].map(header => (
               <CTableHeaderCell key={header} className="py-3 px-4 text-gray-600 font-medium">{header}</CTableHeaderCell>
             ))}
           </CTableRow>
@@ -141,6 +166,7 @@ const handleStatusChange = async (id, newStatus) => {
                 >
                   {row.purchase_generate_id}
                 </CTableDataCell>
+                {/* <CTableDataCell className="py-3 px-4 text-gray-700 cursor-pointer text-blue-600" onClick={() => openItemDetails(row.id)}> ℹ️ </CTableDataCell> */}
                 <CTableDataCell className="py-3 px-4 text-gray-700">{row.supplier_name}</CTableDataCell>
                 <CTableDataCell className="py-3 px-4 text-gray-700">{row.supplier_contact}</CTableDataCell>
                 <CTableDataCell className="py-3 px-4 text-gray-700 text-start">{formatDate(row.po_date)}</CTableDataCell>
@@ -148,7 +174,16 @@ const handleStatusChange = async (id, newStatus) => {
                
                
                 <CTableDataCell className="py-3 px-4 text-gray-700">
-                  {grnValidationMap[row.id] || 'Created'}
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-semibold 
+                      ${grnValidationMap[row.id] === 'Created' ? 'bg-blue-100 text-blue-800' : ''}
+                      ${grnValidationMap[row.id] === 'Received' ? 'bg-green-100 text-green-800' : ''}
+                      ${grnValidationMap[row.id] === 'Returned' ? 'bg-red-100 text-red-800' : ''}`}
+                  >
+                  
+                    {grnValidationMap[row.id] || 'Created'}
+                  </span>
+                
                 </CTableDataCell>
                 
                 <CTableDataCell className="py-3 px-4 text-gray-700 align-middle">
@@ -165,10 +200,10 @@ const handleStatusChange = async (id, newStatus) => {
                       }`}
                   >
                     <option className="text-gray-700 bg-white" value="approve">
-                      Active
+                      Approved
                     </option>
                     <option className="text-gray-700 bg-white" value="disapprove">
-                      Inactive
+                      Rejected
                     </option>
                   </select>
                 </CTableDataCell>
@@ -202,7 +237,38 @@ const handleStatusChange = async (id, newStatus) => {
                     handleEdit={handleEdit}
                   />
                 )}
+
+
+
+{/* expandedRow */}
+                {/* {expandedRowId === row.id && (
+                <CTableRow className="bg-gray-50">
+                  <CTableDataCell colSpan={10} className="py-3 px-4 text-left">
+                    <div className="text-sm text-gray-800">
+                      <strong>Item Details:</strong>
+                      <ul className="list-disc list-inside mt-2">
+                        {row.supplier_name?.length > 0 ? (
+                          row.items.map((item, index) => (
+                            <li key={index}>
+                              {item.supplier_name} - Qty: {item.supplier_name} - Price: {item.supplier_name}
+                            </li>
+                          ))
+                        ) : (
+                          <li>No items available</li>
+                        )}
+                      </ul>
+                    </div>
+                  </CTableDataCell>
+                </CTableRow>
+                )} */}
+{/* expandedRow */}
+
+
+
+
               </CTableRow>
+
+              
             ))
           ) : (
             <CTableRow>

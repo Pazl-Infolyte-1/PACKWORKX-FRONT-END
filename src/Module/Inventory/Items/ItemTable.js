@@ -109,8 +109,8 @@ function ItemsTable({
                           : 'bg-gray-100 text-gray-800 border-gray-300'
                       }`}
                   >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="active">Accepted</option>
+                    <option value="inactive">Rejected</option>
                   </select>
                 </CTableDataCell>
                 <CTableDataCell>{row.standard_cost || ''}</CTableDataCell>

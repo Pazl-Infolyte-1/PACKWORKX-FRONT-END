@@ -20,6 +20,7 @@ const Grn = () => {
   const searchBarRef = useRef(null)
   const [errors, setErrors] = useState({})
   const { searchQuery } = useSearch()
+  const [refresh, setRefresh] = useState(false)
 
   const fetchData = async () => {
     try {
@@ -38,7 +39,7 @@ const Grn = () => {
   useEffect(() => {
     console.log('Fetching data with limit:', limit, 'and searchQuery:', searchQuery)
     fetchData()
-  }, [limit, searchQuery, pagination.currentPage])
+  }, [limit, searchQuery, pagination.currentPage,refresh])
 
   const [grnFormData, setGrnFormData] = useState({
     po_id: null,
@@ -198,6 +199,7 @@ const Grn = () => {
             setGrnData={setGrnData}
             setAlerts={setAlerts}
             handleEdit={handleEdit}
+            setRefresh={setRefresh}
           />
         </div>
         <div>
@@ -223,7 +225,7 @@ const Grn = () => {
         <Drawer
           isOpen={drawerOpen}
           onClose={handleCloseDrawer}
-          maxWidth={'1265px'}
+          maxWidth={'1350px'}
           title={isEdit ? `Edit Grn` : `New Grn`}
         >
           <GrnForm

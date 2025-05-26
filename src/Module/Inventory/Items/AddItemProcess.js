@@ -58,7 +58,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
         setSelectedItemType(itemData.item_type);
 
         // If tags exist, convert them to tagFields
-        const tags = itemData.tags || {};
+        const tags = itemData.tags || itemData?.custom_fields? JSON.parse(itemData.custom_fields) : {} || {};
         const tagsArray = Object.entries(tags).map(([label, value]) => ({ label, value }));
         setTagFields(tagsArray);
       }

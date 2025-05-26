@@ -192,7 +192,7 @@ const PurchaseOrder = () => {
         <Drawer
           isOpen={isDrawerOpen}
           onClose={() => setDrawerOpen(false)}
-          maxWidth={"1280px"}
+          maxWidth={"1350px"}
           title={isEdit ? "Edit Purchase Order" : "Add Purchase Order"}
         >
           <AddPurchaseOrder

@@ -22,7 +22,7 @@ const GrnView = ({ id, handleEdit, setOpenGrnModal }) => {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-indigo-800">GRN Details</h2>
             <div className="bg-indigo-100 px-4 py-2 rounded-full">
-              <span className="font-semibold text-indigo-800">GRN ID: #{grnDetails?.id}</span>
+              <span className="font-semibold text-indigo-800">GRN ID: #{grnDetails?.grn_generate_id}</span>
             </div>
           </div>
           <div className="mt-2 flex items-center">
@@ -35,9 +35,9 @@ const GrnView = ({ id, handleEdit, setOpenGrnModal }) => {
                     : 'bg-gray-100 text-gray-800'
               }`}
             >
-              {grnDetails?.status
-                ? grnDetails.status.charAt(0).toUpperCase() + grnDetails.status.slice(1)
-                : ''}
+              {grnDetails?.status === 'active'
+                ? 'Approved'
+                : 'Rejected'}
             </span>
             <span className="mx-2 text-gray-400">•</span>
             <span className="text-gray-600">

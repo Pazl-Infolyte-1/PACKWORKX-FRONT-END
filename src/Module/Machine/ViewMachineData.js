@@ -168,7 +168,9 @@ function ViewMachineData({ Id }) {
                   {Object.entries(value.process_value).map(([key, val]) => (
                     <div key={key} className=" p-2 rounded">
                       <span className="text-gray-600 text-sm">{key}: </span>
-                      <span className="font-medium">{val || <span className='text-xs'>N/A</span>}</span>
+                      <span className="font-medium">
+                        {val || <span className="text-xs">N/A</span>}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -184,23 +186,35 @@ function ViewMachineData({ Id }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <p className="text-gray-600 text-sm mb-1">Purchase Date</p>
-            <p className="font-medium">{formatDate(machineData.purchase_date)}</p>
+            <p className="font-medium">
+              {machineData.purchase_date ? formatDate(machineData.purchase_date) : '-'}
+            </p>
           </div>
           <div>
             <p className="text-gray-600 text-sm mb-1">Installation Date</p>
-            <p className="font-medium">{formatDate(machineData.installation_date)}</p>
+            <p className="font-medium">
+              {machineData.installation_date ? formatDate(machineData.installation_date) : '-'}
+            </p>
           </div>
           <div>
             <p className="text-gray-600 text-sm mb-1">Last Maintenance</p>
-            <p className="font-medium">{formatDate(machineData.last_maintenance)}</p>
+            <p className="font-medium">
+              {machineData.last_maintenance ? formatDate(machineData.last_maintenance) : '-'}
+            </p>
           </div>
           <div>
             <p className="text-gray-600 text-sm mb-1">Next Maintenance</p>
-            <p className="font-medium">{formatDate(machineData.next_maintenance_due)}</p>
+            <p className="font-medium">
+              {machineData.next_maintenance_due
+                ? formatDate(machineData.next_maintenance_due)
+                : '-'}
+            </p>
           </div>
           <div>
             <p className="text-gray-600 text-sm mb-1">Warranty Expires</p>
-            <p className="font-medium">{formatDate(machineData.warranty_expiry)}</p>
+            <p className="font-medium">
+              {machineData.warranty_expiry ? formatDate(machineData.warranty_expiry) : '-'}
+            </p>
           </div>
         </div>
       </div>

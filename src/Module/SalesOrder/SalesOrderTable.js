@@ -48,12 +48,12 @@ function SalesOrderTable({
   }, [initialData]);
 
   const columns = [
-    {
-      key: 'select',
-      field: 'isSelected',
-      header: '', // empty header for checkbox column
-      type: 'checkbox',
-    },
+    // {
+    //   key: 'select',
+    //   field: 'isSelected',
+    //   header: '', // empty header for checkbox column
+    //   type: 'checkbox',
+    // },
       { key: 'sales_generate_id', header: 'Sales ID', field: 'sales_generate_id' },  
       { key: 'client', header: 'Client', field: 'client' },
       { key: 'skuCount', header: 'No of SKU', field: 'SalesSkuDetails' },

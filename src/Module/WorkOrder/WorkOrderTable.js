@@ -66,12 +66,12 @@ const handleView = (row) => {
   navigate(`view/${row.id}`);
 };
 const columns = [
-  {
-    key: 'select',
-    field: 'isSelected',
-    header: '', // empty header for checkbox column
-    type: 'checkbox',
-  },
+  // {
+  //   key: 'select',
+  //   field: 'isSelected',
+  //   header: '', // empty header for checkbox column
+  //   type: 'checkbox',
+  // },
   { key: 'work_generate_id', header: 'Number', field: 'work_generate_id', cellClass: ''} ,  
       { key: 'sku_name', header: 'SKU Name', field: 'sku_name' },
       { key: 'manufacture', header: 'Manufacture',field: 'manufacture' },

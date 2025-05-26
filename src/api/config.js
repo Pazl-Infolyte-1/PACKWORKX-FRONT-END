@@ -1399,7 +1399,7 @@ singlesku: async (id) => {
       }
     });
   },
-  getRouteList: async () => {
+  getMachineRoute: async () => {
     return await apiClient.get('mapping/machine-route-process')
   },
   saveRouteProcesses: async (payload) => {

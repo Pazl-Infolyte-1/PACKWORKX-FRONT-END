@@ -71,10 +71,10 @@ function ProcessIntegrartionTable({
       field: 'process_name',
     },
     {
-      key: 'Parameters',
+      key: 'field_count',
       header: 'Parameters',
-      field: 'NA',
-      type: 'date',
+      field: 'field_count',
+      type: 'number',
     },
     {
       key: 'created_at',

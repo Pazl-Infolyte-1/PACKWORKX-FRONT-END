@@ -64,9 +64,10 @@ const RouteProcessTable = ({
       field: 'route_name',
     },
     {
-      key: 'NA',
+      key: 'process_count',
       header: 'Number of Process ',
-      field: 'NA',
+      field: 'process_count',
+      type: 'number',
     },
     {
       key: 'created_at',

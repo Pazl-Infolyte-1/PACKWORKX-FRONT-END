@@ -76,7 +76,7 @@ const columns = [
       { key: 'sku_name', header: 'SKU Name', field: 'sku_name' },
       { key: 'manufacture', header: 'Manufacture',field: 'manufacture' },
       { key: 'created_at', header: 'Created Date', field: 'created_at',type:"date" },
-      { key: 'qty', header: 'Qty', type:"date", field: 'qty'  },
+      { key: 'qty', header: 'Qty', type:"number", field: 'qty'  },
       {
         key: 'priority',
         header: 'priority',

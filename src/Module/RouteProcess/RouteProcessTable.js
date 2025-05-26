@@ -65,8 +65,9 @@ const RouteProcessTable = ({
     },
     {
       key: 'process_count',
-      header: 'Toatl Process ',
+      header: 'Number of Process ',
       field: 'process_count',
+      type: 'number',
     },
     {
       key: 'created_at',

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilFlipToBack, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
+import { cilFlipToBack, cilGraph, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 import apiMethods from '../../api/config'
 import ReusableTable from '../SalesOrder/ReusableTable'
 
@@ -15,6 +15,7 @@ const MachineDashboardTable = ({
   onAddProcess,
   setAlerts,
   setOpenFieldValuesModal,
+  setOpenRoutes
 }) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -124,6 +125,13 @@ const MachineDashboardTable = ({
               icon: cilPlus,
               onClick: () => {
                 onAddProcess && onAddProcess(row.id, row.machine_name)
+              },
+            },
+            {
+              label: 'Process Route',
+              icon: cilGraph,
+              onClick: () => {
+                setOpenRoutes({ show: true, id: row.id })
               },
             },
             {

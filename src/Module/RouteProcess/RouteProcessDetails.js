@@ -79,7 +79,7 @@ const RouteProcessDetails = ({ id, handleEdit, setOpenRouteModal }) => {
                   {routeProcessDetails.route_process.length > 0 ? (
                     <div className="flex flex-col items-center space-y-2">
                       {routeProcessDetails.route_process.map((process, index) => (
-                        <>
+                        <div key={index}>
                           <div className="card mt-2" style={{ width: '100%' }}>
                             <div className="card-body d-flex justify-content-center align-items-center">
                               {process.process_name}
@@ -88,7 +88,7 @@ const RouteProcessDetails = ({ id, handleEdit, setOpenRouteModal }) => {
                           {index !== routeProcessDetails.route_process.length - 1 && (
                             <FaArrowDown className="text-muted my-1" />
                           )}
-                        </>
+                        </div>
                       ))}
                     </div>
                   ) : (

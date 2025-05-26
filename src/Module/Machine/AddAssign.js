@@ -293,14 +293,15 @@ function AddAssign({
       if (isEditingValues && processFields.length > 0) {
         const valuesPayload = {
           id: machineValues?.id,
+          machine_id: isAddModalOpen.id,
           process_name_id: selectedProcess.value,
           process_value: valuesFormData,
         }
-
+        let response
         if (machineValues) {
-          await apiMethods.updateProcessValues(valuesPayload)
+        response = await apiMethods.updateProcessValues(valuesPayload)
         } else {
-          await apiMethods.saveProcessValues(valuesPayload)
+          response = await apiMethods.saveProcessValues(valuesPayload)
         }
       }
 

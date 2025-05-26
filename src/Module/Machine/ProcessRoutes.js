@@ -13,7 +13,7 @@ import {
   X,
 } from 'lucide-react'
 
-function ProcessRoutes({ openRoutes, setOpenRoutes }) {
+function ProcessRoutes({ openRoutes, setOpenRoutes, setAlerts }) {
   const [routeProcessDetails, setRouteProcessDetails] = useState([])
   const [allProcess, setAllProcess] = useState([])
   const [selectedProcesses, setSelectedProcesses] = useState([])
@@ -117,24 +117,42 @@ function ProcessRoutes({ openRoutes, setOpenRoutes }) {
         }),
       }
 
+      let response
       if (isEdit) {
-        await apiMethods.updateRouteProcesses(processRoute?.id, payload)
+        response = await apiMethods.updateRouteProcesses(processRoute?.id, payload)
       } else {
-        await apiMethods.saveRouteProcesses(payload)
+        response = await apiMethods.saveRouteProcesses(payload)
       }
 
       setIsEdit(false)
-
+      setAlerts([
+        {
+          severity: 'success',
+          message: response?.data?.message || 'Saved successfully',
+        },
+      ])
       // Refresh the data
-      const response = await apiMethods.getRouteList()
-      setRouteProcessDetails(response?.data?.machineRouteProcesses || [])
+      const routes = await apiMethods.getRouteList()
+      setRouteProcessDetails(routes?.data?.machineRouteProcesses || [])
     } catch (error) {
+      setAlerts([
+        {
+          severity: 'error',
+          message: error?.response?.data?.message || 'Something went wrong',
+        },
+      ])
       console.error('Failed to save processes:', error)
     }
   }
 
   const handleDelete = async () => {
     const deleteProcessRoute = await apiMethods.deleteRoute(processRoute?.id)
+     setAlerts([
+        {
+          severity: 'success',
+          message: deleteProcessRoute?.data?.message || 'Something went wrong',
+        },
+      ])
     setOpenDeleteModal(false)
     const response = await apiMethods.getRouteList()
     setRouteProcessDetails(response?.data?.machineRouteProcesses || [])

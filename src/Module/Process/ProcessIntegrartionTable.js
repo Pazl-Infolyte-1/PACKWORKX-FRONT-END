@@ -74,6 +74,7 @@ function ProcessIntegrartionTable({
       key: 'field_count',
       header: 'Parameters',
       field: 'field_count',
+      type: 'number',
     },
     {
       key: 'created_at',

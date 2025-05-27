@@ -62,16 +62,16 @@ const AppHeader = () => {
               Dashboard
             </CNavLink>
           </CNavItem>
-          <CNavItem>
+          {/* <CNavItem>
             <CNavLink className="text-white font-normal !text-sm" to="/users" as={NavLink}>
               Users
             </CNavLink>
-          </CNavItem>
-          <CNavItem>
+          </CNavItem> */}
+          {/* <CNavItem>
             <CNavLink className="text-white font-normal !text-sm" to="/settings" as={NavLink}>
               Settings
             </CNavLink>
-          </CNavItem>
+          </CNavItem> */}
           <SearchBar />
         </CHeaderNav>
         <CHeaderNav className="ms-auto">
@@ -80,16 +80,16 @@ const AppHeader = () => {
               <CIcon icon={cilBell} size="lg" className="text-white" />
             </CNavLink>
           </CNavItem>
-          <CNavItem>
+          {/* <CNavItem>
             <CNavLink href="#">
               <CIcon icon={cilList} size="lg" className="text-white" />
             </CNavLink>
-          </CNavItem>
-          <CNavItem>
+          </CNavItem> */}
+          {/* <CNavItem>
             <CNavLink href="#">
               <CIcon icon={cilEnvelopeOpen} size="lg" className="text-white" />
             </CNavLink>
-          </CNavItem>
+          </CNavItem> */}
         </CHeaderNav>
         <CHeaderNav className="pe-0">
           <li className="nav-item py-1">
@@ -115,6 +115,15 @@ const AppHeader = () => {
               >
                 <CIcon className="me-2" icon={cilSun} size="lg" /> Light
               </CDropdownItem>
+               {/* <CDropdownItem
+                active={colorMode === 'dark'}
+                className="d-flex align-items-center"
+                as="button"
+                type="button"
+                onClick={() => setColorMode('dark')}
+              >
+                <CIcon className="me-2" icon={cilSun} size="lg" /> Dark
+              </CDropdownItem> */}
             </CDropdownMenu>
           </CDropdown>
           <li className="nav-item py-1">

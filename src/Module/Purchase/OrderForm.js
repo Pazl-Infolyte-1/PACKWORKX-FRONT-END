@@ -307,7 +307,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, setDr
               className="w-full p-2 border border-gray-300 rounded-md"
             >
               <option value="approve">Approve</option>
-              <option value="disapprove">Disapprove</option>
+              <option value="disapprove">Reject</option>
             </select>
           </div>
           </div>

@@ -134,7 +134,7 @@ function Items() {
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className="h-full w-full flex flex-col">
         <div className="w-full h-[40px] flex justify-between items-center">
-          <h4>Items</h4>
+          <h4>Products</h4>
         </div>
 
         <div className="overflow-x-auto border border-gray-200 p-3 rounded-md">

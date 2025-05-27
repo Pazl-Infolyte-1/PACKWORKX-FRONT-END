@@ -376,7 +376,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === 'Purchase Return') {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/purchaseReturn">
+                  <CNavLink as={NavLink} to="/purchase-return">
                     {navLink('Purchase Return', 'cibHighly')}
                   </CNavLink>
                 </CNavItem>

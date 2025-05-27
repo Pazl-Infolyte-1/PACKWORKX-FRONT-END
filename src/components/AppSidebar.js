@@ -16,6 +16,7 @@ import { sygnet } from 'src/assets/brand/sygnet'
 import apiMethods from '../api/config'
 import { AppSideBarNew } from './AppSideBarNew'
 import { cibAboutMe, cibAdobePhotoshop, cibHouzz } from '@coreui/icons'
+import {Link} from 'react-router-dom';
 
 // Define static menu items
 const staticMenuItems = []
@@ -75,9 +76,8 @@ const AppSidebar = () => {
       unfoldable={unfoldable}
       ref={sidebarRef}
     >
-
       <CSidebarHeader className="h-12">
-        <CSidebarBrand to="/">
+        <CSidebarBrand as={Link} to="/dashboard" className="cursor-pointer">
           <CIcon icon={cibHouzz} height={24} className="mb-1" />
           {!unfoldable && sidebarShow && <CIcon icon={sygnet} height={30} width={170} />}
         </CSidebarBrand>

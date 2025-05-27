@@ -24,7 +24,7 @@ function ProcessRoutes({ openRoutes, setOpenRoutes, setAlerts }) {
   useEffect(() => {
     const fetchRoutes = async () => {
       try {
-        const response = await apiMethods.getRouteList()
+        const response = await apiMethods.getMachineRoute()
         setRouteProcessDetails(response?.data?.machineRouteProcesses || [])
       } catch (error) {
         console.error('Failed to fetch route data:', error)
@@ -131,6 +131,7 @@ function ProcessRoutes({ openRoutes, setOpenRoutes, setAlerts }) {
           message: response?.data?.message || 'Saved successfully',
         },
       ])
+      setOpenRoutes({ show: false, id: null })
       // Refresh the data
       const routes = await apiMethods.getRouteList()
       setRouteProcessDetails(routes?.data?.machineRouteProcesses || [])

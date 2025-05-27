@@ -19,9 +19,9 @@ const RouteProcess = () => {
   const [routeProcessData, setRouteProcessData] = useState([])
   const [processData, setProcessData] = useState([])
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(50)
   const searchBarRef = useRef(null)
-  const { searchQuery } = useSearch()
+  const { searchQuery, setGlobalPlaceholder } = useSearch()
   const [refresh, setRefresh] = useState(false)
   const [processOrder, setProcessOrder] = useState([])
   const [openRouteModal, setOpenRouteModal] = useState(false)
@@ -30,6 +30,14 @@ const RouteProcess = () => {
     route_name: '',
     route_process: [],
   })
+
+  useEffect(() => {
+    setGlobalPlaceholder('Search route process...')
+
+    return () => {
+      setGlobalPlaceholder('Search...')
+    }
+  }, [])
 
   const fetchData = async () => {
     try {
@@ -134,7 +142,7 @@ const RouteProcess = () => {
             setOpenRouteModal={setOpenRouteModal}
           />
         </div>
-        <div className='mt-4'>
+        <div className="mt-4">
           <CompactPagination
             count={pagination?.totalPages || 1}
             page={pagination?.page || 1}

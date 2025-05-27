@@ -111,7 +111,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
                 <div className="mt-1">
                   {/* Attention Field */}
                   <div className="flex items-center mb-2">
-                    <label className="text-xs font-medium text-gray-600 w-24 mr-2">Name</label>
+                    <label className="text-xs font-medium text-gray-600 w-24 mr-2 after:content-['*'] after:text-red-500 after:ml-1">Name</label>
                     <input
                       type="text"
                       {...register(`addresses.${index}.attention`, { required: 'Required' })}
@@ -167,7 +167,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
 
                   {/* City */}
                   <div className="flex items-center mb-2">
-                    <label className="text-xs font-medium text-gray-600 w-24 mr-2">City</label>
+                    <label className="text-xs font-medium text-gray-600 w-24 mr-2 after:content-['*'] after:text-red-500 after:ml-1">City</label>
                     <input
                       type="text"
                       {...register(`addresses.${index}.city`, { required: 'Required' })}
@@ -182,7 +182,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
 
                   {/* State */}
                   <div className="flex items-center mb-2">
-                    <label className="text-xs font-medium text-gray-600 w-24 mr-2">State</label>
+                    <label className="text-xs font-medium text-gray-600 w-24 mr-2 after:content-['*'] after:text-red-500 after:ml-1">State</label>
                     <select
                       {...register(`addresses.${index}.state`, {
                         required: 'Required',
@@ -207,7 +207,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
 
                   {/* Pin Code */}
                   <div className="flex items-center mb-2">
-                    <label className="text-xs font-medium text-gray-600 w-24 mr-2">Pin Code</label>
+                    <label className="text-xs font-medium text-gray-600 w-24 mr-2 after:content-['*'] after:text-red-500 after:ml-1">Pin Code</label>
                     <div>
                     <input
                       type="text"
@@ -250,7 +250,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
 
                   {/* Phone */}
                   <div className="flex items-center mb-2">
-                    <label className="text-xs font-medium text-gray-600 w-24 mr-2">Phone</label>
+                    <label className="text-xs font-medium text-gray-600 w-24 mr-2 after:content-['*'] after:text-red-500 after:ml-1">Phone</label>
                     <div className="w-64 flex flex-col">
                       <input
                         type="tel"

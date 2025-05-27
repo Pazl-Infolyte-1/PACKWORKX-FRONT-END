@@ -18,7 +18,7 @@ const PurchaseOrderReturn = () => {
   const [poData, setPoData] = useState([])
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 })
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(50)
   const searchBarRef = useRef(null)
   const { searchQuery } = useSearch()
   const [selectedPoId, setSelectedPoId] = useState(null)

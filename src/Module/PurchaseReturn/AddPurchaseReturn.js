@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
 import ReturnItemForm from './ReturnItemForm'
+import CustomAlert from '../../components/New/CustomAlert';
 
 const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer, selectedPorId, poData }) => {
   const [items, setItems] = useState([])
@@ -12,6 +13,8 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer, selectedPorId
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [selectedPoIdState, setSelectedPoIdState] = useState(null);
+  const [filteredPoData, setFilteredPoData] = useState([]);
+  const [alerts, setAlerts] = useState([]);
 
 
   const [poTotals, setPoTotals] = useState({
@@ -34,6 +37,23 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer, selectedPorId
   useEffect(() => {
     if (itemsData) setItems(itemsData)
   }, [itemsData])
+const handleClose = () => {
+    setAlerts([]);
+  };
+
+  useEffect(() => {
+    const handleCheck = async () => {
+      const fetchGrnData = await apiMethods.getGrn();
+      const grnData = Array.isArray(fetchGrnData?.data?.data) ? fetchGrnData.data.data : [];
+      const grnPoIds = grnData.map(grn => grn.po_id);
+      const filtered = poData.filter(po =>
+        grnPoIds.includes(po.id) 
+      );
+      setFilteredPoData(filtered);
+    };
+
+    if (poData?.length) handleCheck();
+  }, [poData]);
 
   const handlePurchaseDetails = async (poId) => {
     try {
@@ -207,25 +227,25 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer, selectedPorId
     const checkedItems = items.filter(item => item.selected)
     const checkedItemCodes = checkedItems.map(item => item.item_code)
     
+////////////////////////////////////////////////////////////////////////////////////////
+// const response = await apiMethods.getinventory();
+// const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : [];
+// let allAvailable = true;
+// for (const checkedItem of checkedItems) {
+//   const matchedInventory = inventoryList.find(inv => inv.item_id === checkedItem.item_id);
 
-const response = await apiMethods.getinventory();
-const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : [];
-let allAvailable = true;
-for (const checkedItem of checkedItems) {
-  const matchedInventory = inventoryList.find(inv => inv.item_id === checkedItem.item_id);
-
-  if (!matchedInventory || matchedInventory.quantity_available === 0) {
-    allAvailable = false;
-    console.warn(`Item ID ${checkedItem.item_id} is not available in inventory.`);
-    break;
-  }
-}
-const message = allAvailable
-  ? "Purchase return created successfully"
-  : "Some item quantities are zero or unavailable, so return not possible";
-alert(message);
-console.log(message);
-
+//   if (!matchedInventory || matchedInventory.quantity_available === 0) {
+//     allAvailable = false;
+//     console.warn(`Item ID ${checkedItem.item_id} is not available in inventory.`);
+//     break;
+//   }
+// }
+// const message = allAvailable
+//   ? "Purchase return created successfully"
+//   : "Some item quantities are zero or unavailable, so return not possible";
+// alert(message);
+// console.log(message);
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
     // if (checkedItems.length === 0) {
       //   alert('Please select at least one item to return.')
@@ -270,12 +290,13 @@ console.log(message);
 
     try {
       const response = await apiMethods.submitPurchaseOrderReturn(payload)
-      alert('Purchase Order Return submitted successfully!')
+      setAlerts('Purchase Order Return submitted successfully!');
+
       setDrawer(false)
     } catch (error) {
       console.error('Submission error:', error)
       console.error(error.response?.data || error.message);
-      alert('Failed to submit purchase order return.')
+      setAlerts('Failed to submit purchase order return.')
     }
   }
 
@@ -410,6 +431,8 @@ console.log(message);
 
 
   return (
+    <>
+    <CustomAlert alerts={alerts} handleClose={handleClose} />
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <h2 className="text-lg font-semibold mb-4">Purchase Order Details</h2>
@@ -452,7 +475,7 @@ console.log(message);
                 <option value={selectedPoId}>{selectedPoId}</option>
               )}
 
-              {poData?.map((po) => (
+              {filteredPoData?.map((po) => (
                 <option key={po.id} value={po.id}>
                   {po.id}
                 </option>
@@ -682,6 +705,7 @@ console.log(message);
         </div>
       </div>
     </form>
+    </>
   )
 }
 

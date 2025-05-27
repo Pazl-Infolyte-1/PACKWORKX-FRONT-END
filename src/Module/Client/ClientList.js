@@ -40,6 +40,9 @@ function ClientList() {
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
+  const [status,setStatus]=useState("")
+    const [singleStatusUpdate,setSingleStatusUpdate]=useState(false)
+
    const { setGlobalPlaceholder, searchQuery  } = useSearch()
   const selectionFrame = {
     vendor: { id: 1, name: 'vendor', image: vendorImg },
@@ -93,6 +96,7 @@ function ClientList() {
           limit: entriesPerPage,
           page: currentPage,
           entity_type: selectedFilter,
+          status:status
         }
         const response = await apiMethods.getClients(queryParams)
         setData(response?.data || [])
@@ -105,7 +109,8 @@ function ClientList() {
       }
     }
     fetchClientData()
-  }, [reloadData, searchQuery, entriesPerPage, currentPage, selectedFilter])
+    setSingleStatusUpdate(false)
+  }, [reloadData, searchQuery, entriesPerPage, currentPage, selectedFilter,status,singleStatusUpdate])
 
   const handleEntriesChange = (newEntries) => {
     setEntriesPerPage(newEntries)
@@ -229,17 +234,17 @@ function ClientList() {
               {
                 label: 'All Clients',
                 icon: <FaUserGroup size={16} />,
-                onClick: () => console.log('All Clients selected'),
+                onClick: () =>  setStatus(""),
               },
               {
                 label: 'Active Clients',
                 icon: <FaUserCheck size={16} />,
-                onClick: () => console.log('Active Clients selected'),
+                onClick: () => setStatus("active"),
               },
               {
                 label: 'Inactive Clients',
                 icon: <FaUserSlash size={16} />,
-                onClick: () => console.log('Inactive Clients selected'),
+                 onClick: () => setStatus("inactive"),
               },
             ]}
           />
@@ -273,6 +278,7 @@ function ClientList() {
 
         <div className="mt-3 overflow-x-auto">
           <ClientTable
+          setSingleStatusUpdate={setSingleStatusUpdate}
             isMinimized={isMinimized}
             refreshClients={refreshClients}
             clientdata={data}

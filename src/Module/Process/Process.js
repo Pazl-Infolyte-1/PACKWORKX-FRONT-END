@@ -26,7 +26,7 @@ const Process = () => {
   const [isEdit, setIsEdit] = useState(false)
   const [alerts, setAlerts] = useState([])
   const [showProcessFields, setShowProcessFields] = useState(false)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(50)
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
   const [selectedProcessValue, setSelectedProcessValue] = useState(null)
   const [openFieldModal, setOpenFieldModal] = useState({ open: false, id: null })

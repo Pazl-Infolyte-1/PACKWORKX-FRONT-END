@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
 import apiMethods from "../../api/config";
 import { 
   AlertCircle,
@@ -14,6 +15,7 @@ import {
   Tag,
   Truck
 } from 'lucide-react';
+import InvoiceCreationModal from "../SalesOrder/InvoiceCreationModal";
 
 // Format dates
 const formatDate = (dateString) => {
@@ -25,6 +27,9 @@ const formatDate = (dateString) => {
     day: 'numeric' 
   });
 };
+
+
+
 
 // Render production stages based on current progress
 const renderProductionStages = (currentProgress) => {
@@ -132,6 +137,25 @@ const [workOrder, setWorkOrder] = useState([]);
 const [loading, setLoading] = useState(true);
 const [error, setError] = useState(null);
 const navigate = useNavigate()
+const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+
+
+const handleCreateInvoice = async (invoiceData) => {
+  try {
+    const response = await apiMethods.createInvoiceWorkOrder(invoiceData);
+    console.log('Invoice created successfully:', response);
+    
+    // Show success message (you can use a toast library or state)
+    alert('Invoice created successfully!');
+    
+    // Optionally refresh work order data or navigate to invoice
+    // navigate(`/invoice/${response.data.id}`);
+    
+  }catch(err){
+
+  }
+}
+
 const renderProductionStages = (currentProgress) => {
   const stages = [
     { name: "Pending" },
@@ -319,6 +343,29 @@ return (
               </div>
             </div>
 
+            {/* What's Next Section */}
+            <div className="bg-blue-50 border border-blue-100 rounded p-2 mx-4 my-2 text-xs">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <div className="bg-blue-100 p-0.5 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-blue-800 text-xs">WHAT'S NEXT?</h3>
+                    <p className="text-blue-700 text-xs">Convert to packages, shipments, or invoices  .</p>
+                  </div>
+                </div>
+                <button
+                 className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
+                 onClick={() => setIsInvoiceModalOpen(true)}
+                 >
+                  Convert Into Invoice
+                </button>
+              </div>
+            </div>
+
             {/* Product Details */}
             <div className="p-4 border-b border-gray-200">
               <h3 className="text-sm font-medium text-gray-700">Product Details</h3>
@@ -458,7 +505,19 @@ return (
                 </button>
               </div>
             </div>
+
+            {/* Invoice Creation Modal */}
+<InvoiceCreationModal
+  isOpen={isInvoiceModalOpen}
+  onClose={() => setIsInvoiceModalOpen(false)}
+  workOrder={workOrder}
+  onSubmit={handleCreateInvoice}
+/>
+
           </div>
+
+          {/* What's Next Section */}
+
         </div>
       </div>
     </div>

@@ -1417,6 +1417,13 @@ export const apiMethods = {
       console.error(error)
     }
   },
+  createInvoiceWorkOrder:async(body)=>{
+    try {
+      return await apiClient.post(`work-order-invoice/create`,body)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 }
 
 export default apiMethods

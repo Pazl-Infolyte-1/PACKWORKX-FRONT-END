@@ -22,7 +22,7 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import PopUp from '../../components/New/PopUp'
 import { TiFlowSwitch } from 'react-icons/ti'
 
-function ClientTable({ clientdata, refreshClients, isMinimized }) {
+function ClientTable({ clientdata, refreshClients, isMinimized,setSingleStatusUpdate }) {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [selectedClientId, setSelectedClientId] = useState(null)
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
@@ -91,6 +91,17 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
     }
   }
 
+const handleStatusChange = async (clientId, newStatus) => {
+  try {
+const response = await apiMethods.clientStatusSwitch(newStatus, clientId)
+    console.log('✅ Status update response:', response)    // Optionally refetch or update local state here
+    setSingleStatusUpdate(response.data.status)
+  } catch (error) {
+    console.error('Status update failed:', error)
+  }
+}
+
+
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -113,19 +124,22 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
                     />
                   </CTableHeaderCell> */}
                   <CTableHeaderCell className="w-48 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                    Name
+                    Name<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-32 px-4 x-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                    Id
+                  Id<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-40 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                    Reference Id
+                Reference Id<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-52 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                    Email
+                  Email<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-36 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                    Phone
+                  Phone<span className="text-gray-500 ml-1">⌕</span>
+                  </CTableHeaderCell>
+                      <CTableHeaderCell className="w-36 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+                Status
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-24 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
                     Actions
@@ -193,22 +207,38 @@ function ClientTable({ clientdata, refreshClients, isMinimized }) {
                             //e.stopPropagation();
                             openViewCard(client)
                           }}
-                          className="px-4 py-3 text-sm !text-blue-600 font-semibold"
+                          className="px-4 py-3 text-sm !text-blue-600 font-semibold  whitespace-nowrap"
                         >
                           {client.display_name || 'N/A'}
                         </CTableDataCell>
-                        <CTableDataCell className="px-4 py-3 text-sm text-gray-900">
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                           {client.client_ui_id || 'N/A'}
                         </CTableDataCell>
-                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
                           {client.client_ref_id || 'N/A'}
                         </CTableDataCell>
-                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
                           {client.email || 'N/A'}
                         </CTableDataCell>
-                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
                           {client.mobile || 'N/A'}
                         </CTableDataCell>
+           <CTableDataCell className="px-4 py-3 text-sm">
+<select
+  value={client.status === 'active' || client.status === 'inactive' ? client.status : ''}
+  onClick={(e) => e.stopPropagation()}
+  onChange={(e) => handleStatusChange(client.client_id, e.target.value)}
+  className={`border border-gray-300 rounded px-2 py-1 text-sm
+    ${client.status === 'inactive' ? 'bg-gray-200' : 'bg-white'}`}
+>
+  <option value="" disabled hidden>Select Status</option>
+  <option value="active">Active</option>
+  <option value="inactive">In Active</option>
+</select>
+
+</CTableDataCell>
+
+
                         <CTableDataCell className="px-4 py-3">
                           <div onClick={(e) => e.stopPropagation()}>
                             <ThreeDotMenu

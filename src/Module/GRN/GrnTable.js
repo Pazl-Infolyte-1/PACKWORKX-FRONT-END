@@ -13,8 +13,9 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import apiMethods from '../../api/config'
 import PopUp from '../../components/New/PopUp'
 import GrnView from './GrnView'
+import ReusableTable from '../SalesOrder/ReusableTable'
 
-const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit,setRefresh }) => {
+const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh }) => {
   const [confirmModal, setConfirmModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [openGrnModal, setOpenGrnModal] = useState(false)
@@ -47,149 +48,133 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit,setRefresh }) => 
     }
   }
 
-   const formatDate = (dateString) => {
+  const formatDate = (dateString) => {
     if (!dateString) return ''
     return new Date(dateString).toLocaleString('en-GB', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
     })
   }
 
   const handleStatusChange = async (id, newStatus) => {
-  
-    const currentGrn = grnData.find(grn => grn.id === id); // get full PO data
-    console.log('Updating status for ID:', id, 'to', newStatus, 'Current GRN:', currentGrn);
-    
+    const currentGrn = grnData.find((grn) => grn.id === id) // get full PO data
+
     const payload = {
+      id: id,
       status: newStatus,
-      items: currentGrn.items || [] // send existing items back
-    };
-  
-    try {
-      const response = await apiMethods.editGrn(id, payload);
-      console.log('Response:', response);
-      
-      setAlerts([{ severity: 'success', message: "Status updated successfully" }]);
-            setRefresh((prev) => !prev);
-  
-    } catch (error) {
-      console.error('Error:', error);
-      setAlerts([{ severity: 'error', message: error?.response?.data?.message || 'Failed to update status' }]);
+      items: currentGrn.items || [],
     }
-  };
-  
+
+    try {
+      const response = await apiMethods.editGrn(payload)
+      console.log('Response:', response)
+
+      setAlerts([{ severity: 'success', message: 'Status updated successfully' }])
+      setRefresh((prev) => !prev)
+    } catch (error) {
+      console.error('Error:', error)
+      setAlerts([
+        { severity: 'error', message: error?.response?.data?.message || 'Failed to update status' },
+      ])
+    }
+  }
+  const columns = [
+    { key: 'grn_generate_id', header: 'ID', field: 'grn_generate_id' },
+    {
+      key: 'po_id',
+      header: 'PO ID',
+      field: 'po_id',
+    },
+    {
+      key: 'grn_date',
+      header: 'GRN Date',
+      field: 'grn_date',
+    },
+    {
+      key: 'invoice_no',
+      header: (
+        <>
+          Invoice No.<span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'invoice_no',
+    },
+    {
+      key: 'received_by',
+      header: (
+        <>
+          Received By<span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'received_by',
+    },
+    {
+      key: 'delivery_note_no',
+      header: 'Delivery Note No.',
+      field: 'delivery_note_no',
+    },
+    {
+      key: 'invoice_date',
+      header: 'Invoice Date',
+      field: 'invoice_date',
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      field: 'status',
+      type: 'dropdown',
+      options: ['active', 'inactive'],
+      getOptionClass: (val) => {
+        switch (val) {
+          case 'active':
+            return 'bg-green-100 text-green-800 border-green-300'
+          case 'inactive':
+            return 'bg-red-100 text-red-800 border-red-300'
+          default:
+            return 'bg-gray-100 text-gray-800 border-gray-300'
+        }
+      },
+      onChange: (row, newValue) => {
+        handleStatusChange(row.id, newValue)
+      },
+    },
+    {
+      key: 'actions',
+      header: 'Action',
+      field: 'actions',
+      type: 'custom',
+      render: (row) => (
+        <ThreeDotMenu
+          value={[
+            {
+              label: 'Edit Grn',
+              icon: cilPencil,
+              onClick: () => {
+                handleEdit(row)
+              },
+            },
+            {
+              label: 'Delete',
+              icon: cilTrash,
+              onClick: () => {
+                openDeleteModal(row.id)
+              },
+            },
+          ]}
+        />
+      ),
+    },
+  ]
 
   return (
     <>
-      <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar rounded-lg p-2">
-        <CTable striped hover className="w-full m-0">
-          <CTableHead className="bg-gray-100 sticky -top-2 z-10">
-            <CTableRow className="text-center">
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">
-                Id
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                PO ID
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                GRN Date
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Delivery Note No.
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Invoice No.
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Invoice Date
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Decision
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Received By
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Action
-              </CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {grnData && grnData.length > 0 ? (
-              grnData.map((item) => (
-                <CTableRow key={item.id} className="border-b text-center">
-                  <CTableDataCell
-                    onClick={() => setOpenGrnModal({ open: true, id: item.id })}
-                    className="py-3 px-2 !text-blue-600 cursor-pointer underline text-start"
-                  >
-                    {item.grn_generate_id}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">{item.po_id}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">
-                    {formatDate(item.grn_date)}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">{item.delivery_note_no}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">{item.invoice_no}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">
-                    {formatDate(item.invoice_date)}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">{item.received_by}</CTableDataCell>
-
-                  <CTableDataCell className="py-3 px-4 text-gray-700 align-middle">
-                    <select
-                      value={item.status}
-                      onChange={(e) => handleStatusChange(item.id, e.target.value)}
-                      className={`px-2.5 py-1 rounded-full text-sm font-medium outline-none border 
-                        ${
-                          item.status === 'active'
-                            ? 'bg-green-100 text-green-800 border-green-300'
-                            : item.status === 'inactive'
-                            ? 'bg-red-100 text-red-800 border-red-300'
-                            : 'bg-gray-100 text-gray-800 border-gray-300'
-                        }`}
-                    >
-                      <option className="text-gray-700 bg-white" value="active">
-                        Approved
-                      </option>
-                      <option className="text-gray-700 bg-white" value="inactive">
-                        Rejected
-                      </option>
-                    </select>
-                  </CTableDataCell>
-
-
-
-                  <CTableDataCell className="py-3 px-2">{item.received_by}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">
-                    <ThreeDotMenu
-                      value={[
-                        {
-                          label: 'Edit Grn',
-                          icon: cilPencil,
-                          onClick: () => {
-                            handleEdit(item)
-                          },
-                        },
-                        {
-                          label: 'Delete',
-                          icon: cilTrash,
-                          onClick: () => {
-                            openDeleteModal(item.id)
-                          },
-                        },
-                      ]}
-                    />
-                  </CTableDataCell>
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow>
-                <CTableDataCell colSpan={8} className="py-3 px-2 text-center !text-red-500 ">
-                  No Records Found
-                </CTableDataCell>
-              </CTableRow>
-            )}
-          </CTableBody>
-        </CTable>
+      <div className="">
+        <ReusableTable
+          data={grnData}
+          columns={columns}
+          handleRowClick={(row) => setOpenGrnModal({ open: true, id: row.id })}
+        />
         <ConfirmationModale
           isOpen={confirmModal}
           onClose={closeDeleteModal}

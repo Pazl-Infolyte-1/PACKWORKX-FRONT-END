@@ -1431,6 +1431,20 @@ clientStatusSwitch: async (status, clientId) => {
     } catch (error) {
       console.error(error)
     }
+  },
+  getInvoiceList:async(params)=>{
+    try {
+      return await apiClient.get(`/work-order-invoice/get`,{params})
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getInvoiceById:async(id)=>{
+    try {
+      return await apiClient.get(`/work-order-invoice/get/${id}`,)
+    } catch (error) {
+      console.error(error)
+    }
   }
 }
 

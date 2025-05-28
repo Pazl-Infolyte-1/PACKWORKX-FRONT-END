@@ -40,6 +40,8 @@ const wordOrderView = React.lazy(()=> import('./Module/WorkOrder/ViewWorkOrder.j
 const Items = React.lazy(() => import('./Module/Inventory/Items/items.js'))
 const GRN = React.lazy(() => import('./Module/GRN/Grn.js'))
 const Products = React.lazy(() => import('./Module/Products/Products.js'))
+const Invoice = React.lazy(()=>import('./Module/InvoiceWorkOrder/InvoiceList.js'))
+const InvoiceView = React.lazy(()=>import('./Module/InvoiceWorkOrder/InvoiceView.js'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
@@ -149,6 +151,19 @@ const routes = [
   { path: '/inventory/items', name: 'inventory', element: Items, key: '' },
   { path: '/stockmanagement', name: 'stockmanagement', element: StockManagement, key: '' },
   { path: '/products', name: 'products', element: Products, key: '' },
+  { path: '/invoice',
+    name: 'invoice',
+    element: Invoice,
+    key: '',
+    children: [
+      {
+        path: 'view/:id',
+        name: 'InvoiceView',
+        element: InvoiceView,
+        key: '' // Assigned a proper unique key
+      }
+    ]
+  },
 ]
 
 export default routes

@@ -33,9 +33,38 @@ const InventoryDashboard = () => {
   const [totalPages, setTotalPages] = useState(1);
   // const { searchQuery, filteredSearchData } = useSearch();
   const [status, setStatus] = useState('');
+  const [expandedRowId, setExpandedRowId] = useState(null);
+  const [itemCustomFields, setItemCustomFields] = useState({});
   
   
+  const openItemDetails = async(id) => {
+  setExpandedRowId((prevId) => (prevId === id ? null : id));
   
+  const inventoryItem = inventoryData.find(item => item.id === id);
+
+  if (!inventoryItem) {
+    console.warn("No matching inventory item found for id:", id);
+    return;
+  }
+
+  const item_id = inventoryItem.item_id;
+
+  // Fetch all items
+  const response = await apiMethods.getItemList();
+  const items = response?.data?.data || [];
+
+  // Find the full item details based on item_id
+  const item = items.find(i => i.id === parseInt(item_id));
+
+  // Parse custom_fields if available
+  const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {};
+setItemCustomFields(customFields);
+  console.log("Item ID:", item_id);
+  console.log("Item details:", item);
+  console.log("Custom fields:", customFields);
+    
+
+};
 
 
   useEffect(() => {
@@ -222,19 +251,22 @@ const InventoryDashboard = () => {
           <thead>
             <tr className="bg-gray-200">
               <th className="p-2 text-left">Product Name</th>
-              <th className="p-2 text-left">Quantity</th>
+              <th className="p-2 text-left">Available Quantity</th>
               <th className="p-2 text-left">Min Stock Level</th>
               <th className="p-2 text-left">Reorder Level</th>
               <th className="p-2 text-left">Product Type</th>
               <th className="p-2 text-left">Standard Cost</th>
-              <th className="p-2 text-left">Manufacturer</th>
+              {/* <th className="p-2 text-left">Manufacturer</th> */}
             </tr>
           </thead>
           <tbody>
+            {/* onClick={() => openItemDetails(getValues(item.item_id))} */}
             {filteredItems.length > 0 ? (
               filteredItems.map(item => (
-                <tr key={item.id} className="border-b border-gray-300">
-                  <td className="p-2">{item.item_name}</td>
+                  <React.Fragment key={item.id}>
+                <tr key={item.id} className="border-b border-gray-300 hover:bg-gray-100" onClick={() => openItemDetails(item.id)}>
+                 
+                  <td className="p-2" >{item.item_name}</td>
                   {/* <td className="p-2">{item.id==inventoryData.item_id?inventoryData.quantity_available:0}</td> */}
                   <td className="p-2">{(() => {
                     // const inventoryItem = inventoryData.find(inv => inv.item_id === item.id);
@@ -248,8 +280,53 @@ const InventoryDashboard = () => {
                   <td className="p-2">{item.reorder_level}</td>
                   <td className="p-2">{item.item_type.toUpperCase()}</td>
                   <td className="p-2">{item.standard_cost}</td>
-                  <td className="p-2">{item.manufacturer}</td>
+                  {/* <td className="py-3 px-4 text-gray-700 cursor-pointer text-blue-600" onClick={() => openItemDetails(item.id)}> ℹ️ </td> */}
+                  {/* <td className="p-2">{item.manufacturer}</td> */}
                 </tr>
+
+                {/* Expanded row below the clicked row */}
+                {expandedRowId === item.id && (
+                  <tr className="bg-gray-100">
+                    <td colSpan={6} className="p-4">
+                      {Object.keys(itemCustomFields).length > 0 ? (
+                        <div className="grid grid-cols-4 gap-4">
+                          {Object.entries(itemCustomFields).map(([key, value]) => (
+                            <div key={key} className="flex">
+                              <span className="font-semibold">{key}:</span>
+                              <span>{value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500">No custom fields available for this item.</p>
+                      )}
+                    </td>
+                  </tr>
+                )}
+
+                {/* {expandedRowId === item.id && (
+                  <tr className="bg-gray-100">
+                    <td colSpan={6} className="p-4">
+                      <div className="text-sm text-gray-800">
+                        <strong>Item Custom Fields:</strong>
+                        {Object.keys(itemCustomFields).length > 0 ? (
+                          <ul className="list-disc list-inside mt-2">
+                            {Object.entries(itemCustomFields).map(([key, value]) => (
+                              <li key={key}>
+                                <strong>{key}:</strong> {value}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-gray-500">No custom fields available for this item.</p>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )} */}
+              </React.Fragment>
+
+                
               ))
             ) : (
               <tr>

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons';
-import CIcon from '@coreui/icons-react';
+import React, { useState } from 'react'
+import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
+import CIcon from '@coreui/icons-react'
 import {
   CBadge,
   CTable,
@@ -9,11 +9,12 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
-} from '@coreui/react';
+} from '@coreui/react'
 
-import ThreeDotMenu from '../../../components/ThreeDotMenu';
-import apiMethods from '../../../api/config';
-import Loading from '../../../components/New/Loading';
+import ThreeDotMenu from '../../../components/ThreeDotMenu'
+import apiMethods from '../../../api/config'
+import Loading from '../../../components/New/Loading'
+import ReusableTable from '../../SalesOrder/ReusableTable'
 
 function ItemsTable({
   data = [],
@@ -23,131 +24,132 @@ function ItemsTable({
   handleEdit,
   handleView,
   loading,
-  setRefresh
+  setRefresh,
 }) {
-  const [alerts, setAlerts] = useState([]);
+  const [alerts, setAlerts] = useState([])
 
   const handleStatusChange = async (id, newStatus) => {
-    console.log('Updating status for ID:', id, 'to', newStatus);
+    console.log('Updating status for ID:', id, 'to', newStatus)
 
     try {
-      const payload = { status: newStatus }; // change `decision` to `status` if updating item status
-      const response = await apiMethods.updateItem(id, payload);
-      console.log('Response:', response);
-      setRefresh((prev) => !prev);
+      const payload = { status: newStatus } // change `decision` to `status` if updating item status
+      const response = await apiMethods.updateItem(id, payload)
+      console.log('Response:', response)
+      setRefresh((prev) => !prev)
 
       setAlerts([
         {
           severity: 'success',
           message: response.data.message || 'Status updated successfully',
         },
-      ]);
+      ])
       // Ideally refetch data here
     } catch (error) {
-      console.error('Failed to update status:', error);
+      console.error('Failed to update status:', error)
       setAlerts([
         {
           severity: 'error',
-          message:
-            error?.response?.data?.message || 'Failed to update status',
+          message: error?.response?.data?.message || 'Failed to update status',
         },
-      ]);
+      ])
     }
-  };
+  }
+
+  const columns = [
+    { key: 'item_generate_id', header: 'Product ID', field: 'item_generate_id' },
+    {
+      key: 'item_code',
+      header: (
+        <>
+          Reference ID <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'item_code',
+    },
+    {
+      key: 'item_name',
+      header: 'Product Name',
+      field: 'item_name',
+    },
+    {
+      key: 'uom',
+      header: 'UOM',
+      field: 'uom',
+    },
+    {
+      key: 'category',
+      header: 'Category',
+      field: 'category',
+    },
+    {
+      key: 'min_stock_level',
+      header: 'Minimum Stack',
+      field: 'min_stock_level',
+    },
+    {
+      key: 'manufacturer',
+      header: 'Manufacturer',
+      field: 'manufacturer',
+    },
+    {
+      key: 'standard_cost',
+      header: 'Standard Cost',
+      field: 'standard_cost',
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      field: 'status',
+      type: 'dropdown',
+      options: ['active', 'inactive'],
+      getOptionClass: (val) => {
+        switch (val) {
+          case 'active':
+            return 'bg-green-100 text-green-800 border-green-300'
+          case 'inactive':
+            return 'bg-red-100 text-red-800 border-red-300'
+          default:
+            return 'bg-gray-100 text-gray-800 border-gray-300'
+        }
+      },
+      onChange: (row, newValue) => {
+        handleStatusChange(row.id, newValue)
+      },
+    },
+    {
+      key: 'actions',
+      header: 'Action',
+      field: 'actions',
+      type: 'custom',
+      render: (row) => (
+        <ThreeDotMenu
+          value={[
+            {
+              label: 'View',
+              icon: cilHandPointRight,
+              onClick: () => handleView(row.id),
+            },
+            {
+              label: 'Edit',
+              icon: cilPencil,
+              onClick: () => handleEdit(row.id),
+            },
+            {
+              label: 'Delete',
+              icon: cilTrash,
+              onClick: () => handleDelete(row.id),
+            },
+          ]}
+        />
+      ),
+    },
+  ]
 
   return (
-    <div className="h-[420px] overflow-x-auto border whitespace-nowrap mt-2">
-      <CTable striped hover className="border border-gray-200">
-        <CTableHead className="bg-gray-100 sticky top-0 z-10">
-          <CTableRow>
-            <CTableHeaderCell>Product ID</CTableHeaderCell>
-            <CTableHeaderCell>Reference ID</CTableHeaderCell>
-            <CTableHeaderCell>Product Name</CTableHeaderCell>
-            <CTableHeaderCell>UOM</CTableHeaderCell>
-            <CTableHeaderCell>Category</CTableHeaderCell>
-            <CTableHeaderCell>Minimum Stack</CTableHeaderCell>
-            <CTableHeaderCell>Manufacturer</CTableHeaderCell>
-            <CTableHeaderCell>Status</CTableHeaderCell>
-            <CTableHeaderCell>Standard Cost</CTableHeaderCell>
-            <CTableHeaderCell>Action</CTableHeaderCell>
-          </CTableRow>
-        </CTableHead>
-
-        <CTableBody>
-          {loading ? (
-            <CTableRow>
-              <CTableDataCell colSpan="9" className="text-center py-5">
-                <Loading isLoading={loading} />
-              </CTableDataCell>
-            </CTableRow>
-          ) : data.length > 0 ? (
-            data.map((row, index) => (
-              <CTableRow key={index}>
-                <CTableDataCell
-                  className="text-blue-600 font-semibold underline cursor-pointer"
-                  onClick={() => handleView(row.id)}
-                >
-                  {row.item_generate_id || ''}
-                </CTableDataCell>
-
-                <CTableDataCell>{row.item_code || ''}</CTableDataCell>
-                <CTableDataCell>{row.item_name || ''}</CTableDataCell>
-                <CTableDataCell>{row.uom || ''}</CTableDataCell>
-                <CTableDataCell>{row.category || ''}</CTableDataCell>
-                <CTableDataCell>{row.min_stock_level || ''}</CTableDataCell>
-                <CTableDataCell>{row.manufacturer || ''}</CTableDataCell>
-                <CTableDataCell>
-                  <select
-                    value={row.status}
-                    onChange={(e) => handleStatusChange(row.id, e.target.value)}
-                    className={`px-2.5 py-1 rounded-full text-sm font-medium outline-none border
-                      ${
-                        row.status === 'active'
-                          ? 'bg-green-100 text-green-800 border-green-300'
-                          : row.status === 'inactive'
-                          ? 'bg-red-100 text-red-800 border-red-300'
-                          : 'bg-gray-100 text-gray-800 border-gray-300'
-                      }`}
-                  >
-                    <option value="active">Accepted</option>
-                    <option value="inactive">Rejected</option>
-                  </select>
-                </CTableDataCell>
-                <CTableDataCell>{row.standard_cost || ''}</CTableDataCell>
-                <CTableDataCell>
-                  <ThreeDotMenu
-                    value={[
-                      {
-                        label: 'View',
-                        icon: cilHandPointRight,
-                        onClick: () => handleView(row.id),
-                      },
-                      {
-                        label: 'Edit',
-                        icon: cilPencil,
-                        onClick: () => handleEdit(row.id),
-                      },
-                      {
-                        label: 'Delete',
-                        icon: cilTrash,
-                        onClick: () => handleDelete(row.id),
-                      },
-                    ]}
-                  />
-                </CTableDataCell>
-              </CTableRow>
-            ))
-          ) : (
-            <CTableRow>
-              <CTableDataCell colSpan={9} className="text-center py-3">
-                No data available
-              </CTableDataCell>
-            </CTableRow>
-          )}
-        </CTableBody>
-      </CTable>
+    <div>
+      <ReusableTable data={data} columns={columns} handleRowClick={(row) => handleView(row.id)} />
     </div>
-  );
+  )
 }
 
-export default ItemsTable;
+export default ItemsTable

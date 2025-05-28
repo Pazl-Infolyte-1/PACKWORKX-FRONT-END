@@ -1070,7 +1070,7 @@ export const apiMethods = {
     try {
       return await apiClient.get('/items', {
         params: {
-          client: params.client || '',
+          search: params.search || '',
 
           sales_status: params.sales_status || '',
 
@@ -1417,6 +1417,14 @@ export const apiMethods = {
       console.error(error)
     }
   },
+clientStatusSwitch: async (status, clientId) => {
+  try {
+    return await apiClient.patch(`clients/${clientId}/status`, { status })
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 }
 
 export default apiMethods

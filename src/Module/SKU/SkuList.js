@@ -59,7 +59,7 @@ function SkuList() {
   const [validationErrors, setValidationErrors] = useState({})
     const [loading, setLoading] = useState(false)
       const [totalRecords, setTotalRecords] = useState(0)
-
+const navigate=useNavigate()
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
     client_id: null,
@@ -350,8 +350,8 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!layer.bf) layerErrors.bf = 'BF is required'
       if (!layer.color) layerErrors.color = 'Color is required'
       if (
-        layer.layer.toLowerCase().includes('corrugated') &&
-        !layer.flute_type
+        layer?.layer?.toLowerCase()?.includes('corrugated') &&
+        !layer?.flute_type
       ) {
         layerErrors.flute_type = 'Flute Type is required'
       }
@@ -591,6 +591,22 @@ const clientResponse = await apiMethods.getClients({ limit: 10000 })
   console.log("edittag",editTag)
 console.log("pagination",pagination)
 console.log("sku type",addNewSkuData.sku_type)
+useEffect(() => {
+  const { fromClientForm, sku_type_for_navigate_from_client } = location.state || {};
+
+  if (fromClientForm) {
+    console.log("sku type", sku_type_for_navigate_from_client);
+
+    setDrawerOpen(true);
+   setAddNewSkuData((prev) => ({
+      ...prev,
+      sku_type: sku_type_for_navigate_from_client || prev.sku_type,
+    }));
+    // Optional: clear state from history to prevent retrigger
+    navigate(location.pathname, { replace: true, state: {} });
+  }
+}, [location.pathname, location.state]);
+
   return (
     <div className="flex">
       <div className={`${isMinimized ? 'w-[28%]' : 'w-full'} pb-3`}>

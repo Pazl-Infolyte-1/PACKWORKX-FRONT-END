@@ -205,7 +205,7 @@ const PurchaseOrderReturn = () => {
         <Drawer
           isOpen={drawerOpen}
           onClose={handleCloseDrawer}
-          maxWidth={"1270px"}
+          maxWidth={"1350px"}
           title={isPorEdit ? "Edit Purchase Order Return" : "Add Purchase Order Return"}
         >
           <AddPurchaseOrderReturn

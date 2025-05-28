@@ -40,6 +40,9 @@ const wordOrderView = React.lazy(()=> import('./Module/WorkOrder/ViewWorkOrder.j
 const Items = React.lazy(() => import('./Module/Inventory/Items/items.js'))
 const GRN = React.lazy(() => import('./Module/GRN/Grn.js'))
 const Products = React.lazy(() => import('./Module/Products/Products.js'))
+const StockAdjustment = React.lazy(() => import('./Module/StockAdjustment/StockAdjustment.js'))
+const StockAdjustmentForm = React.lazy(() => import('./Module/StockAdjustment/AddEditStockAdjustment.js'))
+
 
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
@@ -149,6 +152,10 @@ const routes = [
   { path: '/inventory/items', name: 'inventory', element: Items, key: '' },
   { path: '/stockmanagement', name: 'stockmanagement', element: StockManagement, key: '' },
   { path: '/products', name: 'products', element: Products, key: '' },
+    { path: '/stockadjustment', name: 'stockadjustment', element: StockAdjustment, key: '' },
+        { path: '/stockadjustment/add', name: 'stockadjustment', element: StockAdjustmentForm, key: '' },
+
+
 ]
 
 export default routes

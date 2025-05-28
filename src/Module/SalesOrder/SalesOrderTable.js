@@ -42,7 +42,7 @@ function SalesOrderTable({
     const updatedData = initialData.map((item) => ({
       ...item,
       isSelected: item.isSelected ?? false,
-      SalesSkuDetails: item.SalesSkuDetails?.length || 0,
+      workOrders: item.workOrders?.length || 0,
     }));
     setData(updatedData);
   }, [initialData]);
@@ -56,7 +56,7 @@ function SalesOrderTable({
     // },
       { key: 'sales_generate_id', header: 'Sales ID', field: 'sales_generate_id' },  
       { key: 'client', header: 'Client', field: 'client' },
-      { key: 'skuCount', header: 'No of SKU', field: 'SalesSkuDetails' },
+      { key: 'skuCount', header: 'Work Orders', field: 'workOrders' },
       { key: 'estimated', header: 'Expected Delivery Date', type:"date", field: 'estimated'  },
       { key: 'created_at', header: 'Created Date', field: 'created_at',type:"date" },
       {

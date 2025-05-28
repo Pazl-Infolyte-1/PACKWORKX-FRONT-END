@@ -47,8 +47,8 @@ export default function SalesOrderView({ }) {
         <div className="flex justify-between items-top p-2">
           <h1 className="text-lg font-semibold">Sales Order # {salesOrderData?.sales_generate_id}</h1>
           <div className="flex items-start space-x-4">
-            <button className="text-black text-xs">Upload Files</button>
-            <button className="text-black text-xs">Comments & History</button>
+            {/* <button className="text-black text-xs">Upload Files</button> */}
+            {/* <button className="text-black text-xs">Comments & History</button> */}
             <button className="text-gray-500 text-sm items-start" onClick={()=>{navigate('/salesorder')}}>✕</button>
           </div>
         </div>
@@ -60,7 +60,7 @@ export default function SalesOrderView({ }) {
             <CIcon icon={cilPencil} className="h-3 w-3" />
             <span>Edit</span>
           </button>
-          <button className="flex items-center gap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
+          {/* <button className="flex items-center gap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
             <CIcon icon={cilEnvelopeOpen} className="h-3 w-3" />
             <span>Email</span>
           </button>
@@ -71,7 +71,7 @@ export default function SalesOrderView({ }) {
           <button className="flex items-center gap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
             <CIcon icon={cilDollar} className="h-3 w-3" />
             <span>To Invoice</span>
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -79,8 +79,8 @@ export default function SalesOrderView({ }) {
       <div className="flex-1 overflow-y-auto">
         {/* Next steps banner */}
         <div className="px-3 flex flex-col mt-4">
-          <div className="bg-blue-50 border border-blue-100 rounded p-1 mb-3 text-xs">
-            <div className="flex items-center justify-between">
+          {/* <div className="bg-blue-50 border border-blue-100 rounded p-1 mb-3 text-xs"> */}
+            {/* <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <div className="bg-blue-100 p-0.5 rounded-full">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
@@ -95,8 +95,8 @@ export default function SalesOrderView({ }) {
               <button className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded shadow-sm text-xs">
                 Convert to Invoice
               </button>
-            </div>
-          </div>
+            </div> */}
+          {/* </div> */}
 
                {/* Invoices section */}
                <div className="bg-white border border-gray-200 rounded mb-3 hover:shadow-sm text-xs">
@@ -373,7 +373,9 @@ export default function SalesOrderView({ }) {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-blue-600 underline cursor-pointer">{item?.sku}</p>
+                    <p className="text-blue-600 underline cursor-pointer" 
+                      onClick={() => navigate(`/SKU/${item.id}`)}
+                    >{item?.sku}</p>
                     <p className="text-gray-600 text-xs">SKU: {item?.sku}</p>
                   </div>
                 </div>

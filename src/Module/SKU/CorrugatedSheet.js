@@ -1,7 +1,7 @@
 import Input from '../../components/New/Input'
 import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
-import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilCloudUpload, cilPencil, cilTrash } from '@coreui/icons'
+import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilCloudUpload, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 import { useEffect, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import CustomAlert from '../../components/New/CustomAlert'
@@ -15,6 +15,12 @@ import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
 import { useDispatch, useSelector } from 'react-redux'
 import RoutePopup from './RoutePopup'
 import apiMethods from '../../api/config'
+import { useNavigate } from 'react-router-dom'
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+
+
 
 function CorrugatedSheet({
   editTag,
@@ -64,7 +70,7 @@ function CorrugatedSheet({
   const [isUploading, setIsUploading] = useState(false);
 //const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
 const [fileNames, setFileNames] = useState([]); 
-
+const navigate = useNavigate()
   const selectionFrame = {
     vendor: {
       id: 1,
@@ -80,6 +86,16 @@ const [fileNames, setFileNames] = useState([]);
   const handleClose = () => {
     setAlerts([])
   }
+ const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+   style: {
+      maxHeight: ITEM_HEIGHT * 5 + ITEM_PADDING_TOP, // Show 5 items with scroll
+      width: 200,
+    },
+  },
+};
 
   useEffect(() => {
     const handleBeforeUnload = (event) => {
@@ -543,35 +559,128 @@ const [fileNames, setFileNames] = useState([]);
           />
         </div>
 
-        <div className="w-[200px]">
+
+  <div className="flex items-end gap-2 w-full max-w-md">
+  {/* Select Input */}
+  <div className="flex items-end gap-1 w-fit">
+    {/* MUI Select with icon inside same box */}
+    <div className="relative w-[200px]">
+      {/* Aligned Label */}
+      <label
+        htmlFor="client"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        Client <span className="text-red-500 ml-1">*</span>
+      </label>
+
+      <FormControl
+        sx={{ width: '100%' }}
+        error={errors.client_id ? true : false}
+      >
+        <Select
+          IconComponent={() => null}
+          labelId="client-select-label"
+          id="client"
+          name="client"
+          disabled={clientDiasble}
+          value={addNewSkuData.client_id}
+          onChange={handleChange}
+          MenuProps={MenuProps}
+          displayEmpty
+          sx={{
+            height: '35px',
+            '& .MuiOutlinedInput-root': {
+              height: '50px',
+              paddingRight: '40px',
+            },
+            '& .MuiSelect-select': {
+              display: 'flex',
+              alignItems: 'center',
+              height: '35px',
+              paddingY: 0,
+            },
+          }}
+        >
+          <MenuItem value="" disabled>
+            <em>Select</em>
+          </MenuItem>
+          {client?.map((item, index) => (
+            <MenuItem key={index} value={item.client_id}>
+              {item.display_name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      {/* Add icon inside the select box */}
+     <button
+  type="button"
+  onClick={() =>
+    navigate('/clients/clientForm', {
+      state: {
+        fromSKU: true,
+        sku_type_for_navigate: 'Board',
+      },
+    })
+  }
+  className="absolute top-[calc(50%+13px)] right-2 -translate-y-1/2 text-blue-600 hover:text-blue-800 z-10"
+  title="Add Client"
+>
+  <CIcon icon={cilPlus} size="lg" className="w-5 h-5 stroke-[2.5]" />
+</button>
+
+    </div>
+  </div>
+</div>
+        {/*<div className="flex items-end gap-2 w-full max-w-md">
+            <div className="flex items-end gap-1 w-fit">
+        <div className="relative w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Client Name
             <span className="text-red-500 ml-1">*</span>
-            {/*{errors.client_id && (
-              <span className="text-red-500 text-sm ml-2 align-middle">{errors.client_id}</span>
-            )}*/}
           </label>
-          <select
-            name="client"
-            id="client"
-            disabled={clientDiasble}
-            value={addNewSkuData.client_id || null}
-            onChange={handleChange}
-className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.client_id ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
-          >
-            <option value="" hidden>
-              Select
-            </option>
-            {client?.map((item, index) => (
-              <option key={index} value={item.client_id}>
-                {item.display_name}
+          <div className="relative">
+            <select
+              name="client"
+              id="client"
+              disabled={clientDiasble}
+              value={addNewSkuData.client_id}
+              onChange={handleChange}
+              className={`w-full p-1 pr-9 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none ${
+                errors.client_id ? 'border-2 border-red-500' : 'border border-gray-300'
+              }`}
+            >
+              <option value="" hidden>
+                Select
               </option>
-            ))}
-            <option value="add_client">➕ Add Client</option>
-          </select>
+              {client?.map((item, index) => (
+                <option key={index} value={item.client_id}>
+                  {item.display_name}
+                </option>
+              ))}
+            </select>
+      
+            <button
+              type="button"
+             onClick={() =>
+    navigate('/clients/clientForm', {
+      state: {
+        fromSKU: true,
+        sku_type_for_navigate: 'Board',
+      },
+    })
+  }
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 hover:text-blue-800"
+              title="Add Client"
+            >
+            <CIcon icon={cilPlus} size="lg" className="w-5 h-5 stroke-[2.5]" />
+      
+            </button>
+          </div>
         </div>
+      </div>
+      </div>
+      */}
         <div className="w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Customer Reference Code

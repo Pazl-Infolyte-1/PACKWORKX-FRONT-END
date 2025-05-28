@@ -49,23 +49,26 @@ const PurchaseReturnTable = ({
     }
   }
 
-  // const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = async (id, newStatus) => {    
   
-  //   const currentPo = data.find(po => po.id === id); // get full PO data
-  //   const payload = {
-  //     decision: newStatus,
-  //     items: currentPo.items || [] // send existing items back
-  //   };
+     const currentPor = porData.find(por => por.id === id); // get full PO data
+    const payload = {
+      decision: newStatus,
+      grn_id: currentPor.grn_id || [] // send existing items back
+    };
+
+    console.log('Payload for status change:', payload);
+    
   
-  //   try {
-  //     const response = await apiMethods.updatePurchaseOrder(id, payload);
-  //     setAlerts([{ severity: 'success', message: response.data.message }]);
-  //     // setRefresh(prev => !prev);
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //     setAlerts([{ severity: 'error', message: error?.response?.data?.message || 'Failed to update status' }]);
-  //   }
-  // };
+    try {
+      const response = await apiMethods.updatePoRetrun(id, payload);
+      setAlerts([{ severity: 'success', message: response.data.message }]);
+      // setRefresh(prev => !prev);
+    } catch (error) {
+      console.error('Error:', error);
+      setAlerts([{ severity: 'error', message: error?.response?.data?.message || 'Failed to update status' }]);
+    }
+  };
 
   return (
     <>
@@ -85,9 +88,9 @@ const PurchaseReturnTable = ({
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
                 Reason
               </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+              {/* <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
                 Notes
-              </CTableHeaderCell>
+              </CTableHeaderCell> */}
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
                 Payment terms
               </CTableHeaderCell>
@@ -120,7 +123,7 @@ const PurchaseReturnTable = ({
                     {item.return_date}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2">{item.reason}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">{item.notes}</CTableDataCell>
+                  {/* <CTableDataCell className="py-3 px-2">{item.notes}</CTableDataCell> */}
                   <CTableDataCell className="py-3 px-2">
                     {item.payment_terms}
                   </CTableDataCell>
@@ -156,11 +159,11 @@ const PurchaseReturnTable = ({
                         //   icon: cilHandPointRight,
                         //   // onClick: () => setShowPopUp(row.id),
                         // },
-                        {
-                          label: 'Edit',
-                          icon: cilPencil,
-                          onClick: () => handleEdit(item),
-                        },
+                        // {
+                        //   label: 'Edit',
+                        //   icon: cilPencil,
+                        //   onClick: () => handleEdit(item),
+                        // },
                         {
                           label: 'Delete',
                           icon: cilTrash,

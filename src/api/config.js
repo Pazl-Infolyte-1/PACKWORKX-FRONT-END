@@ -1417,6 +1417,14 @@ export const apiMethods = {
       console.error(error)
     }
   },
+clientStatusSwitch: async (status, clientId) => {
+  try {
+    return await apiClient.patch(`clients/${clientId}/status`, { status })
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 }
 
 export default apiMethods

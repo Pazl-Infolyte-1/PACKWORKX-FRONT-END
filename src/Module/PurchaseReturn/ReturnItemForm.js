@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState  } from 'react';
 import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import apiMethods from '../../api/config'
 
 const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
-  const { register, control, reset } = useForm({
+  const { register, control, reset,getValues  } = useForm({
     defaultValues: {
       items: [],
     },
@@ -16,6 +16,48 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
 
   const watchedItems = useWatch({ control, name: 'items' });
   const lastHash = useRef('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState(null);
+
+
+  const Modal = ({ isOpen, onClose, children }) => {
+    if (!isOpen) return null;
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded p-6 max-w-md w-full">
+          <button onClick={onClose} className="float-right">&times;</button>
+          <div>{children}</div>
+        </div>
+      </div>
+    );
+  };
+
+  const openItemDetails = async (item_id) => {
+    try {
+      const response = await apiMethods.getItemList();
+      const items = response?.data?.data || [];
+      const item = items.find(i => i.id === parseInt(item_id));
+      const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {};
+  
+      setModalContent(
+        <>
+          <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
+          {Object.entries(customFields).length > 0 ? (
+            Object.entries(customFields).map(([key, value], idx) => (
+              <p key={idx}>
+                <strong>{key}:</strong> {value}
+              </p>
+            ))
+          ) : (
+            <p>No custom fields available.</p>
+          )}
+        </>
+      );
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching item details:', error);
+    }
+  };
 
   // Fetch available quantities and reset form
   useEffect(() => {
@@ -32,10 +74,11 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
 
         return {
           ...item,
-          available_quantity: inventoryItem ? parseFloat(inventoryItem.available_quantity) : 0,
+          available_quantity: inventoryItem ? parseFloat(inventoryItem.quantity_available) : 0,
         };
       });
 
+      
       // Format for form
       const formatted = updatedItems.map((item) => ({
         item_id: item.item_id ?? 0,
@@ -91,9 +134,10 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
               <th>Select</th>
               <th>GRN Item ID</th>
               <th>Item ID</th>
+              <td></td>
               <th>Code</th>
-              <th>Quantity</th>
               <th>Available Quantity</th>
+              <th>Return Quantity</th>
               <th>UOM</th>
               <th>Price</th>
               <th>Tax Price</th>
@@ -132,6 +176,20 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
                       className="border px-2 py-1"
                     />
                   </td>
+                 <td
+                  onClick={() => {
+                    const itemId = getValues(`items.${index}.item_id`);
+                    if (itemId) {
+                      openItemDetails(itemId);
+                    } else {
+                      console.warn('Item ID is empty');
+                    }
+                  }}
+                  className="cursor-pointer text-blue-600"
+                >
+                  ℹ️
+                </td>
+
                   <td>
                     <input
                       type="text"
@@ -139,15 +197,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
                       className="border px-2 py-1"
                     />
                   </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.01"
-                      {...register(`items.${index}.quantity`, { valueAsNumber: true })}
-                      className="border px-2 py-1"
-                    />
-                  </td>
-                  <td>
+                   <td>
                     <input
                       type="number"
                       readOnly
@@ -155,6 +205,15 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
                       className="border px-2 py-1 bg-gray-100"
                     />
                   </td>
+                  <td>
+                    <input
+                      type="number"
+                      step="0.01"                      
+                      // {...register(`items.${index}.quantity`, { valueAsNumber: true })}
+                      className="border px-2 py-1"
+                    />
+                  </td>
+                 
                   <td>
                     <input
                       type="text"
@@ -207,6 +266,9 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
             })}
           </tbody>
         </table>
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+  {modalContent}
+</Modal>
       </div>
     </div>
   );

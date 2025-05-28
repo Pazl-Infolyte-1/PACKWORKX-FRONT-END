@@ -7,11 +7,12 @@ const GrnView = ({ id, setOpenPoReturnModal }) => {
     const fetchData = async () => {
       try {
         const response = await apiMethods.getPurchaseReturn();
-        const poReturnList = Array.isArray(response?.data?.approved) ? response.data.approved : []
+        const poReturnList = Array.isArray(response?.data?.approved) ? response.data.approved : response.data.disapproved || [];
         console.log('poReturnList', poReturnList);
         
         const matchedpoReturnList = poReturnList.find(item => item.id === id)
-
+       console.log('matchedpoReturnList', matchedpoReturnList);
+       
         setPoDetails(matchedpoReturnList)
       } catch (error) {
         console.error('Error fetching data:', error)

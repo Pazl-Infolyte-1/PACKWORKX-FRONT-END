@@ -175,7 +175,6 @@ function PurchaseOrderTable({
       type: 'custom',
       render: (row) => (
         <>
-          {console.log(row.po_status)}
           <span
             className={`px-3 py-1 rounded-full text-xs font-semibold -ml-11
           ${row.po_status === 'partialy-recieved' ? 'bg-blue-100 text-blue-800' : ''}
@@ -185,7 +184,9 @@ function PurchaseOrderTable({
           ${row.po_status === 'amended' ? 'bg-orange-600 text-white' : ''}
           `}
           >
-            {row.po_status || 'Created'}
+            {row.po_status === 'partialy-recieved'
+              ? 'Partialy Recieved'
+              : row.po_status.charAt(0).toUpperCase() + row.po_status.slice(1)}
           </span>
         </>
       ),
@@ -195,7 +196,10 @@ function PurchaseOrderTable({
       header: 'Decision',
       field: 'decision',
       type: 'dropdown',
-      options: ['approve', 'disapprove'],
+      options: [
+        { label: 'Approve', value: 'approve' },
+        { label: 'Reject', value: 'disapprove' },
+      ],
       getOptionClass: (val) => {
         switch (val) {
           case 'approve':
@@ -207,7 +211,7 @@ function PurchaseOrderTable({
         }
       },
       onChange: (row, newValue) => {
-        handleStatusChange(row.id, newValue.toLowerCase())
+        handleStatusChange(row.id, newValue) // newValue will be 'approve' or 'disapprove'
       },
     },
     {

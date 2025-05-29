@@ -35,8 +35,7 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
   useEffect(() => {
     const fetchPurchaseOrderData = async () => {
       try {
-        const response = await apiMethods.getPurchaseOrders()
-        console.log('Purchase Order Data:', response.data)
+        const response = await apiMethods.getPurchaseOrders({limit:20000})
         setPurchaseOrderData(response.data)
       } catch (error) {
         console.error(error)

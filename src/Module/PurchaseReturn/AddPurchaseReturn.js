@@ -56,23 +56,23 @@ const handleClose = () => {
   }, [poData]);
 
   const handlePurchaseDetails = async (poId) => {
-    try {
-      const response = await apiMethods.getinventory()
-      const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : []
-      const matchedInventory = inventoryList.find(item => item.po_id === poId)
-      console.log('inventoryList:', inventoryList);
+    // try {
+    //   const response = await apiMethods.getinventory()
+    //   const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : []
+    //   const matchedInventory = inventoryList.find(item => item.po_id === poId)
+    //   console.log('inventoryList:', inventoryList);
       
 
-      if (matchedInventory) {
-        const grn_id = matchedInventory.grn_id
-        setGrnId(grn_id)
-        await handlePurchaseReturnDetails(poId, grn_id)
-      } else {
-        console.warn('No inventory found for PO ID:', poId)
-      }
-    } catch (error) {
-      console.error('Error fetching inventory:', error)
-    }
+    //   if (matchedInventory) {
+    //     const grn_id = matchedInventory.grn_id
+    //     setGrnId(grn_id)
+    //     await handlePurchaseReturnDetails(poId, grn_id)
+    //   } else {
+    //     console.warn('No inventory found for PO ID:', poId)
+    //   }
+    // } catch (error) {
+    //   console.error('Error fetching inventory:', error)
+    // }
   }
 
   const handlePurchaseReturnDetails = async (po_id, grn_id) => {

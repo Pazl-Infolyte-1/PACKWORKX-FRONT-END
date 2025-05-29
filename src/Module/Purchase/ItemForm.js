@@ -28,6 +28,7 @@ const openItemDetails = async (item_id) => {
   try {
     const response = await apiMethods.getItemList();
     const items = response?.data?.data || [];
+    console.log(items, 'item');
     const item = items.find(i => i.id === parseInt(item_id));
     const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {};
 

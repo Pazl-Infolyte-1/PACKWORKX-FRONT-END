@@ -178,7 +178,7 @@ const GrnView = ({ id, setOpenPoReturnModal }) => {
               </div>
             </div>
           ) : (
-            <div className="bg-gray-50 p-5 rounded-lg shadow-sm md:col-span-2 md:col-span-4 text-center">
+            <div className="bg-gray-50 p-5 rounded-lg shadow-sm md:col-span-4 text-center">
               <p className="text-gray-500">No Grn Items associated with this Grn</p>
             </div>
           )}

@@ -301,29 +301,29 @@ const handleClose = () => {
   }
 
 
-  useEffect(() => {
-    const fetchVendors = async () => {
-      try {
-        const initial = await apiMethods.getClients(); 
-        const count = initial?.length || 100; 
+  // useEffect(() => {
+  //   const fetchVendors = async () => {
+  //     try {
+  //       const initial = await apiMethods.getClients(); 
+  //       const count = initial?.length || 100; 
   
-        const fullData = await apiMethods.getClients({ limit: count });
-        const clientsArray = fullData.data;
+  //       const fullData = await apiMethods.getClients({ limit: count });
+  //       const clientsArray = fullData.data;
   
-        if (Array.isArray(clientsArray)) {
-          const vendorList = clientsArray.filter(client => client.entity_type === "Vendor");
-          console.log('vendorList:', vendorList);
-          setClientData(vendorList);
-        } else {
-          console.error('Expected an array but received:', clientsArray);
-        }
-      } catch (error) {
-        console.error('Error in useEffect:', error);
-      }
-    };
+  //       if (Array.isArray(clientsArray)) {
+  //         const vendorList = clientsArray.filter(client => client.entity_type === "Vendor");
+  //         console.log('vendorList:', vendorList);
+  //         setClientData(vendorList);
+  //       } else {
+  //         console.error('Expected an array but received:', clientsArray);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error in useEffect:', error);
+  //     }
+  //   };
   
-    fetchVendors();
-  }, []);
+  //   fetchVendors();
+  // }, []);
 
 
 

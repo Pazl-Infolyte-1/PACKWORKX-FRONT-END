@@ -21,7 +21,7 @@ const PurchaseOrder = () => {
   const [selectedPoId, setSelectedPoId] = useState(null)
   const [alert, setAlert] = useState({ show: false, message: '', type: '' })
   const [loading, setLoading] = useState(true)
-  const { searchQuery, filteredSearchData, setGlobalPlaceholder } = useSearch() ///need to verify
+  const { searchQuery, filteredSearchData, setGlobalPlaceholder } = useSearch()
   const [totalPages, setTotalPages] = useState(0)
   const [refresh, setRefresh] = useState(false)
   const [paginationParams, setPaginationParams] = useState({
@@ -49,7 +49,7 @@ const PurchaseOrder = () => {
         status: 'active',
       })
       setData(res.data || [])
-      setTotalPages(Math.ceil(res.totalCount / paginationParams.pageSize)) // Calculate total pages
+      setTotalPages(Math.ceil(res.totalCount / paginationParams.pageSize))
     } catch (err) {
       setAlert({
         show: true,
@@ -60,17 +60,16 @@ const PurchaseOrder = () => {
       setLoading(false)
     }
   }
-
   useEffect(() => {
+    // Reset to first page when searchQuery changes
+    if (searchQuery) {
+      setPaginationParams((prev) => ({
+        ...prev,
+        currentPage: 1,
+      }))
+    }
     fetchData()
   }, [paginationParams, searchQuery, refresh])
-
-  useEffect(() => {
-    setPaginationParams((prev) => ({
-      ...prev,
-      currentPage: 1, // Reset to the first page on search
-    }))
-  }, [searchQuery])
 
   const handlePageChange = (event, newPage) => {
     setPaginationParams((prev) => ({

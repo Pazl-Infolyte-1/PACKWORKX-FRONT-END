@@ -31,66 +31,66 @@ function PurchaseOrderTable({
   const [poData, setPoData] = useState([])
   const [grnValidationMap, setGrnValidationMap] = useState({}) // ✅ for per-row validation
   const [expandedRowId, setExpandedRowId] = useState(null)
-  const [itemData, setItemData] = useState([]) // State to hold item data
+  // const [itemData, setItemData] = useState([])
 
   const openItemDetails = (id) => {
     setExpandedRowId((prevId) => (prevId === id ? null : id))
   }
   // getItemData
-  const getItemData = async () => {
-    try {
-      const response = await apiMethods.getItemList()
-      const productData = response || []
-      console.log('Fetched Item Data:', productData)
-      setItemData(productData)
-    } catch (error) {
-      console.error('Error fetching Purchase Order data:', error)
-    }
-  }
-  useEffect(() => {
-    getItemData()
-  }, [])
+  // const getItemData = async () => {
+  //   try {
+  //     const response = await apiMethods.getItemList()
+  //     const productData = response || []
+  //     console.log('Fetched Item Data:', productData)
+  //     setItemData(productData)
+  //   } catch (error) {
+  //     console.error('Error fetching Purchase Order data:', error)
+  //   }
+  // }
+  // useEffect(() => {
+  //   getItemData()
+  // }, [])
 
-  const handleGrnCheck = async () => {
-    try {
-      const response = await apiMethods.getGrn()
-      const grnData = response?.data?.data || []
+  // const handleGrnCheck = async () => {
+  //   try {
+  //     const response = await apiMethods.getGrn()
+  //     const grnData = response?.data?.data || []
 
-      const poReturn = await apiMethods.getPurchaseReturn()
-      const poReturnData = [
-        ...(poReturn?.data?.approved || []),
-        ...(poReturn?.data?.disapproved || []),
-      ]
+  //     const poReturn = await apiMethods.getPurchaseReturn()
+  //     const poReturnData = [
+  //       ...(poReturn?.data?.approved || []),
+  //       ...(poReturn?.data?.disapproved || []),
+  //     ]
 
-      const map = {}
+  //     const map = {}
 
-      data.forEach((row) => {
-        const hasGrn = grnData.some((grn) => grn.po_id === row.id)
-        const matchingPor = poReturnData.find((por) => por.po_id === row.id)
+  //     data.forEach((row) => {
+  //       const hasGrn = grnData.some((grn) => grn.po_id === row.id)
+  //       const matchingPor = poReturnData.find((por) => por.po_id === row.id)
 
-        let status = 'Created'
+  //       let status = 'Created'
 
-        if (matchingPor) {
-          status =
-            Number(row.total_amount) === Number(matchingPor.total_amount) ? 'Returned' : 'Amendment'
-        } else if (hasGrn) {
-          status = 'Received'
-        }
+  //       if (matchingPor) {
+  //         status =
+  //           Number(row.total_amount) === Number(matchingPor.total_amount) ? 'Returned' : 'Amendment'
+  //       } else if (hasGrn) {
+  //         status = 'Received'
+  //       }
 
-        map[row.id] = status
-      })
+  //       map[row.id] = status
+  //     })
 
-      setGrnValidationMap(map)
-    } catch (error) {
-      console.error('Error fetching GRN or Purchase Return data:', error)
-    }
-  }
+  //     setGrnValidationMap(map)
+  //   } catch (error) {
+  //     console.error('Error fetching GRN or Purchase Return data:', error)
+  //   }
+  // }
 
-  useEffect(() => {
-    if (data?.length > 0) {
-      handleGrnCheck()
-    }
-  }, [data])
+  // useEffect(() => {
+  //   if (data?.length > 0) {
+  //     handleGrnCheck()
+  //   }
+  // }, [data])
 
   const handlePoDelete = async () => {
     if (!deleteId) {
@@ -122,10 +122,10 @@ function PurchaseOrderTable({
   }
 
   const handleStatusChange = async (id, newStatus) => {
-    const currentPo = data.find((po) => po.id === id) // get full PO data
+    const currentPo = data.find((po) => po.id === id)
     const payload = {
       decision: newStatus,
-      items: currentPo.items || [], // send existing items back
+      items: currentPo.items || [],
     }
 
     try {
@@ -174,14 +174,20 @@ function PurchaseOrderTable({
       header: 'Status',
       type: 'custom',
       render: (row) => (
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-semibold 
-          ${grnValidationMap[row.id] === 'Created' ? 'bg-blue-100 text-blue-800' : ''}
-          ${grnValidationMap[row.id] === 'Received' ? 'bg-green-100 text-green-800' : ''}
-          ${grnValidationMap[row.id] === 'Returned' ? 'bg-red-100 text-red-800' : ''}`}
-        >
-          {grnValidationMap[row.id] || 'Created'}
-        </span>
+        <>
+          {console.log(row.po_status)}
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-semibold -ml-11
+          ${row.po_status === 'partialy-recieved' ? 'bg-blue-100 text-blue-800' : ''}
+          ${row.po_status === 'created' ? 'bg-green-100 text-green-800' : ''}
+          ${row.po_status === 'returned' ? 'bg-red-100 text-red-800' : ''}
+          ${row.po_status === 'received' ? 'bg-teal-500 text-white' : ''}
+          ${row.po_status === 'amended' ? 'bg-orange-600 text-white' : ''}
+          `}
+          >
+            {row.po_status || 'Created'}
+          </span>
+        </>
       ),
     },
     {
@@ -223,7 +229,7 @@ function PurchaseOrderTable({
               onClick: () => setShowPopUp(row.id),
             },
 
-            ...(grnValidationMap[row.id] === 'Created'
+            ...(row.po_status === 'created'
               ? [
                   { label: 'Edit', icon: cilPencil, onClick: () => handleEdit(row.id) },
                   {
@@ -234,7 +240,7 @@ function PurchaseOrderTable({
                 ]
               : []),
 
-            ...(grnValidationMap[row.id] === 'Received'
+            ...(row.po_status === 'received'
               ? [
                   {
                     label: 'Purchase Return',

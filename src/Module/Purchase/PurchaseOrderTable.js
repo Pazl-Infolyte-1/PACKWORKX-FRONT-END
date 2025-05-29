@@ -177,11 +177,11 @@ function PurchaseOrderTable({
         <>
           {console.log(row.po_status)}
           <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold 
+            className={`px-3 py-1 rounded-full text-xs font-semibold -ml-11
           ${row.po_status === 'partialy-recieved' ? 'bg-blue-100 text-blue-800' : ''}
           ${row.po_status === 'created' ? 'bg-green-100 text-green-800' : ''}
           ${row.po_status === 'returned' ? 'bg-red-100 text-red-800' : ''}
-          ${row.po_status === 'recieved' ? 'bg-green-500 text-black' : ''}
+          ${row.po_status === 'received' ? 'bg-teal-500 text-white' : ''}
           ${row.po_status === 'amended' ? 'bg-orange-600 text-white' : ''}
           `}
           >
@@ -240,7 +240,7 @@ function PurchaseOrderTable({
                 ]
               : []),
 
-            ...(row.po_status === 'recieved'
+            ...(row.po_status === 'received'
               ? [
                   {
                     label: 'Purchase Return',

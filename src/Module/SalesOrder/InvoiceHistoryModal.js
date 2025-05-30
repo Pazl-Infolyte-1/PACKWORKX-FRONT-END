@@ -77,9 +77,9 @@ const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
       <div className="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-hidden font-sans">
         {/* Modal Header */}
         <div className="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">Invoice History</h2>
-            <p className="text-xs text-gray-600 mt-1">
+          <div className="text-left">
+            <h2 className="text-lg font-semibold text-gray-900 text-left">Invoice History</h2>
+            <p className="text-xs text-gray-600 mt-1 text-left">
               {invoiceData.message} • Total: {invoiceData.total} invoice{invoiceData.total !== 1 ? 's' : ''}
             </p>
           </div>
@@ -99,22 +99,22 @@ const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
                 <div key={invoice.id} className="border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
                   {/* Invoice Header */}
                   <div className="bg-gray-50 px-4 py-3 border-b flex justify-between items-center">
-                    <div className="flex items-center gap-4">
-                      <h3 className="text-sm font-semibold text-gray-900">
+                    <div className="flex items-center gap-4 text-left">
+                      <h3 className="text-sm font-semibold text-gray-900 text-left">
                         {invoice.invoice_number}
                       </h3>
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs text-gray-600 text-left">
                         Work Order: {invoice.workOrder?.work_generate_id}
                       </span>
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs text-gray-600 text-left">
                         Sales Order: {invoice.salesOrder?.sales_generate_id}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`text-xs font-medium ${getStatusColor(invoice.payment_status)}`}>
+                      <span className={`text-xs font-medium text-left ${getStatusColor(invoice.payment_status)}`}>
                         {invoice.payment_status?.toUpperCase()}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 text-left">
                         {formatDate(invoice.created_at)}
                       </span>
                     </div>
@@ -124,52 +124,52 @@ const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
                   <div className="p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                       {/* Left Column - Basic Info */}
-                      <div className="space-y-2">
-                        <div>
-                          <span className="text-xs font-semibold text-gray-700">SKU NAME</span>
-                          <p className="text-sm text-gray-900">{invoice.workOrder?.sku_name}</p>
+                      <div className="space-y-2 text-left">
+                        <div className="text-left">
+                          <span className="text-xs font-semibold text-gray-700 text-left">SKU NAME</span>
+                          <p className="text-sm text-gray-900 text-left">{invoice.workOrder?.sku_name}</p>
                         </div>
-                        <div>
-                          <span className="text-xs font-semibold text-gray-700">TRANSACTION TYPE</span>
-                          <p className={`text-sm ${getTransactionTypeColor(invoice.transaction_type)}`}>
+                        <div className="text-left">
+                          <span className="text-xs font-semibold text-gray-700 text-left">TRANSACTION TYPE</span>
+                          <p className={`text-sm text-left ${getTransactionTypeColor(invoice.transaction_type)}`}>
                             {invoice.transaction_type?.replace('_', ' ').toUpperCase()}
                           </p>
                         </div>
                       </div>
 
                       {/* Middle Column - Dates */}
-                      <div className="space-y-2">
-                        <div>
-                          <span className="text-xs font-semibold text-gray-700">DUE DATE</span>
-                          <p className="text-sm text-gray-900">{formatDate(invoice.due_date)}</p>
+                      <div className="space-y-2 text-left">
+                        <div className="text-left">
+                          <span className="text-xs font-semibold text-gray-700 text-left">DUE DATE</span>
+                          <p className="text-sm text-gray-900 text-left">{formatDate(invoice.due_date)}</p>
                         </div>
-                        <div>
-                          <span className="text-xs font-semibold text-gray-700">PAYMENT EXPECTED</span>
-                          <p className="text-sm text-gray-900">{formatDate(invoice.payment_expected_date)}</p>
+                        <div className="text-left">
+                          <span className="text-xs font-semibold text-gray-700 text-left">PAYMENT EXPECTED</span>
+                          <p className="text-sm text-gray-900 text-left">{formatDate(invoice.payment_expected_date)}</p>
                         </div>
                       </div>
 
                       {/* Right Column - Financial */}
-                      <div className="space-y-2">
-                        <div>
-                          <span className="text-xs font-semibold text-gray-700">SUBTOTAL</span>
-                          <p className="text-sm text-gray-900">₹{parseFloat(invoice.total)?.toFixed(2)}</p>
+                      <div className="space-y-2 text-left">
+                        <div className="text-left">
+                          <span className="text-xs font-semibold text-gray-700 text-left">SUBTOTAL</span>
+                          <p className="text-sm text-gray-900 text-left">₹{parseFloat(invoice.total)?.toFixed(2)}</p>
                         </div>
-                        <div>
-                          <span className="text-xs font-semibold text-gray-700">DISCOUNT</span>
-                          <p className="text-sm text-gray-900">₹{parseFloat(invoice.discount)?.toFixed(2)}</p>
+                        <div className="text-left">
+                          <span className="text-xs font-semibold text-gray-700 text-left">DISCOUNT</span>
+                          <p className="text-sm text-gray-900 text-left">₹{parseFloat(invoice.discount)?.toFixed(2)}</p>
                         </div>
                       </div>
 
                       {/* Far Right Column - Totals */}
-                      <div className="space-y-2">
-                        <div>
-                          <span className="text-xs font-semibold text-gray-700">TOTAL AMOUNT</span>
-                          <p className="text-sm font-semibold text-gray-900">₹{parseFloat(invoice.total_amount)?.toFixed(2)}</p>
+                      <div className="space-y-2 text-left">
+                        <div className="text-left">
+                          <span className="text-xs font-semibold text-gray-700 text-left">TOTAL AMOUNT</span>
+                          <p className="text-sm font-semibold text-gray-900 text-left">₹{parseFloat(invoice.total_amount)?.toFixed(2)}</p>
                         </div>
-                        <div>
-                          <span className="text-xs font-semibold text-gray-700">BALANCE</span>
-                          <p className={`text-sm font-medium ${parseFloat(invoice.balance) > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                        <div className="text-left">
+                          <span className="text-xs font-semibold text-gray-700 text-left">BALANCE</span>
+                          <p className={`text-sm font-medium text-left ${parseFloat(invoice.balance) > 0 ? 'text-red-600' : 'text-green-600'}`}>
                             ₹{parseFloat(invoice.balance)?.toFixed(2)}
                           </p>
                         </div>
@@ -179,14 +179,14 @@ const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
                     {/* Status Bar */}
                     <div className="mt-4 pt-3 border-t border-gray-100">
                       <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-4">
-                          <span className="text-gray-600">
-                            Quantity: <span className="font-medium">{invoice.workOrder?.qty}</span>
+                        <div className="flex items-center gap-4 text-left">
+                          <span className="text-gray-600 text-left">
+                            Quantity: <span className="font-medium">{ invoice.workOrder?.qty}</span>
                           </span>
-                          <span className="text-gray-600">
+                          <span className="text-gray-600 text-left">
                             Tax: <span className="font-medium">₹{parseFloat(invoice.total_tax)?.toFixed(2)}</span>
                           </span>
-                          <span className="text-gray-600">
+                          <span className="text-gray-600 text-left">
                             Work Order Status: 
                             <span className={`ml-1 font-medium ${
                               invoice.workOrder?.status === 'active' ? 'text-green-600' : 
@@ -197,7 +197,7 @@ const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <button className="text-blue-600 hover:text-blue-800 underline text-xs">
+                          <button className="text-blue-600 hover:text-blue-800 underline text-xs text-left">
                             View Details
                           </button>
                           {/* <button className="text-gray-600 hover:text-gray-800 underline text-xs">
@@ -211,8 +211,8 @@ const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-left py-12">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -228,8 +228,8 @@ const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
                   />
                 </svg>
               </div>
-              <h3 className="text-sm font-medium text-gray-900 mb-2">No invoices found</h3>
-              <p className="text-xs text-gray-600">There are no previous invoices for this SKU.</p>
+              <h3 className="text-sm font-medium text-gray-900 mb-2 text-left">No invoices found</h3>
+              <p className="text-xs text-gray-600 text-left">There are no previous invoices for this SKU.</p>
             </div>
           )}
         </div>

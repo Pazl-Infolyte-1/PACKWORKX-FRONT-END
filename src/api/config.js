@@ -1488,6 +1488,9 @@ export const apiMethods = {
       throw error
     }
   },
+  getInvoiceHistory:async(id)=>{
+    return await apiClient.get(`/work-order-invoice/get-by-sku/${id}`,)
+  }
 }
 
 export default apiMethods

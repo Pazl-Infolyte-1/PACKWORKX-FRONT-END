@@ -42,6 +42,8 @@ const GRN = React.lazy(() => import('./Module/GRN/Grn.js'))
 const Products = React.lazy(() => import('./Module/Products/Products.js'))
 const StockAdjustment = React.lazy(() => import('./Module/StockAdjustment/StockAdjustment.js'))
 const StockAdjustmentForm = React.lazy(() => import('./Module/StockAdjustment/AddEditStockAdjustment.js'))
+const StockTableView = React.lazy(() => import('./Module/StockAdjustment/StockTableView.js'))
+
 
 
 const routes = [
@@ -152,8 +154,17 @@ const routes = [
   { path: '/inventory/items', name: 'inventory', element: Items, key: '' },
   { path: '/stockmanagement', name: 'stockmanagement', element: StockManagement, key: '' },
   { path: '/products', name: 'products', element: Products, key: '' },
-    { path: '/stockadjustment', name: 'stockadjustment', element: StockAdjustment, key: '' },
-        { path: '/stockadjustment/add', name: 'stockadjustment', element: StockAdjustmentForm, key: '' },
+    //{ path: '/stockadjustment', name: 'stockadjustment', element: StockAdjustment, key: '' },
+     {
+    path: '/stockadjustment',
+    name: 'StockAdjustment',
+    element: StockAdjustment,
+    key: 1600,
+    children: [
+      { path: ':id', element: StockTableView, key: 'StockAdjustment_View' }, 
+    ],
+  },
+        { path: '/stockadjustment/stock_form', name: 'stockadjustment', element: StockAdjustmentForm, key: '' },
 
 
 ]

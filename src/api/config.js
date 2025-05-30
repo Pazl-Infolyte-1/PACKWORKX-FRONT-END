@@ -1423,7 +1423,50 @@ clientStatusSwitch: async (status, clientId) => {
   } catch (error) {
     console.error(error)
   }
-}
+},
+getStockAdjustments: async (page = 1, entries) => {
+  try {
+    return await apiClient.get(`/stock-adjustments?page=${page}&entries=${entries}`);
+  } catch (error) {
+    console.error('Error fetching stock adjustments:', error.response?.data || error.message);
+    throw error;
+  }
+},
+
+  deleteStockAdjustment: async (id) => {
+    try {
+      return await apiClient.delete(`/stock-adjustments/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  singleStockAdjustment: async (id) => {
+    try {
+      const response = await apiClient.get(`/stock-adjustments/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
+postStockAdjustment: async (payload) => {
+  try {
+    return await apiClient.post('/stock-adjustments', payload);
+  } catch (error) {
+    console.error('Error submitting stock adjustment:', error.response?.data || error.message);
+    throw error;
+  }
+},
+
+updateStockAdjustment: async (id, payload) => {
+  try {
+    return await apiClient.put(`/stock-adjustments/${id}`, payload);
+  } catch (error) {
+    console.error('Error updating stock adjustment:', error.response?.data || error.message);
+    throw error;
+  }
+},
+
 
 }
 

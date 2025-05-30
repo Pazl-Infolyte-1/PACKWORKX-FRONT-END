@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { FaShieldAlt, FaStar, FaUsers } from 'react-icons/fa'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
+import { FaShieldAlt, FaStar, FaUsers, FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import { BiDollarCircle } from 'react-icons/bi'
 import { CgWorkAlt } from 'react-icons/cg'
+import { MdPushPin, MdCategory, MdRecycling } from 'react-icons/md'
 import CommonPagination from '../../components/New/Pagination'
 import { FiFilter } from 'react-icons/fi'
 import ActionButton from '../../components/New/ActionButton'
@@ -26,6 +27,9 @@ const InventoryDashboard = () => {
   const [rawMaterialPopup, setRawMaterialPopup] = useState(false)
   const [corrugationgluePopup, setCorrugationGluePopup] = useState(false)
   const [pastinggluePopup, setPastingGlueDetailsPopup] = useState(false)
+  const [showRawMaterialsDropdown, setShowRawMaterialsDropdown] = useState(false)
+  const [showReturnableDropdown, setShowReturnableDropdown] = useState(false)
+  const [selectedReturnable, setSelectedReturnable] = useState('Returnable')
 
   const [paginationParams, setPaginationParams] = useState({ currentPage: 1, pageSize: 50 })
   const [totalPages, setTotalPages] = useState(1)
@@ -33,6 +37,90 @@ const InventoryDashboard = () => {
   const [status, setStatus] = useState('')
   const [expandedRowId, setExpandedRowId] = useState(null)
   const [itemCustomFields, setItemCustomFields] = useState({})
+
+  const dropdownRef = useRef(null)
+  const returnableDropdownRef = useRef(null)
+
+  // Raw materials dropdown options
+  const rawMaterialOptions = [
+    {
+      name: 'Reels',
+      icon: <BiDollarCircle />,
+      color: '#10b981',
+      hoverColor: 'hover:bg-green-50',
+      textColor: 'text-green-700',
+    },
+    {
+      name: 'Corrugation Glue',
+      icon: <FaStar />,
+      color: '#f59e0b',
+      hoverColor: 'hover:bg-yellow-50',
+      textColor: 'text-yellow-700',
+    },
+    {
+      name: 'Pasting Glue',
+      icon: <CgWorkAlt />,
+      color: '#ef4444',
+      hoverColor: 'hover:bg-red-50',
+      textColor: 'text-red-700',
+    },
+    {
+      name: 'Pins',
+      icon: <MdPushPin />,
+      color: '#8b5cf6',
+      hoverColor: 'hover:bg-purple-50',
+      textColor: 'text-purple-700',
+    },
+    {
+      name: 'Other',
+      icon: <MdCategory />,
+      color: '#6b7280',
+      hoverColor: 'hover:bg-gray-50',
+      textColor: 'text-gray-700',
+    },
+  ]
+
+  // Returnable dropdown options
+  const returnableOptions = [
+    {
+      name: 'DYE',
+      icon: <MdCategory />,
+      color: '#10b981',
+      hoverColor: 'hover:bg-green-50',
+      textColor: 'text-green-700',
+    },
+    {
+      name: 'Stereo',
+      icon: <FaStar />,
+      color: '#f59e0b',
+      hoverColor: 'hover:bg-yellow-50',
+      textColor: 'text-yellow-700',
+    },
+    {
+      name: 'Other',
+      icon: <MdPushPin />,
+      color: '#ef4444',
+      hoverColor: 'hover:bg-red-50',
+      textColor: 'text-red-700',
+    },
+  ]
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowRawMaterialsDropdown(false)
+      }
+      if (returnableDropdownRef.current && !returnableDropdownRef.current.contains(event.target)) {
+        setShowReturnableDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const openItemDetails = async (id) => {
     setExpandedRowId((prevId) => (prevId === id ? null : id))
@@ -56,9 +144,6 @@ const InventoryDashboard = () => {
     // Parse custom_fields if available
     const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}
     setItemCustomFields(customFields)
-    console.log('Item ID:', item_id)
-    console.log('Item details:', item)
-    console.log('Custom fields:', customFields)
   }
 
   useEffect(() => {
@@ -195,6 +280,17 @@ const InventoryDashboard = () => {
     }
   }
 
+  const handleRawMaterialClick = (optionName) => {
+    setSelectedType(optionName)
+    setShowRawMaterialsDropdown(false)
+    // You can add additional logic here based on the selected option
+  }
+
+  const handleReturnableClick = (optionName) => {
+    setSelectedReturnable(optionName)
+    setShowReturnableDropdown(false)
+  }
+
   const MaterialTable = ({ data, selectedType }) => {
     const [expandedRowId, setExpandedRowId] = useState(null) // Changed from array to single value
     const [itemCustomFields, setItemCustomFields] = useState({})
@@ -202,6 +298,7 @@ const InventoryDashboard = () => {
     const filteredItems = useMemo(() => {
       const normalizedType = normalize(selectedType)
 
+      let typeFilteredItems
       if (normalizedType === 'rawmaterials') {
         const rawTypes = [
           'reels',
@@ -214,11 +311,26 @@ const InventoryDashboard = () => {
           'rawmaterials',
         ].map(normalize)
 
-        return data.filter((item) => rawTypes.includes(normalize(item.item_type)))
+        typeFilteredItems = data.filter((item) => rawTypes.includes(normalize(item.item_type)))
+      } else {
+        typeFilteredItems = data.filter((item) => normalize(item.item_type) === normalizedType)
       }
 
-      return data.filter((item) => normalize(item.item_type) === normalizedType)
-    }, [data, selectedType])
+      // Apply returnable filter
+      if (selectedReturnable === 'Returnable') {
+        return typeFilteredItems
+      } else {
+        return typeFilteredItems.filter((item) => {
+          // Assuming returnable_type is a field in your item data
+          // If not, you might need to check custom_fields or another field
+          return (
+            item.returnable_type === selectedReturnable ||
+            (item.custom_fields &&
+              JSON.parse(item.custom_fields).returnable_type === selectedReturnable)
+          )
+        })
+      }
+    }, [data, selectedType, selectedReturnable])
 
     const handleRowToggle = async (rowId) => {
       // If clicking on the same row that's already expanded, close it
@@ -261,7 +373,7 @@ const InventoryDashboard = () => {
             (sum, inv) => sum + Number(inv.quantity_available || 0),
             0,
           )
-          return totalQuantity
+          return <p className="-ml-14">{totalQuantity}</p>
         },
       },
       {
@@ -338,7 +450,7 @@ const InventoryDashboard = () => {
   }) => (
     <div
       onClick={() => setSelectedType(title)}
-      className={`w-full h-14 flex items-center justify-between font-bold rounded-lg shadow-md text-white border p-2 ${hoverBgColor} transition`}
+      className={`w-full h-14 flex items-center justify-between font-bold rounded-lg cursor-pointer shadow-md text-white border p-2 ${hoverBgColor} transition`}
       style={{ backgroundColor: bgColor }}
     >
       <div className="flex gap-2 items-center">
@@ -354,69 +466,233 @@ const InventoryDashboard = () => {
     </div>
   )
 
+  const RawMaterialsDropdownCard = () => {
+    return (
+      <div className="relative" ref={dropdownRef}>
+        <div
+          onClick={() => setShowRawMaterialsDropdown(!showRawMaterialsDropdown)}
+          className="w-full h-14 flex items-center justify-between font-bold rounded-lg cursor-pointer shadow-md text-white border p-2 hover:bg-green-600 transition bg-green-500"
+        >
+          <div className="flex gap-2 items-center">
+            <h2 className="text-xl text-white">
+              <BiDollarCircle />
+            </h2>
+            <h2 className="text-sm font-bold text-white">RawMaterials</h2>
+          </div>
+          <div className="h-[40px] w-[50px] flex items-center justify-center rounded-lg bg-green-600">
+            {showRawMaterialsDropdown ? <FaChevronUp /> : <FaChevronDown />}
+          </div>
+        </div>
+
+        {showRawMaterialsDropdown && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 !z-[9999]">
+            <div className="py-2">
+              {rawMaterialOptions.map((option, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleRawMaterialClick(option.name)}
+                  className={`flex items-center gap-3 px-1 py-2 cursor-pointer transition-all duration-200 ${option.hoverColor} border-l-4 border-transparent hover:border-l-4`}
+                  style={{
+                    '--hover-border-color': option.color,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.borderLeftColor = option.color
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.borderLeftColor = 'transparent'
+                  }}
+                >
+                  <div
+                    className="text-lg flex items-center justify-center w-8 h-8 rounded-full"
+                    style={{
+                      backgroundColor: `${option.color}15`,
+                      color: option.color,
+                    }}
+                  >
+                    {option.icon}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className={`font-semibold text-xs ${option.textColor}`}>{option.name}</h3>
+                  </div>
+                  <div
+                    className="p-1 rounded-full text-xs text-black"
+                    // style={{ backgroundColor: option.color }}
+                  >
+                    {inventorySummary[option.name.toLowerCase().replace(' ', '-')]?.total || 0}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  const ReturnableDropdownCard = () => {
+    return (
+      <div className="relative" ref={returnableDropdownRef}>
+        <div
+          onClick={() => setShowReturnableDropdown(!showReturnableDropdown)}
+          className="w-full h-14 flex items-center justify-between font-bold rounded-lg cursor-pointer shadow-md text-white border p-2 hover:bg-purple-600 transition bg-purple-500"
+        >
+          <div className="flex gap-2 items-center min-w-0">
+            <h2 className="text-xl text-white">
+              <MdRecycling />
+            </h2>
+            <h2 className="text-sm font-bold text-white truncate">{selectedReturnable}</h2>
+          </div>
+          <div className="h-[40px] w-[50px] flex items-center justify-center rounded-lg bg-purple-600 flex-shrink-0">
+            {showReturnableDropdown ? <FaChevronUp /> : <FaChevronDown />}
+          </div>
+        </div>
+
+        {showReturnableDropdown && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-[9999]">
+            <div className="py-2">
+              {returnableOptions.map((option, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleReturnableClick(option.name)}
+                  className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-all duration-200 ${option.hoverColor} border-l-4 border-transparent hover:border-l-4`}
+                  style={{
+                    '--hover-border-color': option.color,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.borderLeftColor = option.color
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.borderLeftColor = 'transparent'
+                  }}
+                >
+                  <div
+                    className="text-lg flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0"
+                    style={{
+                      backgroundColor: `${option.color}15`,
+                      color: option.color,
+                    }}
+                  >
+                    {option.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className={`font-semibold text-xs ${option.textColor} truncate`}>
+                      {option.name}
+                    </h3>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div>
       <ContentHeader heading={`${selectedType} Details`} isAddNew={false} />
-      <div className="flex justify-between items-center gap-2 mt-2 pl-3 overflow-x-auto">
-        {/* <StockCard title="Raw Materials" quantity={inventorySummary["raw-materials"]?.total || 0} status={getStatus("Raw Materials")} bgColor="bg-indigo-100" textColor="text-indigo-700" buttonColor="bg-indigo-700" icon={<FaUsers />} modalname="raw_material" /> */}
-        <StockCard
-          title="Reels"
-          quantity={inventorySummary['reels']?.total || 0}
-          status={getStatus('Reels')}
-          bgColor="#10b981"
-          textColor="text-green-800"
-          buttonColor="#059669"
-          hoverBgColor="hover:bg-green-200"
-          icon={<BiDollarCircle />}
-          modalname="reels_details"
-        />
-        <StockCard
-          title="Corrugation Glue"
-          quantity={inventorySummary['corrugation-glue']?.total || 0}
-          status={getStatus('Corrugation Glue')}
-          bgColor="#f59e0b"
-          textColor="text-yellow-800"
-          buttonColor="#d97706"
-          hoverBgColor="hover:bg-yellow-200"
-          icon={<FaStar />}
-          modalname="corrugation_glue"
-        />
-        <StockCard
-          title="Pasting Glue"
-          quantity={inventorySummary['pasting-glue']?.total || 0}
-          status={getStatus('Pasting Glue')}
-          bgColor="#ef4444"
-          textColor="text-red-800"
-          buttonColor="#dc2626"
-          hoverBgColor="hover:bg-red-200"
-          icon={<CgWorkAlt />}
-          modalname="pasting_glue"
-        />
-        <StockCard
-          title="Semi Finished Goods"
-          quantity={inventorySummary['semi-finished-goods']?.total || 0}
-          status={getStatus('Semi Finished Goods')}
-          bgColor="#6366f1"
-          textColor="text-indigo-700"
-          buttonColor="#4f46e5"
-          hoverBgColor="hover:bg-indigo-200"
-          icon={<FaUsers />}
-          modalname="finished_goods"
-        />
-        <StockCard
-          title="Finished Goods"
-          quantity={inventorySummary['finished-goods']?.total || 0}
-          status={getStatus('finished-goods')}
-          bgColor="#6b7280"
-          textColor="text-gray-700"
-          buttonColor="#4b5563"
-          hoverBgColor="hover:bg-gray-300"
-          icon={<FaShieldAlt />}
-          modalname="finished_goods"
-        />
-        <div className="min-w-[200px] h-14 flex flex-col items-center justify-center font-bold rounded-lg shadow-md text-white border p-2 bg-blue-500">
-          <h6 className="text-white text-sm">Total Stock Value</h6>
-          <h5 className="text-sm font-bold text-white">${totalStockValue}</h5>
+      <div className="flex flex-col sm:flex-row justify-between items-stretch gap-2 mt-2 pl-3">
+        {/* Raw Materials Card with Dropdown */}
+        <div className="flex-1 min-w-0">
+          <div className="relative">
+            <div
+              onClick={() => setShowRawMaterialsDropdown(!showRawMaterialsDropdown)}
+              className="w-full h-14 flex items-center justify-between font-bold rounded-lg cursor-pointer shadow-md text-white border p-2 hover:bg-green-600 transition bg-green-500"
+            >
+              <div className="flex gap-2 items-center min-w-0">
+                <h2 className="text-xl text-white">
+                  <BiDollarCircle />
+                </h2>
+                <h2 className="text-sm font-bold text-white truncate">
+                  {selectedType || 'Raw Materials'}
+                </h2>
+              </div>
+              <div className="h-[40px] w-[50px] flex items-center justify-center rounded-lg bg-green-600 flex-shrink-0">
+                {showRawMaterialsDropdown ? <FaChevronUp /> : <FaChevronDown />}
+              </div>
+            </div>
+
+            {showRawMaterialsDropdown && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-[9999]">
+                <div className="py-2">
+                  {rawMaterialOptions.map((option, index) => (
+                    <div
+                      key={index}
+                      onClick={() => handleRawMaterialClick(option.name)}
+                      className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-all duration-200 ${option.hoverColor} border-l-4 border-transparent hover:border-l-4`}
+                      style={{
+                        '--hover-border-color': option.color,
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.borderLeftColor = option.color
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.borderLeftColor = 'transparent'
+                      }}
+                    >
+                      <div
+                        className="text-lg flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0"
+                        style={{
+                          backgroundColor: `${option.color}15`,
+                          color: option.color,
+                        }}
+                      >
+                        {option.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className={`font-semibold text-xs ${option.textColor} truncate`}>
+                          {option.name}
+                        </h3>
+                      </div>
+                      <div className="p-1 rounded-full text-xs text-black flex-shrink-0">
+                        {inventorySummary[option.name.toLowerCase().replace(' ', '-')]?.total || 0}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <StockCard
+            title="Semi Finished Goods"
+            quantity={inventorySummary['semi-finished-goods']?.total || 0}
+            status={getStatus('Semi Finished Goods')}
+            bgColor="#6366f1"
+            textColor="text-indigo-700"
+            buttonColor="#4f46e5"
+            hoverBgColor="hover:bg-indigo-200"
+            icon={<FaUsers />}
+            modalname="finished_goods"
+          />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <StockCard
+            title="Finished Goods"
+            quantity={inventorySummary['finished-goods']?.total || 0}
+            status={getStatus('finished-goods')}
+            bgColor="#6b7280"
+            textColor="text-gray-700"
+            buttonColor="#4b5563"
+            hoverBgColor="hover:bg-gray-300"
+            icon={<FaShieldAlt />}
+            modalname="finished_goods"
+          />
+        </div>
+
+        {/* New Returnable Dropdown Card */}
+        <div className="flex-1 min-w-0">
+          <ReturnableDropdownCard />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="w-full h-14 flex flex-col items-center justify-center font-bold rounded-lg shadow-md text-white border p-2 bg-blue-500">
+            <h6 className="text-white text-sm">Total Stock Value</h6>
+            <h5 className="text-sm font-bold text-white">${totalStockValue}</h5>
+          </div>
         </div>
       </div>
 

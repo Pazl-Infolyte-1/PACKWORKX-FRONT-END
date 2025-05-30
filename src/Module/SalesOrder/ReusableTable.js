@@ -143,8 +143,8 @@ export default function ReusableTable({
                               }`}
                             >
                               {col.options?.map((opt) => (
-                                <option key={opt} value={opt} className="text-gray-700 bg-white">
-                                  {opt}
+                                <option key={opt.value || opt} value={opt.value || opt}  className="text-gray-700 bg-white">
+                                  {opt.label || opt}
                                 </option>
                               ))}
                             </select>

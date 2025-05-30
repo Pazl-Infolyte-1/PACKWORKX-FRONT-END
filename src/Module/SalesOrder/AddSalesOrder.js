@@ -122,7 +122,8 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
     confirmation_oral: ""
   });
 
-
+  // Add this near the top with other state declarations
+  const isWorkOrderList = location.pathname.includes('workorderlist');
 
   // Handle SKU form data updates from the SkuDetails component
   const handleSkuFormUpdate = (data) => {
@@ -258,11 +259,16 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
     try {
       const response = await apiMethods.createWorkOrder(formData);
       console.log('Response:', response);
-      setTimeout(() => {
-        // setDrawer(false)
-      }, 1000);
+
       // await fetchData()
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
+      console.log(location.state)
+
+      if (location?.state?.fromsalesorder && location?.state?.id) {
+        navigate(`/salesorder/view/${location?.state?.id}`);
+      } else {
+        navigate('/workorderlist');
+      }
 
     } catch (error) {
       console.error('Error:', error);
@@ -341,217 +347,193 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
   return (
     <div className="h-screen flex flex-col">
       <div className="flex-shrink-0 pt-2 bg-white border-b border-gray-200 sticky top-0 z-10">
-      <CCol xs={12}>
-  <div className="flex justify-content-between">
-   <CNav variant="tabs" className="flex-grow-1">
-  <CNavItem key={'salesOrder'}>
-    <CNavLink
-      active={activeTab === 'salesOrder'}
-      onClick={(e) => {
-        e.preventDefault()
-        setActiveTab('salesOrder')
-        const params = new URLSearchParams(location.search);
-        params.set('tab', 'salesOrder');
-      }}
-      style={{
-        backgroundColor: activeTab === 'salesOrder' ? '#8761e5' : 'transparent',
-        color: activeTab === 'salesOrder' ? '#ffffff' : '#8761e5',
-        cursor: 'pointer',
-        fontSize: '0.85rem',       // Reduced font size
-        padding: '0.4rem 0.8rem',  // Reduced padding
-      }}
-    >
-      {'Add Sales Order'}
-    </CNavLink>
-  </CNavItem>
-  <CNavItem key={'skuDetails'}>
-    <CNavLink
-      active={activeTab === 'skuDetails'}
-      onClick={(e) => {
-        e.preventDefault()
-        setActiveTab('skuDetails')
-      }}
-      style={{
-        backgroundColor: activeTab === 'skuDetails' ? '#8761e5' : 'transparent',
-        color: activeTab === 'skuDetails' ? '#ffffff' : '#8761e5',
-        cursor: 'pointer',
-        fontSize: '0.85rem',       // Reduced font size
-        padding: '0.4rem 0.8rem',  // Reduced padding
-      }}
-    >
-      {'Work Order'}
-    </CNavLink>
-  </CNavItem>
-</CNav>
-    
+        <CCol xs={12}>
+          <div className="flex justify-content-between">
+            {!isWorkOrderList && (
+              <>
+                <CNav variant="tabs" className="flex-grow-1">
+                  <CNavItem key={'salesOrder'}>
+                    <CNavLink
+                      active={activeTab === 'salesOrder'}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setActiveTab('salesOrder')
+                        const params = new URLSearchParams(location.search);
+                        params.set('tab', 'salesOrder');
+                      }}
+                      style={{
+                        backgroundColor: activeTab === 'salesOrder' ? '#8761e5' : 'transparent',
+                        color: activeTab === 'salesOrder' ? '#ffffff' : '#8761e5',
+                        cursor: 'pointer',
+                        fontSize: '0.85rem',
+                        padding: '0.4rem 0.8rem',
+                      }}
+                    >
+                      {'Add Sales Order'}
+                    </CNavLink>
+                  </CNavItem>
+                  <CNavItem key={'skuDetails'}>
+                    <CNavLink
+                      active={activeTab === 'skuDetails'}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setActiveTab('skuDetails')
+                      }}
+                      style={{
+                        backgroundColor: activeTab === 'skuDetails' ? '#8761e5' : 'transparent',
+                        color: activeTab === 'skuDetails' ? '#ffffff' : '#8761e5',
+                        cursor: 'pointer',
+                        fontSize: '0.85rem',
+                        padding: '0.4rem 0.8rem',
+                      }}
+                    >
+                      {'Work Order'}
+                    </CNavLink>
+                  </CNavItem>
+                </CNav>
 
-    {/* {activeTab === 'salesOrder' && (
+                <div className="ml-2 flex items-center space-x-2">
+                  {activeTab === 'salesOrder' && (
+                    <button
+                      onClick={() => setActiveTab('skuDetails')}
+                      className="
+                        flex items-center space-x-2
+                        text-[#8761e5] hover:text-[#512fa9]
+                        transition-all duration-300
+                        group relative
+                        overflow-hidden
+                        px-2 py-1
+                        rounded-lg
+                      "
+                    >
+                      <span className="absolute inset-0 bg-purple-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg -z-10"></span>
+                      <span className="font-medium inline-block group-hover:translate-x-0.5 transition-transform duration-300">
+                        Next
+                      </span>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        className="
+                          text-[#8761e5] group-hover:text-[#794ee6]
+                          transition-all duration-500
+                          group-hover:translate-x-1
+                        "
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          d="M9 5l7 7-7 7" 
+                          className="opacity-100 group-hover:opacity-0 transition-opacity duration-300 absolute"
+                        />
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          d="M13 5l7 7-7 7m-7-7h14" 
+                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        />
+                      </svg>
+                      <span className="absolute -right-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-purple-600 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping delay-100 duration-1000"></span>
+                    </button>
+                  )}
 
-<ActionButton
- onClick={handleParentSubmit}
- label={"Submit"}
- variant='submit'
- />
-    )} */}
-
-
-<div className="ml-2 flex items-center space-x-2">
-  {activeTab === 'salesOrder' && (
-    <button
-      onClick={() => setActiveTab('skuDetails')}
-      className="
-        flex items-center space-x-2
-         text-[#8761e5] hover:text-[#512fa9]
-        transition-all duration-300
-        group relative
-        overflow-hidden
-        px-2 py-1
-        rounded-lg
-      "
-    >
-      {/* Animated background (appears on hover) */}
-      <span className="absolute inset-0 bg-purple-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg -z-10"></span>
-      
-      {/* Text with slide effect */}
-      <span className="font-medium inline-block group-hover:translate-x-0.5 transition-transform duration-300">
-        Next
-      </span>
-      
-      {/* Animated arrow */}
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        className="
-          text-[#8761e5] group-hover:text-[#794ee6]
-          transition-all duration-500
-          group-hover:translate-x-1
-        "
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          d="M9 5l7 7-7 7" 
-          className="opacity-100 group-hover:opacity-0 transition-opacity duration-300 absolute"
-        />
-        <path 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          d="M13 5l7 7-7 7m-7-7h14" 
-          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        />
-      </svg>
-      
-      {/* Pulse dot animation */}
-      <span className="absolute -right-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-purple-600 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping delay-100 duration-1000"></span>
-    </button>
-  )}
-
-  {activeTab === 'skuDetails' && (
-    <button
-      onClick={() => setActiveTab('salesOrder')}
-      className="
-        flex items-center space-x-2
-        text-[#8761e5] hover:text-[#683fd0]
-        transition-all duration-300
-        group relative
-        overflow-hidden
-        px-2 py-1
-        rounded-lg
-      "
-    >
-      {/* Animated background (appears on hover) */}
-      <span className="absolute inset-0 bg-purple-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg -z-10"></span>
-      
-      {/* Animated arrow */}
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        className="
-          text-[#8761e5] group-hover:text-purple-900
-          transition-all duration-500
-          group-hover:-translate-x-1
-          rotate-180
-        "
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          d="M9 5l7 7-7 7" 
-          className="opacity-100 group-hover:opacity-0 transition-opacity duration-300 absolute"
-        />
-        <path 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          d="M13 5l7 7-7 7m-7-7h14" 
-          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        />
-      </svg>
-      
-      {/* Text with slide effect */}
-      <span className="font-medium inline-block group-hover:-translate-x-0.5 transition-transform duration-300">
-        Back
-      </span>
-      
-      {/* Pulse dot animation */}
-      <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-purple-600 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping delay-100 duration-1000"></span>
-    </button>
-  )}
-</div>
-
-    
-
-  </div>
-</CCol>
-</div>
- <div className="flex-1 overflow-y-auto pb-12">
-      {/* Content Sections */}
-      <CustomAlert alerts={alerts} handleClose={handleClose} />
-
-      <div className="bg-white">
-        {activeTab === 'salesOrder' && (
-            <OrderForm
-            // setDrawer={setDrawer}
-            formData={salesDetailsForm}
-            setFormData={handleSalesDetailsUpdate}
-            skuDetailsForm={skuDetailsForm}
-            handleSkuFormUpdate={handleSkuFormUpdate}
-            handleFormSubmit={handleFormSubmit}
-            totals={totals}
-            setTotals={setTotals}
-            ref={childRef}
-            setIsFormTouched={setIsFormTouched}
-            handleSubmit1={handleParentSubmit}
-          />
-        )}
-        {activeTab === 'skuDetails' && (
-          <div className="p-1 bg-white rounded-lg h-full">
-            <WorkOrders
-              setWorkOrders={setWorkOrders}
-              workOrders={workOrders}
-              setFormData={handleWorkOrderFormUpdate}
-              workOrdersData={workOrdersData}
-              skuDetailsForm={skuDetailsForm} // Pass the SKU details to WorkOrders component
-              setworkOrdersData={setWorkOrdersData}
-              setWorkOrdersDummy={setWorkOrdersDummy}
-              workOrdersDummy={workOrdersDummy}
-              skuVersionsMap={skuVersionsMap}
-              setSkuVersionsMap={setSkuVersionsMap}
-              workOrderListSubmit={workOrderListSubmit}
-              setIsFormTouched={setIsFormTouched}
-              skuValuesMap={skuValuesMap}
-              setSkuValuesMap={setSkuValuesMap}
-            />
+                  {activeTab === 'skuDetails' && (
+                    <button
+                      onClick={() => setActiveTab('salesOrder')}
+                      className="
+                        flex items-center space-x-2
+                        text-[#8761e5] hover:text-[#683fd0]
+                        transition-all duration-300
+                        group relative
+                        overflow-hidden
+                        px-2 py-1
+                        rounded-lg
+                      "
+                    >
+                      <span className="absolute inset-0 bg-purple-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg -z-10"></span>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        className="
+                          text-[#8761e5] group-hover:text-purple-900
+                          transition-all duration-500
+                          group-hover:-translate-x-1
+                          rotate-180
+                        "
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          d="M9 5l7 7-7 7" 
+                          className="opacity-100 group-hover:opacity-0 transition-opacity duration-300 absolute"
+                        />
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          d="M13 5l7 7-7 7m-7-7h14" 
+                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        />
+                      </svg>
+                      <span className="font-medium inline-block group-hover:-translate-x-0.5 transition-transform duration-300">
+                        Back
+                      </span>
+                      <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-purple-600 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping delay-100 duration-1000"></span>
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
           </div>
-        )}
+        </CCol>
       </div>
+      <div className="flex-1 overflow-y-auto pb-12">
+        {/* Content Sections */}
+        <CustomAlert alerts={alerts} handleClose={handleClose} />
+
+        <div className="bg-white">
+          {activeTab === 'salesOrder' && (
+              <OrderForm
+              // setDrawer={setDrawer}
+              formData={salesDetailsForm}
+              setFormData={handleSalesDetailsUpdate}
+              skuDetailsForm={skuDetailsForm}
+              handleSkuFormUpdate={handleSkuFormUpdate}
+              handleFormSubmit={handleFormSubmit}
+              totals={totals}
+              setTotals={setTotals}
+              ref={childRef}
+              setIsFormTouched={setIsFormTouched}
+              handleSubmit1={handleParentSubmit}
+            />
+          )}
+          {activeTab === 'skuDetails' && (
+            <div className="p-1 bg-white rounded-lg h-full">
+              <WorkOrders
+                setWorkOrders={setWorkOrders}
+                workOrders={workOrders}
+                setFormData={handleWorkOrderFormUpdate}
+                workOrdersData={workOrdersData}
+                skuDetailsForm={skuDetailsForm} // Pass the SKU details to WorkOrders component
+                setworkOrdersData={setWorkOrdersData}
+                setWorkOrdersDummy={setWorkOrdersDummy}
+                workOrdersDummy={workOrdersDummy}
+                skuVersionsMap={skuVersionsMap}
+                setSkuVersionsMap={setSkuVersionsMap}
+                workOrderListSubmit={workOrderListSubmit}
+                setIsFormTouched={setIsFormTouched}
+                skuValuesMap={skuValuesMap}
+                setSkuValuesMap={setSkuValuesMap}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

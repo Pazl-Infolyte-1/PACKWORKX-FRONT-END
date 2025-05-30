@@ -194,6 +194,7 @@ const WorkOrders = () => {
       <div className="flex w-full">
 
        <div className={`${isMinimiseTable ? 'w-2/6' : 'w-full'} !h-[90vh] `}>
+         
          <ContentHeader
             heading={"Work Order"}
             isMinimized={isMinimiseTable}
@@ -254,11 +255,11 @@ const WorkOrders = () => {
         </div>
           <Outlet></Outlet>
         {/* </div> */}
-        <Drawer isOpen={drawerOpen} maxWidth="1280px" onClose={() => handleCloseDrawer()}>
+        {/* <Drawer isOpen={drawerOpen} maxWidth="1280px" onClose={() => handleCloseDrawer()}>
           {drawerOpen && (
             <AddSalesOrder currentTab={'skuDetails'} setDrawer={setDrawerOpen} fetchData={fetchData} setIsFormTouched={setIsTouched} handleCloseDrawer={handleCloseDrawer} />
           )}
-        </Drawer>
+        </Drawer> */}
 
 
 

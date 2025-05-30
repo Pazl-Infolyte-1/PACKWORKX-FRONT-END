@@ -45,6 +45,8 @@ const StockAdjustmentForm = React.lazy(() => import('./Module/StockAdjustment/Ad
 const StockTableView = React.lazy(() => import('./Module/StockAdjustment/StockTableView.js'))
 
 
+const Invoice = React.lazy(()=>import('./Module/InvoiceWorkOrder/InvoiceList.js'))
+const InvoiceView = React.lazy(()=>import('./Module/InvoiceWorkOrder/InvoiceView.js'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
@@ -167,6 +169,19 @@ const routes = [
         { path: '/stockadjustment/stock_form', name: 'stockadjustment', element: StockAdjustmentForm, key: '' },
 
 
+  { path: '/invoice',
+    name: 'invoice',
+    element: Invoice,
+    key: '',
+    children: [
+      {
+        path: 'view/:id',
+        name: 'InvoiceView',
+        element: InvoiceView,
+        key: '' // Assigned a proper unique key
+      }
+    ]
+  },
 ]
 
 export default routes

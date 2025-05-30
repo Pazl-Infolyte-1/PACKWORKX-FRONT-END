@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
 import { useSearch } from './SearchContext'
 import { IoSearch } from 'react-icons/io5'
+import ClearIcon from '@mui/icons-material/Clear';
 
 const SearchBar = forwardRef(({ placeholder = "Search..." }, ref) => {
   const { searchQuery, setGlobalSearchQuery, searchPlaceholder, clearSearch: contextClearSearch } = useSearch()
@@ -59,6 +60,11 @@ const SearchBar = forwardRef(({ placeholder = "Search..." }, ref) => {
           value={localQuery}
           onChange={handleChange}
         />
+        {searchQuery && (
+          <div className="text-white h-full w-10 flex justify-center items-center ">
+            <ClearIcon fontSize="inherit" onClick={() => contextClearSearch()} />
+          </div>
+        )}
       </div>
     </div>
   )

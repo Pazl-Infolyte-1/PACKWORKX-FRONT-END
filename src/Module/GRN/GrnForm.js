@@ -35,8 +35,7 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
   useEffect(() => {
     const fetchPurchaseOrderData = async () => {
       try {
-        const response = await apiMethods.getPurchaseOrders()
-        console.log('Purchase Order Data:', response.data)
+        const response = await apiMethods.getPurchaseOrders({limit:20000})
         setPurchaseOrderData(response.data)
       } catch (error) {
         console.error(error)
@@ -143,7 +142,7 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                               className="px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors duration-150"
                               onClick={() => selectClient(po.id)}
                             >
-                              {po.id}
+                              {po.purchase_generate_id}
                             </div>
                           ))
                         ) : (

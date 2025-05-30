@@ -186,7 +186,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Product Type <span className="text-red-500"> *</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Product Type</label>
             <select
               className="w-full border border-gray-300 rounded px-3 py-2"
               value={selectedItemType}

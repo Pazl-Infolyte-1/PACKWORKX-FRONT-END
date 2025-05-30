@@ -1070,7 +1070,7 @@ export const apiMethods = {
     try {
       return await apiClient.get('/items', {
         params: {
-          client: params.client || '',
+          search: params.search || '',
 
           sales_status: params.sales_status || '',
 

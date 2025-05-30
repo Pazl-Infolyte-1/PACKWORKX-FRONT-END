@@ -163,7 +163,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawerOpen, fetchData }) =>
         ))}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Product Type <span className="text-red-500"> *</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Product Type<span className="text-red-500"> *</span></label>
           <select
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
             {...register('item_type', { required: 'required' })}

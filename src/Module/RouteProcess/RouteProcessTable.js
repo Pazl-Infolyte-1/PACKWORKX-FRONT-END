@@ -71,21 +71,13 @@ const RouteProcessTable = ({
     },
     {
       key: 'created_at',
-      header: (
-        <>
-          Created at <span className="text-gray-500">⌕</span>
-        </>
-      ),
+      header:'Created at',
       field: 'created_at',
       type: 'date',
     },
     {
       key: 'updated_at',
-      header: (
-        <>
-          Updated at <span className="text-gray-500">⌕</span>
-        </>
-      ),
+      header: 'Updated',
       field: 'updated_at',
       type: 'date',
     },

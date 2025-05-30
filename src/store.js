@@ -41,7 +41,7 @@ const initialState = {
     part_value: [],
     part_count: 0,
   },
-  
+    productArray: []
 }
 
 const changeState = (state = initialState, { type, payload, ...rest }) => {
@@ -180,6 +180,14 @@ case 'SET_SKU_PART_VALUE':
       ...state.skuBuilder,
       part_value: payload,
       part_count: payload.length,
+    },
+  };
+case 'SET_PRODUCT_ARRAY':
+  return {
+    ...state,
+    auth: {
+      ...state.auth,
+      productArray: payload,
     },
   };
 

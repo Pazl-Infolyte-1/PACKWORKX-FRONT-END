@@ -11,11 +11,13 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useSearch } from '../../components/New/SearchContext'
 import Loader from '../../components/New/Loader'
 import CompactPagination from '../../components/New/CompactPagination'
+import { FaUserGroup } from 'react-icons/fa6'
+import { FaUserCheck, FaUserSlash } from 'react-icons/fa'
 
 function StockAdjustment() {
   const [stockadjustments, setStockadjustments] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [entriesPerPage, setEntriesPerPage] = useState(10)
+  const [entriesPerPage, setEntriesPerPage] = useState(50)
   const [totalPages, setTotalPages] = useState(1)
   const [totalRecords, setTotalRecords] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -24,48 +26,46 @@ function StockAdjustment() {
   const [isEdit, setIsEdit] = useState(false)
   const [alerts, setAlerts] = useState([])
   const [refresh, setRefresh] = useState(false)
+    const [data, setData] = useState([])
   const location = useLocation()
+   const [totalPage, setTotalPage] = useState(1)
+    const [isMinimized, setIsMinimized] = useState(false)
 const navigate=useNavigate()
   const { setGlobalPlaceholder, searchQuery } = useSearch()
-
+  const [reloadData, setReloadData] = useState(false)
+  
+  
   useEffect(() => {
     setGlobalPlaceholder("Search stock adjustments...")
     return () => setGlobalPlaceholder("Search...")
   }, [setGlobalPlaceholder])
 
-  useEffect(() => {
-    const fetchStockAdjustments = async () => {
-      setLoading(true)
-      try {
-        const response = await apiMethods.getstockadjustment({
-          search: searchQuery,
-          page: currentPage,
-          limit: entriesPerPage,
-        })
 
-        if (response?.data?.success) {
-          setStockadjustments(response.data.data)
-          setTotalPages(response.data.pagination.totalPages || 1)
-          setTotalRecords(response.data.pagination.total || 0)
-        }
-      } catch (error) {
-        setAlerts([{ severity: 'error', message: 'Failed to fetch stock adjustments.' }])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchStockAdjustments()
-  }, [searchQuery, currentPage, entriesPerPage, refresh])
 
   const handleAdd = () => {
-    navigate('/stockadjustment/add') // Navigate to the add page
+    navigate('/stockadjustment/stock_form') // Navigate to the add page
     
     // setDrawerOpen(true)
     // setIsEdit(false)
     // setSelectedData(null)
   }
 
+
+useEffect(() => {
+  const fetchStockAdjustments = async () => {
+    try {
+ const response = await apiMethods.getStockAdjustments(currentPage, entriesPerPage);
+      console.log('Stock Adjustments:', response.data);
+            setTotalPages(response?.data?.pagination?.totalPages);
+      setTotalRecords(response?.data?.pagination?.totalRecords);
+      setData(response?.data?.data)
+    } catch (error) {
+      console.error('Error fetching stock adjustments:', error);
+    }
+  };
+
+  fetchStockAdjustments();
+}, [reloadData, currentPage, entriesPerPage]);
   const handleEdit = (id) => {
     const found = stockadjustments.find((item) => item.id === id)
     if (found) {
@@ -91,14 +91,14 @@ const navigate=useNavigate()
     setAlerts([{ severity: 'success', message: isEdit ? 'Updated' : 'Created successfully' }])
   }
 
-  const handleEntriesChange = (newLimit) => {
-    setEntriesPerPage(newLimit)
-    setCurrentPage(1)
-  }
+const handlePageChange = (e, newPage) => {
+  setCurrentPage(newPage);
+};
 
-  const handlePageChange = (e, newPage) => {
-    setCurrentPage(newPage)
-  }
+const handleEntriesChange = (newEntries) => {
+  setEntriesPerPage(newEntries);
+  setCurrentPage(1); // Reset to page 1 on page size change
+};
 
   const downloadExcelSheet = async () => {
     try {
@@ -119,66 +119,87 @@ const navigate=useNavigate()
     }
   }
 
+
+    const refreshClients = () => {
+    setReloadData((prev) => !prev)
+  }
+
+    useEffect(() => {
+    if (location.pathname === '/stockadjustment') {
+      setIsMinimized(false)
+    } else {
+      setIsMinimized(true)
+    }
+  }, [location.pathname])
   return (
-    <div className="flex">
-      <div className="w-full">
-        <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
-        <ContentHeader
-          isMinimized={false}
-          heading="Stock Adjustments"
-          onAddClick={handleAdd}
-          menuOptions={[
-            {
-              icon: <FiUpload className="mr-2 text-blue-500" />,
-              label: 'Import',
-              onClick: () => console.log('Import clicked'),
-            },
-            {
-              icon: <FiDownload className="mr-2 text-blue-500" />,
-              label: 'Export',
-              onClick: downloadExcelSheet,
-            },
-          ]}
-        />
+     <div className="flex ">
+      <div className={isMinimized ? 'w-[320px] border-r' : 'w-full'}>
+        <div className="relative">
+          <ContentHeader
+            isMinimized={isMinimized}
+            heading="Stock Adjustment"
+            onAddClick={handleAdd}
+            menuOptions={[
+              {
+                icon: <FiUpload className="mr-2 text-blue-500" />,
+                label: 'Import',
+                onClick: () => console.log('Import clicked'),
+              },
+              {
+                icon: <FiDownload className="mr-2 text-blue-500" />,
+                label: 'Export',
+                  onClick: () => console.log('Export clicked'),
+              },
+            ]}
+            headingOptions={[
+              {
+                label: 'All Stocks',
+                icon: <FaUserGroup size={16} />,
+                onClick: () => console.log('All Clients clicked'),
+              },
+              {
+                label: 'Active Stocks',
+                icon: <FaUserCheck size={16} />,
+                onClick: () => console.log('Active Clients clicked'),
+              },
+              {
+                label: 'Inactive Stocks',
+                icon: <FaUserSlash size={16} />,
+                    onClick: () => console.log('Inactive clicked'),
+              },
+            ]}
+          />
+
+        </div>
 
         <Loader isLoading={loading} />
 
         <div className="mt-3 overflow-x-auto">
           <StockAdjustmentTable
-            stockadjustment={stockadjustments}
-            loading={loading}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
+          //setSingleStatusUpdate={setSingleStatusUpdate}
+            isMinimized={isMinimized}
+            refreshClients={refreshClients}
+            stockAdjustmentData={data}
           />
         </div>
-
-        <div className="flex justify-between items-center gap-4 m-2 px-2">
-          <div className="text-sm text-gray-700 font-medium">
-            Total Records: <span className="font-semibold">{totalRecords}</span>
-          </div>
-
-          <CompactPagination
-            totalRecords={totalRecords}
-            count={totalPages}
-            page={currentPage}
-            onPageChange={handlePageChange}
-            entriesPerPage={entriesPerPage}
-            onEntriesChange={handleEntriesChange}
-          />
-        </div>
-
-        <Drawer
-          isOpen={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          maxWidth="1350px"
-          title={isEdit ? 'Edit Stock Adjustment' : 'New Stock Adjustment'}
+        <div
+          className={`${isMinimized ? 'flex-col ' : 'flex justify-between '} items-center gap-4 m-2 px-2`}
         >
-          <AddEditStockAdjustment
-            isEdit={isEdit}
-            stockadjustmentData={selectedData}
-            onSuccess={handleFormSuccess}
-          />
-        </Drawer>
+          <div className=" flex w-32 items-center gap-1 font-normal text-sm">
+            <span>Total Count:</span>
+            <span className="font-medium">{totalRecords}</span>
+          </div>
+<CompactPagination
+  totalRecords={totalRecords}
+  count={totalPages}
+  page={currentPage}
+  onPageChange={handlePageChange}
+  entriesPerPage={entriesPerPage}
+  onEntriesChange={handleEntriesChange}
+/>
+
+        </div>
+       
       </div>
 
       <div className="flex-1 transition-all duration-300">

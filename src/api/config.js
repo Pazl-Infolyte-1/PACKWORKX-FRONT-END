@@ -1089,6 +1089,13 @@ export const apiMethods = {
   getItemData: async (id) => {
     return await apiClient.get(`/items/${id}`)
   },
+  getCategoryList: async () => {
+    return await apiClient.get(`/category`)
+  },
+
+  getSubCategory: async () => {
+    return await apiClient.get(`/sub-category`)
+  },
 
   addItem: async (body) => {
     return await apiClient.post(`/items`, body)

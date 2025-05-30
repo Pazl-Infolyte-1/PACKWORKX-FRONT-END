@@ -351,7 +351,7 @@ useEffect(() => {
           <table className="min-w-full bg-white rounded-lg">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-2">Item</th>
+                <th className="px-4 py-2">Product</th>
                 <td></td>
                 <th className="px-4 py-2">Item Code</th>
                 <th className="px-4 py-2">Quantity</th>
@@ -388,6 +388,7 @@ useEffect(() => {
                     <input
                       {...register(`items.${index}.item_code`)}
                       readOnly
+                      placeholder='Item Code'
                       className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                     />
                   </td>

@@ -1426,25 +1426,16 @@ clientStatusSwitch: async (status, clientId) => {
 },
 
   createInvoiceWorkOrder:async(body)=>{
-    try {
       return await apiClient.post(`work-order-invoice/create`,body)
-    } catch (error) {
-      console.error(error)
-    }
   },
   getInvoiceList:async(params)=>{
-    try {
       return await apiClient.get(`/work-order-invoice/get`,{params})
-    } catch (error) {
-      console.error(error)
-    }
-  },
+    },
   getInvoiceById:async(id)=>{
-    try {
       return await apiClient.get(`/work-order-invoice/get/${id}`,)
-    } catch (error) {
-      console.error(error)
-    }
+    },
+  getInvoiceHistory:async(id)=>{
+    return await apiClient.get(`/work-order-invoice/get-by-sku/${id}`,)
   }
 }
 

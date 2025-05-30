@@ -22,6 +22,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
     }
   });
 
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -49,12 +50,16 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
     
     try {
       const invoiceData = {
+        ...data,
         client_id: workOrder.client_id,
         sku_id: workOrder.sku_id,
         work_id: workOrder.id,
         sale_id: workOrder.sales_order_id,
-        ...data
+        sku_version_id:workOrder.sales_order_i
       };
+      
+
+      console.log(invoiceData)
       
       await onSubmit(invoiceData);
       handleClose();

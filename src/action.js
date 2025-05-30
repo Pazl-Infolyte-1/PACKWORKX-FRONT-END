@@ -21,3 +21,8 @@ export const setSkuPartValue = (payload) => ({
   payload, // Array of { sku_id, sku_name, ratio }
 });
 
+// actions.js
+export const setProductArray = (payload) => ({
+  type: 'SET_PRODUCT_ARRAY',
+  payload, // Array of selected product IDs
+});

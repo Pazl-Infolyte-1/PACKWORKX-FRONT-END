@@ -1417,26 +1417,77 @@ export const apiMethods = {
       console.error(error)
     }
   },
-clientStatusSwitch: async (status, clientId) => {
-  try {
-    return await apiClient.patch(`clients/${clientId}/status`, { status })
-  } catch (error) {
-    console.error(error)
-  }
-},
-
-  createInvoiceWorkOrder:async(body)=>{
-      return await apiClient.post(`work-order-invoice/create`,body)
+  clientStatusSwitch: async (status, clientId) => {
+    try {
+      return await apiClient.patch(`clients/${clientId}/status`, { status })
+    } catch (error) {
+      console.error(error)
+    }
   },
-  getInvoiceList:async(params)=>{
-      return await apiClient.get(`/work-order-invoice/get`,{params})
-    },
-  getInvoiceById:async(id)=>{
-      return await apiClient.get(`/work-order-invoice/get/${id}`,)
-    },
-  getInvoiceHistory:async(id)=>{
-    return await apiClient.get(`/work-order-invoice/get-by-sku/${id}`,)
-  }
+
+  createInvoiceWorkOrder: async (body) => {
+    try {
+      return await apiClient.post(`work-order-invoice/create`, body)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getInvoiceList: async (params) => {
+    try {
+      return await apiClient.get(`/work-order-invoice/get`, { params })
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getInvoiceById: async (id) => {
+    try {
+      return await apiClient.get(`/work-order-invoice/get/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getStockAdjustments: async (page = 1, entries) => {
+    try {
+      return await apiClient.get(`/stock-adjustments?page=${page}&entries=${entries}`)
+    } catch (error) {
+      console.error('Error fetching stock adjustments:', error.response?.data || error.message)
+      throw error
+    }
+  },
+
+  deleteStockAdjustment: async (id) => {
+    try {
+      return await apiClient.delete(`/stock-adjustments/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  singleStockAdjustment: async (id) => {
+    try {
+      const response = await apiClient.get(`/stock-adjustments/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  postStockAdjustment: async (payload) => {
+    try {
+      return await apiClient.post('/stock-adjustments', payload)
+    } catch (error) {
+      console.error('Error submitting stock adjustment:', error.response?.data || error.message)
+      throw error
+    }
+  },
+
+  updateStockAdjustment: async (id, payload) => {
+    try {
+      return await apiClient.put(`/stock-adjustments/${id}`, payload)
+    } catch (error) {
+      console.error('Error updating stock adjustment:', error.response?.data || error.message)
+      throw error
+    }
+  },
 }
 
 export default apiMethods

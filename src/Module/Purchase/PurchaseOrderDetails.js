@@ -1,51 +1,56 @@
 // import React from 'react'
 import PopUp from '../../components/New/PopUp'
 import ActionButton from '../../components/New/ActionButton'
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react'
+import apiMethods from '../../api/config'
 
 function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
-  
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState(null);
-  
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalContent, setModalContent] = useState(null)
+
   const Modal = ({ isOpen, onClose, children }) => {
-    if (!isOpen) return null;
+    if (!isOpen) return null
     return (
-      <div className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded p-6 max-w-md w-full">
-          <button onClick={onClose} className="float-right">&times;</button>
+      <div className="absolute bottom-44 -my-64 inset-0 bg-opacity-25 flex items-center justify-center">
+        <div className="bg-white rounded p-6 max-w-md w-full border border-gray-950 z-50">
+          <button onClick={onClose} className="float-right">
+            &times;
+          </button>
           <div>{children}</div>
         </div>
       </div>
-    );
-  };
-  
-  const openItemDetails = (index) => {
-    // const item = getValues(`items.${index}`);
-    // console.log('Item Details:',  getValues(`items.${index}`));
-    
+    )
+  }
+
+  const openItemDetails = async (id) => {
+    const response = await apiMethods.getItemList()
+    const items = response?.data?.data || []
+    console.log(items, 'item')
+    const item = items.find((i) => i.id === parseInt(id))
+    const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}
+    console.log(customFields)
+
     setModalContent(
       <>
-        <h3>Item Details</h3>
-        <p>Item ID: {cell.item_id || "N/A"}</p>
-          <p>Item Code: {cell.item_code || "N/A"}</p>
-          <p>Quantity: {cell.quantity}</p>
-          <p>Standard Cost: {cell.standard_cost}</p>
-          <p>CGST: {cell.cgst}% (Amount: {cell.cgst_amount})</p>
-          <p>SGST: {cell.sgst}% (Amount: {cell.sgst_amount})</p>
-          <p>Tax Amount: {cell.tax_amount}</p>
-          <p>Total Amount: {cell.total_amount}</p>
-          <p>Unit Price: {cell.unit_price}</p>
-      </>
-    );
-    setIsModalOpen(true);
-  };
-
+        <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
+        {Object.entries(customFields).length > 0 ? (
+          Object.entries(customFields).map(([key, value], idx) => (
+            <p key={idx}>
+              <strong>{key}:</strong> {value}
+            </p>
+          ))
+        ) : (
+          <p>No custom fields available.</p>
+        )}
+      </>,
+    )
+    setIsModalOpen(true)
+  }
 
   return (
     <PopUp
-    visible={showPopUp && !editTag} // This ensures proper visibility
-    showCloseButton={true}
+      visible={showPopUp && !editTag} // This ensures proper visibility
+      showCloseButton={true}
       setVisible={() => setShowPopUp(null)}
       height={'95vh'}
       width={'70vw'}
@@ -67,9 +72,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
-                  {cell.status === 'active'
-                      ? 'Approved'
-                      : 'Rejected'}
+                  {cell.status === 'active' ? 'Approved' : 'Rejected'}
                 </span>
                 {/* <ActionButton
                   label={'Edit'}
@@ -85,37 +88,37 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
           {/* Main Content */}
           <div className="grid grid-cols-1 gap-8">
             {/* Supplier Information Card */}
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold text-gray-800">Supplier Information</h2>
-                  <p className="text-gray-500">#{cell.supplier_id}</p>
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+              <div className="p-6">
+                <h2 className="text-xl font-semibold text-gray-800">Supplier Information</h2>
+                <p className="text-gray-500">#{cell.supplier_id}</p>
 
-                  <div className="bg-indigo-50 p-4 rounded-lg mt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">Name</span>
-                        <span className="text-gray-800 mt-1">{cell.supplier_name}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-500">Contact</span>
-                        <span className="text-gray-800 mt-1">{cell.supplier_contact}</span>
-                      </div>
-                      <div className="flex flex-col p-2 gap-2">
-                        <span className="text-sm font-medium text-gray-500">Email</span>
-                        <span className="text-gray-800 mt-1">{cell.supplier_email}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-500">Address</span>
-                        <span className="text-gray-800 mt-1">{cell.shipping_address}</span>
-                      </div>
+                <div className="bg-indigo-50 p-4 rounded-lg mt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">Name</span>
+                      <span className="text-gray-800 mt-1">{cell.supplier_name}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-500">Contact</span>
+                      <span className="text-gray-800 mt-1">{cell.supplier_contact}</span>
+                    </div>
+                    <div className="flex flex-col p-2 gap-2">
+                      <span className="text-sm font-medium text-gray-500">Email</span>
+                      <span className="text-gray-800 mt-1">{cell.supplier_email}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-500">Address</span>
+                      <span className="text-gray-800 mt-1">{cell.shipping_address}</span>
                     </div>
                   </div>
                 </div>
+              </div>
             </div>
 
-              {/* Purchase Order Details Card */}
+            {/* Purchase Order Details Card */}
             <div className="grid grid-cols-1 gap-8">
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 ">
                 <div className="p-6">
                   <h2 className="text-xl font-semibold text-gray-800">Purchase Order Details</h2>
                   <p className="text-gray-500">Purchase Order - #{cell.purchase_generate_id}</p>
@@ -149,10 +152,10 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
             </div>
 
             {/* Items Table Card */}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 relative">
               <div className="p-6">
                 <h2 className="text-xl font-semibold text-gray-800">Item Details</h2>
-                
+
                 <div className="bg-indigo-50 p-4 rounded-lg mt-4">
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -194,7 +197,12 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                               {item.item_code}
                             </td>
-                            <td onClick={() => openItemDetails(index)} className="cursor-pointer text-blue-600">ℹ️</td>
+                            <td
+                              onClick={() => openItemDetails(item.id)}
+                              className="cursor-pointer text-blue-600"
+                            >
+                              ℹ️
+                            </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                               {item.quantity}
                             </td>
@@ -220,50 +228,42 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
                   </div>
                 </div>
 
-                
-                
-                
                 <div className="flex mt-4">
-                  <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false) }>
-            {modalContent}
-          </Modal>
-         
-        <table className="flex-1">
-          <tbody className='gap-4'>
-            <tr>
-              <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                Total Qty: {cell.total_qty}
-              </td>
-              <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                C-GST: {cell.cgst_amount}
-              </td>
-              <td className="px-4 py-2"></td>
-              <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                S-GST: {cell.sgst_amount}
-              </td>
-            </tr>
-            <tr>
-              <td className="px-4 py-2"></td>
-              <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                Total: {cell.amount}
-              </td>
-              <td className="px-4 py-2"></td>
-              <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                Tax Amount: {cell.tax_amount}
-              </td>
-              <td className="px-4 py-2"></td>
-              <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                Total Incl of GST: {cell.total_amount}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                  <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                    {modalContent}
+                  </Modal>
 
-          
-      </div>
-
-
-
+                  <table className="flex-1">
+                    <tbody className="gap-4">
+                      <tr>
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          Total Qty: {cell.total_qty}
+                        </td>
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          C-GST: {cell.cgst_amount}
+                        </td>
+                        <td className="px-4 py-2"></td>
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          S-GST: {cell.sgst_amount}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-2"></td>
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          Total: {cell.amount}
+                        </td>
+                        <td className="px-4 py-2"></td>
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          Tax Amount: {cell.tax_amount}
+                        </td>
+                        <td className="px-4 py-2"></td>
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          Total Incl of GST: {cell.total_amount}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>

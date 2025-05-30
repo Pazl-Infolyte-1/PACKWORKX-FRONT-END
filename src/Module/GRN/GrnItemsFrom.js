@@ -62,9 +62,11 @@ const openItemDetails = async (item_id) => {
   useEffect(() => {
     function syncPurchaseOrderItems() {
       remove()
-
+      console.log('grnFormData.po_id', grnFormData);
+      
       const selectedPo = purchaseOrderData.find((po) => po.id === grnFormData.po_id)
-
+      
+      console.log('selectedPo', selectedPo)
       if (selectedPo?.PurchaseOrderItems?.length > 0) {
         const newItems = selectedPo.PurchaseOrderItems.map((item) => ({
           po_item_id: item.id || 0,
@@ -84,7 +86,6 @@ const openItemDetails = async (item_id) => {
 
         append(newItems)
 
-        console.log('selectedPo', selectedPo)
       }
 
       setTimeout(() => updateParentFormData(), 0)
@@ -168,6 +169,8 @@ const openItemDetails = async (item_id) => {
     console.log('updateParentFormData function called')
 
     const currentValues = getValues('grn_items')
+    console.log(currentValues);
+    
     if (!currentValues || !Array.isArray(currentValues)) return
 
     const formatedValues = currentValues.map((item, index) => {

@@ -25,15 +25,14 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, fetchDat
   useEffect(() => {
     const fetchVendors = async () => {
       try {
-        const initial = await apiMethods.getClients()
-        const count = initial?.length || 100
+        // const initial = await apiMethods.getClients()
+        // const count = initial?.length || 100
 
-        const fullData = await apiMethods.getClients({ limit: count })
+        const fullData = await apiMethods.getClients()
         const clientsArray = fullData.data
 
         if (Array.isArray(clientsArray)) {
           const vendorList = clientsArray.filter((client) => client.entity_type === 'Vendor')
-          console.log('vendorList:', vendorList)
           setClientData(vendorList)
         } else {
           console.error('Expected an array but received:', clientsArray)

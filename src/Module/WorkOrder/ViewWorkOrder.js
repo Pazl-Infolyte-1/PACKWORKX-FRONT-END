@@ -299,7 +299,7 @@ return (
             <button className="flex items-center px-2 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
               <Printer size={14} className="mr-1" />
               Print
-            </button>
+            </button>          
             <button className="flex items-center px-2 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
               <Download size={14} className="mr-1" />
               Export

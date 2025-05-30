@@ -421,8 +421,12 @@ const OrderForm = forwardRef(({
                       )}
 <div
   className="flex items-center gap-2 px-3 py-2 text-xs text-blue-500 cursor-pointer hover:bg-gray-200 rounded"
-  onClick={() => navigate('/clients/clientForm')}
->
+  onClick={() =>
+    navigate('/clients/clientForm', {
+      state: { fromSalesForm: true }
+    })
+  }
+  >
   <svg
     xmlns="http://www.w3.org/2000/svg"
     className="h-4 w-4 text-blue-500"

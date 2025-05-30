@@ -259,11 +259,16 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
     try {
       const response = await apiMethods.createWorkOrder(formData);
       console.log('Response:', response);
-      setTimeout(() => {
-        // setDrawer(false)
-      }, 1000);
+
       // await fetchData()
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
+      console.log(location.state)
+
+      if (location?.state?.fromsalesorder && location?.state?.id) {
+        navigate(`/salesorder/view/${location?.state?.id}`);
+      } else {
+        navigate('/workorderlist');
+      }
 
     } catch (error) {
       console.error('Error:', error);

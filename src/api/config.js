@@ -1152,6 +1152,10 @@ export const apiMethods = {
     }
   },
 
+  getAllPurchaseOrderIds: async () => {
+   return await apiClient.get('/purchase-orders/ids')
+  },
+
   // Get a single purchase order by ID
 
   getPurchaseOrderById: async (id) => {

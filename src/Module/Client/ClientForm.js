@@ -419,7 +419,11 @@ const ClientForm = ({ resetForm, setReloadData }) => {
     sku_type_for_navigate_from_client: skuType,
   },
 });
-  } else {
+  }else if (location.state?.fromSalesForm) {
+    navigate('/salesorder/form?tab=salesOrder', {
+    });
+  }
+   else {
     navigate('/clients');
   }
         //navigate('/clients')
@@ -444,15 +448,18 @@ const ClientForm = ({ resetForm, setReloadData }) => {
 }, [location.state?.sku_type_for_navigate]);
 // cancel handler
 const handleCancel = () => {
-  reset();
   if (location.state?.fromSKU) {
     console.log("in client form", location.state?.sku_type_for_navigate);
-  navigate('/SKU', {
-  state: {
-    fromClientForm: true,
-    sku_type_for_navigate_from_client: skuType,
-  },
-});
+    navigate('/SKU', {
+      state: {
+        fromClientForm: true,
+        sku_type_for_navigate_from_client: skuType,
+      },
+    });
+  } else if (location.state?.fromSalesForm) {
+    // Add logic here for the second condition
+    navigate('/salesorder/form?tab=salesOrder', {
+    });
   } else {
     navigate('/clients');
   }
@@ -486,7 +493,7 @@ const handleCancel = () => {
       </div>
       <FormProvider {...methods}>
         <div className="pr-2 pl-2 relative border-b border-gray-200 bg-white">
-        {!location.state?.fromSKU && (
+        {!location.state?.fromSKU &&!location.state?.fromSalesForm&& (
   <h5 className="px-4 capitalize">
     {editData ? `Edit ${editData.entity_type}` : `Add ${entityType}`}
   </h5>

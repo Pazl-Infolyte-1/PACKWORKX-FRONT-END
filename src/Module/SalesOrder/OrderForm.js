@@ -41,7 +41,6 @@ const OrderForm = forwardRef(({
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    console.log("Search term:", e.target.value);
   };
 
 
@@ -197,7 +196,7 @@ const OrderForm = forwardRef(({
       const fetchClients = async () => {
         try {
           const params = {
-            ...(searchQuery && { search: searchQuery }),
+            ...(searchTerm && { search: searchTerm }),
             limit: 25,
           };
 
@@ -348,7 +347,7 @@ const OrderForm = forwardRef(({
               {/* Customer Name */}
               <div className="flex items-center bg-gray-50 py-4">
                 <label className="text-xs text-red-600 w-40">
-                  Customer Name*
+                  Client Name*
                 </label>
                 <div className="relative" ref={dropdownRef}>
                   <div
@@ -361,7 +360,7 @@ const OrderForm = forwardRef(({
                     }}
                   >
                     <span className="truncate text-sm text-gray-500">
-                      {localFormData.client || "Select or add a customer"}
+                      {localFormData.client || "Select or add a client"}
                     </span>
                     <span className="text-gray-500">
                       {isOpen ?
@@ -420,6 +419,26 @@ const OrderForm = forwardRef(({
                       ) : (
                         <div className="px-3 py-2 text-xs text-gray-500">No results found</div>
                       )}
+<div
+  className="flex items-center gap-2 px-3 py-2 text-xs text-blue-500 cursor-pointer hover:bg-gray-200 rounded"
+  onClick={() =>
+    navigate('/clients/clientForm', {
+      state: { fromSalesForm: true }
+    })
+  }
+  >
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-4 w-4 text-blue-500"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+  </svg>
+  <span>Add New Client</span>
+</div>
                     </div>
                   )}
                 </div>

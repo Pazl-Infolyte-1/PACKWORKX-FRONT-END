@@ -382,11 +382,16 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
+
             return null
           })}
         </>
       )}
-
+      <CNavItem>
+                  <CNavLink as={NavLink} to="/stockadjustment">
+                    {navLink('Stock Adjustment', 'cibHighly')}
+                  </CNavLink>
+                </CNavItem>
       {/*reports*/}
       {shouldDisplayReports && (
         <>

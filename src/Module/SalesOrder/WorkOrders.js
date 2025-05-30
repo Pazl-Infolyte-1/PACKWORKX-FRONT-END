@@ -64,6 +64,20 @@ const WorkOrders = ({
   const [canDeactivate, setCanDeactivate] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
 
+  const { id: salesOrderId, fromsalesorder } = location.state || {};
+
+  useEffect(() => {
+    if (fromsalesorder && salesOrderId && salesOrder?.length > 0) {
+      const selectedSalesOrderId = salesOrderId.toString();
+      const selectedSalesOrder = salesOrder.find((so) => so.id.toString() === selectedSalesOrderId);
+  
+      const clientId = selectedSalesOrder?.client_id;
+      
+        handleSalesOrderChange(1, selectedSalesOrderId, clientId);
+    }
+  }, [fromsalesorder, salesOrderId,salesOrder]);
+  
+
 
   
 
@@ -176,11 +190,10 @@ const WorkOrders = ({
     if (isWorkOrderList) {
       const isValid = validateForm(workOrders[0]); // Validate first order only
       if (isValid) {
-        console.log(workOrders[0], 'fafasdfasdfasdfasf')
+        console.log(workOrders[0])
         workOrderListSubmit(workOrders[0]);
       }
     } else {
-      // console.log("Submitting work orders:", filledWorkOrders)
       const filledWorkOrders = workOrders.filter(order =>
         order.sku_name || order.qty || order.description
       )
@@ -207,7 +220,7 @@ const WorkOrders = ({
     setworkOrdersData(updatedWorkOrdersData)
 
     // Show confirmation to user
-    alert("Work order saved successfully!")
+    // alert("Work order saved successfully!")
 
     // console.log("Updated work order:", workOrderToUpdate)
     // console.log("Updated work orders data:", updatedWorkOrdersData)
@@ -395,6 +408,7 @@ const WorkOrders = ({
   // }
 
   const handleSalesOrderChange = async (orderId, value, clientID) => {
+    console.log(orderId)
     handleWorkOrderChange(orderId, 'sales_order_id', value);
     handleWorkOrderChange(orderId, 'client_id', clientID);
 
@@ -868,7 +882,7 @@ const WorkOrders = ({
                         </option>
                         {salesOrder?.map((so) => (
                           <option key={so.id} value={so.id}>
-                            {`SO-${so.id}`}
+                            {`${so.sales_generate_id}`}
                           </option>
                         ))}
                       </select>

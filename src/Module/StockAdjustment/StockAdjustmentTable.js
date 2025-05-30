@@ -10,16 +10,16 @@ import {
 import { cilPencil, cilTrash } from '@coreui/icons';
 import ThreeDotMenu from '../../components/ThreeDotMenu';
 import { useNavigate } from 'react-router-dom';
+import CustomAlert from '../../components/New/CustomAlert';
+import apiMethods from '../../api/config';
+import ConfirmationModale from '../../components/New/ConfirmationModale';
 
-const StockAdjustmentTable = ({
-  adjustments = [],
-  isMinimized = false,
-  openViewCard,
-}) => {
+const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized,refreshClients }) => {
+  console.log("stock data in table",stockAdjustmentData)
   const [selectedRows, setSelectedRows] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState({ open: false, id: null });
   const navigate = useNavigate();
-
+  const [alerts, setAlerts] = useState([])
   const handleRowSelect = (id) => {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
@@ -34,136 +34,192 @@ const StockAdjustmentTable = ({
     }
   };
 
-  return (
-    <div className="overflow-y-auto custom-scrollbar">
-      <div className="bg-white shadow-sm border border-gray-200 rounded-lg h-[calc(82vh-74px)]">
-        <CTable hover className="w-full">
-          {!isMinimized && (
-            <CTableHead className="!bg-gray-300 sticky top-0 z-10">
-              <CTableRow>
-                <CTableHeaderCell className="w-48 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  Product
-                </CTableHeaderCell>
-                <CTableHeaderCell className="w-32 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  Type
-                </CTableHeaderCell>
-                <CTableHeaderCell className="w-24 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  Quantity
-                </CTableHeaderCell>
-                <CTableHeaderCell className="w-40 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  Date
-                </CTableHeaderCell>
-                <CTableHeaderCell className="w-48 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  Remarks
-                </CTableHeaderCell>
-                <CTableHeaderCell className="w-24 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  Actions
-                </CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-          )}
+    const handleClose = () => {
+    setAlerts([])
+  }
 
-          <CTableBody>
-            {adjustments.length > 0 ? (
-              adjustments.map((adj) => (
-                <CTableRow
-                  key={adj.id}
-                  onClick={() => navigate(`/stock-adjustments/${adj.id}`)}
-                  className={`${
-                    selectedRows.includes(adj.id)
-                      ? 'bg-blue-50'
-                      : 'hover:bg-gray-50'
-                  } border-b cursor-pointer`}
-                >
-                  {isMinimized ? (
-                    <CTableDataCell className="px-4 py-3 flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={selectedRows.includes(adj.id)}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          handleRowSelect(adj.id);
-                        }}
-                        className="form-checkbox h-4 w-4 text-blue-600 rounded mb-2"
-                      />
-                      <div
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openViewCard(adj);
-                        }}
-                        className="cursor-pointer flex flex-col"
-                      >
-                        <span className="text-sm text-black font-semibold">
-                          {adj.product_name || 'N/A'}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          Qty: {adj.quantity}
-                        </span>
-                      </div>
-                    </CTableDataCell>
-                  ) : (
-                    <>
-                      <CTableDataCell
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openViewCard(adj);
-                        }}
-                        className="px-4 py-3 text-sm text-blue-600 font-semibold"
-                      >
-                        {adj.product_name || 'N/A'}
-                      </CTableDataCell>
-                      <CTableDataCell className="px-4 py-3 text-sm text-gray-900">
-                        {adj.type || 'N/A'}
-                      </CTableDataCell>
-                      <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
-                        {adj.quantity}
-                      </CTableDataCell>
-                      <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
-                        {adj.date}
-                      </CTableDataCell>
-                      <CTableDataCell className="px-4 py-3 text-sm text-gray-500">
-                        {adj.remarks || 'N/A'}
-                      </CTableDataCell>
-                      <CTableDataCell className="px-4 py-3">
-                        <div onClick={(e) => e.stopPropagation()}>
-                          <ThreeDotMenu
-                            value={[
-                              {
-                                label: 'Edit',
-                                icon: cilPencil,
-                                onClick: () =>
-                                  navigate('/stock-adjustments/form', {
-                                    state: { adjustment: adj },
-                                  }),
-                              },
-                              {
-                                label: 'Delete',
-                                icon: cilTrash,
-                                onClick: () =>
-                                  setIsDeleteModalOpen({ open: true, id: adj.id }),
-                              },
-                            ]}
-                          />
-                        </div>
-                      </CTableDataCell>
-                    </>
-                  )}
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow>
-                <CTableDataCell
-                  colSpan={isMinimized ? 2 : 6}
-                  className="text-center text-sm !text-red-600 py-3"
-                >
-                  No Stock Adjustments Found
-                </CTableDataCell>
-              </CTableRow>
+  
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen({ open: false, id: null })
+  }
+
+  const deleteStock = async () => {
+      if (!isDeleteModalOpen.id) return
+  
+      try {
+        const response = await apiMethods.deleteStockAdjustment(isDeleteModalOpen.id)
+        if (!response?.status) {
+          throw new Error(response?.message || 'Failed to delete client')
+        }
+  console.log("response del",response)
+        setAlerts([{ severity: 'success', message: response?.data?.message }])
+      } catch (error) {
+        console.error('Error deleting client:', error)
+  
+        setAlerts([{ severity: 'error', message: error?.message || 'Something went wrong' }])
+      } finally {
+        setTimeout(() => {
+          setAlerts([])
+          refreshClients()
+        }, 3000)
+  
+        closeDeleteModal()
+        refreshClients()
+      }
+    }
+  
+  return (
+    <>
+      <CustomAlert alerts={alerts} handleClose={handleClose} />
+      <div className=" overflow-y-auto custom-scrollbar ">
+        <div className="bg-white shadow-sm border border-gray-200 rounded-lg h-[calc(82vh-74px)]">
+          <CTable hover className="w-full">
+            {/* Render table headers only if not minimized */}
+            {!isMinimized && (
+         <CTableHead className="!bg-gray-300 sticky top-0 z-10">
+  <CTableRow>
+    <CTableHeaderCell className="w-48 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+      Stock Adjustment Id<span className="text-gray-500 ml-1">⌕</span>
+    </CTableHeaderCell>
+    <CTableHeaderCell className="w-32 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+      Adjustment Date<span className="text-gray-500 ml-1">⌕</span>
+    </CTableHeaderCell>
+    <CTableHeaderCell className="w-40 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+      Reason<span className="text-gray-500 ml-1">⌕</span>
+    </CTableHeaderCell>
+    <CTableHeaderCell className="w-52 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+      Remarks<span className="text-gray-500 ml-1">⌕</span>
+    </CTableHeaderCell>
+    <CTableHeaderCell className="w-36 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+      Status<span className="text-gray-500 ml-1">⌕</span>
+    </CTableHeaderCell>
+    <CTableHeaderCell className="w-36 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+      Actions
+    </CTableHeaderCell>
+  </CTableRow>
+</CTableHead>
+
             )}
-          </CTableBody>
-        </CTable>
+
+            <CTableBody>
+              {stockAdjustmentData?.length > 0 ? (
+                stockAdjustmentData?.map((stock) => (
+                  <CTableRow
+                    key={stock.id}
+                    onClick={() => navigate(`/stockadjustment/${stock.id}`)}
+                    className={`${
+                      selectedRows.includes(stock.id) ? 'bg-blue-50' : 'hover:bg-gray-50'
+                    } border-b cursor-pointer`}
+                  >
+                    {/* When minimized: Only render checkbox and display name */}
+                    {isMinimized ? (
+                      <>
+                        <CTableDataCell className="px-4 py-3 flex items-center gap-2">
+                          {/*<input
+                            type="checkbox"
+                            checked={selectedRows.includes(stock.id)}
+                            onChange={(e) => {
+                              e.stopPropagation()
+                              handleRowSelect(stock.id)
+                            }}
+                            className="form-checkbox h-4 w-4 text-blue-600 rounded mb-2"
+                          />*/}
+                          <div
+                            //onClick={(e) => {
+                            //  openViewCard(stock)
+                            //}}
+                            className="cursor-pointer flex flex-col"
+                          >
+                             {stock.stock_adjustment_generate_id || 'N/A'}
+                          </div>
+                        </CTableDataCell>
+                      </>
+                    ) : (
+                      <>
+                        {/* <CTableDataCell>{''}</CTableDataCell>
+                        <CTableDataCell className="px-4 py-3">
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={selectedRows.includes(client.client_id)}
+                              onChange={(e) => {
+                                e.stopPropagation()
+                                handleRowSelect(client.client_id)
+                              }}
+                              className="form-checkbox h-3 w-3 text-blue-600 rounded"
+                            />
+                          </div>
+                        </CTableDataCell> */}
+                        <CTableDataCell
+                          onClick={(e) => {
+                            //e.stopPropagation();
+                            openViewCard(stock)
+                          }}
+                          className="px-4 py-3 text-sm !text-blue-600 font-semibold  whitespace-nowrap"
+                        >
+                          {stock.stock_adjustment_generate_id || 'N/A'}
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                          {stock.adjustment_date || 'N/A'}
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
+                          {stock.reason || 'N/A'}
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
+                          {stock.remarks || 'N/A'}
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
+                          {stock.status || 'N/A'}
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3">
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <ThreeDotMenu
+                              value={[
+                                {
+                                  label: 'Edit',
+                                  icon: cilPencil,
+                                  onClick: () => {
+                                    console.log('Edit', stock)
+                                    navigate('/stockadjustment/stock_form', { state: { stock } })
+                                  },
+                                },
+                                {
+                                  label: 'Delete',
+                                  icon: cilTrash,
+                                  onClick: () => setIsDeleteModalOpen({
+                                    open: true,
+                                    id: stock.id,
+                                  }),
+                                },
+                              ]}
+                            />
+                          </div>
+                        </CTableDataCell>
+                      </>
+                    )}
+                  </CTableRow>
+                ))
+              ) : (
+                <CTableRow>
+                  <CTableDataCell colSpan={isMinimized ? 2 : 8} className="text-center text-sm !text-red-600  py-3">
+                    No Data Found
+                  </CTableDataCell>
+                </CTableRow>
+              )}
+            </CTableBody>
+          </CTable>
+        </div>
+
+ 
+        <ConfirmationModale
+          isOpen={isDeleteModalOpen.open}
+          onClose={closeDeleteModal}
+          onConfirm={deleteStock}
+          title="Delete Confirmation"
+          message="Are you sure you want to delete this item?"
+        />
       </div>
-    </div>
+    </>
   );
 };
 

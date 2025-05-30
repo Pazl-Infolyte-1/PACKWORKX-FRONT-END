@@ -127,13 +127,13 @@ const Grn = () => {
           const response = await apiMethods.editGrn(data)
           setAlerts((prev) => [
             ...prev,
-            { severity: 'success', message: response.data.message || 'GRN Uopdated Successfully' },
+            { severity: 'success', message: response?.data?.message || 'GRN Uopdated Successfully' },
           ])
         } else {
           const response = await apiMethods.postGrn(data)
           setAlerts((prev) => [
             ...prev,
-            { severity: 'success', message: response.data.message || 'GRN Added Successfully' },
+            { severity: 'success', message: response?.data?.message || 'GRN Added Successfully' },
           ])
         }
         setGrnFormData({

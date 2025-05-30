@@ -1089,6 +1089,13 @@ export const apiMethods = {
   getItemData: async (id) => {
     return await apiClient.get(`/items/${id}`)
   },
+  getCategoryList: async () => {
+    return await apiClient.get(`/category`)
+  },
+
+  getSubCategory: async () => {
+    return await apiClient.get(`/sub-category`)
+  },
 
   addItem: async (body) => {
     return await apiClient.post(`/items`, body)
@@ -1150,6 +1157,10 @@ export const apiMethods = {
 
       throw error
     }
+  },
+
+  getAllPurchaseOrderIds: async () => {
+   return await apiClient.get('/purchase-orders/ids')
   },
 
   // Get a single purchase order by ID

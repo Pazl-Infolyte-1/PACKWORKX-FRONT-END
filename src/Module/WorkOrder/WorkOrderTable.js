@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CTable,
   CTableRow,
@@ -14,10 +14,30 @@ import apiMethods from '../../api/config'
 import WorkOrderDetails from './WorkOrderDetails'
 import Loading from '../../components/New/Loading'
 import ReusableTable from '../SalesOrder/ReusableTable'
-import { useNavigate } from 'react-router-dom'
+import { data, useNavigate } from 'react-router-dom'
+import ProgressCompletedModal from './ProgressCompletedModale'
 
 const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellData,handleDelete,loading,setloading,setAlerts,isMinimiseTable }) => {
   const navigate = useNavigate()
+  const [progressOptions, setProgressOptions] = useState([]);
+ const  [isOpenProgressModale,setIsOpenProgressModale] = useState(false);
+ const [completedWorkOrderData, setCompletedWorkOrderData] = useState(null); // or useState({})
+
+  useEffect(() => {
+    const fetchProgressOptions = async () => {
+      try {
+        const response = await apiMethods.getWorkOrderProgressDropDownOptions();
+        const data = response?.data?.data || [];
+        const options = data.map(item => item.work_order_status);
+        setProgressOptions(options);
+        console.log(options)
+      } catch (error) {
+        console.error('Error fetching work order progress options:', error);
+      }
+    };
+  
+    fetchProgressOptions();
+  }, []);
 
   const handlePriorityChange = async (e, id) => {
     const newValue = e;
@@ -41,25 +61,49 @@ const WorkOrderTable = ({ cellData, setShowPopUp, showPopUp,handleEdit,setCellDa
 
   const handleProgressChange = async (e, id) => {
   const newValue = e;
-  const body = { progress: newValue };
 
-  try {
-  const response =   await apiMethods.workOrderStatusUpdate(id, body);
 
-    // Update UI if cellData is a state
-    setCellData(prev =>
-      prev.map(r => r.id === id ? { ...r, progress: newValue } : r)
-    );
-    setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated Progress" }]);
 
-  } catch (error) {
-    console.error("Error updating progress:", error);
-    setAlerts([{ severity: "error", message: response?.data?.message || "failed to update Progress" }]);
 
+
+
+  if(newValue=="Completed"){
+    const item = cellData.find(a => a.id == id);
+  if (!item) {
+    console.log(`Item with id ${id} not found`);
+    return;
   }
-  finally{
-    // setloading(false)
+  const newEntry = { id, qty: item.qty,progress:newValue };
+  setCompletedWorkOrderData(newEntry);
+
+  setIsOpenProgressModale(true)
+
+  }else{
+    const body = { progress: newValue };
+
+    try {
+
+      const response =   await apiMethods.workOrderStatusUpdate(id, body);
+    
+        // Update UI if cellData is a state
+        setCellData(prev =>
+          prev.map(r => r.id === id ? { ...r, progress: newValue } : r)
+        );
+        setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated Progress" }]);
+    
+      } catch (error) {
+        console.error("Error updating progress:", error);
+        setAlerts([{ severity: "error", message: response?.data?.message || "failed to update Progress" }]);
+    
+      }
+      finally{
+        // setloading(false)
+      }
   }
+
+
+
+
 }
 
 const handleView = (row) => {
@@ -102,7 +146,7 @@ const columns = [
         header: 'progress',
         field: 'progress',
         type: 'dropdown',
-        options: ['Pending', 'Product Planning',"Procurement Sourcing","Production Planning","Production","Quality Control","Packaging","Shipping"],
+        options: [...progressOptions],
         onChange: (row, newValue) => {
           handleProgressChange(newValue,row.id)
         }
@@ -144,6 +188,7 @@ const columns = [
 
 
   return (
+    <>
     <ReusableTable
     columns={columns}
     data={cellData}
@@ -151,6 +196,18 @@ const columns = [
     isMinimiseTable={isMinimiseTable}
     handleRowClick={handleView}
     />
+
+<ProgressCompletedModal
+qty={completedWorkOrderData?.qty}
+id={completedWorkOrderData?.id}
+progress={completedWorkOrderData?.progress}
+isOpen={isOpenProgressModale}
+onClose={()=>setIsOpenProgressModale(false)}
+setAlerts={setAlerts}
+setCellData={setCellData}
+/>
+
+  </>
   )
 }
 

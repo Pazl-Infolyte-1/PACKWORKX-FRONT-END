@@ -943,7 +943,7 @@ export const apiMethods = {
     return response
   },
   workOrderStatusUpdate: async (id, body) => {
-    const response = await apiClient.put(`/work-order/status/${id}`, body)
+    const response = await apiClient.patch(`/work-order/status/${id}`, body)
     return response
   },
   editWorkOrder: async (id, body) => {
@@ -1450,13 +1450,10 @@ export const apiMethods = {
       console.error(error)
     }
   },
-  getInvoiceById: async (id) => {
-    try {
-      return await apiClient.get(`/work-order-invoice/get/${id}`)
-    } catch (error) {
-      console.error(error)
-    }
-  },
+
+  getInvoiceById: async (id, params = {}) => {
+    return await apiClient.get(`/work-order-invoice/get/${id}`, { params });
+  },    
   getStockAdjustments: async (page = 1, entries) => {
     try {
       return await apiClient.get(`/stock-adjustments?page=${page}&entries=${entries}`)
@@ -1501,7 +1498,13 @@ export const apiMethods = {
   },
   getInvoiceHistory:async(id)=>{
     return await apiClient.get(`/work-order-invoice/get-by-sku/${id}`,)
-  }
+  },
+  getWorkOrderProgressDropDownOptions:async(id)=>{
+    return await apiClient.get(`/common-service/work-order-status`,)
+  },
+  getInvoice: async ( params = {}) => {
+    return await apiClient.get(`/work-order-invoice/get`, { params });
+  },    
 }
 
 export default apiMethods

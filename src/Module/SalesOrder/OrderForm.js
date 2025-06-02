@@ -132,7 +132,7 @@ const OrderForm = forwardRef(({
       totalGst: skuFormData ? skuFormData.totalGst : 0,
       totalWithGST: skuFormData ? skuFormData.totalWithGST : 0
     },
-    
+
     validateForm: () => {
       setAttemptedSubmit(true);
       return validateForm();
@@ -316,10 +316,10 @@ const OrderForm = forwardRef(({
     e.preventDefault();
 
     setAttemptedSubmit(true)
-      const isValid = validateForm();
-  if (!isValid) {
-    return; // Stop submission if validation fails
-  }
+    const isValid = validateForm();
+    if (!isValid) {
+      return; // Stop submission if validation fails
+    }
     // Combine order form data with SKU details
     const completeFormData = {
       ...localFormData,
@@ -332,7 +332,7 @@ const OrderForm = forwardRef(({
       totalWithGST: skuFormData ? skuFormData.totalWithGST : 0
     };
 
- 
+
     if (handleFormSubmit) {
       handleFormSubmit(completeFormData);
     }
@@ -406,40 +406,42 @@ const OrderForm = forwardRef(({
                         </div>
                       </div>
 
-                      {clients.length > 0 ? (
-                        clients.map((client, index) => (
-                          <div
-                            key={index}
-                            className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
-                            onChange={() => selectClient(client.company_name, client.client_id, client?.addresses?.[0]?.state)}
-                            onClick={() => selectClient(client.company_name, client.client_id, client?.addresses?.[0]?.state)}
-                          >
-                            {client.display_name}
-                          </div>
-                        ))
+                      {clients.filter(client => client.status === "active").length > 0 ? (
+                        clients
+                          .filter(client => client.status === "active")
+                          .map((client, index) => (
+                            <div
+                              key={index}
+                              className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
+                              onClick={() => selectClient(client.company_name, client.client_id, client?.addresses?.[0]?.state)}
+                            >
+                              {client.display_name}
+                            </div>
+                          ))
                       ) : (
                         <div className="px-3 py-2 text-xs text-gray-500">No results found</div>
                       )}
-<div
-  className="flex items-center gap-2 px-3 py-2 text-xs text-blue-500 cursor-pointer hover:bg-gray-200 rounded"
-  onClick={() =>
-    navigate('/clients/clientForm', {
-      state: { fromSalesForm: true }
-    })
-  }
-  >
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-4 w-4 text-blue-500"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-  </svg>
-  <span>Add New Client</span>
-</div>
+
+                      <div
+                        className="flex items-center gap-2 px-3 py-2 text-xs text-blue-500 cursor-pointer hover:bg-gray-200 rounded"
+                        onClick={() =>
+                          navigate('/clients/clientForm', {
+                            state: { fromSalesForm: true }
+                          })
+                        }
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-blue-500"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>Add New Client</span>
+                      </div>
                     </div>
                   )}
                 </div>

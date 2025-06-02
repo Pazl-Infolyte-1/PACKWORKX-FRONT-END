@@ -1313,6 +1313,18 @@ export const apiMethods = {
       console.error(error)
     }
   },
+getinventoryWithParams: async (catId, page) => {
+  try {
+    const params = { limit: 10000, page };
+    if (catId) {
+      params.categoryId = catId;
+    }
+    return await apiClient.get('/inventory', { params });
+  } catch (error) {
+    console.error(error);
+  }
+},
+
 
   getPurchaseReturn: async (params) => {
     try {
@@ -1501,7 +1513,32 @@ export const apiMethods = {
   },
   getInvoiceHistory:async(id)=>{
     return await apiClient.get(`/work-order-invoice/get-by-sku/${id}`,)
+  },
+subCategoryDropdown: async (categoryId) => {
+  try {
+    const response = await apiClient.get(
+      categoryId ? `/items/sub-category/id` : `/sub-category`,
+      {
+        params: categoryId ? { category_id: categoryId } : {},
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error inside subCategoryDropdown:", error); // 👈 helpful
+    throw error; // ✅ so it gets caught in `useEffect`
   }
+},
+
+  singleInventoryView: async (id) => {
+    try {
+      const response = await apiClient.get(`/inventory/status/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+       throw error;
+    }
+  },
+
 }
 
 export default apiMethods

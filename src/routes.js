@@ -14,6 +14,7 @@ const PurchaseOrder = React.lazy(() => import('./Module/Purchase/PurchaseOrder.j
 const MachineDashboard = React.lazy(() => import('./Module/Machine/MachineDashboard.js'))
 const AddEditMachine = React.lazy(() => import('./Module/Machine/AddEditMachine.js'))
 const InventoryHandling = React.lazy(() => import('./Module/Inventory/InventoryHandling.js'))
+const InventoryMain = React.lazy(() => import('./Module/Inventory/InventoryMain.js'))
 const Production = React.lazy(() => import('./Module/Production/Index.js'))
 const Packages = React.lazy(() => import('./Module/Admin/Packages/Packages.js'))
 const Billing = React.lazy(() => import('./Module/Admin/Billing/Billing.js'))
@@ -47,6 +48,7 @@ const StockTableView = React.lazy(() => import('./Module/StockAdjustment/StockTa
 
 const Invoice = React.lazy(()=>import('./Module/InvoiceWorkOrder/InvoiceList.js'))
 const InvoiceView = React.lazy(()=>import('./Module/InvoiceWorkOrder/InvoiceView.js'))
+const InventoryForm =React.lazy(()=>import('./Module/Inventory/Items/AddItemProcess.js'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
@@ -93,7 +95,8 @@ const routes = [
     element: AddEditMachine,
     key: 22,
   },
-  { path: '/inventoryhandling', name: 'Inventory Handling', element: InventoryHandling, key: 28 },
+  { path: '/inventoryhandling', name: 'Inventory Handling', element: InventoryMain, key: 28 },
+    { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 230 },
   { path: '/production', name: 'Production', element: Production, key: 26 },
   { path: '/packages', name: 'Packages', element: Packages, key: 5001 },
   { path: '/process', name: 'Process', element: Process, key: 5007 },
@@ -182,6 +185,8 @@ const routes = [
       }
     ]
   },
+          { path: '/inventoryhandling/inventory_form', name: 'stockadjustment', element: InventoryForm, key: '' },
+
 ]
 
 export default routes

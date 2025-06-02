@@ -17,6 +17,7 @@ import { cilDog } from '@coreui/icons'
 import ContentHeader from '../../components/New/ContentHeader'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import CompactPagination from '../../components/New/CompactPagination'
+import InventoryTable from './InventoryTable'
 
 const InventoryDashboard = () => {
   const [isfinishedgoodpopup, setfinishedgoodpopup] = useState(false)
@@ -30,7 +31,8 @@ const InventoryDashboard = () => {
   const [showRawMaterialsDropdown, setShowRawMaterialsDropdown] = useState(false)
   const [showReturnableDropdown, setShowReturnableDropdown] = useState(false)
   const [selectedReturnable, setSelectedReturnable] = useState('Returnable')
-
+const [categoryId,setCategoryId]=useState(null)
+const [subCategoryId,setSubCategoryId]=useState(null)
   const [paginationParams, setPaginationParams] = useState({ currentPage: 1, pageSize: 50 })
   const [totalPages, setTotalPages] = useState(1)
   // const { searchQuery, filteredSearchData } = useSearch();
@@ -44,6 +46,7 @@ const InventoryDashboard = () => {
   // Raw materials dropdown options
   const rawMaterialOptions = [
     {
+      id:1,
       name: 'Reels',
       icon: <BiDollarCircle />,
       color: '#10b981',
@@ -51,6 +54,7 @@ const InventoryDashboard = () => {
       textColor: 'text-green-700',
     },
     {
+      id:2,
       name: 'Corrugation Glue',
       icon: <FaStar />,
       color: '#f59e0b',
@@ -58,6 +62,7 @@ const InventoryDashboard = () => {
       textColor: 'text-yellow-700',
     },
     {
+      id:3,
       name: 'Pasting Glue',
       icon: <CgWorkAlt />,
       color: '#ef4444',
@@ -65,6 +70,7 @@ const InventoryDashboard = () => {
       textColor: 'text-red-700',
     },
     {
+      id:4,
       name: 'Pins',
       icon: <MdPushPin />,
       color: '#8b5cf6',
@@ -72,6 +78,7 @@ const InventoryDashboard = () => {
       textColor: 'text-purple-700',
     },
     {
+      id:5,
       name: 'Other',
       icon: <MdCategory />,
       color: '#6b7280',
@@ -83,6 +90,7 @@ const InventoryDashboard = () => {
   // Returnable dropdown options
   const returnableOptions = [
     {
+      id:1,
       name: 'DYE',
       icon: <MdCategory />,
       color: '#10b981',
@@ -90,6 +98,7 @@ const InventoryDashboard = () => {
       textColor: 'text-green-700',
     },
     {
+      id:2,
       name: 'Stereo',
       icon: <FaStar />,
       color: '#f59e0b',
@@ -97,6 +106,7 @@ const InventoryDashboard = () => {
       textColor: 'text-yellow-700',
     },
     {
+      id:3,
       name: 'Other',
       icon: <MdPushPin />,
       color: '#ef4444',
@@ -280,15 +290,22 @@ const InventoryDashboard = () => {
     }
   }
 
-  const handleRawMaterialClick = (optionName) => {
+  const handleRawMaterialClick = (optionName,id) => {
     setSelectedType(optionName)
     setShowRawMaterialsDropdown(false)
+    console.log("iddd",id)
+      if (id) {
+    setSubCategoryId(id);
+  }
     // You can add additional logic here based on the selected option
   }
 
-  const handleReturnableClick = (optionName) => {
+  const handleReturnableClick = (optionName,id) => {
     setSelectedReturnable(optionName)
     setShowReturnableDropdown(false)
+    if(id){
+    setSubCategoryId(id)
+    }
   }
 
   const MaterialTable = ({ data, selectedType }) => {
@@ -490,7 +507,7 @@ const InventoryDashboard = () => {
               {rawMaterialOptions.map((option, index) => (
                 <div
                   key={index}
-                  onClick={() => handleRawMaterialClick(option.name)}
+                  onClick={() => handleRawMaterialClick(option.name,option.id)}
                   className={`flex items-center gap-3 px-1 py-2 cursor-pointer transition-all duration-200 ${option.hoverColor} border-l-4 border-transparent hover:border-l-4`}
                   style={{
                     '--hover-border-color': option.color,
@@ -553,7 +570,7 @@ const InventoryDashboard = () => {
               {returnableOptions.map((option, index) => (
                 <div
                   key={index}
-                  onClick={() => handleReturnableClick(option.name)}
+                  onClick={() => handleReturnableClick(option.name,option.id)}
                   className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-all duration-200 ${option.hoverColor} border-l-4 border-transparent hover:border-l-4`}
                   style={{
                     '--hover-border-color': option.color,
@@ -587,7 +604,7 @@ const InventoryDashboard = () => {
       </div>
     )
   }
-
+console.log("dddd",subCategoryId)
   return (
     <div>
       <ContentHeader heading={`${selectedType} Details`} isAddNew={false} />
@@ -618,7 +635,7 @@ const InventoryDashboard = () => {
                   {rawMaterialOptions.map((option, index) => (
                     <div
                       key={index}
-                      onClick={() => handleRawMaterialClick(option.name)}
+                      onClick={() => handleRawMaterialClick(option.name,option.id)}
                       className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-all duration-200 ${option.hoverColor} border-l-4 border-transparent hover:border-l-4`}
                       style={{
                         '--hover-border-color': option.color,
@@ -709,8 +726,8 @@ const InventoryDashboard = () => {
         </div> */}
 
         {/* Pass full itemData and selectedType */}
-        <MaterialTable data={itemData} selectedType={selectedType} />
-
+        {/*<MaterialTable data={itemData} selectedType={selectedType} />*/}
+<InventoryTable inventoryData={inventoryData}/>
         <div className="flex justify-end items-center">
           <CompactPagination
             count={totalPages}

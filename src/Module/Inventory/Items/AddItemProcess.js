@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import apiMethods from '../../../api/config'
 import CustomAlert from '../../../components/New/CustomAlert'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
   const [alerts, setAlerts] = useState([])
@@ -11,7 +12,12 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
   const [tagFields, setTagFields] = useState([])
   const [category, setCategory] = useState([])
   const [subCategory, setSubCategory] = useState([])
+    const [categoryId, setCategoryId] = useState(null)
 
+
+const location = useLocation()
+const navigate=useNavigate()
+const fromInventory = location.state?.fromInventory
   const {
     register,
     handleSubmit,
@@ -86,24 +92,47 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
     }
   }
 
-  useEffect(() => {
-    const fetchCatagory = async () => {
+useEffect(() => {
+  const fetchCategoryAndSubCategory = async () => {
+    try {
+      const category = await apiMethods.getCategoryList();
+      setCategory(category.data.data);
+
       try {
-        const category = await apiMethods.getCategoryList()
-        const subCategory = await apiMethods.getSubCategory()
-        setCategory(category.data.data)
-        setSubCategory(subCategory.data.data)
-      } catch (error) {
-        setAlerts([
-          {
-            severity: 'error',
-            message: error?.response?.data?.message || 'Error fetching category data.',
-          },
-        ])
+        const subCategoryResponse = await apiMethods.subCategoryDropdown(categoryId);
+        setSubCategory(subCategoryResponse?.data?.data);
+      } catch (subCatErr) {
+        console.log("SubCategory API error:", subCatErr.response.data.message); // 👈 only log this call’s error
+              setAlerts([
+        {
+          severity: 'error',
+          message: subCatErr.response.data.message || 'Error fetching category data.',
+        },
+      ]);
       }
+
+    } catch (error) {
+      console.error("General category fetch error:", error);
+      setAlerts([
+        {
+          severity: 'error',
+          message: error?.response?.data?.message || 'Error fetching category data.',
+        },
+      ]);
     }
-    fetchCatagory()
-  }, [isEdit, selectedItemID])
+  };
+
+  fetchCategoryAndSubCategory();
+}, [isEdit, selectedItemID, categoryId]);
+
+useEffect(() => {
+  if (subCategory.length === 0) {
+    setSelectedSubCategory("");
+    setTagFields([])
+  }
+}, [subCategory]);
+
+
 
   const onSubmit = async (data) => {
     try {
@@ -143,7 +172,11 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
       ])
 
       setTimeout(() => {
+          if (fromInventory) {
+    navigate('/inventoryhandling');
+  }else{
         setDrawer(false)
+  }
         fetchData()
       }, 1500)
     } catch (error) {
@@ -188,6 +221,79 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
       step: '0.01',
     },
   ]
+const handleCancel = () => {
+  console.log("from inventy",fromInventory)
+  if (fromInventory) {
+    navigate('/inventoryhandling');
+  } else {
+    setDrawer(false);
+  }
+};
+
+console.log("cateee",categoryId)
+const packingReelsTags = [
+  { label: "Core Type: 3-inch", value: "core_3_inch" },
+  { label: "Core Type: 6-inch", value: "core_6_inch" },
+  { label: "Material: Kraft Paper", value: "kraft_paper" },
+  { label: "Material: Duplex Board", value: "duplex_board" },
+  { label: "GSM: 120", value: "gsm_120" },
+  { label: "GSM: 140", value: "gsm_140" },
+  { label: "Deckle Size: 24 inches", value: "deckle_24" },
+  { label: "Deckle Size: 36 inches", value: "deckle_36" },
+  { label: "Color: White", value: "color_white" },
+  { label: "Color: Brown", value: "color_brown" },
+];
+const corrugationGlueTags = [
+  { label: "Viscosity: High", value: "viscosity_high" },
+  { label: "Viscosity: Medium", value: "viscosity_medium" },
+  { label: "Viscosity: Low", value: "viscosity_low" },
+  { label: "Type: Starch-Based", value: "type_starch" },
+  { label: "Type: Synthetic", value: "type_synthetic" },
+  { label: "pH Level: 7", value: "ph_7" },
+  { label: "pH Level: 8", value: "ph_8" },
+  { label: "Bond Strength: Strong", value: "bond_strong" },
+  { label: "Bond Strength: Medium", value: "bond_medium" },
+  { label: "Dry Time: Fast", value: "dry_fast" },
+];
+const pastingGlueTags = [
+  { label: "Adhesion: Strong", value: "adhesion_strong" },
+  { label: "Adhesion: Medium", value: "adhesion_medium" },
+  { label: "Viscosity: 2000 cps", value: "viscosity_2000" },
+  { label: "Viscosity: 3000 cps", value: "viscosity_3000" },
+  { label: "Drying Time: Quick", value: "dry_quick" },
+  { label: "Drying Time: Normal", value: "dry_normal" },
+  { label: "Color: White", value: "color_white" },
+  { label: "Color: Transparent", value: "color_transparent" },
+  { label: "PH Level: 6.5", value: "ph_6_5" },
+  { label: "PH Level: 7.5", value: "ph_7_5" },
+];
+
+const pinsTags = [
+  { label: "Material: Steel", value: "material_steel" },
+  { label: "Material: Copper", value: "material_copper" },
+  { label: "Size: 1 inch", value: "size_1_inch" },
+  { label: "Size: 2 inch", value: "size_2_inch" },
+  { label: "Finish: Polished", value: "finish_polished" },
+  { label: "Finish: Matte", value: "finish_matte" },
+  { label: "Usage: Manual", value: "usage_manual" },
+  { label: "Usage: Machine", value: "usage_machine" },
+  { label: "Coating: Zinc", value: "coating_zinc" },
+  { label: "Coating: Nickel", value: "coating_nickel" },
+];
+useEffect(() => {
+  if (selectedSubCategory === 'reels') {
+    setTagFields(packingReelsTags);
+  } else if (selectedSubCategory === 'corrugation-glue') {
+    setTagFields(corrugationGlueTags);
+  } else if (selectedSubCategory === 'pasting-glue') {
+    setTagFields(pastingGlueTags);
+  } else if (selectedSubCategory === 'pins') {
+    setTagFields(pinsTags);
+  } else {
+    setTagFields([]); // Optional: clear for other subcategories
+  }
+}, [selectedSubCategory]);
+
 
   return (
     <div className="p-6 bg-white rounded">
@@ -258,6 +364,9 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
             onChange={(e) => {
               setSelectedItemType(e.target.value)
               setValue('category', e.target.value)
+                 const selectedCategoryId = e.target.value;
+      console.log('Selected Category ID:', selectedCategoryId);
+setCategoryId(selectedCategoryId)
             }}
           >
             {category.map((Category) => (
@@ -280,26 +389,27 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
               setValue('sub_category', selectedItem?.id || '')
             }}
           >
-            {subCategory.map((Sc) => (
-              <option key={Sc.id} value={Sc.sub_category_name}>
-                {Sc.sub_category_name}
+            {subCategory?.map((Sc) => (
+              <option key={Sc?.id} value={Sc?.sub_category_name}>
+                {Sc?.sub_category_name}
               </option>
             ))}
           </select>
         </div>
 
         {/* Add button for custom tags spanning full width when needed */}
-        {['reels', 'corrugation-glue', 'pasting-glue', 'pins'].includes(selectedSubCategory) && (
-          <div className="md:col-span-3 mt-2 mb-2">
-            <button
-              type="button"
-              onClick={handleAddField}
-              className="bg-purple-500 text-white text-sm px-2 py-1 rounded-md shadow-md hover:bg-purple-400"
-            >
-              + Add {cleanAndUppercase(selectedSubCategory)} Custom Tags
-            </button>
-          </div>
-        )}
+    {['reels', 'corrugation-glue', 'pasting-glue', 'pins'].includes(selectedSubCategory) && subCategory.length > 0 && (
+  <div className="md:col-span-3 mt-2 mb-2">
+    <button
+      type="button"
+      onClick={handleAddField}
+      className="bg-purple-500 text-white text-sm px-2 py-1 rounded-md shadow-md hover:bg-purple-400"
+    >
+      + Add {cleanAndUppercase(selectedSubCategory)} Custom Tags
+    </button>
+  </div>
+)}
+
 
         {/* Custom tags section spanning full width */}
         <div className="md:col-span-3">
@@ -332,7 +442,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
 
         <div className="md:col-span-3 flex justify-end">
           <button
-            onClick={() => setDrawer(false)}
+            onClick={handleCancel}
             type="button"
             className="p-2 border border-gray-300 rounded w-24 mr-2 hover:bg-gray-100 transition"
           >

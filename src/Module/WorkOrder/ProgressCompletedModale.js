@@ -5,9 +5,9 @@ import apiMethods from '../../api/config'
 
 export default function ProgressCompletedModal({ qty, isOpen, onClose, id, progress, setCellData, setAlerts }) {
   const initialFormState = {
-    excess_qty: '',
-    pending_qty: '',
-    manufactured_qty: ''
+    excess_qty: null,
+    pending_qty: null,
+    manufactured_qty: null
   };
 
   const [formData, setFormData] = useState(initialFormState);

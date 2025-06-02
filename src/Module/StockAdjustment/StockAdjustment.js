@@ -151,23 +151,23 @@ const handleEntriesChange = (newEntries) => {
                   onClick: () => console.log('Export clicked'),
               },
             ]}
-            headingOptions={[
-              {
-                label: 'All Stocks',
-                icon: <FaUserGroup size={16} />,
-                onClick: () => console.log('All Clients clicked'),
-              },
-              {
-                label: 'Active Stocks',
-                icon: <FaUserCheck size={16} />,
-                onClick: () => console.log('Active Clients clicked'),
-              },
-              {
-                label: 'Inactive Stocks',
-                icon: <FaUserSlash size={16} />,
-                    onClick: () => console.log('Inactive clicked'),
-              },
-            ]}
+            //headingOptions={[
+            //  {
+            //    label: 'All Stocks',
+            //    icon: <FaUserGroup size={16} />,
+            //    onClick: () => console.log('All Clients clicked'),
+            //  },
+            //  {
+            //    label: 'Active Stocks',
+            //    icon: <FaUserCheck size={16} />,
+            //    onClick: () => console.log('Active Clients clicked'),
+            //  },
+            //  {
+            //    label: 'Inactive Stocks',
+            //    icon: <FaUserSlash size={16} />,
+            //        onClick: () => console.log('Inactive clicked'),
+            //  },
+            //]}
           />
 
         </div>

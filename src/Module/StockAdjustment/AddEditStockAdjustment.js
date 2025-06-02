@@ -57,9 +57,10 @@ const watchedItems = watch('items');
         type: item.type || 'increase',
         adjustment_quantity: item.adjustment_quantity || '',
       }));
-      const itemIds = data?.StockAdjustmentItems?.map(item => item.item_id?.toString()) || [];
-      dispatch(setProductArray(itemIds));
 
+      const itemIds = data?.StockAdjustmentItems?.map(item => item.item_id?.toString()) || [];
+      const mergedItemIds = Array.from(new Set([...(selectedProductIds || []), ...itemIds]));
+      dispatch(setProductArray(mergedItemIds)); // ✅ merged instead of replaced
       // Reset form with fetched values
       reset({
         reason: data.reason || '',
@@ -77,7 +78,7 @@ const watchedItems = watch('items');
   if (stock?.id) {
     fetchStock();
   }
-}, [stock?.id, reset,renderState]);
+}, [stock?.id, reset]);
 
 useEffect(() => {
   const fetchProduct = async () => {
@@ -172,8 +173,9 @@ console.log("redux id",selectedProductIds)
       <h2 className="text-lg font-semibold text-purple-700 mb-4">Add Stock Adjustment</h2>
 
  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-  {/* Items Section */}
-  <div className="grid grid-cols-3 md:grid-cols-2 gap-2">
+  {/* Items Section + Remarks */}
+  <div className="grid grid-cols-3 md:grid-cols-3 gap-2">
+    {/* Items List */}
     <div className="p-3 rounded-lg flex flex-col col-span-3 md:col-span-2">
       <h3 className="text-sm font-medium mt-1 mb-2">Items</h3>
       {fields.map((item, index) => (
@@ -183,7 +185,9 @@ console.log("redux id",selectedProductIds)
               required: true,
               onChange: (e) => handleProductSelect(e.target.value),
             })}
-            className="border border-[#c2c2c2] rounded-md w-1/2 h-[40px]"
+          className={`w-1/2 h-[40px] rounded-md px-2 
+  ${errors.items?.[index]?.item_id ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'}`}
+
           >
             <option value="">Select Product</option>
             {product.map((prod) => {
@@ -213,7 +217,8 @@ console.log("redux id",selectedProductIds)
             step="0.01"
             placeholder="Quantity"
             {...register(`items.${index}.adjustment_quantity`, { required: true })}
-            className="border border-[#c2c2c2] rounded-md w-1/2 h-[40px] px-2"
+   className={`w-1/2 h-[40px] px-2 rounded-md 
+    ${errors.items?.[index]?.adjustment_quantity ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'}`}
           />
 
           <button
@@ -235,28 +240,30 @@ console.log("redux id",selectedProductIds)
         + Add Item
       </button>
     </div>
+
+    {/* Remarks Section moved here */}
+    <div className="p-3 rounded-lg flex flex-col col-span-3 md:col-span-1">
+      <label className="text-black font-normal mb-2">Remarks</label>
+      <textarea
+        {...register('remarks', { required: true })}
+        placeholder="Add any remarks"
+       className={`w-full px-2 rounded-md bg-white leading-[26px] outline-none placeholder:text-sm 
+    ${errors.remarks ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'}`}
+        rows={3}
+      />
+    </div>
   </div>
 
-  {/* Reason & Remarks - moved below */}
+  {/* Reason Section */}
   <div className="grid grid-cols-3 md:grid-cols-2 gap-2">
     <div className="p-3 rounded-lg flex flex-col">
       <label className="text-black font-normal mb-2">Reason</label>
       <input
-        {...register('reason', { required: true })}
+        {...register('reason')}
         placeholder="Reason for adjustment"
         className="w-full h-[40px] px-2 border border-[#c2c2c2] rounded-md bg-white placeholder:text-sm"
       />
       {errors.reason && <span className="text-red-500 text-xs">Required</span>}
-    </div>
-
-    <div className="p-3 rounded-lg flex flex-col">
-      <label className="text-black font-normal mb-2">Remarks</label>
-      <textarea
-        {...register('remarks')}
-        placeholder="Add any remarks"
-        className="w-full px-2 border border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-        rows={3}
-      />
     </div>
   </div>
 
@@ -279,31 +286,7 @@ console.log("redux id",selectedProductIds)
   </div>
 </form>
 
-      
-{/* <div>
-      <h3 className="text-sm font-medium mt-1 mb-1">Items</h3>
-      {adjustmentData.items.map((item, index) => (
-        <div key={index} className="flex space-x-1 items-center mb-1">
-          <CFormSelect
-            value={item.type}
-            onChange={(e) => handleItemChange(index, 'type', e.target.value)}
-            options={[
-              { label: 'Increase', value: 'increase' },
-              { label: 'Decrease', value: 'decrease' },
-            ]}
-            className="border-[#c2c2c2] rounded-md"
-          />
-          <CFormInput
-            type="number"
-            step="0.01"
-            placeholder="Quantity"
-            value={item.adjustment_quantity}
-            onChange={(e) => handleItemChange(index, 'adjustment_quantity', e.target.value)}
-            className="border-[#c2c2c2] rounded-md"
-          />
-        </div>
-      ))}
-</div> */}
+
     </div>
   )
 }

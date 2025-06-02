@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import apiMethods from "../../api/config";
-import { 
+import {
   AlertCircle,
   Calendar,
   ChevronLeft,
@@ -16,15 +16,16 @@ import {
   Truck
 } from 'lucide-react';
 import InvoiceCreationModal from "../SalesOrder/InvoiceCreationModal";
+import InvoiceModal from "./InvoiceModal";
 
 // Format dates
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
   });
 };
 
@@ -42,7 +43,7 @@ const renderProductionStages = (currentProgress) => {
 
   // Determine the current stage index
   let currentIndex = -1;
-  switch(currentProgress) {
+  switch (currentProgress) {
     case "Not Started":
       currentIndex = -1;
       break;
@@ -68,7 +69,7 @@ const renderProductionStages = (currentProgress) => {
     let bgColor = "bg-gray-50";
     let borderColor = "";
     let statusText = "Pending";
-    
+
     if (index < currentIndex) {
       // Completed stage
       statusColor = "bg-green-500";
@@ -97,7 +98,7 @@ const renderProductionStages = (currentProgress) => {
 
 // Determine status badge color
 const getStatusColor = (status) => {
-  switch(status) {
+  switch (status) {
     case "active": return "bg-green-100 text-green-800";
     case "pending": return "bg-yellow-100 text-yellow-800";
     case "completed": return "bg-blue-100 text-blue-800";
@@ -107,7 +108,7 @@ const getStatusColor = (status) => {
 
 // Determine priority badge color
 const getPriorityColor = (priority) => {
-  switch(priority) {
+  switch (priority) {
     case "High": return "bg-red-100 text-red-800";
     case "Medium": return "bg-orange-100 text-orange-800";
     case "Low": return "bg-blue-100 text-blue-800";
@@ -117,7 +118,7 @@ const getPriorityColor = (priority) => {
 
 // Determine progress badge color and icon
 const getProgressInfo = (progress) => {
-  switch(progress) {
+  switch (progress) {
     case "Not Started":
       return { color: "bg-gray-100 text-gray-800", icon: <Clock size={14} className="mr-1" /> };
     case "In Progress":
@@ -132,314 +133,357 @@ const getProgressInfo = (progress) => {
 };
 
 const ViewWorkOrder = () => {
-const { id } = useParams();
-const [workOrder, setWorkOrder] = useState([]);
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState(null);
-const navigate = useNavigate()
-const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const { id } = useParams();
+  const [workOrder, setWorkOrder] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate()
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [invoiceHistory,setinVoiceHistory] = useState([])
+  const [isInvoiceOpen,setInvoiceOpen] = useState(false)
 
 
-const handleCreateInvoice = async (invoiceData) => {
-  try {
-    console.log(invoiceData)
-    const response = await apiMethods.createInvoiceWorkOrder(invoiceData);
-    console.log('Invoice created successfully:', response);
-    
-    // Show success message (you can use a toast library or state)
-    alert('Invoice created successfully!');
-    
-    // Optionally refresh work order data or navigate to invoice
-    // navigate(`/invoice/${response.data.id}`);
-    
-  }catch(err){
-
-  }
-}
-
-const renderProductionStages = (currentProgress) => {
-  const stages = [
-    { name: "Pending" },
-    { name: "Product Planning" },
-    { name: "Procurement Sourcing" },
-    { name: "Production Planning" },
-    { name: "Production" },
-    { name: "Quality Control" },
-    { name: "Packaging" },
-    { name: "Shipping" }
-  ];
-
-  // Determine the current stage index
-  let currentIndex = -1;
-  switch(currentProgress) {
-    case "Pending":
-      currentIndex = 0;
-      break;
-    case "Product Planning":
-      currentIndex = 1;
-      break;
-    case "Procurement Sourcing":
-      currentIndex = 2;
-      break;
-    case "Production Planning":
-      currentIndex = 3;
-      break;
-    case "Production":
-      currentIndex = 4;
-      break;
-    case "Quality Control":
-      currentIndex = 5;
-      break;
-    case "Packaging":
-      currentIndex = 6;
-      break;
-    case "Shipping":
-      currentIndex = 7;
-      break;
-    case "Completed":
-      currentIndex = 8; // Beyond all stages
-      break;
-    default:
-      currentIndex = -1;
-  }
-
-  return stages.map((stage, index) => {
-    // Determine the state of this stage
-    let statusColor = "bg-gray-300"; // default: not started
-    let bgColor = "bg-gray-50";
-    let borderColor = "";
-    let statusText = "Pending";
-    
-    if (index < currentIndex) {
-      // Completed stage
-      statusColor = "bg-green-500";
-      statusText = `Completed${stage.date ? ` on ${stage.date}` : ''}`;
-    } else if (index === currentIndex) {
-      // Current stage
-      statusColor = "bg-blue-500"; // Changed to blue to match the image
-      bgColor = "bg-blue-50";
-      borderColor = "border border-blue-100";
-      statusText = "In progress";
-    }
-
-    return (
-      <li key={stage.name} className="relative pl-8">
-        <div className="absolute left-0 flex items-center justify-center w-8 h-8">
-          <div className={`w-3 h-3 ${statusColor} rounded-full border-4 border-white`}></div>
-        </div>
-        <div className={`p-2 ${bgColor} rounded-md ${borderColor}`}>
-          <p className="text-xs font-medium">{stage.name}</p>
-        </div>
-      </li>
-    );
-  });
-};
-
-useEffect(() => {
-  const fetchWorkOrder = async () => {
+  const handleCreateInvoice = async (invoiceData) => {
     try {
-      setLoading(true);
-      const response = await apiMethods.getWorkOrderById(id);
-      setWorkOrder(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Failed to fetch work order:', error);
-      setError('Failed to load work order details');
-      setLoading(false);
+      console.log(invoiceData)
+      const response = await apiMethods.createInvoiceWorkOrder(invoiceData);
+      console.log('Invoice created successfully:', response);
+
+      // Optionally refresh work order data or navigate to invoice
+      navigate(`/invoice/view/${response.data.data.id}`);
+      
+
+    } catch (err) {
+      console.log(error)
     }
+  }
+
+  useEffect(() => {
+    const getInvoiceData = async () => {
+      try {
+        const response = await apiMethods.getInvoice({
+          work_id: id
+        });
+        setinVoiceHistory(response.data.invoices);
+      } catch (error) {
+        console.error("Failed to fetch invoice data:", error);
+      }
+    };
+  
+    getInvoiceData();
+  }, [id]); // include `id` in dependency array if it's coming from props/state
+  
+
+  const renderProductionStages = (currentProgress) => {
+    const stages = [
+      { name: "Pending" },
+      { name: "Product Planning" },
+      { name: "Procurement Sourcing" },
+      { name: "Production Planning" },
+      { name: "Production" },
+      { name: "Quality Control" },
+      { name: "Packaging" },
+      { name: "Shipping" }
+    ];
+
+    // Determine the current stage index
+    let currentIndex = -1;
+    switch (currentProgress) {
+      case "Pending":
+        currentIndex = 0;
+        break;
+      case "Product Planning":
+        currentIndex = 1;
+        break;
+      case "Procurement Sourcing":
+        currentIndex = 2;
+        break;
+      case "Production Planning":
+        currentIndex = 3;
+        break;
+      case "Production":
+        currentIndex = 4;
+        break;
+      case "Quality Control":
+        currentIndex = 5;
+        break;
+      case "Packaging":
+        currentIndex = 6;
+        break;
+      case "Shipping":
+        currentIndex = 7;
+        break;
+      case "Completed":
+        currentIndex = 8; // Beyond all stages
+        break;
+      default:
+        currentIndex = -1;
+    }
+
+    return stages.map((stage, index) => {
+      // Determine the state of this stage
+      let statusColor = "bg-gray-300"; // default: not started
+      let bgColor = "bg-gray-50";
+      let borderColor = "";
+      let statusText = "Pending";
+
+      if (index < currentIndex) {
+        // Completed stage
+        statusColor = "bg-green-500";
+        statusText = `Completed${stage.date ? ` on ${stage.date}` : ''}`;
+      } else if (index === currentIndex) {
+        // Current stage
+        statusColor = "bg-blue-500"; // Changed to blue to match the image
+        bgColor = "bg-blue-50";
+        borderColor = "border border-blue-100";
+        statusText = "In progress";
+      }
+
+      return (
+        <li key={stage.name} className="relative pl-8">
+          <div className="absolute left-0 flex items-center justify-center w-8 h-8">
+            <div className={`w-3 h-3 ${statusColor} rounded-full border-4 border-white`}></div>
+          </div>
+          <div className={`p-2 ${bgColor} rounded-md ${borderColor}`}>
+            <p className="text-xs font-medium">{stage.name}</p>
+          </div>
+        </li>
+      );
+    });
   };
 
-  if (id) {
-    fetchWorkOrder();
+  useEffect(() => {
+    const fetchWorkOrder = async () => {
+      try {
+        setLoading(true);
+        const response = await apiMethods.getWorkOrderById(id);
+        setWorkOrder(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch work order:', error);
+        setError('Failed to load work order details');
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchWorkOrder();
+    }
+  }, [id]);
+
+  // Get progress info with icon
+  const progressInfo = getProgressInfo(workOrder?.progress);
+
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <AlertCircle className="w-10 h-10 text-red-500" />
+        <p className="mt-4 text-sm text-gray-600">{error}</p>
+        <button
+          className="px-4 py-2 mt-4 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+          onClick={() => window.location.reload()}
+        >
+          Try Again
+        </button>
+      </div>
+    );
   }
-}, [id]);
 
-// Get progress info with icon
-const progressInfo = getProgressInfo(workOrder?.progress);
+  // No data state
+  if (!workOrder) {
+    return (
+      <div className="flex flex-col items-center justify-center  bg-gray-50">
+        <AlertCircle className="w-10 h-10 text-yellow-500" />
+        <p className="mt-4 text-sm text-gray-600">No work order found</p>
+      </div>
+    );
+  }
 
-
-// Error state
-if (error) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-      <AlertCircle className="w-10 h-10 text-red-500" />
-      <p className="mt-4 text-sm text-gray-600">{error}</p>
-      <button 
-        className="px-4 py-2 mt-4 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
-        onClick={() => window.location.reload()}
-      >
-        Try Again
-      </button>
-    </div>
-  );
-}
-
-// No data state
-if (!workOrder) {
-  return (
-    <div className="flex flex-col items-center justify-center  bg-gray-50">
-      <AlertCircle className="w-10 h-10 text-yellow-500" />
-      <p className="mt-4 text-sm text-gray-600">No work order found</p>
-    </div>
-  );
-}
-
-return (
-  <div className=" bg-gray-50">
-    {/* Header */}
-    <div className="bg-white border-b border-gray-200 ">
-      <div className="px-4 py-2 mx-auto sm:px-6 lg:px-8 max-w-7xl">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center  space-x-3">
-            <button className="p-1 text-gray-500 rounded hover:bg-gray-100" onClick={()=>{navigate('/workorderlist')}}>
-              <ChevronLeft size={20} />
-            </button>
-            {/* <h1 className="text-sm   font-medium text-gray-900">Work Order Details</h1> */}
-          </div>
-          <div className="flex items-center space-x-2 ">
-            <button className="flex items-center px-2 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-              <Printer size={14} className="mr-1" />
-              Print
-            </button>          
-            <button className="flex items-center px-2 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-              <Download size={14} className="mr-1" />
-              Export
-            </button>
-            <button className="px-3 py-1 text-xs text-white bg-blue-600 rounded hover:bg-blue-700">
-              Edit
-            </button>
+    <div className=" bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 ">
+        <div className="px-4 py-2 mx-auto sm:px-6 lg:px-8 max-w-7xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center  space-x-3">
+              <button className="p-1 text-gray-500 rounded hover:bg-gray-100" onClick={() => { navigate('/workorderlist') }}>
+                <ChevronLeft size={20} />
+              </button>
+              {/* <h1 className="text-sm   font-medium text-gray-900">Work Order Details</h1> */}
+            </div>
+            <div className="flex items-center space-x-2 ">
+              <button className="flex items-center px-2 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                <Printer size={14} className="mr-1" />
+                Print
+              </button>
+              <button className="flex items-center px-2 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                <Download size={14} className="mr-1" />
+                Export
+              </button>
+              <button className="px-3 py-1 text-xs text-white bg-blue-600 rounded hover:bg-blue-700">
+                Edit
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Content */}
+      <div className="p-4 mx-auto h-[calc(92vh-70px)] sm:px-6 lg:px-8 overflow-y-scroll custom-scrollbar">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {/* Left Column - Main Info */}
+          <div className="col-span-2">
+            <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+              {/* Work Order Header */}
+              <div className="flex items-start justify-between p-4 border-b border-gray-200">
+                <div>
+                  <div className="flex items-center">
+                    <h2 className="text-lg font-medium text-gray-900">{workOrder.work_generate_id}</h2>
+                    <span className={`ml-2 px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(workOrder.status)}`}>
+                      {workOrder.status ? workOrder.status.charAt(0).toUpperCase() + workOrder.status.slice(1) : 'Unknown'}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">Created on {formatDate(workOrder.created_at)}</p>
+                </div>
+                <div className="flex flex-col items-end">
+                  <div className="flex items-center">
+                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getPriorityColor(workOrder.priority)}`}>
+                      {workOrder.priority || 'Normal'} Priority
+                    </span>
+                  </div>
+                  <div className="mt-1">
+                    <span className={`flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${progressInfo.color}`}>
+                      {progressInfo.icon} {workOrder.progress || 'Not Started'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* What's Next Section */}
+              {invoiceHistory.length === 0 ? (
+  <div className="bg-blue-50 border border-blue-100 rounded p-2 mx-4 my-2 text-xs">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-1">
+        <div className="bg-blue-100 p-0.5 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <div>
+          <h3 className="font-semibold text-blue-800 text-xs">WHAT'S NEXT?</h3>
+          <p className="text-blue-700 text-xs">Convert to packages, shipments, or invoices.</p>
+        </div>
+      </div>
+      <button
+        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
+        onClick={() => setIsInvoiceModalOpen(true)}
+      >
+        Convert Into Invoice
+      </button>
     </div>
+  </div>
+) : (
+  <div className="bg-green-50 border border-green-100 rounded p-2 mx-4 my-2 text-xs">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-1">
+        <div className="bg-green-100 p-0.5 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <div>
+          <h3 className="font-semibold text-green-800 text-xs">INVOICE AVAILABLE</h3>
+          <p className="text-green-700 text-xs">This work order has already been invoiced.</p>
+        </div>
+      </div>
+      <button
+        className="bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
+        onClick={()=>{setInvoiceOpen(true)}}
+      >
+        Show Invoice
+      </button>
+    </div>
+  </div>
+)}
 
-    {/* Content */}
-    <div className="p-4 mx-auto h-[calc(92vh-70px)] sm:px-6 lg:px-8 overflow-y-scroll custom-scrollbar">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {/* Left Column - Main Info */}
-        <div className="col-span-2">
-          <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-            {/* Work Order Header */}
-            <div className="flex items-start justify-between p-4 border-b border-gray-200">
-              <div>
-                <div className="flex items-center">
-                  <h2 className="text-lg font-medium text-gray-900">{workOrder.work_generate_id}</h2>
-                  <span className={`ml-2 px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(workOrder.status)}`}>
-                    {workOrder.status ? workOrder.status.charAt(0).toUpperCase() + workOrder.status.slice(1) : 'Unknown'}
-                  </span>
-                </div>
-                <p className="mt-1 text-xs text-gray-500">Created on {formatDate(workOrder.created_at)}</p>
-              </div>
-              <div className="flex flex-col items-end">
-                <div className="flex items-center">
-                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getPriorityColor(workOrder.priority)}`}>
-                    {workOrder.priority || 'Normal'} Priority
-                  </span>
-                </div>
-                <div className="mt-1">
-                  <span className={`flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${progressInfo.color}`}>
-                    {progressInfo.icon} {workOrder.progress || 'Not Started'}
-                  </span>
-                </div>
-              </div>
-            </div>
 
-            {/* What's Next Section */}
-            <div className="bg-blue-50 border border-blue-100 rounded p-2 mx-4 my-2 text-xs">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <div className="bg-blue-100 p-0.5 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                    </svg>
+              {/* Product Details */}
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Product Details</h3>
+                <div className="grid grid-cols-2 gap-4 mt-4 sm:grid-cols-3">
+                  <div>
+                    <p className="text-xs text-gray-500">SKU</p>
+                    <p
+                      onClick={() => navigate(`/SKU/${workOrder.sku_id}`)}
+                      className="text-sm font-medium text-blue-600 hover:text-blue-800 cursor-pointer">{workOrder.sku_name || 'N/A'}</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-blue-800 text-xs">WHAT'S NEXT?</h3>
-                    <p className="text-blue-700 text-xs">Convert to packages, shipments, or invoices  .</p>
+                    <p className="text-xs text-gray-500">Quantity</p>
+                    <p className="text-sm font-medium">{workOrder.qty || 0} units</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Manufacture Type</p>
+                    <p className="text-sm font-medium capitalize">{workOrder.manufacture || 'N/A'}</p>
                   </div>
                 </div>
-                <button
-                 className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
-                 onClick={() => setIsInvoiceModalOpen(true)}
-                 >
-                  Convert Into Invoice
-                </button>
+              </div>
+
+              {/* Timeline */}
+              <div className="p-4">
+                <h3 className="text-sm font-medium text-gray-700">Timeline</h3>
+                <div className="grid grid-cols-1 gap-3 mt-2 sm:grid-cols-3">
+                  <div className="p-2 border border-gray-200 rounded-md">
+                    <div className="flex items-center">
+                      <Calendar size={14} className="text-gray-500" />
+                      <p className="ml-1 text-xs text-gray-500">Start Date</p>
+                    </div>
+                    <p className="mt-1 text-sm font-medium">{formatDate(workOrder.planned_start_date)}</p>
+                  </div>
+                  <div className="p-2 border border-gray-200 rounded-md">
+                    <div className="flex items-center">
+                      <Calendar size={14} className="text-gray-500" />
+                      <p className="ml-1 text-xs text-gray-500">End Date</p>
+                    </div>
+                    <p className="mt-1 text-sm font-medium">{formatDate(workOrder.planned_end_date)}</p>
+                  </div>
+                  <div className="p-2 border border-gray-200 rounded-md">
+                    <div className="flex items-center">
+                      <Truck size={14} className="text-gray-500" />
+                      <p className="ml-1 text-xs text-gray-500">Expected Delivery</p>
+                    </div>
+                    <p className="mt-1 text-sm font-medium">{formatDate(workOrder.edd)}</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Product Details */}
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="text-sm font-medium text-gray-700">Product Details</h3>
-              <div className="grid grid-cols-2 gap-4 mt-2 sm:grid-cols-3">
-                <div>
-                  <p className="text-xs text-gray-500">SKU</p>
-                  <p className="text-sm font-medium">{workOrder.sku_name || 'N/A'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Quantity</p>
-                  <p className="text-sm font-medium">{workOrder.qty || 0} units</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Manufacture Type</p>
-                  <p className="text-sm font-medium capitalize">{workOrder.manufacture || 'N/A'}</p>
-                </div>
+            {/* Production Stages - Dynamic based on progress */}
+            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Production Stages</h3>
               </div>
-            </div>
-
-            {/* Timeline */}
-            <div className="p-4">
-              <h3 className="text-sm font-medium text-gray-700">Timeline</h3>
-              <div className="grid grid-cols-1 gap-3 mt-2 sm:grid-cols-3">
-                <div className="p-2 border border-gray-200 rounded-md">
-                  <div className="flex items-center">
-                    <Calendar size={14} className="text-gray-500" />
-                    <p className="ml-1 text-xs text-gray-500">Start Date</p>
-                  </div>
-                  <p className="mt-1 text-sm font-medium">{formatDate(workOrder.planned_start_date)}</p>
-                </div>
-                <div className="p-2 border border-gray-200 rounded-md">
-                  <div className="flex items-center">
-                    <Calendar size={14} className="text-gray-500" />
-                    <p className="ml-1 text-xs text-gray-500">End Date</p>
-                  </div>
-                  <p className="mt-1 text-sm font-medium">{formatDate(workOrder.planned_end_date)}</p>
-                </div>
-                <div className="p-2 border border-gray-200 rounded-md">
-                  <div className="flex items-center">
-                    <Truck size={14} className="text-gray-500" />
-                    <p className="ml-1 text-xs text-gray-500">Expected Delivery</p>
-                  </div>
-                  <p className="mt-1 text-sm font-medium">{formatDate(workOrder.edd)}</p>
+              <div className="p-4">
+                <div className="relative">
+                  <div className="absolute left-4 h-full w-0.5 bg-gray-200"></div>
+                  <ul className="space-y-4">
+                    {renderProductionStages(workOrder.progress)}
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Production Stages - Dynamic based on progress */}
-          <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="text-sm font-medium text-gray-700">Production Stages</h3>
-            </div>
-            <div className="p-4">
-              <div className="relative">
-                <div className="absolute left-4 h-full w-0.5 bg-gray-200"></div>
-                <ul className="space-y-4">
-                  {renderProductionStages(workOrder.progress)}
-                </ul>
+          {/* Right Column - Related Info */}
+          <div>
+            {/* QR Code - Using actual QR code URL if available */}
+            <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+              <div className="p-3 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Work Order QR Code</h3>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column - Related Info */}
-        <div>
-          {/* QR Code - Using actual QR code URL if available */}
-          <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-            <div className="p-3 border-b border-gray-200">
-              <h3 className="text-sm font-medium text-gray-700">Work Order QR Code</h3>
-            </div>
-            <div className="flex flex-col items-center p-4">
-              {/* <div className="bg-white p-2 border border-gray-200 rounded-md">
+              <div className="flex flex-col items-center p-4">
+                {/* <div className="bg-white p-2 border border-gray-200 rounded-md">
                 {workOrder?.qr_code_url ? (
                   <img 
                     src={workOrder?.qr_code_url} 
@@ -458,72 +502,81 @@ return (
                   />
                 )}
               </div> */}
-              <button className="mt-3 px-3 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                <Download size={14} className="inline mr-1" />
-                Download QR Code
-              </button>
-            </div>
-          </div>
-
-          {/* Related Info */}
-          <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-            <div className="p-3 border-b border-gray-200">
-              <h3 className="text-sm font-medium text-gray-700">Related Information</h3>
-            </div>
-            <div className="p-4">
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs text-gray-500">Sales Order</p>
-                  <p className="text-sm font-medium">#{workOrder.sales_order_id ? `SO-${workOrder.sales_order_id.toString().padStart(5, '0')}` : 'N/A'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Client</p>
-                  <p className="text-sm font-medium">Client #{workOrder.client_id || 'N/A'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Last Updated</p>
-                  <p className="text-sm font-medium">{formatDate(workOrder.updated_at)}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-            <div className="p-3 border-b border-gray-200">
-              <h3 className="text-sm font-medium text-gray-700">Actions</h3>
-            </div>
-            <div className="p-4">
-              <div className="space-y-2">
-                <button className="w-full px-3 py-1.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700">
-                  Update Progress
-                </button>
-                <button className="w-full px-3 py-1.5 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                  View Production Reports
-                </button>
-                <button className="w-full px-3 py-1.5 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                  View Materials Used
+                <button className="mt-3 px-3 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                  <Download size={14} className="inline mr-1" />
+                  Download QR Code
                 </button>
               </div>
             </div>
 
-            {/* Invoice Creation Modal */}
-<InvoiceCreationModal
-  isOpen={isInvoiceModalOpen}
-  onClose={() => setIsInvoiceModalOpen(false)}
-  workOrder={workOrder}
-  onSubmit={handleCreateInvoice}
-/>
+            {/* Related Info */}
+            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+              <div className="p-3 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Related Information</h3>
+              </div>
+              <div className="p-4">
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs text-gray-500">Sales Order</p>
+                    <p
+                     onClick={()=>navigate(`/salesorder/view/${workOrder.sales_order_id}`)}
+                     className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">#{workOrder.sales_order_id ? `SO-${workOrder.sales_order_id.toString().padStart(5, '0')}` : 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Client</p>
+                    <p
+                     onClick={()=>navigate(`/clients/${workOrder.client_id}`)}
+                     className=" text-blue-600 hover:text-blue-800 cursor-pointer text-sm font-medium">Client #{workOrder.client_id || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Last Updated</p>
+                    <p className="text-sm font-medium">{formatDate(workOrder.updated_at)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+              <div className="p-3 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Actions</h3>
+              </div>
+              <div className="p-4">
+                <div className="space-y-2">
+                  {/* <button className="w-full px-3 py-1.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700">
+                    Update Progress
+                  </button> */}
+                  <button className="w-full px-3 py-1.5 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                    View Production Reports
+                  </button>
+                  <button className="w-full px-3 py-1.5 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                    View Materials Used
+                  </button>
+                </div>
+              </div>
+
+              {/* Invoice Creation Modal */}
+              <InvoiceCreationModal
+                isOpen={isInvoiceModalOpen}
+                onClose={() => setIsInvoiceModalOpen(false)}
+                workOrder={workOrder}
+                onSubmit={handleCreateInvoice}
+              />
+              <InvoiceModal
+              isOpen={isInvoiceOpen}
+              invoices={invoiceHistory}
+              setIsOpen={setInvoiceOpen}
+              />
+
+            </div>
+
+            {/* What's Next Section */}
 
           </div>
-
-          {/* What's Next Section */}
-
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default ViewWorkOrder;

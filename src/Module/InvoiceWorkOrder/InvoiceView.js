@@ -64,13 +64,13 @@ function InvoiceView() {
                     </div>
                 </div>
                 <div className="flex bg-gray-50 px-3 border-t text-xs">
-                    <button
+                    {/* <button
                         className="flex items-centergap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600"
                     //    onClick={()=>navigate(`/salesorder/form/${invoice?.id}?tab=salesOrder`)}
                     >
                         <CIcon icon={cilPencil} className="h-3 w-3" />
                         <span>Edit</span>
-                    </button>
+                    </button> */}
                     <button className="flex items-center gap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
                         <CIcon icon={cilEnvelopeOpen} className="h-3 w-3" />
                         <span>Email</span>

@@ -463,7 +463,7 @@ const OrderForm = forwardRef(({
               {/* Sales Order Id */}
               <div className="flex items-center mt-1">
                 <label className="text-xs text-red-600 w-40">
-                  Sales Order#*
+                  Sales Order Reference*
                 </label>
                 <div className="relative">
                   <input

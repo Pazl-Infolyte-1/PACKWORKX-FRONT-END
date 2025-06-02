@@ -162,7 +162,7 @@ const response = await apiMethods.clientStatusSwitch(newStatus, clientId)
                     {isMinimized ? (
                       <>
                         <CTableDataCell className="px-4 py-3 flex items-center gap-2">
-                          <input
+                          {/* <input
                             type="checkbox"
                             checked={selectedRows.includes(client.client_id)}
                             onChange={(e) => {
@@ -170,7 +170,7 @@ const response = await apiMethods.clientStatusSwitch(newStatus, clientId)
                               handleRowSelect(client.client_id)
                             }}
                             className="form-checkbox h-4 w-4 text-blue-600 rounded mb-2"
-                          />
+                          /> */}
                           <div
                             onClick={(e) => {
                               openViewCard(client)
@@ -228,12 +228,12 @@ const response = await apiMethods.clientStatusSwitch(newStatus, clientId)
   value={client.status === 'active' || client.status === 'inactive' ? client.status : ''}
   onClick={(e) => e.stopPropagation()}
   onChange={(e) => handleStatusChange(client.client_id, e.target.value)}
-  className={`border border-gray-300 rounded px-2 py-1 text-sm
-    ${client.status === 'inactive' ? 'bg-gray-200' : 'bg-white'}`}
+  className={`border border-gray-300 rounded-2xl px-1 py-1 text-sm bold
+    ${client.status === 'inactive' ? 'bg-red-100 text-red-900' : 'bg-green-100 text-green-900'}`}
 >
   <option value="" disabled hidden>Select Status</option>
-  <option value="active">Active</option>
-  <option value="inactive">In Active</option>
+  <option value="active">active</option>
+  <option value="inactive">In active</option>
 </select>
 
 </CTableDataCell>

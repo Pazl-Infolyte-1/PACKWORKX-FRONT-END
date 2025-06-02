@@ -16,7 +16,7 @@ const AddSalesOrder = () => {
   const { id: selectedSalesOrderID } = useParams();
   const [isEdit, setIsEdit] = useState(false);
 const { id } = useParams(); // assuming the route has a parameter like /edit/:id
-  const [activeTab, setActiveTab] = useState()
+  const [activeTab, setActiveTab] = useState('salesOrder') // Set default to salesOrder
   const [loading, setLoading] = useState(false)
   const [existingSalesOrderData, setExistingSalesOrderData] = useState('')
   const [alerts, setAlerts] = useState([]);
@@ -25,6 +25,9 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
   const [errors, setErrors] = useState({});
 
   const navigate = useNavigate()
+
+  // Add state to track if sales order step is completed
+  const [isSalesOrderCompleted, setIsSalesOrderCompleted] = useState(false)
 
   const [totals, setTotals] = useState({
     total_amount:0,
@@ -41,32 +44,28 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
 
   const childRef = useRef();
 
-  // const handleParentSubmit = () => {
-
-  //   if (childRef.current) {
-  //     handleFormSubmit(childRef.current.getCompleteFormData)
-  //   }
-  // };
-
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const tab = queryParams.get('tab');
 
     if (tab) {
       setActiveTab(tab);
+    } else {
+      setActiveTab('salesOrder'); // Default to salesOrder tab
     }
   }, [location.search]);
 
   useEffect(() => {
     if (id) {
       setIsEdit(true);
+      // If editing, allow access to work order tab
+      setIsSalesOrderCompleted(true);
     } else {
       setIsEdit(false);
+      setIsSalesOrderCompleted(false);
     }
   }, [id]);
   
-
-
   const handleParentSubmit = () => {
 
     if (childRef.current) {
@@ -79,6 +78,32 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
       }
     }
   };
+
+  // Function to handle "Next" button click
+  const handleNextClick = () => {
+    // Validate the sales order form before proceeding
+    if (childRef.current) {
+      const isValid = childRef.current.validateForm();
+      
+      if (isValid) {
+        setIsSalesOrderCompleted(true);
+        setActiveTab('skuDetails');
+        
+        // Update URL params
+        const params = new URLSearchParams(location.search);
+        params.set('tab', 'skuDetails');
+        window.history.replaceState({}, '', `${location.pathname}?${params}`);
+      } else {
+        // Show validation errors or alert
+        setAlerts([{ severity: "warning", message: "Please complete all required fields in the Sales Order form." }]);
+      }
+    } else {
+      // If no validation method available, just proceed
+      setIsSalesOrderCompleted(true);
+      setActiveTab('skuDetails');
+    }
+  };
+
   // Main state for SKU details that will be shared across components
   const [skuDetailsForm, setSkuDetailsForm] = useState([])
 
@@ -172,7 +197,6 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
     setSalesDetailsForm({ ...data });
   };
 
-
   useEffect(() => {
     // If skuDetails was added to salesDetailsForm directly, update skuDetailsForm 
     if (salesDetailsForm.skuDetails) {
@@ -227,7 +251,6 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
     setSalesDetailsForm((prevState) => {
       const updatedForm = completeFormData;
 
-
       const workDetailsWithClient = workOrdersData.map(workOrder => ({
         ...workOrder,
         client_id: updatedForm.client_id
@@ -264,7 +287,6 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
       // ✅ Redirect after success
       setTimeout(() => {
         navigate('/salesorder'); // Change '/sales-orders' to your actual route
-
       }, 500);
     
     }catch (error) {
@@ -281,9 +303,6 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
       setAlerts([])
     }, 3000);
   };
-  
-
-
 
   const workOrderListSubmit = async (formData) => {
     try {
@@ -303,11 +322,9 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
     } catch (error) {
       console.error('Error:', error);
       setAlerts([{ severity: "error", message: error?.response?.data?.message || "Unable To update Work order please try again later " }]);
-
     }
   };
   
-
   // Function to handle final form submission from WorkOrders component
   const handleWorkOrderFormUpdate = async (formData) => {
     try {
@@ -331,7 +348,6 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
         skuDetailsForm &&
         skuDetailsForm?.length > 0 &&
         skuDetailsForm[0]?.quantity_required;
-
 
       // Construct the final sales order object including SKU and Work Orders
       const finalSalesOrder = {
@@ -360,7 +376,6 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
     } catch (error) {
       console.error("Error submitting sales order:", error);
       setAlerts([{ severity: "error", message: error?.response?.data?.message ||"Failed To Update WorkOrder " }]);
-
     } finally {
       // setLoading(false);
     }
@@ -369,10 +384,6 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
   useEffect(() => {
     setIsEdit(!!selectedSalesOrderID); // ✅ if id exists → edit mode
   }, [selectedSalesOrderID]);
-
-
-
-
 
   return (
     <div className="h-[91vh] overflow-hidden flex flex-col">

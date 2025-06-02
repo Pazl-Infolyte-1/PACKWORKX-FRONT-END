@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronDown, ChevronUp, X, Calendar, DollarSign, FileText, Package } from 'lucide-react';
+import { ChevronDown, ChevronUp, X, Calendar, DollarSign, FileText, Package, IndianRupee } from 'lucide-react';
 
 const InvoiceModal = ({isOpen,setIsOpen,invoices}) => {
   const [expandedInvoice, setExpandedInvoice] = useState(null);

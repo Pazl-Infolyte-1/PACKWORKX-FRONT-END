@@ -943,7 +943,7 @@ export const apiMethods = {
     return response
   },
   workOrderStatusUpdate: async (id, body) => {
-    const response = await apiClient.put(`/work-order/status/${id}`, body)
+    const response = await apiClient.patch(`/work-order/status/${id}`, body)
     return response
   },
   editWorkOrder: async (id, body) => {
@@ -1462,13 +1462,10 @@ getinventoryWithParams: async (catId, page) => {
       console.error(error)
     }
   },
-  getInvoiceById: async (id) => {
-    try {
-      return await apiClient.get(`/work-order-invoice/get/${id}`)
-    } catch (error) {
-      console.error(error)
-    }
-  },
+
+  getInvoiceById: async (id, params = {}) => {
+    return await apiClient.get(`/work-order-invoice/get/${id}`, { params });
+  },    
   getStockAdjustments: async (page = 1, entries) => {
     try {
       return await apiClient.get(`/stock-adjustments?page=${page}&entries=${entries}`)
@@ -1514,31 +1511,12 @@ getinventoryWithParams: async (catId, page) => {
   getInvoiceHistory:async(id)=>{
     return await apiClient.get(`/work-order-invoice/get-by-sku/${id}`,)
   },
-subCategoryDropdown: async (categoryId) => {
-  try {
-    const response = await apiClient.get(
-      categoryId ? `/items/sub-category/id` : `/sub-category`,
-      {
-        params: categoryId ? { category_id: categoryId } : {},
-      }
-    );
-    return response;
-  } catch (error) {
-    console.error("Error inside subCategoryDropdown:", error); // 👈 helpful
-    throw error; // ✅ so it gets caught in `useEffect`
-  }
-},
-
-  singleInventoryView: async (id) => {
-    try {
-      const response = await apiClient.get(`/inventory/status/${id}`)
-      return response.data
-    } catch (error) {
-      console.error(error)
-       throw error;
-    }
+  getWorkOrderProgressDropDownOptions:async(id)=>{
+    return await apiClient.get(`/common-service/work-order-status`,)
   },
-
+  getInvoice: async ( params = {}) => {
+    return await apiClient.get(`/work-order-invoice/get`, { params });
+  },    
 }
 
 export default apiMethods

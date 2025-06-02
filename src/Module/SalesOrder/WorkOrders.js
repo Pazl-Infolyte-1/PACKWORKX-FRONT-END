@@ -6,7 +6,7 @@ import apiMethods from '../../api/config'
 import SkuVersionAddEdit from './SkuVersionAddEdit'
 import VersionChoicePopup from './VersionChoicePopup'
 import PopUp from '../../components/New/PopUp'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import CustomAlert from '../../components/New/CustomAlert'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 
@@ -33,7 +33,7 @@ const WorkOrders = ({
   setFormData,
   workOrdersData,
   setworkOrdersData,
-  handleCloseDrawer,
+  // handleCloseDrawer,
   workOrders,
   setWorkOrders,
   setDrawer,
@@ -77,9 +77,12 @@ const WorkOrders = ({
     }
   }, [fromsalesorder, salesOrderId,salesOrder]);
   
+const navigate = useNavigate() // Add this line
 
-
-  
+  const handleCancel = () => {
+  // Navigate to workorderlist page
+  navigate('/workorderlist'); // Adjust the path according to your routing structure
+};
 
   useEffect(() => {
     console.log(skuDetailsForm, 'skudetailsform in workorderform')
@@ -1158,9 +1161,7 @@ const WorkOrders = ({
           <div className="pr-3 mx-auto flex justify-end">
             <div className='flex gap-2'>
               <ActionButton
-                onClick={() => {
-                  handleCloseDrawer()
-                }}
+                onClick={handleCancel}
                 variant="cancel"
                 label={"cancel"}
               />

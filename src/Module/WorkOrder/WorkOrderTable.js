@@ -159,47 +159,95 @@ const WorkOrderTable = ({
             return 'bg-blue-100 text-blue-800'
           case 'Production Planned':
             return 'bg-gray-100 text-gray-800'
-          default:
+          case 'Invoiced':
             return 'bg-red-100 text-red-800'
+          default:
+            return 'bg-gray-100 text-gray-800'
         }
       },
       onChange: (row, newValue) => {
         handleProgressChange(newValue, row.id)
       },
     },
+
     {
-      key: 'actions',
-      header: 'action',
-      field: 'actions',
-      type: 'custom',
-      render: (row) => (
-        <ThreeDotMenu
-          value={[
-            {
-              label: 'View',
-              icon: cilHandPointRight,
-              onClick: () => {
-                handleView(row)
-              },
+  key: 'actions',
+  header: 'action',
+  field: 'actions',
+  type: 'custom',
+  render: (row) => (
+    row.progress === 'Invoiced' ? (
+      <div className="text-gray-400 cursor-not-allowed pointer-events-none">
+        <svg 
+          className="w-5 h-5" 
+          fill="currentColor" 
+          viewBox="0 0 20 20"
+        >
+          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+        </svg>
+      </div>
+    ) : (
+      <ThreeDotMenu
+        value={[
+          {
+            label: 'View',
+            icon: cilHandPointRight,
+            onClick: () => {
+              handleView(row)
             },
-            {
-              label: 'Edit',
-              icon: cilPencil,
-              onClick: () => {
-                handleEdit(row.id)
-              },
+          },
+          {
+            label: 'Edit',
+            icon: cilPencil,
+            onClick: () => {
+              handleEdit(row.id)
             },
-            {
-              label: 'Delete',
-              icon: cilTrash,
-              onClick: () => {
-                handleDelete(row.id)
-              },
+          },
+          {
+            label: 'Delete',
+            icon: cilTrash,
+            onClick: () => {
+              handleDelete(row.id)
             },
-          ]}
-        />
-      ),
-    },
+          },
+        ]}
+      />
+    )
+  ),
+},
+    // {
+    //   key: 'actions',
+    //   header: 'action',
+    //   field: 'actions',
+    //   type: 'custom',
+    //   render: (row) => (
+    //     <ThreeDotMenu
+    //       value={[
+    //         {
+    //           label: 'View',
+    //           icon: cilHandPointRight,
+    //           onClick: () => {
+    //             handleView(row)
+    //           },
+    //         },
+    //         {
+    //           label: 'Edit',
+    //           icon: cilPencil,
+    //           onClick: () => {
+    //             handleEdit(row.id)
+    //           },
+    //         },
+    //         {
+    //           label: 'Delete',
+    //           icon: cilTrash,
+    //           onClick: () => {
+    //             handleDelete(row.id)
+    //           },
+    //         },
+    //       ]}
+    //     />
+    //   ),
+    // },
   ]
 
   return (

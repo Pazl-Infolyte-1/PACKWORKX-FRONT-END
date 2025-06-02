@@ -82,6 +82,7 @@ function ViewMachineData({ Id }) {
       return dateString
     }
   }
+  console.log(machineData)
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 ">
@@ -198,19 +199,23 @@ function ViewMachineData({ Id }) {
       <div className="mt-4 bg-gray-50 p-4 rounded-lg">
         <div className=" bg-gray-50 rounded-lg">
           <h3 className="text-sm uppercase tracking-wide text-black mb-2">Process Values</h3>
-          {values.length > 0 ? (
-            values.map((value, index) => (
+          {machineData.machine_process.length > 0 ? (
+            machineData.machine_process.map((value, index) => (
               <div key={index} className="mb-4 bg-white p-2">
-                <h4 className="text-sm">{value.ProcessName.process_name}</h4>
+                <h4 className="text-sm">{value.process_name}</h4>
                 <div className="grid grid-cols-3 gap-2 mt-2 ">
-                  {Object.entries(value.process_value).map(([key, val]) => (
-                    <div key={key} className=" p-2 rounded">
-                      <span className="text-gray-600 text-sm">{key}: </span>
-                      <span className="font-medium">
-                        {val || <span className="text-xs">N/A</span>}
-                      </span>
-                    </div>
-                  ))}
+                  {Object.keys(value.process_values || {}).length > 0 ? (
+                    Object.entries(value.process_values).map(([key, val]) => (
+                      <div key={key} className="p-2 rounded">
+                        <span className="text-gray-600 text-sm">{key}: </span>
+                        <span className="font-medium">
+                          {val || <span className="text-xs">N/A</span>}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-sm text-red-500 p-2">No Field Available</div>
+                  )}
                 </div>
               </div>
             ))

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Select from 'react-select';
 import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form';
 import apiMethods from '../../api/config';
+import InvoiceHistoryModal from './InvoiceHistoryModal';
 
 const SalesOrderSkuForm = ({ 
   isIgstApplicable = false, 
@@ -23,6 +24,7 @@ const SalesOrderSkuForm = ({
   const [totalCGST, setTotalCGST] = useState(0);
   const [totalWithGST, setTotalWithGST] = useState(0);
   const [totalGst, setTotalGst] = useState(0);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   // Initialize form with skuDetailsForm data if it exists
   const { register, control, watch, setValue, getValues } = useForm({
@@ -598,7 +600,7 @@ const calculateRowValues = (index) => {
                         <td className="py-2 text-center">
                           <button 
                             type="button" 
-                            onClick={() => {/* TODO: Add history view handler */}} 
+                            onClick={() => setIsInvoiceModalOpen(true)}
                             className="text-blue-500 hover:text-blue-700"
                             title="View Invoice History"
                           >
@@ -617,6 +619,15 @@ const calculateRowValues = (index) => {
                               <polyline points="12 6 12 12 16 14"></polyline>
                             </svg>
                           </button>
+                          {isInvoiceModalOpen && (
+  <InvoiceHistoryModal
+    isOpen={isInvoiceModalOpen}
+    onClose={() => setIsInvoiceModalOpen(false)}
+    sku={skusData[index]?.sku}
+    skuList={skuList}
+  />
+)}
+
                         </td>
                       </tr>
 
@@ -714,7 +725,10 @@ const calculateRowValues = (index) => {
           </div>
         </div>
       </div>
+
+
     </div>
+
   );
 };
 

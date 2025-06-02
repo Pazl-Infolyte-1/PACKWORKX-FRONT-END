@@ -31,6 +31,7 @@ const OrderForm = forwardRef(({
   const stateID = localStorage.getItem('company_state_id');
   const [isIgstApplicable, setIsIgstApplicable] = useState(true)
   const { searchQuery, setGlobalPlaceholder } = useSearch()
+
   const navigate = useNavigate()
 
 
@@ -197,7 +198,7 @@ const OrderForm = forwardRef(({
         try {
           const params = {
             ...(searchTerm && { search: searchTerm }),
-            limit: 25,
+            limit: 10000,
           };
 
           const response = await apiMethods.getClients(params);
@@ -413,7 +414,7 @@ const OrderForm = forwardRef(({
                             onChange={() => selectClient(client.company_name, client.client_id, client?.addresses?.[0]?.state)}
                             onClick={() => selectClient(client.company_name, client.client_id, client?.addresses?.[0]?.state)}
                           >
-                            {client.company_name}
+                            {client.display_name}
                           </div>
                         ))
                       ) : (

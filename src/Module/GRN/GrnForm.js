@@ -13,8 +13,48 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
     setSearchTerm(e.target.value)
   }
 
-  const selectClient = (poId) => {
-    const event = { target: { name: 'po_id', value: poId } }
+  const selectClient = async (id) => {
+    const event = { target: { name: 'po_id', value: id } }
+
+    try {
+      const response = await apiMethods.getPurchaseOrderById(id)
+      const poData = response.data
+      console.log('PO Data:', poData);
+
+      // Update the main form data with PO information
+      setGrnFormData((prevData) => ({
+        ...prevData,
+        po_id: id,
+        supplier_id: poData.supplier_id,
+        supplier_name: poData.supplier_name,
+      }))
+
+      // Format the items for the GRN form
+      const formattedItems = poData.PurchaseOrderItems.map((item) => ({
+        po_item_id: item.id,
+        item_id: item.item_id,
+        item_code: item.item_code,
+        grn_item_name: item.po_item_name || '',
+        description: item.description || '',
+        quantity_ordered: parseFloat(item.quantity) || 0,
+        quantity_received: 0, 
+        accepted_quantity: 0, 
+        rejected_quantity: 0,
+        batch_no: '',
+        notes: '',
+        work_order_no: '',
+        location: '',
+      }))
+
+      // Update the items in the form data
+      setGrnFormData((prevData) => ({
+        ...prevData,
+        items: formattedItems,
+      }))
+    } catch (error) {
+      console.error('Error fetching purchase order:', error)
+    }
+
     handleInputChange(event)
     setIsOpen(false)
   }
@@ -35,8 +75,9 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
   useEffect(() => {
     const fetchPurchaseOrderData = async () => {
       try {
-        const response = await apiMethods.getPurchaseOrders({limit:20000})
-        setPurchaseOrderData(response.data)
+        const response = await apiMethods.getAllPurchaseOrderIds()
+        // const response = await apiMethods.getPurchaseOrders({limit:20000})
+        setPurchaseOrderData(response.data.data)
       } catch (error) {
         console.error(error)
       }

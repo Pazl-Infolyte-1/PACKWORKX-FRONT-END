@@ -142,6 +142,7 @@ const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
 const handleCreateInvoice = async (invoiceData) => {
   try {
+    console.log(invoiceData)
     const response = await apiMethods.createInvoiceWorkOrder(invoiceData);
     console.log('Invoice created successfully:', response);
     

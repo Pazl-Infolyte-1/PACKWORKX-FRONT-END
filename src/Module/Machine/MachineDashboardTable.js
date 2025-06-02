@@ -120,13 +120,13 @@ const MachineDashboardTable = ({
       render: (row) => (
         <ThreeDotMenu
           value={[
-            {
-              label: 'Assign Process & Values',
-              icon: cilPlus,
-              onClick: () => {
-                onAddProcess && onAddProcess(row.id, row.machine_name)
-              },
-            },
+            // {
+            //   label: 'Assign Process & Values',
+            //   icon: cilPlus,
+            //   onClick: () => {
+            //     onAddProcess && onAddProcess(row.id, row.machine_name)
+            //   },
+            // },
             {
               label: 'Process Route',
               icon: cilGraph,
@@ -134,13 +134,13 @@ const MachineDashboardTable = ({
                 setOpenRoutes({ show: true, id: row.id })
               },
             },
-            {
-              label: 'Edit Values',
-              icon: cilFlipToBack,
-              onClick: () => {
-                setOpenFieldValuesModal({ show: true, id: row.id })
-              },
-            },
+            // {
+            //   label: 'Edit Values',
+            //   icon: cilFlipToBack,
+            //   onClick: () => {
+            //     setOpenFieldValuesModal({ show: true, id: row.id })
+            //   },
+            // },
             {
               label: 'Edit',
               icon: cilPencil,

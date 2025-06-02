@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import apiMethods from '../../api/config';
 import CIcon from '@coreui/icons-react';
 import { cilEnvelopeOpen, cilPencil, cilPrint } from '@coreui/icons';
@@ -9,6 +9,7 @@ import html2pdf from 'html2pdf.js';
 function InvoiceView() {
     const { id } = useParams(); // grabs the `id` from the URL
     const [invoice, setInvoice] = useState([]);
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchSalesOrderData = async () => {
@@ -60,7 +61,7 @@ function InvoiceView() {
                     <div className="flex items-start space-x-4">
                         <button className="text-black text-xs">Upload Files</button>
                         <button className="text-black text-xs">Comments & History</button>
-                        <button className="text-gray-500 text-sm items-start" onClick={() => { navigate('/salesorder') }}>✕</button>
+                        <button className="text-gray-500 text-sm items-start" onClick={() => { navigate('/invoice') }}>✕</button>
                     </div>
                 </div>
                 <div className="flex bg-gray-50 px-3 border-t text-xs">

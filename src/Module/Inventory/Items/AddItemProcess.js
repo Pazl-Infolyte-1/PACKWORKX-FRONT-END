@@ -102,11 +102,11 @@ useEffect(() => {
         const subCategoryResponse = await apiMethods.subCategoryDropdown(categoryId);
         setSubCategory(subCategoryResponse?.data?.data);
       } catch (subCatErr) {
-        console.log("SubCategory API error:", subCatErr.response.data.message); // 👈 only log this call’s error
+        console.log("SubCategory API error:", subCatErr?.response?.data?.message); // 👈 only log this call’s error
               setAlerts([
         {
           severity: 'error',
-          message: subCatErr.response.data.message || 'Error fetching category data.',
+          message: subCatErr?.response?.data?.message || 'Error fetching category data.',
         },
       ]);
       }

@@ -40,7 +40,7 @@ function ClientList() {
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
-  const [status,setStatus]=useState("")
+  const [status,setStatus]=useState("active")
     const [singleStatusUpdate,setSingleStatusUpdate]=useState(false)
 
    const { setGlobalPlaceholder, searchQuery  } = useSearch()

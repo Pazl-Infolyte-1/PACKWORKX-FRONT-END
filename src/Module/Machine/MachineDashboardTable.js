@@ -127,13 +127,13 @@ const MachineDashboardTable = ({
             //     onAddProcess && onAddProcess(row.id, row.machine_name)
             //   },
             // },
-            {
-              label: 'Process Route',
-              icon: cilGraph,
-              onClick: () => {
-                setOpenRoutes({ show: true, id: row.id })
-              },
-            },
+            // {
+            //   label: 'Process Route',
+            //   icon: cilGraph,
+            //   onClick: () => {
+            //     setOpenRoutes({ show: true, id: row.id })
+            //   },
+            // },
             // {
             //   label: 'Edit Values',
             //   icon: cilFlipToBack,

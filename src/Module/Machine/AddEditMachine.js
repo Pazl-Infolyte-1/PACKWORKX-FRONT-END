@@ -6,7 +6,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import CustomAlert from '../../components/New/CustomAlert'
 import Select from 'react-select'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash } from '@coreui/icons'
+import { cilPencil, cilTrash, cilArrowBottom, cilArrowTop } from '@coreui/icons'
+import { GripVertical } from 'lucide-react'
 
 const RequiredFieldLabel = ({ label, isRequired }) => (
   <label className="text-sm font-medium text-gray-600 mr-2">
@@ -33,10 +34,12 @@ const defaultValues = {
   ip_address: '',
   warranty_expiry: null,
   remarks_notes: '',
-  // New fields for process assignment
+  // Process assignment fields
   processValues: {},
   selectedProcesses: [],
   machine_process: [],
+  // Process route fields
+  machine_route: [],
 }
 
 function AddEditMachine({}) {
@@ -45,7 +48,7 @@ function AddEditMachine({}) {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [processes, setProcesses] = useState([])
   const [processFieldsMap, setProcessFieldsMap] = useState({})
-  const [completedProcesses, setCompletedProcesses] = useState([])
+  const [draggingItem, setDraggingItem] = useState(null)
   const location = useLocation()
   const { Id, isEdit } = location.state || {}
   const navigate = useNavigate()
@@ -62,6 +65,55 @@ function AddEditMachine({}) {
     defaultValues,
   })
 
+  // Get available processes for route (selected processes not already in route)
+  const getAvailableRouteProcesses = () => {
+    const selected = watch('selectedProcesses') || []
+    const route = watch('machine_route') || []
+
+    // Get unique processes from selected that aren't in the route
+    const uniqueProcesses = selected.reduce((acc, process) => {
+      if (!route.includes(process.value)) {
+        acc.push(process)
+      }
+      return acc
+    }, [])
+
+    return uniqueProcesses
+  }
+
+  // Drag and drop handlers
+const handleDragStart = (e, process, source) => {
+  setDraggingItem({ process, source });
+  e.dataTransfer.setData('text/plain', process.id);
+  e.dataTransfer.effectAllowed = 'move';
+};
+
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+ const handleDrop = (e, target) => {
+  e.preventDefault();
+  if (!draggingItem) return;
+
+  if (target === 'route' && draggingItem.source === 'available') {
+    // Add to route
+    const currentRoute = watch('machine_route') || [];
+    if (!currentRoute.includes(draggingItem.process.value)) {
+      setValue('machine_route', [...currentRoute, draggingItem.process.value]);
+    }
+  } else if (target === 'available' && draggingItem.source === 'route') {
+    // Remove from route
+    const currentRoute = watch('machine_route') || [];
+    setValue(
+      'machine_route',
+      currentRoute.filter((id) => id !== draggingItem.process.value),
+    );
+  }
+  setDraggingItem(null);
+};
+
   // Fetch all processes when component mounts
   useEffect(() => {
     const fetchProcesses = async () => {
@@ -75,57 +127,17 @@ function AddEditMachine({}) {
     fetchProcesses()
   }, [])
 
-  // Fetch machine data when in edit mode
-  useEffect(() => {
-    if (!isEdit) {
-      reset(defaultValues)
-    }
-
-    if (isEdit && Id) {
-      const fetchData = async () => {
-        try {
-          const response = await apiMethods.getMachineById(Id)
-          reset(response.data.data)
-
-          // If editing, fetch all assigned processes and their values
-          const assignedResponse = await apiMethods.getByMachineId(Id)
-          if (assignedResponse.data.data.length > 0) {
-            const selectedProcesses = assignedResponse.data.data.map((process) => ({
-              value: process.process_id,
-              label: process.process_name,
-            }))
-
-            setValue('selectedProcesses', selectedProcesses)
-
-            // Fetch process fields and values for all assigned processes
-            await Promise.all(
-              selectedProcesses.map(async (process) => {
-                await fetchProcessFieldsAndValues(process.value)
-              }),
-            )
-          }
-        } catch (error) {
-          console.error('Error fetching data:', error)
-        }
-      }
-      fetchData()
-    }
-  }, [isEdit, reset])
-
-  // Fetch process fields and values when process is selected
+  // Fetch process fields and values
   const fetchProcessFieldsAndValues = async (processId) => {
     try {
-      // Fetch fields for the process
       const fieldsResponse = await apiMethods.getProcessFields(processId)
       const fields = fieldsResponse.data.data || []
 
-      // Store fields in the map
       setProcessFieldsMap((prev) => ({
         ...prev,
         [processId]: fields,
       }))
 
-      // Fetch existing values if any
       const valuesResponse = await apiMethods.getProcessValues()
       const processValues = valuesResponse.data.data.find((p) => p.process_name_id === processId)
 
@@ -137,7 +149,6 @@ function AddEditMachine({}) {
           [processId]: processValues.process_value || {},
         })
       } else {
-        // Initialize empty values for each field
         const initialValues = {}
         fields.forEach((field) => {
           initialValues[field.label] = ''
@@ -153,18 +164,17 @@ function AddEditMachine({}) {
     }
   }
 
+  // Handle process selection change
   const handleProcessChange = (selectedOptions) => {
     const selectedProcesses = selectedOptions || []
     setValue('selectedProcesses', selectedProcesses)
 
-    // Fetch fields for newly selected processes
     selectedProcesses.forEach((option) => {
       if (!processFieldsMap[option.value]) {
         fetchProcessFieldsAndValues(option.value)
       }
     })
 
-    // Clean up process values for removed processes
     const currentProcessValues = watch('processValues') || {}
     const newProcessValues = {}
     selectedProcesses.forEach((process) => {
@@ -175,6 +185,7 @@ function AddEditMachine({}) {
     setValue('processValues', newProcessValues)
   }
 
+  // Handle value change for process fields
   const handleValueChange = (processId, fieldName, value) => {
     const currentValues = watch('processValues') || {}
     setValue('processValues', {
@@ -199,70 +210,107 @@ function AddEditMachine({}) {
     })
   }
 
-  // Move completed process to the top
-  const moveToCompleted = (processId) => {
-    const selectedProcesses = watch('selectedProcesses') || []
-    const processToMove = selectedProcesses.find((p) => p.value === processId)
+  // Fetch machine data when in edit mode
+  useEffect(() => {
+    if (!isEdit) {
+      reset(defaultValues)
+    }
 
-    if (processToMove && isProcessComplete(processId)) {
-      // Remove from selected processes
-      const updatedSelected = selectedProcesses.filter((p) => p.value !== processId)
-      setValue('selectedProcesses', updatedSelected)
+    if (isEdit && Id) {
+      const fetchData = async () => {
+        try {
+          setIsLoading(true)
+          const response = await apiMethods.getMachineById(Id)
+          const machineData = response.data.data
 
-      // Add to completed processes if not already there
-      if (!completedProcesses.find((p) => p.value === processId)) {
-        setCompletedProcesses((prev) => [...prev, processToMove])
+          // Set basic machine data
+          const formattedData = {
+            ...machineData,
+            machine_status: machineData.machine_status === 'Active',
+            purchase_date: machineData.purchase_date
+              ? machineData.purchase_date.split('T')[0]
+              : null,
+            installation_date: machineData.installation_date
+              ? machineData.installation_date.split('T')[0]
+              : null,
+            last_maintenance: machineData.last_maintenance
+              ? machineData.last_maintenance.split('T')[0]
+              : null,
+            next_maintenance_due: machineData.next_maintenance_due
+              ? machineData.next_maintenance_due.split('T')[0]
+              : null,
+            warranty_expiry: machineData.warranty_expiry
+              ? machineData.warranty_expiry.split('T')[0]
+              : null,
+          }
+          reset(formattedData)
+
+          // Handle machine_process
+          if (machineData.machine_process && machineData.machine_process.length > 0) {
+            const selectedProcesses = machineData.machine_process.map((process) => ({
+              value: process.process_id,
+              label: process.process_name,
+            }))
+
+            setValue('selectedProcesses', selectedProcesses)
+
+            // Set process values
+            const processValues = {}
+            machineData.machine_process.forEach((process) => {
+              processValues[process.process_id] = process.process_values
+            })
+            setValue('processValues', processValues)
+
+            // Fetch process fields for all assigned processes
+            await Promise.all(
+              machineData.machine_process.map(async (process) => {
+                const fieldsResponse = await apiMethods.getProcessFields(process.process_id)
+                setProcessFieldsMap((prev) => ({
+                  ...prev,
+                  [process.process_id]: fieldsResponse.data.data || [],
+                }))
+              }),
+            )
+          }
+
+          // Handle machine_route
+          if (machineData.machine_route && machineData.machine_route.length > 0) {
+            setValue(
+              'machine_route',
+              machineData.machine_route.map((process) => process.process_id),
+            )
+          }
+        } catch (error) {
+          console.error('Error fetching data:', error)
+          setAlerts([{ severity: 'error', message: 'Failed to fetch machine data' }])
+        } finally {
+          setIsLoading(false)
+        }
       }
+      fetchData()
     }
-  }
-
-  // Remove from completed processes
-  const removeFromCompleted = (processId) => {
-    setCompletedProcesses((prev) => prev.filter((p) => p.value !== processId))
-
-    // Clear values for this process
-    const currentValues = watch('processValues') || {}
-    const newValues = { ...currentValues }
-    delete newValues[processId]
-    setValue('processValues', newValues)
-  }
-
-  // Edit completed process
-  const editCompletedProcess = (processId) => {
-    const processToEdit = completedProcesses.find((p) => p.value === processId)
-    if (processToEdit) {
-      // Move back to selected processes
-      const currentSelected = watch('selectedProcesses') || []
-      setValue('selectedProcesses', [...currentSelected, processToEdit])
-
-      // Remove from completed
-      setCompletedProcesses((prev) => prev.filter((p) => p.value !== processId))
-    }
-  }
+  }, [isEdit, reset, processes])
 
   const onSubmit = async (data) => {
     setIsSubmitted(true)
     try {
       setIsLoading(true)
 
-      // Prepare the machine data
-      const machineData = { ...data }
+      const machineData = {
+        ...data,
+        machine_status: data.machine_status ? 'Active' : 'Inactive',
+      }
       delete machineData.selectedProcesses
       delete machineData.processValues
 
-      // Combine selected processes and completed processes
-      const allProcesses = [...(data.selectedProcesses || []), ...completedProcesses]
+      // Prepare machine_process data
+      machineData.machine_process = (data.selectedProcesses || []).map((process) => ({
+        process_id: process.value,
+        process_name: process.label,
+        process_values: data.processValues[process.value] || {},
+      }))
 
-      // Add machine_process array with all processes
-      if (allProcesses.length > 0) {
-        machineData.machine_process = allProcesses.map((process) => ({
-          process_id: process.value,
-          process_name: process.label,
-          process_values: data.processValues[process.value] || {},
-        }))
-      } else {
-        machineData.machine_process = []
-      }
+      machineData.machine_route = data.machine_route || []
 
       const apiCall = isEdit
         ? apiMethods.editMachine(Id, machineData)
@@ -301,16 +349,26 @@ function AddEditMachine({}) {
     }
   }
 
-  const processOptions = processes
-    .filter(
-      (process) =>
-        // Filter out processes that are already completed
-        !completedProcesses.find((completed) => completed.value === process.id),
-    )
-    .map((process) => ({
-      value: process.id,
-      label: process.process_name,
-    }))
+  const processOptions = processes.map((process) => ({
+    value: process.id,
+    label: process.process_name,
+  }))
+
+  const handleDropOnItem = (e, dropIndex) => {
+  e.preventDefault();
+  if (!draggingItem) return;
+
+  if (draggingItem.source === 'route') {
+    const currentRoute = [...watch('machine_route')];
+    const draggedIndex = currentRoute.findIndex(id => id === draggingItem.process.value);
+
+    if (draggedIndex !== dropIndex) {
+      const [removed] = currentRoute.splice(draggedIndex, 1);
+      currentRoute.splice(dropIndex, 0, removed);
+      setValue('machine_route', currentRoute);
+    }
+  }
+};
 
   return (
     <div className="mx-auto mt-3 relative flex flex-col">
@@ -498,56 +556,6 @@ function AddEditMachine({}) {
             ></textarea>
           </div>
 
-          {/* Completed Processes Cards */}
-          {completedProcesses.length > 0 && (
-            <div className="px-4 mb-6">
-              <h3 className="text-base font-medium text-green-600">Configured Processes</h3>
-              <div className="space-y-4">
-                {completedProcesses.map((process) => {
-                  const processValues = watch(`processValues.${process.value}`) || {}
-                  const fields = processFieldsMap[process.value] || []
-
-                  return (
-                    <div
-                      key={process.value}
-                      className="border border-green-200 rounded-lg p-2 px-4 "
-                    >
-                      <div className="flex justify-between items-center">
-                        <h4 className="text-sm font-semibold text-green-800">{process.label}</h4>
-                        <div className="flex gap-2">
-                          <CIcon
-                            icon={cilPencil}
-                            onClick={() => editCompletedProcess(process.value)}
-                            className="!text-blue-600 hover:text-blue-800"
-                          />
-                          <CIcon
-                            icon={cilTrash}
-                            onClick={() => removeFromCompleted(process.value)}
-                            className="!text-red-600 hover:text-red-800"
-                          />
-
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {fields.map((field) => (
-                          <div key={field.id} className="bg-white p-2 rounded border">
-                            <div className="text-xs font-medium text-gray-600 mb-1">
-                              {field.label.replace(/_/g, ' ')}
-                            </div>
-                            <div className="text-sm text-gray-800">
-                              {processValues[field.label] || 'N/A'}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
           {/* Process Assignment */}
           <div className="px-4 rounded-lg mb-5 w-1/3">
             <RequiredFieldLabel label="Assign Process" />
@@ -565,7 +573,7 @@ function AddEditMachine({}) {
             />
           </div>
 
-          {/* Process Values Section - Only for currently selected processes */}
+          {/* Process Values Section */}
           {watch('selectedProcesses')?.length > 0 && (
             <div className="w-full px-4 rounded-lg mb-5 border-t pt-4 z-[9999]">
               {watch('selectedProcesses').map((process) => {
@@ -579,20 +587,6 @@ function AddEditMachine({}) {
                   >
                     <div className="flex justify-between items-center">
                       <h4 className="text-sm font-medium">{process.label}</h4>
-                      {fields.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => moveToCompleted(process.value)}
-                          disabled={!isProcessComplete(process.value)}
-                          className={`px-3 py-1 rounded text-sm font-medium ${
-                            isProcessComplete(process.value)
-                              ? 'bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer'
-                              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          }`}
-                        >
-                          {isProcessComplete(process.value) ? 'Add' : 'Fill all fields'}
-                        </button>
-                      )}
                     </div>
 
                     {fields.length > 0 ? (
@@ -620,6 +614,132 @@ function AddEditMachine({}) {
                   </div>
                 )
               })}
+            </div>
+          )}
+
+          {/* Process Route Configuration */}
+          {watch('selectedProcesses')?.length > 0 && (
+            <div className="px-4 mt-6 mb-20">
+              <h3 className="text-lg font-medium mb-4">Process Route Configuration</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Available Processes for Route */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <h4 className="text-sm font-medium">Available Processes</h4>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                      {getAvailableRouteProcesses().length}
+                    </span>
+                  </div>
+                  <div
+                    className="space-y-2 max-h-60 overflow-y-auto"
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, 'available')}
+                  >
+                    {getAvailableRouteProcesses().map((process) => (
+                      <div
+                        key={process.value}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, process, 'available')}
+                        className="group flex items-center space-x-3 p-3 bg-gray-50 border border-gray-200 rounded-lg cursor-move hover:bg-blue-50 hover:border-blue-200 transition-all duration-200"
+                      >
+                        <CIcon
+                          icon={GripVertical}
+                          className="text-gray-400 group-hover:text-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700">
+                          {process.label}
+                        </span>
+                      </div>
+                    ))}
+                    {getAvailableRouteProcesses().length === 0 && (
+                      <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-lg">
+                        <p className="text-sm text-gray-500 mb-1">No processes available</p>
+                        <p className="text-xs text-gray-400">Select processes above first</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Current Route */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <h4 className="text-sm font-medium">Process Route Sequence</h4>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                      {watch('machine_route')?.length || 0}
+                    </span>
+                  </div>
+                  <div
+                    className="space-y-3 max-h-60 overflow-y-auto"
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, 'route')}
+                  >
+                    {watch('machine_route')?.map((processId, index) => {
+                      // First try to find from the selected processes (which have correct labels)
+                      const selectedProcess = watch('selectedProcesses')?.find((p) => p.value === processId);
+                      
+                      // If not found in selected, try to find from all processes
+                      const allProcess = processes.find((p) => p.id === processId);
+                      
+                      // Use the selected process first (preferred), then fallback to all processes
+                      const process = selectedProcess || {
+                        label: allProcess?.process_name || `Process ${processId}`,
+                        value: processId,
+                        process_name: allProcess?.process_name || `Process ${processId}`
+                      };
+
+                      return (
+                       <div
+  key={`route-${processId}-${index}`}
+>
+  <div
+    draggable
+    onDragStart={(e) => handleDragStart(e, process, 'route')}
+    onDragOver={handleDragOver}
+    onDrop={(e) => handleDropOnItem(e, index)}
+    className="group flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg cursor-move hover:bg-blue-100 transition-all duration-200"
+    data-index={index}
+  >
+                            <div className="flex items-center">
+                              <div className="flex items-center justify-center w-6 h-6 bg-blue-500 text-white text-xs font-semibold rounded-full mr-3">
+                                {index + 1}
+                              </div>
+                              <CIcon icon={GripVertical} className="text-blue-400 mr-2" />
+                              <span className="text-sm font-medium text-blue-800">
+                                {process.label || process.process_name}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const currentRoute = watch('machine_route') || [];
+                                setValue(
+                                  'machine_route',
+                                  currentRoute.filter((id) => id !== processId)
+                                );
+                              }}
+                              className="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                            >
+                              <CIcon icon={cilTrash} className="w-4 h-4" />
+                            </button>
+                          </div>
+                          {index !== watch('machine_route').length - 1 && (
+                            <div className="flex justify-center">
+                              <CIcon icon={cilArrowBottom} className="w-4 h-4 text-gray-400" />
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                    {(!watch('machine_route') || watch('machine_route').length === 0) && (
+                      <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-lg">
+                        <p className="text-sm text-gray-500 mb-1">Drop processes here</p>
+                        <p className="text-xs text-gray-400">Create your process sequence</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </form>

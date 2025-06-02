@@ -132,9 +132,9 @@ export default function SalesOrderView({ }) {
 
           {/* Work Orders section */}
           {salesOrderData?.workOrders && salesOrderData?.workOrders?.length > 0 ? (
-            <div className="bg-white border border-gray-200 rounded-lg mb-3 overflow-hidden text-xs shadow-sm">
+            <div className="bg-white border border-gray-200 rounded-lg mb-3 overflow-hidden text-xs">
               <div 
-                className="p-4 flex items-center justify-between cursor-pointer border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200"
+                className="p-2 flex items-center justify-between cursor-pointer border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200"
                 onClick={() => setWorkOrdersExpanded(!workOrdersExpanded)}
               >
                 <div className="flex items-center gap-3">
@@ -413,11 +413,15 @@ export default function SalesOrderView({ }) {
                     <td className="text-base font-bold">₹{parseFloat(salesOrderData?.total_amount)?.toFixed(2)}</td>
                   </tr>
                   <tr>
+                    <td className="text-base font-medium"> Total Gst </td>
+                    <td className="text-base font-bold">₹{(parseFloat(salesOrderData?.total_incl_gst || 0) - parseFloat(salesOrderData?.total_amount || 0)).toFixed(2)}</td>
+                  </tr>
+                  {/* <tr>
                     <td colSpan={2} className="text-xs text-gray-600 pt-1">
                       Total Quantity : {salesOrderData?.SalesSkuDetails ? 
                         salesOrderData?.SalesSkuDetails?.reduce((total, item) => total + parseInt(item?.quantity_required), 0) : 0}
                     </td>
-                  </tr>
+                  </tr> */}
                   {(parseFloat(salesOrderData?.sgst) > 0 || parseFloat(salesOrderData?.cgst) > 0) && (
                     <>
                       {parseFloat(salesOrderData?.sgst) > 0 && (

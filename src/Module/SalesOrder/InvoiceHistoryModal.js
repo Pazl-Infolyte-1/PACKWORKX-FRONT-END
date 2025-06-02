@@ -73,7 +73,7 @@ const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
   return (
 
 
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 pl-32  bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-hidden font-sans">
         {/* Modal Header */}
         <div className="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
@@ -92,7 +92,7 @@ const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
         </div>
 
         {/* Modal Body */}
-        <div className="overflow-y-auto max-h-[calc(90vh-120px)] p-6">
+        <div className="overflow-y-auto max-h-[calc(90vh-120px)] p-6 ">
           {invoiceData.invoices && invoiceData.invoices.length > 0 ? (
             <div className="space-y-4">
               {invoiceData.invoices.map((invoice, index) => (
@@ -211,8 +211,8 @@ const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
               ))}
             </div>
           ) : (
-            <div className="text-left py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -228,8 +228,8 @@ const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
                   />
                 </svg>
               </div>
-              <h3 className="text-sm font-medium text-gray-900 mb-2 text-left">No invoices found</h3>
-              <p className="text-xs text-gray-600 text-left">There are no previous invoices for this SKU.</p>
+              <h3 className="text-sm font-medium text-gray-900 mb-2">No invoices found</h3>
+              <p className="text-xs text-gray-600">There are no previous invoices for this SKU.</p>
             </div>
           )}
         </div>

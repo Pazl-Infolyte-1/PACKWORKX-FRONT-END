@@ -6,6 +6,7 @@ import InvoiceHistoryModal from './InvoiceHistoryModal';
 
 const SalesOrderSkuForm = ({ 
   isIgstApplicable = false, 
+  attemptedSubmit,
   formData, 
   setFormData, 
   selectedClient = '',
@@ -499,8 +500,12 @@ const calculateRowValues = (index) => {
               minHeight: 32,
               height: 32,
               fontSize: 14,
-              borderColor: errors?.skuDetails?.[index] ? 'red' : state.isFocused ? '#6366f1' : 'transparent',
-              boxShadow: state.isFocused ? '0 0 0 1px #6366f1' : 'none',
+              borderColor: attemptedSubmit && errors?.skuDetails?.[index]
+              ? 'red'
+              : state.isFocused
+              ? '#6366f1'  // Indigo when focused
+              : 'transparent',  // Default when not focused and no error
+                          boxShadow: state.isFocused ? '0 0 0 1px #6366f1' : 'none',
               '&:hover': {
                 borderColor: state.isFocused ? '#6366f1' : '#c2c2c2',
               },

@@ -22,6 +22,8 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
   const [alerts, setAlerts] = useState([]);
   const [workOrdersData, setWorkOrdersData] = useState([])
   const [workOrdersDummy, setWorkOrdersDummy] = useState([])
+  const [errors, setErrors] = useState({});
+
   const navigate = useNavigate()
 
   const [totals, setTotals] = useState({
@@ -35,6 +37,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
 
   const [skuVersionsMap, setSkuVersionsMap] = useState({})
   const [skuValuesMap, setSkuValuesMap] = useState({})
+
 
   const childRef = useRef();
 
@@ -134,6 +137,33 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
       setSkuDetailsForm(data.skuDetails);
     }
   };
+
+  useEffect(() => {
+    let retries = 5;
+  
+    const checkRefReady = () => {
+      if (childRef.current?.validateFormForButtonHide) {
+        const isValid = childRef.current.validateFormForButtonHide();
+        console.log("Initial validation result:", isValid);
+      } else if (retries > 0) {
+        retries--;
+        setTimeout(checkRefReady, 50); // retry after short delay
+      } else {
+        console.warn("Child ref not ready after retries");
+      }
+    };
+  
+    checkRefReady();
+  }, []);
+
+
+  // useEffect(()=>{
+  //   console.log(errors)
+  // },[errors])
+    
+  
+  
+
 
 
 
@@ -377,14 +407,18 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
                       active={activeTab === 'skuDetails'}
                       onClick={(e) => {
                         e.preventDefault()
-                        setActiveTab('skuDetails')
+                        if (Object.values(errors).every(value => !value)) {
+                          setActiveTab('skuDetails')
+                        }
                       }}
                       style={{
                         backgroundColor: activeTab === 'skuDetails' ? '#8761e5' : 'transparent',
-                        color: activeTab === 'skuDetails' ? '#ffffff' : '#8761e5',
-                        cursor: 'pointer',
+                        color: activeTab === 'skuDetails' ? '#ffffff' : Object.values(errors).every(value => !value) ? '#8761e5' : '#9ca3af',
+                        cursor: Object.values(errors).every(value => !value) ? 'pointer' : 'not-allowed',
                         fontSize: '0.85rem',
                         padding: '0.4rem 0.8rem',
+                        opacity: Object.values(errors).every(value => !value) ? '1' : '0.5',
+                        transition: 'all 0.3s ease'
                       }}
                     >
                       {'Work Order'}
@@ -396,17 +430,20 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
                   {activeTab === 'salesOrder' && (
                     <button
                       onClick={() => setActiveTab('skuDetails')}
-                      className="
+                      disabled={!Object.values(errors).every(value => !value)}
+                      className={`
                         flex items-center space-x-2
-                        text-[#8761e5] hover:text-[#512fa9]
                         transition-all duration-300
                         group relative
                         overflow-hidden
                         px-2 py-1
                         rounded-lg
-                      "
+                        ${Object.values(errors).every(value => !value) 
+                          ? 'text-[#8761e5] hover:text-[#512fa9] cursor-pointer' 
+                          : 'text-gray-400 cursor-not-allowed opacity-50'}
+                      `}
                     >
-                      <span className="absolute inset-0 bg-purple-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg -z-10"></span>
+                      <span className={`absolute inset-0 ${Object.values(errors).every(value => !value) ? 'bg-purple-100' : 'bg-gray-100'} opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg -z-10`}></span>
                       <span className="font-medium inline-block group-hover:translate-x-0.5 transition-transform duration-300">
                         Next
                       </span>
@@ -414,11 +451,13 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
                         width="18"
                         height="18"
                         viewBox="0 0 24 24"
-                        className="
-                          text-[#8761e5] group-hover:text-[#794ee6]
+                        className={`
                           transition-all duration-500
                           group-hover:translate-x-1
-                        "
+                          ${Object.values(errors).every(value => !value) 
+                            ? 'text-[#8761e5] group-hover:text-[#794ee6]' 
+                            : 'text-gray-400'}
+                        `}
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="2"
@@ -436,7 +475,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
                           className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                         />
                       </svg>
-                      <span className="absolute -right-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-purple-600 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping delay-100 duration-1000"></span>
+                      <span className={`absolute -right-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 ${Object.values(errors).every(value => !value) ? 'bg-purple-600' : 'bg-gray-400'} rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping delay-100 duration-1000`}></span>
                     </button>
                   )}
 
@@ -511,6 +550,8 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
               ref={childRef}
               setIsFormTouched={setIsFormTouched}
               handleSubmit1={handleParentSubmit}
+  errors={errors}
+  setErrors={setErrors}
             />
           )}
           {activeTab === 'skuDetails' && (

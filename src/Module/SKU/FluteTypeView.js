@@ -15,7 +15,7 @@ import {
   CTableDataCell,
 } from '@coreui/react'
 
-const FluteTypeView = () => {
+const FluteTypeView = ({ onSelect }) => {
   const [flutesList, setFlutesList] = useState([])
   const [openDelModal, setOpenDelModal] = useState(false)
   const [openAddEditModal, setOpenAddEditModal] = useState(false)
@@ -68,9 +68,7 @@ const FluteTypeView = () => {
 
   return (
     <div className="overflow-x-auto">
-      <div className="flex justify-end my-2">
-        <ActionButton height={6} variant="add" label="Add Flute" onClick={handleAddNew} />
-      </div>
+
       <div className="h-[200px] overflow-y-auto border border-gray-200 rounded custom-scrollbar">
   <CTable striped hover className="w-full m-0 text-sm">
     <CTableHead className="bg-gray-100 sticky top-0 z-10">
@@ -86,8 +84,12 @@ const FluteTypeView = () => {
 
     <CTableBody>
       {flutesList.length > 0 ? (
-        flutesList.map((flute) => (
-          <CTableRow key={flute.id} className="hover:bg-gray-50 text-center">
+        flutesList.map((flute,index) => (
+              <CTableRow
+          key={flute.id}
+          onClick={() => onSelect(flute, index)} // Notify parent on click
+          className="hover:bg-gray-100 cursor-pointer text-center"
+        >
             <CTableDataCell className="py-2 px-1 text-gray-700">{flute.name}</CTableDataCell>
             <CTableDataCell className="py-2 px-1 text-gray-700">{flute.flute_height}</CTableDataCell>
             <CTableDataCell className="py-2 px-1 text-gray-700">{flute.number_of_flutes_per_meter}</CTableDataCell>
@@ -120,8 +122,11 @@ const FluteTypeView = () => {
       )}
     </CTableBody>
   </CTable>
+  
 </div>
-
+      <div className="flex justify-start my-2">
+        <ActionButton height={6} variant="add" label="Add Flute" onClick={handleAddNew} />
+      </div>
       
       {/* Delete confirmation modal */}
       <ConfirmationModale

@@ -36,8 +36,12 @@ const initialState = {
     ups: null,
     deckle_size: null,
     deckleError: '',
-  }
-  
+  },
+    skuBuilder: {
+    part_value: [],
+    part_count: 0,
+  },
+    productArray: []
 }
 
 const changeState = (state = initialState, { type, payload, ...rest }) => {
@@ -168,6 +172,25 @@ case 'SET_RSC_DECKLE_SIZE': {
   // For any other cases, do not change state
   return state;
 }
+
+case 'SET_SKU_PART_VALUE':
+  return {
+    ...state,
+    skuBuilder: {
+      ...state.skuBuilder,
+      part_value: payload,
+      part_count: payload.length,
+    },
+  };
+case 'SET_PRODUCT_ARRAY':
+  return {
+    ...state,
+    auth: {
+      ...state.auth,
+      productArray: payload,
+    },
+  };
+
 
   
     default:

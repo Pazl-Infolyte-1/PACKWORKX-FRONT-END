@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {API_BASE_URL} from './constant'
+import { API_BASE_URL } from './constant'
 
 const BASE_URL = API_BASE_URL
 const GST_URL = 'http://sheet.gstincheck.co.in/check/9ee24120971acd5c17dc6cad239d99fa'
@@ -294,6 +294,7 @@ export const apiMethods = {
     }
   },
   getClients: async (queryParams = {}) => {
+    console.log(queryParams)
     try {
       const token = localStorage.getItem('token') // Retrieve token
       // const token = await getToken()
@@ -441,14 +442,24 @@ export const apiMethods = {
     }
   },
 
-  singleclients: async (id) => { 
-  try {
-    const response = await apiClient.get(`/clients/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(error);
-  }
-},
+  singleclients: async (id) => {
+    try {
+      const response = await apiClient.get(`/clients/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  singlesku: async (id) => {
+    try {
+      const response = await apiClient.get(`/sku-details/${id}`)
+      return response.data
+    } catch (error) {
+      console.error('API error in singlesku:', error)
+      throw error // Optional: rethrow for handling at the call site
+    }
+  },
 
   getSkuType: async () => {
     try {
@@ -565,7 +576,7 @@ export const apiMethods = {
     }
   },
   editEmployee: async (id, body) => {
-      return await apiClient.put(`/user/employees/${id}`, body)
+    return await apiClient.put(`/user/employees/${id}`, body)
   },
   getEmployeeData: async (id) => {
     try {
@@ -932,7 +943,7 @@ export const apiMethods = {
     return response
   },
   workOrderStatusUpdate: async (id, body) => {
-    const response = await apiClient.put(`/work-order/status/${id}`, body)
+    const response = await apiClient.patch(`/work-order/status/${id}`, body)
     return response
   },
   editWorkOrder: async (id, body) => {
@@ -1059,7 +1070,7 @@ export const apiMethods = {
     try {
       return await apiClient.get('/items', {
         params: {
-          client: params.client || '',
+          search: params.search || '',
 
           sales_status: params.sales_status || '',
 
@@ -1077,6 +1088,13 @@ export const apiMethods = {
 
   getItemData: async (id) => {
     return await apiClient.get(`/items/${id}`)
+  },
+  getCategoryList: async () => {
+    return await apiClient.get(`/category`)
+  },
+
+  getSubCategory: async () => {
+    return await apiClient.get(`/sub-category`)
   },
 
   addItem: async (body) => {
@@ -1139,6 +1157,10 @@ export const apiMethods = {
 
       throw error
     }
+  },
+
+  getAllPurchaseOrderIds: async () => {
+   return await apiClient.get('/purchase-orders/ids')
   },
 
   // Get a single purchase order by ID
@@ -1286,8 +1308,7 @@ export const apiMethods = {
   // },
   getinventory: async () => {
     try {
-      return await apiClient.get('/inventory?limit=10000'
-    )
+      return await apiClient.get('/inventory?limit=10000')
     } catch (error) {
       console.error(error)
     }
@@ -1301,7 +1322,7 @@ export const apiMethods = {
     }
   },
 
-  getDropDown: async () =>{
+  getDropDown: async () => {
     return await apiClient.get('/common-service/dropdown-name')
   },
 
@@ -1336,7 +1357,7 @@ export const apiMethods = {
   getState: async () => {
     return await apiClient.get('/common-service/states')
   },
-  
+
   getPurchaseOrderDetails: async ({ po_id, grn_id }) => {
     try {
       return await apiClient.get('/purchase-order/details/po', {
@@ -1350,7 +1371,7 @@ export const apiMethods = {
       throw error
     }
   },
-  
+
   submitPurchaseOrderReturn: async (payload) => {
     try {
       return await apiClient.post('/purchase-order/return/gst/po', payload)
@@ -1359,20 +1380,131 @@ export const apiMethods = {
       throw error
     }
   },
-  
- 
-  getSkuByClientId:async(client_id)=>{
+
+  getSkuByClientId: async (client_id) => {
     return await apiClient.get(`sku-details/client-sku/${client_id}`)
   },
-  postSkuValuesOptions:async(body)=>{
-    return await apiClient.post(`sku-details/options`,body)
+  postSkuValuesOptions: async (body) => {
+    return await apiClient.post(`sku-details/options`, body)
   },
 
-  getSkuValuesOptions:async(id)=>{
-    return await apiClient.get(`sku-details/${id}/options`,)
-  }
+  getSkuValuesOptions: async (id) => {
+    return await apiClient.get(`sku-details/${id}/options`)
+  },
+  downloadSalesOrder: async () => {
+    return await apiClient.get('sale-order/download/excel', {
+      responseType: 'blob', // for binary files like Excel
+      headers: {
+        Accept: 'application/octet-stream',
+      },
+    })
+  },
+  downloadWorkOrder: async () => {
+    return await apiClient.get('work-order/download/excel', {
+      responseType: 'blob', // for binary files like Excel
+      headers: {
+        Accept: 'application/octet-stream',
+      },
+    })
+  },
+  getMachineRoute: async () => {
+    return await apiClient.get('mapping/machine-route-process')
+  },
+  saveRouteProcesses: async (payload) => {
+    return await apiClient.post('mapping/machine-route-process', payload)
+  },
 
+  updateRouteProcesses: async (id, payload) => {
+    return await apiClient.put(`mapping/machine-route-process/${id}`, payload)
+  },
 
+  deleteRoute: async (id) => {
+    return await apiClient.delete(`mapping/machine-route-process/${id}`)
+  },
+  deletePoReturn: async (id) => {
+    try {
+      return await apiClient.delete(`/purchase-order-return/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  clientStatusSwitch: async (status, clientId) => {
+    try {
+      return await apiClient.patch(`clients/${clientId}/status`, { status })
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  createInvoiceWorkOrder: async (body) => {
+    try {
+      return await apiClient.post(`work-order-invoice/create`, body)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getInvoiceList: async (params) => {
+    try {
+      return await apiClient.get(`/work-order-invoice/get`, { params })
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getInvoiceById: async (id, params = {}) => {
+    return await apiClient.get(`/work-order-invoice/get/${id}`, { params });
+  },    
+  getStockAdjustments: async (page = 1, entries) => {
+    try {
+      return await apiClient.get(`/stock-adjustments?page=${page}&entries=${entries}`)
+    } catch (error) {
+      console.error('Error fetching stock adjustments:', error.response?.data || error.message)
+      throw error
+    }
+  },
+
+  deleteStockAdjustment: async (id) => {
+    try {
+      return await apiClient.delete(`/stock-adjustments/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  singleStockAdjustment: async (id) => {
+    try {
+      const response = await apiClient.get(`/stock-adjustments/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  postStockAdjustment: async (payload) => {
+    try {
+      return await apiClient.post('/stock-adjustments', payload)
+    } catch (error) {
+      console.error('Error submitting stock adjustment:', error.response?.data || error.message)
+      throw error
+    }
+  },
+
+  updateStockAdjustment: async (id, payload) => {
+    try {
+      return await apiClient.put(`/stock-adjustments/${id}`, payload)
+    } catch (error) {
+      console.error('Error updating stock adjustment:', error.response?.data || error.message)
+      throw error
+    }
+  },
+  getInvoiceHistory:async(id)=>{
+    return await apiClient.get(`/work-order-invoice/get-by-sku/${id}`,)
+  },
+  getWorkOrderProgressDropDownOptions:async(id)=>{
+    return await apiClient.get(`/common-service/work-order-status`,)
+  },
+  getInvoice: async ( params = {}) => {
+    return await apiClient.get(`/work-order-invoice/get`, { params });
+  },    
 }
 
 export default apiMethods

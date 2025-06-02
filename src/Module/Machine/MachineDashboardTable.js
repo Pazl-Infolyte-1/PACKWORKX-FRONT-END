@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilFlipToBack, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
+import { cilFlipToBack, cilGraph, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 import apiMethods from '../../api/config'
 import ReusableTable from '../SalesOrder/ReusableTable'
 
@@ -15,6 +15,7 @@ const MachineDashboardTable = ({
   onAddProcess,
   setAlerts,
   setOpenFieldValuesModal,
+  setOpenRoutes
 }) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -61,14 +62,34 @@ const MachineDashboardTable = ({
 
   const columns = [
     { key: 'machine_generate_id', header: 'ID', field: 'machine_generate_id' },
-    { key: 'machine_name', header: 'Name', field: 'machine_name' },
+    {
+      key: 'machine_name',
+      header: (
+        <>
+          Name <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'machine_name',
+    },
     {
       key: 'model_number',
-      header: 'Model Number',
+      header: (
+        <>
+          Model Number <span className="text-gray-500">⌕</span>
+        </>
+      ),
       field: 'model_number',
     },
-    { key: 'manufacturer', header: 'Manufacturer', field: 'manufacturer' },
-    { key: 'power_rating', header: 'Power', field: 'power_rating', type: 'date' },
+    {
+      key: 'manufacturer',
+      header: (
+        <>
+          Manufacturer <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'manufacturer',
+    },
+    { key: 'power_rating', header: 'Power', field: 'power_rating' },
     {
       key: 'machine_status',
       header: 'Status',
@@ -78,13 +99,13 @@ const MachineDashboardTable = ({
       getOptionClass: (val) => {
         switch (val) {
           case 'Under Maintenance':
-            return 'bg-blue-100 text-blue-800 w-[120px]'
+            return 'bg-blue-100 text-blue-800 w-[150px] text-xs text-center'
           case 'Active':
-            return 'bg-green-100 text-green-800 w-[120px]'
+            return 'bg-green-100 text-green-800 w-[150px] text-xs text-center'
           case 'Inactive':
-            return 'bg-red-100 text-red-800 w-[120px]'
+            return 'bg-red-100 text-red-800 w-[150px] text-xs text-center'
           default:
-            return 'bg-gray-100 text-gray-800 w-[120px]'
+            return 'bg-gray-100 text-gray-800 w-[150px] text-xs text-center'
         }
       },
       onChange: (row, newValue) => {
@@ -99,27 +120,27 @@ const MachineDashboardTable = ({
       render: (row) => (
         <ThreeDotMenu
           value={[
-            {
-              label: 'View',
-              icon: cilHandPointRight,
-              onClick: () => {
-                onView(row)
-              },
-            },
-            {
-              label: 'Assign Process',
-              icon: cilPlus,
-              onClick: () => {
-                onAddProcess && onAddProcess(row.id, row.machine_name)
-              },
-            },
-            {
-              label: 'Field, Values',
-              icon: cilFlipToBack,
-              onClick: () => {
-                setOpenFieldValuesModal({ show: true, id: row.id })
-              },
-            },
+            // {
+            //   label: 'Assign Process & Values',
+            //   icon: cilPlus,
+            //   onClick: () => {
+            //     onAddProcess && onAddProcess(row.id, row.machine_name)
+            //   },
+            // },
+            // {
+            //   label: 'Process Route',
+            //   icon: cilGraph,
+            //   onClick: () => {
+            //     setOpenRoutes({ show: true, id: row.id })
+            //   },
+            // },
+            // {
+            //   label: 'Edit Values',
+            //   icon: cilFlipToBack,
+            //   onClick: () => {
+            //     setOpenFieldValuesModal({ show: true, id: row.id })
+            //   },
+            // },
             {
               label: 'Edit',
               icon: cilPencil,
@@ -141,8 +162,8 @@ const MachineDashboardTable = ({
   ]
 
   return (
-    <div className="py-2">
-      <ReusableTable data={cellData} columns={columns} handleRowClick={onView} />
+    <>
+      <ReusableTable data={cellData} columns={columns} handleRowClick={onView} height={'67vh'} />
       <ConfirmationModale
         isOpen={isConfirmationModalOpen}
         onClose={handleCancel}
@@ -152,7 +173,7 @@ const MachineDashboardTable = ({
         confirmText={isLoading ? 'Deleting...' : 'Delete'}
         cancelText="Cancel"
       />
-    </div>
+    </>
   )
 }
 

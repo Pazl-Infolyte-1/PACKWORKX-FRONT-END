@@ -9,6 +9,48 @@ import apiMethods from '../../api/config';
 const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [itemList, setItemList] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+const [modalContent, setModalContent] = useState(null);
+
+const Modal = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded p-6 max-w-md w-full">
+        <button onClick={onClose} className="float-right">&times;</button>
+        <div>{children}</div>
+      </div>
+    </div>
+  );
+};
+
+const openItemDetails = async (item_id) => {
+  try {
+    const response = await apiMethods.getItemList();
+    const items = response?.data?.data || [];
+    console.log(items, 'item');
+    const item = items.find(i => i.id === parseInt(item_id));
+    const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {};
+
+    setModalContent(
+      <>
+        <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
+        {Object.entries(customFields).length > 0 ? (
+          Object.entries(customFields).map(([key, value], idx) => (
+            <p key={idx}>
+              <strong>{key}:</strong> {value}
+            </p>
+          ))
+        ) : (
+          <p>No custom fields available.</p>
+        )}
+      </>
+    );
+    setIsModalOpen(true);
+  } catch (error) {
+    console.error('Error fetching item details:', error);
+  }
+};
 
   // Form with both items and PO totals
   const { control, register, setValue, getValues, reset, watch } = useForm({
@@ -294,6 +336,9 @@ useEffect(() => {
     });
   };
 
+
+  
+
   return (
     <div className="mt-2 p-4 bg-white rounded-lg border border-[#c2c2c2] w-full max-h-[600px]">
       <div className="flex justify-between items-center">
@@ -306,7 +351,8 @@ useEffect(() => {
           <table className="min-w-full bg-white rounded-lg">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-2">Item</th>
+                <th className="px-4 py-2">Product</th>
+                <td></td>
                 <th className="px-4 py-2">Item Code</th>
                 <th className="px-4 py-2">Quantity</th>
                 <th className="px-4 py-2">Rate</th>
@@ -335,11 +381,14 @@ useEffect(() => {
                         </option>
                       ))}
                     </select>
+                   
                   </td>
+                  <td onClick={() => openItemDetails(getValues(`items.${index}.item_id`))} className="cursor-pointer text-blue-600">ℹ️</td>                  
                   <td className="px-4 py-2">
                     <input
                       {...register(`items.${index}.item_code`)}
                       readOnly
+                      placeholder='Item Code'
                       className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                     />
                   </td>
@@ -417,6 +466,10 @@ useEffect(() => {
               ))}
             </tbody>
           </table>
+
+          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+  {modalContent}
+</Modal>
         </div>
       </div>
 

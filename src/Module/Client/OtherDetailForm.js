@@ -182,7 +182,7 @@ const OtherDetailForm = () => {
 
           {/* Documents */}
           <div className="flex items-center mb-3">
-            <label className="text-xs w-32">ID Proof</label>
+            <label className="text-xs w-32">Documents</label>
             <div className="flex flex-col w-full">
               <input
                 type="file"

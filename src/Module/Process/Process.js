@@ -13,6 +13,8 @@ import ProcessForm from './AddProcessNameForm'
 import Field from './Field'
 import ProcessDetails from './ProcessDetails'
 import Values from './Values'
+import ContentHeader from '../../components/New/ContentHeader'
+import CompactPagination from '../../components/New/CompactPagination'
 
 const Process = () => {
   const [showAddProcessModal, setShowAddProcessModal] = useState(false)
@@ -24,7 +26,7 @@ const Process = () => {
   const [isEdit, setIsEdit] = useState(false)
   const [alerts, setAlerts] = useState([])
   const [showProcessFields, setShowProcessFields] = useState(false)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(50)
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
   const [selectedProcessValue, setSelectedProcessValue] = useState(null)
   const [openFieldModal, setOpenFieldModal] = useState({ open: false, id: null })
@@ -32,7 +34,7 @@ const Process = () => {
   const [openValuesModal, setOpenValuesModal] = useState({ open: false, id: null })
   const [allprocessValue, setAllprocessValue] = useState([])
   const [showEditModal, setShowEditModal] = useState(false)
-  const { searchQuery } = useSearch()
+  const { searchQuery, setGlobalPlaceholder } = useSearch()
   const searchBarRef = useRef(null)
 
   const fetchData = async () => {
@@ -48,6 +50,13 @@ const Process = () => {
       console.error(error)
     }
   }
+  useEffect(() => {
+    setGlobalPlaceholder('Search Process...')
+
+    return () => {
+      setGlobalPlaceholder('Search...')
+    }
+  })
 
   useEffect(() => {
     fetchData()
@@ -94,32 +103,64 @@ const Process = () => {
     setAlerts([])
   }
 
-  const handleProcessSubmit = async (data) => {
-    try {
-      if (isEdit) {
-        const response = await apiMethods.EditProcess(data)
-        setAlerts([
-          { severity: 'success', message: response.data.message || 'Process Updated Successfully' },
-        ])
-      } else {
-        const response = await apiMethods.AddProcess(data)
-        setAlerts([
-          { severity: 'success', message: response.data.message || 'Process Added Successfully' },
-        ])
-      }
-    } catch (error) {
-      setAlerts([
-        { severity: 'error', message: error?.response?.data?.message || 'Something went wrong' },
-      ])
-      console.error(error)
+const handleProcessSubmit = async (data) => {
+  try {
+    let processResponse;
+    if (isEdit) {
+      processResponse = await apiMethods.EditProcess({
+        id: data.id,
+        process_name: data.process_name
+      });
+    } else {
+      processResponse = await apiMethods.AddProcess({
+        process_name: data.process_name
+      });
     }
-    setShowAddProcessModal(false)
+
+    // Get the process ID (for new processes, it comes from the response)
+    const processId = isEdit ? data.id : processResponse.data.data.id;
+
+    // Then add the fields - check if fields exist and have at least one item
+    if (data.fields && Array.isArray(data.fields) && data.fields.length > 0) {
+      // Process each field individually
+      for (const field of data.fields) {
+        const payload = {
+          process_name_id: processId,
+          label: field.label,
+          field_type: field.field_type.charAt(0).toUpperCase() + field.field_type.slice(1),
+          required: field.required
+        };
+        
+        try {
+          const res = await apiMethods.addFields(payload);
+        } catch (error) {
+          console.error('Error saving individual field:', error);
+          throw error;
+        }
+      }
+    }
+
+    setAlerts([
+      { severity: 'success', message: isEdit ? 
+        'Process and fields updated successfully' : 
+        'Process and fields added successfully' }
+    ]);
+    
+    setShowAddProcessModal(false);
     setFormData({
       process_name: '',
-    })
-    setRefresh((prev) => !prev)
+    });
+    setRefresh((prev) => !prev);
+  } catch (error) {
+    console.error('Error in handleProcessSubmit:', error);
+    setAlerts([
+      { 
+        severity: 'error', 
+        message: error?.response?.data?.message || 'Something went wrong while saving process or fields' 
+      },
+    ]);
   }
-
+};
   const handleAddField = (id) => {
     const process = id ? processData.find((p) => p.id === id) : null
 
@@ -147,25 +188,16 @@ const Process = () => {
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <div className="flex flex-col lg:flex-row item-center gap-5 relative my-3">
-        <h3 className="text-xl font-semibold mb-3">Process Integration</h3>
-      </div>
+      <ContentHeader
+        heading={'Process Integration'}
+        onAddClick={() => {
+          setIsEdit(false)
+          setShowAddProcessModal(true)
+        }}
+      />
 
-      <div className="bg-white p-3 rounded-lg w-full h-full">
-        <div className="flex items-center">
-          <SearchBar data={processData} text={'Process Integration'} ref={searchBarRef} />
-          <div className="flex-grow flex justify-end gap-3">
-            <ActionButton
-              variant="add"
-              label={'Add Process Name'}
-              onClick={() => {
-                setIsEdit(false)
-                setShowAddProcessModal(true)
-              }}
-            />
-          </div>
-        </div>
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap my-4">
+      <div className="bg-white  rounded-lg w-full h-full">
+        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap">
           <ProcessIntegrartionTable
             processData={processData}
             setProcessData={setProcessData}
@@ -186,17 +218,17 @@ const Process = () => {
           />
         </div>
 
-        <div>
-          <CommonPagination
+        <div className='mt-4'>
+          <CompactPagination
             count={pagination?.totalPages || 1}
             page={pagination?.page || 1}
-            onChange={(event, value) => {
+            onPageChange={(event, value) => {
               setPagination((prev) => ({
                 ...prev,
                 page: value,
               }))
             }}
-            onLimitChange={(newLimit) => {
+            onEntriesChange={(newLimit) => {
               setLimit(newLimit)
               // Reset to first page when changing limit
               setPagination((prev) => ({
@@ -204,21 +236,22 @@ const Process = () => {
                 page: 1,
               }))
             }}
-            limit={limit}
+            entriesPerPage={limit}
           />
         </div>
 
         <PopUp
           visible={showAddProcessModal}
           setVisible={setShowAddProcessModal}
-          width="500px"
+          width="800px"
+          maxHeight="80vh"
           header={isEdit ? 'Edit Process' : 'Add Process'}
           showCloseButton={true}
         >
           <ProcessForm
             isEdit={isEdit}
             initialData={formData}
-            onCancel={() => setShowAddProcessModal(false)}
+            onCancel={() => {setShowAddProcessModal(false), setFormData(initialData)}}
             onSubmit={handleProcessSubmit}
           />
         </PopUp>
@@ -290,7 +323,7 @@ const Process = () => {
           }}
           showCloseButton={true}
           width={'70vw'}
-          header={'Fields'}
+          header={'Process & Fields'}
         >
           <Field
             AllfieldData={fieldData}

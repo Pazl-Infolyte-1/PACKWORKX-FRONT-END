@@ -29,6 +29,7 @@ const ClientForm = ({ resetForm, setReloadData }) => {
   const location = useLocation()
   const entityType = location.state?.entityType
   const client = location.state?.client
+  const [skuType, setSkuType] = useState('');
   useEffect(() => {
     if (client) {
       setEditData(client)
@@ -410,7 +411,22 @@ const ClientForm = ({ resetForm, setReloadData }) => {
       setTimeout(() => {
         setAlerts([])
         reset()
-        navigate('/clients')
+          if (location.state?.fromSKU) {
+    console.log("in client form", location.state?.sku_type_for_navigate);
+  navigate('/SKU', {
+  state: {
+    fromClientForm: true,
+    sku_type_for_navigate_from_client: skuType,
+  },
+});
+  }else if (location.state?.fromSalesForm) {
+    navigate('/salesorder/form?tab=salesOrder', {
+    });
+  }
+   else {
+    navigate('/clients');
+  }
+        //navigate('/clients')
       }, 3000)
     } catch (error) {
       console.error('Error processing client:', error)
@@ -425,10 +441,29 @@ const ClientForm = ({ resetForm, setReloadData }) => {
     }
   }
 
-  const handleCancel = () => {
-    reset()
-    navigate('/clients')
+  useEffect(() => {
+  if (location.state?.sku_type_for_navigate) {
+    setSkuType(location.state.sku_type_for_navigate);
   }
+}, [location.state?.sku_type_for_navigate]);
+// cancel handler
+const handleCancel = () => {
+  if (location.state?.fromSKU) {
+    console.log("in client form", location.state?.sku_type_for_navigate);
+    navigate('/SKU', {
+      state: {
+        fromClientForm: true,
+        sku_type_for_navigate_from_client: skuType,
+      },
+    });
+  } else if (location.state?.fromSalesForm) {
+    // Add logic here for the second condition
+    navigate('/salesorder/form?tab=salesOrder', {
+    });
+  } else {
+    navigate('/clients');
+  }
+};
 
   // Helper function to apply red border style
   const getInputStyle = (hasError) => ({
@@ -458,13 +493,39 @@ const ClientForm = ({ resetForm, setReloadData }) => {
       </div>
       <FormProvider {...methods}>
         <div className="pr-2 pl-2 relative border-b border-gray-200 bg-white">
-          <h5 className="px-4 capitalize">
-            {editData ? `Edit ${editData.entity_type}` : `Add ${entityType}`}
-          </h5>
+        {!location.state?.fromSKU &&!location.state?.fromSalesForm&& (
+  <h5 className="px-4 capitalize">
+    {editData ? `Edit ${editData.entity_type}` : `Add ${entityType}`}
+  </h5>
+)}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-auto">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-auto pt-1">
             <div className=" px-4">
               {/* Reference ID */}
+           {location.state?.fromSKU && (
+  <div className="mb-2">
+    <div className="flex items-center">
+      <label className="text-sm w-32 after:content-['*'] after:text-red-500 after:ml-1">
+        Create New
+      </label>
+      <select
+        {...register('clientData.entity_type', { required: true })}
+        value={watch('clientData.entity_type')}
+        onChange={(e) => setValue('clientData.entity_type', e.target.value)}
+        className={`p-1.5 text-sm rounded flex-1 border ${
+          errors.clientData?.entity_type ? 'border-red-500' : 'border-gray-300'
+        }`}
+      >
+        <option value="" hidden>Select</option>
+        <option value="Client">Client</option>
+        <option value="Vendor">Vendor</option>
+      </select>
+    </div>
+  </div>
+)}
+
+
               <div className="mb-2">
                 <div className="flex items-center">
                   <label className="text-sm  w-32 after:content-['*'] after:text-red-500 after:ml-1">
@@ -669,7 +730,7 @@ const ClientForm = ({ resetForm, setReloadData }) => {
                           placeholder="Mobile"
                           maxLength={10}
                           {...register('clientData.mobile', {
-                            required: true,
+                            // required: true,
                             pattern: {
                               value: /^\d{10}$/,
                               message: 'Invalid phone number',
@@ -698,6 +759,8 @@ const ClientForm = ({ resetForm, setReloadData }) => {
                           className="outline-none w-full text-sm bg-transparent"
                         />
                       </div>
+
+                      
                     </div>
                     {(errors.clientData?.work_phone || errors.clientData?.mobile) && (
                       <p className="text-red-500 text-xs">

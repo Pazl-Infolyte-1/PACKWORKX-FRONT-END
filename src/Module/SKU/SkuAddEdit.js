@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux'
 import updown from '../../assets/images/updown.png'
 import { version } from 'core-js'
 import { setRscDeckleSize } from '../../action';
+import { setSkuPartValue } from '../../action'
 
 function SkuAddEdit({
   isopenval,
@@ -58,7 +59,11 @@ function SkuAddEdit({
   const [selectedVersion, setSelectedVersion] = useState(null)
   const [defaultSkuValues, setDefaultSkuValues] = useState([])
   const [color,setColor]=useState([])
+  const [fluteDropdown,setFluteDropdown]=useState([])
   const [rscUnits,setRscUnits] = useState("mm")
+const [selectedFluteIndex, setSelectedFluteIndex] = useState(null);
+
+
   const createInitialSkuData = () => ({
     client_id: null,
     sku_name: null,
@@ -96,6 +101,8 @@ function SkuAddEdit({
     print_type:null,
     tags: {},
     gst_percentage: null,
+        total_weight:null,
+total_bursting_strength:null,
     sku_values: [
       {
         layer: null,
@@ -189,49 +196,116 @@ dispatch(setRscDeckleSize({ length: null, height: null, ups: null }));
     setSkuVariant(option.sku_type || option.value)
     setAddNewSkuData(baseSkuData)
   }
+const calculateWeight = ({ gsm, isCorrugated, selectedFlute, areaInSquareMeters }) => {
+  const numberOfFlutes = isCorrugated
+    ? selectedFlute?.number_of_flutes_per_meter || 0
+    : 1;
 
-  const handleSkuValuesChange = (index, field, value) => {
-    setAddNewSkuData((prevData) => {
-      const updatedSkuValues = [...prevData.sku_values]
-      const updatedItem = { ...updatedSkuValues[index], [field]: value }
+  if (!gsm || !areaInSquareMeters) return null;
+console.log("values///",((gsm * areaInSquareMeters) * 0.001) * numberOfFlutes)
+  return ((gsm * areaInSquareMeters) * 0.001) * numberOfFlutes;
+};
+const handleSkuValuesChange = (index, field, value) => {
+  setAddNewSkuData((prevData) => {
+    const updatedSkuValues = [...prevData.sku_values];
+    const updatedItem = { ...updatedSkuValues[index], [field]: value };
 
-      const isCorrugated = updatedItem.layer?.toLowerCase().includes('corrugated')
+    // Determine if layer is corrugated
+    const isCorrugated = updatedItem.layer?.toLowerCase().includes('corrugated');
 
-      // Update weight based on conditions
-      if (field === 'gsm' || field === 'bf' || field === 'layer') {
-        const gsm = field === 'gsm' ? value : updatedItem.gsm
-        const bf = field === 'bf' ? value : updatedItem.bf
-console.log("units rsc",rscUnits)
-console.log("into msquare",meterSquareData)
+    // Store selectedFlute (or update if field was 'selected_flute')
+    if (field === 'selected_flute') {
+      updatedItem.selected_flute = value;
+    }
+    const selectedFlute = updatedItem.selected_flute;
 
-  // Convert area to square meters
-  let areaInSquareMeters = 0;
+    // Set default flute info if non-corrugated
+    if (field === 'layer' && !isCorrugated) {
+      updatedItem.flute_type = '--';
+      updatedItem.selected_flute = { number_of_flutes_per_meter: 1 };
+    }
 
-  if (rscUnits === 'mm') {
-    areaInSquareMeters = meterSquareData * 1e-6; // mm² → m²
-  } else if (rscUnits === 'cm') {
-    areaInSquareMeters = meterSquareData * 1e-4; // cm² → m²
-  } else if (rscUnits === 'in') {
-    areaInSquareMeters = meterSquareData * 0.00064516; // in² → m²
-  } else {
-    console.warn("Unknown rscUnit:", rscUnits);
-  }
+    // Calculate area in square meters
+    let areaInSquareMeters = 0;
+    if (rscUnits === 'mm') areaInSquareMeters = meterSquareData * 1e-6;
+    else if (rscUnits === 'cm') areaInSquareMeters = meterSquareData * 1e-4;
+    else if (rscUnits === 'in') areaInSquareMeters = meterSquareData * 0.00064516;
 
-        if (isCorrugated && gsm && bf) {
-          updatedItem.weight = gsm * bf * areaInSquareMeters
-        } else if (gsm) {
-          updatedItem.weight = gsm * areaInSquareMeters
-        }
-      }
+    // Trigger weight recalculation
+    if (['gsm', 'layer', 'selected_flute'].includes(field)) {
+      updatedItem.weight = calculateWeight({
+        gsm: field === 'gsm' ? value : updatedItem.gsm,
+        isCorrugated,
+        selectedFlute,
+        areaInSquareMeters,
+      });
+    }
 
-      // Auto-set flute_type for corrugated layer
-      if (field === 'layer') {
-        updatedItem.flute_type = isCorrugated ? '' : 'N/A'
-      }
-      updatedSkuValues[index] = updatedItem
-      return { ...prevData, sku_values: updatedSkuValues }
-    })
-  }
+    updatedSkuValues[index] = updatedItem;
+    return { ...prevData, sku_values: updatedSkuValues };
+  });
+};
+useEffect(() => {
+  // 1. First reset weights to ensure recalculation doesn't use stale data
+  const resetWeights = addNewSkuData.sku_values.map((item) => ({
+    ...item,
+    weight: null,
+  }));
+
+  setAddNewSkuData((prevData) => ({
+    ...prevData,
+    sku_values: resetWeights,
+  }));
+
+  // 2. Now recalculate weights after a short delay to ensure reset completes
+  // This avoids race condition with batched updates
+  setTimeout(() => {
+    let areaInSquareMeters = 0;
+    if (rscUnits === 'mm') areaInSquareMeters = meterSquareData * 1e-6;
+    else if (rscUnits === 'cm') areaInSquareMeters = meterSquareData * 1e-4;
+    else if (rscUnits === 'in') areaInSquareMeters = meterSquareData * 0.00064516;
+
+    const updatedSkuValues = addNewSkuData.sku_values.map((item) => {
+      const isCorrugated = item.layer?.toLowerCase().includes('corrugated');
+      const selectedFlute = item.selected_flute;
+
+      return {
+        ...item,
+        weight: calculateWeight({
+          gsm: item.gsm,
+          isCorrugated,
+          selectedFlute,
+          areaInSquareMeters,
+        }),
+        ...(isCorrugated
+          ? {}
+          : {
+              flute_type: "--",
+              selected_flute: { number_of_flutes_per_meter: 1 },
+            }),
+      };
+    });
+
+    setAddNewSkuData((prevData) => ({
+      ...prevData,
+      sku_values: updatedSkuValues,
+    }));
+  }, 0); // Runs after reset
+}, [
+  addNewSkuData.length,
+  addNewSkuData.width,
+  addNewSkuData.height,
+  rscUnits,
+  addNewSkuData.width_board_size_cm2,
+  addNewSkuData.length_board_size_cm2,
+  meterSquareData,
+  JSON.stringify(
+    addNewSkuData.sku_values.map(
+      (item) => item.selected_flute?.number_of_flutes_per_meter || 0
+    )
+  ),
+]);
+
 
   //for updating the gsm calculations when dimension changes
   useEffect(() => {
@@ -251,40 +325,40 @@ console.log("into msquare",meterSquareData)
 
   const plyLayerConfigurations = {
     2: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer', type: 'Corrugated Layer' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer', type: 'Corrugated Layer' },
     ],
     3: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
     ],
     5: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { id:2,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { id:3,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
     ],
     7: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { layer: 'Liner Layer 2', type: 'Liner Layer 2' },
-      { layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
-      { layer: 'Liner Layer 3', type: 'Liner Layer 3' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { id:2,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { id:3,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { id:2,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
+      { id:3,layer: 'Liner Layer 3', type: 'Liner Layer 3' },
     ],
     9: [
-      { layer: 'Top Layer', type: 'Top Layer' },
-      { layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { layer: 'Liner Layer 2', type: 'Liner Layer 2' },
-      { layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
-      { layer: 'Liner Layer 3', type: 'Liner Layer 3' },
-      { layer: 'Corrugated Layer 4', type: 'Corrugated Layer 4' },
-      { layer: 'Liner Layer 4', type: 'Liner Layer 4' },
+      { id:1,layer: 'Top Layer', type: 'Top Layer' },
+      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
+      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { id:2,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { id:3,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { id:2,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
+      { id:3,layer: 'Liner Layer 3', type: 'Liner Layer 3' },
+      { id:2,layer: 'Corrugated Layer 4', type: 'Corrugated Layer 4' },
+      { id:3,layer: 'Liner Layer 4', type: 'Liner Layer 4' },
     ],
   }
 
@@ -362,6 +436,8 @@ console.log("into msquare",meterSquareData)
     //'Corrugated Sheet': (
     Board: (
       <CorrugatedSheet
+        onMeterDataChange={handleMeterDataChange}
+            setRscUnits={setRscUnits}
         uploadedFiles={uploadedFiles}
           setUploadedFiles={setUploadedFiles}
         isopenval={isopenval}
@@ -389,6 +465,8 @@ console.log("into msquare",meterSquareData)
     ),
     'Die Cut box': (
       <DieCutBox
+             onMeterDataChange={handleMeterDataChange}
+        setRscUnits={setRscUnits}
               uploadedFiles={uploadedFiles}
           setUploadedFiles={setUploadedFiles}
         isopenval={isopenval}
@@ -477,7 +555,9 @@ console.log("into msquare",meterSquareData)
     setisSingleViewPopup(false)
   }
 
+
   const handleCancel = () => {
+  dispatch(setSkuPartValue([]))
     setAddNewSkuData(createInitialSkuData())
     handleClose()
   }
@@ -637,7 +717,52 @@ useEffect(() => {
 }, []);
 
 console.log("shared unitr form rsc",rscUnits)
+console.log("composite",compositeSelect)
+console.log("sku values...",JSON.stringify(addNewSkuData.sku_values))
+useEffect(() => {
+  const totalWeight = addNewSkuData.sku_values.reduce(
+    (acc, item) => acc + (Number(item.weight) || 0),
+    0
+  )
 
+  const totalBurstingStrength = addNewSkuData.sku_values.reduce(
+    (acc, item) => acc + ((item.gsm && item.bf) ? (item.gsm * item.bf) / 1000 : 0),
+    0
+  )
+
+  setAddNewSkuData((prevData) => ({
+    ...prevData,
+    total_weight: Math.round(totalWeight * 1000) / 1000,
+    total_bursting_strength: Math.round(totalBurstingStrength * 1000) / 1000,
+  }))
+}, [addNewSkuData.sku_values])
+
+  useEffect(() => {
+    fetchFluteList()
+  }, [])
+
+  const fetchFluteList = async () => {
+    try {
+      const response = await apiMethods.getFluteType()
+      setFluteDropdown(response.data.data)
+      console.log("flute type",JSON.stringify(response.data.data))
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+
+const handleFluteSelection = (selectedFlute, fluteIndex) => {
+  console.log("selected flute",selectedFlute)
+  if (fluteIndex !== null) {
+    handleSkuValuesChange(fluteIndex, 'flute_type', selectedFlute.name);
+    handleSkuValuesChange(fluteIndex, 'selected_flute', selectedFlute);
+    setSelectedFluteIndex(null);
+    setisSingleViewPopup(false);
+  }
+};
+
+console.log("addnedwskudata unit",rscUnits)
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
@@ -683,7 +808,7 @@ console.log("shared unitr form rsc",rscUnits)
       )}
 
       {addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
-        <div className="mt-6">
+        <div className="mt-6 mb-6">
           <div className="border rounded-lg overflow-auto">
             <table className="w-full">
               <thead className="bg-gray-100">
@@ -733,21 +858,30 @@ console.log("shared unitr form rsc",rscUnits)
                     </td>
 
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <input
-                        type="number"
-                        className="p-1 border rounded text-center w-full"
-                        value={item.gsm || ''}
-                        placeholder="gsm"
-                        onChange={(e) =>
-                          handleSkuValuesChange(index, 'gsm', Number(e.target.value))
-                        }
-                        readOnly={editTag}
-                      />
+                    <input
+  type="number"
+  className={`p-1 rounded text-center w-full transition-colors ${
+    errors.sku_values?.[index]?.gsm
+      ? 'border-2 border-red-500'
+      : 'border border-gray-300'
+  }`}
+  value={item.gsm || ''}
+  placeholder="gsm"
+  onChange={(e) =>
+    handleSkuValuesChange(index, 'gsm', Number(e.target.value))
+  }
+  readOnly={editTag}
+/>
+
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
                       <input
                         type="number"
-                        className="p-1 border rounded text-center w-full"
+                      className={`p-1 rounded text-center w-full transition-colors ${
+    errors.sku_values?.[index]?.bf
+      ? 'border-2 border-red-500'
+      : 'border border-gray-300'
+  }`}
                         value={item.bf || ''}
                         placeholder="bf"
                         onChange={(e) => handleSkuValuesChange(index, 'bf', Number(e.target.value))}
@@ -756,7 +890,11 @@ console.log("shared unitr form rsc",rscUnits)
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
 <select
-  className="p-1 border rounded w-full"
+     className={`p-1 rounded w-full transition-colors ${
+      errors.sku_values?.[index]?.color
+        ? 'border-2 border-red-500'
+        : 'border border-gray-300'
+    }`}
   value={item.color}
   onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
   disabled={editTag} // use disabled for select instead of readOnly
@@ -774,7 +912,11 @@ console.log("shared unitr form rsc",rscUnits)
                       {item?.layer?.toLowerCase().includes('corrugated') ? (
                         <div className="relative w-full flex items-center">
                           <select
-                            className="p-1 border rounded w-full pr-8 appearance-none"
+                              className={`p-1 rounded w-full pr-8 appearance-none transition-colors ${
+          errors.sku_values?.[index]?.flute_type
+            ? 'border-2 border-red-500'
+            : 'border border-gray-300'
+        }`}
                             value={item.flute_type}
                             onChange={(e) =>
                               handleSkuValuesChange(index, 'flute_type', e.target.value)
@@ -782,20 +924,25 @@ console.log("shared unitr form rsc",rscUnits)
                             disabled={editTag}
                           >
                             <option hidden>Select</option>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                            <option value="E">E</option>
-                            <option value="F,G,N">F,G,N</option>
+  {fluteDropdown.map((flute) => (
+    <option key={flute.id} value={flute.name} disabled>
+      {flute.name}
+    </option>
+  ))}
                           </select>
                           <FaEye
                             className="absolute right-2 text-gray-500 cursor-pointer"
-                            onClick={openViewCard}
+                           onClick={() => {
+    setSelectedFluteIndex(index);
+    setisSingleViewPopup(true);
+  }}
                           />
                         </div>
                       ) : (
                         <p className="text-gray-500">--</p>
                       )}
+
+
                     </td>
 
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
@@ -818,11 +965,25 @@ console.log("shared unitr form rsc",rscUnits)
                 ))}
               </tbody>
             </table>
+
           </div>
         </div>
       )}
+{addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
+  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-4 mt-4 mb-6">
+    <p className="text-sm font-medium text-gray-700 mb-10">
+      Total Weight:{' '}
+ {addNewSkuData.total_weight}
+    </p>
+    <p className="text-sm font-medium text-gray-700 mb-10">
+      Total Bursting Strength:{' '}
+{addNewSkuData.total_bursting_strength}
+    </p>
+  </div>
+)}
 
-      {addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
+
+      {/*{addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
         <tr className="bg-gray-100 font-semibold text-center">
           <td colSpan={6} className="p-2 text-right">
             Total Weight:
@@ -832,20 +993,35 @@ console.log("shared unitr form rsc",rscUnits)
               addNewSkuData.sku_values?.reduce((acc, item) => acc + (Number(item.weight) || 0), 0),
             )}
           </td>
-          <td></td> {/* Empty cell to align with the columns */}
+          <td></td> 
         </tr>
-      )}
+      )}*/}
 
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 pb-6 px-4 flex justify-end space-x-4 z-20">
-  <button className="p-1 border border-gray-300 rounded w-20" onClick={handleCancel}>
-    Cancel
-  </button>
+{/*<button   className="p-1.5 border border-gray-300 rounded w-20 text-sm" onClick={handleCancel}>
+  Cancel
+</button>
+
   <ActionButton
     onClick={handleAddSkuSubmit}
     label={editTag ? 'Update' : 'Submit'}
     variant="save"
-    className="bg-[#079b54] text-white px-2 py-1 rounded-md"
-  />
+    className="bg-[#079b54] text-white px-1 py-1 rounded-md"
+  />*/}
+        <button
+            className="p-1.5 border border-gray-300 rounded w-20 text-sm"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
+     <button
+            className="p-1.5 rounded w-20 mr-3 text-white bg-purple-600 hover:bg-purple-700 text-sm disabled:bg-gray-400"
+      onClick={handleAddSkuSubmit}
+          >
+           {editTag ? 'Update' : 'Submit'}
+          </button>
+
+  
 </div>
 
       <PopUp
@@ -855,7 +1031,11 @@ console.log("shared unitr form rsc",rscUnits)
         width={'50vw'}
         header={'Add Flute'}
       >
-        <FluteTypeView></FluteTypeView>
+ <FluteTypeView
+    onSelect={(selectedFlute) =>
+      handleFluteSelection(selectedFlute, selectedFluteIndex)
+    }
+  />
       </PopUp>
 
       <PopUp
@@ -953,32 +1133,42 @@ console.log("shared unitr form rsc",rscUnits)
                             onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
                           />
                         </td>
-                        <td className="p-2 text-center w-full sm:w-1/12 relative">
-                          {item?.layer?.toLowerCase().includes('corrugated') ? (
-                            <div className="relative w-full flex items-center">
-                              <select
-                                className="p-1 border rounded w-full pr-8 appearance-none"
-                                value={item.flute_type}
-                                onChange={(e) =>
-                                  handleSkuValuesChange(index, 'flute_type', e.target.value)
-                                }
-                              >
-                                <option hidden>Select</option>
-                                <option value="A">A</option>
-                                <option value="B">B</option>
-                                <option value="C">C</option>
-                                <option value="E">E</option>
-                                <option value="F,G,N">F,G,N</option>
-                              </select>
-                              <FaEye
-                                className="absolute right-2 text-gray-500 cursor-pointer"
-                                onClick={openViewCard}
-                              />
-                            </div>
-                          ) : (
-                            <p className="text-gray-500">--</p>
-                          )}
-                        </td>
+                         <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
+                      {item?.layer?.toLowerCase().includes('corrugated') ? (
+                        <div className="relative w-full flex items-center">
+                          <select
+                              className={`p-1 rounded w-full pr-8 appearance-none transition-colors ${
+          errors.sku_values?.[index]?.flute_type
+            ? 'border-2 border-red-500'
+            : 'border border-gray-300'
+        }`}
+                            value={item.flute_type}
+                            onChange={(e) =>
+                              handleSkuValuesChange(index, 'flute_type', e.target.value)
+                            }
+                            disabled={editTag}
+                          >
+                            <option hidden>Select</option>
+  {fluteDropdown.map((flute) => (
+    <option key={flute.id} value={flute.name} disabled>
+      {flute.name}
+    </option>
+  ))}
+                          </select>
+                          <FaEye
+                            className="absolute right-2 text-gray-500 cursor-pointer"
+                           onClick={() => {
+    setSelectedFluteIndex(index);
+    setisSingleViewPopup(true);
+  }}
+                          />
+                        </div>
+                      ) : (
+                        <p className="text-gray-500">--</p>
+                      )}
+
+
+                    </td>
                         <td className="p-2 text-center w-full sm:w-1/12">
                           <input
                             type="text"

@@ -8,17 +8,20 @@ import Drawer from '../../components/Drawer/Drawer'
 import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
 import PurchaseReturnForm from './PurchaseReturnForm'
+import AddPurchaseOrderReturn from './AddPurchaseReturn'  
 
 const PurchaseOrderReturn = () => {
   const [isPorEdit, setIsPorEdit] = useState(false)
   const [selectedPorId, setSelectedPorId] = useState(null)
   const [alerts, setAlerts] = useState([])
   const [porData, setPorData] = useState([])
+  const [poData, setPoData] = useState([])
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 })
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(50)
   const searchBarRef = useRef(null)
   const { searchQuery } = useSearch()
+  const [selectedPoId, setSelectedPoId] = useState(null)
 
   // Fetch data
   const fetchData = async () => {
@@ -37,6 +40,29 @@ const PurchaseOrderReturn = () => {
 
   useEffect(() => {
     fetchData()
+  }, [limit, searchQuery, pagination.currentPage])
+
+
+  //po data
+  const poFetchData = async () => {
+    try {
+      const response = await apiMethods.getPurchaseOrders({
+        search: searchQuery,
+        page: pagination.currentPage,
+        limit: limit,
+      })
+      console.log('podata',response?.data);
+      
+      setPoData(response?.data || [])
+      setPagination(response.data.pagination || { currentPage: 1, totalPages: 1, total: 0 })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    poFetchData()
+    
   }, [limit, searchQuery, pagination.currentPage])
 
   // Fetch details for editing
@@ -66,7 +92,6 @@ const PurchaseOrderReturn = () => {
             reason: matchedPor.reason,
             payment_terms: matchedPor.payment_terms,
             notes: matchedPor.notes,
-            return_date: matchedPor.return_date,
             status: matchedPor.status,
             total_qty: matchedPor.total_qty,
             amount: matchedPor.amount,
@@ -86,11 +111,19 @@ const PurchaseOrderReturn = () => {
   }
 
   // Handle edit button
-  const handleEdit = (item) => {
-    console.log('item.id',item.id)
-    setSelectedPorId(item.id)
+  const handleEdit = (po_return) => {
+    console.log('po_return',po_return)
+    setSelectedPorId(po_return.id)
+    setSelectedPoId(po_return.po_id)
     setIsPorEdit(true)
     setDrawerOpen(true)
+  }
+
+  const handleAddNew = () => {
+    setIsPorEdit(false)
+    setDrawerOpen(true)
+    setIsPorEdit(false)
+
   }
 
   const handleCloseDrawer = () => {
@@ -134,7 +167,13 @@ const PurchaseOrderReturn = () => {
             </svg>
             <span className="whitespace-nowrap">Clear</span>
           </button>
-        </div>
+          <div className="ml-auto flex gap-2">
+                  <ActionButton label="Add Purchase Return" onClick={handleAddNew} variant="add" />
+          </div>
+        </div>      
+        
+        
+
         <div className="overflow-x-auto overflow-y-auto whitespace-nowrap my-4">
           <PurchaseReturnTable
             porData={porData}
@@ -166,15 +205,17 @@ const PurchaseOrderReturn = () => {
         <Drawer
           isOpen={drawerOpen}
           onClose={handleCloseDrawer}
-          maxWidth={"1270px"}
+          maxWidth={"1350px"}
           title={isPorEdit ? "Edit Purchase Order Return" : "Add Purchase Order Return"}
         >
-          <PurchaseReturnForm
+          <AddPurchaseOrderReturn
             isPorEdit={isPorEdit}
             selectedPorId={selectedPorId}
+            selectedPoId={selectedPoId}
             setDrawer={setDrawerOpen}
             handlePurchaseDetails={handlePurchaseDetails}
             fetchData={fetchData}
+            poData={poData}
           />
         </Drawer>
       </div>

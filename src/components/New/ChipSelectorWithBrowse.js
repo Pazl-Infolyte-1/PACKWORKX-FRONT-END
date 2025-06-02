@@ -10,8 +10,8 @@ const ChipSelectorWithBrowse = ({
   required = false,
   errors
 }) => {
-  const selectedChips = allOptions.filter((item) =>
-    selectedIds.includes(item.id)
+  const selectedChips = allOptions?.filter((item) =>
+    selectedIds?.includes(item.id)
   );
 console.log("route errors",errors)
   return (
@@ -27,12 +27,12 @@ console.log("route errors",errors)
       errors?.route ? 'border-2 border-red-500' : 'border border-gray-300'
     }`}
   >
-    {selectedChips.map((chip) => (
+    {selectedChips?.map((chip) => (
       <span
-        key={chip.id}
+        key={chip?.id}
         className="flex items-center text-sm gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs h-[12px] whitespace-nowrap"
       >
-        {chip.route_name}
+        {chip?.route_name}
         <button
           onClick={() => onRemoveChip(chip.id)}
           className="ml-1 text-blue-500 hover:text-blue-700 focus:outline-none"

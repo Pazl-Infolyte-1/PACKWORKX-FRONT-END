@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState  } from 'react';
 import { useForm, useFieldArray, useWatch } from 'react-hook-form';
+import apiMethods from '../../api/config'
 
 const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
-  
-  const { register, control, reset } = useForm({
+  const { register, control, reset,getValues  } = useForm({
     defaultValues: {
       items: [],
     },
@@ -15,14 +15,72 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
   });
 
   const watchedItems = useWatch({ control, name: 'items' });
-
   const lastHash = useRef('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState(null);
 
-  // Set form items from props once
+
+  const Modal = ({ isOpen, onClose, children }) => {
+    if (!isOpen) return null;
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded p-6 max-w-md w-full">
+          <button onClick={onClose} className="float-right">&times;</button>
+          <div>{children}</div>
+        </div>
+      </div>
+    );
+  };
+
+  const openItemDetails = async (item_id) => {
+    try {
+      const response = await apiMethods.getItemList();
+      const items = response?.data?.data || [];
+      const item = items.find(i => i.id === parseInt(item_id));
+      const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {};
+  
+      setModalContent(
+        <>
+          <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
+          {Object.entries(customFields).length > 0 ? (
+            Object.entries(customFields).map(([key, value], idx) => (
+              <p key={idx}>
+                <strong>{key}:</strong> {value}
+              </p>
+            ))
+          ) : (
+            <p>No custom fields available.</p>
+          )}
+        </>
+      );
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching item details:', error);
+    }
+  };
+
+  // Fetch available quantities and reset form
   useEffect(() => {
-    // console.log('items', items);
-    if (Array.isArray(items) && items.length > 0) {
-      const formattedItems = items.map((item) => ({
+    const fetchAvailableQuantities = async () => {
+      if (!Array.isArray(items) || items.length === 0) return;
+
+      const response = await apiMethods.getinventory();
+      const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : [];
+
+      const updatedItems = items.map((item) => {
+        const inventoryItem = inventoryList.find(
+          (invItem) => invItem.item_id === item.item_id
+        );
+
+        return {
+          ...item,
+          available_quantity: inventoryItem ? parseFloat(inventoryItem.quantity_available) : 0,
+        };
+      });
+
+      
+      // Format for form
+      const formatted = updatedItems.map((item) => ({
         item_id: item.item_id ?? 0,
         grn_item_id: item.grn_item_id ?? 0,
         item_code: item.item_code ?? '',
@@ -32,15 +90,18 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
         tax_amount: parseFloat(item.tax_amount ?? 0),
         remarks: item.remarks ?? '',
         selected: !!item.selected,
+        available_quantity: parseFloat(item.available_quantity ?? 0),
       }));
-      reset({ items: formattedItems });
-    }
+
+      reset({ items: formatted });
+    };
+
+    fetchAvailableQuantities();
   }, [items, reset]);
 
-  // Watch and compute totals only when data changes
+  // Recalculate totals when items change
   useEffect(() => {
     const hash = JSON.stringify(watchedItems);
-
     if (hash !== lastHash.current) {
       lastHash.current = hash;
 
@@ -62,29 +123,10 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
         grand_total: grandTotal,
       }));
     }
-  }, [watchedItems]);
-
-  const addItem = () => {
-    append({
-      item_id: 0,
-      grn_item_id: 0,
-      item_code: '',
-      quantity: 0,
-      uom: '',
-      unit_price: 0,
-      tax_amount: 0,
-      remarks: '',
-      selected: false,
-    });
-  };
-
-  const removeItem = (index) => remove(index);
+  }, [watchedItems, setItems, setFormValues]);
 
   return (
     <div className="p-2">
-      <button onClick={addItem} className="mb-2 bg-blue-500 text-white px-4 py-2 rounded">
-        + Add Item
-      </button>
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border">
           <thead className="bg-gray-100">
@@ -92,8 +134,10 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
               <th>Select</th>
               <th>GRN Item ID</th>
               <th>Item ID</th>
+              <td></td>
               <th>Code</th>
-              <th>Quantity</th>
+              <th>Available Quantity</th>
+              <th>Return Quantity</th>
               <th>UOM</th>
               <th>Price</th>
               <th>Tax Price</th>
@@ -106,7 +150,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
             {fields.map((item, index) => {
               const quantity = watchedItems?.[index]?.quantity || 0;
               const unit_price = watchedItems?.[index]?.unit_price || 0;
-                const tax_amount = watchedItems?.[index]?.tax_amount || 0;
+              const tax_amount = watchedItems?.[index]?.tax_amount || 0;
               const total = quantity * unit_price + tax_amount;
 
               return (
@@ -132,6 +176,20 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
                       className="border px-2 py-1"
                     />
                   </td>
+                 <td
+                  onClick={() => {
+                    const itemId = getValues(`items.${index}.item_id`);
+                    if (itemId) {
+                      openItemDetails(itemId);
+                    } else {
+                      console.warn('Item ID is empty');
+                    }
+                  }}
+                  className="cursor-pointer text-blue-600"
+                >
+                  ℹ️
+                </td>
+
                   <td>
                     <input
                       type="text"
@@ -139,14 +197,23 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
                       className="border px-2 py-1"
                     />
                   </td>
+                   <td>
+                    <input
+                      type="number"
+                      readOnly
+                      {...register(`items.${index}.available_quantity`)}
+                      className="border px-2 py-1 bg-gray-100"
+                    />
+                  </td>
                   <td>
                     <input
                       type="number"
-                      step="0.01"
-                      {...register(`items.${index}.quantity`, { valueAsNumber: true })}
+                      step="0.01"                      
+                      // {...register(`items.${index}.quantity`, { valueAsNumber: true })}
                       className="border px-2 py-1"
                     />
                   </td>
+                 
                   <td>
                     <input
                       type="text"
@@ -186,7 +253,11 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
                     />
                   </td>
                   <td>
-                    <button onClick={() => removeItem(index)} className="text-red-500">
+                    <button
+                      type="button"
+                      onClick={() => remove(index)}
+                      className="text-red-500"
+                    >
                       Remove
                     </button>
                   </td>
@@ -195,6 +266,9 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
             })}
           </tbody>
         </table>
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+  {modalContent}
+</Modal>
       </div>
     </div>
   );

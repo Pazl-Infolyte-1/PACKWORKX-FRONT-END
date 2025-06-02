@@ -35,7 +35,7 @@ function ViewMachineData({ Id }) {
               (processValue) => processValue.process_name_id === machineProcess.process_id,
             )
           })
-          .filter(Boolean) // Remove undefined values if no match found
+          .filter(Boolean)
 
         setValues(matchedValues)
       } catch (error) {
@@ -82,6 +82,7 @@ function ViewMachineData({ Id }) {
       return dateString
     }
   }
+  console.log(machineData)
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 ">
@@ -158,50 +159,69 @@ function ViewMachineData({ Id }) {
       </div>
 
       <div className="mt-4 bg-gray-50 p-4 rounded-lg">
+        <h3 className="text-sm uppercase tracking-wide text-black mb-2">Dates & Maintenance</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
+          <div>
+            <p className="text-gray-600 text-sm m-0">Purchase Date</p>
+            <p className="font-medium text-xs">
+              {machineData.purchase_date ? formatDate(machineData.purchase_date) : '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-gray-600 text-sm m-0">Installation Date</p>
+            <p className="font-medium text-xs">
+              {machineData.installation_date ? formatDate(machineData.installation_date) : '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-gray-600 text-sm m-0">Last Maintenance</p>
+            <p className="font-medium text-xs">
+              {machineData.last_maintenance ? formatDate(machineData.last_maintenance) : '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-gray-600 text-sm m-0">Next Maintenance</p>
+            <p className="font-medium text-xs">
+              {machineData.next_maintenance_due
+                ? formatDate(machineData.next_maintenance_due)
+                : '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-gray-600 text-sm m-0">Warranty Expires</p>
+            <p className="font-medium text-xs">
+              {machineData.warranty_expiry ? formatDate(machineData.warranty_expiry) : '-'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 bg-gray-50 p-4 rounded-lg">
         <div className=" bg-gray-50 rounded-lg">
           <h3 className="text-sm uppercase tracking-wide text-black mb-2">Process Values</h3>
-          {values.length > 0 ? (
-            values.map((value, index) => (
+          {machineData.machine_process.length > 0 ? (
+            machineData.machine_process.map((value, index) => (
               <div key={index} className="mb-4 bg-white p-2">
-                <h4 className="text-sm">{value.ProcessName.process_name}</h4>
+                <h4 className="text-sm">{value.process_name}</h4>
                 <div className="grid grid-cols-3 gap-2 mt-2 ">
-                  {Object.entries(value.process_value).map(([key, val]) => (
-                    <div key={key} className=" p-2 rounded">
-                      <span className="text-gray-600 text-sm">{key}: </span>
-                      <span className="font-medium">{val}</span>
-                    </div>
-                  ))}
+                  {Object.keys(value.process_values || {}).length > 0 ? (
+                    Object.entries(value.process_values).map(([key, val]) => (
+                      <div key={key} className="p-2 rounded">
+                        <span className="text-gray-600 text-sm">{key}: </span>
+                        <span className="font-medium">
+                          {val || <span className="text-xs">N/A</span>}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-sm text-red-500 p-2">No Field Available</div>
+                  )}
                 </div>
               </div>
             ))
           ) : (
             <p className="text-gray-600 text-sm text-center">No process values found.</p>
           )}
-        </div>
-      </div>
-      <div className="mt-4 bg-gray-50 p-4 rounded-lg">
-        <h3 className="text-sm uppercase tracking-wide text-black mb-2">Dates & Maintenance</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <p className="text-gray-600 text-sm mb-1">Purchase Date</p>
-            <p className="font-medium">{formatDate(machineData.purchase_date)}</p>
-          </div>
-          <div>
-            <p className="text-gray-600 text-sm mb-1">Installation Date</p>
-            <p className="font-medium">{formatDate(machineData.installation_date)}</p>
-          </div>
-          <div>
-            <p className="text-gray-600 text-sm mb-1">Last Maintenance</p>
-            <p className="font-medium">{formatDate(machineData.last_maintenance)}</p>
-          </div>
-          <div>
-            <p className="text-gray-600 text-sm mb-1">Next Maintenance</p>
-            <p className="font-medium">{formatDate(machineData.next_maintenance_due)}</p>
-          </div>
-          <div>
-            <p className="text-gray-600 text-sm mb-1">Warranty Expires</p>
-            <p className="font-medium">{formatDate(machineData.warranty_expiry)}</p>
-          </div>
         </div>
       </div>
 

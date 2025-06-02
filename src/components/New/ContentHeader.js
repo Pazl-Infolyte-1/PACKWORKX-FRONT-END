@@ -12,6 +12,7 @@ function ContentHeader({
   menuOptions = [],
   headingOptions = [],
   isMinimized,
+  isAddNew = true
 }) {
   const [showMenu, setShowMenu] = useState(false)
   const [showHeadingDropdown, setShowHeadingDropdown] = useState(false)
@@ -73,9 +74,9 @@ function ContentHeader({
         <div
           ref={headingRef}
           onClick={headingOptions.length > 0 ? handleHeadingClick : undefined}
-   className={`text-lg font-semibold flex items-center px-2 py-1 rounded cursor-${headingOptions.length > 0 ? 'pointer' : 'default'} ${
-    headingOptions.length > 0 ? 'hover:bg-[#f1f2f7] active:bg-[#e4e6ed]' : ''
-  }`}
+          className={`text-lg font-semibold flex items-center px-2 py-1 rounded cursor-${headingOptions.length > 0 ? 'pointer' : 'default'} ${
+            headingOptions.length > 0 ? 'hover:bg-[#f1f2f7] active:bg-[#e4e6ed]' : ''
+          }`}
         >
           {heading}
           {headingOptions.length > 0 && (
@@ -110,43 +111,49 @@ function ContentHeader({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onAddClick}
-          className={`flex items-center justify-center rounded-md transition-all duration-200
-    ${isMinimized ? 'w-8 h-8 text-xl bg-blue-600 text-white' : 'bg-blue-500 text-white py-1.5 px-3'}
-  `}
-        >
-          {isMinimized ? '+' : `+ ${addLabel}`}
-        </button>
+      <div className="flex items-center gap-4">
+        {isAddNew && (
+          <button
+            onClick={onAddClick}
+            className={`flex items-center justify-center rounded-md transition-all duration-200
+    ${isMinimized ? 'w-8 h-8 text-xl bg-blue-600 text-white' : 'bg-blue-500 text-white py-1.5 px-3'}`}
+          >
+            {isMinimized ? '+' : `+ ${addLabel}`}
+          </button>
+        )}
 
         {/* Three Dot Menu */}
-        <div className="relative">
-          <button ref={buttonRef} onClick={handleMenuClick} className="p-2 rounded-md bg-gray-200">
-            <BsThreeDots className="text-gray-600 text-xl" />
-          </button>
-
-          {showMenu && (
-            <div
-              ref={menuRef}
-              className="absolute right-0 mt-2 w-32 text-xs bg-white rounded-md shadow-lg z-50 border border-gray-200"
+        {menuOptions.length > 0 && (
+          <div className="relative">
+            <button
+              ref={buttonRef}
+              onClick={handleMenuClick}
+              className="p-2 rounded-md bg-gray-200"
             >
-        
-              <div className="py-1">
-                {menuOptions.map((option, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => handleMenuItemClick(option.onClick)}
-                  >
-                    {option.icon && <span className="mr-2">{option.icon}</span>}
-                    <span>{option.label}</span>
-                  </div>
-                ))}
+              <BsThreeDots className="text-gray-600 text-xl" />
+            </button>
+
+            {showMenu && (
+              <div
+                ref={menuRef}
+                className="absolute right-0 mt-2 w-44 text-xs bg-white rounded-md shadow-lg z-50 border border-gray-200"
+              >
+                <div className="py-1">
+                  {menuOptions.map((option, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleMenuItemClick(option.onClick)}
+                    >
+                      {option.icon && <span className="mr-2">{option.icon}</span>}
+                      <span>{option.label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         {/* Help Button */}
         {/*<button onClick={onHelpClick} className="bg-orange-400 p-2 rounded-md text-white">

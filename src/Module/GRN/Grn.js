@@ -9,6 +9,8 @@ import Drawer from '../../components/Drawer/Drawer'
 import GrnForm from './GrnForm'
 import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
+import ContentHeader from '../../components/New/ContentHeader'
+import CompactPagination from '../../components/New/CompactPagination'
 
 const Grn = () => {
   const [alerts, setAlerts] = useState([])
@@ -16,10 +18,19 @@ const Grn = () => {
   const [grnData, setGrnData] = useState([])
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 })
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(50)
   const searchBarRef = useRef(null)
   const [errors, setErrors] = useState({})
-  const { searchQuery } = useSearch()
+  const { searchQuery, setGlobalPlaceholder } = useSearch()
+  const [refresh, setRefresh] = useState(false)
+
+  useEffect(() => {
+    setGlobalPlaceholder('Search GRN...')
+
+    return () => {
+      setGlobalPlaceholder('Search...')
+    }
+  }, [])
 
   const fetchData = async () => {
     try {
@@ -38,7 +49,7 @@ const Grn = () => {
   useEffect(() => {
     console.log('Fetching data with limit:', limit, 'and searchQuery:', searchQuery)
     fetchData()
-  }, [limit, searchQuery, pagination.currentPage])
+  }, [limit, searchQuery, pagination.currentPage, refresh])
 
   const [grnFormData, setGrnFormData] = useState({
     po_id: null,
@@ -116,13 +127,13 @@ const Grn = () => {
           const response = await apiMethods.editGrn(data)
           setAlerts((prev) => [
             ...prev,
-            { severity: 'success', message: response.data.message || 'GRN Uopdated Successfully' },
+            { severity: 'success', message: response?.data?.message || 'GRN Uopdated Successfully' },
           ])
         } else {
           const response = await apiMethods.postGrn(data)
           setAlerts((prev) => [
             ...prev,
-            { severity: 'success', message: response.data.message || 'GRN Added Successfully' },
+            { severity: 'success', message: response?.data?.message || 'GRN Added Successfully' },
           ])
         }
         setGrnFormData({
@@ -154,76 +165,47 @@ const Grn = () => {
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <div className="flex flex-col lg:flex-row item-center gap-5 relative my-3">
-        <h3 className="text-xl font-semibold mb-3">GRN</h3>
-      </div>
-      <div className="bg-white p-3 rounded-lg w-full h-full">
-        <div className="flex items-center">
-          <SearchBar data={grnData} text={'Grn'} ref={searchBarRef} />
-          <button
-            className="ml-4 border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition-colors duration-200 flex items-center gap-1"
-            onClick={clearFilters}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-            <span className="whitespace-nowrap">Clear</span>
-          </button>
-
-          <div className="flex-grow flex justify-end gap-3">
-            <ActionButton
-              variant="add"
-              label={'Add GRN'}
-              onClick={() => {
-                setIsEdit(false)
-                setDrawerOpen(true)
-              }}
-            />
-          </div>
-        </div>
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap my-4">
+      <ContentHeader
+        heading={'GRN'}
+        onAddClick={() => {
+          setIsEdit(false)
+          setDrawerOpen(true)
+        }}
+      />
+      <div className="">
+        <div>
           <GrnTable
             grnData={grnData}
             setGrnData={setGrnData}
             setAlerts={setAlerts}
             handleEdit={handleEdit}
+            setRefresh={setRefresh}
           />
         </div>
-        <div>
-          <CommonPagination
+        <div className='my-2'>
+          <CompactPagination
             count={pagination?.totalPages || 1}
             page={pagination?.currentPage || 1}
-            onChange={(event, value) => {
+            onPageChange={(event, value) => {
               setPagination((prev) => ({
                 ...prev,
                 currentPage: value,
               }))
             }}
-            onLimitChange={(newLimit) => {
+            onEntriesChange={(newLimit) => {
               setLimit(newLimit)
               setPagination((prev) => ({
                 ...prev,
                 page: 1,
               }))
             }}
-            limit={limit}
+            entriesPerPage={limit}
           />
         </div>
         <Drawer
           isOpen={drawerOpen}
           onClose={handleCloseDrawer}
-          maxWidth={'1265px'}
+          maxWidth={'1350px'}
           title={isEdit ? `Edit Grn` : `New Grn`}
         >
           <GrnForm

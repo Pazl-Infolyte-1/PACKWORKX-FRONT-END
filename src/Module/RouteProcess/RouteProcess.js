@@ -9,6 +9,8 @@ import { RouteProcessForm } from './RouteProcessForm'
 import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
 import RouteProcessDetails from './RouteProcessDetails'
+import ContentHeader from '../../components/New/ContentHeader'
+import CompactPagination from '../../components/New/CompactPagination'
 
 const RouteProcess = () => {
   const [showAddRouteProcessModal, setShowAddRouteProcessModal] = useState(false)
@@ -17,9 +19,9 @@ const RouteProcess = () => {
   const [routeProcessData, setRouteProcessData] = useState([])
   const [processData, setProcessData] = useState([])
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(50)
   const searchBarRef = useRef(null)
-  const { searchQuery } = useSearch()
+  const { searchQuery, setGlobalPlaceholder } = useSearch()
   const [refresh, setRefresh] = useState(false)
   const [processOrder, setProcessOrder] = useState([])
   const [openRouteModal, setOpenRouteModal] = useState(false)
@@ -28,6 +30,14 @@ const RouteProcess = () => {
     route_name: '',
     route_process: [],
   })
+
+  useEffect(() => {
+    setGlobalPlaceholder('Search route process...')
+
+    return () => {
+      setGlobalPlaceholder('Search...')
+    }
+  }, [])
 
   const fetchData = async () => {
     try {
@@ -113,26 +123,17 @@ const RouteProcess = () => {
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <div className="flex flex-col lg:flex-row item-center gap-5 relative my-3">
-        <h3 className="text-xl font-semibold mb-3">Route Process</h3>
-      </div>
-      <div className="bg-white p-3 rounded-lg w-full h-full">
-        <div className="flex items-center">
-          <SearchBar data={routeProcessData} text={'Route Process'} ref={searchBarRef} />
-          <div className="flex-grow flex justify-end gap-3">
-            <ActionButton
-              variant="add"
-              label={'Add Route Process'}
-              onClick={() => {
-                setIsEdit(false)
-                setShowAddRouteProcessModal(true)
-                setProcessOrder([])
-                setRefresh(!refresh)
-              }}
-            />
-          </div>
-        </div>
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap my-4">
+      <ContentHeader
+        heading={'Route Process'}
+        onAddClick={() => {
+          setIsEdit(false)
+          setShowAddRouteProcessModal(true)
+          setProcessOrder([])
+          setRefresh(!refresh)
+        }}
+      />
+      <div className="bg-white rounded-lg w-full h-full">
+        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap">
           <RouteProcessTable
             routeProcessData={routeProcessData}
             setRouteProcessData={setRouteProcessData}
@@ -141,24 +142,24 @@ const RouteProcess = () => {
             setOpenRouteModal={setOpenRouteModal}
           />
         </div>
-        <div>
-          <CommonPagination
+        <div className="mt-4">
+          <CompactPagination
             count={pagination?.totalPages || 1}
             page={pagination?.page || 1}
-            onChange={(event, value) => {
+            onPageChange={(event, value) => {
               setPagination((prev) => ({
                 ...prev,
                 page: value,
               }))
             }}
-            onLimitChange={(newLimit) => {
+            onEntriesChange={(newLimit) => {
               setLimit(newLimit)
               setPagination((prev) => ({
                 ...prev,
                 page: 1,
               }))
             }}
-            limit={limit}
+            entriesPerPage={limit}
           />
         </div>
         <PopUp

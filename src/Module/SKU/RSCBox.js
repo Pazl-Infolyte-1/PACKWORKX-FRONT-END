@@ -1,7 +1,13 @@
 import Input from '../../components/New/Input'
 import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
-import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
+import {
+  cilChevronCircleDownAlt,
+  cilChevronDoubleDown,
+  cilPencil,
+  cilPlus,
+  cilTrash,
+} from '@coreui/icons'
 import { useEffect, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import CustomAlert from '../../components/New/CustomAlert'
@@ -18,13 +24,12 @@ import RoutePopup from './RoutePopup'
 import apiMethods from '../../api/config'
 import { useDispatch, useSelector } from 'react-redux'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
-import { setRscDeckleSize } from '../../action';
-import { cilCloudUpload } from '@coreui/icons';
+import { setRscDeckleSize } from '../../action'
+import { cilCloudUpload } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-
+import MenuItem from '@mui/material/MenuItem'
+import FormControl from '@mui/material/FormControl'
+import Select from '@mui/material/Select'
 
 function RSCBox({
   dropdownRef,
@@ -79,18 +84,18 @@ function RSCBox({
   const [isUploading, setIsUploading] = useState(false)
   //const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
   const [fileNames, setFileNames] = useState([])
-  const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-   style: {
-      maxHeight: ITEM_HEIGHT * 5 + ITEM_PADDING_TOP, // Show 5 items with scroll
-      width: 200,
+  const ITEM_HEIGHT = 48
+  const ITEM_PADDING_TOP = 8
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 5 + ITEM_PADDING_TOP, // Show 5 items with scroll
+        width: 200,
+      },
     },
-  },
-};
+  }
 
-const navigate = useNavigate()
+  const navigate = useNavigate()
   const deckleSize = useSelector((state) => state.deckleSize)
 
   const dispatch = useDispatch()
@@ -117,8 +122,8 @@ const navigate = useNavigate()
     const upsval = parseFloat(data.ups) || 0
     const flapWidth = Number(parseFloat(data.flap_width)) || 0
 
-    const lengthBoardSize = (length + width) * 2 + lengthTrimmingTolerance + flapWidth
-    const widthBoardSize = width + height + widthTrimmingTolerance
+    const lengthBoardSize = ((length + width) * 2) + lengthTrimmingTolerance + flapWidth
+    const widthBoardSize = (width + height) + widthTrimmingTolerance
     const totalBoardSize = lengthBoardSize * widthBoardSize
     //const deckleSizeVal = widthBoardSize * upsval
     const EPSILON = 0.001
@@ -258,10 +263,9 @@ const navigate = useNavigate()
       const length_board_size_cm2 = convertValue(prev.length_board_size_cm2)
       const width_board_size_cm2 = convertValue(prev.width_board_size_cm2)
 
-      console.log("convert value", parseInt(convertValue(prev.length)))
-            console.log("convert value",  parseInt(convertValue(prev.width)))
-                        console.log("convert value",  parseInt(convertValue(prev.height)))
-
+      console.log('convert value', parseInt(convertValue(prev.length)))
+      console.log('convert value', parseInt(convertValue(prev.width)))
+      console.log('convert value', parseInt(convertValue(prev.height)))
 
       return {
         ...prev,
@@ -712,77 +716,70 @@ const navigate = useNavigate()
           />
         </div>
         <div className="flex items-end gap-2 w-full max-w-md">
-  {/* Select Input */}
-  <div className="flex items-end gap-1 w-fit">
-    {/* MUI Select with icon inside same box */}
-    <div className="relative w-[200px]">
-      {/* Aligned Label */}
-      <label
-        htmlFor="client"
-        className="block text-sm font-medium text-gray-700 mb-1"
-      >
-        Client <span className="text-red-500 ml-1">*</span>
-      </label>
+          {/* Select Input */}
+          <div className="flex items-end gap-1 w-fit">
+            {/* MUI Select with icon inside same box */}
+            <div className="relative w-[200px]">
+              {/* Aligned Label */}
+              <label htmlFor="client" className="block text-sm font-medium text-gray-700 mb-1">
+                Client <span className="text-red-500 ml-1">*</span>
+              </label>
 
-      <FormControl
-        sx={{ width: '100%' }}
-        error={errors.client_id ? true : false}
-      >
-        <Select
-          IconComponent={() => null}
-          labelId="client-select-label"
-          id="client"
-          name="client"
-          disabled={clientDiasble}
-          value={addNewSkuData.client_id}
-          onChange={handleChange}
-          MenuProps={MenuProps}
-          displayEmpty
-          sx={{
-            height: '35px',
-            '& .MuiOutlinedInput-root': {
-              height: '50px',
-              paddingRight: '40px',
-            },
-            '& .MuiSelect-select': {
-              display: 'flex',
-              alignItems: 'center',
-              height: '35px',
-              paddingY: 0,
-            },
-          }}
-        >
-          <MenuItem value="" disabled>
-            <em>Select</em>
-          </MenuItem>
-          {client?.map((item, index) => (
-            <MenuItem key={index} value={item.client_id}>
-              {item.display_name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+              <FormControl sx={{ width: '100%' }} error={errors.client_id ? true : false}>
+                <Select
+                  IconComponent={() => null}
+                  labelId="client-select-label"
+                  id="client"
+                  name="client"
+                  disabled={clientDiasble}
+                  value={addNewSkuData.client_id}
+                  onChange={handleChange}
+                  MenuProps={MenuProps}
+                  displayEmpty
+                  sx={{
+                    height: '35px',
+                    '& .MuiOutlinedInput-root': {
+                      height: '50px',
+                      paddingRight: '40px',
+                    },
+                    '& .MuiSelect-select': {
+                      display: 'flex',
+                      alignItems: 'center',
+                      height: '35px',
+                      paddingY: 0,
+                    },
+                  }}
+                >
+                  <MenuItem value="" disabled>
+                    <em>Select</em>
+                  </MenuItem>
+                  {client?.map((item, index) => (
+                    <MenuItem key={index} value={item.client_id}>
+                      {item.display_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-      {/* Add icon inside the select box */}
-     <button
-  type="button"
-  onClick={() =>
-    navigate('/clients/clientForm', {
-      state: {
-        fromSKU: true,
-        sku_type_for_navigate: 'RSC box',
-      },
-    })
-  }
-  className="absolute top-[calc(50%+13px)] right-2 -translate-y-1/2 text-blue-600 hover:text-blue-800 z-10"
-  title="Add Client"
->
-  <CIcon icon={cilPlus} size="lg" className="w-5 h-5 stroke-[2.5]" />
-</button>
-
-    </div>
-  </div>
-</div>
+              {/* Add icon inside the select box */}
+              <button
+                type="button"
+                onClick={() =>
+                  navigate('/clients/clientForm', {
+                    state: {
+                      fromSKU: true,
+                      sku_type_for_navigate: 'RSC box',
+                    },
+                  })
+                }
+                className="absolute top-[calc(50%+13px)] right-2 -translate-y-1/2 text-blue-600 hover:text-blue-800 z-10"
+                title="Add Client"
+              >
+                <CIcon icon={cilPlus} size="lg" className="w-5 h-5 stroke-[2.5]" />
+              </button>
+            </div>
+          </div>
+        </div>
 
         <div className="w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -913,10 +910,17 @@ const navigate = useNavigate()
               <input
                 id="joints"
                 name="joints"
-             value={addNewSkuData?.joints ?? ''}
+                value={addNewSkuData?.joints ?? ''}
                 onChange={handleChange}
                 readOnly={editTag}
-                //className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                type="text"
+                inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
                 className={`w-full h-8 p-1 text-sm rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                   errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
                 }`}
@@ -936,14 +940,15 @@ const navigate = useNavigate()
                 readOnly={editTag}
                 //className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 className={`w-full h-8 p-1 text-sm rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.deckle_size || deckleSize>addNewSkuData.deckle_size ? 'border-2 border-red-500' : 'border border-gray-300'
+                  errors.deckle_size || deckleSize > addNewSkuData.deckle_size
+                    ? 'border-2 border-red-500'
+                    : 'border border-gray-300'
                 }`}
               />
-         <p className="text-[10px] text-gray-500 mt-1">
-  {/*Deckle should be greater than (({Math.round(Number(addNewSkuData?.length) * 100) / 100 || ''} + {Math.round(Number(addNewSkuData?.height) * 100) / 100 || ''}) × {Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}) + 20*/}
-Deckle should be greater than {deckleSize}
-</p>
-
+              <p className="text-[10px] text-gray-500 mt-1">
+                {/*Deckle should be greater than (({Math.round(Number(addNewSkuData?.length) * 100) / 100 || ''} + {Math.round(Number(addNewSkuData?.height) * 100) / 100 || ''}) × {Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}) + 20*/}
+                Deckle should be greater than {deckleSize}
+              </p>
             </div>
           </div>
         </Tooltip>
@@ -1081,7 +1086,7 @@ Deckle should be greater than {deckleSize}
           <input
             id="ups"
             name="ups"
-                value={Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}
+            value={Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}
             onChange={modifiedHandleChange}
             readOnly={editTag}
             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
@@ -1104,7 +1109,9 @@ Deckle should be greater than {deckleSize}
             <input
               id="length_trimming_tolerance"
               name="length_trimming_tolerance"
-              value={Math.round(Number(addNewSkuData.length_trimming_tolerance) * 100) / 100 || null}
+              value={
+                Math.round(Number(addNewSkuData.length_trimming_tolerance) * 100) / 100 || null
+              }
               onChange={modifiedHandleChange}
               readOnly={editTag}
               className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
@@ -1206,25 +1213,25 @@ Deckle should be greater than {deckleSize}
           </select>
         </div>
 
-{(addNewSkuData?.print_type === 'Offset' || addNewSkuData?.print_type === 'Flexo') && (
-  <div className="flex w-[200px]">
-    <div className="flex flex-col flex w-[200px]">
-      {/* Custom styled file input */}
-         <label className="block text-sm font-medium text-gray-700 mb-2">Documents</label>
-      <label
-        htmlFor="file-upload"
-        className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
-      >
-        <CIcon icon={cilCloudUpload} size="sm" className="text-gray-700" /> Upload Files
-      </label>
-      <input
-        id="file-upload"
-        type="file"
-        accept="application/pdf"
-        onChange={handleFileUpload}
-        multiple
-        className="hidden"
-      />
+        {(addNewSkuData?.print_type === 'Offset' || addNewSkuData?.print_type === 'Flexo') && (
+          <div className="flex w-[200px]">
+            <div className="flex flex-col flex w-[200px]">
+              {/* Custom styled file input */}
+              <label className="block text-sm font-medium text-gray-700 mb-2">Documents</label>
+              <label
+                htmlFor="file-upload"
+                className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
+              >
+                <CIcon icon={cilCloudUpload} size="sm" className="text-gray-700" /> Upload Files
+              </label>
+              <input
+                id="file-upload"
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileUpload}
+                multiple
+                className="hidden"
+              />
 
               {/* Uploading text */}
               {isUploading && <div className="text-sm text-blue-600 mt-2">Uploading files...</div>}

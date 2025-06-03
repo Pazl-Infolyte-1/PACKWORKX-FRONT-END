@@ -293,15 +293,26 @@ const OrderForm = forwardRef(({
     if (!localFormData.client) newErrors.client = "Required";
     if (!localFormData.credit_period) newErrors.credit_period = "Required";
 
-
     // SKU validation
     const skuErrors = [];
     let hasSkuError = false;
 
     skuFormData?.skuDetails?.forEach((skuItem, index) => {
+      const rowErrors = {};
       if (!skuItem.sku || skuItem.sku.trim() === "") {
-        skuErrors[index] = "Required";
+        rowErrors.sku = "Required";
         hasSkuError = true;
+      }
+      if (!skuItem.quantity_required || skuItem.quantity_required <= 0) {
+        rowErrors.quantity = "Required";
+        hasSkuError = true;
+      }
+      if (!skuItem.rate_per_sku || skuItem.rate_per_sku <= 0) {
+        rowErrors.rate = "Required";
+        hasSkuError = true;
+      }
+      if (Object.keys(rowErrors).length > 0) {
+        skuErrors[index] = rowErrors;
       }
     });
 

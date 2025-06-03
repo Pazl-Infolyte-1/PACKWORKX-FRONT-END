@@ -69,8 +69,7 @@ const InvoiceModal = ({isOpen,setIsOpen,invoices}) => {
                       {invoice?.payment_status?.charAt(0)?.toUpperCase() + invoice?.payment_status?.slice(1)}
                     </span>
                     <div className="flex items-center space-x-1 text-gray-600">
-                      <DollarSign size={14} />
-                      <span className="text-sm font-medium">${invoice?.total_amount}</span>
+                      <span className="text-sm font-medium">₹{invoice?.total_amount}</span>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -89,23 +88,23 @@ const InvoiceModal = ({isOpen,setIsOpen,invoices}) => {
                         <div className="grid grid-cols-2 gap-3 text-xs">
                           <div>
                             <span className="text-gray-500">Total:</span>
-                            <span className="ml-2 font-medium">${invoice?.total}</span>
+                            <span className="ml-2 font-medium">₹{invoice?.total}</span>
                           </div>
                           <div>
                             <span className="text-gray-500">Balance:</span>
-                            <span className="ml-2 font-medium">${invoice?.balance}</span>
+                            <span className="ml-2 font-medium">₹{invoice?.balance}</span>
                           </div>
                           <div>
                             <span className="text-gray-500">Tax:</span>
-                            <span className="ml-2 font-medium">${invoice?.total_tax}</span>
+                            <span className="ml-2 font-medium">₹{invoice?.total_tax}</span>
                           </div>
                           <div>
                             <span className="text-gray-500">Discount:</span>
-                            <span className="ml-2 font-medium">${invoice?.discount} ({invoice?.discount_type})</span>
+                            <span className="ml-2 font-medium">₹{invoice?.discount} ({invoice?.discount_type})</span>
                           </div>
                           <div className="col-span-2 pt-2 border-t">
                             <span className="text-gray-700 font-medium">Total Amount:</span>
-                            <span className="ml-2 font-bold text-sm">${invoice?.total_amount}</span>
+                            <span className="ml-2 font-bold text-sm">₹{invoice?.total_amount}</span>
                           </div>
                         </div>
                       </div>

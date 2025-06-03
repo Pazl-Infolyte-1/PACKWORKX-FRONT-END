@@ -79,10 +79,14 @@ const WorkOrders = ({
   
 const navigate = useNavigate() // Add this line
 
-  const handleCancel = () => {
-  // Navigate to workorderlist page
-  navigate('/workorderlist'); // Adjust the path according to your routing structure
+const handleCancel = () => {
+  if (location.pathname.startsWith('/workorderlist')) {
+    navigate('/workorderlist');
+  } else {
+    navigate('/salesorder');
+  }
 };
+
 
   useEffect(() => {
     console.log(skuDetailsForm, 'skudetailsform in workorderform')

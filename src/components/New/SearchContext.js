@@ -16,8 +16,25 @@ export const SearchProvider = ({ children }) => {
     setSearchPlaceholder(placeholder)
   }
 
-  const handleSearch = (data) => {
-    // ... existing handleSearch implementation
+  const handleSearch = (searchValue, dataToFilter) => {
+    if (!searchValue || !dataToFilter) {
+      setFilteredSearchData(dataToFilter || [])
+      return
+    }
+
+    const lowercasedSearch = searchValue.toLowerCase()
+    
+    const filteredData = dataToFilter.filter(item => {
+      // Search through all string properties of the item
+      return Object.values(item).some(value => {
+        if (typeof value === 'string') {
+          return value.toLowerCase().includes(lowercasedSearch)
+        }
+        return false
+      })
+    })
+
+    setFilteredSearchData(filteredData)
   }
 
   const clearSearch = () => {

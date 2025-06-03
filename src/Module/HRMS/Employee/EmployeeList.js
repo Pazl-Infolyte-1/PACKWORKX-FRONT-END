@@ -123,22 +123,16 @@ function EmployeeList() {
   }, [searchQuery, status])
 
   // Initial data fetch on component mount
-useEffect(() => {
-  fetchEmployeeData()
-}, [paginationParams, searchQuery, status, filters])
+  useEffect(() => {
+    fetchEmployeeData()
+  }, [paginationParams, searchQuery, status, filters])
 
   const handleEdit = async (id, userId) => {
     setIsEdit(true)
     setCurrentEmployeeId(userId)
 
     try {
-      // Log the request parameters
-      console.log('Requesting employee data for ID:', id)
-
       const response = await apiMethods.getEmployeeData(id)
-
-      // Log the full response to see its structure
-      console.log('API Response:', response)
 
       if (!response || !response.data || !response.data.data) {
         console.error('Invalid API response structure:', response)
@@ -146,10 +140,8 @@ useEffect(() => {
       }
 
       const selectedEmployee = response.data.data
-      console.log('Selected Employee Data:', selectedEmployee)
 
       // Set form data and then open drawer
-
       setFormData({
         name: selectedEmployee.user_name || '',
         email: selectedEmployee.user_email || '',
@@ -176,7 +168,6 @@ useEffect(() => {
       // Add a delay before opening the drawer to ensure state is updated
       setTimeout(() => {
         setDrawerOpen(true)
-        console.log('Current form data after setting:', formData) // This will likely show stale data due to closure
       }, 100)
     } catch (error) {
       console.error('Error fetching employee data:', error)
@@ -333,34 +324,33 @@ useEffect(() => {
     }))
   }
   const fetchEmployeeData = async () => {
-  setLoading(true)
-  try {
-    const response = await apiMethods.GetEmployeelist({
-      search: searchQuery,
-      page: paginationParams.currentPage,
-      limit: paginationParams.pageSize,
-      status: status,
-      department: filters.department, // Add filter parameters
-      role: filters.role,
-      // Add other filter parameters as needed
-    })
-    setEmployeesData(response.data.data)
-    setEmployeeResponse(response.data)
-  } catch (error) {
-    console.error('Error fetching employee data:', error)
-    setAlerts([
-      {
-        severity: 'error',
-        message:
-          error?.response?.data?.message || 'Failed to fetch employee data. Please try again.',
-      },
-    ])
-    setEmployeesData([])
-    setEmployeeResponse(null)
-  } finally {
-    setLoading(false)
+    setLoading(true)
+    try {
+      const response = await apiMethods.GetEmployeelist({
+        search: searchQuery || filters.department || filters.role,
+        page: paginationParams.currentPage,
+        limit: paginationParams.pageSize,
+        status: status,
+        department: filters.department,
+        role: filters.role,
+      })
+      setEmployeesData(response.data.data)
+      setEmployeeResponse(response.data)
+    } catch (error) {
+      console.error('Error fetching employee data:', error)
+      setAlerts([
+        {
+          severity: 'error',
+          message:
+            error?.response?.data?.message || 'Failed to fetch employee data. Please try again.',
+        },
+      ])
+      setEmployeesData([])
+      setEmployeeResponse(null)
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
   const handleView = async (id) => {
     try {
@@ -381,28 +371,28 @@ useEffect(() => {
     setAlerts([])
   }
 
-const clearFilters = () => {
-  document.querySelectorAll('.filter-dropdown').forEach((dropdown) => {
-    dropdown.value = ''
-  })
+  const clearFilters = () => {
+    document.querySelectorAll('.filter-dropdown').forEach((dropdown) => {
+      dropdown.value = ''
+    })
 
-  setFilters({
-    department: '',
-    role: '',
-    status: ''
-  })
-  setFilterStatus('')
-  
-  if (searchBarRef.current && searchBarRef.current.clearSearch) {
-    searchBarRef.current.clearSearch()
+    setFilters({
+      department: '',
+      role: '',
+      status: '',
+    })
+    setFilterStatus('')
+
+    if (searchBarRef.current && searchBarRef.current.clearSearch) {
+      searchBarRef.current.clearSearch()
+    }
+
+    // Reset pagination
+    setPaginationParams((prev) => ({
+      ...prev,
+      currentPage: 1,
+    }))
   }
-  
-  // Reset pagination
-  setPaginationParams(prev => ({
-    ...prev,
-    currentPage: 1
-  }))
-}
 
   return (
     <>

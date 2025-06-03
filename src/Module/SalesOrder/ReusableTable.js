@@ -35,7 +35,7 @@ export default function ReusableTable({
     })
 
   const formatDate = (dateString) => {
-    if (!dateString) return '—'
+    if (!dateString) return '-'
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -214,7 +214,7 @@ export default function ReusableTable({
                         // ✅ Default / Date
                         return (
                           <CTableDataCell key={col.key} className="px-3 py-3 text-left">
-                            {col.type === 'date' ? formatDate(cellValue) : cellValue || '—'}
+                            {col.type === 'date' ? formatDate(cellValue) : cellValue || '-'}
                           </CTableDataCell>
                         )
                       })}
@@ -334,7 +334,7 @@ export default function ReusableTable({
                               key={col.key}
                               className={`px-3 py-3  text-left ${col.cellClass || ''}`}
                             >
-                              {col.type === 'date' ? formatDate(cellValue) : cellValue || '—'}
+                              {col.type === 'date' ? formatDate(cellValue) : cellValue || '-'}
                             </CTableDataCell>
                           )
                         })}

@@ -1057,7 +1057,7 @@ function RSCBox({
             <input
               id="flap_width"
               name="flap_width"
-              value={Number(addNewSkuData.flap_width) || null}
+              value={Number(addNewSkuData.flap_width) || ""}
               onChange={modifiedHandleChange}
               readOnly={editTag}
               className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
@@ -1242,7 +1242,7 @@ function RSCBox({
             name="minimum_order_level"
             type="number"
             min="0"
-            value={Number(addNewSkuData.minimum_order_level) || null}
+            value={Number(addNewSkuData.minimum_order_level) || ""}
             onChange={handleChange}
             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
               errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'

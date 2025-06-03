@@ -40,6 +40,7 @@ const [subCategoryId,setSubCategoryId]=useState(null)
   const [expandedRowId, setExpandedRowId] = useState(null)
   const [itemCustomFields, setItemCustomFields] = useState({})
 
+
   const dropdownRef = useRef(null)
   const returnableDropdownRef = useRef(null)
 
@@ -114,6 +115,7 @@ const [subCategoryId,setSubCategoryId]=useState(null)
       textColor: 'text-red-700',
     },
   ]
+
 
   // Close dropdown when clicking outside
   useEffect(() => {

@@ -9,6 +9,7 @@ import { cilArrowTop, cilSave } from "@coreui/icons"
 import CIcon from '@coreui/icons-react';
 import ContentHeader from "../../components/New/ContentHeader"
 import { useNavigate } from "react-router-dom"
+import CompactPagination from "../../components/New/CompactPagination"
 
 
 
@@ -19,7 +20,13 @@ const InventoryMain=()=>{
 	  	  const [category,setCategory]=useState([])
 		  	  	  const [categoryId,setCategoryId]=useState(null)
 const icons = [FaShieldAlt, FaStar, FaUsers, FaChevronDown, FaChevronUp];
-const [page, setPage] = useState(1); // default to page 1
+const [currentPage, setCurrentPage] = useState(1);
+const [totalPage, setTotalPage] = useState(1);
+const [totalRecords, setTotalRecords] = useState(0);
+const [entriesPerPage, setEntriesPerPage] = useState(50); // default to 50
+const [openCategoryId, setOpenCategoryId] = useState(null);
+const [subCategories, setSubCategories] = useState([]);
+
 
 
 		  const navigate=useNavigate()
@@ -43,18 +50,31 @@ const [page, setPage] = useState(1); // default to page 1
 useEffect(() => {
   const fetchInventory = async () => {
     try {
-      const response = await apiMethods.getinventoryWithParams(categoryId, page);
+      const response = await apiMethods.getinventoryWithParams(categoryId, currentPage, entriesPerPage);
       if (response?.data?.success) {
         setInventoryData(response.data.data);
+        const pagination = response.data.pagination;
+        setCurrentPage(pagination.currentPage);
+        setTotalPage(pagination.totalPages);
+        setTotalRecords(pagination.totalCount);
+        setEntriesPerPage(pagination.perPage); // optional: keeps in sync
       }
     } catch (error) {
       console.error('Failed to fetch inventory:', error);
     }
   };
   fetchInventory();
-}, [categoryId, page]); // now also runs when `page` changes
+}, [categoryId, currentPage, entriesPerPage]);
 
-	
+const handlePageChange = (_, newPage) => {
+  setCurrentPage(newPage);
+};
+
+const handleEntriesChange = (newEntriesPerPage) => {
+  setEntriesPerPage(newEntriesPerPage);
+  setCurrentPage(1); // Reset to page 1 on entries change
+};
+
 	 const rawMaterialOptions = [
 		{
 		  id:1,
@@ -153,6 +173,17 @@ useEffect(() => {
 
 console.log("category",category)
 console.log("category",categoryId)
+console.log("total records",totalRecords)
+const handleSubCategoryClick = async (e, categoryId) => {
+  e.stopPropagation();
+  try {
+    const res = await apiMethods.subCategoryDropdown(categoryId);
+    setSubCategories(res.data.data);
+    setOpenCategoryId(prev => (prev === categoryId ? null : categoryId)); // toggle open/close
+  } catch (error) {
+    console.error("Failed to fetch subcategories:", error);
+  }
+};
 
 	return (
 	<>
@@ -163,49 +194,62 @@ console.log("category",categoryId)
   })}
           />
 
+
+{/*dashboard panel*/}
 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 w-full mt-2">
   {category.map((item, index) => {
-  const IconComponent = icons[index % icons.length];
-  return (
-    <div
-      key={item.id}
-      onClick={() => setCategoryId(item.id)}
-      className={`p-2 rounded-xl shadow-md text-center capitalize flex items-center justify-between w-full cursor-pointer ${
-        backgroundColors[index % backgroundColors.length]
-      }`}
-    >
-      <div className="flex items-center pl-2">
-        <IconComponent className="text-white mr-2" />
-        <span className="font-bold text-white">
-          {item.category_name.replace(/-/g, ' ')}
+    const IconComponent = icons[index % icons.length];
+
+    const handleSubCategoryClick = async (e) => {
+      e.stopPropagation(); // prevent triggering setCategoryId
+      try {
+        const res = await apiMethods.subCategoryDropdown(item.id);
+        console.log("Subcategory Response:", res.data);
+        // Optionally, store in state if needed
+      } catch (error) {
+        console.error("Failed to fetch subcategories:", error);
+      }
+    };
+
+    return (
+      <div
+        key={item.id}
+        onClick={() => setCategoryId(item.id)}
+        className={`p-2 rounded-xl shadow-md text-center capitalize flex items-center justify-between w-full cursor-pointer ${
+          backgroundColors[index % backgroundColors.length]
+        }`}
+      >
+        <div className="flex items-center pl-2">
+          <IconComponent className="text-white mr-2" />
+          <span className="font-bold text-white">
+            {item.category_name.replace(/-/g, ' ')}
+          </span>
+        </div>
+        <span
+          className={`size-8 rounded flex items-center justify-center mr-2 border border-white shadow-lg ${
+            ['bg-green-700', 'bg-indigo-700', 'bg-slate-700', 'bg-purple-700'][index % 4]
+          }`}
+        >
+          {(item.id === 1 || item.id === 4) ? (
+<FaChevronDown
+  className="text-sm text-white cursor-pointer"
+  onClick={(e) => handleSubCategoryClick(e, item.id)}
+/>
+          ) : (
+            <span className="text-sm text-white">0</span>
+          )}
         </span>
       </div>
-      <span
-       className={`size-8 rounded flex items-center justify-center mr-2 border border-white shadow-lg ${
-    [
-      'bg-green-700',
-      'bg-indigo-700',
-      'bg-slate-700',
-      'bg-purple-700'
-    ][index % 4]
-  }`}
-      >
-        {(item.id === 1 || item.id === 4) ? (
-          <FaChevronDown className="text-sm text-white" />
-        ) : (
-          <span className="text-sm text-white">0</span>
-        )}
-      </span>
-    </div>
-  );
-})}
-
+    );
+  })}
 
   {/* Total Stock Value Card */}
   <div className="bg-blue-600 p-4 rounded-xl shadow-md text-center font-bold capitalize flex items-center justify-center gap-2 w-full text-white">
     <span>Total Stock Value</span>
   </div>
 </div>
+
+
 
 
 
@@ -219,6 +263,26 @@ console.log("category",categoryId)
 </div>
 
 	<InventoryTable inventoryData={inventoryData}/>
+
+<div className="fixed bottom-0 left-0 w-full bg-white shadow-md z-50 px-4 py-2">
+  <div className="flex justify-between items-center w-full">
+    <p className="text-sm font-medium text-gray-700 ml-[200px]">
+      Total Records: {totalRecords}
+    </p>
+    <div className="mr-3">
+      <CompactPagination
+        totalRecords={totalRecords}
+        count={totalPage}
+        page={currentPage}
+        onPageChange={handlePageChange}
+        entriesPerPage={entriesPerPage}
+        onEntriesChange={handleEntriesChange}
+      />
+    </div>
+  </div>
+</div>
+
+
 
 
 	</>

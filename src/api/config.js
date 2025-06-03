@@ -1313,9 +1313,9 @@ export const apiMethods = {
       console.error(error)
     }
   },
-getinventoryWithParams: async (catId, page) => {
+getinventoryWithParams: async (catId, page, limit = 50) => {
   try {
-    const params = { limit: 10000, page };
+    const params = { limit, page };
     if (catId) {
       params.categoryId = catId;
     }

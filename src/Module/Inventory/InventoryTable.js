@@ -15,7 +15,7 @@ const InventoryTable = ({ inventoryData }) => {
 const [selectedItem, setSelectedItem] = useState(null);
 
   return (
-    <div className="w-full overflow-auto max-h-[480px] border rounded-md shadow-sm mt-1">
+    <div className="w-full overflow-auto max-h-[410px] border rounded-md shadow-sm mt-1 mb-3">
       <CTable className="min-w-[1000px] table-fixed border-separate border-spacing-0">
         <CTableHead className="!bg-gray-100">
         <CTableRow>

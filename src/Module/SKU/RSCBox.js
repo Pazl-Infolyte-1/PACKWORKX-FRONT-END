@@ -913,7 +913,7 @@ const navigate = useNavigate()
               <input
                 id="joints"
                 name="joints"
-                value={Number(addNewSkuData.joints) || ''}
+             value={addNewSkuData?.joints ?? ''}
                 onChange={handleChange}
                 readOnly={editTag}
                 //className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -936,11 +936,12 @@ const navigate = useNavigate()
                 readOnly={editTag}
                 //className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 className={`w-full h-8 p-1 text-sm rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
+                  errors.deckle_size || deckleSize>addNewSkuData.deckle_size ? 'border-2 border-red-500' : 'border border-gray-300'
                 }`}
               />
          <p className="text-[10px] text-gray-500 mt-1">
-  Deckle should be greater than (({Math.round(Number(addNewSkuData?.length) * 100) / 100 || ''} + {Math.round(Number(addNewSkuData?.height) * 100) / 100 || ''}) × {Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}) + 20
+  {/*Deckle should be greater than (({Math.round(Number(addNewSkuData?.length) * 100) / 100 || ''} + {Math.round(Number(addNewSkuData?.height) * 100) / 100 || ''}) × {Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}) + 20*/}
+Deckle should be greater than {deckleSize}
 </p>
 
             </div>

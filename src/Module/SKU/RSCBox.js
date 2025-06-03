@@ -651,6 +651,21 @@ const navigate = useNavigate()
     }
   }, [editTag, addNewSkuData.print_type]) // <- remove addNewSkuData.documents from deps
 
+
+  useEffect(() => {
+  if (addNewSkuData.sku_name && addNewSkuData.customer_reference) {
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      reference_number: `${prev.sku_name}/${prev.customer_reference}`,
+    }));
+  } else {
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      reference_number: '',
+    }));
+  }
+}, [addNewSkuData.sku_name, addNewSkuData.customer_reference]);
+
   return (
     <div className="rounded-lg ">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -802,9 +817,11 @@ const navigate = useNavigate()
           <input
             id="reference_number"
             name="reference_number"
-            value={Number(addNewSkuData.reference_number) || null}
+            //value={Number(addNewSkuData.reference_number) || null}
+                value={addNewSkuData.reference_number || ''}
             onChange={handleChange}
             className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            readOnly
           />
         </div>
       </div>
@@ -873,6 +890,13 @@ const navigate = useNavigate()
                 value={Math.round(Number(addNewSkuData.length) * 100) / 100 || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
+                    inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
                 className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-l-md"
               />
               <span className="text-gray-500 px-1">x</span>
@@ -884,6 +908,13 @@ const navigate = useNavigate()
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
                 min="0"
+                    inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
                 className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <span className="text-gray-500 px-1">x</span>
@@ -894,6 +925,13 @@ const navigate = useNavigate()
                 value={Math.round(Number(addNewSkuData.height) * 100) / 100 || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
+                    inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
                 className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
@@ -934,9 +972,16 @@ const navigate = useNavigate()
                 value={Number(toThreeDecimalFixed(addNewSkuData.deckle_size)) || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
+                    inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
                 //className="w-full h-8 p-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 className={`w-full h-8 p-1 text-sm rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.deckle_size || deckleSize>addNewSkuData.deckle_size ? 'border-2 border-red-500' : 'border border-gray-300'
+                  errors.deckle_size ? 'border-2 border-red-500' : 'border border-gray-300'
                 }`}
               />
          <p className="text-[10px] text-gray-500 mt-1">
@@ -1005,6 +1050,13 @@ Deckle should be greater than {deckleSize}
               className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                 errors.flap_width ? 'border-2 border-red-500' : 'border border-gray-300'
               }`}
+                  inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
             />
           </div>
         </Tooltip>
@@ -1087,6 +1139,13 @@ Deckle should be greater than {deckleSize}
             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
               errors.ups ? 'border-2 border-red-500' : 'border border-gray-300'
             }`}
+                inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
           />
         </div>
 
@@ -1112,6 +1171,13 @@ Deckle should be greater than {deckleSize}
                   ? 'border-2 border-red-500'
                   : 'border border-gray-300'
               }`}
+                  inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
             />
           </div>
         </Tooltip>
@@ -1138,6 +1204,13 @@ Deckle should be greater than {deckleSize}
                   ? 'border-2 border-red-500'
                   : 'border border-gray-300'
               }`}
+                  inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
             />
           </div>
         </Tooltip>
@@ -1162,6 +1235,13 @@ Deckle should be greater than {deckleSize}
             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
               errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
             }`}
+                inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
           />
         </div>
         <ChipSelectorWithBrowse

@@ -87,7 +87,7 @@ const navigate=useNavigate()
     strict_adherence: strictAdherence,
     customer_reference: null,
     reference_number: null,
-    internal_id: null,
+    // internal_id: null,
     board_size_cm2: null,
     deckle_size: null,
     minimum_order_level: null,
@@ -103,7 +103,7 @@ const navigate=useNavigate()
     tags: {},
     gst_percentage: null,
     total_weight:null,
-total_bursting_strength:null,
+    total_bursting_strength:null,
     sku_values: [
       {
         layer: null,
@@ -252,7 +252,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       // if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
       // if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
       if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
-      if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
+      // if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
       if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
       if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
       if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
@@ -292,7 +292,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!addNewSkuData.length_trimming_tolerance) newErrors.length_trimming_tolerance = 'Required'
       // if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
       // if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
-      if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
+      // if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
       if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
       if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
       if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
@@ -348,7 +348,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!addNewSkuData.width_trimming_tolerance) newErrors.width_trimming_tolerance = 'Required'
       // if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
       // if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
-      if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
+      // if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
       if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
       if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
       if (!addNewSkuData.ups) newErrors.ups = 'Required'
@@ -472,7 +472,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       strict_adherence: selectedSku.strict_adherence || false,
       customer_reference: selectedSku.customer_reference || null,
       reference_number: selectedSku.reference_number || null,
-      internal_id: selectedSku.internal_id || null,
+      // internal_id: selectedSku.internal_id || null,
       board_size_cm2: selectedSku.board_size_cm2 || null,
       deckle_size: selectedSku.deckle_size || null,
       minimum_order_level: selectedSku.minimum_order_level || null,
@@ -522,7 +522,7 @@ total_bursting_strength:selectedSku.total_bursting_strength ||null,
         page: pagination?.currentPage || 1,
         limit: message ? 10000 : limit,
       })
-const clientResponse = await apiMethods.getClients({ limit: 10000 }) 
+const clientResponse = await apiMethods.getSkuClients({ limit: 10000 }) 
 
       setSkuData(response.data)
       setClient(clientResponse.data)

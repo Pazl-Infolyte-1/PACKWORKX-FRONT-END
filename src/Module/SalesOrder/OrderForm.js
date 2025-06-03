@@ -17,7 +17,9 @@ const OrderForm = forwardRef(({
   totals,
   setTotals,
   setIsFormTouched,
-  handleSubmit1
+  handleSubmit1,
+  errors,
+  setErrors
 }, ref) => {
 
   const [clients, setClients] = useState([]); // State for client list
@@ -25,7 +27,6 @@ const OrderForm = forwardRef(({
   const [localFormData, setLocalFormData] = useState(formData);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [errors, setErrors] = useState({});
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const [selectedClient, setSelectedClient] = useState('')
   const stateID = localStorage.getItem('company_state_id');
@@ -132,11 +133,11 @@ const OrderForm = forwardRef(({
       totalGst: skuFormData ? skuFormData.totalGst : 0,
       totalWithGST: skuFormData ? skuFormData.totalWithGST : 0
     },
-
     validateForm: () => {
       setAttemptedSubmit(true);
       return validateForm();
-    }
+    },
+    validateFormForButtonHide: ()=> validateForm()
   }));
 
   const [confirmationMethod, setConfirmationMethod] = useState(
@@ -231,8 +232,11 @@ const OrderForm = forwardRef(({
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setIsFormTouched(true)
-    errors[name] = ""
-
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      [name]: ""
+    }));
+    
     let updatedData;
 
     // For client selection, include both name and ID
@@ -289,15 +293,26 @@ const OrderForm = forwardRef(({
     if (!localFormData.client) newErrors.client = "Required";
     if (!localFormData.credit_period) newErrors.credit_period = "Required";
 
-
     // SKU validation
     const skuErrors = [];
     let hasSkuError = false;
 
     skuFormData?.skuDetails?.forEach((skuItem, index) => {
+      const rowErrors = {};
       if (!skuItem.sku || skuItem.sku.trim() === "") {
-        skuErrors[index] = "Required";
+        rowErrors.sku = "Required";
         hasSkuError = true;
+      }
+      if (!skuItem.quantity_required || skuItem.quantity_required <= 0) {
+        rowErrors.quantity = "Required";
+        hasSkuError = true;
+      }
+      if (!skuItem.rate_per_sku || skuItem.rate_per_sku <= 0) {
+        rowErrors.rate = "Required";
+        hasSkuError = true;
+      }
+      if (Object.keys(rowErrors).length > 0) {
+        skuErrors[index] = rowErrors;
       }
     });
 
@@ -357,7 +372,10 @@ const OrderForm = forwardRef(({
 
                     onClick={() => {
                       setIsOpen(!isOpen);
-                      errors.client = "";
+                      setErrors(prevErrors => ({
+                        ...prevErrors,
+                        client: ""
+                      }));
                     }}
                   >
                     <span className="truncate text-sm text-gray-500">
@@ -628,6 +646,7 @@ const OrderForm = forwardRef(({
             totals={totals}
             setTotals={setTotals}
             setIsFormTouched={setIsFormTouched}
+            attemptedSubmit={attemptedSubmit}
             errors={errors}
             setErrors={setErrors}
           />

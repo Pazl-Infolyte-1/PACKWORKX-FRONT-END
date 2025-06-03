@@ -198,7 +198,7 @@ dispatch(setRscDeckleSize({ length: null, height: null, ups: null }));
   }
 const calculateWeight = ({ gsm, isCorrugated, selectedFlute, areaInSquareMeters }) => {
   const numberOfFlutes = isCorrugated
-    ? selectedFlute?.number_of_flutes_per_meter || 0
+    ? selectedFlute?.take_up_factor || 0
     : 1;
 
   if (!gsm || !areaInSquareMeters) return null;
@@ -213,6 +213,17 @@ const handleSkuValuesChange = (index, field, value) => {
     // Determine if layer is corrugated
     const isCorrugated = updatedItem.layer?.toLowerCase().includes('corrugated');
 
+
+        if (field === 'flute_type') {
+      updatedItem.flute_type = value;
+
+      // Match the flute object by name
+      const matchedFlute = fluteDropdown.find((flute) => flute.name === value);
+      if (matchedFlute) {
+        updatedItem.selected_flute = matchedFlute;
+      }
+    }
+
     // Store selectedFlute (or update if field was 'selected_flute')
     if (field === 'selected_flute') {
       updatedItem.selected_flute = value;
@@ -222,7 +233,7 @@ const handleSkuValuesChange = (index, field, value) => {
     // Set default flute info if non-corrugated
     if (field === 'layer' && !isCorrugated) {
       updatedItem.flute_type = '--';
-      updatedItem.selected_flute = { number_of_flutes_per_meter: 1 };
+      updatedItem.selected_flute = { take_up_factor: 1 };
     }
 
     // Calculate area in square meters
@@ -281,7 +292,7 @@ useEffect(() => {
           ? {}
           : {
               flute_type: "--",
-              selected_flute: { number_of_flutes_per_meter: 1 },
+              selected_flute: { take_up_factor: 1 },
             }),
       };
     });
@@ -301,7 +312,7 @@ useEffect(() => {
   meterSquareData,
   JSON.stringify(
     addNewSkuData.sku_values.map(
-      (item) => item.selected_flute?.number_of_flutes_per_meter || 0
+      (item) => item.selected_flute?.take_up_factor || 0
     )
   ),
 ]);
@@ -745,6 +756,7 @@ useEffect(() => {
     try {
       const response = await apiMethods.getFluteType()
       setFluteDropdown(response.data.data)
+      console.log("flute",response.data.data)
       console.log("flute type",JSON.stringify(response.data.data))
     } catch (error) {
       console.error(error)
@@ -925,7 +937,7 @@ console.log("addnedwskudata unit",rscUnits)
                           >
                             <option hidden>Select</option>
   {fluteDropdown.map((flute) => (
-    <option key={flute.id} value={flute.name} disabled>
+    <option key={flute.id} value={flute.name}>
       {flute.name}
     </option>
   ))}

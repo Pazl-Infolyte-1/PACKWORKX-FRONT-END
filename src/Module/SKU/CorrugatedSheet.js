@@ -907,13 +907,10 @@ function CorrugatedSheet({
           </div>
         </Tooltip>
 
-        <div className="w-[200px]">
+        {/* <div className="w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Internal Id
             <span className="text-red-500 ml-1">*</span>
-            {/*{errors.internal_id && (
-              <span className="text-red-500 text-sm ml-2 align-middle">{errors.internal_id}</span>
-            )}*/}
           </label>
           <input
             id="internal_id"
@@ -925,7 +922,7 @@ function CorrugatedSheet({
               errors.internal_id ? 'border-2 border-red-500' : 'border border-gray-300'
             }`}
           />
-        </div>
+        </div> */}
 
         <Tooltip title={unitTooltip}>
           <div className="w-[200px]">

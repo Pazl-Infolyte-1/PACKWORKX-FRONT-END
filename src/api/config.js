@@ -314,6 +314,28 @@ export const apiMethods = {
       throw error
     }
   },
+
+  getSkuClients: async (queryParams = {}) => {
+    console.log(queryParams)
+    try {
+      const token = localStorage.getItem('token') // Retrieve token
+      // const token = await getToken()
+
+      if (!token) {
+        throw new Error('No token found. Please log in again.')
+      }
+      const response = await apiClient.get('/clients?status=active', {
+        headers: {
+          Authorization: `Bearer ${token}`, // Attach token
+        },
+        params: queryParams, // Attach query params (optional)
+      })
+      return response.data
+    } catch (error) {
+      console.error('Error fetching clients:', error.response?.data || error.message)
+      throw error
+    }
+  },
   deleteClient: async (clientId) => {
     try {
       const token = localStorage.getItem('token') // Retrieve token before sending request

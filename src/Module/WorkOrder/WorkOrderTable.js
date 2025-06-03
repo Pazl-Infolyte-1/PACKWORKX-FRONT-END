@@ -119,6 +119,8 @@ const WorkOrderTable = ({
     //   type: 'checkbox',
     // },
     { key: 'work_generate_id', header: 'Number', field: 'work_generate_id', cellClass: '' },
+    { key: 'sales_generate_id', header: 'SALES-ID', field: 'salesOrder.sales_generate_id', cellClass: '' },
+    { key: 'sales_ui_id', header: 'SO-Reference', field: 'salesOrder.sales_ui_id', cellClass: '' },
     { key: 'sku_name', header: 'SKU Name', field: 'sku_name' },
     { key: 'manufacture', header: 'Manufacture', field: 'manufacture' },
     { key: 'created_at', header: 'Created Date', field: 'created_at', type: 'date' },
@@ -249,6 +251,8 @@ const WorkOrderTable = ({
     //   ),
     // },
   ]
+
+
 
   return (
     <>

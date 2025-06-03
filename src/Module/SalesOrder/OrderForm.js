@@ -202,7 +202,7 @@ const OrderForm = forwardRef(({
             limit: 10000,
           };
 
-          const response = await apiMethods.getClients(params);
+          const response = await apiMethods.getSkuClients(params);
           setClients(response.data); // Assuming response.data contains the client list
         } catch (error) {
           console.error("Error fetching clients:", error);
@@ -515,10 +515,18 @@ const OrderForm = forwardRef(({
                 </label>
                 <div className="relative">
                   <input
-                    type="number"
+                    // type="number"
                     name="credit_period"
                     value={localFormData.credit_period || ""}
-                    min="0"
+                    type="text"
+                    inputMode="numeric"
+                    onKeyPress={(e) => {
+                      // Only allow numbers 0-9
+                      if (!/[0-9]/.test(e.key)) {
+                        e.preventDefault()
+                      }
+                    }}
+                    // min="0"
                     onChange={handleInputChange}
                     className={`h-7 w-80 rounded border px-3 text-sm ${attemptedSubmit && errors.credit_period ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
                       }`} />
@@ -532,9 +540,17 @@ const OrderForm = forwardRef(({
                 </label>
                 <div className="relative">
                   <input
-                    type="number"
+                    // type="number"
                     name="freight_paid"
-                    min="0"
+                    // min="0"
+                    type="text"
+                    inputMode="numeric"
+                    onKeyPress={(e) => {
+                      // Only allow numbers 0-9
+                      if (!/[0-9]/.test(e.key)) {
+                        e.preventDefault()
+                      }
+                    }}
                     value={localFormData.freight_paid || ""}
                     onChange={handleInputChange}
                     className="h-7 w-80 rounded border border-gray-300 px-3 text-sm"

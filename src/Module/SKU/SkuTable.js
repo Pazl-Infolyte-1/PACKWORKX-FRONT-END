@@ -190,9 +190,13 @@ const navigate = useNavigate()
       {cell.client}
     </CTableDataCell>
 <CTableDataCell style={{ width: '120px' }} className="text-center text-gray-700">
-  {cell.length && cell.width && cell.height
-    ? `${Number(cell.length).toFixed(2)} x ${Number(cell.width).toFixed(2)} x ${Number(cell.height).toFixed(2)}`
-    : '-'}
+  {cell.length && cell.width && cell.height ? (
+    `${Number(cell.length) % 1 === 0 ? Number(cell.length) : Number(cell.length).toFixed(2)} x ` +
+    `${Number(cell.width) % 1 === 0 ? Number(cell.width) : Number(cell.width).toFixed(2)} x ` +
+    `${Number(cell.height) % 1 === 0 ? Number(cell.height) : Number(cell.height).toFixed(2)}`
+  ) : (
+    '-'
+  )}
 </CTableDataCell>
 
     <CTableDataCell style={{ width: '100px' }} className="text-center text-gray-700">

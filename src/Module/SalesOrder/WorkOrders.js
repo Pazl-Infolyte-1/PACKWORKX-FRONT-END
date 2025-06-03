@@ -889,7 +889,7 @@ const handleCancel = () => {
                         </option>
                         {salesOrder?.map((so) => (
                           <option key={so.id} value={so.id}>
-                            {`${so.sales_generate_id}`}
+                            {`${so.sales_generate_id} | ${so.sales_ui_id}`}
                           </option>
                         ))}
                       </select>

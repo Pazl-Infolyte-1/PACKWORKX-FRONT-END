@@ -203,7 +203,7 @@ export default function ReusableTable({
                           return (
                             <CTableDataCell
                               key={col.key}
-                              className="px-3 py-3 text-center"
+                              className="px-3 py-3  text-center"
                               onClick={(e) => e.stopPropagation()} // Prevent row click if needed
                             >
                               {col.render(row)}
@@ -332,7 +332,7 @@ export default function ReusableTable({
                           return (
                             <CTableDataCell
                               key={col.key}
-                              className={`px-3 py-3 text-left ${col.cellClass || ''}`}
+                              className={`px-3 py-3  text-left ${col.cellClass || ''}`}
                             >
                               {col.type === 'date' ? formatDate(cellValue) : cellValue || '—'}
                             </CTableDataCell>

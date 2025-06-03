@@ -5,6 +5,7 @@ import apiMethods from '../../api/config';
 import ConfirmationModale from '../../components/New/ConfirmationModale';
 import CustomAlert from '../../components/New/CustomAlert';
 import AddEditRoleForm from './AddEditRoleForm';
+import ContentHeader from '../../components/New/ContentHeader';
 
 function Role() {
   const [roles, setRoles] = useState([]);
@@ -114,17 +115,7 @@ function Role() {
   return (
     <div className="">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Role</h2>
-        <div className="flex gap-2">
-          <ActionButton
-            label="+ Add"
-            onClick={handleAddRole}
-            variant="add"
-            className="text-white"
-          />
-        </div>
-      </div>
+      <ContentHeader heading={"Role"} onAddClick={handleAddRole}/>
       
       <RoleTable 
         roles={roles} 

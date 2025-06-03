@@ -5,6 +5,7 @@ import apiMethods from '../../api/config';
 import ConfirmationModale from '../../components/New/ConfirmationModale';
 import CustomAlert from '../../components/New/CustomAlert';
 import AddEditDesignation from './AddEditDesignation';
+import ContentHeader from '../../components/New/ContentHeader';
 
 const Designation = () => {
   const [designations, setDesignations] = useState([]);
@@ -88,17 +89,8 @@ const Designation = () => {
   return (
     <div className="">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Designation</h2>
-        <div className="flex gap-2">
-          <ActionButton
-            label="+ Add"
-            onClick={handleAddDesignation}
-            variant="add"
-            className="text-white"
-          />
-        </div>
-      </div>
+      
+      <ContentHeader heading={"Designation"} onAddClick={handleAddDesignation}/>
       
       <DesignationTable 
         designations={designations} 

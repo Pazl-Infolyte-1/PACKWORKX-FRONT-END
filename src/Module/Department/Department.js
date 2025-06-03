@@ -5,6 +5,7 @@ import apiMethods from '../../api/config';
 import ConfirmationModale from '../../components/New/ConfirmationModale';
 import CustomAlert from '../../components/New/CustomAlert';
 import AddEditDepartmentForm from './AddEditDepartmentForm';
+import ContentHeader from '../../components/New/ContentHeader';
 
 function Department() {
   const [departments, setDepartments] = useState([]);
@@ -86,20 +87,10 @@ function Department() {
   };
 
   return (
-    <div className='flex flex-col gap-8 h-full'>
+    <div className='flex flex-col  h-full'>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Department</h2>
-        <div className="flex gap-2">
-          <ActionButton
-            label="+ Add"
-            onClick={handleAddDepartment}
-            variant='add'
-            className='text-white'
-          />
-        </div>
-      </div>
-      <div className='flex-1'>
+      <ContentHeader heading={'Department'} onAddClick={handleAddDepartment}/>
+      <div className='mt-2'>
         <DepartmentTable 
           departments={departments} 
           loading={loading} 

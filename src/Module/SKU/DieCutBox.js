@@ -500,6 +500,20 @@ const MenuProps = {
     //setAreaInM2(convertedArea)
   }, [addNewSkuData.width_board_size_cm2*addNewSkuData.width_board_size_cm2])
 
+      useEffect(() => {
+  if (addNewSkuData.sku_name && addNewSkuData.customer_reference) {
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      reference_number: `${prev.sku_name}/${prev.customer_reference}`,
+    }));
+  } else {
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      reference_number: '',
+    }));
+  }
+}, [addNewSkuData.sku_name, addNewSkuData.customer_reference]);
+
   return (
     <div className="rounded-lg">
       {/* Top header fields */}
@@ -654,9 +668,10 @@ const MenuProps = {
               id="reference_number"
               name="reference_number"
               min={0}
-              value={addNewSkuData.reference_number}
+               value={addNewSkuData.reference_number || ''}
               onChange={handleChange}
               className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              readOnly
             />
           </div>
         </div>
@@ -712,6 +727,13 @@ const MenuProps = {
                 value={addNewSkuData.ups}
                 onChange={handleChange}
                 readOnly={editTag}
+                     inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
                   className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
       errors.ups ? 'border-2 border-red-500' : 'border border-gray-300'
     }`}
@@ -750,14 +772,11 @@ const MenuProps = {
           </div>
         </div>
 
-        <div>
+        {/* <div>
           <div className="w-[200px]">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Internal ID
               <span className="text-red-500 ml-1">*</span>
-              {/*{errors.internal_id && (
-                <span className="text-red-500 text-sm ml-2 align-middle">{errors.internal_id}</span>
-              )}*/}
             </label>
             <input
               id="internal_id"
@@ -770,7 +789,7 @@ const MenuProps = {
     }`}
             />
           </div>
-        </div>
+        </div> */}
 
         <Tooltip title={unitTooltip}>
           <div className="w-[200px]">
@@ -834,6 +853,13 @@ const MenuProps = {
                 min="0"
                 readOnly={editTag}
                 onChange={handleChange}
+                     inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
                 //className={`w-full p-1 border rounded-md focus:ring-2 transition-colors ${
                 //  diecutCalculations.deckleError
                 //    ? 'border-red-500 ring-red-400'
@@ -866,6 +892,13 @@ const MenuProps = {
               id="minimum_order_level"
               name="minimum_order_level"
               value={addNewSkuData.minimum_order_level}
+                   inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
               onChange={handleChange}
                              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
       errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'

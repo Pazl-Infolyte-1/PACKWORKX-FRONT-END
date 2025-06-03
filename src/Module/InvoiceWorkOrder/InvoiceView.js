@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import apiMethods from '../../api/config';
 import CIcon from '@coreui/icons-react';
 import { cilEnvelopeOpen, cilPencil, cilPrint } from '@coreui/icons';
@@ -9,6 +9,7 @@ import html2pdf from 'html2pdf.js';
 function InvoiceView() {
     const { id } = useParams(); // grabs the `id` from the URL
     const [invoice, setInvoice] = useState([]);
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchSalesOrderData = async () => {
@@ -60,17 +61,17 @@ function InvoiceView() {
                     <div className="flex items-start space-x-4">
                         <button className="text-black text-xs">Upload Files</button>
                         <button className="text-black text-xs">Comments & History</button>
-                        <button className="text-gray-500 text-sm items-start" onClick={() => { navigate('/salesorder') }}>✕</button>
+                        <button className="text-gray-500 text-sm items-start" onClick={() => { navigate('/invoice') }}>✕</button>
                     </div>
                 </div>
                 <div className="flex bg-gray-50 px-3 border-t text-xs">
-                    <button
+                    {/* <button
                         className="flex items-centergap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600"
                     //    onClick={()=>navigate(`/salesorder/form/${invoice?.id}?tab=salesOrder`)}
                     >
                         <CIcon icon={cilPencil} className="h-3 w-3" />
                         <span>Edit</span>
-                    </button>
+                    </button> */}
                     <button className="flex items-center gap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
                         <CIcon icon={cilEnvelopeOpen} className="h-3 w-3" />
                         <span>Email</span>

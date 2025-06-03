@@ -59,6 +59,8 @@ function SkuList() {
   const [validationErrors, setValidationErrors] = useState({})
     const [loading, setLoading] = useState(false)
       const [totalRecords, setTotalRecords] = useState(0)
+        const deckleSize = useSelector((state) => state.deckleSize)
+      
 const navigate=useNavigate()
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
@@ -85,7 +87,7 @@ const navigate=useNavigate()
     strict_adherence: strictAdherence,
     customer_reference: null,
     reference_number: null,
-    internal_id: null,
+    // internal_id: null,
     board_size_cm2: null,
     deckle_size: null,
     minimum_order_level: null,
@@ -101,7 +103,7 @@ const navigate=useNavigate()
     tags: {},
     gst_percentage: null,
     total_weight:null,
-total_bursting_strength:null,
+    total_bursting_strength:null,
     sku_values: [
       {
         layer: null,
@@ -141,16 +143,15 @@ total_bursting_strength:null,
   const handleChange = (event) => {
     const { name, value } = event.target
 
-    if (name === 'client' && value === 'add_client') {
-      setPopupOpen(true)
-
-      // Don't set 'add_client' as the selected value
-      setAddNewSkuData((prev) => ({
-        ...prev,
-        client: null,
-      }))
-      return
-    }
+  if (name === 'client' && value === 'add_client') {
+    setPopupOpen(true);
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      client: null,
+      client_id: null,
+    }));
+    return;
+  }
     if (name === 'gst_percentage') {
       setAddNewSkuData((prev) => ({
         ...prev,
@@ -165,23 +166,29 @@ total_bursting_strength:null,
     }))
 
     // Find the selected client based on the client_id
-    const selectedClient = client.find((item) => item.client_id === parseInt(value)) // Ensure value is an integer
+   if (name === 'client') {
+    const selectedClient = client?.find(
+      (item) => item?.client_id === parseInt(value)
+    );
 
     if (selectedClient) {
       setAddNewSkuData((prev) => ({
         ...prev,
         client_id: selectedClient.client_id,
         client: selectedClient.company_name,
-      }))
+      }));
+
+      // Clear validation error
       if (selectedClient.client_id?.toString().trim()) {
         setErrors((prev) => {
-          const newErrors = { ...prev }
-          delete newErrors.client_id
-          return newErrors
-        })
+          const newErrors = { ...prev };
+          delete newErrors.client_id;
+          return newErrors;
+        });
       }
     }
-
+    return; // Prevent further updates for 'client'
+  }
     if (value?.trim()) {
       setErrors((prev) => {
         const newErrors = { ...prev }
@@ -189,6 +196,7 @@ total_bursting_strength:null,
         return newErrors
       })
     }
+
   }
 
   const handleStrictAdherenceToggle = () => {
@@ -244,7 +252,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       // if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
       // if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
       if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
-      if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
+      // if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
       if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
       if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
       if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
@@ -284,7 +292,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!addNewSkuData.length_trimming_tolerance) newErrors.length_trimming_tolerance = 'Required'
       // if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
       // if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
-      if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
+      // if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
       if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
       if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
       if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
@@ -327,14 +335,20 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!addNewSkuData.width) newErrors.width = 'Required'
       if (!addNewSkuData.height) newErrors.height = 'Required'
       if (!addNewSkuData.joints) newErrors.joints = 'Required'
-      if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
+      //if (!addNewSkuData.deckle_size &&  deckleSize>addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
+      if (!addNewSkuData.deckle_size) {
+  newErrors.deckle_size = 'Deckle size is required';
+} else if (Number(addNewSkuData.deckle_size) < deckleSize) {
+  newErrors.deckle_size = `Deckle size must be greater than ${deckleSize.toFixed(3)}`;
+}
+
       //if (!addNewSkuData.inner_outer_dimension) newErrors.inner_outer_dimension = 'Required'
       if (!addNewSkuData.flap_width) newErrors.flap_width = 'Required'
       if (!addNewSkuData.length_trimming_tolerance) newErrors.length_trimming_tolerance = 'Required'
       if (!addNewSkuData.width_trimming_tolerance) newErrors.width_trimming_tolerance = 'Required'
       // if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
       // if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
-      if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
+      // if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
       if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
       if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
       if (!addNewSkuData.ups) newErrors.ups = 'Required'
@@ -437,8 +451,8 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
     setAddNewSkuData({
       id: selectedSku.id || null,
       sku_name: selectedSku.sku_name || null,
-      client_id: selectedSku.client_id || null,
-      client: selectedSku.company_name || null,
+      client_id: selectedSku?.client_id || null,
+      client: selectedSku?.company_name || null,
       ply: selectedSku.ply || null,
       length: selectedSku.length || null,
       width: selectedSku.width || null,
@@ -458,7 +472,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       strict_adherence: selectedSku.strict_adherence || false,
       customer_reference: selectedSku.customer_reference || null,
       reference_number: selectedSku.reference_number || null,
-      internal_id: selectedSku.internal_id || null,
+      // internal_id: selectedSku.internal_id || null,
       board_size_cm2: selectedSku.board_size_cm2 || null,
       deckle_size: selectedSku.deckle_size || null,
       minimum_order_level: selectedSku.minimum_order_level || null,
@@ -508,7 +522,7 @@ total_bursting_strength:selectedSku.total_bursting_strength ||null,
         page: pagination?.currentPage || 1,
         limit: message ? 10000 : limit,
       })
-const clientResponse = await apiMethods.getClients({ limit: 10000 }) 
+const clientResponse = await apiMethods.getSkuClients({ limit: 10000 }) 
 
       setSkuData(response.data)
       setClient(clientResponse.data)

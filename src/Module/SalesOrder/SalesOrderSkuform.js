@@ -6,6 +6,7 @@ import InvoiceHistoryModal from './InvoiceHistoryModal';
 
 const SalesOrderSkuForm = ({ 
   isIgstApplicable = false, 
+  attemptedSubmit,
   formData, 
   setFormData, 
   selectedClient = '',
@@ -484,10 +485,18 @@ const calculateRowValues = (index) => {
           onChange={(selectedOption) => {
             field.onChange(selectedOption?.value || "");
 
+            // Clear SKU error if value is selected
             if (selectedOption?.value && errors?.skuDetails?.[index]) {
               const newErrors = { ...errors };
-              if (newErrors.skuDetails) {
-                newErrors.skuDetails[index] = undefined;
+              if (newErrors.skuDetails?.[index]) {
+                newErrors.skuDetails[index] = {
+                  ...newErrors.skuDetails[index],
+                  sku: undefined // Clear only the SKU error
+                };
+                // If no other errors exist for this row, remove the entire row error
+                if (Object.values(newErrors.skuDetails[index]).every(val => !val)) {
+                  delete newErrors.skuDetails[index];
+                }
                 setErrors(newErrors);
               }
             }
@@ -496,11 +505,15 @@ const calculateRowValues = (index) => {
           styles={{
             control: (base, state) => ({
               ...base,
-              minHeight: 32,
-              height: 32,
+              minHeight: 40,
+              height: 40,
               fontSize: 14,
-              borderColor: errors?.skuDetails?.[index] ? 'red' : state.isFocused ? '#6366f1' : 'transparent',
-              boxShadow: state.isFocused ? '0 0 0 1px #6366f1' : 'none',
+              borderColor: attemptedSubmit && errors?.skuDetails?.[index]?.sku
+                ? 'red'
+                : state.isFocused
+                ? '#6366f1'  // Indigo when focused
+                : 'transparent',  // Default when not focused and no error
+                            boxShadow: state.isFocused ? '0 0 0 1px #6366f1' : 'none',
               '&:hover': {
                 borderColor: state.isFocused ? '#6366f1' : '#c2c2c2',
               },
@@ -509,10 +522,11 @@ const calculateRowValues = (index) => {
               ...base,
               padding: "0 6px",
               textAlign: "left",
+              height: 40,
             }),
             indicatorsContainer: (base) => ({
               ...base,
-              height: 32,
+              height: 40,
             }),
             dropdownIndicator: (base) => ({
               ...base,
@@ -537,7 +551,22 @@ const calculateRowValues = (index) => {
                         <td className="p-1 border items-start">
                           <input
                             {...register(`skus[${index}].quantity`, {
-                              onChange: () => {
+                              onChange: (e) => {
+                                // Clear quantity error if value is entered
+                                if (e.target.value && errors?.skuDetails?.[index]) {
+                                  const newErrors = { ...errors };
+                                  if (newErrors.skuDetails?.[index]) {
+                                    newErrors.skuDetails[index] = {
+                                      ...newErrors.skuDetails[index],
+                                      quantity: undefined // Clear only the quantity error
+                                    };
+                                    // If no other errors exist for this row, remove the entire row error
+                                    if (Object.values(newErrors.skuDetails[index]).every(val => !val)) {
+                                      delete newErrors.skuDetails[index];
+                                    }
+                                    setErrors(newErrors);
+                                  }
+                                }
                                 calculateRowValues(index);
                               }
                             })}
@@ -545,7 +574,9 @@ const calculateRowValues = (index) => {
                             placeholder="1.00"
                             min="0"
                             onWheel={(e) => e.target.blur()}
-                            className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none no-spinner"
+                            className={`w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none no-spinner ${
+                              attemptedSubmit && errors?.skuDetails?.[index]?.quantity ? 'ring-1 ring-red-500' : ''
+                            }`}
                           />
                         </td>
 
@@ -565,7 +596,22 @@ const calculateRowValues = (index) => {
                         <td className="p-0 border">
                           <input
                             {...register(`skus[${index}].rate`, {
-                              onChange: () => {
+                              onChange: (e) => {
+                                // Clear rate error if value is entered
+                                if (e.target.value && errors?.skuDetails?.[index]) {
+                                  const newErrors = { ...errors };
+                                  if (newErrors.skuDetails?.[index]) {
+                                    newErrors.skuDetails[index] = {
+                                      ...newErrors.skuDetails[index],
+                                      rate: undefined // Clear only the rate error
+                                    };
+                                    // If no other errors exist for this row, remove the entire row error
+                                    if (Object.values(newErrors.skuDetails[index]).every(val => !val)) {
+                                      delete newErrors.skuDetails[index];
+                                    }
+                                    setErrors(newErrors);
+                                  }
+                                }
                                 calculateRowValues(index);
                               }
                             })}
@@ -573,7 +619,9 @@ const calculateRowValues = (index) => {
                             placeholder="0.00"
                             min="0"
                             onWheel={(e) => e.target.blur()}
-                            className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus:ring-0 focus-visible:outline-none"
+                            className={`w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none ${
+                              attemptedSubmit && errors?.skuDetails?.[index]?.rate ? 'ring-1 ring-red-500' : ''
+                            }`}
                           />
                         </td>
 

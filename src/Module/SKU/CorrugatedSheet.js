@@ -1,7 +1,14 @@
 import Input from '../../components/New/Input'
 import { BsChevronDown } from 'react-icons/bs'
 import CIcon from '@coreui/icons-react'
-import { cilChevronCircleDownAlt, cilChevronDoubleDown, cilCloudUpload, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
+import {
+  cilChevronCircleDownAlt,
+  cilChevronDoubleDown,
+  cilCloudUpload,
+  cilPencil,
+  cilPlus,
+  cilTrash,
+} from '@coreui/icons'
 import { useEffect, useState } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import CustomAlert from '../../components/New/CustomAlert'
@@ -16,11 +23,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import RoutePopup from './RoutePopup'
 import apiMethods from '../../api/config'
 import { useNavigate } from 'react-router-dom'
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-
-
+import MenuItem from '@mui/material/MenuItem'
+import FormControl from '@mui/material/FormControl'
+import Select from '@mui/material/Select'
 
 function CorrugatedSheet({
   editTag,
@@ -44,10 +49,10 @@ function CorrugatedSheet({
   setMessage,
   errors,
   setErrors,
-       uploadedFiles,
-          setUploadedFiles,
-          setRscUnits,
-          onMeterDataChange
+  uploadedFiles,
+  setUploadedFiles,
+  setRscUnits,
+  onMeterDataChange,
 }) {
   const [alerts, setAlerts] = useState([])
   const filteredClient = locationvalue
@@ -67,10 +72,10 @@ function CorrugatedSheet({
   const [isSingleViewPopupRoute, setisSingleViewPopupRoute] = useState(false)
   const [fullRouteResponse, setFullRouteResponse] = useState(null)
   const [deckleError, setDeckleError] = useState('')
-  const [isUploading, setIsUploading] = useState(false);
-//const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
-const [fileNames, setFileNames] = useState([]); 
-const navigate = useNavigate()
+  const [isUploading, setIsUploading] = useState(false)
+  //const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
+  const [fileNames, setFileNames] = useState([])
+  const navigate = useNavigate()
   const selectionFrame = {
     vendor: {
       id: 1,
@@ -86,16 +91,16 @@ const navigate = useNavigate()
   const handleClose = () => {
     setAlerts([])
   }
- const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-   style: {
-      maxHeight: ITEM_HEIGHT * 5 + ITEM_PADDING_TOP, // Show 5 items with scroll
-      width: 200,
+  const ITEM_HEIGHT = 48
+  const ITEM_PADDING_TOP = 8
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 5 + ITEM_PADDING_TOP, // Show 5 items with scroll
+        width: 200,
+      },
     },
-  },
-};
+  }
 
   useEffect(() => {
     const handleBeforeUnload = (event) => {
@@ -144,7 +149,7 @@ const MenuProps = {
   }
   const handleUnitChange = (e) => {
     const newUnit = e.target.value
-      setRscUnits(newUnit);
+    setRscUnits(newUnit)
     let tooltipMessage = ''
     switch (newUnit) {
       case 'cm':
@@ -407,96 +412,108 @@ const MenuProps = {
     }
   }, [selectedRouteIds2])
 
-
-
   const handleFileUpload = async (event) => {
-    const selectedFiles = event.target.files;
-    if (!selectedFiles || selectedFiles.length === 0) return;
-  
-    setIsUploading(true);
-  
-    const urls = [...uploadedFiles];
-    const names = [...fileNames];
-  
+    const selectedFiles = event.target.files
+    if (!selectedFiles || selectedFiles.length === 0) return
+
+    setIsUploading(true)
+
+    const urls = [...uploadedFiles]
+    const names = [...fileNames]
+
     for (let i = 0; i < selectedFiles.length; i++) {
-      const file = selectedFiles[i];
-      const formData = new FormData();
-      formData.append('file', file);
-  
+      const file = selectedFiles[i]
+      const formData = new FormData()
+      formData.append('file', file)
+
       try {
-        const response = await apiMethods.uploadFile(formData);
-        const fileUrl = response?.data?.data?.file_url;
-  
+        const response = await apiMethods.uploadFile(formData)
+        const fileUrl = response?.data?.data?.file_url
+
         if (fileUrl) {
-          urls.push(fileUrl);
-          names.push(file.name);
+          urls.push(fileUrl)
+          names.push(file.name)
         }
       } catch (err) {
-        console.error('File upload failed:', err);
+        console.error('File upload failed:', err)
       }
     }
-  
-    setUploadedFiles(urls);
-      setAddNewSkuData(prev => ({
+
+    setUploadedFiles(urls)
+    setAddNewSkuData((prev) => ({
       ...prev,
-      documents: urls
-    }));
-    setFileNames(names);
-  
-    setIsUploading(false);
-    event.target.value = '';
-  };
-  
+      documents: urls,
+    }))
+    setFileNames(names)
+
+    setIsUploading(false)
+    event.target.value = ''
+  }
+
   // Add this function to handle file removal
   const removeFile = (indexToRemove) => {
-    const updatedUrls = uploadedFiles.filter((_, index) => index !== indexToRemove);
-    const updatedNames = fileNames.filter((_, index) => index !== indexToRemove);
-  
-    setUploadedFiles(updatedUrls);
-      setAddNewSkuData((prev) => ({
+    const updatedUrls = uploadedFiles.filter((_, index) => index !== indexToRemove)
+    const updatedNames = fileNames.filter((_, index) => index !== indexToRemove)
+
+    setUploadedFiles(updatedUrls)
+    setAddNewSkuData((prev) => ({
       ...prev,
       documents: updatedUrls, // Keep documents in sync
-    }));
-    setFileNames(updatedNames);
-  };
-  
+    }))
+    setFileNames(updatedNames)
+  }
+
   //document edit
- useEffect(() => {
-  // Clear files only if print_type is 'None' and documents are not already empty
-  if (addNewSkuData.print_type === 'None') {
-    if (uploadedFiles.length > 0 || addNewSkuData.documents.length > 0) {
-      setUploadedFiles([]);
-      setFileNames([]);
+  useEffect(() => {
+    // Clear files only if print_type is 'None' and documents are not already empty
+    if (addNewSkuData.print_type === 'None') {
+      if (uploadedFiles.length > 0 || addNewSkuData.documents.length > 0) {
+        setUploadedFiles([])
+        setFileNames([])
 
-      // Only update documents if not already empty
-      if (addNewSkuData.documents.length > 0) {
-        setAddNewSkuData((prev) => ({
-          ...prev,
-          documents: [],
-        }));
+        // Only update documents if not already empty
+        if (addNewSkuData.documents.length > 0) {
+          setAddNewSkuData((prev) => ({
+            ...prev,
+            documents: [],
+          }))
+        }
       }
+      return
     }
-    return;
-  }
 
-  // Load files only if editing and there are documents to load
-  if (editTag && addNewSkuData.documents?.length > 0 && uploadedFiles.length === 0) {
-    setUploadedFiles([...addNewSkuData.documents]);
-    setFileNames(
-      addNewSkuData.documents.map((file) =>
-        typeof file === 'string' ? file.split('/').pop() : file.name
+    // Load files only if editing and there are documents to load
+    if (editTag && addNewSkuData.documents?.length > 0 && uploadedFiles.length === 0) {
+      setUploadedFiles([...addNewSkuData.documents])
+      setFileNames(
+        addNewSkuData.documents.map((file) =>
+          typeof file === 'string' ? file.split('/').pop() : file.name,
+        ),
       )
-    );
-  }
-}, [editTag, addNewSkuData.print_type]); // <- remove addNewSkuData.documents from deps
-
+    }
+  }, [editTag, addNewSkuData.print_type]) // <- remove addNewSkuData.documents from deps
 
   useEffect(() => {
-    let area = addNewSkuData.width_board_size_cm2*addNewSkuData.width_board_size_cm2
+    let area = addNewSkuData.width_board_size_cm2 * addNewSkuData.width_board_size_cm2
 
     onMeterDataChange(area)
     //setAreaInM2(convertedArea)
-  }, [addNewSkuData.width_board_size_cm2*addNewSkuData.width_board_size_cm2])
+  }, [addNewSkuData.width_board_size_cm2 * addNewSkuData.width_board_size_cm2])
+
+
+    useEffect(() => {
+  if (addNewSkuData.sku_name && addNewSkuData.customer_reference) {
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      reference_number: `${prev.sku_name}/${prev.customer_reference}`,
+    }));
+  } else {
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      reference_number: '',
+    }));
+  }
+}, [addNewSkuData.sku_name, addNewSkuData.customer_reference]);
 
   return (
     <div className="rounded-lg">
@@ -553,85 +570,77 @@ const MenuProps = {
             name="sku_name"
             value={addNewSkuData.sku_name}
             onChange={handleChange}
-                                                                 className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.sku_name ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+              errors.sku_name ? 'border-2 border-red-500' : 'border border-gray-300'
+            }`}
           />
         </div>
 
+        <div className="flex items-end gap-2 w-full max-w-md">
+          {/* Select Input */}
+          <div className="flex items-end gap-1 w-fit">
+            {/* MUI Select with icon inside same box */}
+            <div className="relative w-[200px]">
+              {/* Aligned Label */}
+              <label htmlFor="client" className="block text-sm font-medium text-gray-700 mb-1">
+                Client <span className="text-red-500 ml-1">*</span>
+              </label>
 
-  <div className="flex items-end gap-2 w-full max-w-md">
-  {/* Select Input */}
-  <div className="flex items-end gap-1 w-fit">
-    {/* MUI Select with icon inside same box */}
-    <div className="relative w-[200px]">
-      {/* Aligned Label */}
-      <label
-        htmlFor="client"
-        className="block text-sm font-medium text-gray-700 mb-1"
-      >
-        Client <span className="text-red-500 ml-1">*</span>
-      </label>
+              <FormControl sx={{ width: '100%' }} error={errors.client_id ? true : false}>
+                <Select
+                  IconComponent={() => null}
+                  labelId="client-select-label"
+                  id="client"
+                  name="client"
+                  disabled={clientDiasble}
+                  value={addNewSkuData.client_id}
+                  onChange={handleChange}
+                  MenuProps={MenuProps}
+                  displayEmpty
+                  sx={{
+                    height: '35px',
+                    '& .MuiOutlinedInput-root': {
+                      height: '50px',
+                      paddingRight: '40px',
+                    },
+                    '& .MuiSelect-select': {
+                      display: 'flex',
+                      alignItems: 'center',
+                      height: '35px',
+                      paddingY: 0,
+                    },
+                  }}
+                >
+                  <MenuItem value="" disabled>
+                    <em>Select</em>
+                  </MenuItem>
+                  {client?.map((item, index) => (
+                    <MenuItem key={index} value={item.client_id}>
+                      {item.display_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-      <FormControl
-        sx={{ width: '100%' }}
-        error={errors.client_id ? true : false}
-      >
-        <Select
-          IconComponent={() => null}
-          labelId="client-select-label"
-          id="client"
-          name="client"
-          disabled={clientDiasble}
-          value={addNewSkuData.client_id}
-          onChange={handleChange}
-          MenuProps={MenuProps}
-          displayEmpty
-          sx={{
-            height: '35px',
-            '& .MuiOutlinedInput-root': {
-              height: '50px',
-              paddingRight: '40px',
-            },
-            '& .MuiSelect-select': {
-              display: 'flex',
-              alignItems: 'center',
-              height: '35px',
-              paddingY: 0,
-            },
-          }}
-        >
-          <MenuItem value="" disabled>
-            <em>Select</em>
-          </MenuItem>
-          {client?.map((item, index) => (
-            <MenuItem key={index} value={item.client_id}>
-              {item.display_name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      {/* Add icon inside the select box */}
-     <button
-  type="button"
-  onClick={() =>
-    navigate('/clients/clientForm', {
-      state: {
-        fromSKU: true,
-        sku_type_for_navigate: 'Board',
-      },
-    })
-  }
-  className="absolute top-[calc(50%+13px)] right-2 -translate-y-1/2 text-blue-600 hover:text-blue-800 z-10"
-  title="Add Client"
->
-  <CIcon icon={cilPlus} size="lg" className="w-5 h-5 stroke-[2.5]" />
-</button>
-
-    </div>
-  </div>
-</div>
+              {/* Add icon inside the select box */}
+              <button
+                type="button"
+                onClick={() =>
+                  navigate('/clients/clientForm', {
+                    state: {
+                      fromSKU: true,
+                      sku_type_for_navigate: 'Board',
+                    },
+                  })
+                }
+                className="absolute top-[calc(50%+13px)] right-2 -translate-y-1/2 text-blue-600 hover:text-blue-800 z-10"
+                title="Add Client"
+              >
+                <CIcon icon={cilPlus} size="lg" className="w-5 h-5 stroke-[2.5]" />
+              </button>
+            </div>
+          </div>
+        </div>
         {/*<div className="flex items-end gap-2 w-full max-w-md">
             <div className="flex items-end gap-1 w-fit">
         <div className="relative w-[200px]">
@@ -699,9 +708,11 @@ const MenuProps = {
           <input
             id="reference_number"
             name="reference_number"
-            value={Number(addNewSkuData.reference_number) || null}
+            //value={Number(addNewSkuData.reference_number) || null}
+                value={addNewSkuData.reference_number || ''}
             onChange={handleChange}
             className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            readOnly
           />
         </div>
       </div>
@@ -752,14 +763,20 @@ const MenuProps = {
             <input
               id="joints"
               name="joints"
-              type="number"
-              min="0"
               value={addNewSkuData.joints}
               onChange={handleChange}
               readOnly={editTag}
-            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+              type="text"
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
+              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
+              }`}
             />
           </div>
         </Tooltip>
@@ -776,14 +793,20 @@ const MenuProps = {
             <input
               id="ups"
               name="ups"
-              type="number"
               value={addNewSkuData.ups}
-              min="0"
               onChange={handleChange}
               readOnly={editTag}
-            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.ups ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+              type="text"
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
+              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.ups ? 'border-2 border-red-500' : 'border border-gray-300'
+              }`}
             />
           </div>
         </Tooltip>
@@ -801,13 +824,19 @@ const MenuProps = {
               id="flap_width"
               name="flap_width"
               value={addNewSkuData.flap_width}
-              min="0"
               onChange={handleChange}
-              type="number"
               readOnly={editTag}
-               className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.flap_width ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+              type="text"
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
+              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.flap_width ? 'border-2 border-red-500' : 'border border-gray-300'
+              }`}
             />
           </div>
         </Tooltip>
@@ -828,12 +857,18 @@ const MenuProps = {
               name="flap_tolerance"
               value={addNewSkuData.flap_tolerance ?? ''}
               onChange={handleChange}
-              min="0"
-              type="number"
               readOnly={editTag}
-               className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.flap_tolerance ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+              type="text"
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
+              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.flap_tolerance ? 'border-2 border-red-500' : 'border border-gray-300'
+              }`}
             />
           </div>
         </Tooltip>
@@ -854,23 +889,28 @@ const MenuProps = {
               name="length_trimming_tolerance"
               value={addNewSkuData.length_trimming_tolerance}
               onChange={handleChange}
-              min="0"
-              type="number"
               readOnly={editTag}
-             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.length_trimming_tolerance ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+              type="text"
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
+              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.length_trimming_tolerance
+                  ? 'border-2 border-red-500'
+                  : 'border border-gray-300'
+              }`}
             />
           </div>
         </Tooltip>
 
-        <div className="w-[200px]">
+        {/* <div className="w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Internal Id
             <span className="text-red-500 ml-1">*</span>
-            {/*{errors.internal_id && (
-              <span className="text-red-500 text-sm ml-2 align-middle">{errors.internal_id}</span>
-            )}*/}
           </label>
           <input
             id="internal_id"
@@ -879,10 +919,10 @@ const MenuProps = {
             onChange={handleChange}
             readOnly={editTag}
             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.internal_id ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+              errors.internal_id ? 'border-2 border-red-500' : 'border border-gray-300'
+            }`}
           />
-        </div>
+        </div> */}
 
         <Tooltip title={unitTooltip}>
           <div className="w-[200px]">
@@ -895,20 +935,30 @@ const MenuProps = {
                 </span>
               )}*/}
             </label>
-            <div  className={`h-8 rounded-md flex items-center bg-white ${
-      errors.width_board_size_cm2 || errors.length_board_size_cm2
-        ? 'border-2 border-red-500'
-        : 'border border-gray-300'
-    }`}>
+            <div
+              className={`h-8 rounded-md flex items-center bg-white ${
+                errors.width_board_size_cm2 || errors.length_board_size_cm2
+                  ? 'border-2 border-red-500'
+                  : 'border border-gray-300'
+              }`}
+            >
               <input
                 id="width_board_size_cm2"
                 name="width_board_size_cm2"
                 value={addNewSkuData.width_board_size_cm2 || null}
                 onChange={handleChange}
-                type="number"
+                
                 readOnly={editTag}
+                type="text"
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
                 className="w-[50%] p-[2px] text-center focus:outline-none rounded-l-md bg-gray-50"
-                min="0"
+                
               />
               <span className="flex items-center justify-center text-gray-500">x</span>
               <input
@@ -916,10 +966,16 @@ const MenuProps = {
                 name="length_board_size_cm2"
                 value={addNewSkuData.length_board_size_cm2 || null}
                 onChange={handleChange}
-                type="number"
                 readOnly={editTag}
+                type="text"
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
                 className="w-[50%] p-[2px] text-center focus:outline-none bg-gray-50"
-                min="0"
               />
             </div>
           </div>
@@ -937,17 +993,24 @@ const MenuProps = {
             <input
               id="deckle_size"
               name="deckle_size"
-              type="number"
+              
               value={addNewSkuData.deckle_size}
-              min="0"
+              
               onChange={handleChange}
               readOnly={editTag}
-     className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-  errors.deckle_size || diecutCalculations.deckleError
-    ? 'border-2 border-red-500'
-    : 'border border-gray-300'
-}`}
-
+              type="text"
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
+              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.deckle_size || diecutCalculations.deckleError
+                  ? 'border-2 border-red-500'
+                  : 'border border-gray-300'
+              }`}
             />
             {diecutCalculations.deckleError && (
               <p className="mt-1 text-sm text-red-600">{diecutCalculations.deckleError}</p>
@@ -967,14 +1030,20 @@ const MenuProps = {
           </label>
           <input
             id="minimum_order_level"
-            name="minimum_order_level"
-            type="number"
-            min="0"
+            name="minimum_order_level"           
             value={addNewSkuData.minimum_order_level}
             onChange={handleChange}
-                     className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-      errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
-    }`}
+            type="text"
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
+            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+              errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
+            }`}
           />
         </div>
 
@@ -1004,74 +1073,73 @@ const MenuProps = {
           </select>
         </div>
 
-        
-      <div className="w-[200px]">
-  <label className="block text-sm font-medium text-gray-700 mb-2">Print Type</label>
-  <select
-    id="print_type"
-    name="print_type"
-    value={addNewSkuData?.print_type || ''}
-    onChange={handleChange}
-    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-  >
-    <option value="">Select Type</option>
-    <option value="None">None</option>
-    <option value="Offset">Offset</option>
-    <option value="Flexo">Flexo</option>
-  </select>
-</div>
-
-{(addNewSkuData?.print_type === 'Offset' || addNewSkuData?.print_type === 'Flexo') && (
-  <div className="flex w-[200px]">
-    <div className="flex flex-col flex w-[200px]">
-      {/* Custom styled file input */}
-         <label className="block text-sm font-medium text-gray-700 mb-2">Documents</label>
-   <label
-        htmlFor="file-upload"
-        className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
-      >
-        <CIcon icon={cilCloudUpload} size="sm" className="text-gray-700" /> Upload Files
-      </label>
-      <input
-        id="file-upload"
-        type="file"
-        accept="application/pdf"
-        onChange={handleFileUpload}
-        multiple
-        className="hidden"
-      />
-
-      {/* Uploading text */}
-      {isUploading && (
-        <div className="text-sm text-blue-600 mt-2">Uploading files...</div>
-      )}
-
-      {/* Display uploaded files */}
-      {uploadedFiles.length > 0 && (
-        <div className="mt-2">
-          <p className="text-xs text-gray-600 mb-1">Uploaded files:</p>
-       <ul className="space-y-0.5">
-  {uploadedFiles.map((file, index) => (
-    <li key={index} className="flex items-center text-xs w-full max-w-[240px]">
-      <div className="flex-1 truncate text-gray-700">
-        {file.name || (typeof file === 'string' ? file.split('/').pop() : file.url.split('/').pop())}
-      </div>
-      <button
-        type="button"
-        onClick={() => removeFile(index)}
-        className="ml-1 text-red-500 hover:text-red-700 text-sm"
-      >
-        ✕
-      </button>
-    </li>
-  ))}
-</ul>
-
+        <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Print Type</label>
+          <select
+            id="print_type"
+            name="print_type"
+            value={addNewSkuData?.print_type || ''}
+            onChange={handleChange}
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          >
+            <option value="">Select Type</option>
+            <option value="None">None</option>
+            <option value="Offset">Offset</option>
+            <option value="Flexo">Flexo</option>
+          </select>
         </div>
-      )}
-    </div>
-  </div>
-)}
+
+        {(addNewSkuData?.print_type === 'Offset' || addNewSkuData?.print_type === 'Flexo') && (
+          <div className="flex w-[200px]">
+            <div className="flex flex-col flex w-[200px]">
+              {/* Custom styled file input */}
+              <label className="block text-sm font-medium text-gray-700 mb-2">Documents</label>
+              <label
+                htmlFor="file-upload"
+                className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
+              >
+                <CIcon icon={cilCloudUpload} size="sm" className="text-gray-700" /> Upload Files
+              </label>
+              <input
+                id="file-upload"
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileUpload}
+                multiple
+                className="hidden"
+              />
+
+              {/* Uploading text */}
+              {isUploading && <div className="text-sm text-blue-600 mt-2">Uploading files...</div>}
+
+              {/* Display uploaded files */}
+              {uploadedFiles.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-xs text-gray-600 mb-1">Uploaded files:</p>
+                  <ul className="space-y-0.5">
+                    {uploadedFiles.map((file, index) => (
+                      <li key={index} className="flex items-center text-xs w-full max-w-[240px]">
+                        <div className="flex-1 truncate text-gray-700">
+                          {file.name ||
+                            (typeof file === 'string'
+                              ? file.split('/').pop()
+                              : file.url.split('/').pop())}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(index)}
+                          className="ml-1 text-red-500 hover:text-red-700 text-sm"
+                        >
+                          ✕
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/*client create drop down option popup*/}

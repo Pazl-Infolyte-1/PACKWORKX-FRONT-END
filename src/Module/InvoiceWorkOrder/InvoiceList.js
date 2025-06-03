@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react'
 import ContentHeader from '../../components/New/ContentHeader'
 import InvoiceTable from './InvoiceTable'
 import apiMethods from '../../api/config'
-import { Outlet, useParams } from 'react-router-dom'
+import { Outlet, useLocation, useParams } from 'react-router-dom'
 import CompactPagination from '../../components/New/CompactPagination'
 import { useSearch } from '../../components/New/SearchContext'
 
 function InvoiceList() {
-  const [isMiniMised, setIsMinimised] = useState(false)
+  const [isMiniMised, setIsMinimised] = useState()
   const [invoices, setInvoices] = useState([])
   const [pagination, setPagination] = useState({
     page: 1,
@@ -17,6 +17,8 @@ function InvoiceList() {
   })
   const { id } = useParams();
   const { searchQuery } = useSearch()
+  const location = useLocation()
+
 
   useEffect(() => {
     const fetchInvoices = async () => {
@@ -40,11 +42,17 @@ function InvoiceList() {
     fetchInvoices();
   }, [pagination.page, pagination.limit, searchQuery]);
 
+
+
   useEffect(() => {
-    if (!isNaN(id)) {
+    // Check if current route includes "/salesorder/view/"
+    if (location.pathname.includes('/invoice/view/')) {
       setIsMinimised(true);
+    } else {
+      setIsMinimised(false);
     }
-  }, [id]);
+  }, [location.pathname]);
+
 
   return (
     <div className='flex flex-row'>

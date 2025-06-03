@@ -177,13 +177,11 @@ const ViewWorkOrder = () => {
   const renderProductionStages = (currentProgress) => {
     const stages = [
       { name: "Pending" },
-      { name: "Product Planning" },
+      { name: "Raw Meterial Allocation" },
       { name: "Procurement Sourcing" },
-      { name: "Production Planning" },
-      { name: "Production" },
-      { name: "Quality Control" },
-      { name: "Packaging" },
-      { name: "Shipping" }
+      { name: "Production Planned" },
+      { name: "Completed" },
+      { name: "Invoiced" }
     ];
 
     // Determine the current stage index
@@ -192,29 +190,20 @@ const ViewWorkOrder = () => {
       case "Pending":
         currentIndex = 0;
         break;
-      case "Product Planning":
+      case "Raw Meterial Allocation":
         currentIndex = 1;
         break;
       case "Procurement Sourcing":
         currentIndex = 2;
         break;
-      case "Production Planning":
+      case "Production Planned":
         currentIndex = 3;
         break;
-      case "Production":
+      case "Completed":
         currentIndex = 4;
         break;
-      case "Quality Control":
+      case "Invoiced":
         currentIndex = 5;
-        break;
-      case "Packaging":
-        currentIndex = 6;
-        break;
-      case "Shipping":
-        currentIndex = 7;
-        break;
-      case "Completed":
-        currentIndex = 8; // Beyond all stages
         break;
       default:
         currentIndex = -1;
@@ -473,6 +462,71 @@ const ViewWorkOrder = () => {
                 </div>
               </div>
             </div>
+
+             {/* Layer Configuration - LEFT SIDE, styled to match */}
+             <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+                <div className="p-3 border-b border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-700">Layer Configuration</h3>
+                </div>
+                <div className="p-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Group 1 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-gray-500">Group 1</p>
+                        <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">3 Layers</span>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 rounded-full bg-yellow-800"></div>
+                            <p className="text-sm font-medium">Top Layer</p>
+                          </div>
+                          <p className="text-xs text-gray-500">GSM: 1</p>
+                        </div>
+                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                            <p className="text-sm font-medium">Corrugated Layer 1</p>
+                          </div>
+                          <p className="text-xs text-gray-500">Flute: A</p>
+                        </div>
+                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 rounded-full bg-yellow-800"></div>
+                            <p className="text-sm font-medium">Bottom Layer</p>
+                          </div>
+                          <p className="text-xs text-gray-500">GSM: 1</p>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Group 2 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-gray-500">Group 2</p>
+                        <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">2 Layers</span>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 rounded-full bg-yellow-800"></div>
+                            <p className="text-sm font-medium">Layer 1</p>
+                          </div>
+                          <p className="text-xs text-gray-500">GSM: 1</p>
+                        </div>
+                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                            <p className="text-sm font-medium">Layer 2</p>
+                          </div>
+                          <p className="text-xs text-gray-500">GSM: 1</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
           </div>
 
           {/* Right Column - Related Info */}

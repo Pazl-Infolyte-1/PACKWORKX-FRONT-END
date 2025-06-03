@@ -252,6 +252,7 @@ const handleSkuValuesChange = (index, field, value) => {
       });
     }
 
+    
     updatedSkuValues[index] = updatedItem;
     return { ...prevData, sku_values: updatedSkuValues };
   });
@@ -618,18 +619,19 @@ useEffect(() => {
   }, [isSingleViewPopupForType])
 
   useEffect(() => {
-    const updatedSkuValues = addNewSkuData.sku_values.map((item) => {
-      if (item.gsm && item.bf) {
-        const calculatedBS = Number(((item.gsm * item.bf) / 1000).toFixed(3))
-
-        // Only update if bursting_strength actually changed
-        if (item.bursting_strength !== calculatedBS) {
-          return { ...item, bursting_strength: calculatedBS }
-        }
+      const updatedSkuValues = addNewSkuData.sku_values.map((item) => {
+    const { gsm, bf, selected_flute } = item;
+    if (gsm && bf) {
+      const takeUpFactor = selected_flute?.take_up_factor ?? 1; // default to 1 if not present
+      const calculatedBS = Number(((gsm * bf * takeUpFactor) / 1000).toFixed(3));
+console.log("calculated bs",calculatedBS)
+      // Only update if bursting_strength actually changed
+      if (item.bursting_strength !== calculatedBS) {
+        return { ...item, bursting_strength: calculatedBS };
       }
-      return item
-    })
-
+    }
+    return item;
+  });
     const hasChanged = updatedSkuValues.some(
       (item, index) => item.bursting_strength !== addNewSkuData.sku_values[index].bursting_strength,
     )
@@ -640,7 +642,7 @@ useEffect(() => {
         sku_values: updatedSkuValues,
       }))
     }
-  }, [addNewSkuData.sku_values])
+  }, [JSON.stringify(addNewSkuData.sku_values)])
   const handleAutofillRow = (currentIndex) => {
     if (currentIndex === 0) return
 
@@ -775,6 +777,9 @@ const handleFluteSelection = (selectedFlute, fluteIndex) => {
 };
 
 console.log("addnedwskudata unit",rscUnits)
+console.log("add sku data",addNewSkuData.client)
+console.log("add sku data",addNewSkuData.client_id)
+
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
@@ -971,7 +976,7 @@ console.log("addnedwskudata unit",rscUnits)
                       <p>{toThreeDecimalFixed(item.weight) || 'N/A'}</p>
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <p>{toThreeDecimalFixed((item.gsm * item.bf) / 1000)}</p>
+                      <p>{Math.round(item.bursting_strength) / 1000}</p>
                     </td>
                   </tr>
                 ))}
@@ -1215,6 +1220,7 @@ console.log("addnedwskudata unit",rscUnits)
                 // setIsCompositePopupCreate(false)
                 setCompositeSelect(null)
                 setAddNewSkuData(createInitialSkuData())
+                
               }}
             >
               Cancel

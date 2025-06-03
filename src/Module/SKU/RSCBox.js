@@ -764,15 +764,25 @@ function RSCBox({
                       paddingY: 0,
                     },
                   }}
-                >
-                  <MenuItem value="" disabled>
-                    <em>Select</em>
-                  </MenuItem>
-                  {client?.map((item, index) => (
-                    <MenuItem key={index} value={item.client_id}>
-                      {item.display_name}
-                    </MenuItem>
-                  ))}
+                renderValue={(selected) => {
+    // Show placeholder if none selected
+    if (!selected) return <em>Select</em>;
+
+    // Show display_name of matched client_id
+    const selectedClient = client.find(
+      (item) => item.client_id === selected
+    );
+    return selectedClient ? selectedClient.display_name : 'Unknown';
+  }}
+>
+  <MenuItem value="" disabled>
+    <em>Select</em>
+  </MenuItem>
+  {client.map((item) => (
+    <MenuItem key={item.client_id} value={item.client_id}>
+      {item.display_name}
+    </MenuItem>
+  ))}
                 </Select>
               </FormControl>
 
@@ -1279,6 +1289,7 @@ function RSCBox({
             name="print_type"
             value={addNewSkuData?.print_type || ''}
             onChange={handleChange}
+            disabled={editTag}
             className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="">Select Type</option>
@@ -1305,6 +1316,7 @@ function RSCBox({
                 accept="application/pdf"
                 onChange={handleFileUpload}
                 multiple
+                disabled={editTag}
                 className="hidden"
               />
 
@@ -1326,6 +1338,7 @@ function RSCBox({
                         </div>
                         <button
                           type="button"
+                        disabled={editTag}
                           onClick={() => removeFile(index)}
                           className="ml-1 text-red-500 hover:text-red-700 text-sm"
                         >

@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import PopUp from '../../components/New/PopUp'
-import apiMethods from '../../api/config';
+import PopUp from '../../../components/New/PopUp'
+import apiMethods from '../../../api/config'
 
 function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess }) {
   const [formData, setFormData] = useState({
     name: '',
     display_name: '',
-    description: ''
-  });
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+    description: '',
+  })
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState({})
 
   // If editing, populate form with role data
   useEffect(() => {
@@ -17,81 +17,83 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
       setFormData({
         name: roleData.name || '',
         display_name: roleData.display_name || '',
-        description: roleData.description || ''
-      });
+        description: roleData.description || '',
+      })
     }
-  }, [isEdit, roleData]);
+  }, [isEdit, roleData])
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     setFormData({
       ...formData,
-      [name]: value
-    });
-    
+      [name]: value,
+    })
+
     // Clear error for this field when user types
     if (errors[name]) {
       setErrors({
         ...errors,
-        [name]: ''
-      });
+        [name]: '',
+      })
     }
-  };
+  }
 
   const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Required';
-    if (!formData.display_name.trim()) newErrors.display_name = 'Required';
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    const newErrors = {}
+    if (!formData.name.trim()) newErrors.name = 'Required'
+    if (!formData.display_name.trim()) newErrors.display_name = 'Required'
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
-    
-    setLoading(true);
+    e.preventDefault()
+
+    if (!validateForm()) return
+
+    setLoading(true)
     try {
-      let response;
-      
+      let response
+
       if (isEdit) {
-        response = await apiMethods.updateRole(roleData.id, formData);
+        response = await apiMethods.updateRole(roleData.id, formData)
       } else {
-        response = await apiMethods.postRole(formData);
+        response = await apiMethods.postRole(formData)
       }
-      
+
       if (response.data.success) {
-        onSuccess && onSuccess(response.data);
-        setShowForm(false);
+        onSuccess && onSuccess(response.data)
+        setShowForm(false)
       }
     } catch (error) {
-      console.error('Error saving role:', error);
+      console.error('Error saving role:', error)
       // Handle API errors
       if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
+        setErrors(error.response.data.errors)
       } else {
-        setErrors({ general: 'Failed to save role. Please try again.' });
+        setErrors({ general: 'Failed to save role. Please try again.' })
       }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <PopUp
       visible={showForm}
-      setVisible={() => { setShowForm(false) }}
+      setVisible={() => {
+        setShowForm(false)
+      }}
       showCloseButton={true}
-      header={isEdit ? "Edit Role" : "Add New Role"}
-      height={"auto"}
-      width={"500px"}
+      header={isEdit ? 'Edit Role' : 'Add New Role'}
+      height={'auto'}
+      width={'500px'}
     >
       <form onSubmit={handleSubmit} className="p-4">
         <div className="mb-4">
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-            Role Name <span className='text-red-500'>*</span>
+            Role Name <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -103,20 +105,31 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
             // placeholder="Enter role name"
           />
           {errors.name && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      {errors.name}
-    </div>
-    )}
+            <div className="text-red-500 text-xs mt-1 flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-1"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              {errors.name}
+            </div>
+          )}
         </div>
-        
+
         <div className="mb-4">
           <label htmlFor="display_name" className="block text-sm font-medium text-gray-700 mb-1">
-            Display Name <span className='text-red-500'>*</span>
+            Display Name <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -127,19 +140,29 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
             className={`w-full px-3 py-2 border ${errors.display_name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
             // placeholder="Enter display name"
           />
-            {errors.display_name && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      {errors.display_name}
-    </div>
-    )}
-          
+          {errors.display_name && (
+            <div className="text-red-500 text-xs mt-1 flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-1"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              {errors.display_name}
+            </div>
+          )}
         </div>
-        
+
         <div className="mb-4">
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
             Description
@@ -154,13 +177,11 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
             // placeholder="Enter role description"
           ></textarea>
         </div>
-        
+
         {errors.general && (
-          <div className="mb-4 p-2 bg-red-50 text-red-500 rounded-md">
-            {errors.general}
-          </div>
+          <div className="mb-4 p-2 bg-red-50 text-red-500 rounded-md">{errors.general}</div>
         )}
-        
+
         <div className="flex justify-end space-x-3 mt-6">
           <button
             type="button"
@@ -179,7 +200,7 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
         </div>
       </form>
     </PopUp>
-  );
+  )
 }
 
-export default AddEditRoleForm;
+export default AddEditRoleForm

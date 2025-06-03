@@ -9,9 +9,9 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash } from '@coreui/icons'
-import Loading from '../../components/New/Loading' // Adjust the path as needed
-import ReusableTable from '../SalesOrder/ReusableTable'
-import ThreeDotMenu from '../../components/ThreeDotMenu'
+import Loading from '../../../components/New/Loading' // Adjust the path as needed
+import ReusableTable from '../../SalesOrder/ReusableTable'
+import ThreeDotMenu from '../../../components/ThreeDotMenu'
 
 function RoleTable({ roles, loading, onEdit, onDelete }) {
   if (!roles) roles = []
@@ -62,7 +62,7 @@ function RoleTable({ roles, loading, onEdit, onDelete }) {
 
   return (
     <div className="mt-2">
-      <ReusableTable data={roles} columns={columns}  height='80vh'/>
+      <ReusableTable data={roles} columns={columns} height="80vh" />
     </div>
   )
 }

@@ -9,9 +9,9 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash } from '@coreui/icons'
-import Loading from '../../components/New/Loading'
-import ReusableTable from '../SalesOrder/ReusableTable'
-import ThreeDotMenu from '../../components/ThreeDotMenu'
+import Loading from '../../../components/New/Loading'
+import ReusableTable from '../../SalesOrder/ReusableTable'
+import ThreeDotMenu from '../../../components/ThreeDotMenu'
 
 function DesignationTable({ designations, loading, onEdit, onDelete }) {
   if (!designations) designations = []
@@ -36,8 +36,6 @@ function DesignationTable({ designations, loading, onEdit, onDelete }) {
       type: 'custom',
       render: (row) => {
         const parent = designations?.find((desig) => desig?.id === row?.parent_id)
-        console.log(parent)
-
         return <p className="text-start">{parent?.name || 'None'}</p>
       },
     },
@@ -71,8 +69,8 @@ function DesignationTable({ designations, loading, onEdit, onDelete }) {
   ]
 
   return (
-    <div className='mt-2'>
-      <ReusableTable data={designations} columns={columns} height='80vh'/>
+    <div className="mt-2">
+      <ReusableTable data={designations} columns={columns} height="80vh" />
     </div>
   )
 }

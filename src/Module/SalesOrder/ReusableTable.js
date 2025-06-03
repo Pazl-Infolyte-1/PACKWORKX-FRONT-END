@@ -35,7 +35,7 @@ export default function ReusableTable({
     })
 
   const formatDate = (dateString) => {
-    if (!dateString) return '—'
+    if (!dateString) return '-'
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -203,7 +203,7 @@ export default function ReusableTable({
                           return (
                             <CTableDataCell
                               key={col.key}
-                              className="px-3 py-3 text-center"
+                              className="px-3 py-3  text-center"
                               onClick={(e) => e.stopPropagation()} // Prevent row click if needed
                             >
                               {col.render(row)}
@@ -214,7 +214,11 @@ export default function ReusableTable({
                         // ✅ Default / Date
                         return (
                           <CTableDataCell key={col.key} className="px-3 py-3 text-left">
-                            {col.type === 'date' ? formatDate(cellValue) : cellValue || '—'}
+                            {col.type === 'date' 
+                              ? formatDate(cellValue) 
+                              : col.field.includes('.') 
+                                ? col.field.split('.').reduce((obj, key) => obj?.[key], row) || '—'
+                                : cellValue || '—'}
                           </CTableDataCell>
                         )
                       })}
@@ -254,7 +258,9 @@ export default function ReusableTable({
                 data.map((row, rowIndex) => (
                   <React.Fragment key={rowIndex}>
                     <CTableRow
-                      className={`border-b text-sm text-gray-900 hover:bg-gray-50 transition-colors ${expandableConfig ? 'cursor-pointer' : ''}`}
+                      className={`border-b text-sm text-gray-900 hover:bg-gray-50 transition-colors ${expandableConfig ? 'cursor-pointer' : ''} ${
+                        miniScreenFields.length === 2 ? 'flex justify-between' : ''
+                      }`}
                       onClick={(e) => handleRowClick1(row, e, rowIndex)}
                     >
                       {columns
@@ -332,9 +338,13 @@ export default function ReusableTable({
                           return (
                             <CTableDataCell
                               key={col.key}
-                              className={`px-3 py-3 text-left ${col.cellClass || ''}`}
+                              className={`px-3 py-3  text-left ${col.cellClass || ''}`}
                             >
-                              {col.type === 'date' ? formatDate(cellValue) : cellValue || '—'}
+                              {col.type === 'date' 
+                                ? formatDate(cellValue) 
+                                : col.field.includes('.') 
+                                  ? col.field.split('.').reduce((obj, key) => obj?.[key], row) || '—'
+                                  : cellValue || '—'}
                             </CTableDataCell>
                           )
                         })}

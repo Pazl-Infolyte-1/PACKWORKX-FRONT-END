@@ -471,7 +471,7 @@ function SkuVersionAddEdit({
     </td>
 
     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-      <p>{item.weight || 'N/A'}</p>
+      <p>{item.weight ? Number(item.weight).toFixed(3) : 'N/A'}</p>
     </td>
 
     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">

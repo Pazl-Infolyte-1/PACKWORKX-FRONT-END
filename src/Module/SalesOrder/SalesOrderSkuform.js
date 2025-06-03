@@ -425,7 +425,7 @@ const calculateRowValues = (index) => {
                   <tr>
                     <th className="py-2 pl-2 border-r border-b text-xs font-medium text-left">ITEM DETAILS</th>
                     <th className="p-2 border-r text-xs font-medium text-right">QUANTITY</th>
-                    <th className="p-2 border-r text-xs font-medium text-right uppercase">Acceptable Units</th>
+                    <th className="p-2 border-r text-xs font-medium text-right uppercase">Acceptable</th>
                     <th className="p-2 border-r text-xs font-medium text-right">RATE</th>
                     <th className="p-2 border-b text-xs font-medium text-right">AMOUNT</th>
                     <th className="py-2 w-10"></th> {/* Empty header for delete button */}

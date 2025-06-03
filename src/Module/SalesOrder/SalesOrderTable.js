@@ -55,6 +55,7 @@ function SalesOrderTable({
     //   type: 'checkbox',
     // },
       { key: 'sales_generate_id', header: 'Sales ID', field: 'sales_generate_id' },  
+      { key: 'sales_ui_id', header: 'SO-Reference', field: 'sales_ui_id' },  
       { key: 'client', header: 'Client', field: 'client' },
       { key: 'skuCount', header: 'Work Orders', field: 'workOrders' },
       { key: 'estimated', header: 'Expected Delivery Date', type:"date", field: 'estimated'  },
@@ -137,7 +138,7 @@ function SalesOrderTable({
     data={data}
     onCheckboxChange={handleCheckboxChange}
     onSelectAllChange={handleSelectAllCheckboxes}
-    miniScreenFields={["select","sales_generate_id"]}
+    miniScreenFields={["select","sales_generate_id","sales_ui_id"]}
     handleRowClick={handleRowClick}
     isMinimiseTable={isMinimiseTable}
     />

@@ -70,7 +70,13 @@ export default function SalesOrderView({ }) {
       {/* Header */}
       <div className="w-full bg-white z-50">
         <div className="flex justify-between items-top p-2">
-          <h1 className="text-lg font-semibold">Sales Order # {salesOrderData?.sales_generate_id}</h1>
+          <div className="flex flex-col">
+            <h1 className="text-lg font-semibold">Sales Order # {salesOrderData?.sales_generate_id}</h1>
+            {salesOrderData?.sales_ui_id && (
+              <span className="text-sm text-gray-600">Reference: {salesOrderData?.sales_ui_id}</span>
+            )}
+          </div>
+          
           <div className="flex items-start space-x-4">
             {/* <button className="text-black text-xs">Upload Files</button> */}
             {/* <button className="text-black text-xs">Comments & History</button> */}
@@ -333,6 +339,9 @@ export default function SalesOrderView({ }) {
             <div className="flex flex-col gap-0 mb-4 md:mb-0">
               <span className="text-xl">SALES ORDER</span>
               <span className="text-xs text-gray-600">Sales Order# <span className="font-bold">{salesOrderData?.sales_generate_id}</span></span>
+              {salesOrderData?.sales_ui_id && (
+                <span className="text-xs text-gray-600">Reference: {salesOrderData?.sales_ui_id}</span>
+              )}
             </div>
 
             <div className="flex flex-col gap-0 items-start">

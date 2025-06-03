@@ -500,6 +500,21 @@ function CorrugatedSheet({
     //setAreaInM2(convertedArea)
   }, [addNewSkuData.width_board_size_cm2 * addNewSkuData.width_board_size_cm2])
 
+
+    useEffect(() => {
+  if (addNewSkuData.sku_name && addNewSkuData.customer_reference) {
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      reference_number: `${prev.sku_name}/${prev.customer_reference}`,
+    }));
+  } else {
+    setAddNewSkuData((prev) => ({
+      ...prev,
+      reference_number: '',
+    }));
+  }
+}, [addNewSkuData.sku_name, addNewSkuData.customer_reference]);
+
   return (
     <div className="rounded-lg">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -693,9 +708,11 @@ function CorrugatedSheet({
           <input
             id="reference_number"
             name="reference_number"
-            value={Number(addNewSkuData.reference_number) || null}
+            //value={Number(addNewSkuData.reference_number) || null}
+                value={addNewSkuData.reference_number || ''}
             onChange={handleChange}
             className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            readOnly
           />
         </div>
       </div>

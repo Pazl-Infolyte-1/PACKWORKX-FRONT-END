@@ -702,6 +702,13 @@ useEffect(() => {
                                         className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
       errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
     }`}
+         inputMode="numeric"
+                onKeyPress={(e) => {
+                  // Only allow numbers 0-9
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
             />
           </div>
         </div>

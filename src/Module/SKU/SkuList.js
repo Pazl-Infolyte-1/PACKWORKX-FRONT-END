@@ -335,7 +335,13 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!addNewSkuData.width) newErrors.width = 'Required'
       if (!addNewSkuData.height) newErrors.height = 'Required'
       if (!addNewSkuData.joints) newErrors.joints = 'Required'
-      if (!addNewSkuData.deckle_size &&  deckleSize>addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
+      //if (!addNewSkuData.deckle_size &&  deckleSize>addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
+      if (!addNewSkuData.deckle_size) {
+  newErrors.deckle_size = 'Deckle size is required';
+} else if (Number(addNewSkuData.deckle_size) < deckleSize) {
+  newErrors.deckle_size = `Deckle size must be greater than ${deckleSize.toFixed(3)}`;
+}
+
       //if (!addNewSkuData.inner_outer_dimension) newErrors.inner_outer_dimension = 'Required'
       if (!addNewSkuData.flap_width) newErrors.flap_width = 'Required'
       if (!addNewSkuData.length_trimming_tolerance) newErrors.length_trimming_tolerance = 'Required'

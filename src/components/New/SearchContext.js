@@ -17,16 +17,21 @@ export const SearchProvider = ({ children }) => {
   }
 
   const handleSearch = (searchValue, dataToFilter) => {
+    if (searchQuery) {
+      setFilteredSearchData([])
+      return
+    }
+    
     if (!searchValue || !dataToFilter) {
       setFilteredSearchData(dataToFilter || [])
       return
     }
 
     const lowercasedSearch = searchValue.toLowerCase()
-    
-    const filteredData = dataToFilter.filter(item => {
+
+    const filteredData = dataToFilter.filter((item) => {
       // Search through all string properties of the item
-      return Object.values(item).some(value => {
+      return Object.values(item).some((value) => {
         if (typeof value === 'string') {
           return value.toLowerCase().includes(lowercasedSearch)
         }
@@ -43,15 +48,15 @@ export const SearchProvider = ({ children }) => {
   }
 
   return (
-    <SearchContext.Provider 
-      value={{ 
-        searchQuery, 
+    <SearchContext.Provider
+      value={{
+        searchQuery,
         setGlobalSearchQuery,
         searchPlaceholder,
         setGlobalPlaceholder,
-        filteredSearchData, 
-        handleSearch, 
-        clearSearch 
+        filteredSearchData,
+        handleSearch,
+        clearSearch,
       }}
     >
       {children}

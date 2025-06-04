@@ -515,6 +515,8 @@ function CorrugatedSheet({
   }
 }, [addNewSkuData.sku_name, addNewSkuData.customer_reference]);
 
+console.log("unit sheet///",addNewSkuData.unit)
+
   return (
     <div className="rounded-lg">
       <CustomAlert alerts={alerts} handleClose={handleClose} />

@@ -4,6 +4,8 @@ import { FaEye, FaSpinner } from "react-icons/fa";
 import CustomAlert from "../../components/New/CustomAlert";
 import PopUp from "../../components/New/PopUp";
 import VersionChoicePopup from "./VersionChoicePopup";
+import FluteTypeView from "../SKU/FluteTypeView";
+
 
 function SkuVersionAddEdit({
   skuID,
@@ -15,7 +17,9 @@ function SkuVersionAddEdit({
   setVisible,
   currentVersionCount,
   setWorkOrders ,
-  skuvaluesFromParent
+  skuvaluesFromParent,
+  allSkuData,
+  handleWholeSkuObject
       }) {
   const [skuValues, setSkuValues] = useState([skuvaluesFromParent]);
   const [clientID, setClientID] = useState("");
@@ -28,12 +32,76 @@ function SkuVersionAddEdit({
   const [editedMap, setEditedMap] = useState({});
   const [skuOptions, setSkuOptions] = useState({});
   const [focusedField, setFocusedField] = useState(null);
+    const [allSkuDetails, setAllSkuDetails] = useState(null);
+      const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
+      const [selectedFluteIndex, setSelectedFluteIndex] = useState(null);
+        const [fluteDropdown,setFluteDropdown]=useState([])
+const [colorList, setColorList] = useState([]);
+
+    
+  const handleCloseSingleViewPopup = () => {
+    setisSingleViewPopup(false)
+  }
+
+useEffect(() => {
+  const colorData = async () => {
+    try {
+      const response = await apiMethods.getColors();
+      setColorList(response.data.data); // contains objects with color_name
+      console.log("color data", response.data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  colorData();
+}, []);
+
+  
+// Call this when popup selection happens
+const handleFluteSelection = (selectedFlute, fluteIndex) => {
+  if (fluteIndex !== null) {
+    const updatedValues = [...skuvaluesFromParent];
+    updatedValues[fluteIndex].flute_type = selectedFlute.name;
+    updatedValues[fluteIndex].take_up_factor = parseFloat(selectedFlute.take_up_factor);
+
+    recalcRowValues(updatedValues[fluteIndex]);
+
+    setSkuValues(updatedValues);
+    setWorkOrders(prevOrders =>
+      prevOrders.map(order =>
+        order.id === orderId
+          ? { ...order, work_order_sku_values: updatedValues }
+          : order
+      )
+    );
+
+    setSelectedFluteIndex(null);
+    setisSingleViewPopup(false);
+  }
+};
+
   // const [currentVersionCount, setCurrentVersionCount] = useState(0);
 
   // Helper function to check if any changes have been made
   const hasChanges = () => {
     return Object.keys(editedMap).length > 0;
   };
+  
+
+  useEffect(() => {
+    fetchFluteList()
+  }, [])
+
+  const fetchFluteList = async () => {
+    try {
+      const response = await apiMethods.getFluteType()
+      setFluteDropdown(response.data.data)
+      console.log("flute",response.data.data)
+      console.log("flute type",JSON.stringify(response.data.data))
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
  useEffect(() => {
     const fetchData = async () => {
@@ -53,10 +121,12 @@ function SkuVersionAddEdit({
           console.log("Handling skuID + skuVersionID case (not edit mode)");
           // Add your custom logic here for this case
           // Example:
-          const [skuResponse, versionResponse] = await Promise.all([
-            apiMethods.getSingleSkuData(skuID),
-            apiMethods.getSingleSkuVersion(skuVersionID)
-          ]);
+       const skuPromise = apiMethods.getSingleSkuData(skuID);
+const versionPromise = apiMethods.getSingleSkuVersion(skuVersionID);
+
+const [skuResponse, versionResponse] = await Promise.all([skuPromise, versionPromise]);
+setAllSkuDetails(skuResponse.data)
+handleWholeSkuObject(skuResponse.data);
 
           setWorkOrders(prevOrders =>
             prevOrders.map(order =>
@@ -92,6 +162,8 @@ function SkuVersionAddEdit({
                   : order
               )
             )
+            setAllSkuDetails(response.data)
+            handleWholeSkuObject(response.data);
             setSkuValues(response.data.sku_values);
             setSkuInitalData(response.data.sku_values);
             setClientID(response.data.client_id);
@@ -115,27 +187,102 @@ function SkuVersionAddEdit({
   }, [skuID, IsEditVersion, skuVersionID, setSkuVersionsMap,]);
   
 
-  const handleValueChange = (index, field, value) => {
+  //const handleValueChange = (index, field, value) => {
 
-    const updatedValues = [...skuvaluesFromParent];
+  //  const updatedValues = [...skuvaluesFromParent];
+  //  updatedValues[index][field] = value;
+  //  setSkuValues(updatedValues);
+  //  setWorkOrders(prevOrders =>
+  //    prevOrders.map(order =>
+  //      order.id === orderId
+  //        ? { ...order, ["work_order_sku_values"]: updatedValues || []  }
+  //        : order
+  //    )
+  //  )
+
+  //  // Track changed field per index
+  //  setEditedMap(prev => {
+  //    const updatedFields = { ...(prev[index] || {}) };
+  //    updatedFields[field] = value;
+  //    return { ...prev, [index]: updatedFields };
+  //  });
+  //};
+const recalcRowValues = (item) => {
+  const lengthVal = Number(allSkuDetails?.length_board_size_cm2 || 0);
+  const widthVal = Number(allSkuDetails?.width_board_size_cm2 || 0);
+  const unit = (allSkuDetails?.unit || "").toLowerCase();
+
+  const areaOriginalUnit = lengthVal * widthVal;
+  let areaM2 = 0;
+
+  switch (unit) {
+    case "mm":
+      areaM2 = areaOriginalUnit / 1_000_000;
+      break;
+    case "cm":
+      areaM2 = areaOriginalUnit / 10_000;
+      break;
+    case "in":
+    case "inch":
+      areaM2 = areaOriginalUnit * 0.00064516;
+      break;
+    default:
+      areaM2 = 0;
+  }
+
+  const gsm = Number(item.gsm);
+  const bf = Number(item.bf);
+
+  const isCorrugated = item.layer?.toLowerCase().includes("corrugated");
+  const takeUpFactor = isCorrugated ? parseFloat(item.take_up_factor || 1) : 1;
+
+  // Calculate weight
+  if (!isNaN(gsm) && areaM2 > 0) {
+    item.weight = parseFloat((gsm * areaM2 * 0.001 * takeUpFactor).toFixed(3));
+  } else {
+    item.weight = 0;
+  }
+
+  // Calculate bursting strength
+  if (!isNaN(gsm) && !isNaN(bf)) {
+    item.bursting_strength = parseFloat(((gsm * bf * takeUpFactor) / 1000).toFixed(3));
+  } else {
+    item.bursting_strength = 0;
+  }
+};
+const handleValueChange = (index, field, value) => {
+  const updatedValues = [...skuvaluesFromParent];
+
+  if (field === 'flute_type') {
+    const selectedFlute = fluteDropdown.find(f => f.name === value);
+    if (selectedFlute) {
+      updatedValues[index].flute_type = selectedFlute.name;
+      updatedValues[index].take_up_factor = parseFloat(selectedFlute.take_up_factor);
+    }
+  } else {
     updatedValues[index][field] = value;
-    setSkuValues(updatedValues);
+  }
 
-    setWorkOrders(prevOrders =>
-      prevOrders.map(order =>
-        order.id === orderId
-          ? { ...order, ["work_order_sku_values"]: updatedValues || []  }
-          : order
-      )
+  recalcRowValues(updatedValues[index]);
+
+  setSkuValues(updatedValues);
+  setWorkOrders(prevOrders =>
+    prevOrders.map(order =>
+      order.id === orderId
+        ? { ...order, work_order_sku_values: updatedValues }
+        : order
     )
+  );
 
-    // Track changed field per index
-    setEditedMap(prev => {
-      const updatedFields = { ...(prev[index] || {}) };
-      updatedFields[field] = value;
-      return { ...prev, [index]: updatedFields };
-    });
-  };
+  setEditedMap(prev => {
+    const updatedFields = { ...(prev[index] || {}) };
+    updatedFields[field] = value;
+    return { ...prev, [index]: updatedFields };
+  });
+};
+
+
+
 
   const handleAddOption = async () => {
     try {
@@ -221,6 +368,7 @@ function SkuVersionAddEdit({
 
   const openViewCard = () => {
     console.log("View flute card details");
+    
   };
 
   const handleAddVersion = async () => {
@@ -270,6 +418,10 @@ function SkuVersionAddEdit({
     setVersionChoiceOpen(false);
   }
 
+  console.log("all data",allSkuData)
+    console.log("all data 2",skuvaluesFromParent)
+     console.log('llll')
+     console.log("all 888888",allSkuDetails)
   return (
     <>
       {skuvaluesFromParent?.length > 0 && (
@@ -389,57 +541,65 @@ function SkuVersionAddEdit({
       </div>
     </td>
 
-    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
-      <div className="relative w-full">
-        <input
-          type="text"
-          className="p-1 border rounded w-full"
-          value={item.color || ""}
-          onFocus={() => setFocusedField({ index, name: 'color' })}
-          onBlur={() => setFocusedField(null)}
-          onChange={(e) => handleValueChange(index, 'color', e.target.value)}
-        />
-        {
-          focusedField?.index === index && focusedField?.name === 'color' &&
-          skuOptions[`sku_values.${index}.color`] && (
-            <ul className="absolute z-10 mt-1 w-full bg-white border shadow rounded text-sm max-h-36 overflow-y-auto">
-              {skuOptions[`sku_values.${index}.color`].map((option) => (
-                <li
-                  key={option.id}
-                  className="px-2 py-1 hover:bg-gray-200 cursor-pointer"
-                  onMouseDown={() => handleValueChange(index, 'color', option.field_value)}
-                >
-                  {option.field_value}
-                </li>
-              ))}
-            </ul>
-          )
-        }
-      </div>
-    </td>
+   <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
+  <div className="relative w-full">
+    <input
+      type="text"
+      className="p-1 border rounded w-full"
+      value={item.color || ""}
+      onFocus={() => setFocusedField({ index, name: 'color' })}
+      onBlur={() => setFocusedField(null)}
+      onChange={(e) => handleValueChange(index, 'color', e.target.value)}
+    />
 
-    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
-      <div className="relative w-full flex items-center">
+    {focusedField?.index === index && focusedField?.name === 'color' && (
+      <ul className="absolute z-10 mt-1 w-full bg-white border shadow rounded text-sm max-h-36 overflow-y-auto">
+        {colorList.map((color) => (
+          <li
+            key={color.id}
+            className="px-2 py-1 hover:bg-gray-200 cursor-pointer"
+            onMouseDown={() => handleValueChange(index, 'color', color.color_name)}
+          >
+            {color.color_name}
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</td>
+
+
+  <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
+  <div className="relative w-full flex items-center">
+    {item.layer?.toLowerCase().includes("corrugated") ? (
+      <>
         <select
           className="p-1 border rounded w-full pr-8 appearance-none"
-          value={item.flute_type || 'Select'}
+          value={item.flute_type || ''}
           onChange={(e) => handleValueChange(index, 'flute_type', e.target.value)}
         >
-          <option hidden>Select</option>
-          <option value="A">A</option>
-          <option value="B">B</option>
-          <option value="C">C</option>
-          <option value="E">E</option>
-          <option value="F">F</option>
-          <option value="G">G</option>
-          <option value="N">N</option>
+          <option value="" hidden>Select</option>
+          {fluteDropdown.map(flute => (
+            <option key={flute.id} value={flute.name}>
+              {flute.name}
+            </option>
+          ))}
         </select>
         <FaEye
           className="absolute right-2 text-gray-500 cursor-pointer"
-          onClick={openViewCard}
+          onClick={() => {
+            setSelectedFluteIndex(index);
+            setisSingleViewPopup(true);
+          }}
         />
-      </div>
-    </td>
+      </>
+    ) : (
+      <p className="text-gray-400 italic">--</p>
+    )}
+  </div>
+</td>
+
+
 
     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
       <div className="relative w-full">
@@ -475,7 +635,8 @@ function SkuVersionAddEdit({
     </td>
 
     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-      <p>N/A</p>
+    <p>{item.bursting_strength ? item.bursting_strength.toFixed(3) : 'N/A'}</p>
+
     </td>
   </tr>
 ))}
@@ -537,6 +698,20 @@ function SkuVersionAddEdit({
         currentVersionCount={currentVersionCount}
         handleOneTimeUse={handleOneTimeUse}
       />
+
+            <PopUp
+              visible={isSingleViewPopup}
+              setVisible={handleCloseSingleViewPopup}
+              showCloseButton={true}
+              width={'50vw'}
+              header={'Add Flute'}
+            >
+       <FluteTypeView
+          onSelect={(selectedFlute) =>
+            handleFluteSelection(selectedFlute, selectedFluteIndex)
+          }
+        />
+            </PopUp>
     </>
   );
 }

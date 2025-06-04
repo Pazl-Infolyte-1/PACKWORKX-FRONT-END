@@ -29,6 +29,7 @@ const ViewInventory = ({ item }) => {
     'Stock Adjustment',
   ]
 
+  
   const [activeMenu, setActiveMenu] = useState('Products')
   useEffect(() => {
     const fetchSingleItem = async () => {
@@ -137,10 +138,13 @@ const ViewInventory = ({ item }) => {
       <div>
         {activeMenu === 'Products' ? (
           <div className="p-3">
-            <h2 className="text-xl font-bold mb-2   text-gray-800 flex items-center gap-2">
+            <div className='flex justify-between'>
+              <h2 className="text-xl font-bold mb-2   text-gray-800 flex items-center gap-2">
               <Package className="w-6 h-6 text-blue-600" />
               Product Details
             </h2>
+            <p className='text-xl font-bold'>{item?.item?.item_generate_id}</p>
+            </div>
 
             {itemDetails?.products ? (
               <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
@@ -290,7 +294,10 @@ const ViewInventory = ({ item }) => {
                   <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                     <FileText className="w-6 h-6 text-white" />
                   </div>
-                  <h1 className="text-xl font-bold text-gray-900">Purchase Orders</h1>
+                  <div className='flex justify-between w-full'>
+                    <h1 className="text-xl font-bold text-gray-900">Purchase Orders</h1>
+                  <p className='text-xl font-bold'>{item?.item?.item_generate_id}</p>
+                  </div>
                 </div>
                 <p className="text-gray-600 text-sm">
                   Manage and track your purchase orders efficiently
@@ -449,7 +456,10 @@ const ViewInventory = ({ item }) => {
                   <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
                     <Package className="w-6 h-6 text-white" />
                   </div>
-                  <h1 className="text-xl font-bold text-gray-900">Stock Adjustments</h1>
+                  <div className='flex justify-between w-full'>
+                    <h1 className="text-xl font-bold text-gray-900">Stock Adjustment</h1>
+                  <p className='text-xl font-bold'>{item?.item?.item_generate_id}</p>
+                  </div>
                 </div>
                 <p className="text-gray-600 text-sm">Track and manage inventory adjustments efficiently</p>
               </div>

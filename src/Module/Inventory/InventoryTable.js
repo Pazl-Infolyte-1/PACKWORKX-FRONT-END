@@ -20,22 +20,22 @@ const InventoryTable = ({ inventoryData }) => {
   const navigate = useNavigate()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState({ open: false, id: null })
 
-
-
-const toTitleCase = (str) =>
-  str
-    ?.toLowerCase()
-    .split(' ')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-
+  const toTitleCase = (str) =>
+    str
+      ?.toLowerCase()
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
 
   return (
     <>
-      <div className="w-full overflow-x-auto overflow-y-auto max-h-[410px] border rounded-md shadow-sm mt-1 mb-3">
+      <div className="w-full overflow-x-auto overflow-y-auto max-h-[450px] border rounded-md shadow-sm mt-1 mb-3">
         <CTable className="min-w-[1000px] table-fixed border-separate border-spacing-0">
           <CTableHead className="!bg-gray-100">
             <CTableRow>
+              <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
+                Product ID
+              </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                 Product Name
               </CTableHeaderCell>
@@ -81,6 +81,9 @@ const toTitleCase = (str) =>
                   }}
                 >
                   <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
+                    {item?.item?.item_generate_id || '--'}
+                  </CTableDataCell>
+                  <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
                     {item?.item?.item_name || '--'}
                   </CTableDataCell>
                   <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
@@ -125,7 +128,15 @@ const toTitleCase = (str) =>
                         display: 'inline-block',
                       }}
                     >
-                      {item.status || '--'}
+                      {item.total_quantity && item.total_quantity === 0 ? (
+                        <p className='m-0'>Out of Stock</p>
+                      ) : item.total_quantity >= item.item.min_stock_level ? (
+                        <p className='m-0 px-3'>In Stock</p>
+                      ) : item.total_quantity < item.item.min_stock_level ? (
+                        <p className='m-0 px-2'>Low Stock</p>
+                      ) : (
+                        '--'
+                      )}
                     </span>
                   </CTableDataCell>
                   <CTableDataCell className="px-4 py-3">
@@ -137,7 +148,12 @@ const toTitleCase = (str) =>
                             icon: cilPencil,
                             onClick: () => {
                               navigate('/inventoryhandling/inventory_form', {
-                                state: { item, fromInventory: true, isInventoryEditing: true, isEdit: true },
+                                state: {
+                                  item,
+                                  fromInventory: true,
+                                  isInventoryEditing: true,
+                                  isEdit: true,
+                                },
                               })
                             },
                           },

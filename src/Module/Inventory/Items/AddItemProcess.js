@@ -38,6 +38,13 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
     },
   })
 
+   const toTitleCase = (str) =>
+    str
+      ?.toLowerCase()
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+
   const handleAddField = () => {
     const newIndex = tagFields.length + 1
     const newLabel = `label${newIndex}`
@@ -449,7 +456,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
             <option value="">Select Category</option>
             {category.map((cat) => (
               <option key={cat.id} value={cat.id}>
-                {cat.category_name}
+                {toTitleCase(cat.category_name)}
               </option>
             ))}
           </select>
@@ -474,7 +481,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
               <option value="">Select Subcategory</option>
               {subCategory.map((sc) => (
                 <option key={sc.id} value={sc.id}>
-                  {sc.sub_category_name}
+                  {toTitleCase(sc.sub_category_name)}
                 </option>
               ))}
             </select>

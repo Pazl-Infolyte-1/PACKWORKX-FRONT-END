@@ -19,6 +19,15 @@ const [selectedItem, setSelectedItem] = useState(null);
 const navigate = useNavigate()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState({ open: false, id: null })
 
+
+  const totalInventoryValue = inventoryData?.reduce((acc, item) => {
+  const quantity = item.total_quantity || 0;
+  const cost = item.item?.standard_cost || 0;
+  return acc + (quantity * cost);
+}, 0);
+
+console.log("Total Inventory Value:", totalInventoryValue);
+
   return (<>
 <div className="w-full overflow-x-auto overflow-y-auto max-h-[410px] border rounded-md shadow-sm mt-1 mb-3">
       <CTable className="min-w-[1000px] table-fixed border-separate border-spacing-0">
@@ -77,7 +86,7 @@ const navigate = useNavigate()
                         <CTableDataCell className="whitespace-nowrap">{item.item.min_stock_level || '--'}</CTableDataCell>
                                                 <CTableDataCell className="whitespace-nowrap">{item.total_quantity || '--'}</CTableDataCell>
                 <CTableDataCell className="whitespace-nowrap">{item.item.standard_cost || '--'}</CTableDataCell>
-                                <CTableDataCell className="whitespace-nowrap">Total Value</CTableDataCell> 
+                                <CTableDataCell className="whitespace-nowrap">{item.total_quantity*item.item.standard_cost || '--'}</CTableDataCell> 
 <CTableDataCell className="whitespace-nowrap text-center">
   <span
     style={{

@@ -4,7 +4,7 @@ import InventoryTable from './InventoryTable'
 import { BiDollarCircle } from 'react-icons/bi'
 import { FaShieldAlt, FaStar, FaUsers, FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import { CgWorkAlt } from 'react-icons/cg'
-import { MdCategory, MdPushPin } from 'react-icons/md'
+import { MdCategory, MdPushPin, MdRecycling } from 'react-icons/md'
 import { cilArrowTop, cilSave } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import ContentHeader from '../../components/New/ContentHeader'
@@ -18,7 +18,7 @@ const InventoryMain = () => {
   const [category, setCategory] = useState([])
   const [categoryId, setCategoryId] = useState(null)
   const [subCategoryId, setSubCategoryId] = useState(null)
-  const icons = [FaShieldAlt, FaStar, FaUsers, FaChevronDown, FaChevronUp]
+  const icons = [FaShieldAlt, FaStar, FaUsers, MdRecycling, FaChevronUp]
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPage, setTotalPage] = useState(1)
   const [totalRecords, setTotalRecords] = useState(0)
@@ -37,10 +37,6 @@ const InventoryMain = () => {
     'bg-red-100',
     'bg-gray-100',
   ]
-
-  {
-    console.log(subCategoryQuantities)
-  }
 
   const totalInventoryValue = inventoryData?.reduce((acc, item) => {
     const quantity = item.total_quantity || 0
@@ -134,7 +130,7 @@ const InventoryMain = () => {
   return (
     <>
       <ContentHeader
-        addLabel="Add New Product"
+        addLabel="New Product"
         heading="Inventory"
         onAddClick={() =>
           navigate('/inventoryhandling/inventory_form', {
@@ -154,7 +150,7 @@ const InventoryMain = () => {
             <div key={item.id} className="relative">
               <div
                 onClick={() => setCategoryId(item.id)}
-                className={`p-2 rounded-xl shadow-md text-center capitalize flex items-center justify-between w-full cursor-pointer ${
+                className={`p-2 py-3 rounded-md shadow-md text-center capitalize flex items-center justify-between w-full cursor-pointer ${
                   backgroundColors[index % backgroundColors.length]
                 }`}
               >
@@ -192,24 +188,24 @@ const InventoryMain = () => {
 
               {/* Subcategory Dropdown */}
               {isOpen && subCategories.length > 0 && (
-                <div className="absolute top-12 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                <div className="absolute top-16 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
                   {subCategories.map((subCat, subIndex) => {
                     // Get corresponding icon and color for subcategory
                     const getSubCategoryIcon = (name) => {
+                      console.log(name);
+                      
                       const lowerName = name.toLowerCase()
-                      if (lowerName.includes('reel')) return BiDollarCircle
-                      if (lowerName.includes('corrugation')) return FaStar
-                      if (lowerName.includes('pasting')) return CgWorkAlt
-                      if (lowerName.includes('pin')) return MdPushPin
-                      return MdCategory
+                      if (lowerName.includes('dye')) return BiDollarCircle
+                      if (lowerName.includes('stereo')) return FaStar
+                      if (lowerName.includes('other')) return MdCategory
+                      return CgWorkAlt
                     }
 
                     const getSubCategoryColor = (name) => {
                       const lowerName = name.toLowerCase()
-                      if (lowerName.includes('reel')) return '#10b981'
-                      if (lowerName.includes('corrugation')) return '#f59e0b'
-                      if (lowerName.includes('pasting')) return '#ef4444'
-                      if (lowerName.includes('pin')) return '#8b5cf6'
+                      if (lowerName.includes('dye')) return '#10b981'
+                      if (lowerName.includes('stereo')) return '#f59e0b'
+                      if (lowerName.includes('other')) return '#ef4444'
                       return '#6b7280'
                     }
 
@@ -255,7 +251,7 @@ const InventoryMain = () => {
         })}
 
         {/* Total Stock Value Card */}
-        <div className="bg-blue-600 rounded-xl m-0 shadow-md text-center font-bold capitalize w-full text-white">
+        <div className="bg-blue-600 rounded-md m-0 shadow-md text-center font-bold capitalize w-full text-white">
           <p className="m-0">Total Stock Value</p>
           <p className="m-0">₹{totalInventoryValue}</p>
         </div>

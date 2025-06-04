@@ -46,7 +46,7 @@ const InventoryTable = ({ inventoryData }) => {
                 Sub Category
               </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Location
+                Location <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                 Min Stockn Level

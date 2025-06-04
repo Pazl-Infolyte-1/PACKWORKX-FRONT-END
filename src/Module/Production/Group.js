@@ -77,11 +77,15 @@ function LayerDragble({ lg, workOrderId }) {
       <div className='flex justify-between'>
         <div className='flex flex-col items-start  '>
           <div className="font-semibold">{lg.layer_name}</div>
-          <div className="flex gap-2 mt-3 text-sm">
-            <span>Board Size (L x W) : {lg.boardSize.length}-{lg.boardSize.width}</span>
-            <span>{lg.color}</span>
-            <span>{lg.gsm} GSM</span>
-            <span>{lg.bf} BF</span>
+          <div className="flex gap-3 mt-3 text-sm">
+            {/* <span>Board Size (L x W) : {lg.boardSize.length}-{lg.boardSize.width}</span> */}
+            <span>{lg?.color}</span>
+<span>{lg?.gsm} GSM</span>
+<span>{lg?.bf} BF</span>
+<span>{lg?.flute_type}</span>
+<span>{lg?.weight} KG</span>
+<span>{lg?.material} Material</span>
+
           </div>
           
         </div>
@@ -129,7 +133,7 @@ function WorkOrderCard({
       order,
       index,
       isGroup: true,
-      layers: order.layer_group,
+      layers: order.work_order_sku_values,
     },
   }))
 
@@ -161,10 +165,10 @@ function WorkOrderCard({
               <div className="flex items-start gap-3">
                 {/* Progress bar moved to the right side */}
 
-                <h6 className='text-primary'>123/2450</h6>
+                <h6 className='text-primary'>0/{order.qty}</h6>
                 <div className="w-12">
                   <ProgressBar
-                    value={69}
+                    value={0/order.qty}
                   />
                 </div>
 
@@ -209,7 +213,7 @@ function WorkOrderCard({
 
         <CCollapse className="custom-collapse" visible={visibleIndex === index}>
           <hr />
-          {order?.layer_group?.map((lg) => (
+          {order?.work_order_sku_values?.map((lg) => (
             <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
           ))}
           <div
@@ -477,6 +481,7 @@ const Group = ({
   const [visible, setVisible] = useState(false)
   const [selectedType, setSelectedType] = useState('')
   const [splitVisible, setSplitVisible] = useState(false)
+
   const removeWorkOrderFromGroup = (order, groupIndex) => {
     setGroupOrders((prevGroups) =>
       prevGroups.map((group, index) =>
@@ -485,6 +490,7 @@ const Group = ({
           : group,
       ),
     )
+
     setWorkOrders((prevOrders) => {
       const updatedOrders = [...prevOrders,]
       updatedOrders.sort((a, b) => a.id - b.id)
@@ -605,7 +611,7 @@ const Group = ({
         <CRow className="mt-3">
           <CCol xs={12}>
             {workOrders
-              ?.filter((order) => order.layer_group && order.layer_group.length > 0)
+              ?.filter((order) => order.work_order_sku_values && order.work_order_sku_values.length > 0)
               ?.map((order) => (
                 <WorkOrderCard
                   key={order.id}

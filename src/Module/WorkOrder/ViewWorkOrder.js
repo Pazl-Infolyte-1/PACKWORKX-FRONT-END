@@ -13,10 +13,14 @@ import {
   Package,
   Printer,
   Tag,
-  Truck
+  Truck,
+  ChevronDown,
+  X
 } from 'lucide-react';
 import InvoiceCreationModal from "../SalesOrder/InvoiceCreationModal";
 import InvoiceModal from "./InvoiceModal";
+import CustomAlert from "../../components/New/CustomAlert";
+import ProgressCompletedModal from "./ProgressCompletedModale";
 
 // Format dates
 const formatDate = (dateString) => {
@@ -141,7 +145,19 @@ const ViewWorkOrder = () => {
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [invoiceHistory,setinVoiceHistory] = useState([])
   const [isInvoiceOpen,setInvoiceOpen] = useState(false)
+  const [progressOptions, setProgressOptions] = useState([]);
+  const [isProgressDropdownOpen, setIsProgressDropdownOpen] = useState(false);
+  const [alerts,setAlerts] = useState([])
+  const [completedWorkOrderData, setCompletedWorkOrderData] = useState(null) // or useState({})
+  const [isOpenProgressModale, setIsOpenProgressModale] = useState(false)
+  const [isRawMaterialModalOpen, setIsRawMaterialModalOpen] = useState(false);
+  const [isProductionPlannedModalOpen, setIsProductionPlannedModalOpen] = useState(false);
 
+
+
+  const handleClose = ()=>{
+    setAlerts([])
+  }
 
   const handleCreateInvoice = async (invoiceData) => {
     try {
@@ -178,7 +194,6 @@ const ViewWorkOrder = () => {
     const stages = [
       { name: "Pending" },
       { name: "Raw Meterial Allocation" },
-      { name: "Procurement Sourcing" },
       { name: "Production Planned" },
       { name: "Completed" },
       { name: "Invoiced" }
@@ -190,20 +205,20 @@ const ViewWorkOrder = () => {
       case "Pending":
         currentIndex = 0;
         break;
-      case "Raw Meterial Allocation":
+      case "Raw Material Allocation":
         currentIndex = 1;
         break;
-      case "Procurement Sourcing":
+      // case "Procurement Sourcing":
+      //   currentIndex = 2;
+      //   break;
+      case "Production Planned":
         currentIndex = 2;
         break;
-      case "Production Planned":
+      case "Completed":
         currentIndex = 3;
         break;
-      case "Completed":
-        currentIndex = 4;
-        break;
       case "Invoiced":
-        currentIndex = 5;
+        currentIndex = 4;
         break;
       default:
         currentIndex = -1;
@@ -263,6 +278,69 @@ const ViewWorkOrder = () => {
   // Get progress info with icon
   const progressInfo = getProgressInfo(workOrder?.progress);
 
+  // Add useEffect to fetch progress options
+  useEffect(() => {
+    const fetchProgressOptions = async () => {
+      try {
+        const response = await apiMethods.getWorkOrderProgressDropDownOptions();
+        const data = response?.data?.data || [];
+        const options = data.map((item) => item.work_order_status);
+        setProgressOptions(options);
+      } catch (error) {
+        console.error('Error fetching progress options:', error);
+      }
+    };
+
+    fetchProgressOptions();
+  }, []);
+
+  // Add handler for progress update
+  const handleProgressUpdate = (newProgress) => {
+    alert(`Clicked option: ${newProgress}`);
+    setIsProgressDropdownOpen(false);
+  };
+
+
+  
+  const handleProgressChange = async (newProgress) => {
+    const newValue = newProgress
+
+    if (newValue == 'Completed') {
+
+      const newEntry = { id, qty: workOrder.qty, progress: newProgress }
+      setCompletedWorkOrderData(newEntry)
+
+      setIsOpenProgressModale(true)
+    } else {
+      const body = { progress: newProgress }
+
+      try {
+        const response = await apiMethods.workOrderStatusUpdate(id, body)
+
+        // Update UI if cellData is a state
+        setAlerts([
+          {
+            severity: 'success',
+            message: response?.data?.message || 'Successfull updated Progress',
+          },
+        ])
+    setIsProgressDropdownOpen(false);
+
+    setWorkOrder((prev) => ({
+      ...prev,
+      progress: newProgress
+    }))
+
+      } catch (error) {
+        console.error('Error updating progress:', error)
+        setAlerts([
+          { severity: 'error', message: response?.data?.message || 'failed to update Progress' },
+        ])
+      } finally {
+        // setloading(false)
+      }
+    }
+  }
 
   // Error state
   if (error) {
@@ -526,7 +604,6 @@ const ViewWorkOrder = () => {
                   </div>
                 </div>
               </div>
-
           </div>
 
           {/* Right Column - Related Info */}
@@ -569,18 +646,23 @@ const ViewWorkOrder = () => {
                 <h3 className="text-sm font-medium text-gray-700">Related Information</h3>
               </div>
               <div className="p-4">
-                <div className="space-y-3">
+              <div className="space-y-3">
                   <div>
                     <p className="text-xs text-gray-500">Sales Order</p>
                     <p
                      onClick={()=>navigate(`/salesorder/view/${workOrder.sales_order_id}`)}
-                     className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">#{workOrder.sales_order_id ? `SO-${workOrder.sales_order_id.toString().padStart(5, '0')}` : 'N/A'}</p>
+                     className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">#{workOrder?.salesOrder?.sales_generate_id ?workOrder?.salesOrder?.sales_generate_id  : 'N/A'}</p>
                   </div>
+                  <div>
+                    <p className="text-xs text-gray-500">SO-REFERENCE</p>
+                    <p
+onClick={()=>navigate(`/salesorder/view/${workOrder.sales_order_id}`)}
+className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">{workOrder?.salesOrder?.sales_ui_id ?workOrder?.salesOrder?.sales_ui_id  : 'N/A'}</p>                  </div>
                   <div>
                     <p className="text-xs text-gray-500">Client</p>
                     <p
                      onClick={()=>navigate(`/clients/${workOrder.client_id}`)}
-                     className=" text-blue-600 hover:text-blue-800 cursor-pointer text-sm font-medium">Client #{workOrder.client_id || 'N/A'}</p>
+                     className=" text-blue-600 hover:text-blue-800 cursor-pointer text-sm font-medium">{workOrder?.salesOrder?.client || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Last Updated</p>
@@ -590,16 +672,41 @@ const ViewWorkOrder = () => {
               </div>
             </div>
 
+            {/* What's Next Section */}
+
             {/* Actions */}
-            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div className="mt-4 overflow-visible bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="p-3 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">Actions</h3>
               </div>
               <div className="p-4">
                 <div className="space-y-2">
-                  {/* <button className="w-full px-3 py-1.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700">
-                    Update Progress
-                  </button> */}
+                  <div className="relative">
+                    <button 
+                      className="w-full px-3 py-1.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700 flex items-center justify-between"
+                      onClick={() => setIsProgressDropdownOpen(!isProgressDropdownOpen)}
+                    >
+                      Update Progress
+                      <ChevronDown size={14} className="ml-1" />
+                    </button>
+                    
+                    {isProgressDropdownOpen && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {progressOptions.map((option) => (
+                          <button
+                            key={option}
+                            className={`w-full px-3 py-1.5 text-xs text-left hover:bg-gray-50 ${
+                              workOrder.progress === option ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                            }`}
+                            onClick={() => handleProgressChange(option)}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
                   <button className="w-full px-3 py-1.5 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
                     View Production Reports
                   </button>
@@ -608,24 +715,212 @@ const ViewWorkOrder = () => {
                   </button>
                 </div>
               </div>
-
-              {/* Invoice Creation Modal */}
-              <InvoiceCreationModal
-                isOpen={isInvoiceModalOpen}
-                onClose={() => setIsInvoiceModalOpen(false)}
-                workOrder={workOrder}
-                onSubmit={handleCreateInvoice}
-              />
-              <InvoiceModal
-              isOpen={isInvoiceOpen}
-              invoices={invoiceHistory}
-              setIsOpen={setInvoiceOpen}
-              />
-
             </div>
 
-            {/* What's Next Section */}
+            {/* Production Planned Section */}
+            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+              <div className="p-3 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Production Planned</h3>
+              </div>
+              <div className="p-4">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-600">Production Schedule</span>
+                    </div>
+                    <button
+                      onClick={() => setIsProductionPlannedModalOpen(true)}
+                      className=" p-0.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
+                    >
+                      Plan Production
+                    </button>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    No production schedule set
+                  </div>
+                </div>
+              </div>
+            </div>
 
+            {/* Raw Material Allocation Section */}
+            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+              <div className="p-3 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Raw Material Allocation</h3>
+              </div>
+              <div className="p-4">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Package size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-600">Allocated Materials</span>
+                    </div>
+                    <button
+                      onClick={() => setIsRawMaterialModalOpen(true)}
+                      className="p-0.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
+                    >
+                      Allocate Materials
+                    </button>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    No materials allocated yet
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Invoice Creation Modal */}
+            <InvoiceCreationModal
+              isOpen={isInvoiceModalOpen}
+              onClose={() => setIsInvoiceModalOpen(false)}
+              workOrder={workOrder}
+              onSubmit={handleCreateInvoice}
+            />
+            <InvoiceModal
+            isOpen={isInvoiceOpen}
+            invoices={invoiceHistory}
+            setIsOpen={setInvoiceOpen}
+            />
+                    <CustomAlert
+        alerts={alerts}
+        handleClose={handleClose}
+      />
+
+<ProgressCompletedModal
+        qty={completedWorkOrderData?.qty}
+        id={completedWorkOrderData?.id}
+        progress={completedWorkOrderData?.progress}
+        isOpen={isOpenProgressModale}
+        onClose={() => {setIsOpenProgressModale(false)
+          setIsProgressDropdownOpen(false)
+        }
+        }
+        setAlerts={setAlerts}
+        // setCellData={setWorkOrder}
+        setWorkOrder={setWorkOrder}
+    setIsProgressDropdownOpen={setIsProgressDropdownOpen}
+
+        
+      />
+
+          </div>
+        </div>
+      </div>
+
+      {/* Raw Material Allocation Modal */}
+      <div className={`fixed inset-0 z-50 flex items-start justify-center pt-4 px-4 ${isRawMaterialModalOpen ? '' : 'hidden'}`}>
+        <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setIsRawMaterialModalOpen(false)}></div>
+        <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h3 className="text-lg font-medium">Allocate Raw Materials</h3>
+            <button onClick={() => setIsRawMaterialModalOpen(false)} className="text-gray-400 hover:text-gray-500">
+              <X size={20} />
+            </button>
+          </div>
+          <div className="p-4">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Material Type</label>
+                <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                  <option>Select Material</option>
+                  <option>Paper</option>
+                  <option>Ink</option>
+                  <option>Adhesive</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Quantity</label>
+                <input
+                  type="number"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Enter quantity"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Notes</label>
+                <textarea
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  rows="3"
+                  placeholder="Add any additional notes"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 p-4 border-t">
+            <button
+              onClick={() => setIsRawMaterialModalOpen(false)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => setIsRawMaterialModalOpen(false)}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            >
+              Allocate
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Production Planned Modal */}
+      <div className={`fixed inset-0 z-50 flex items-start justify-center pt-4 px-4 ${isProductionPlannedModalOpen ? '' : 'hidden'}`}>
+        <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setIsProductionPlannedModalOpen(false)}></div>
+        <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h3 className="text-lg font-medium">Plan Production</h3>
+            <button onClick={() => setIsProductionPlannedModalOpen(false)} className="text-gray-400 hover:text-gray-500">
+              <X size={20} />
+            </button>
+          </div>
+          <div className="p-4">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                <input
+                  type="date"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">End Date</label>
+                <input
+                  type="date"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Production Line</label>
+                <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                  <option>Select Production Line</option>
+                  <option>Line 1</option>
+                  <option>Line 2</option>
+                  <option>Line 3</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Notes</label>
+                <textarea
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  rows="3"
+                  placeholder="Add any additional notes"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 p-4 border-t">
+            <button
+              onClick={() => setIsProductionPlannedModalOpen(false)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => setIsProductionPlannedModalOpen(false)}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            >
+              Plan
+            </button>
           </div>
         </div>
       </div>

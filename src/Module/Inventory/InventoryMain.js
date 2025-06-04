@@ -10,6 +10,7 @@ import CIcon from '@coreui/icons-react';
 import ContentHeader from "../../components/New/ContentHeader"
 import { useNavigate } from "react-router-dom"
 import CompactPagination from "../../components/New/CompactPagination"
+import { useSearch } from "../../components/New/SearchContext"
 
 
 
@@ -26,6 +27,7 @@ const [totalRecords, setTotalRecords] = useState(0);
 const [entriesPerPage, setEntriesPerPage] = useState(50); // default to 50
 const [openCategoryId, setOpenCategoryId] = useState(null);
 const [subCategories, setSubCategories] = useState([]);
+   const { setGlobalPlaceholder, searchQuery  } = useSearch()
 
 
 
@@ -48,23 +50,33 @@ const [subCategories, setSubCategories] = useState([]);
   ];
 
 useEffect(() => {
+  setGlobalPlaceholder('Search Inventory');
+
   const fetchInventory = async () => {
     try {
-      const response = await apiMethods.getinventoryWithParams(categoryId, currentPage, entriesPerPage);
+      const response = await apiMethods.getinventoryWithParams(
+        categoryId,
+        currentPage,
+        entriesPerPage,
+        searchQuery // pass search
+      );
+
       if (response?.data?.success) {
         setInventoryData(response.data.data);
         const pagination = response.data.pagination;
         setCurrentPage(pagination.currentPage);
         setTotalPage(pagination.totalPages);
         setTotalRecords(pagination.totalCount);
-        setEntriesPerPage(pagination.perPage); // optional: keeps in sync
+        setEntriesPerPage(pagination.perPage);
       }
     } catch (error) {
       console.error('Failed to fetch inventory:', error);
     }
   };
+
   fetchInventory();
-}, [categoryId, currentPage, entriesPerPage]);
+}, [categoryId, currentPage, entriesPerPage, searchQuery]);
+
 
 const handlePageChange = (_, newPage) => {
   setCurrentPage(newPage);
@@ -188,6 +200,7 @@ const handleSubCategoryClick = async (e, categoryId) => {
 	return (
 	<>
 	  <ContentHeader
+        addLabel="Add New Product"
         heading="Inventory"
          onAddClick={() =>  navigate('/inventoryhandling/inventory_form', {
     state: { fromInventory: true }

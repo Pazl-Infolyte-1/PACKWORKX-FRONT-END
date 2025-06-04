@@ -1335,13 +1335,16 @@ export const apiMethods = {
       console.error(error)
     }
   },
-getinventoryWithParams: async (catId, page, limit = 50) => {
+getinventoryWithParams: async (catId, page, limit = 50, search = '') => {
   try {
-    const params = { limit, page };
+    // Build query string manually to control order
+    let query = `/inventory?search=${encodeURIComponent(search || '')}`;
+    query += `&page=${page}&limit=${limit}`;
     if (catId) {
-      params.categoryId = catId;
+      query += `&categoryId=${catId}`;
     }
-    return await apiClient.get('/inventory', { params });
+
+    return await apiClient.get(query); // use constructed query string
   } catch (error) {
     console.error(error);
   }
@@ -1557,6 +1560,15 @@ getinventoryWithParams: async (catId, page, limit = 50) => {
   singleInventoryView: async (id) => {
     try {
       const response = await apiClient.get(`/inventory/status/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+       throw error;
+    }
+  },
+   singleItem: async (id) => {
+    try {
+      const response = await apiClient.get(`/items/${id}`)
       return response.data
     } catch (error) {
       console.error(error)

@@ -25,6 +25,7 @@ const InventoryMain = () => {
   const [entriesPerPage, setEntriesPerPage] = useState(50)
   const [openCategoryId, setOpenCategoryId] = useState(null)
   const [subCategories, setSubCategories] = useState([])
+  const [subCategoryQuantities, setSubCategoryQuantities] = useState([])
   const { setGlobalPlaceholder, searchQuery } = useSearch()
 
   const navigate = useNavigate()
@@ -36,6 +37,10 @@ const InventoryMain = () => {
     'bg-red-100',
     'bg-gray-100',
   ]
+
+  {
+    console.log(subCategoryQuantities)
+  }
 
   const totalInventoryValue = inventoryData?.reduce((acc, item) => {
     const quantity = item.total_quantity || 0
@@ -59,7 +64,8 @@ const InventoryMain = () => {
         )
 
         if (response?.data?.success) {
-          setInventoryData(response.data.data)
+          setInventoryData(response.data.data.inventoryData)
+          setSubCategoryQuantities(response.data.data.subCategoryQuantities)
           const pagination = response.data.pagination
           setCurrentPage(pagination.currentPage)
           setTotalPage(pagination.totalPages)
@@ -210,6 +216,14 @@ const InventoryMain = () => {
                     const SubIcon = getSubCategoryIcon(subCat.sub_category_name)
                     const iconColor = getSubCategoryColor(subCat.sub_category_name)
 
+                    const getQuantityForSubCategory = (subCategoryId) => {
+                      const found = subCategoryQuantities.find(
+                        (item) => item.sub_category === subCategoryId,
+                      )
+                      return found?.total_quantity ? parseInt(found.total_quantity) : '0'
+
+                    }
+
                     return (
                       <div
                         key={subCat.id}
@@ -227,15 +241,9 @@ const InventoryMain = () => {
                             {subCat.sub_category_name.replace(/-/g, ' ')}
                           </span>
                         </div>
+
                         <span className="text-gray-500 text-xs bg-gray-100 px-2 py-1 rounded">
-                          {(() => {
-                            const name = subCat.sub_category_name.toLowerCase()
-                            if (name.includes('reel')) return '23'
-                            if (name.includes('corrugation')) return '0'
-                            if (name.includes('pasting')) return '0'
-                            if (name.includes('pin')) return '0'
-                            return '0'
-                          })()}
+                          {getQuantityForSubCategory(subCat.id)}
                         </span>
                       </div>
                     )
@@ -247,9 +255,9 @@ const InventoryMain = () => {
         })}
 
         {/* Total Stock Value Card */}
-        <div className="bg-blue-600 p-1 rounded-xl m-0 shadow-md text-center font-bold capitalize w-full text-white">
-          <span className="m-0">Total Stock Value</span>
-          <span>₹{totalInventoryValue}</span>
+        <div className="bg-blue-600 rounded-xl m-0 shadow-md text-center font-bold capitalize w-full text-white">
+          <p className="m-0">Total Stock Value</p>
+          <p className="m-0">₹{totalInventoryValue}</p>
         </div>
       </div>
 

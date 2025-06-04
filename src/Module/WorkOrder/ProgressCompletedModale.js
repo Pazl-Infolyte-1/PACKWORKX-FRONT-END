@@ -3,7 +3,7 @@ import { X, Package } from 'lucide-react';
 import apiMethods from '../../api/config'
 
 
-export default function ProgressCompletedModal({ qty, isOpen, onClose, id, progress, setCellData, setAlerts }) {
+export default function ProgressCompletedModal({ qty, isOpen, onClose, id, progress, setCellData, setAlerts,setWorkOrder }) {
   const initialFormState = {
     excess_qty: null,
     pending_qty: null,
@@ -39,9 +39,17 @@ export default function ProgressCompletedModal({ qty, isOpen, onClose, id, progr
       const response = await apiMethods.workOrderStatusUpdate(id, body);
       
       // Update UI if cellData is a state
-      setCellData(prev =>
-        prev.map(r => r.id === id ? { ...r, progress: progress } : r)
-      );
+      if(setCellData){
+        setCellData(prev =>
+          prev?.map(r => r.id === id ? { ...r, progress: progress } : r)
+        );
+      }else if (setWorkOrder){
+        setWorkOrder((prev) => ({
+          ...prev,
+          progress: progress
+        }))
+      }
+
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfully updated Progress" }]);
 
       resetForm();

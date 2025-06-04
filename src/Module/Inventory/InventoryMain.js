@@ -38,10 +38,6 @@ const InventoryMain = () => {
     'bg-gray-100',
   ]
 
-  {
-    console.log(subCategoryQuantities)
-  }
-
   const totalInventoryValue = inventoryData?.reduce((acc, item) => {
     const quantity = item.total_quantity || 0
     const cost = item.item?.standard_cost || 0
@@ -134,7 +130,7 @@ const InventoryMain = () => {
   return (
     <>
       <ContentHeader
-        addLabel="Add New Product"
+        addLabel="New Product"
         heading="Inventory"
         onAddClick={() =>
           navigate('/inventoryhandling/inventory_form', {

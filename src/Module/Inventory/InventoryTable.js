@@ -22,7 +22,7 @@ const InventoryTable = ({ inventoryData }) => {
 
 
 
-  const toTitleCase = (str) =>
+const toTitleCase = (str) =>
   str
     ?.toLowerCase()
     .split(' ')
@@ -81,16 +81,16 @@ const InventoryTable = ({ inventoryData }) => {
                   }}
                 >
                   <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
-                    {capitalize(item?.item?.item_name) || '--'}
+                    {item?.item?.item_name || '--'}
+                  </CTableDataCell>
+                  <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
+                    {toTitleCase(item.item?.category_info?.category_name) || '--'}
+                  </CTableDataCell>
+                  <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
+                    {toTitleCase(item.item?.sub_category_info?.sub_category_name) || '--'}
                   </CTableDataCell>
                   <CTableDataCell className="whitespace-nowrap">
-                    {item.item?.category_info?.category_name || '--'}
-                  </CTableDataCell>
-                  <CTableDataCell className="whitespace-nowrap">
-                    {item.item?.sub_category_info?.sub_category_name || '--'}
-                  </CTableDataCell>
-                  <CTableDataCell className="whitespace-nowrap">
-                    {item.location || '--'}
+                    {toTitleCase(item.location) || '--'}
                   </CTableDataCell>
                   <CTableDataCell className="whitespace-nowrap">
                     {item.item.min_stock_level || '--'}
@@ -137,19 +137,19 @@ const InventoryTable = ({ inventoryData }) => {
                             icon: cilPencil,
                             onClick: () => {
                               navigate('/inventoryhandling/inventory_form', {
-                                state: { item, fromInventory: true, isInventoryEditing: true },
+                                state: { item, fromInventory: true, isInventoryEditing: true, isEdit: true },
                               })
                             },
                           },
-                          {
-                            label: 'Delete',
-                            icon: cilTrash,
-                            onClick: () =>
-                              setIsDeleteModalOpen({
-                                open: true,
-                                id: item.item_id,
-                              }),
-                          },
+                          // {
+                          //   label: 'Delete',
+                          //   icon: cilTrash,
+                          //   onClick: () =>
+                          //     setIsDeleteModalOpen({
+                          //       open: true,
+                          //       id: item.item_id,
+                          //     }),
+                          // },
                         ]}
                       />
                     </div>

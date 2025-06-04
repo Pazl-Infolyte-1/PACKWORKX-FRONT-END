@@ -191,7 +191,7 @@ const Index = () => {
     async function getWorkOrders() {
       try {
         const response = await apiMethods.getWorkOrders()
-        // setWorkOrders(response?.data?.workOrders)
+        setWorkOrders(response?.data?.workOrders)
       } catch (error) {
         console.error('Error fetching work orders:', error)
       }
@@ -249,7 +249,7 @@ const Index = () => {
         </div>
       </div>
 
-      <CCol xs={12}>
+      <CCol xs={12} className=''>
         <CNav variant="tabs">
           {tabs.map((tab) => (
             <CNavItem key={tab}>

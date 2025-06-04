@@ -187,7 +187,7 @@ const routes = [
       },
     ],
   },
-          { path: '/inventoryhandling/inventory_form', name: 'stockadjustment', element: InventoryForm, key: '' },
+          { path: '/inventoryhandling/inventory_form', name: 'Inventory', element: InventoryForm, key: 2232 },
 
 ]
 

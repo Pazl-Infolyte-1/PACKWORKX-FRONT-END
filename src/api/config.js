@@ -1335,13 +1335,16 @@ export const apiMethods = {
       console.error(error)
     }
   },
-getinventoryWithParams: async (catId, page, limit = 50, search = '') => {
+getinventoryWithParams: async (catId, page, limit = 50, search = '', subCatId) => {
   try {
     // Build query string manually to control order
     let query = `/inventory?search=${encodeURIComponent(search || '')}`;
     query += `&page=${page}&limit=${limit}`;
     if (catId) {
       query += `&categoryId=${catId}`;
+    }
+    if(subCatId){
+      query += `&subCategoryId=${subCatId}`;
     }
 
     return await apiClient.get(query); // use constructed query string

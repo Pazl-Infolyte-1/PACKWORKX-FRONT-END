@@ -18,6 +18,8 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
 const location = useLocation()
 const navigate=useNavigate()
 const fromInventory = location.state?.fromInventory
+const isEditing=location.state?.isInventoryEditing
+const itemVal=location.state?.item
   const {
     register,
     handleSubmit,
@@ -294,6 +296,59 @@ useEffect(() => {
   }
 }, [selectedSubCategory]);
 
+console.log("editing inventory",isEditing)
+console.log("item data",itemVal)
+useEffect(() => {
+  const fetchItem = async () => {
+    try {
+      const res = await apiMethods.singleItem(itemVal.item_id);
+      const data = res?.data;
+
+      console.log('Single item response:', data);
+
+      if (data) {
+        // Reset the form with response values
+        reset({
+          item_code: data.item_code,
+          item_name: data.item_name,
+          hsn_code: data.hsn_code,
+          uom: data.uom,
+          cgst: parseFloat(data.cgst),
+          sgst: parseFloat(data.sgst),
+          manufacturer: data.manufacturer,
+          min_stock_level: parseFloat(data.min_stock_level),
+          reorder_level: parseFloat(data.reorder_level),
+          standard_cost: parseFloat(data.standard_cost),
+          specifications: data.specifications,
+          description: data.description,
+          category: data.category ?? '',
+          sub_category: data.sub_category ?? '',
+        });
+
+        // Set state for dropdowns
+        setSelectedItemType(data.category ?? '');
+        setSelectedSubCategory(data.sub_category ?? '');
+
+        if (data.category) {
+          setCategoryId(data.category);
+
+          // Filter subcategories belonging to selected category
+          const filtered = allSubCategories.filter(
+            (sc) => sc.category_id === Number(data.category)
+          );
+          setSubCategory(filtered);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching single item:', error);
+    }
+  };
+
+  if (isEditing && itemVal?.item_id) {
+    fetchItem();
+  }
+}, [itemVal?.item_id, isEditing]);
+
 
   return (
     <div className="p-6 bg-white rounded">
@@ -361,13 +416,19 @@ useEffect(() => {
           <select
             className="w-full border border-gray-300 rounded px-3 py-2"
             value={selectedItemType}
-            onChange={(e) => {
-              setSelectedItemType(e.target.value)
-              setValue('category', e.target.value)
-                 const selectedCategoryId = e.target.value;
-      console.log('Selected Category ID:', selectedCategoryId);
-setCategoryId(selectedCategoryId)
-            }}
+      onChange={(e) => {
+  const selectedCategoryId = e.target.value;
+  setSelectedItemType(selectedCategoryId);
+  setValue('category', Number(selectedCategoryId));
+  setCategoryId(selectedCategoryId);
+
+  // Filter subcategories that belong to selected category
+  const filteredSubCategories = allSubCategories.filter(
+    (sc) => sc.category_id === Number(selectedCategoryId)
+  );
+  setSubCategory(filteredSubCategories);
+  setSelectedSubCategory(''); // reset selected subcategory
+}}
           >
             {category.map((Category) => (
               <option key={Category.id} value={Category.id}>
@@ -377,25 +438,29 @@ setCategoryId(selectedCategoryId)
           </select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">SubCategory</label>
-          <select
-            className="w-full border border-gray-300 rounded px-3 py-2"
-            value={selectedSubCategory}
-            onChange={(e) => {
-              const selectedName = e.target.value
-              const selectedItem = subCategory.find((sc) => sc.sub_category_name === selectedName)
-              setSelectedSubCategory(selectedName)
-              setValue('sub_category', selectedItem?.id || '')
-            }}
-          >
-            {subCategory?.map((Sc) => (
-              <option key={Sc?.id} value={Sc?.sub_category_name}>
-                {Sc?.sub_category_name}
-              </option>
-            ))}
-          </select>
-        </div>
+       {selectedItemType && subCategory.length > 0 && (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">SubCategory</label>
+    <select
+      className="w-full border border-gray-300 rounded px-3 py-2"
+      value={selectedSubCategory}
+      onChange={(e) => {
+        const selectedName = e.target.value;
+        const selectedItem = subCategory.find((sc) => sc.sub_category_name === selectedName);
+        setSelectedSubCategory(selectedName);
+        setValue('sub_category', selectedItem?.id || '');
+      }}
+    >
+      <option value="">Select Subcategory</option>
+      {subCategory.map((Sc) => (
+        <option key={Sc.id} value={Sc.sub_category_name}>
+          {Sc.sub_category_name}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
+
 
         {/* Add button for custom tags spanning full width when needed */}
     {['reels', 'corrugation-glue', 'pasting-glue', 'pins'].includes(selectedSubCategory) && subCategory.length > 0 && (

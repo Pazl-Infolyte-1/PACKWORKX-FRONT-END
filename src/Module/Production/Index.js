@@ -44,6 +44,7 @@ import SplitWorkOrder from './SplitWorkOrder'
 import ActionButton from '../../components/New/ActionButton'
 import Outsource_Preview from './Outsource_Preview'
 import apiMethods from '../../api/config'
+import WorkOrderLIsting from './WorkOrderLIsting'
 
 
 const Index = () => {
@@ -211,8 +212,8 @@ const Index = () => {
   }, [])
 
   const [groupOrders, setGroupOrders] = useState([])
-  const [activeTab, setActiveTab] = useState('Group Layers')
-  const tabs = ['Group Layers', 'Allocate SFG', 'Allocate RM', 'Returnables', 'Outsource & Preview']
+  const [activeTab, setActiveTab] = useState('Work Orders')
+  const tabs = ['Work Orders','Group Layers', 'Allocate SFG', 'Allocate RM', 'Returnables', 'Outsource & Preview']
 
   const handleNextStep = () => {
     const currentIndex = tabs.indexOf(activeTab)
@@ -273,6 +274,21 @@ const Index = () => {
       </CCol>
 
       <CRow>
+      {activeTab === 'Work Orders' && (
+          // <Group
+          //   workOrders={workOrders}
+          //   groupOrders={groupOrders}
+          //   setGroupOrders={setGroupOrders}
+          //   setWorkOrders={setWorkOrders}
+          //   autoSyncOrders={autoSyncOrders}
+          //   setVisibleSplit={setVisibleSplit}
+          // />
+          <WorkOrderLIsting
+          workOrders={workOrders}
+          />
+          
+        )}
+
         {activeTab === 'Group Layers' && (
           <Group
             workOrders={workOrders}

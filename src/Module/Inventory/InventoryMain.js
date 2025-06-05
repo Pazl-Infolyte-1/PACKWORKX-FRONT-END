@@ -97,15 +97,12 @@ const InventoryMain = () => {
     // In the fetchInventory function, modify the API call parameters:
     const fetchInventory = async () => {
       try {
-        // Only pass subCategoryId if it exists AND the category has subcategories
-        const shouldApplySubCategoryFilter = subCategoryId && (categoryId === 1 || categoryId === 4) // Only apply to categories that have subcategories
-
         const response = await apiMethods.getinventoryWithParams(
           categoryId,
           currentPage,
           entriesPerPage,
           searchQuery,
-          shouldApplySubCategoryFilter ? subCategoryId : null, // Conditionally pass subCategoryId
+          subCategoryId , 
         )
 
         if (response?.data?.success) {
@@ -187,6 +184,8 @@ const InventoryMain = () => {
   }
 
   const handleSubCategorySelect = (subCategoryId) => {
+    console.log(subCategoryId);
+    
     setSubCategoryId(subCategoryId)
     setOpenCategoryId(null)
   }
@@ -212,13 +211,12 @@ const InventoryMain = () => {
   }
 
 const handleInventoryExelExport = async () => {
-  const shouldApplySubCategoryFilter = subCategoryId && (categoryId === 1 || categoryId === 4);
   const params = {
     categoryId,
     currentPage,
     entriesPerPage,
     searchQuery,
-    subCategoryId: shouldApplySubCategoryFilter ? subCategoryId : null,
+    subCategoryId,
   };
   await apiMethods.getInventoryExcelExport(params);
 }

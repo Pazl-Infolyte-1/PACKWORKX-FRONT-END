@@ -1,56 +1,61 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { TrashIcon } from '@heroicons/react/solid';
-import ActionButton from '../../components/New/ActionButton';
-import apiMethods from '../../api/config';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { TrashIcon } from '@heroicons/react/solid'
+import ActionButton from '../../components/New/ActionButton'
+import apiMethods from '../../api/config'
 // import { set } from 'core-js/core/dict';
 
-
 const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [itemList, setItemList] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-const [modalContent, setModalContent] = useState(null);
-
-const Modal = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded p-6 max-w-md w-full">
-        <button onClick={onClose} className="float-right">&times;</button>
-        <div>{children}</div>
+  const [isLoading, setIsLoading] = useState(true)
+  const [itemList, setItemList] = useState([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalContent, setModalContent] = useState(null)
+  const debounceTimeouts = useRef({})
+  const Modal = ({ isOpen, onClose, children }) => {
+    if (!isOpen) return null
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded p-6 max-w-md w-full">
+          <button onClick={onClose} className="float-right">
+            &times;
+          </button>
+          <div>{children}</div>
+        </div>
       </div>
-    </div>
-  );
-};
-
-const openItemDetails = async (item_id) => {
-  try {
-    const response = await apiMethods.getItemList();
-    const items = response?.data?.data || [];
-    console.log(items, 'item');
-    const item = items.find(i => i.id === parseInt(item_id));
-    const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {};
-
-    setModalContent(
-      <>
-        <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
-        {Object.entries(customFields).length > 0 ? (
-          Object.entries(customFields).map(([key, value], idx) => (
-            <p key={idx}>
-              <strong>{key}:</strong> {value}
-            </p>
-          ))
-        ) : (
-          <p>No custom fields available.</p>
-        )}
-      </>
-    );
-    setIsModalOpen(true);
-  } catch (error) {
-    console.error('Error fetching item details:', error);
+    )
   }
-};
+
+  {
+    console.log('item form')
+  }
+
+  const openItemDetails = async (item_id) => {
+    try {
+      const response = await apiMethods.getItemList()
+      const items = response?.data?.data || []
+      console.log(items, 'item')
+      const item = items.find((i) => i.id === parseInt(item_id))
+      const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}
+
+      setModalContent(
+        <>
+          <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
+          {Object.entries(customFields).length > 0 ? (
+            Object.entries(customFields).map(([key, value], idx) => (
+              <p key={idx}>
+                <strong>{key}:</strong> {value}
+              </p>
+            ))
+          ) : (
+            <p>No custom fields available.</p>
+          )}
+        </>,
+      )
+      setIsModalOpen(true)
+    } catch (error) {
+      console.error('Error fetching item details:', error)
+    }
+  }
 
   // Form with both items and PO totals
   const { control, register, setValue, getValues, reset, watch } = useForm({
@@ -62,75 +67,78 @@ const openItemDetails = async (item_id) => {
       sgst_amount: 0,
       amount: 0,
       tax_amount: 0,
-      total_amount: 0
-    }
-  });
+      total_amount: 0,
+    },
+  })
 
   // Watch for changes to update parent component
-  const formData = watch();
+  const formData = watch()
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'items'
-  });
+    name: 'items',
+  })
 
   useEffect(() => {
     if (fields.length === 0) {
-      append({ item_id: "", quantity: 1 });
-    } 
-  }, [append, fields.length]);
+      append({ item_id: '', quantity: 1 })
+    }
+  }, [append, fields.length])
 
   // Calculate totals from items without setting values
   // This prevents the infinite update loop
   const totals = useMemo(() => {
     try {
-      return (getValues('items') || []).reduce((acc, item) => {
-        const qty = parseFloat(item.quantity) || 0;
-        const amt = parseFloat(item.amount) || 0;
-        const sgst = parseFloat(item.sgst) || 0;
-        const cgst = parseFloat(item.cgst) || 0;
-        const sgstAmt = parseFloat(item.sgst_amount) || 0;
-        const cgstAmt = parseFloat(item.cgst_amount) || 0;
+      return (getValues('items') || []).reduce(
+        (acc, item) => {
+          const qty = parseFloat(item.quantity) || 0
+          const amt = parseFloat(item.amount) || 0
+          const sgst = parseFloat(item.sgst) || 0
+          const cgst = parseFloat(item.cgst) || 0
+          const sgstAmt = parseFloat(item.sgst_amount) || 0
+          const cgstAmt = parseFloat(item.cgst_amount) || 0
 
-        return {
-          total_qty: acc.total_qty + qty,
-          amount: parseFloat((acc.amount + amt).toFixed(2)),
-          total_amount: parseFloat((acc.total_amount + amt).toFixed(2)),
-          sgst: parseFloat((acc.sgst + sgstAmt).toFixed(2)),
-          cgst: parseFloat((acc.cgst + cgstAmt).toFixed(2)),
-          total_incl_gst: parseFloat((acc.total_incl_gst + amt + sgstAmt + cgstAmt).toFixed(2))
-        };
-      }, {
-        total_qty: 0,
-        total_amount: 0,
-        amount: 0,
-        sgst: 0,
-        cgst: 0,
-        total_incl_gst: 0
-      });
+          return {
+            total_qty: acc.total_qty + qty,
+            amount: parseFloat((acc.amount + amt).toFixed(2)),
+            total_amount: parseFloat((acc.total_amount + amt).toFixed(2)),
+            sgst: parseFloat((acc.sgst + sgstAmt).toFixed(2)),
+            cgst: parseFloat((acc.cgst + cgstAmt).toFixed(2)),
+            total_incl_gst: parseFloat((acc.total_incl_gst + amt + sgstAmt + cgstAmt).toFixed(2)),
+          }
+        },
+        {
+          total_qty: 0,
+          total_amount: 0,
+          amount: 0,
+          sgst: 0,
+          cgst: 0,
+          total_incl_gst: 0,
+        },
+      )
     } catch (error) {
-      console.error('Totals calculation error:', error);
+      console.error('Totals calculation error:', error)
       return {
         total_qty: 0,
         total_amount: 0,
         amount: 0,
         sgst: 0,
         cgst: 0,
-        total_incl_gst: 0
-      };
+        total_incl_gst: 0,
+      }
     }
-  }, [formData.items]); // Only depend on the items array, not getValues or fields
+  }, [formData.items]) // Only depend on the items array, not getValues or fields
 
   // Only update form values with totals when totals change
   useEffect(() => {
     // Update the form values without causing extra re-renders
-    setValue('total_qty', totals.total_qty, { shouldDirty: false });
-    setValue('cgst_amount', totals.cgst, { shouldDirty: false });
-    setValue('sgst_amount', totals.sgst, { shouldDirty: false });
-    setValue('amount', totals.total_amount, { shouldDirty: false });
-    setValue('tax_amount', totals.cgst + totals.sgst, { shouldDirty: false });
-    setValue('total_amount', totals.total_incl_gst, { shouldDirty: false });
-  }, [totals, setValue]);
+    setValue('total_qty', totals.total_qty, { shouldDirty: false })
+    setValue('cgst_amount', totals.cgst, { shouldDirty: false })
+    setValue('sgst_amount', totals.sgst, { shouldDirty: false })
+    setValue('amount', totals.total_amount, { shouldDirty: false })
+    setValue('tax_amount', totals.cgst + totals.sgst, { shouldDirty: false })
+    setValue('total_amount', totals.total_incl_gst, { shouldDirty: false })
+  }, [totals, setValue])
 
   // Initialize form with items
   // useEffect(() => {
@@ -155,49 +163,52 @@ const openItemDetails = async (item_id) => {
   //     return () => clearTimeout(timeoutId);
   //   }
   // }, [items, reset]); // Don't include calculateRowValues in dependencies
-// Initialize form with items
-useEffect(() => {
-  if (items && items.length > 0) {
-    // Map incoming items to ensure unit_price maps to standard_cost
-    const mappedItems = items.map(item => ({
-      ...item,
-      standard_cost: item.unit_price || item.standard_cost // Use unit_price if available, fall back to standard_cost
-    }));
-    
-    reset({
-      items: mappedItems,
-      total_qty: 0,
-      cgst_amount: 0,
-      sgst_amount: 0,
-      amount: 0,
-      tax_amount: 0,
-      total_amount: 0
-    });
+  // Initialize form with items
+  // Replace your current useEffect with this:
+  useEffect(() => {
+    if (items && items.length > 0) {
+      // Reset form with new items
+      reset({
+        items: items.map((item) => ({
+          ...item,
+          // Ensure all required fields are present
+          item_id: item.item_id || '',
+          quantity: item.quantity || 0,
+          standard_cost: item.unit_price || item.standard_cost || 0,
+          // ... other fields
+        })),
+        // Reset totals
+        total_qty: 0,
+        cgst_amount: 0,
+        sgst_amount: 0,
+        amount: 0,
+        tax_amount: 0,
+        total_amount: 0,
+      })
 
-    // Calculate row values but don't cause a loop
-    const timeoutId = setTimeout(() => {
-      mappedItems.forEach((_, index) => {
-        calculateRowValues(index);
-      });
-    }, 0);
-
-    return () => clearTimeout(timeoutId);
-  }
-}, [items, reset]); // Don't include calculateRowValues in dependencies
+      // Calculate initial values
+      items.forEach((_, index) => {
+        calculateRowValues(index)
+      })
+    } else if (fields.length === 0) {
+      // Only append empty item if no items exist
+      append({ item_id: '', quantity: 1 })
+    }
+  }, [items]) // Only depend on items prop
   // Fetch item list only once
   useEffect(() => {
-    fetchItemList();
-  }, []);
+    fetchItemList()
+  }, [])
 
   // Update parent component with form data including totals
   // Use a ref to prevent unnecessary updates
-  const prevTotalsRef = React.useRef(null);
+  const prevTotalsRef = useRef(null)
   useEffect(() => {
     // Only update if totals have changed
-    if (setFormValues &&
-      (!prevTotalsRef.current ||
-        JSON.stringify(prevTotalsRef.current) !== JSON.stringify(totals))) {
-
+    if (
+      setFormValues &&
+      (!prevTotalsRef.current || JSON.stringify(prevTotalsRef.current) !== JSON.stringify(totals))
+    ) {
       const totalValues = {
         ...formValues,
         total_qty: totals.total_qty,
@@ -205,36 +216,34 @@ useEffect(() => {
         sgst_amount: totals.sgst,
         amount: totals.total_amount,
         tax_amount: totals.cgst + totals.sgst,
-        total_amount: totals.total_incl_gst
-      };
-      setFormValues(totalValues);
-      prevTotalsRef.current = { ...totals };
+        total_amount: totals.total_incl_gst,
+      }
+      setFormValues(totalValues)
+      prevTotalsRef.current = { ...totals }
     }
-  }, [totals, formValues, setFormValues]);
+  }, [totals, formValues, setFormValues])
 
   const fetchItemList = async () => {
     try {
-      setIsLoading(true);
+      setIsLoading(true)
       const response = await apiMethods.getItemList({
         search: '',
         client: '',
         page: 1,
         limit: 100,
-      });
+      })
 
-      const items = response?.data?.data;
-      setItemList(items || []);
+      const items = response?.data?.data
+      setItemList(items || [])
     } catch (error) {
-      console.error('Error fetching items:', error);
+      console.error('Error fetching items:', error)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleItemChange = (index, selectedItemId) => {
-    const selectedItem = itemList.find(item => item.id === parseInt(selectedItemId));
-
-    // console.log('Selected Item:', selectedItem);
+    const selectedItem = itemList.find((item) => item.id === parseInt(selectedItemId))
 
     if (selectedItem) {
       setValue(`items.${index}`, {
@@ -253,67 +262,153 @@ useEffect(() => {
         cgst_amount: 0,
         amount: 0,
         tax_amount: 0,
-        total_amount: 0
-      });
-      calculateRowValues(index);
+        total_amount: 0,
+      })
+      calculateRowValuesOptimized(index)
     }
-  };
+  }
 
   const incrementQuantity = (index) => {
-    const currentQty = parseFloat(getValues(`items.${index}.quantity`)) || 0;
-    setValue(`items.${index}.quantity`, currentQty + 1);
-    calculateRowValues(index);
-  };
+    const currentQty = parseFloat(getValues(`items.${index}.quantity`)) || 0
+    setValue(`items.${index}.quantity`, currentQty + 1)
+    calculateRowValuesOptimized(index)
+  }
 
   const decrementQuantity = (index) => {
-    const currentQty = parseFloat(getValues(`items.${index}.quantity`)) || 0;
+    const currentQty = parseFloat(getValues(`items.${index}.quantity`)) || 0
     if (currentQty > 0) {
-      setValue(`items.${index}.quantity`, currentQty - 1);
-      calculateRowValues(index);
+      setValue(`items.${index}.quantity`, currentQty - 1)
+      calculateRowValuesOptimized(index)
     }
-  };
+  }
 
   // Memoize this function to prevent recreation on each render
-  const calculateRowValues = React.useCallback((index) => {
-    try {
-      const item = getValues(`items.${index}`);
-      const quantity = Math.max(0, parseFloat(item.quantity) || 0);
-      const standardCost = Math.max(0, parseFloat(item.standard_cost) || 0);
-      const sgst = Math.max(0, parseFloat(item.sgst) || 9);
-      const cgst = Math.max(0, parseFloat(item.cgst) || 9);
+  const calculateRowValues = React.useCallback(
+    (index) => {
+      try {
+        const item = getValues(`items.${index}`)
+        const quantity = Math.max(0, parseFloat(item.quantity) || 0)
+        const standardCost = Math.max(0, parseFloat(item.standard_cost) || 0)
+        const sgst = Math.max(0, parseFloat(item.sgst) || 9)
+        const cgst = Math.max(0, parseFloat(item.cgst) || 9)
 
-      const amount = parseFloat((quantity * standardCost).toFixed(2));
-      const sgstAmount = parseFloat(((amount * sgst) / 100).toFixed(2));
-      const cgstAmount = parseFloat(((amount * cgst) / 100).toFixed(2));
-      const taxAmount = parseFloat((sgstAmount + cgstAmount).toFixed(2));
-      const totalAmount = parseFloat((amount + taxAmount).toFixed(2));
+        const amount = parseFloat((quantity * standardCost).toFixed(2))
+        const sgstAmount = parseFloat(((amount * sgst) / 100).toFixed(2))
+        const cgstAmount = parseFloat(((amount * cgst) / 100).toFixed(2))
+        const taxAmount = parseFloat((sgstAmount + cgstAmount).toFixed(2))
+        const totalAmount = parseFloat((amount + taxAmount).toFixed(2))
 
-      setValue(`items.${index}`, {
-        ...item,
-        quantity,
-        unit_price: standardCost,
-        standard_cost: standardCost,
-        sgst,
-        cgst,
-        sgst_amount: sgstAmount,
-        cgst_amount: cgstAmount,
-        amount: amount,
-        tax_amount: taxAmount,
-        total_amount: totalAmount
-      }, { shouldDirty: false });
+        setValue(
+          `items.${index}`,
+          {
+            ...item,
+            quantity,
+            unit_price: standardCost,
+            standard_cost: standardCost,
+            sgst,
+            cgst,
+            sgst_amount: sgstAmount,
+            cgst_amount: cgstAmount,
+            amount: amount,
+            tax_amount: taxAmount,
+            total_amount: totalAmount,
+          },
+          { shouldDirty: false },
+        )
 
-      // Use a more efficient way to check if items changed
-      const currentItems = getValues('items');
-      if (setItems && items && currentItems && JSON.stringify(currentItems) !== JSON.stringify(items)) {
-        // Use setTimeout to break the update cycle
-        setTimeout(() => {
-          setItems(currentItems);
-        }, 0);
+        const currentItems = getValues('items')
+        if (
+          setItems &&
+          items &&
+          currentItems &&
+          JSON.stringify(currentItems) !== JSON.stringify(items)
+        ) {
+          setTimeout(() => {
+            setItems(currentItems)
+          }, 0)
+        }
+      } catch (error) {
+        console.error('Calculation error:', error)
       }
-    } catch (error) {
-      console.error('Calculation error:', error);
-    }
-  }, [getValues, setValue, items, setItems]);
+    },
+    [getValues, setValue, items, setItems],
+  )
+
+  const calculateRowValuesOptimized = useCallback(
+    (index, customRate = null) => {
+      try {
+        const item = getValues(`items.${index}`)
+        const quantity = Math.max(0, parseFloat(item.quantity) || 0)
+        // Use custom rate if provided, otherwise use current value
+        const standardCost =
+          customRate !== null ? customRate : Math.max(0, parseFloat(item.standard_cost) || 0)
+        const sgst = Math.max(0, parseFloat(item.sgst) || 9)
+        const cgst = Math.max(0, parseFloat(item.cgst) || 9)
+
+        const amount = parseFloat((quantity * standardCost).toFixed(2))
+        const sgstAmount = parseFloat(((amount * sgst) / 100).toFixed(2))
+        const cgstAmount = parseFloat(((amount * cgst) / 100).toFixed(2))
+        const taxAmount = parseFloat((sgstAmount + cgstAmount).toFixed(2))
+        const totalAmount = parseFloat((amount + taxAmount).toFixed(2))
+
+        // Only update the calculated fields, not the rate field if it's being typed
+        const updatedItem = {
+          ...item,
+          quantity,
+          unit_price: standardCost,
+          standard_cost: standardCost,
+          sgst,
+          cgst,
+          sgst_amount: sgstAmount,
+          cgst_amount: cgstAmount,
+          amount: amount,
+          tax_amount: taxAmount,
+          total_amount: totalAmount,
+        }
+
+        // Update individual fields instead of the entire object
+        setValue(`items.${index}.sgst_amount`, sgstAmount, { shouldDirty: false })
+        setValue(`items.${index}.cgst_amount`, cgstAmount, { shouldDirty: false })
+        setValue(`items.${index}.amount`, amount, { shouldDirty: false })
+        setValue(`items.${index}.tax_amount`, taxAmount, { shouldDirty: false })
+        setValue(`items.${index}.total_amount`, totalAmount, { shouldDirty: false })
+        setValue(`items.${index}.unit_price`, standardCost, { shouldDirty: false })
+
+        const currentItems = getValues('items')
+        if (
+          setItems &&
+          items &&
+          currentItems &&
+          JSON.stringify(currentItems) !== JSON.stringify(items)
+        ) {
+          setTimeout(() => {
+            setItems(currentItems)
+          }, 0)
+        }
+      } catch (error) {
+        console.error('Calculation error:', error)
+      }
+    },
+    [getValues, setValue, items, setItems],
+  )
+
+  // Debounced handler for rate changes
+  const handleRateChangeDebounced = useCallback(
+    (index, value) => {
+      // Clear existing timeout for this specific field
+      if (debounceTimeouts.current[index]) {
+        clearTimeout(debounceTimeouts.current[index])
+      }
+
+      // Set new timeout
+      debounceTimeouts.current[index] = setTimeout(() => {
+        const numericValue = parseFloat(value) || 0
+        setValue(`items.${index}.standard_cost`, numericValue, { shouldDirty: false })
+        calculateRowValuesOptimized(index, numericValue)
+      }, 300) // Reduced to 300ms for faster response
+    },
+    [setValue, calculateRowValuesOptimized],
+  )
 
   const addNewItem = () => {
     append({
@@ -332,12 +427,9 @@ useEffect(() => {
       cgst_amount: 0,
       amount: 0,
       tax_amount: 0,
-      total_amount: 0
-    });
-  };
-
-
-  
+      total_amount: 0,
+    })
+  }
 
   return (
     <div className="mt-2 p-4 bg-white rounded-lg border border-[#c2c2c2] w-full max-h-[600px]">
@@ -366,29 +458,33 @@ useEffect(() => {
             </thead>
             <tbody>
               {fields.map((field, index) => (
-
                 <tr key={field.id}>
                   <td className="px-4 py-2">
                     <select
                       {...register(`items.${index}.item_id`)}
-                      onChange={(e) => handleItemChange(index, e.target.value)} 
+                      onChange={(e) => handleItemChange(index, e.target.value)}
                       className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
+                      value={getValues(`items.${index}.item_id`)}
                     >
-                      <option value="">{isLoading ? "Loading..." : "Select Item"}</option>
+                      <option value="">{isLoading ? 'Loading...' : 'Select Item'}</option>
                       {itemList.map((item) => (
                         <option key={item.id} value={item.id}>
                           {item.item_name}
                         </option>
                       ))}
                     </select>
-                   
                   </td>
-                  <td onClick={() => openItemDetails(getValues(`items.${index}.item_id`))} className="cursor-pointer text-blue-600">ℹ️</td>                  
+                  <td
+                    onClick={() => openItemDetails(getValues(`items.${index}.item_id`))}
+                    className="cursor-pointer text-blue-600"
+                  >
+                    ℹ️
+                  </td>
                   <td className="px-4 py-2">
                     <input
                       {...register(`items.${index}.item_code`)}
                       readOnly
-                      placeholder='Item Code'
+                      placeholder="Item Code"
                       className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                     />
                   </td>
@@ -418,7 +514,21 @@ useEffect(() => {
                   <td className="px-4 py-2">
                     <input
                       {...register(`items.${index}.standard_cost`)}
-                      readOnly
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      onChange={(e) => {
+                        // Update the display value immediately
+                        const value = e.target.value
+                        // Debounce the calculation
+                        handleRateChangeDebounced(index, value)
+                      }}
+                      onBlur={(e) => {
+                        // Ensure calculation happens on blur as well
+                        const value = parseFloat(e.target.value) || 0
+                        setValue(`items.${index}.standard_cost`, value, { shouldDirty: false })
+                        calculateRowValuesOptimized(index, value)
+                      }}
                       className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                     />
                   </td>
@@ -468,14 +578,14 @@ useEffect(() => {
           </table>
 
           <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-  {modalContent}
-</Modal>
+            {modalContent}
+          </Modal>
         </div>
       </div>
 
       <div className="flex mt-4">
         <table className="flex-1">
-          <tbody className='gap-4'>
+          <tbody className="gap-4">
             <tr>
               <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                 Total Qty: {totals.total_qty}
@@ -500,40 +610,18 @@ useEffect(() => {
               <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                 Total Incl of GST: {totals.total_incl_gst.toFixed(2)}
                 <input type="hidden" {...register('total_amount')} />
-                <input type="hidden" {...register('tax_amount')} value={totals.cgst + totals.sgst} />
+                <input
+                  type="hidden"
+                  {...register('tax_amount')}
+                  value={totals.cgst + totals.sgst}
+                />
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ItemForm;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default ItemForm

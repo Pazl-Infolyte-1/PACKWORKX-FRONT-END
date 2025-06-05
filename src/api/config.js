@@ -1182,7 +1182,7 @@ export const apiMethods = {
   },
 
   getAllPurchaseOrderIds: async () => {
-   return await apiClient.get('/purchase-orders/ids')
+    return await apiClient.get('/purchase-orders/ids')
   },
 
   // Get a single purchase order by ID
@@ -1335,24 +1335,23 @@ export const apiMethods = {
       console.error(error)
     }
   },
-getinventoryWithParams: async (catId, page, limit = 50, search = '', subCatId) => {
-  try {
-    // Build query string manually to control order
-    let query = `/inventory?search=${encodeURIComponent(search || '')}`;
-    query += `&page=${page}&limit=${limit}`;
-    if (catId) {
-      query += `&categoryId=${catId}`;
-    }
-    if(subCatId){
-      query += `&subCategoryId=${subCatId}`;
-    }
+  getinventoryWithParams: async (catId, page, limit = 50, search = '', subCatId) => {
+    try {
+      // Build query string manually to control order
+      let query = `/inventory?search=${encodeURIComponent(search || '')}`
+      query += `&page=${page}&limit=${limit}`
+      if (catId) {
+        query += `&categoryId=${catId}`
+      }
+      if (subCatId) {
+        query += `&subCategoryId=${subCatId}`
+      }
 
-    return await apiClient.get(query); // use constructed query string
-  } catch (error) {
-    console.error(error);
-  }
-},
-
+      return await apiClient.get(query) // use constructed query string
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
   getPurchaseReturn: async (params) => {
     try {
@@ -1492,8 +1491,8 @@ getinventoryWithParams: async (catId, page, limit = 50, search = '', subCatId) =
   },
 
   getInvoiceById: async (id, params = {}) => {
-    return await apiClient.get(`/work-order-invoice/get/${id}`, { params });
-  },    
+    return await apiClient.get(`/work-order-invoice/get/${id}`, { params })
+  },
   getStockAdjustments: async (page = 1, entries) => {
     try {
       return await apiClient.get(`/stock-adjustments?page=${page}&entries=${entries}`)
@@ -1536,29 +1535,29 @@ getinventoryWithParams: async (catId, page, limit = 50, search = '', subCatId) =
       throw error
     }
   },
-  getInvoiceHistory:async(id)=>{
-    return await apiClient.get(`/work-order-invoice/get-by-sku/${id}`,)
+  getInvoiceHistory: async (id) => {
+    return await apiClient.get(`/work-order-invoice/get-by-sku/${id}`)
   },
-  getWorkOrderProgressDropDownOptions:async(id)=>{
-    return await apiClient.get(`/common-service/work-order-status`,)
+  getWorkOrderProgressDropDownOptions: async (id) => {
+    return await apiClient.get(`/common-service/work-order-status`)
   },
-  getInvoice: async ( params = {}) => {
-    return await apiClient.get(`/work-order-invoice/get`, { params });
-  },    
+  getInvoice: async (params = {}) => {
+    return await apiClient.get(`/work-order-invoice/get`, { params })
+  },
   subCategoryDropdown: async (categoryId) => {
-  try {
-    const response = await apiClient.get(
-      categoryId ? `/items/sub-category/id` : `/sub-category`,
-      {
-        params: categoryId ? { category_id: categoryId } : {},
-      }
-    );
-    return response;
-  } catch (error) {
-    console.error("Error inside subCategoryDropdown:", error); // 👈 helpful
-    throw error; // ✅ so it gets caught in `useEffect`
-  }
-},
+    try {
+      const response = await apiClient.get(
+        categoryId ? `/items/sub-category/id` : `/sub-category`,
+        {
+          params: categoryId ? { category_id: categoryId } : {},
+        },
+      )
+      return response
+    } catch (error) {
+      console.error('Error inside subCategoryDropdown:', error) // 👈 helpful
+      throw error // ✅ so it gets caught in `useEffect`
+    }
+  },
 
   singleInventoryView: async (id) => {
     try {
@@ -1566,44 +1565,49 @@ getinventoryWithParams: async (catId, page, limit = 50, search = '', subCatId) =
       return response.data
     } catch (error) {
       console.error(error)
-       throw error;
+      throw error
     }
   },
-   singleItem: async (id) => {
+  singleItem: async (id) => {
     try {
       const response = await apiClient.get(`/items/${id}`)
       return response.data
     } catch (error) {
       console.error(error)
-       throw error;
+      throw error
     }
   },
 
   getInventoryExcelExport: async (params) => {
-  try {
-    const response = await apiClient.get(`/inventory/export`, {
-      responseType: 'blob',
-      params,
-    });
+    try {
+      const response = await apiClient.get(`/inventory/export`, {
+        responseType: 'blob',
+        params,
+      })
 
-    const blob = new Blob([response.data], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
-    const url = window.URL.createObjectURL(blob);
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      })
+      const url = window.URL.createObjectURL(blob)
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'Inventory Details.xlsx');
-    document.body.appendChild(link);
-    link.click();
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'Inventory Details.xlsx')
+      document.body.appendChild(link)
+      link.click()
 
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(link);
-  } catch (error) {
-    console.error('Failed to export inventory Excel:', error);
-  }
-},
-
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(link)
+    } catch (error) {
+      console.error('Failed to export inventory Excel:', error)
+    }
+  },
+  addWorkOrderIntoProduction: async (body) => {
+    return await apiClient.patch('/work-order/production/batch', body)
+  },
+  getWorkOrderInProduction: async (body) => {
+    return await apiClient.get('/work-order/production=in_production')
+  },
 }
 
 export default apiMethods

@@ -984,7 +984,7 @@ console.log("whole sku",wholeSkuObject)
     }
   }}
                       className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
-                      disabled={!skuVersionsMap[order.id]}
+                   disabled={!skuVersionsMap[order.id]}
                     >
                       {/*<option value="" disabled>Select Version</option>*/}
                       <option value="0">Default Master</option>

@@ -196,66 +196,64 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       }
     }
   }, [subCategory, isEditing])
+const onSubmit = async (data) => {
+  try {
+    setIsSubmitting(true)
+    let response
 
-  const onSubmit = async (data) => {
-    try {
-      setIsSubmitting(true)
-      let response
+    // Convert tagFields to an object
+    const tagsObj = Array.isArray(tagFields)
+      ? tagFields.reduce((acc, curr) => {
+          if (curr.label) acc[curr.label] = curr.value
+          return acc
+        }, {})
+      : {}
 
-      // Convert tagFields to an object
-      const tagsObj = Array.isArray(tagFields)
-        ? tagFields.reduce((acc, curr) => {
-            if (curr.label) acc[curr.label] = curr.value
-            return acc
-          }, {})
-        : {}
-
-      const formattedData = {
-        ...data,
-        custom_fields: tagsObj,
-        min_stock_level: parseFloat(data.min_stock_level) || 0,
-        reorder_level: parseFloat(data.reorder_level) || 0,
-        standard_cost: parseFloat(data.standard_cost) || 0,
-        cgst: parseFloat(data.cgst) || 0,
-        sgst: parseFloat(data.sgst) || 0,
-        category: Number(data.category),
-        sub_category: data.sub_category ? Number(data.sub_category) : null,
-      }
-
-      if (isEditing) {
-        formattedData.id = currentItemId
-
-        response = await apiMethods.updateItem(currentItemId, formattedData)
-      } else {
-        response = await apiMethods.addItem(formattedData)
-      }
-
-      setAlerts([
-        {
-          severity: 'success',
-          message: response?.data?.message || `Item ${isEditing ? 'updated' : 'added'} successfully`,
-        },
-      ])
-
-      setTimeout(() => {
-        if (fromInventory) {
-          navigate('/inventoryhandling')
-        } else {
-          setDrawer(false)
-        }
-        fetchData()
-      }, 1500)
-    } catch (error) {
-      setAlerts([
-        {
-          severity: 'error',
-          message: error?.response?.data?.message || 'Operation failed',
-        },
-      ])
-    } finally {
-      setIsSubmitting(false)
+    const formattedData = {
+      ...data,
+      custom_fields: JSON.stringify(tagsObj), // Send as JSON string to ensure complete replacement
+      min_stock_level: parseFloat(data.min_stock_level) || 0,
+      reorder_level: parseFloat(data.reorder_level) || 0,
+      standard_cost: parseFloat(data.standard_cost) || 0,
+      cgst: parseFloat(data.cgst) || 0,
+      sgst: parseFloat(data.sgst) || 0,
+      category: Number(data.category),
+      sub_category: data.sub_category ? Number(data.sub_category) : null,
     }
+
+    if (isEditing) {
+      formattedData.id = currentItemId
+      response = await apiMethods.updateItem(currentItemId, formattedData)
+    } else {
+      response = await apiMethods.addItem(formattedData)
+    }
+
+    setAlerts([
+      {
+        severity: 'success',
+        message: response?.data?.message || `Item ${isEditing ? 'updated' : 'added'} successfully`,
+      },
+    ])
+
+    setTimeout(() => {
+      if (fromInventory) {
+        navigate('/inventoryhandling')
+      } else {
+        setDrawer(false)
+      }
+      fetchData()
+    }, 1500)
+  } catch (error) {
+    setAlerts([
+      {
+        severity: 'error',
+        message: error?.response?.data?.message || 'Operation failed',
+      },
+    ])
+  } finally {
+    setIsSubmitting(false)
   }
+}
 
   function cleanAndUppercase(text) {
     return (
@@ -295,6 +293,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
     }
   }
 
+  // Raw Materials subcategory tags
   const packingReelsTags = [
     { label: 'Core Type', value: 'core_3_inch' },
     { label: 'Core Type', value: 'core_6_inch' },
@@ -346,26 +345,60 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
     { label: 'Coating', value: 'coating_zinc' },
     { label: 'Coating', value: 'coating_nickel' },
   ]
+
+  // Returnable category tags
+  const dyeTags = [
+    { label: 'Color', value: 'color_red' },
+    { label: 'Color', value: 'color_green' },
+    { label: 'Type', value: 'type_reactive' },
+    { label: 'Type', value: 'type_direct' },
+    { label: 'Concentration', value: 'concentration_high' },
+    { label: 'Concentration', value: 'concentration_low' },
+    { label: 'Fastness', value: 'fastness_excellent' },
+    { label: 'Fastness', value: 'fastness_good' },
+    { label: 'Solubility', value: 'solubility_water' },
+    { label: 'Solubility', value: 'solubility_alcohol' },
+  ]
+
+  const steroTags = [
+    { label: 'Size', value: 'size_small' },
+    { label: 'Size', value: 'size_medium' },
+    { label: 'Material', value: 'material_metal' },
+    { label: 'Material', value: 'material_rubber' },
+    { label: 'Shape', value: 'shape_round' },
+    { label: 'Shape', value: 'shape_rectangular' },
+    { label: 'Weight', value: 'weight_light' },
+    { label: 'Weight', value: 'weight_heavy' },
+    { label: 'Usage', value: 'usage_industrial' },
+    { label: 'Usage', value: 'usage_commercial' },
+  ]
   
   // Handle predefined tags based on subcategory
   useEffect(() => {
+    const selectedSubCat = subCategory.find(sc => sc.id == selectedSubCategory) || 
+                          allSubCategories.find(sc => sc.id == selectedSubCategory)
+    const subCatName = selectedSubCat?.sub_category_name
+    console.log(subCatName);
     
-      const selectedSubCat = subCategory.find(sc => sc.id == selectedSubCategory) || 
-                            allSubCategories.find(sc => sc.id == selectedSubCategory)
-      const subCatName = selectedSubCat?.sub_category_name
 
-      if (subCatName === 'reels') {
-        setTagFields(packingReelsTags)
-      } else if (subCatName === 'corrugation-glue') {
-        setTagFields(corrugationGlueTags)
-      } else if (subCatName === 'pasting-glue') {
-        setTagFields(pastingGlueTags)
-      } else if (subCatName === 'pins') {
-        setTagFields(pinsTags)
-      } else {
-        if (!isEditing) setTagFields([])
-      }
-    
+    // Raw Materials subcategories
+    if (subCatName === 'reels') {
+      setTagFields(packingReelsTags)
+    } else if (subCatName === 'corrugation-glue') {
+      setTagFields(corrugationGlueTags)
+    } else if (subCatName === 'pasting-glue') {
+      setTagFields(pastingGlueTags)
+    } else if (subCatName === 'pins') {
+      setTagFields(pinsTags)
+    }
+    // Returnable subcategories
+    else if (subCatName === 'dye') {
+      setTagFields(dyeTags)
+    } else if (subCatName === 'stereo') {
+      setTagFields(steroTags)
+    } else {
+      if (!isEditing) setTagFields([])
+    }
   }, [selectedSubCategory, subCategory, allSubCategories, isEditing])
 
   return (
@@ -494,7 +527,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
                                 allSubCategories.find(sc => sc.id == selectedSubCategory);
           const subCatName = selectedSubCat?.sub_category_name;
           
-          return ['reels', 'corrugation-glue', 'pasting-glue', 'pins'].includes(subCatName) && (
+          return ['reels', 'corrugation-glue', 'pasting-glue', 'pins', 'dye', 'stereo'].includes(subCatName) && (
             <div className="md:col-span-3 mt-2 mb-2">
               <button
                 type="button"

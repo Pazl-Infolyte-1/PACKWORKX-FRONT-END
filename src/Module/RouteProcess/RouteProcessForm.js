@@ -135,7 +135,7 @@ export const RouteProcessForm = ({
     }
 
     return (
-      <div className="card mt-2 cursor-move" ref={drop}>
+      <div className="card mt-2 cursor-move"  style={{ minHeight: '320px',minWidth:"300px" }} ref={drop}>
         {processOrder.length > 0 ? (
           <div className="card-body d-flex flex-column align-items-center">
             {processOrder.map((process, index) => (
@@ -177,33 +177,37 @@ export const RouteProcessForm = ({
             />
           </div>
         </div>
-        <div
-          className="space-y-4 my-3 border border-gray-50 rounded-md p-3"
-          style={{ height: '400px', overflowY: 'auto' }}
-        >
-          <div className="row">
-            <div className="col-lg-5 col-md-5 col-sm-6 col-xs-12">
-              <h5 className="text-center mb-3">Process</h5>
-              {processData.map((process) => (
-                <ProcessDraggable key={process.id} process={process} />
-              ))}
-            </div>
+      <div className="space-y-4 my-3 border border-gray-50 rounded-md p-3" style={{ height: '400px' }}>
+  <div className="row h-full">
+    {/* Process Column */}
+    <div className="col-lg-5 col-md-5 col-sm-6 col-xs-12 flex flex-col h-full">
+      <h5 className="text-center mb-2 bg-white sticky top-0 z-10">Process</h5>
+      <div className="overflow-y-auto flex-1 pr-2">
+        {processData.map((process) => (
+          <ProcessDraggable key={process.id} process={process} />
+        ))}
+      </div>
+    </div>
 
-            <div className="d-none d-md-flex justify-content-center align-items-start col-md-1">
-              <div style={{ borderLeft: '1px solid #ccc', height: '100%' }}></div>
-            </div>
+    {/* Divider */}
+    <div className="d-none d-md-flex justify-content-center align-items-start col-md-1">
+      <div style={{ borderLeft: '1px solid #ccc', height: '100%' }}></div>
+    </div>
 
-            <div className="col-lg-5 col-md-5 col-sm-6 col-xs-12">
-              <h5 className="text-center mb-3">Route Process</h5>
-              <ProcessDrop
-                processOrder={processOrder}
-                setProcessOrder={setProcessOrder}
-                setProcessData={setProcessData}
-                setFormData={setFormData}
-              />
-            </div>
-          </div>
-        </div>
+    {/* Route Process Column */}
+    <div className="col-lg-5 col-md-5 col-sm-6 col-xs-12 flex flex-col h-full">
+      <h5 className="text-center mb-2 bg-white sticky top-0 z-10">Route Process</h5>
+      <div className="overflow-y-auto flex-1 pl-2">
+        <ProcessDrop
+          processOrder={processOrder}
+          setProcessOrder={setProcessOrder}
+          setProcessData={setProcessData}
+          setFormData={setFormData}
+        />
+      </div>
+    </div>
+  </div>
+</div>
 
         <div className="flex justify-end space-x-3">
           <button

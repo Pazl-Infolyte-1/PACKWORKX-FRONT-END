@@ -45,6 +45,7 @@ const WorkOrders = ({
   skuValuesMap,
   setSkuValuesMap
 }) => {
+  console.log("sku details",skuDetailsForm)
   const [openCreateAccordion, setCreateOpenAccordion] = useState([1])
   const [openCreateAccordion1, setCreateOpenAccordion1] = useState([])
   const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
@@ -63,9 +64,17 @@ const WorkOrders = ({
   const [salesOrderSkus, setSalesOrderSkus] = useState([])
   const [canDeactivate, setCanDeactivate] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
+const [wholeSkuObject, setWholeSkuObject] = useState(null);
+
+
+const handleWholeSkuObject = (data) => {
+  console.log("Received in parent:", data);
+  setWholeSkuObject(data);
+};
 
   const { id: salesOrderId, fromsalesorder } = location.state || {};
 
+  console.log("work orders///",workOrders)
   useEffect(() => {
     if (fromsalesorder && salesOrderId && salesOrder?.length > 0) {
       const selectedSalesOrderId = salesOrderId.toString();
@@ -526,6 +535,7 @@ const handleCancel = () => {
     setVersionDrawerOpen(true)
   }
 
+console.log("whole sku",wholeSkuObject)
   return (
     <div className="relative min-h-screen pb-20"> {/* Add padding bottom to account for fixed buttons */}
       <div className='w-full mt-2'>
@@ -1114,6 +1124,8 @@ const handleCancel = () => {
                     setSkuValuesMap={setSkuValuesMap}
                     setWorkOrders={setWorkOrders}
                     skuvaluesFromParent = {order.work_order_sku_values}
+                    allSkuData={order}
+                handleWholeSkuObject={handleWholeSkuObject} 
                   />
                 </div>
               )}

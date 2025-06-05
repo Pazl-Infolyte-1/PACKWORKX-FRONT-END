@@ -1577,7 +1577,14 @@ getinventoryWithParams: async (catId, page, limit = 50, search = '', subCatId) =
       console.error(error)
        throw error;
     }
-  }
+  },
+  addWorkOrderIntoProduction: async (body) => {
+    return await apiClient.patch('/work-order/production/batch', body)
+  },
+  getWorkOrderInProduction: async (body) => {
+    return await apiClient.get('/work-order/production=in_production')
+  },
+
 }
 
 export default apiMethods

@@ -674,7 +674,9 @@ const ViewWorkOrder = () => {
                       <span className="text-sm text-gray-600">Production Schedule</span>
                     </div>
                     <button
-                      onClick={() => setIsProductionPlannedModalOpen(true)}
+                      onClick={() => {setIsProductionPlannedModalOpen(true)
+                      }
+                      }
                       className="p-0.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
                     >
                       Plan Production

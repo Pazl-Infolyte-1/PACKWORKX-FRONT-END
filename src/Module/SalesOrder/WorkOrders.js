@@ -270,7 +270,8 @@ const handleCancel = () => {
         planned_start_date,
         acceptable_excess_units,
         planned_end_date,
-        work_order_sku_values
+        work_order_sku_values,
+        select_plant,
       } = selectedWorkOrder;
 
       // Check if any of the fields are empty
@@ -396,8 +397,8 @@ const handleCancel = () => {
 
   // const handleToggle = () => {
   //   setSelectedOption((prev) => {
-  //     if (prev === 'inhouse') return 'outsource'
-  //     if (prev === 'outsource') return 'purchaseOrder'
+  //     if (prev === 'inhouse') next = 'outsource';
+  //     if (prev === 'outsource') next = 'purchaseOrder';
   //     return 'inhouse'
   //   })
   // }
@@ -462,6 +463,7 @@ const handleCancel = () => {
         manufacture: 'inhouse',
         priority: "Low",
         progress: "Pending",
+        select_plant: "Auto Plant",
         work_order_sku_values:[]
       },
     ])
@@ -761,6 +763,41 @@ console.log("whole sku",wholeSkuObject)
                           />
                         </div>
                       </div>
+
+                      {/* Plant Type Toggle Section - Moved above Description */}
+                      <div className="flex items-center">
+                  <label className="text-xs text-gray-600 font-medium w-24">Plant Type</label>
+                  <div className="flex-1">
+                    <div className="relative w-[220px] h-[22px] bg-white border border-[#8167E5] rounded-md  cursor-pointer flex items-center justify-between overflow-hidden">
+                      {/* Auto Plant */}
+                      <span
+                        className={`text-[10px] leading-[14px] text-center w-1/2 z-10 transition-all font-medium ${
+                          item.select_plant === "Auto Plant" ? 'text-white' : 'text-gray-700'
+                        }`}
+                        onClick={() => handleWorkOrderChange1(item.id, 'select_plant', "Auto Plant")}
+                      >
+                        Auto Plant
+                      </span>
+
+                      {/* Semi Auto Plant */}
+                      <span
+                        className={`text-[10px] leading-[14px] text-center w-1/2 z-10 transition-all font-medium ${
+                          item.select_plant === "Semi Auto Plant" ? 'text-white' : 'text-gray-700'
+                        }`}
+                        onClick={() => handleWorkOrderChange1(item.id, 'select_plant', "Semi Auto Plant")}
+                      >
+                        Semi Auto Plant
+                      </span>
+
+                      {/* Toggle Indicator */}
+                      <div
+                        className={`absolute top-1/2 w-1/2 h-[100%] bg-[#8167E5] rounded-sm transform -translate-y-1/2 transition-all duration-300 ${
+                          item.select_plant === "Auto Plant" ? 'left-0' : 'left-1/2'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </div>
 
                       {/* Description Section */}
                       <div className="flex items-center">
@@ -1128,18 +1165,53 @@ console.log("whole sku",wholeSkuObject)
                   </div>
                 </div>
 
-                {/* Description Section */}
+                {/* Plant Type Toggle Section - Moved above Description */}
                 <div className="flex items-center">
-                  <label className="text-xs text-gray-600 font-medium w-24">Description</label>
+                  <label className="text-xs text-gray-600 font-medium w-24">Plant Type</label>
                   <div className="flex-1">
-                    <input
-                      value={order.description}
-                      onChange={(e) => handleWorkOrderChange(order.id, 'description', e.target.value)}
-                      className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
-                      placeholder="Enter description"
-                    />
+                    <div className="relative w-[220px] h-[22px] bg-white border border-[#8167E5] rounded-md  cursor-pointer flex items-center justify-between overflow-hidden">
+                      {/* Auto Plant */}
+                      <span
+                        className={`text-[10px] leading-[14px] text-center w-1/2 z-10 transition-all font-medium ${
+                          order.select_plant === "Auto Plant" ? 'text-white' : 'text-gray-700'
+                        }`}
+                        onClick={() => handleWorkOrderChange(order.id, 'select_plant', "Auto Plant")}
+                      >
+                        Auto Plant
+                      </span>
+
+                      {/* Semi Auto Plant */}
+                      <span
+                        className={`text-[10px] leading-[14px] text-center w-1/2 z-10 transition-all font-medium ${
+                          order.select_plant === "Semi Auto Plant" ? 'text-white' : 'text-gray-700'
+                        }`}
+                        onClick={() => handleWorkOrderChange(order.id, 'select_plant', "Semi Auto Plant")}
+                      >
+                        Semi Auto Plant
+                      </span>
+
+                      {/* Toggle Indicator */}
+                      <div
+                        className={`absolute top-1/2 w-1/2 h-[100%] bg-[#8167E5] rounded-sm transform -translate-y-1/2 transition-all duration-300 ${
+                          order.select_plant === "Auto Plant" ? 'left-0' : 'left-1/2'
+                        }`}
+                      />
+                    </div>
                   </div>
                 </div>
+
+                                      {/* Description Section */}
+                                      <div className="flex items-center">
+                        <label className="text-xs text-gray-600 font-medium w-24">Description</label>
+                        <div className="flex-1">
+                          <input
+                            value={order.description || ''}
+                            onChange={(e) => handleWorkOrderChange(order.id, 'description', e.target.value)}
+                            className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                            placeholder="Enter description"
+                          />
+                        </div>
+                      </div>
               </div>
 
               {/* SkuVersionAddEdit section */}

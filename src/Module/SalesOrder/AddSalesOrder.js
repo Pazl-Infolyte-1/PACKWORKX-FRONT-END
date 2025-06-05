@@ -133,6 +133,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
       manufacture: "inhouse",
       priority:"Low",
       progress:"Pending",
+      select_plant:"Auto Plant",
       work_order_sku_values:[]
     }
   ])

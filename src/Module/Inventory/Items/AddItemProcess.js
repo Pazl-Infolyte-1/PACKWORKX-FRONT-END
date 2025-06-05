@@ -487,7 +487,7 @@ const onSubmit = async (data) => {
             }}
           >
             <option value="">Select Category</option>
-            {category.map((cat) => (
+            {category.filter((cat) => cat.is_visible === 1).map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {toTitleCase(cat.category_name)}
               </option>
@@ -512,7 +512,7 @@ const onSubmit = async (data) => {
               }}
             >
               <option value="">Select Subcategory</option>
-              {subCategory.map((sc) => (
+              {subCategory.filter((cat) => cat.is_visible === 1).map((sc) => (
                 <option key={sc.id} value={sc.id}>
                   {toTitleCase(sc.sub_category_name)}
                 </option>

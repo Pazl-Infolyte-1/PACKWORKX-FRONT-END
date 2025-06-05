@@ -111,10 +111,12 @@ const PurchaseOrder = () => {
   }
 
 const handleSuccess = (updatedData) => {
+  console.log('Updated Data:', updatedData);
+  
   setRefresh(prev => !prev) // Trigger refresh
   setAlert({ 
     show: true, 
-    message: `Purchase Order ${isEdit ? 'updated' : 'created'} successfully`, 
+    message: updatedData || `Purchase Order ${isEdit ? 'updated' : 'created'} successfully`, 
     type: 'success' 
   })
   
@@ -202,6 +204,7 @@ const handleSuccess = (updatedData) => {
             selectedPoId={selectedPoId}
             setDrawer={setDrawerOpen}
             onSuccess={handleSuccess}
+            setRefresh={setRefresh}
           />
           }
         </Drawer>

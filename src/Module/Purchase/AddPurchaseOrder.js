@@ -4,7 +4,7 @@ import apiMethods from '../../api/config'
 import Loader from '../../components/New/Loader'
 import CustomAlert from '../../components/New/CustomAlert'
 
-const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess }) => {
+const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefresh }) => {
   const [loading, setLoading] = useState(false)
   const [alerts, setAlerts] = useState([])
   const [clientData, setClientData] = useState([])
@@ -25,9 +25,6 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess }) => {
   useEffect(() => {
     const fetchVendors = async () => {
       try {
-        // const initial = await apiMethods.getClients()
-        // const count = initial?.length || 100
-
         const fullData = await apiMethods.getClients()
         const clientsArray = fullData.data
 
@@ -91,63 +88,55 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess }) => {
     }
   }
 
-const handleFormSubmit = async (formData) => {
-  setLoading(true)
-  try {
-    const payload = {
-      ...formData.orderData,
-      items: formData.itemsData.map((item) => ({
-        ...item,
-        price: parseFloat(item.price),
-        quantity: parseInt(item.quantity),
-        total: parseFloat(item.price) * parseInt(item.quantity),
-      })),
-    }
+  const handleFormSubmit = async (formData) => {
+    setLoading(true)
+    try {
+      const payload = {
+        ...formData.orderData,
+        items: formData.itemsData.map((item) => ({
+          ...item,
+          price: parseFloat(item.price),
+          quantity: parseInt(item.quantity),
+          total: parseFloat(item.price) * parseInt(item.quantity),
+        })),
+      }
 
-    let response
-    if (isEdit) {
-      response = await apiMethods.updatePurchaseOrder(selectedPoId, payload)
-      console.log(response.data, 'updated');
-      
-      setAlerts([
-        { severity: 'success', message: response?.data?.message || 'Successfully updated' },
-      ])
-      
-      // Call onSuccess immediately to refresh the parent data
-      if (onSuccess) {
-        onSuccess(response.data) // Pass the updated data back
+      let response
+      if (isEdit) {
+        response = await apiMethods.updatePurchaseOrder(selectedPoId, payload)
+        console.log(response.data, 'updated')
+
+        setAlerts([
+          { severity: 'success', message: response?.data?.message || 'Successfully updated' },
+        ])
+        setTimeout(() => {
+          setDrawer(false)
+        }, 1000)
+        setRefresh((prev) => !prev)
+      } else {
+        response = await apiMethods.createPurchaseOrder(payload)
+        setAlerts([
+          { severity: 'success', message: response?.data?.message || 'Successfully created' },
+        ])
+        setTimeout(() => {
+          setDrawer(false)
+        }, 1000)
+        setRefresh((prev) => !prev)
       }
-      
-      // Close the drawer after a short delay
-      setTimeout(() => {
-        setDrawer(false)
-      }, 1000)
-    } else {
-      response = await apiMethods.createPurchaseOrder(payload)
+    } catch (error) {
+      console.error('API Error:', error)
       setAlerts([
-        { severity: 'success', message: response?.data?.message || 'Successfully created' },
+        {
+          severity: 'error',
+          message:
+            error.response?.data?.message ||
+            `Failed to ${isEdit ? 'update' : 'create'} Purchase Order`,
+        },
       ])
-      if (onSuccess) {
-        onSuccess(response.data)
-      }
-      setTimeout(() => {
-        setDrawer(false)
-      }, 1000)
+    } finally {
+      setLoading(false)
     }
-  } catch (error) {
-    console.error('API Error:', error)
-    setAlerts([
-      {
-        severity: 'error',
-        message:
-          error.response?.data?.message ||
-          `Failed to ${isEdit ? 'update' : 'create'} Purchase Order`,
-      },
-    ])
-  } finally {
-    setLoading(false)
   }
-}
 
   const handleCloseAlert = (index) => {
     setAlerts(alerts.filter((_, i) => i !== index))
@@ -176,8 +165,7 @@ const handleFormSubmit = async (formData) => {
           isEdit={isEdit}
           isSubmitting={loading}
           clientData={clientData}
-           selectedPoId={selectedPoId}
-
+          selectedPoId={selectedPoId}
         />
       )}
     </div>

@@ -400,7 +400,13 @@ const handleValueChange = (index, field, value) => {
         }));
         // setCurrentVersionCount(updatedVersionsResponse.data.data.length)
       }
-
+setWorkOrders(prevOrders =>
+          prevOrders.map(order =>
+            order.id === orderId
+              ? { ...order, sku_version: response.data.skuVersion.id }
+              : order
+          )
+        );
       // Clear edited map and close popup
       setEditedMap({});
       setVersionChoiceOpen(false);
@@ -543,28 +549,22 @@ const handleValueChange = (index, field, value) => {
 
    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
   <div className="relative w-full">
-    <input
-      type="text"
-      className="p-1 border rounded w-full"
+    <select
+      className="p-1 border rounded w-full text-sm"
       value={item.color || ""}
+      onChange={(e) => handleValueChange(index, 'color', e.target.value)}
       onFocus={() => setFocusedField({ index, name: 'color' })}
       onBlur={() => setFocusedField(null)}
-      onChange={(e) => handleValueChange(index, 'color', e.target.value)}
-    />
-
-    {focusedField?.index === index && focusedField?.name === 'color' && (
-      <ul className="absolute z-10 mt-1 w-full bg-white border shadow rounded text-sm max-h-36 overflow-y-auto">
-        {colorList.map((color) => (
-          <li
-            key={color.id}
-            className="px-2 py-1 hover:bg-gray-200 cursor-pointer"
-            onMouseDown={() => handleValueChange(index, 'color', color.color_name)}
-          >
-            {color.color_name}
-          </li>
-        ))}
-      </ul>
-    )}
+    >
+      <option value="" disabled>
+        Select color
+      </option>
+      {colorList.map((color) => (
+        <option key={color.id} value={color.color_name}>
+          {color.color_name}
+        </option>
+      ))}
+    </select>
   </div>
 </td>
 

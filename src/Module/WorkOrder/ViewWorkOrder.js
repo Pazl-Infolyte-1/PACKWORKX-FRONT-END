@@ -143,11 +143,11 @@ const ViewWorkOrder = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate()
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
-  const [invoiceHistory,setinVoiceHistory] = useState([])
-  const [isInvoiceOpen,setInvoiceOpen] = useState(false)
+  const [invoiceHistory, setinVoiceHistory] = useState([])
+  const [isInvoiceOpen, setInvoiceOpen] = useState(false)
   const [progressOptions, setProgressOptions] = useState([]);
   const [isProgressDropdownOpen, setIsProgressDropdownOpen] = useState(false);
-  const [alerts,setAlerts] = useState([])
+  const [alerts, setAlerts] = useState([])
   const [completedWorkOrderData, setCompletedWorkOrderData] = useState(null) // or useState({})
   const [isOpenProgressModale, setIsOpenProgressModale] = useState(false)
   const [isRawMaterialModalOpen, setIsRawMaterialModalOpen] = useState(false);
@@ -155,7 +155,7 @@ const ViewWorkOrder = () => {
 
 
 
-  const handleClose = ()=>{
+  const handleClose = () => {
     setAlerts([])
   }
 
@@ -167,7 +167,7 @@ const ViewWorkOrder = () => {
 
       // Optionally refresh work order data or navigate to invoice
       navigate(`/invoice/view/${response.data.data.id}`);
-      
+
 
     } catch (err) {
       console.log(error)
@@ -185,10 +185,10 @@ const ViewWorkOrder = () => {
         console.error("Failed to fetch invoice data:", error);
       }
     };
-  
+
     getInvoiceData();
   }, [id]); // include `id` in dependency array if it's coming from props/state
-  
+
 
   const renderProductionStages = (currentProgress) => {
     const stages = [
@@ -301,7 +301,7 @@ const ViewWorkOrder = () => {
   };
 
 
-  
+
   const handleProgressChange = async (newProgress) => {
     const newValue = newProgress
 
@@ -324,12 +324,12 @@ const ViewWorkOrder = () => {
             message: response?.data?.message || 'Successfull updated Progress',
           },
         ])
-    setIsProgressDropdownOpen(false);
+        setIsProgressDropdownOpen(false);
 
-    setWorkOrder((prev) => ({
-      ...prev,
-      progress: newProgress
-    }))
+        setWorkOrder((prev) => ({
+          ...prev,
+          progress: newProgress
+        }))
 
       } catch (error) {
         console.error('Error updating progress:', error)
@@ -430,50 +430,50 @@ const ViewWorkOrder = () => {
 
               {/* What's Next Section */}
               {invoiceHistory.length === 0 ? (
-  <div className="bg-blue-50 border border-blue-100 rounded p-2 mx-4 my-2 text-xs">
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-1">
-        <div className="bg-blue-100 p-0.5 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-          </svg>
-        </div>
-        <div>
-          <h3 className="font-semibold text-blue-800 text-xs">WHAT'S NEXT?</h3>
-          <p className="text-blue-700 text-xs">Convert to packages, shipments, or invoices.</p>
-        </div>
-      </div>
-      <button
-        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
-        onClick={() => setIsInvoiceModalOpen(true)}
-      >
-        Convert Into Invoice
-      </button>
-    </div>
-  </div>
-) : (
-  <div className="bg-green-50 border border-green-100 rounded p-2 mx-4 my-2 text-xs">
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-1">
-        <div className="bg-green-100 p-0.5 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-green-600" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        </div>
-        <div>
-          <h3 className="font-semibold text-green-800 text-xs">INVOICE AVAILABLE</h3>
-          <p className="text-green-700 text-xs">This work order has already been invoiced.</p>
-        </div>
-      </div>
-      <button
-        className="bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
-        onClick={()=>{setInvoiceOpen(true)}}
-      >
-        Show Invoice
-      </button>
-    </div>
-  </div>
-)}
+                <div className="bg-blue-50 border border-blue-100 rounded p-2 mx-4 my-2 text-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <div className="bg-blue-100 p-0.5 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-blue-800 text-xs">WHAT'S NEXT?</h3>
+                        <p className="text-blue-700 text-xs">Convert to packages, shipments, or invoices.</p>
+                      </div>
+                    </div>
+                    <button
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
+                      onClick={() => setIsInvoiceModalOpen(true)}
+                    >
+                      Convert Into Invoice
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-green-50 border border-green-100 rounded p-2 mx-4 my-2 text-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <div className="bg-green-100 p-0.5 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-green-800 text-xs">INVOICE AVAILABLE</h3>
+                        <p className="text-green-700 text-xs">This work order has already been invoiced.</p>
+                      </div>
+                    </div>
+                    <button
+                      className="bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
+                      onClick={() => { setInvoiceOpen(true) }}
+                    >
+                      Show Invoice
+                    </button>
+                  </div>
+                </div>
+              )}
 
 
               {/* Product Details */}
@@ -541,178 +541,122 @@ const ViewWorkOrder = () => {
               </div>
             </div>
 
-             {/* Layer Configuration - LEFT SIDE, styled to match */}
-             <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-                <div className="p-3 border-b border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-700">Layer Configuration</h3>
-                </div>
-                <div className="p-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Group 1 */}
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs text-gray-500">Group 1</p>
-                        <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">3 Layers</span>
+            {/* Layer Configuration - LEFT SIDE, styled to match */}
+            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+              <div className="p-3 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Layer Configuration</h3>
+              </div>
+              <div className="p-4">
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Group 1 */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs text-gray-500">Group 1</p>
+                      <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">3 Layers</span>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-yellow-800"></div>
+                          <p className="text-sm font-medium">Top Layer</p>
+                        </div>
+                        <p className="text-xs text-gray-500">GSM: 1</p>
                       </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 rounded-full bg-yellow-800"></div>
-                            <p className="text-sm font-medium">Top Layer</p>
-                          </div>
-                          <p className="text-xs text-gray-500">GSM: 1</p>
+                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                          <p className="text-sm font-medium">Corrugated Layer 1</p>
                         </div>
-                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                            <p className="text-sm font-medium">Corrugated Layer 1</p>
-                          </div>
-                          <p className="text-xs text-gray-500">Flute: A</p>
+                        <p className="text-xs text-gray-500">Flute: A</p>
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-yellow-800"></div>
+                          <p className="text-sm font-medium">Bottom Layer</p>
                         </div>
-                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 rounded-full bg-yellow-800"></div>
-                            <p className="text-sm font-medium">Bottom Layer</p>
-                          </div>
-                          <p className="text-xs text-gray-500">GSM: 1</p>
-                        </div>
+                        <p className="text-xs text-gray-500">GSM: 1</p>
                       </div>
                     </div>
-                    {/* Group 2 */}
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs text-gray-500">Group 2</p>
-                        <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">2 Layers</span>
+                  </div>
+                  {/* Group 2 */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs text-gray-500">Group 2</p>
+                      <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">2 Layers</span>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-yellow-800"></div>
+                          <p className="text-sm font-medium">Layer 1</p>
+                        </div>
+                        <p className="text-xs text-gray-500">GSM: 1</p>
                       </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 rounded-full bg-yellow-800"></div>
-                            <p className="text-sm font-medium">Layer 1</p>
-                          </div>
-                          <p className="text-xs text-gray-500">GSM: 1</p>
+                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                          <p className="text-sm font-medium">Layer 2</p>
                         </div>
-                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                            <p className="text-sm font-medium">Layer 2</p>
-                          </div>
-                          <p className="text-xs text-gray-500">GSM: 1</p>
-                        </div>
+                        <p className="text-xs text-gray-500">GSM: 1</p>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
           </div>
 
           {/* Right Column - Related Info */}
           <div>
-            {/* QR Code - Using actual QR code URL if available */}
-            <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-              <div className="p-3 border-b border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700">Work Order QR Code</h3>
-              </div>
-              <div className="flex flex-col items-center p-4">
-                {/* <div className="bg-white p-2 border border-gray-200 rounded-md">
-                {workOrder?.qr_code_url ? (
-                  <img 
-                    src={workOrder?.qr_code_url} 
-                    alt="QR code" 
-                    className="w-full max-w-xs"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/api/placeholder/200/200";
-                    }}
-                  />
-                ) : (
-                  <img 
-                    src="/api/placeholder/200/200" 
-                    alt="QR code placeholder" 
-                    className="w-full max-w-xs" 
-                  />
-                )}
-              </div> */}
-                <button className="mt-3 px-3 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                  <Download size={14} className="inline mr-1" />
-                  Download QR Code
-                </button>
-              </div>
-            </div>
-
-            {/* Related Info */}
-            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-              <div className="p-3 border-b border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700">Related Information</h3>
-              </div>
-              <div className="p-4">
-              <div className="space-y-3">
-                  <div>
-                    <p className="text-xs text-gray-500">Sales Order</p>
-                    <p
-                     onClick={()=>navigate(`/salesorder/view/${workOrder.sales_order_id}`)}
-                     className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">#{workOrder?.salesOrder?.sales_generate_id ?workOrder?.salesOrder?.sales_generate_id  : 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">SO-REFERENCE</p>
-                    <p
-onClick={()=>navigate(`/salesorder/view/${workOrder.sales_order_id}`)}
-className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">{workOrder?.salesOrder?.sales_ui_id ?workOrder?.salesOrder?.sales_ui_id  : 'N/A'}</p>                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Client</p>
-                    <p
-                     onClick={()=>navigate(`/clients/${workOrder.client_id}`)}
-                     className=" text-blue-600 hover:text-blue-800 cursor-pointer text-sm font-medium">{workOrder?.salesOrder?.client || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Last Updated</p>
-                    <p className="text-sm font-medium">{formatDate(workOrder.updated_at)}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* What's Next Section */}
-
             {/* Actions */}
-            <div className="mt-4 overflow-visible bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div className="overflow-visible bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="p-3 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">Actions</h3>
               </div>
               <div className="p-4">
                 <div className="space-y-2">
                   <div className="relative">
-                    <button 
+                    <button
                       className="w-full px-3 py-1.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700 flex items-center justify-between"
                       onClick={() => setIsProgressDropdownOpen(!isProgressDropdownOpen)}
                     >
                       Update Progress
                       <ChevronDown size={14} className="ml-1" />
                     </button>
-                    
-                    {isProgressDropdownOpen && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                        {progressOptions.map((option) => (
-                          <button
-                            key={option}
-                            className={`w-full px-3 py-1.5 text-xs text-left hover:bg-gray-50 ${
-                              workOrder.progress === option ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-                            }`}
-                            onClick={() => handleProgressChange(option)}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    )}
                   </div>
-                  
-                  <button className="w-full px-3 py-1.5 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                    View Production Reports
-                  </button>
-                  <button className="w-full px-3 py-1.5 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                    View Materials Used
-                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Related Info */}
+            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+              <div className="p-2 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Related Information</h3>
+              </div>
+              <div className="p-2">
+                <div>
+                  <div className="mb-0.5">
+                    <p className="text-xs text-gray-500">Sales Order</p>
+                    <p
+                      onClick={() => navigate(`/salesorder/view/${workOrder.sales_order_id}`)}
+                      className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">#{workOrder?.salesOrder?.sales_generate_id ? workOrder?.salesOrder?.sales_generate_id : 'N/A'}</p>
+                  </div>
+                  <div className="mb-0.5">
+                    <p className="text-xs text-gray-500">SO-REFERENCE</p>
+                    <p
+                      onClick={() => navigate(`/salesorder/view/${workOrder.sales_order_id}`)}
+                      className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">{workOrder?.salesOrder?.sales_ui_id ? workOrder?.salesOrder?.sales_ui_id : 'N/A'}</p>
+                  </div>
+                  <div className="mb-0.5">
+                    <p className="text-xs text-gray-500">Client</p>
+                    <p
+                      onClick={() => navigate(`/clients/${workOrder.client_id}`)}
+                      className="text-blue-600 hover:text-blue-800 cursor-pointer text-sm font-medium">{workOrder?.salesOrder?.client || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Last Updated</p>
+                    <p className="text-sm font-medium">{formatDate(workOrder.updated_at)}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -731,7 +675,7 @@ className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium"
                     </div>
                     <button
                       onClick={() => setIsProductionPlannedModalOpen(true)}
-                      className=" p-0.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
+                      className="p-0.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
                     >
                       Plan Production
                     </button>
@@ -769,7 +713,20 @@ className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium"
               </div>
             </div>
 
-            {/* Invoice Creation Modal */}
+            {/* Work Order QR Code - Moved to bottom */}
+            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+              <div className="p-3 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Work Order QR Code</h3>
+              </div>
+              <div className="flex flex-col items-center p-4">
+                <button className="mt-3 px-3 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                  <Download size={14} className="inline mr-1" />
+                  Download QR Code
+                </button>
+              </div>
+            </div>
+
+            {/* Modals */}
             <InvoiceCreationModal
               isOpen={isInvoiceModalOpen}
               onClose={() => setIsInvoiceModalOpen(false)}
@@ -777,32 +734,27 @@ className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium"
               onSubmit={handleCreateInvoice}
             />
             <InvoiceModal
-            isOpen={isInvoiceOpen}
-            invoices={invoiceHistory}
-            setIsOpen={setInvoiceOpen}
+              isOpen={isInvoiceOpen}
+              invoices={invoiceHistory}
+              setIsOpen={setInvoiceOpen}
             />
-                    <CustomAlert
-        alerts={alerts}
-        handleClose={handleClose}
-      />
-
-<ProgressCompletedModal
-        qty={completedWorkOrderData?.qty}
-        id={completedWorkOrderData?.id}
-        progress={completedWorkOrderData?.progress}
-        isOpen={isOpenProgressModale}
-        onClose={() => {setIsOpenProgressModale(false)
-          setIsProgressDropdownOpen(false)
-        }
-        }
-        setAlerts={setAlerts}
-        // setCellData={setWorkOrder}
-        setWorkOrder={setWorkOrder}
-    setIsProgressDropdownOpen={setIsProgressDropdownOpen}
-
-        
-      />
-
+            <CustomAlert
+              alerts={alerts}
+              handleClose={handleClose}
+            />
+            <ProgressCompletedModal
+              qty={completedWorkOrderData?.qty}
+              id={completedWorkOrderData?.id}
+              progress={completedWorkOrderData?.progress}
+              isOpen={isOpenProgressModale}
+              onClose={() => {
+                setIsOpenProgressModale(false)
+                setIsProgressDropdownOpen(false)
+              }}
+              setAlerts={setAlerts}
+              setWorkOrder={setWorkOrder}
+              setIsProgressDropdownOpen={setIsProgressDropdownOpen}
+            />
           </div>
         </div>
       </div>

@@ -259,7 +259,7 @@ const WorkOrderTable = ({
       <ReusableTable
         columns={columns}
         data={cellData}
-        miniScreenFields={['select', 'work_generate_id']}
+        miniScreenFields={['work_generate_id']}
         isMinimiseTable={isMinimiseTable}
         handleRowClick={handleView}
       />

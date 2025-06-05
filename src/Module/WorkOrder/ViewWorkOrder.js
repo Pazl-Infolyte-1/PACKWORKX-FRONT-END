@@ -607,12 +607,8 @@ const ViewWorkOrder = () => {
           </div>
 
           {/* Right Column - Related Info */}
-
-
           <div>
-            {/* QR Code - Using actual QR code URL if available */}
-
-
+            {/* Actions */}
             <div className="overflow-visible bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="p-3 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">Actions</h3>
@@ -627,87 +623,35 @@ const ViewWorkOrder = () => {
                       Update Progress
                       <ChevronDown size={14} className="ml-1" />
                     </button>
-
-                    {isProgressDropdownOpen && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                        {progressOptions.map((option) => (
-                          <button
-                            key={option}
-                            className={`w-full px-3 py-1.5 text-xs text-left hover:bg-gray-50 ${workOrder.progress === option ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-                              }`}
-                            onClick={() => handleProgressChange(option)}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    )}
                   </div>
-                  {/*                   
-                  <button className="w-full px-3 py-1.5 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                    View Production Reports
-                  </button>
-                  <button className="w-full px-3 py-1.5 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                    View Materials Used
-                  </button> */}
                 </div>
-              </div>
-            </div>
-
-            <div className="overflow-hidden mt-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-              <div className="p-3 border-b border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700">Work Order QR Code</h3>
-              </div>
-              <div className="flex flex-col items-center p-4">
-                {/* <div className="bg-white p-2 border border-gray-200 rounded-md">
-                {workOrder?.qr_code_url ? (
-                  <img 
-                    src={workOrder?.qr_code_url} 
-                    alt="QR code" 
-                    className="w-full max-w-xs"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/api/placeholder/200/200";
-                    }}
-                  />
-                ) : (
-                  <img 
-                    src="/api/placeholder/200/200" 
-                    alt="QR code placeholder" 
-                    className="w-full max-w-xs" 
-                  />
-                )}
-              </div> */}
-                <button className="mt-3 px-3 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                  <Download size={14} className="inline mr-1" />
-                  Download QR Code
-                </button>
               </div>
             </div>
 
             {/* Related Info */}
             <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-              <div className="p-3 border-b border-gray-200">
+              <div className="p-2 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">Related Information</h3>
               </div>
-              <div className="p-4">
-                <div className="space-y-3">
-                  <div className="">
+              <div className="p-2">
+                <div>
+                  <div className="mb-0.5">
                     <p className="text-xs text-gray-500">Sales Order</p>
                     <p
                       onClick={() => navigate(`/salesorder/view/${workOrder.sales_order_id}`)}
                       className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">#{workOrder?.salesOrder?.sales_generate_id ? workOrder?.salesOrder?.sales_generate_id : 'N/A'}</p>
                   </div>
-                  <div>
+                  <div className="mb-0.5">
                     <p className="text-xs text-gray-500">SO-REFERENCE</p>
                     <p
                       onClick={() => navigate(`/salesorder/view/${workOrder.sales_order_id}`)}
-                      className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">{workOrder?.salesOrder?.sales_ui_id ? workOrder?.salesOrder?.sales_ui_id : 'N/A'}</p>                  </div>
-                  <div>
+                      className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">{workOrder?.salesOrder?.sales_ui_id ? workOrder?.salesOrder?.sales_ui_id : 'N/A'}</p>
+                  </div>
+                  <div className="mb-0.5">
                     <p className="text-xs text-gray-500">Client</p>
                     <p
                       onClick={() => navigate(`/clients/${workOrder.client_id}`)}
-                      className=" text-blue-600 hover:text-blue-800 cursor-pointer text-sm font-medium">{workOrder?.salesOrder?.client || 'N/A'}</p>
+                      className="text-blue-600 hover:text-blue-800 cursor-pointer text-sm font-medium">{workOrder?.salesOrder?.client || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Last Updated</p>
@@ -716,51 +660,6 @@ const ViewWorkOrder = () => {
                 </div>
               </div>
             </div>
-
-            {/* What's Next Section */}
-
-            {/* Actions */}
-            {/* <div className=" mt-4overflow-visible bg-white border border-gray-200 rounded-lg shadow-sm">
-              <div className="p-3 border-b border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700">Actions</h3>
-              </div>
-              <div className="p-4">
-                <div className="space-y-2">
-                  <div className="relative">
-                    <button 
-                      className="w-full px-3 py-1.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700 flex items-center justify-between"
-                      onClick={() => setIsProgressDropdownOpen(!isProgressDropdownOpen)}
-                    >
-                      Update Progress
-                      <ChevronDown size={14} className="ml-1" />
-                    </button>
-                    
-                    {isProgressDropdownOpen && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                        {progressOptions.map((option) => (
-                          <button
-                            key={option}
-                            className={`w-full px-3 py-1.5 text-xs text-left hover:bg-gray-50 ${
-                              workOrder.progress === option ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-                            }`}
-                            onClick={() => handleProgressChange(option)}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <button className="w-full px-3 py-1.5 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                    View Production Reports
-                  </button>
-                  <button className="w-full px-3 py-1.5 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                    View Materials Used
-                  </button>
-                </div>
-              </div>
-            </div> */}
 
             {/* Production Planned Section */}
             <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
@@ -776,7 +675,7 @@ const ViewWorkOrder = () => {
                     </div>
                     <button
                       onClick={() => setIsProductionPlannedModalOpen(true)}
-                      className=" p-0.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
+                      className="p-0.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
                     >
                       Plan Production
                     </button>
@@ -787,9 +686,6 @@ const ViewWorkOrder = () => {
                 </div>
               </div>
             </div>
-
-
-
 
             {/* Raw Material Allocation Section */}
             <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
@@ -817,7 +713,20 @@ const ViewWorkOrder = () => {
               </div>
             </div>
 
-            {/* Invoice Creation Modal */}
+            {/* Work Order QR Code - Moved to bottom */}
+            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+              <div className="p-3 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700">Work Order QR Code</h3>
+              </div>
+              <div className="flex flex-col items-center p-4">
+                <button className="mt-3 px-3 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                  <Download size={14} className="inline mr-1" />
+                  Download QR Code
+                </button>
+              </div>
+            </div>
+
+            {/* Modals */}
             <InvoiceCreationModal
               isOpen={isInvoiceModalOpen}
               onClose={() => setIsInvoiceModalOpen(false)}
@@ -833,7 +742,6 @@ const ViewWorkOrder = () => {
               alerts={alerts}
               handleClose={handleClose}
             />
-
             <ProgressCompletedModal
               qty={completedWorkOrderData?.qty}
               id={completedWorkOrderData?.id}
@@ -842,16 +750,11 @@ const ViewWorkOrder = () => {
               onClose={() => {
                 setIsOpenProgressModale(false)
                 setIsProgressDropdownOpen(false)
-              }
-              }
+              }}
               setAlerts={setAlerts}
-              // setCellData={setWorkOrder}
               setWorkOrder={setWorkOrder}
               setIsProgressDropdownOpen={setIsProgressDropdownOpen}
-
-
             />
-
           </div>
         </div>
       </div>

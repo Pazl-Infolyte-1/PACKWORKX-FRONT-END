@@ -12,7 +12,7 @@ const OrderForm = ({
   isSubmitting,
   setDrawer,
   clientData,
-   selectedPoId
+  selectedPoId
 }) => {
   const [formValues, setFormValues] = useState(orderData)
   const [items, setItems] = useState(itemsData || [])
@@ -28,9 +28,6 @@ const OrderForm = ({
     total_amount: 0,
   })
 
-  console.log('order form');
-  
-
   const {
     register,
     handleSubmit,
@@ -38,6 +35,7 @@ const OrderForm = ({
     formState: { errors },
     setValue,
     watch,
+    clearErrors, // Add this to clear errors
   } = useForm({
     defaultValues: orderData || {
       po_date: new Date().toISOString().split('T')[0],
@@ -53,16 +51,47 @@ const OrderForm = ({
     },
   })
 
+  // Reset form when orderData changes (for edit mode)
   useEffect(() => {
     if (orderData) {
+      // Clear all previous errors first
+      clearErrors()
+      
+      // Reset form with new data
+      reset(orderData)
+      
+      // Set individual values to ensure they're properly set
       Object.keys(orderData).forEach((key) => {
         setValue(key, orderData[key])
       })
-      if (orderData.billing_addresses) {
+      
+      if (orderData.supplier_addresses) {
         setSupplierAddresses(orderData.supplier_addresses)
       }
     }
-  }, [orderData, setValue])
+  }, [orderData, reset, setValue, clearErrors])
+
+  // Clear form when not in edit mode
+  useEffect(() => {
+    if (!isEdit) {
+      clearErrors() // Clear errors when switching to add mode
+      reset({
+        po_date: new Date().toISOString().split('T')[0],
+        valid_till: '',
+        supplier_id: '',
+        supplier_name: '',
+        supplier_contact: '',
+        supplier_email: '',
+        billing_address: '',
+        shipping_address: '',
+        payment_terms: '',
+        freight_terms: '',
+      })
+      setItems([{ item_id: '', quantity: 1 }])
+      setSupplierAddresses([])
+      setSelectedAddressIndex(0)
+    }
+  }, [isEdit, reset, clearErrors])
 
   useEffect(() => {
     setItems(itemsData || [])
@@ -78,12 +107,14 @@ const OrderForm = ({
       setValue('supplier_contact', selectedClient.mobile || selectedClient.work_phone || '')
       setValue('payment_terms', selectedClient.payment_terms || '')
 
+      // Clear supplier_id error when a valid supplier is selected
+      clearErrors('supplier_id')
+
       // Handle addresses
       const addresses = selectedClient.addresses || []
       setSupplierAddresses(addresses)
       setSelectedAddressIndex(0)
 
-      // billing_address:"",
       const address_billing = addresses[0] || {}
       const billingString = [
         address_billing.attention,
@@ -200,7 +231,6 @@ const OrderForm = ({
     )
   }
 
-  // When confirming address selection in modal
   const handleAddressSelect = () => {
     const addressObj = supplierAddresses[selectedAddressIndex] || {}
     const addressString = [
@@ -232,7 +262,7 @@ const OrderForm = ({
               Supplier ID <span className="text-red-500"> *</span>
             </label>
             <select
-              {...register('supplier_id', { required: 'required' })}
+              {...register('supplier_id', { required: 'Supplier is required' })}
               onChange={handleSupplierChange}
               className="w-full p-2 border border-gray-300 rounded-md"
             >
@@ -254,7 +284,7 @@ const OrderForm = ({
             </label>
             <input
               type="text"
-              {...register('supplier_name', { required: 'required' })}
+              {...register('supplier_name', { required: 'Supplier name is required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
               readOnly
             />
@@ -269,7 +299,7 @@ const OrderForm = ({
             </label>
             <input
               type="number"
-              {...register('supplier_contact', { required: 'required' })}
+              {...register('supplier_contact', { required: 'Supplier contact is required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
               readOnly
             />
@@ -284,7 +314,7 @@ const OrderForm = ({
             </label>
             <input
               type="email"
-              {...register('supplier_email', { required: 'required' })}
+              {...register('supplier_email', { required: 'Supplier email is required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
               readOnly
             />
@@ -299,9 +329,8 @@ const OrderForm = ({
             </label>
             <input
               type="text"
-              {...register('payment_terms', { required: 'required' })}
+              {...register('payment_terms', { required: 'Payment terms are required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
-              // readOnly
             />
             {errors.payment_terms && (
               <p className="text-red-500 text-sm mt-1">{errors.payment_terms.message}</p>
@@ -323,7 +352,7 @@ const OrderForm = ({
             </label>
             <input
               type="date"
-              {...register('valid_till', { required: 'required' })}
+              {...register('valid_till', { required: 'Valid till date is required' })}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
             {errors.valid_till && (
@@ -341,7 +370,7 @@ const OrderForm = ({
           </div>
         </div>
 
-        {/* Address */}
+        {/* Address sections remain the same */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
           <div className="form-group">
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -450,8 +479,6 @@ const OrderForm = ({
                       <div className="flex-1">
                         <div>{formatAddress(address)}</div>
                       </div>
-                      {/* Optional: Delete button */}
-                      {/* <button className="text-red-500 text-xs ml-2">Delete</button> */}
                     </div>
                   ))}
                 </div>

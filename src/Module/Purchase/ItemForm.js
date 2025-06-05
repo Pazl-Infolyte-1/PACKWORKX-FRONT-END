@@ -24,11 +24,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
       </div>
     )
   }
-
-  {
-    console.log('item form')
-  }
-
+  
   const openItemDetails = async (item_id) => {
     try {
       const response = await apiMethods.getItemList()

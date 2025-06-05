@@ -269,7 +269,7 @@ const onSubmit = async (data) => {
     { label: 'Reference Number', name: 'item_code', required: true },
     { label: 'Product Name', name: 'item_name', required: true },
     { label: 'HSN Code', name: 'hsn_code' },
-    { label: 'UOM', name: 'uom', required: true },
+    { label: 'UOM (Unit of Measurments)', name: 'uom', required: true },
     { label: 'CGST %', name: 'cgst', type: 'number', min: 0, max: 100 },
     { label: 'SGST %', name: 'sgst', type: 'number', min: 0, max: 100 },
     { label: 'Manufacturer', name: 'manufacturer' },

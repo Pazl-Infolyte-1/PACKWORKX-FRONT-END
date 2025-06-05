@@ -110,12 +110,26 @@ const PurchaseOrder = () => {
     setReturnDrawerOpen(true)
   }
 
-  const handleSuccess = (message) => {
-    setRefresh(prev => !prev)
-    setAlert({ show: true, message, type: 'success' })
-    setDrawerOpen(false)
-    setReturnDrawerOpen(false)
+const handleSuccess = (updatedData) => {
+  setRefresh(prev => !prev) // Trigger refresh
+  setAlert({ 
+    show: true, 
+    message: `Purchase Order ${isEdit ? 'updated' : 'created'} successfully`, 
+    type: 'success' 
+  })
+  
+  // If editing, update the local data state
+  if (isEdit && updatedData) {
+    setData(prevData => 
+      prevData.map(item => 
+        item.id === updatedData.id ? updatedData : item
+      )
+    )
   }
+  
+  setDrawerOpen(false)
+  setReturnDrawerOpen(false)
+}
 
   const closeAlert = () => {
     setAlert(prev => ({ ...prev, show: false }))
@@ -181,12 +195,15 @@ const PurchaseOrder = () => {
           maxWidth={'1350px'}
           title={isEdit ? 'Edit Purchase Order' : 'Add Purchase Order'}
         >
-          <AddPurchaseOrder
+          {
+            isDrawerOpen &&
+            <AddPurchaseOrder
             isEdit={isEdit}
             selectedPoId={selectedPoId}
             setDrawer={setDrawerOpen}
             onSuccess={handleSuccess}
           />
+          }
         </Drawer>
 
         <Drawer

@@ -107,25 +107,33 @@ const handleFormSubmit = async (formData) => {
     let response
     if (isEdit) {
       response = await apiMethods.updatePurchaseOrder(selectedPoId, payload)
+      console.log(response.data, 'updated');
+      
       setAlerts([
         { severity: 'success', message: response?.data?.message || 'Successfully updated' },
       ])
+      
+      // Call onSuccess immediately to refresh the parent data
+      if (onSuccess) {
+        onSuccess(response.data) // Pass the updated data back
+      }
+      
+      // Close the drawer after a short delay
+      setTimeout(() => {
+        setDrawer(false)
+      }, 1000)
     } else {
       response = await apiMethods.createPurchaseOrder(payload)
       setAlerts([
         { severity: 'success', message: response?.data?.message || 'Successfully created' },
       ])
+      if (onSuccess) {
+        onSuccess(response.data)
+      }
+      setTimeout(() => {
+        setDrawer(false)
+      }, 1000)
     }
-
-    // Call onSuccess immediately to refresh the parent data
-    if (onSuccess) {
-      onSuccess(response?.data?.message || `Successfully ${isEdit ? 'updated' : 'created'}`)
-    }
-
-    setTimeout(() => {
-      setDrawer(false)
-    }, 1000)
-    
   } catch (error) {
     console.error('API Error:', error)
     setAlerts([

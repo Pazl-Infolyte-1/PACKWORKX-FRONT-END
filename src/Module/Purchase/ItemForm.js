@@ -15,7 +15,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
     if (!isOpen) return null
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded p-6 max-w-md w-full">
+        <div className="bg-white rounded p-6 max-w-2xl w-full">
           <button onClick={onClose} className="float-right">
             &times;
           </button>
@@ -24,34 +24,126 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
       </div>
     )
   }
-  
-  const openItemDetails = async (item_id) => {
-    try {
-      const response = await apiMethods.getItemList()
-      const items = response?.data?.data || []
-      console.log(items, 'item')
-      const item = items.find((i) => i.id === parseInt(item_id))
-      const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}
 
+  const openItemDetails = async (item_id) => {
+  try {
+    const response = await apiMethods.getItemList()
+    const items = response?.data?.data || []
+    const item = items.find((i) => i.id === parseInt(item_id))
+    console.log(item, 'item')
+    
+    if (!item) {
       setModalContent(
-        <>
-          <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
-          {Object.entries(customFields).length > 0 ? (
-            Object.entries(customFields).map(([key, value], idx) => (
-              <p key={idx}>
-                <strong>{key}:</strong> {value}
-              </p>
-            ))
-          ) : (
-            <p>No custom fields available.</p>
-          )}
-        </>,
+        <div className="text-center py-4">
+          <p className="text-red-500">Item not found.</p>
+        </div>
       )
       setIsModalOpen(true)
-    } catch (error) {
-      console.error('Error fetching item details:', error)
+      return
     }
+
+    const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}
+
+    setModalContent(
+      <div className="max-h-96 overflow-y-auto">
+        <h3 className="text-xl font-semibold mb-4 text-gray-800">Item Details</h3>
+        
+        {/* Basic Information */}
+        <div className="mb-6">
+          <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Basic Information</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+            <p><strong>Item ID:</strong> {item.id}</p>
+            <p><strong>Item Code:</strong> {item.item_code}</p>
+            <p><strong>Generated ID:</strong> {item.item_generate_id}</p>
+            <p><strong>Item Name:</strong> {item.item_name}</p>
+            <p><strong>Status:</strong> 
+              <span className={`ml-1 px-2 py-1 rounded text-xs ${
+                item.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+              }`}>
+                {item.status}
+              </span>
+            </p>
+            <p><strong>UOM:</strong> {item.uom}</p>
+          </div>
+        </div>
+
+        {/* Description */}
+        {item.description && (
+          <div className="mb-6">
+            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Description</h4>
+            <p className="text-sm">{item.description}</p>
+          </div>
+        )}
+
+        {/* Financial Information */}
+        <div className="mb-6">
+          <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Financial Information</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+            <p><strong>Standard Cost:</strong> ₹{item.standard_cost}</p>
+            <p><strong>CGST:</strong> {item.cgst}%</p>
+            <p><strong>SGST:</strong> {item.sgst}%</p>
+            <p><strong>HSN Code:</strong> {item.hsn_code}</p>
+          </div>
+        </div>
+
+        {/* Stock Information */}
+        <div className="mb-6">
+          <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Stock Information</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+            <p><strong>Min Stock Level:</strong> {item.min_stock_level}</p>
+            <p><strong>Reorder Level:</strong> {item.reorder_level}</p>
+          </div>
+        </div>
+
+        {/* Category Information */}
+        <div className="mb-6">
+          <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Category Information</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+            <p><strong>Category ID:</strong> {item.category}</p>
+            <p><strong>Sub Category ID:</strong> {item.sub_category}</p>
+            <p><strong>Company ID:</strong> {item.company_id}</p>
+          </div>
+        </div>
+
+        {/* Manufacturing Information */}
+        <div className="mb-6">
+          <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Manufacturing Information</h4>
+          <div className="text-sm">
+            <p><strong>Manufacturer:</strong> {item.manufacturer}</p>
+            {item.specifications && (
+              <p><strong>Specifications:</strong> {item.specifications}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Custom Fields */}
+        <div className="mb-6">
+          <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Custom Fields</h4>
+          {Object.entries(customFields).length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              {Object.entries(customFields).map(([key, value], idx) => (
+                <p key={idx}>
+                  <strong>{key}:</strong> {value}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No custom fields available.</p>
+          )}
+        </div>
+      </div>
+    )
+    setIsModalOpen(true)
+  } catch (error) {
+    console.error('Error fetching item details:', error)
+    setModalContent(
+      <div className="text-center py-4">
+        <p className="text-red-500">Error loading item details. Please try again.</p>
+      </div>
+    )
+    setIsModalOpen(true)
   }
+}
 
   // Form with both items and PO totals
   const { control, register, setValue, getValues, reset, watch } = useForm({

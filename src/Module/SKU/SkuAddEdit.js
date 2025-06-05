@@ -621,16 +621,23 @@ useEffect(() => {
 
   useEffect(() => {
       const updatedSkuValues = addNewSkuData.sku_values.map((item) => {
-    const { gsm, bf, selected_flute } = item;
+    const { gsm, bf, selected_flute, layer } = item;
+
     if (gsm && bf) {
-      const takeUpFactor = selected_flute?.take_up_factor ?? 1; // default to 1 if not present
-      const calculatedBS = Number(((gsm * bf * takeUpFactor) / 1000).toFixed(3));
-console.log("calculated bs",calculatedBS)
-      // Only update if bursting_strength actually changed
+      const isCorrugated = layer?.toLowerCase().includes('corrugated');
+
+      // Choose divisor based on corrugated status
+      const divisor = isCorrugated ? 2000 : 1000;
+
+      const calculatedBS = Number(((gsm * bf) / divisor).toFixed(3));
+      console.log("calculated bursting strength:", calculatedBS);
+
+      // Only update if the calculated bursting strength is different
       if (item.bursting_strength !== calculatedBS) {
         return { ...item, bursting_strength: calculatedBS };
       }
     }
+
     return item;
   });
     const hasChanged = updatedSkuValues.some(
@@ -977,7 +984,7 @@ console.log("add sku data",addNewSkuData.client_id)
                       <p>{toThreeDecimalFixed(item.weight) || 'N/A'}</p>
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <p>{Math.round(item.bursting_strength) / 1000}</p>
+                      <p>{Math.round(item.bursting_strength)}</p>
                     </td>
                   </tr>
                 ))}

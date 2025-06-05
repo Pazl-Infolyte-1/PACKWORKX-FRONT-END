@@ -1577,7 +1577,33 @@ getinventoryWithParams: async (catId, page, limit = 50, search = '', subCatId) =
       console.error(error)
        throw error;
     }
+  },
+
+  getInventoryExcelExport: async (params) => {
+  try {
+    const response = await apiClient.get(`/inventory/export`, {
+      responseType: 'blob',
+      params,
+    });
+
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'Inventory Details.xlsx');
+    document.body.appendChild(link);
+    link.click();
+
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error('Failed to export inventory Excel:', error);
   }
+},
+
 }
 
 export default apiMethods

@@ -29,7 +29,7 @@ const InventoryTable = ({ inventoryData }) => {
 
   return (
     <>
-      <div className="w-full overflow-x-auto overflow-y-auto max-h-[410px] border rounded-md shadow-sm mt-1 mb-3">
+      <div className="w-full overflow-x-auto overflow-y-auto min-h-[430px] border rounded-md shadow-sm mt-1 mb-3">
         <CTable className="min-w-[1000px] table-fixed border-separate border-spacing-0">
           <CTableHead className="!bg-gray-100">
             <CTableRow>
@@ -105,16 +105,20 @@ const InventoryTable = ({ inventoryData }) => {
                     {item.item.standard_cost || '--'}
                   </CTableDataCell>
                   <CTableDataCell className="whitespace-nowrap">
-                    {item.total_quantity * item.item.standard_cost || '--'}
+                    {item.total_quantity * item.item.standard_cost || '0'}
                   </CTableDataCell>
                   <CTableDataCell className="whitespace-nowrap text-center">
                     {(() => {
                       let stockStatus = '--'
-                      if (item.total_quantity == 0.00) {
+                      // Convert strings to numbers
+                      const totalQuantity = parseFloat(item.total_quantity)
+                      const minStockLevel = parseFloat(item.item.min_stock_level)
+
+                      if (totalQuantity === 0.0) {
                         stockStatus = 'Out of Stock'
-                      } else if (item.total_quantity >= item.item.min_stock_level) {
+                      } else if (totalQuantity >= minStockLevel) {
                         stockStatus = 'In Stock'
-                      } else if (item.total_quantity < item.item.min_stock_level) {
+                      } else if (totalQuantity < minStockLevel) {
                         stockStatus = 'Low Stock'
                       }
 
@@ -153,8 +157,8 @@ const InventoryTable = ({ inventoryData }) => {
                     })()}
                   </CTableDataCell>
 
-                  <CTableDataCell className="px-4 py-3">
-                    <div onClick={(e) => e.stopPropagation()}>
+                  <CTableDataCell className=" py-3">
+                    <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
                       <ThreeDotMenu
                         value={[
                           {

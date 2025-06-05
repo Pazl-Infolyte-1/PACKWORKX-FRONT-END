@@ -60,6 +60,7 @@ function RSCBox({
   setRscUnits,
   uploadedFiles,
   setUploadedFiles,
+  rscUnits
 }) {
   const [alerts, setAlerts] = useState([])
   const [unitTooltip, setUnitTooltip] = useState('Enter Millimeter')
@@ -670,6 +671,8 @@ function RSCBox({
   }
 }, [addNewSkuData.sku_name, addNewSkuData.customer_reference]);
 
+
+console.log("unit///",rscUnits)
   return (
     <div className="rounded-lg ">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -837,7 +840,7 @@ function RSCBox({
           <label className="text-sm text-gray-700 font-medium">Select Units:</label>
           <div className="relative w-28">
             <select
-              value={addNewSkuData.unit || 'mm'}
+              value={addNewSkuData.unit || rscUnits}
               onChange={handleUnitChange}
               className="w-full appearance-none bg-gray-700 text-white py-1.5 px-2 pr-7 rounded-md text-sm hover:bg-gray-400 transition-colors focus:outline-none"
             >

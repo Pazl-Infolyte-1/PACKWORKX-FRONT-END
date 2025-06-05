@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import PurchaseOrderTable from './PurchaseOrderTable'
 import AddPurchaseOrder from './AddPurchaseOrder'
 import AddPurchaseOrderReturn from '../PurchaseReturn/AddPurchaseReturn'
@@ -11,17 +11,17 @@ import Loader from '../../components/New/Loader'
 import CompactPagination from '../../components/New/CompactPagination'
 import { useSearch } from '../../components/New/SearchContext'
 import ContentHeader from '../../components/New/ContentHeader'
+import { debounce } from 'lodash'
 
 const PurchaseOrder = () => {
   const [data, setData] = useState([])
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [isReturnDrawerOpen, setReturnDrawerOpen] = useState(false)
-
   const [isEdit, setIsEdit] = useState(false)
   const [selectedPoId, setSelectedPoId] = useState(null)
   const [alert, setAlert] = useState({ show: false, message: '', type: '' })
   const [loading, setLoading] = useState(true)
-  const { searchQuery, filteredSearchData, setGlobalPlaceholder } = useSearch()
+  const { searchQuery, setGlobalSearchQuery, setGlobalPlaceholder } = useSearch()
   const [totalPages, setTotalPages] = useState(0)
   const [refresh, setRefresh] = useState(false)
   const [paginationParams, setPaginationParams] = useState({
@@ -29,27 +29,27 @@ const PurchaseOrder = () => {
     pageSize: 50,
   })
   const searchBarRef = useRef(null)
-  const [status, setStatus] = useState('')
 
+  // Set placeholder on mount
   useEffect(() => {
     setGlobalPlaceholder('Search purchase orders...')
-
     return () => {
       setGlobalPlaceholder('Search...')
     }
-  }, [])
+  }, [setGlobalPlaceholder])
 
-  const fetchData = async () => {
+  // Debounced fetch function
+  const fetchData = useCallback(async (search, pageParams) => {
     setLoading(true)
     try {
       const res = await apiMethods.getPurchaseOrders({
-        search: searchQuery,
-        page: paginationParams.currentPage,
-        limit: paginationParams.pageSize,
+        search,
+        page: pageParams.currentPage,
+        limit: pageParams.pageSize,
         status: 'active',
       })
       setData(res.data || [])
-      setTotalPages(Math.ceil(res.totalCount / paginationParams.pageSize))
+      setTotalPages(Math.ceil(res.totalCount / pageParams.pageSize))
     } catch (err) {
       setAlert({
         show: true,
@@ -59,29 +59,36 @@ const PurchaseOrder = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  // Create debounced version of fetchData
+  const debouncedFetchData = useRef(
+    debounce((search, params) => fetchData(search, params), 500)
+  ).current
+
+  // Fetch data when dependencies change
   useEffect(() => {
-    // Reset to first page when searchQuery changes
-    if (searchQuery) {
-      setPaginationParams((prev) => ({
-        ...prev,
-        currentPage: 1,
-      }))
+    debouncedFetchData(searchQuery, paginationParams)
+  }, [searchQuery, paginationParams, refresh, debouncedFetchData])
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      debouncedFetchData.cancel()
     }
-    fetchData()
-  }, [paginationParams, searchQuery, refresh])
+  }, [debouncedFetchData])
 
   const handlePageChange = (event, newPage) => {
-    setPaginationParams((prev) => ({
+    setPaginationParams(prev => ({
       ...prev,
-      currentPage: newPage, // Update the current page
+      currentPage: newPage,
     }))
   }
 
   const handleLimitChange = (value) => {
     setPaginationParams({
-      currentPage: 1, // Reset to the first page when limit changes
-      pageSize: value, // Update the page size
+      currentPage: 1,
+      pageSize: value,
     })
   }
 
@@ -104,54 +111,61 @@ const PurchaseOrder = () => {
   }
 
   const handleSuccess = (message) => {
-    fetchData()
+    setRefresh(prev => !prev)
     setAlert({ show: true, message, type: 'success' })
     setDrawerOpen(false)
+    setReturnDrawerOpen(false)
   }
 
   const closeAlert = () => {
-    setAlert({ ...alert, show: false })
+    setAlert(prev => ({ ...prev, show: false }))
   }
 
-  // const handleDelete = async (id) => {
-  //   try {
-  //     await apiMethods.deletePurchaseOrder(id);
-  //     setAlert({ show: true, message: "Purchase order deleted successfully!", type: "success" });
-  //     fetchData(); // Re-fetch the updated data
-  //   } catch (error) {
-  //     setAlert({ show: true, message: "Failed to delete purchase order.", type: "error" });
-  //   }
-  // };
+  const handleSearchChange = (value) => {
+    setGlobalSearchQuery(value)
+    // Reset to first page when searching
+    setPaginationParams(prev => ({
+      ...prev,
+      currentPage: 1,
+    }))
+  }
+
   const clearFilters = () => {
-    setStatus('')
     if (searchBarRef.current) {
       searchBarRef.current.clearSearch()
     }
+    setGlobalSearchQuery('')
   }
 
   return (
     <div className="p-1">
       {alert.show && (
-        <CustomAlert message={alert.message} severity={alert.type} onClose={closeAlert} />
+        <CustomAlert 
+          message={alert.message} 
+          severity={alert.type} 
+          onClose={closeAlert} 
+        />
       )}
       <div className="h-full w-full flex flex-col">
-        <ContentHeader heading={'Purchase Order'} onAddClick={handleAddNew} />
+        <ContentHeader 
+          heading={'Purchase Order'} 
+          onAddClick={handleAddNew} 
+        />
 
         {loading ? (
           <Loader />
         ) : (
           <>
             <PurchaseOrderTable
-              data={filteredSearchData.length ? filteredSearchData : data}
+              data={data}
               handleEdit={handleEdit}
               handlePurchaseDetails={handlePurchaseDetails}
-              // handleDelete={handleDelete}
               setRefresh={setRefresh}
             />
 
-            <div className="flex justify-end items-center gap-4 mt-2 ">
+            <div className="flex justify-end items-center gap-4 mt-2">
               <CompactPagination
-                count={totalPages} // Use totalPages directly
+                count={totalPages}
                 page={paginationParams.currentPage}
                 onPageChange={handlePageChange}
                 onEntriesChange={handleLimitChange}
@@ -172,7 +186,6 @@ const PurchaseOrder = () => {
             selectedPoId={selectedPoId}
             setDrawer={setDrawerOpen}
             onSuccess={handleSuccess}
-            fetchData={fetchData}
           />
         </Drawer>
 
@@ -180,14 +193,12 @@ const PurchaseOrder = () => {
           isOpen={isReturnDrawerOpen}
           onClose={() => setReturnDrawerOpen(false)}
           maxWidth={'1270px'}
-          title={isEdit ? 'Purchase Order Return' : 'Edit Purchase Order Return'}
+          title={'Purchase Order Return'}
         >
           <AddPurchaseOrderReturn
-            isEdit={isEdit}
             selectedPoId={selectedPoId}
             setDrawer={setReturnDrawerOpen}
             onSuccess={handleSuccess}
-            fetchData={fetchData}
           />
         </Drawer>
       </div>

@@ -4,7 +4,7 @@ import apiMethods from '../../../api/config'
 import CustomAlert from '../../../components/New/CustomAlert'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
+const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
   const [alerts, setAlerts] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedItemType, setSelectedItemType] = useState('')
@@ -12,14 +12,18 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawer, fetchData }) => {
   const [tagFields, setTagFields] = useState([])
   const [category, setCategory] = useState([])
   const [subCategory, setSubCategory] = useState([])
-    const [categoryId, setCategoryId] = useState(null)
+  const [allSubCategories, setAllSubCategories] = useState([])
+  const [categoryId, setCategoryId] = useState(null)
 
-
-const location = useLocation()
-const navigate=useNavigate()
-const fromInventory = location.state?.fromInventory
-const isEditing=location.state?.isInventoryEditing
-const itemVal=location.state?.item
+  const location = useLocation()
+  const navigate = useNavigate()
+  const fromInventory = location.state?.fromInventory
+  const isEditing = location.state?.isEdit
+  const itemVal = location.state?.item
+  
+  // Determine the correct item ID based on context
+  const currentItemId = selectedItemID || itemVal?.item_id
+  
   const {
     register,
     handleSubmit,
@@ -33,6 +37,13 @@ const itemVal=location.state?.item
       tags: {},
     },
   })
+
+   const toTitleCase = (str) =>
+    str
+      ?.toLowerCase()
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
 
   const handleAddField = () => {
     const newIndex = tagFields.length + 1
@@ -52,39 +63,110 @@ const itemVal=location.state?.item
     setTagFields(updatedFields)
   }
 
+  // Fetch categories and subcategories on component mount
   useEffect(() => {
-    if (isEdit && selectedItemID) {
-      fetchItemData(selectedItemID)
-    } else {
-      setSelectedItemType('raw-materials')
+    const fetchCategoryAndSubCategory = async () => {
+      try {
+        const categoryResponse = await apiMethods.getCategoryList()
+        setCategory(categoryResponse.data.data)
+
+        // Fetch all subcategories and store them separately
+        try {
+          const allSubCategoriesResponse = await apiMethods.subCategoryDropdown()
+          setAllSubCategories(allSubCategoriesResponse?.data?.data || [])
+        } catch (subCatErr) {
+          setAlerts([
+            {
+              severity: 'error',
+              message: subCatErr?.response?.data?.message || 'Error fetching subcategory data.',
+            },
+          ])
+        }
+      } catch (error) {
+        console.error('General category fetch error:', error)
+        setAlerts([
+          {
+            severity: 'error',
+            message: error?.response?.data?.message || 'Error fetching category data.',
+          },
+        ])
+      }
     }
-  }, [isEdit, selectedItemID])
-  
+
+    fetchCategoryAndSubCategory()
+  }, [])
+
+  // Initialize form based on editing state
+  useEffect(() => {
+    if (isEditing && currentItemId && category.length > 0 && allSubCategories.length > 0) {
+      fetchItemData(currentItemId)
+    } else if (!isEditing) {
+      setSelectedItemType('')
+      setSelectedSubCategory('')
+      setTagFields([])
+    }
+  }, [isEditing, currentItemId, category.length, allSubCategories.length])
+
   const fetchItemData = async (id) => {
     try {
-      const response = await apiMethods.getItemData(id)
-      if (response?.data?.data) {
-        const itemData = response.data.data
-        reset(itemData)
+      const response = await apiMethods.singleItem(id)
+      const itemData = response?.data
 
-        // Set the category (item_type) from the fetched data
-        setSelectedItemType(itemData.category || 'raw-materials')
+      if (itemData) {
+        // Reset the form with response values
+        reset({
+          item_code: itemData.item_code,
+          item_name: itemData.item_name,
+          hsn_code: itemData.hsn_code,
+          uom: itemData.uom,
+          cgst: parseFloat(itemData.cgst) || 0,
+          sgst: parseFloat(itemData.sgst) || 0,
+          manufacturer: itemData.manufacturer,
+          min_stock_level: parseFloat(itemData.min_stock_level) || 0,
+          reorder_level: parseFloat(itemData.reorder_level) || 0,
+          standard_cost: parseFloat(itemData.standard_cost) || 0,
+          specifications: itemData.specifications,
+          description: itemData.description,
+          category: itemData.category,
+          sub_category: itemData.sub_category,
+        })
 
-        // Find and set the sub-category name from the ID
-        if (itemData.sub_category) {
-          const subCat = subCategory.find((sc) => sc.id === itemData.sub_category)
-          if (subCat) {
-            setSelectedSubCategory(subCat.sub_category_name)
-          }
+        // Set category state - ensure it's a string for comparison
+        const categoryValue = String(itemData.category || '')
+        setSelectedItemType(categoryValue)
+        setCategoryId(categoryValue)
+
+        // Filter subcategories for the selected category
+        if (itemData.category) {
+          const filteredSubCategories = allSubCategories.filter(
+            (sc) => sc.category_id === Number(itemData.category)
+          )
+          setSubCategory(filteredSubCategories)
+
+          // Set subcategory state
+          const subCategoryValue = String(itemData.sub_category || '')
+          setSelectedSubCategory(subCategoryValue)
         }
 
-        // If tags exist, convert them to tagFields
-        const tags =
-          itemData.tags || itemData?.custom_fields ? JSON.parse(itemData.custom_fields) : {} || {}
-        const tagsArray = Object.entries(tags).map(([label, value]) => ({ label, value }))
-        setTagFields(tagsArray)
+        // Handle custom fields/tags
+        if (itemData.custom_fields) {
+          try {
+            const customFields = typeof itemData.custom_fields === 'string' 
+              ? JSON.parse(itemData.custom_fields) 
+              : itemData.custom_fields
+            const tagsArray = Object.entries(customFields).map(([label, value]) => ({ 
+              label, 
+              value: String(value) 
+            }))
+            setTagFields(tagsArray)
+          } catch (parseError) {
+            console.error('Error parsing custom fields:', parseError)
+            setTagFields([])
+          }
+        }
       }
     } catch (error) {
+      console.error('Error fetching item data:', error)
       setAlerts([
         {
           severity: 'error',
@@ -94,47 +176,26 @@ const itemVal=location.state?.item
     }
   }
 
-useEffect(() => {
-  const fetchCategoryAndSubCategory = async () => {
-    try {
-      const category = await apiMethods.getCategoryList();
-      setCategory(category.data.data);
-
-      try {
-        const subCategoryResponse = await apiMethods.subCategoryDropdown(categoryId);
-        setSubCategory(subCategoryResponse?.data?.data);
-      } catch (subCatErr) {
-        console.log("SubCategory API error:", subCatErr?.response?.data?.message); // 👈 only log this call’s error
-              setAlerts([
-        {
-          severity: 'error',
-          message: subCatErr?.response?.data?.message || 'Error fetching category data.',
-        },
-      ]);
-      }
-
-    } catch (error) {
-      console.error("General category fetch error:", error);
-      setAlerts([
-        {
-          severity: 'error',
-          message: error?.response?.data?.message || 'Error fetching category data.',
-        },
-      ]);
+  // Update subcategories when category changes
+  useEffect(() => {
+    if (categoryId && allSubCategories.length > 0) {
+      const filteredSubCategories = allSubCategories.filter(
+        (sc) => sc.category_id === Number(categoryId)
+      )
+      setSubCategory(filteredSubCategories)
+    } else {
+      setSubCategory([])
     }
-  };
+  }, [categoryId, allSubCategories])
 
-  fetchCategoryAndSubCategory();
-}, [isEdit, selectedItemID, categoryId]);
-
-useEffect(() => {
-  if (subCategory.length === 0) {
-    setSelectedSubCategory("");
-    setTagFields([])
-  }
-}, [subCategory]);
-
-
+  useEffect(() => {
+    if (subCategory.length === 0) {
+      setSelectedSubCategory('')
+      if (!isEditing) {
+        setTagFields([])
+      }
+    }
+  }, [subCategory, isEditing])
 
   const onSubmit = async (data) => {
     try {
@@ -157,11 +218,14 @@ useEffect(() => {
         standard_cost: parseFloat(data.standard_cost) || 0,
         cgst: parseFloat(data.cgst) || 0,
         sgst: parseFloat(data.sgst) || 0,
+        category: Number(data.category),
+        sub_category: data.sub_category ? Number(data.sub_category) : null,
       }
 
-      if (isEdit) {
-        formattedData.id = selectedItemID
-        response = await apiMethods.updateItem(selectedItemID, formattedData)
+      if (isEditing) {
+        formattedData.id = currentItemId
+
+        response = await apiMethods.updateItem(currentItemId, formattedData)
       } else {
         response = await apiMethods.addItem(formattedData)
       }
@@ -169,16 +233,16 @@ useEffect(() => {
       setAlerts([
         {
           severity: 'success',
-          message: response?.data?.message || `Item ${isEdit ? 'updated' : 'added'} successfully`,
+          message: response?.data?.message || `Item ${isEditing ? 'updated' : 'added'} successfully`,
         },
       ])
 
       setTimeout(() => {
-          if (fromInventory) {
-    navigate('/inventoryhandling');
-  }else{
-        setDrawer(false)
-  }
+        if (fromInventory) {
+          navigate('/inventoryhandling')
+        } else {
+          setDrawer(false)
+        }
         fetchData()
       }, 1500)
     } catch (error) {
@@ -196,12 +260,11 @@ useEffect(() => {
   function cleanAndUppercase(text) {
     return (
       text
-        .replace(/[^a-zA-Z0-9\s]/g, ' ') // Replace special chars with spaces
-        .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-        .trim() // Remove leading/trailing spaces
-        // .toUpperCase();
+        .replace(/[^a-zA-Z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
         .replace(/\b\w/g, (char) => char.toUpperCase())
-    ) // Convert to uppercase
+    )
   }
 
   const formFields = [
@@ -223,137 +286,92 @@ useEffect(() => {
       step: '0.01',
     },
   ]
-const handleCancel = () => {
-  console.log("from inventy",fromInventory)
-  if (fromInventory) {
-    navigate('/inventoryhandling');
-  } else {
-    setDrawer(false);
-  }
-};
-
-console.log("cateee",categoryId)
-const packingReelsTags = [
-  { label: "Core Type: 3-inch", value: "core_3_inch" },
-  { label: "Core Type: 6-inch", value: "core_6_inch" },
-  { label: "Material: Kraft Paper", value: "kraft_paper" },
-  { label: "Material: Duplex Board", value: "duplex_board" },
-  { label: "GSM: 120", value: "gsm_120" },
-  { label: "GSM: 140", value: "gsm_140" },
-  { label: "Deckle Size: 24 inches", value: "deckle_24" },
-  { label: "Deckle Size: 36 inches", value: "deckle_36" },
-  { label: "Color: White", value: "color_white" },
-  { label: "Color: Brown", value: "color_brown" },
-];
-const corrugationGlueTags = [
-  { label: "Viscosity: High", value: "viscosity_high" },
-  { label: "Viscosity: Medium", value: "viscosity_medium" },
-  { label: "Viscosity: Low", value: "viscosity_low" },
-  { label: "Type: Starch-Based", value: "type_starch" },
-  { label: "Type: Synthetic", value: "type_synthetic" },
-  { label: "pH Level: 7", value: "ph_7" },
-  { label: "pH Level: 8", value: "ph_8" },
-  { label: "Bond Strength: Strong", value: "bond_strong" },
-  { label: "Bond Strength: Medium", value: "bond_medium" },
-  { label: "Dry Time: Fast", value: "dry_fast" },
-];
-const pastingGlueTags = [
-  { label: "Adhesion: Strong", value: "adhesion_strong" },
-  { label: "Adhesion: Medium", value: "adhesion_medium" },
-  { label: "Viscosity: 2000 cps", value: "viscosity_2000" },
-  { label: "Viscosity: 3000 cps", value: "viscosity_3000" },
-  { label: "Drying Time: Quick", value: "dry_quick" },
-  { label: "Drying Time: Normal", value: "dry_normal" },
-  { label: "Color: White", value: "color_white" },
-  { label: "Color: Transparent", value: "color_transparent" },
-  { label: "PH Level: 6.5", value: "ph_6_5" },
-  { label: "PH Level: 7.5", value: "ph_7_5" },
-];
-
-const pinsTags = [
-  { label: "Material: Steel", value: "material_steel" },
-  { label: "Material: Copper", value: "material_copper" },
-  { label: "Size: 1 inch", value: "size_1_inch" },
-  { label: "Size: 2 inch", value: "size_2_inch" },
-  { label: "Finish: Polished", value: "finish_polished" },
-  { label: "Finish: Matte", value: "finish_matte" },
-  { label: "Usage: Manual", value: "usage_manual" },
-  { label: "Usage: Machine", value: "usage_machine" },
-  { label: "Coating: Zinc", value: "coating_zinc" },
-  { label: "Coating: Nickel", value: "coating_nickel" },
-];
-useEffect(() => {
-  if (selectedSubCategory === 'reels') {
-    setTagFields(packingReelsTags);
-  } else if (selectedSubCategory === 'corrugation-glue') {
-    setTagFields(corrugationGlueTags);
-  } else if (selectedSubCategory === 'pasting-glue') {
-    setTagFields(pastingGlueTags);
-  } else if (selectedSubCategory === 'pins') {
-    setTagFields(pinsTags);
-  } else {
-    setTagFields([]); // Optional: clear for other subcategories
-  }
-}, [selectedSubCategory]);
-
-console.log("editing inventory",isEditing)
-console.log("item data",itemVal)
-useEffect(() => {
-  const fetchItem = async () => {
-    try {
-      const res = await apiMethods.singleItem(itemVal.item_id);
-      const data = res?.data;
-
-      console.log('Single item response:', data);
-
-      if (data) {
-        // Reset the form with response values
-        reset({
-          item_code: data.item_code,
-          item_name: data.item_name,
-          hsn_code: data.hsn_code,
-          uom: data.uom,
-          cgst: parseFloat(data.cgst),
-          sgst: parseFloat(data.sgst),
-          manufacturer: data.manufacturer,
-          min_stock_level: parseFloat(data.min_stock_level),
-          reorder_level: parseFloat(data.reorder_level),
-          standard_cost: parseFloat(data.standard_cost),
-          specifications: data.specifications,
-          description: data.description,
-          category: data.category ?? '',
-          sub_category: data.sub_category ?? '',
-        });
-
-        // Set state for dropdowns
-        setSelectedItemType(data.category ?? '');
-        setSelectedSubCategory(data.sub_category ?? '');
-
-        if (data.category) {
-          setCategoryId(data.category);
-
-          // Filter subcategories belonging to selected category
-          const filtered = allSubCategories.filter(
-            (sc) => sc.category_id === Number(data.category)
-          );
-          setSubCategory(filtered);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching single item:', error);
+  
+  const handleCancel = () => {
+    if (fromInventory) {
+      navigate('/inventoryhandling')
+    } else {
+      setDrawer(false)
     }
-  };
-
-  if (isEditing && itemVal?.item_id) {
-    fetchItem();
   }
-}, [itemVal?.item_id, isEditing]);
 
+  const packingReelsTags = [
+    { label: 'Core Type', value: 'core_3_inch' },
+    { label: 'Core Type', value: 'core_6_inch' },
+    { label: 'Material', value: 'kraft_paper' },
+    { label: 'Material', value: 'duplex_board' },
+    { label: 'GSM', value: 'gsm_120' },
+    { label: 'GSM', value: 'gsm_140' },
+    { label: 'Deckle Size', value: 'deckle_24' },
+    { label: 'Deckle Size', value: 'deckle_36' },
+    { label: 'Color', value: 'color_white' },
+    { label: 'Color', value: 'color_brown' },
+  ]
+  
+  const corrugationGlueTags = [
+    { label: 'Viscosity', value: 'viscosity_high' },
+    { label: 'Viscosity', value: 'viscosity_medium' },
+    { label: 'Viscosity', value: 'viscosity_low' },
+    { label: 'Type', value: 'type_starch' },
+    { label: 'Type', value: 'type_synthetic' },
+    { label: 'pH Level', value: 'ph_7' },
+    { label: 'pH Level', value: 'ph_8' },
+    { label: 'Bond Strength', value: 'bond_strong' },
+    { label: 'Bond Strength', value: 'bond_medium' },
+    { label: 'Dry Time', value: 'dry_fast' },
+  ]
+  
+  const pastingGlueTags = [
+    { label: 'Adhesion', value: 'adhesion_strong' },
+    { label: 'Adhesion', value: 'adhesion_medium' },
+    { label: 'Viscosity', value: 'viscosity_2000' },
+    { label: 'Viscosity', value: 'viscosity_3000' },
+    { label: 'Drying Time', value: 'dry_quick' },
+    { label: 'Drying Time', value: 'dry_normal' },
+    { label: 'Color', value: 'color_white' },
+    { label: 'Color', value: 'color_transparent' },
+    { label: 'PH Level', value: 'ph_6_5' },
+    { label: 'PH Level', value: 'ph_7_5' },
+  ]
+
+  const pinsTags = [
+    { label: 'Material', value: 'material_steel' },
+    { label: 'Material', value: 'material_copper' },
+    { label: 'Size', value: 'size_1_inch' },
+    { label: 'Size', value: 'size_2_inch' },
+    { label: 'Finish', value: 'finish_polished' },
+    { label: 'Finish', value: 'finish_matte' },
+    { label: 'Usage', value: 'usage_manual' },
+    { label: 'Usage', value: 'usage_machine' },
+    { label: 'Coating', value: 'coating_zinc' },
+    { label: 'Coating', value: 'coating_nickel' },
+  ]
+  
+  // Handle predefined tags based on subcategory
+  useEffect(() => {
+    
+      const selectedSubCat = subCategory.find(sc => sc.id == selectedSubCategory) || 
+                            allSubCategories.find(sc => sc.id == selectedSubCategory)
+      const subCatName = selectedSubCat?.sub_category_name
+
+      if (subCatName === 'reels') {
+        setTagFields(packingReelsTags)
+      } else if (subCatName === 'corrugation-glue') {
+        setTagFields(corrugationGlueTags)
+      } else if (subCatName === 'pasting-glue') {
+        setTagFields(pastingGlueTags)
+      } else if (subCatName === 'pins') {
+        setTagFields(pinsTags)
+      } else {
+        if (!isEditing) setTagFields([])
+      }
+    
+  }, [selectedSubCategory, subCategory, allSubCategories, isEditing])
 
   return (
     <div className="p-6 bg-white rounded">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
-      <h2 className="text-lg font-semibold mb-4">{isEdit ? 'Edit Product' : 'Add Product'}</h2>
+      <h2 className="text-lg font-semibold mb-4">{isEditing ? 'Edit Product' : 'Add Product'}</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {formFields.map(({ label, name, type = 'text', required, min, max, step, readOnly }) => (
@@ -416,65 +434,78 @@ useEffect(() => {
           <select
             className="w-full border border-gray-300 rounded px-3 py-2"
             value={selectedItemType}
-      onChange={(e) => {
-  const selectedCategoryId = e.target.value;
-  setSelectedItemType(selectedCategoryId);
-  setValue('category', Number(selectedCategoryId));
-  setCategoryId(selectedCategoryId);
+            {...register('category', { required: 'Category is required' })}
+            onChange={(e) => {
+              const selectedCategoryId = e.target.value
+              setSelectedItemType(selectedCategoryId)
+              setValue('category', Number(selectedCategoryId))
+              setCategoryId(selectedCategoryId)
 
-  // Filter subcategories that belong to selected category
-  const filteredSubCategories = allSubCategories.filter(
-    (sc) => sc.category_id === Number(selectedCategoryId)
-  );
-  setSubCategory(filteredSubCategories);
-  setSelectedSubCategory(''); // reset selected subcategory
-}}
+              // Reset subcategory when category changes
+              setSelectedSubCategory('')
+              setValue('sub_category', '')
+              setTagFields([])
+
+              // Filter subcategories that belong to selected category
+              const filteredSubCategories = allSubCategories.filter(
+                (sc) => sc.category_id === Number(selectedCategoryId)
+              )
+              setSubCategory(filteredSubCategories)
+            }}
           >
-            {category.map((Category) => (
-              <option key={Category.id} value={Category.id}>
-                {Category.category_name}
+            <option value="">Select Category</option>
+            {category.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {toTitleCase(cat.category_name)}
               </option>
             ))}
           </select>
+          {errors.category && (
+            <p className="text-sm text-red-600 mt-1">{errors.category.message}</p>
+          )}
         </div>
 
-       {selectedItemType && subCategory.length > 0 && (
-  <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">SubCategory</label>
-    <select
-      className="w-full border border-gray-300 rounded px-3 py-2"
-      value={selectedSubCategory}
-      onChange={(e) => {
-        const selectedName = e.target.value;
-        const selectedItem = subCategory.find((sc) => sc.sub_category_name === selectedName);
-        setSelectedSubCategory(selectedName);
-        setValue('sub_category', selectedItem?.id || '');
-      }}
-    >
-      <option value="">Select Subcategory</option>
-      {subCategory.map((Sc) => (
-        <option key={Sc.id} value={Sc.sub_category_name}>
-          {Sc.sub_category_name}
-        </option>
-      ))}
-    </select>
-  </div>
-)}
-
+        {selectedItemType && subCategory.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">SubCategory</label>
+            <select
+              className="w-full border border-gray-300 rounded px-3 py-2"
+              value={selectedSubCategory}
+              {...register('sub_category')}
+              onChange={(e) => {
+                const selectedId = e.target.value
+                setSelectedSubCategory(selectedId)
+                setValue('sub_category', selectedId)
+              }}
+            >
+              <option value="">Select Subcategory</option>
+              {subCategory.map((sc) => (
+                <option key={sc.id} value={sc.id}>
+                  {toTitleCase(sc.sub_category_name)}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* Add button for custom tags spanning full width when needed */}
-    {['reels', 'corrugation-glue', 'pasting-glue', 'pins'].includes(selectedSubCategory) && subCategory.length > 0 && (
-  <div className="md:col-span-3 mt-2 mb-2">
-    <button
-      type="button"
-      onClick={handleAddField}
-      className="bg-purple-500 text-white text-sm px-2 py-1 rounded-md shadow-md hover:bg-purple-400"
-    >
-      + Add {cleanAndUppercase(selectedSubCategory)} Custom Tags
-    </button>
-  </div>
-)}
-
+        {(() => {
+          const selectedSubCat = subCategory.find(sc => sc.id == selectedSubCategory) || 
+                                allSubCategories.find(sc => sc.id == selectedSubCategory);
+          const subCatName = selectedSubCat?.sub_category_name;
+          
+          return ['reels', 'corrugation-glue', 'pasting-glue', 'pins'].includes(subCatName) && (
+            <div className="md:col-span-3 mt-2 mb-2">
+              <button
+                type="button"
+                onClick={handleAddField}
+                className="bg-purple-500 text-white text-sm px-2 py-1 rounded-md shadow-md hover:bg-purple-400"
+              >
+                + Add {cleanAndUppercase(subCatName)} Custom Tags
+              </button>
+            </div>
+          )
+        })()}
 
         {/* Custom tags section spanning full width */}
         <div className="md:col-span-3">
@@ -519,7 +550,7 @@ useEffect(() => {
             className={`px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow-sm transition duration-200
               ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {isSubmitting ? 'Processing...' : isEdit ? 'Update' : 'Submit'}
+            {isSubmitting ? 'Processing...' : isEditing ? 'Update' : 'Submit'}
           </button>
         </div>
       </form>

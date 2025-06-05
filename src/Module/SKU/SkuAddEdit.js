@@ -63,7 +63,7 @@ function SkuAddEdit({
   const [rscUnits,setRscUnits] = useState("mm")
 const [selectedFluteIndex, setSelectedFluteIndex] = useState(null);
 
-
+console.log("data",rscUnits)
   const createInitialSkuData = () => ({
     client_id: null,
     sku_name: null,
@@ -416,6 +416,7 @@ useEffect(() => {
       <RSCBox
          uploadedFiles={uploadedFiles}
           setUploadedFiles={setUploadedFiles}
+          rscUnits={rscUnits}
       setRscUnits={setRscUnits}
         isopenval={isopenval}
         dropdownRef={dropdownRef}

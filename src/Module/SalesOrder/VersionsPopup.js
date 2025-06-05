@@ -142,7 +142,7 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
                           {summary.primaryMaterial}
                         </CTableDataCell>
                         <CTableDataCell className="min-w-[100px] border-none">
-                          {summary.totalWeight}
+                       {Number(summary.totalWeight).toFixed(3)}
                         </CTableDataCell>
                         <CTableDataCell className="min-w-[80px] border-none">
                     <ThreeDotMenu
@@ -198,7 +198,8 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
                                       <CTableDataCell>{item.bf || '-'}</CTableDataCell>
                                       <CTableDataCell>{item.color || '-'}</CTableDataCell>
                                       <CTableDataCell>{item.material || '-'}</CTableDataCell>
-                                      <CTableDataCell>{item.weight || '-'}</CTableDataCell>
+                                      <CTableDataCell>{Number(item.weight).toFixed(3)}
+</CTableDataCell>
                                     </CTableRow>
                                   ))}
                                 </CTableBody>

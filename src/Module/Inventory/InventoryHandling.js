@@ -480,6 +480,8 @@ const [subCategoryId,setSubCategoryId]=useState(null)
         className="h-[40px] w-[50px] flex items-center justify-center rounded-lg"
         style={{ backgroundColor: buttonColor }}
       >
+        {console.log(quantity)
+        }
         {quantity}
       </div>
     </div>

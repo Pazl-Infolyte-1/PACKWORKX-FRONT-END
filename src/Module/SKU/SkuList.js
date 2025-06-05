@@ -60,7 +60,7 @@ function SkuList() {
     const [loading, setLoading] = useState(false)
       const [totalRecords, setTotalRecords] = useState(0)
         const deckleSize = useSelector((state) => state.deckleSize)
-      
+
 const navigate=useNavigate()
   const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
@@ -398,6 +398,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
 
       const numberSkuData = {
         ...addNewSkuData,
+         unit: addNewSkuData.unit?.trim() ? addNewSkuData.unit : "mm",
         width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
         length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
         deckle_size: Number(addNewSkuData.deckle_size),

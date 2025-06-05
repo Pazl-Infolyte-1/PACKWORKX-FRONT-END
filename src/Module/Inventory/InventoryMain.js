@@ -1,6 +1,6 @@
-// Updated InventoryMain component with selected category/subcategory display
+// Updated InventoryMain component with click-outside functionality for dropdowns
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import apiMethods from '../../api/config'
 import InventoryTable from './InventoryTable'
 import { BiDollarCircle } from 'react-icons/bi'
@@ -34,6 +34,10 @@ const InventoryMain = () => {
   const [stockFilter, setStockFilter] = useState(null)
   const [isStockDropdownOpen, setIsStockDropdownOpen] = useState(false)
 
+  // Refs for click outside detection
+  const stockDropdownRef = useRef(null)
+  const subCategoryDropdownRefs = useRef({})
+
   const navigate = useNavigate()
   const backgroundColors = [
     'bg-[#22c35c]',
@@ -43,6 +47,33 @@ const InventoryMain = () => {
     'bg-red-100',
     'bg-gray-100',
   ]
+
+  // Click outside effect for all dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Close stock dropdown if click is outside
+      if (stockDropdownRef.current && !stockDropdownRef.current.contains(event.target)) {
+        setIsStockDropdownOpen(false)
+      }
+
+      // Close subcategory dropdown if click is outside
+      if (openCategoryId) {
+        const currentDropdownRef = subCategoryDropdownRefs.current[openCategoryId]
+        if (currentDropdownRef && !currentDropdownRef.contains(event.target)) {
+          setOpenCategoryId(null)
+          setSubCategories([])
+        }
+      }
+    }
+
+    // Add event listener
+    document.addEventListener('mousedown', handleClickOutside)
+    
+    // Cleanup
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [openCategoryId])
 
   // Function to determine stock status
   const getStockStatus = (item) => {
@@ -97,15 +128,12 @@ const InventoryMain = () => {
     // In the fetchInventory function, modify the API call parameters:
     const fetchInventory = async () => {
       try {
-        // Only pass subCategoryId if it exists AND the category has subcategories
-        const shouldApplySubCategoryFilter = subCategoryId && (categoryId === 1 || categoryId === 4) // Only apply to categories that have subcategories
-
         const response = await apiMethods.getinventoryWithParams(
           categoryId,
           currentPage,
           entriesPerPage,
           searchQuery,
-          shouldApplySubCategoryFilter ? subCategoryId : null, // Conditionally pass subCategoryId
+          subCategoryId , 
         )
 
         if (response?.data?.success) {
@@ -187,6 +215,8 @@ const InventoryMain = () => {
   }
 
   const handleSubCategorySelect = (subCategoryId) => {
+    console.log(subCategoryId);
+    
     setSubCategoryId(subCategoryId)
     setOpenCategoryId(null)
   }
@@ -212,13 +242,12 @@ const InventoryMain = () => {
   }
 
 const handleInventoryExelExport = async () => {
-  const shouldApplySubCategoryFilter = subCategoryId && (categoryId === 1 || categoryId === 4);
   const params = {
     categoryId,
     currentPage,
     entriesPerPage,
     searchQuery,
-    subCategoryId: shouldApplySubCategoryFilter ? subCategoryId : null,
+    subCategoryId,
   };
   await apiMethods.getInventoryExcelExport(params);
 }
@@ -251,7 +280,15 @@ const handleInventoryExelExport = async () => {
           const isSelected = categoryId === item.id
 
           return (
-            <div key={item.id} className="relative">
+            <div 
+              key={item.id} 
+              className="relative"
+              ref={(el) => {
+                if (el) {
+                  subCategoryDropdownRefs.current[item.id] = el
+                }
+              }}
+            >
               <div
                 onClick={() => setCategoryId(item.id)}
                 className={`p-2 py-3 rounded-md shadow-md text-center capitalize flex items-center justify-between w-full cursor-pointer ${
@@ -438,8 +475,8 @@ const handleInventoryExelExport = async () => {
           </div>
         )}
 
-        <div className="relative z-50 flex gap-3 ml-auto">
-          {/* Rest of your button code remains the same */}
+        <div className="relative z-50 flex gap-3 ml-auto" ref={stockDropdownRef}>
+          {/* Stock Filter Dropdown */}
           <button
             className={` px-4 rounded-lg border transition-all duration-200 flex items-center ${
               stockFilter

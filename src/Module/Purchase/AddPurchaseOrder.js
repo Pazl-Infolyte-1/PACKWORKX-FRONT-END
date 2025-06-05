@@ -4,7 +4,7 @@ import apiMethods from '../../api/config'
 import Loader from '../../components/New/Loader'
 import CustomAlert from '../../components/New/CustomAlert'
 
-const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, fetchData }) => {
+const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefresh }) => {
   const [loading, setLoading] = useState(false)
   const [alerts, setAlerts] = useState([])
   const [clientData, setClientData] = useState([])
@@ -25,9 +25,6 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, fetchDat
   useEffect(() => {
     const fetchVendors = async () => {
       try {
-        // const initial = await apiMethods.getClients()
-        // const count = initial?.length || 100
-
         const fullData = await apiMethods.getClients()
         const clientsArray = fullData.data
 
@@ -103,42 +100,29 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, fetchDat
           total: parseFloat(item.price) * parseInt(item.quantity),
         })),
       }
-      console.log('Payload:', payload)
 
       let response
       if (isEdit) {
         response = await apiMethods.updatePurchaseOrder(selectedPoId, payload)
+        console.log(response.data, 'updated')
+
         setAlerts([
-          { severity: 'success', message: response?.data?.message || 'Successfull updated' },
+          { severity: 'success', message: response?.data?.message || 'Successfully updated' },
         ])
         setTimeout(() => {
           setDrawer(false)
         }, 1000)
-        await fetchData()
+        setRefresh((prev) => !prev)
       } else {
         response = await apiMethods.createPurchaseOrder(payload)
         setAlerts([
-          { severity: 'success', message: response?.data?.message || 'Successfull updated' },
+          { severity: 'success', message: response?.data?.message || 'Successfully created' },
         ])
         setTimeout(() => {
           setDrawer(false)
         }, 1000)
-        await fetchData()
+        setRefresh((prev) => !prev)
       }
-
-      // setAlerts([{
-      //   severity: "success",
-      //   message: response?.data?.message ||
-      //     `Purchase Order ${isEdit ? 'updated' : 'created'} successfully`
-      // }]);
-
-      // // Close drawer after 2 seconds
-      // setTimeout(() => {
-      //   if (onSuccess) onSuccess();
-      //   setTimeout(() => {
-      //     setDrawer(false);
-      //   }, 1000); // Close drawer 1 second after onSuccess callback
-      // }, 3000);
     } catch (error) {
       console.error('API Error:', error)
       setAlerts([
@@ -181,6 +165,7 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, fetchDat
           isEdit={isEdit}
           isSubmitting={loading}
           clientData={clientData}
+          selectedPoId={selectedPoId}
         />
       )}
     </div>

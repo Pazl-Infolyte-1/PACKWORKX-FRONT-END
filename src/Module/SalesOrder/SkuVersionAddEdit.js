@@ -243,9 +243,10 @@ const recalcRowValues = (item) => {
     item.weight = 0;
   }
 
-  // Calculate bursting strength
+    // ✅ Bursting Strength calculation (modified logic)
   if (!isNaN(gsm) && !isNaN(bf)) {
-    item.bursting_strength = parseFloat(((gsm * bf * takeUpFactor) / 1000).toFixed(3));
+    const divisor = isCorrugated ? 2000 : 1000;
+    item.bursting_strength = parseFloat(((gsm * bf) / divisor).toFixed(3));
   } else {
     item.bursting_strength = 0;
   }

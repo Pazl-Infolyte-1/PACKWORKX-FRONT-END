@@ -5,15 +5,19 @@ import {
   Calendar,
   CheckCircle,
   Clock,
+  CreditCard,
   DollarSign,
   FileText,
   Info,
   MessageSquare,
   Package,
   Phone,
+  Receipt,
+  RotateCcw,
   Tag,
   TrendingDown,
   TrendingUp,
+  Truck,
   User,
 } from 'lucide-react'
 import { FaRupeeSign } from 'react-icons/fa'
@@ -299,7 +303,6 @@ const ViewInventory = ({ item }) => {
           </div>
         ) : activeMenu === 'Purchase Order' ? (
           <div className="min-h-screen p-3">
-            {console.log(itemDetails)}
             <div className="max-w-7xl mx-auto">
               {/* Header */}
               <div className="mb-8">
@@ -309,15 +312,12 @@ const ViewInventory = ({ item }) => {
                   </div>
                   <div className="flex justify-between w-full">
                     <h1 className="text-xl font-bold text-gray-900">Purchase Orders</h1>
-                    <div>
+                    <div className="">
                       <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
                       <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
                     </div>
                   </div>
                 </div>
-                <p className="text-gray-600 text-sm">
-                  Manage and track your purchase orders efficiently
-                </p>
               </div>
 
               {itemDetails?.purchaseOrders?.length > 0 ? (
@@ -450,7 +450,7 @@ const ViewInventory = ({ item }) => {
                 </div>
               ) : (
                 <div className="text-center py-16">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <FileText className="w-10 h-10 text-gray-400" />
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -480,9 +480,6 @@ const ViewInventory = ({ item }) => {
                     </div>
                   </div>
                 </div>
-                <p className="text-gray-600 text-sm">
-                  Track and manage inventory adjustments efficiently
-                </p>
               </div>
 
               {itemDetails?.stockAdjustments?.length > 0 ? (
@@ -618,6 +615,16 @@ const ViewInventory = ({ item }) => {
           </div>
         ) : activeMenu === 'GRN' ? (
           <>
+            <div className="flex justify-between">
+              <h2 className="text-xl font-bold mb-2   text-gray-800 flex items-center gap-2">
+                <Truck className="w-6 h-6 text-blue-600" />
+                GRN
+              </h2>
+              <div className="">
+                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+              </div>
+            </div>
             {itemDetails?.grns.length > 0 ? (
               <></>
             ) : (
@@ -632,6 +639,16 @@ const ViewInventory = ({ item }) => {
           </>
         ) : activeMenu === 'Debit Notes' ? (
           <>
+            <div className="flex justify-between">
+              <h2 className="text-xl font-bold mb-2   text-gray-800 flex items-center gap-2">
+                <CreditCard className="w-6 h-6 text-blue-600" />
+                Debit Notes
+              </h2>
+              <div className="">
+                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+              </div>
+            </div>
             {itemDetails?.debitNotes.length > 0 ? (
               <></>
             ) : (
@@ -646,6 +663,16 @@ const ViewInventory = ({ item }) => {
           </>
         ) : activeMenu === 'Credit Notes' ? (
           <>
+            <div className="flex justify-between">
+              <h2 className="text-xl font-bold mb-2   text-gray-800 flex items-center gap-2">
+                <Receipt className="w-6 h-6 text-blue-600" />
+                Credit Notes
+              </h2>
+              <div className="">
+                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+              </div>
+            </div>
             {itemDetails?.creditNotes.length > 0 ? (
               <></>
             ) : (
@@ -660,6 +687,16 @@ const ViewInventory = ({ item }) => {
           </>
         ) : activeMenu === 'Purchase Returns' ? (
           <>
+            <div className="flex justify-between">
+              <h2 className="text-xl font-bold mb-2   text-gray-800 flex items-center gap-2">
+                <RotateCcw className="w-6 h-6 text-blue-600" />
+                Purchase Returns
+              </h2>
+              <div className="">
+                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+              </div>
+            </div>
             {itemDetails?.purchaseReturns.length > 0 ? (
               <></>
             ) : (

@@ -288,8 +288,12 @@ const recalculateAllTotals = (data = null) => {
     if (!currentValues) return;
 
     const formattedSkus = currentValues.map(sku => {
+      // Find matching SKU from skuList to get sku_id
+      const matchingSku = skuList.find(item => item.sku_name === sku.sku);
+      
       const commonFields = {
         sku: sku.sku,
+        sku_id: matchingSku?.id || null, // Add sku_id field
         quantity_required: sku.quantity,
         rate_per_sku: sku.rate,
         acceptable_sku_units: sku.acceptableUnits,

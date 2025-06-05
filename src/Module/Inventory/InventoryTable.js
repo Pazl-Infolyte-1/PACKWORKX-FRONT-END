@@ -29,21 +29,21 @@ const InventoryTable = ({ inventoryData }) => {
 
   return (
     <>
-      <div className="w-full overflow-x-auto overflow-y-auto max-h-[450px] border rounded-md shadow-sm mt-1 mb-3">
+      <div className="w-full overflow-x-auto overflow-y-auto max-h-[410px] border rounded-md shadow-sm mt-1 mb-3">
         <CTable className="min-w-[1000px] table-fixed border-separate border-spacing-0">
           <CTableHead className="!bg-gray-100">
             <CTableRow>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Product ID
+                Product ID <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Product Name
+                Product Name <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Category
+                Category <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Sub Category
+                Sub Category <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                 Location <span className="text-gray-500">⌕</span>
@@ -110,7 +110,7 @@ const InventoryTable = ({ inventoryData }) => {
                   <CTableDataCell className="whitespace-nowrap text-center">
                     {(() => {
                       let stockStatus = '--'
-                      if (item.total_quantity === 0) {
+                      if (item.total_quantity == 0.00) {
                         stockStatus = 'Out of Stock'
                       } else if (item.total_quantity >= item.item.min_stock_level) {
                         stockStatus = 'In Stock'

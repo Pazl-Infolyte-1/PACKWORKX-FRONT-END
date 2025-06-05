@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
@@ -9,6 +9,22 @@ import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilArrowBottom, cilArrowTop } from '@coreui/icons'
 import { GripVertical } from 'lucide-react'
 
+
+
+const unitConversion = {
+  mm: {
+    cm: (val) => val / 10,
+    in: (val) => val * 0.039370078740157,
+  },
+  cm: {
+    mm: (val) => val * 10,
+    in: (val) => val / 2.54,
+  },
+  in: {
+    mm: (val) => val * 25.4,
+    cm: (val) => val * 2.54,
+  },
+};
 const RequiredFieldLabel = ({ label, isRequired }) => (
   <label className="text-sm font-medium text-gray-600 mr-2">
     {label}
@@ -33,6 +49,9 @@ const defaultValues = {
   connectivity_status: true,
   ip_address: '',
   warranty_expiry: null,
+  board_length:null,
+  board_width:null,
+  unit:"mm",
   remarks_notes: '',
   // Process assignment fields
   processValues: {},
@@ -52,6 +71,7 @@ function AddEditMachine({}) {
   const location = useLocation()
   const { Id, isEdit } = location.state || {}
   const navigate = useNavigate()
+  const prevUnitRef = useRef('mm'); // default unit
 
   const {
     register,
@@ -64,6 +84,48 @@ function AddEditMachine({}) {
   } = useForm({
     defaultValues,
   })
+
+   const currentUnit = watch('unit');
+  const boardLength = watch('board_length');
+  const boardWidth = watch('board_width');
+   // Convert values when unit changes
+ useEffect(() => {
+  const prevUnit = prevUnitRef.current;
+  if (prevUnit !== currentUnit) {
+    const length = parseFloat(boardLength);
+    const width = parseFloat(boardWidth);
+
+    if (!isNaN(length) && unitConversion[prevUnit]?.[currentUnit]) {
+      const newLength = unitConversion[prevUnit][currentUnit](length);
+      const accurate = parseFloat(newLength.toFixed(3));
+      setValue('board_length', accurate);
+    }
+
+    if (!isNaN(width) && unitConversion[prevUnit]?.[currentUnit]) {
+      const newWidth = unitConversion[prevUnit][currentUnit](width);
+      const accurate = parseFloat(newWidth.toFixed(3));
+      setValue('board_width', accurate);
+    }
+
+    prevUnitRef.current = currentUnit;
+  }
+}, [currentUnit, boardLength, boardWidth, setValue]);
+
+
+  // Positive integer validation handler
+const handleIntegerInput = (e, field) => {
+  let value = e.target.value;
+
+  // Allow only digits and a single decimal point
+  value = value.replace(/[^0-9.]/g, ''); // remove non-numeric except dot
+  const parts = value.split('.');
+  if (parts.length > 2) {
+    // More than one dot: keep only the first
+    value = parts[0] + '.' + parts[1];
+  }
+
+  setValue(field, value);
+};
 
   // Get available processes for route (selected processes not already in route)
   const getAvailableRouteProcesses = () => {
@@ -430,6 +492,43 @@ return (
                 style={getInputStyle('manufacturer')}
               />
             </div>
+
+         <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Board Size (Length × Width) <span className="text-red-500">*</span>
+      </label>
+      <div className="flex items-center rounded border border-gray-300 overflow-hidden w-full h-[36px]">
+        <input
+  {...register('board_length', { required: true })}
+  placeholder="Length"
+  className="w-1/3 px-2 py-1 text-sm focus:outline-none"
+  type="text"
+  onChange={(e) => handleIntegerInput(e, 'board_length')}
+  value={watch('board_length') !== '' ? parseFloat(Number(watch('board_length')).toFixed(3)) : ''}
+/>
+
+        <span className="text-gray-600 text-sm px-1">×</span>
+     <input
+  {...register('board_width', { required: true })}
+  placeholder="Width"
+  className="w-1/3 px-2 py-1 text-sm focus:outline-none"
+  type="text"
+  onChange={(e) => handleIntegerInput(e, 'board_width')}
+  value={watch('board_width') !== '' ? parseFloat(Number(watch('board_width')).toFixed(3)) : ''}
+/>
+
+        <select
+          {...register('unit')}
+          className="w-1/3 px-2 py-1 text-sm text-gray-700 bg-gray-100 focus:outline-none h-[36px]"
+          style={{ border: 'none' }}
+        >
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="in">in</option>
+        </select>
+      </div>
+    </div>
+
           </div>
 
           {/* Column 2 - Machine Status */}
@@ -545,7 +644,7 @@ return (
         </div>
 
         {/* Remarks */}
-        <div className="w-full px-4 rounded-lg">
+        {/*<div className="w-full px-4 rounded-lg">
           <RequiredFieldLabel label="Notes & Remarks" />
           <textarea
             {...register('remarks_notes')}
@@ -553,10 +652,10 @@ return (
             className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
             style={getInputStyle('remarks_notes')}
           ></textarea>
-        </div>
+        </div>*/}
 
         {/* Process Assignment */}
-        <div className="px-4 rounded-lg mb-5 w-full">
+        <div className="px-4 rounded-lg mb-5 w-1/2">
           <RequiredFieldLabel label="Assign Process" />
           <Select
             options={processOptions}

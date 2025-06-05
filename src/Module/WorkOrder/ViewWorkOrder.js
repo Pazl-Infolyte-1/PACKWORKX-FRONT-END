@@ -645,34 +645,50 @@ const ViewWorkOrder = () => {
               </div>
             </div>
 
+            {/* Description Section */}
+            {/* {workOrder?.description && (
+              <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+                <div className="p-2 border-b border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-700">Description</h3>
+                </div>
+                <div className="p-3">
+                  <p className="text-sm text-gray-600">{workOrder.description}</p>
+                </div>
+              </div>
+            )} */}
+
             {/* Related Info */}
             <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="p-2 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">Related Information</h3>
               </div>
               <div className="p-2">
-                <div>
-                  <div className="mb-0.5">
-                    <p className="text-xs text-gray-500">Sales Order</p>
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center py-1 px-2 hover:bg-gray-50 rounded">
+                    <span className="text-xs text-gray-500">Sales Order</span>
                     <p
                       onClick={() => navigate(`/salesorder/view/${workOrder.sales_order_id}`)}
-                      className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">#{workOrder?.salesOrder?.sales_generate_id ? workOrder?.salesOrder?.sales_generate_id : 'N/A'}</p>
+                      className="text-xs text-blue-600 hover:text-blue-800 cursor-pointer font-medium">{workOrder?.salesOrder?.sales_generate_id ? workOrder?.salesOrder?.sales_generate_id : 'N/A'}</p>
                   </div>
-                  <div className="mb-0.5">
-                    <p className="text-xs text-gray-500">SO-REFERENCE</p>
+                  <div className="flex justify-between items-center py-1 px-2 hover:bg-gray-50 rounded">
+                    <span className="text-xs text-gray-500">SO-REFERENCE</span>
                     <p
                       onClick={() => navigate(`/salesorder/view/${workOrder.sales_order_id}`)}
-                      className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">{workOrder?.salesOrder?.sales_ui_id ? workOrder?.salesOrder?.sales_ui_id : 'N/A'}</p>
+                      className="text-xs text-blue-600 hover:text-blue-800 cursor-pointer font-medium">{workOrder?.salesOrder?.sales_ui_id ? workOrder?.salesOrder?.sales_ui_id : 'N/A'}</p>
                   </div>
-                  <div className="mb-0.5">
-                    <p className="text-xs text-gray-500">Client</p>
+                  <div className="flex justify-between items-center py-1 px-2 hover:bg-gray-50 rounded">
+                    <span className="text-xs text-gray-500">Client</span>
                     <p
                       onClick={() => navigate(`/clients/${workOrder.client_id}`)}
-                      className="text-blue-600 hover:text-blue-800 cursor-pointer text-sm font-medium">{workOrder?.salesOrder?.client || 'N/A'}</p>
+                      className="text-xs text-blue-600 hover:text-blue-800 cursor-pointer font-medium">{workOrder?.salesOrder?.client || 'N/A'}</p>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Last Updated</p>
-                    <p className="text-sm font-medium">{formatDate(workOrder.updated_at)}</p>
+                  <div className="flex justify-between items-center py-1 px-2 hover:bg-gray-50 rounded">
+                    <span className="text-xs text-gray-500">Plant</span>
+                    <p className="text-xs font-medium">{workOrder?.select_plant || 'N/A'}</p>
+                  </div>
+                  <div className="flex justify-between items-center py-1 px-2 hover:bg-gray-50 rounded">
+                    <span className="text-xs text-gray-500">Last Updated</span>
+                    <p className="text-xs font-medium">{formatDate(workOrder.updated_at)}</p>
                   </div>
                 </div>
               </div>

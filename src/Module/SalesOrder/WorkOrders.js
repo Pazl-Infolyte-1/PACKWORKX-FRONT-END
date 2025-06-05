@@ -270,7 +270,8 @@ const handleCancel = () => {
         planned_start_date,
         acceptable_excess_units,
         planned_end_date,
-        work_order_sku_values
+        work_order_sku_values,
+        select_plant,
       } = selectedWorkOrder;
 
       // Check if any of the fields are empty
@@ -351,13 +352,13 @@ const handleCancel = () => {
 
     const selectedSku = skuList.find((sku) => sku.id === selectedId);
 
-    SetselectedSkuID(selectedId)
+    // SetselectedSkuID(selectedId)
 
     const response = await getskuversions(selectedId)
 
     // console.log(response.data.data)
 
-    setSelectedWorkOrderForVersions(orderId)
+    // setSelectedWorkOrderForVersions(orderId)
     setSkuVersionsMap(prev => ({
       ...prev,
       [orderId]: response?.data?.data // Store the version data for this work order
@@ -396,8 +397,8 @@ const handleCancel = () => {
 
   // const handleToggle = () => {
   //   setSelectedOption((prev) => {
-  //     if (prev === 'inhouse') return 'outsource'
-  //     if (prev === 'outsource') return 'purchaseOrder'
+  //     if (prev === 'inhouse') next = 'outsource';
+  //     if (prev === 'outsource') next = 'purchaseOrder';
   //     return 'inhouse'
   //   })
   // }
@@ -462,6 +463,7 @@ const handleCancel = () => {
         manufacture: 'inhouse',
         priority: "Low",
         progress: "Pending",
+        select_plant: "Auto Plant",
         work_order_sku_values:[]
       },
     ])
@@ -762,6 +764,41 @@ console.log("whole sku",wholeSkuObject)
                         </div>
                       </div>
 
+                      {/* Plant Type Toggle Section - Moved above Description */}
+                      <div className="flex items-center">
+                  <label className="text-xs text-gray-600 font-medium w-24">Plant Type</label>
+                  <div className="flex-1">
+                    <div className="relative w-[220px] h-[22px] bg-white border border-[#8167E5] rounded-md  cursor-pointer flex items-center justify-between overflow-hidden">
+                      {/* Auto Plant */}
+                      <span
+                        className={`text-[10px] leading-[14px] text-center w-1/2 z-10 transition-all font-medium ${
+                          item.select_plant === "Auto Plant" ? 'text-white' : 'text-gray-700'
+                        }`}
+                        onClick={() => handleWorkOrderChange1(item.id, 'select_plant', "Auto Plant")}
+                      >
+                        Auto Plant
+                      </span>
+
+                      {/* Semi Auto Plant */}
+                      <span
+                        className={`text-[10px] leading-[14px] text-center w-1/2 z-10 transition-all font-medium ${
+                          item.select_plant === "Semi Auto Plant" ? 'text-white' : 'text-gray-700'
+                        }`}
+                        onClick={() => handleWorkOrderChange1(item.id, 'select_plant', "Semi Auto Plant")}
+                      >
+                        Semi Auto Plant
+                      </span>
+
+                      {/* Toggle Indicator */}
+                      <div
+                        className={`absolute top-1/2 w-1/2 h-[100%] bg-[#8167E5] rounded-sm transform -translate-y-1/2 transition-all duration-300 ${
+                          item.select_plant === "Auto Plant" ? 'left-0' : 'left-1/2'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </div>
+
                       {/* Description Section */}
                       <div className="flex items-center">
                         <label className="text-xs text-gray-600 font-medium w-24">Description</label>
@@ -782,6 +819,26 @@ console.log("whole sku",wholeSkuObject)
                       setSkuVersionsMap={setSkuVersionsMap}
                       orderId={item.id}
                     />
+
+{item.sku_id && (
+                <div className=" border-gray-200 px-4 py-2">
+                  <SkuVersionAddEdit
+                    handleDeleteVersion={handleDeleteVersion}
+                    skuID={item.sku_id}
+                    setSkuVersionsMap={setSkuVersionsMap}
+                    orderId={item.id}
+                    skuVersionID={item.sku_version}
+                    currentVersionCount={skuVersionsMap[item.id]?.length || 0}
+                    skuValues={skuValuesMap[item.id]}
+                    setSkuValuesMap={setSkuValuesMap}
+                    setWorkOrders={setWorkOrders}
+                    skuvaluesFromParent = {item.work_order_sku_values}
+                    allSkuData={item}
+                handleWholeSkuObject={handleWholeSkuObject} 
+                  />
+                </div>
+              )}
+
                   </div>
                 )}
               </div>
@@ -882,11 +939,10 @@ console.log("whole sku",wholeSkuObject)
                     <label className="text-xs text-gray-600 font-medium w-24">Sales Order</label>
                     <div className="flex-1">
                       <select
-  className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
-    validationErrors.sales_order_id 
-      ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
-      : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
-  }`}                        value={order.sales_order_id || ''}
+                        className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${validationErrors.sales_order_id
+                            ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500'
+                            : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
+                          }`} value={order.sales_order_id || ''}
                         onChange={(e) => {
                           const selectedSalesOrderId = e.target.value;
                           const selectedSalesOrder = salesOrder.find((so) => so.id.toString() === selectedSalesOrderId);
@@ -917,11 +973,10 @@ console.log("whole sku",wholeSkuObject)
                       // SKU Dropdown shown only in workorderlist
                       <div>
                         <select
-  className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
-    validationErrors.sku_id 
-      ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
-      : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
-  }`}                          value={order.sku_id || ''}
+                          className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${validationErrors.sku_id
+                              ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500'
+                              : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
+                            }`} value={order.sku_id || ''}
                           onChange={(e) => handleSkuChange(e, order.id)}
                         >
                           <option value="" disabled>
@@ -975,14 +1030,14 @@ console.log("whole sku",wholeSkuObject)
                     <select
                       value={order.sku_version}
                      onChange={(e) => {
-    const selectedVersion = e.target.value;
-    handleWorkOrderChange(order.id, 'sku_version', selectedVersion);
+                       const selectedVersion = e.target.value;
+                       handleWorkOrderChange(order.id, 'sku_version', selectedVersion);
 
-    // Trigger SKU logic again if Default Master is selected
-    if (selectedVersion === "0") {
-      handleSkuChange({ target: { value: order.sku_id.toString() } }, order.id);
-    }
-  }}
+                       // Trigger SKU logic again if Default Master is selected
+                       if (selectedVersion === "0") {
+                         handleSkuChange({ target: { value: order.sku_id.toString() } }, order.id);
+                       }
+                     }}
                       className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
                    disabled={!skuVersionsMap[order.id]}
                     >
@@ -1001,7 +1056,14 @@ console.log("whole sku",wholeSkuObject)
                     <ActionButton
                       label={"Version History"}
                       variant='minimal'
-                      onClick={() => handleVersionHistoryClick(order.id)}
+                      onClick={
+                        () =>{ 
+                          handleVersionHistoryClick(order.id)
+                          SetselectedSkuID(order.sku_id)
+                          setSelectedWorkOrderForVersions(order.id)
+                        }
+
+                      }
                       className={"h-6 text-xs text-[#8167e5] hover:bg-[#f0edfb]"}
                     />
                   </div>
@@ -1013,17 +1075,16 @@ console.log("whole sku",wholeSkuObject)
                     Quantity <span className='text-red-500'>*</span>
                   </label>
                   <div className="flex-1">
-<input
-  type="number"
-  value={order.qty}
-  min={0}
-  onChange={(e) => handleWorkOrderChange(order.id, 'qty', e.target.value)}
-  className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${
-    validationErrors.qty 
-      ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500' 
-      : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
-  }`}
-/>
+                    <input
+                      type="number"
+                      value={order.qty}
+                      min={0}
+                      onChange={(e) => handleWorkOrderChange(order.id, 'qty', e.target.value)}
+                      className={`h-8 w-80 rounded-md border px-2 text-xs focus:outline-none focus:ring-1 ${validationErrors.qty
+                          ? 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500'
+                          : 'border-gray-300 focus:border-[#8167e5] focus:ring-[#8167e5]'
+                        }`}
+                    />
               
                   </div>
                 </div>
@@ -1104,18 +1165,53 @@ console.log("whole sku",wholeSkuObject)
                   </div>
                 </div>
 
-                {/* Description Section */}
+                {/* Plant Type Toggle Section - Moved above Description */}
                 <div className="flex items-center">
-                  <label className="text-xs text-gray-600 font-medium w-24">Description</label>
+                  <label className="text-xs text-gray-600 font-medium w-24">Plant Type</label>
                   <div className="flex-1">
-                    <input
-                      value={order.description}
-                      onChange={(e) => handleWorkOrderChange(order.id, 'description', e.target.value)}
-                      className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
-                      placeholder="Enter description"
-                    />
+                    <div className="relative w-[220px] h-[22px] bg-white border border-[#8167E5] rounded-md  cursor-pointer flex items-center justify-between overflow-hidden">
+                      {/* Auto Plant */}
+                      <span
+                        className={`text-[10px] leading-[14px] text-center w-1/2 z-10 transition-all font-medium ${
+                          order.select_plant === "Auto Plant" ? 'text-white' : 'text-gray-700'
+                        }`}
+                        onClick={() => handleWorkOrderChange(order.id, 'select_plant', "Auto Plant")}
+                      >
+                        Auto Plant
+                      </span>
+
+                      {/* Semi Auto Plant */}
+                      <span
+                        className={`text-[10px] leading-[14px] text-center w-1/2 z-10 transition-all font-medium ${
+                          order.select_plant === "Semi Auto Plant" ? 'text-white' : 'text-gray-700'
+                        }`}
+                        onClick={() => handleWorkOrderChange(order.id, 'select_plant', "Semi Auto Plant")}
+                      >
+                        Semi Auto Plant
+                      </span>
+
+                      {/* Toggle Indicator */}
+                      <div
+                        className={`absolute top-1/2 w-1/2 h-[100%] bg-[#8167E5] rounded-sm transform -translate-y-1/2 transition-all duration-300 ${
+                          order.select_plant === "Auto Plant" ? 'left-0' : 'left-1/2'
+                        }`}
+                      />
+                    </div>
                   </div>
                 </div>
+
+                                      {/* Description Section */}
+                                      <div className="flex items-center">
+                        <label className="text-xs text-gray-600 font-medium w-24">Description</label>
+                        <div className="flex-1">
+                          <input
+                            value={order.description || ''}
+                            onChange={(e) => handleWorkOrderChange(order.id, 'description', e.target.value)}
+                            className="h-8 w-80 rounded-md border border-gray-300 px-2 text-xs focus:border-[#8167e5] focus:outline-none focus:ring-1 focus:ring-[#8167e5]"
+                            placeholder="Enter description"
+                          />
+                        </div>
+                      </div>
               </div>
 
               {/* SkuVersionAddEdit section */}

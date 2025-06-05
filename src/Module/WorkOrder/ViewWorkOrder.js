@@ -623,8 +623,25 @@ const ViewWorkOrder = () => {
                       Update Progress
                       <ChevronDown size={14} className="ml-1" />
                     </button>
+                    {isProgressDropdownOpen && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {progressOptions.map((option) => (
+                          <button
+                            key={option}
+                            className={`w-full px-3 py-1.5 text-xs text-left hover:bg-gray-50 ${
+                              workOrder.progress === option ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                            }`}
+                            onClick={() => handleProgressChange(option)}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
+                  
                 </div>
+                
               </div>
             </div>
 
@@ -674,7 +691,9 @@ const ViewWorkOrder = () => {
                       <span className="text-sm text-gray-600">Production Schedule</span>
                     </div>
                     <button
-                      onClick={() => setIsProductionPlannedModalOpen(true)}
+                      onClick={() => {setIsProductionPlannedModalOpen(true)
+                      }
+                      }
                       className="p-0.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
                     >
                       Plan Production

@@ -1,15 +1,46 @@
 import React, { useEffect, useState } from 'react'
 import { CRow, CCol, CCard, CCardBody } from '@coreui/react'
 import { FaClipboardList, FaBox, FaCalendarAlt, FaPlus, FaMinus } from 'react-icons/fa'
+import apiMethods from '../../api/config'
 
-function WorkOrderListing({ workOrders, onSelectedOrdersChange }) {
+function WorkOrderListing({ workOrders,activeTab,isNextStepClicked,setActiveTab}) {
   const [selectedOrders, setSelectedOrders] = useState([])
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (onSelectedOrdersChange) {
-      onSelectedOrdersChange(selectedOrders)
+    const handleWorkOrderProduction = async () => {
+      if (isNextStepClicked && activeTab === "Work Orders") {
+        try {
+          if (selectedOrders.length === 0) {
+            setError("Please select at least one work order")
+            return
+          }
+
+          const body = {
+            workOrderIds: selectedOrders,
+            production: 'in_production'
+          }
+          
+          const response = await apiMethods.addWorkOrderIntoProduction(body)
+          setActiveTab('Group Layers')
+          console.log('Work orders added to production:', response)
+          setError(null)
+        } catch (err) {
+          console.error('Error adding work orders to production:', err)
+          setError(err.message || 'Failed to add work orders to production')
+        }
+      }
     }
-  }, [selectedOrders, onSelectedOrdersChange])
+
+    handleWorkOrderProduction()
+  }, [isNextStepClicked])
+  
+
+  // useEffect(() => {
+  //   if (onSelectedOrdersChange) {
+  //     onSelectedOrdersChange(selectedOrders)
+  //   }
+  // }, [selectedOrders, onSelectedOrdersChange])
 
   const handleOrderToggle = (workOrderId) => {
     setSelectedOrders(prev => 

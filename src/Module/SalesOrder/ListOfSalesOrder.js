@@ -125,6 +125,7 @@ function ListOfSalesOrder() {
       })
       setData(response?.data?.data)
       setApiResponse(response?.data)
+      console.log("mmmm",response?.data)
       // setFilteredData(response.data.data)
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -285,7 +286,8 @@ function ListOfSalesOrder() {
 
             />
 
-            <div className="flex justify-end items-center gap-4  mt-2">
+            <div className="flex justify-end items-center gap-4  mt-3 ml-4 mr-4">
+              <p className='w-50 text-sm'>Total Count : <span className='font-semibold'>{ApiResponse?.total}</span></p>
               <CompactPagination
                 count={ApiResponse?.totalPages}
                 page={paginationParams?.currentPage || 1}

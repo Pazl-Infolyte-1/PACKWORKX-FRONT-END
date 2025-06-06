@@ -163,7 +163,7 @@ const MachineDashboardTable = ({
 
   return (
     <>
-      <ReusableTable data={cellData} columns={columns} handleRowClick={onView} height={'67vh'} />
+      <ReusableTable data={cellData} columns={columns} handleRowClick={onView} height={'64vh'} />
       <ConfirmationModale
         isOpen={isConfirmationModalOpen}
         onClose={handleCancel}

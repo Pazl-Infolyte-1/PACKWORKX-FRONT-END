@@ -116,7 +116,7 @@ const RouteProcessTable = ({
       <ReusableTable
         data={routeProcessData}
         columns={columns}
-        minHeight="74vh"
+        minHeight="vh65"
         handleRowClick={RowClick}
       />
       {/* <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar rounded-lg p-2">

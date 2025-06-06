@@ -119,26 +119,26 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh }) =>
       header: 'Invoice Date',
       field: 'invoice_date',
     },
-    {
-      key: 'status',
-      header: 'Status',
-      field: 'status',
-      type: 'dropdown',
-      options: ['active', 'inactive'],
-      getOptionClass: (val) => {
-        switch (val) {
-          case 'active':
-            return 'bg-green-100 text-green-800 border-green-300'
-          case 'inactive':
-            return 'bg-red-100 text-red-800 border-red-300'
-          default:
-            return 'bg-gray-100 text-gray-800 border-gray-300'
-        }
-      },
-      onChange: (row, newValue) => {
-        handleStatusChange(row.id, newValue)
-      },
-    },
+    // {
+    //   key: 'status',
+    //   header: 'Status',
+    //   field: 'status',
+    //   type: 'dropdown',
+    //   options: ['active', 'inactive'],
+    //   getOptionClass: (val) => {
+    //     switch (val) {
+    //       case 'active':
+    //         return 'bg-green-100 text-green-800 border-green-300'
+    //       case 'inactive':
+    //         return 'bg-red-100 text-red-800 border-red-300'
+    //       default:
+    //         return 'bg-gray-100 text-gray-800 border-gray-300'
+    //     }
+    //   },
+    //   onChange: (row, newValue) => {
+    //     handleStatusChange(row.id, newValue)
+    //   },
+    // },
     {
       key: 'actions',
       header: 'Action',

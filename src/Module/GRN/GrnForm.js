@@ -19,7 +19,7 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
     try {
       const response = await apiMethods.getPurchaseOrderById(id)
       const poData = response.data
-      console.log('PO Data:', poData);
+      console.log('PO Data:', poData)
 
       // Update the main form data with PO information
       setGrnFormData((prevData) => ({
@@ -37,8 +37,8 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
         grn_item_name: item.po_item_name || '',
         description: item.description || '',
         quantity_ordered: parseFloat(item.quantity) || 0,
-        quantity_received: 0, 
-        accepted_quantity: 0, 
+        quantity_received: 0,
+        accepted_quantity: 0,
         rejected_quantity: 0,
         batch_no: '',
         notes: '',
@@ -99,20 +99,17 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     <label className="text-black font-normal leading-6 mb-2 text-left">
                       Purchase Order <span className="text-red-500">*</span>
                     </label>
-                    {errors.po_id && (
-                      <span className="text-red-500 text-sm ml-2 mb-2 align-middle">
-                        {errors.po_id}
-                      </span>
-                    )}
                   </div>
                   <div className="relative w-full" ref={dropdownRef}>
                     <div
                       className="w-full h-[40px] px-3 border border-gray-300 rounded-md bg-white text-gray-800 flex items-center justify-between cursor-pointer hover:border-[#8167E5] transition-all duration-200"
                       onClick={() => setIsOpen(!isOpen)}
                     >
-                      <span className=" truncate">
-                        {grnFormData.po_id || 'Select Purchase Order'}
+                      <span className="truncate">
+                        {purchaseOrderData.find((po) => po.id === grnFormData.po_id)
+                          ?.purchase_generate_id || 'Select Purchase Order'}
                       </span>
+
                       <span className="text-gray-500">
                         {isOpen ? (
                           <svg
@@ -192,6 +189,11 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                       </div>
                     )}
                   </div>
+                  {errors.po_id && (
+                    <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
+                      {errors.po_id}
+                    </span>
+                  )}
                 </div>
 
                 <div className="p-2 rounded-lg flex flex-col">
@@ -199,9 +201,6 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     <label className="text-black font-normal leading-6 text-left">
                       Grn Date <span className="text-red-500">*</span>
                     </label>
-                    {errors.grn_date && (
-                      <span className="text-red-500 text-sm ml-2 mb-2">{errors.grn_date}</span>
-                    )}
                   </div>
 
                   <input
@@ -211,6 +210,9 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     onChange={handleInputChange}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
+                  {errors.grn_date && (
+                    <span className="text-red-500 text-sm mt-1 ml-2 mb-2">{errors.grn_date}</span>
+                  )}
                 </div>
 
                 <div className="p-2 rounded-lg flex flex-col">
@@ -218,11 +220,6 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     <label className="text-black font-normal leading-6 mb-2 text-left">
                       Delivery Note No. <span className="text-red-500">*</span>
                     </label>
-                    {errors.delivery_note_no && (
-                      <span className="text-red-500 text-sm ml-2 mb-2 align-middle">
-                        {errors.delivery_note_no}
-                      </span>
-                    )}
                   </div>
                   <input
                     type="text"
@@ -231,6 +228,11 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     onChange={handleInputChange}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
+                  {errors.delivery_note_no && (
+                    <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
+                      {errors.delivery_note_no}
+                    </span>
+                  )}
                 </div>
 
                 <div className="p-2 rounded-lg flex flex-col">
@@ -238,11 +240,6 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     <label className="text-black font-normal leading-6 mb-2 text-left">
                       Invoice No. <span className="text-red-500">*</span>
                     </label>
-                    {errors.invoice_no && (
-                      <span className="text-red-500 text-sm ml-2 mb-2 align-middle">
-                        {errors.invoice_no}
-                      </span>
-                    )}
                   </div>
                   <input
                     type="text"
@@ -251,17 +248,17 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     onChange={handleInputChange}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
+                  {errors.invoice_no && (
+                    <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
+                      {errors.invoice_no}
+                    </span>
+                  )}
                 </div>
                 <div className="p-2 rounded-lg flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
                     <label className="text-black font-normal leading-6 mb-2 text-left">
                       Invoice Date <span className="text-red-500">*</span>
                     </label>
-                    {errors.invoice_date && (
-                      <span className="text-red-500 text-sm ml-2 mb-2 align-middle">
-                        {errors.invoice_date}
-                      </span>
-                    )}
                   </div>
                   <input
                     type="date"
@@ -270,17 +267,17 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     onChange={handleInputChange}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
+                  {errors.invoice_date && (
+                    <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
+                      {errors.invoice_date}
+                    </span>
+                  )}
                 </div>
                 <div className="p-2 rounded-lg flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
                     <label className="text-black font-normal leading-6 mb-2 text-left">
                       Received By <span className="text-red-500">*</span>
                     </label>
-                    {errors.received_by && (
-                      <span className="text-red-500 text-sm ml-2 mb-2 align-middle">
-                        {errors.received_by}
-                      </span>
-                    )}
                   </div>
                   <input
                     type="text"
@@ -289,17 +286,17 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     onChange={handleInputChange}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
+                  {errors.received_by && (
+                    <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
+                      {errors.received_by}
+                    </span>
+                  )}
                 </div>
                 <div className="p-2 rounded-lg flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
                     <label className="text-black font-normal leading-6 mb-2 text-left">
                       Notes <span className="text-red-500">*</span>
                     </label>
-                    {errors.notes && (
-                      <span className="text-red-500 text-sm ml-2 mb-2 align-middle">
-                        {errors.notes}
-                      </span>
-                    )}
                   </div>
                   <input
                     type="text"
@@ -308,6 +305,11 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     onChange={handleInputChange}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
+                  {errors.notes && (
+                    <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
+                      {errors.notes}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

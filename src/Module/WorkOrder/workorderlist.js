@@ -25,6 +25,8 @@ const WorkOrders = () => {
   const { filteredSearchData, searchQuery, } = useSearch()
   const [showPopUp, setShowPopUp] = useState(null)
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1 })
+    const [count, setCount] = useState(null)
+
   const [isEditFormVisible,setIsFormVisible] = useState(false);
   const [selectedWorkOrderId,setSelectedWorkOrderId] = useState("")
   const [isConfirmationModaleOpen,setIsConfirmationModaleOpen]=useState(false)
@@ -65,6 +67,8 @@ const WorkOrders = () => {
       })
 
       setData(response.data?.workOrders || [])
+      console.log("jjjjj",response.data.pagination.total )
+      setCount(response.data.pagination.total)
       setPagination(prev => ({
         ...prev,
         totalPages: response.data.pagination.totalPages
@@ -231,7 +235,8 @@ const WorkOrders = () => {
 
 
           {/* Pagination Section */}
-          <div className="flex justify-end items-center gap-4 mt-4">
+       <div className="flex justify-end items-center gap-4  mt-4 ml-4 mr-4">
+              <p className='w-50 text-sm'>Total Count : <span className='font-semibold'>{count}</span></p>
             <CompactPagination
               count={pagination?.totalPages}
               page={pagination?.page}

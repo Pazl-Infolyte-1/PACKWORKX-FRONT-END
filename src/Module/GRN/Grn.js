@@ -19,6 +19,7 @@ const Grn = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 })
   const [limit, setLimit] = useState(50)
+    const [count, setCount] = useState(null)
   const searchBarRef = useRef(null)
   const [errors, setErrors] = useState({})
   const { searchQuery, setGlobalPlaceholder } = useSearch()
@@ -41,6 +42,7 @@ const Grn = () => {
       })
       setGrnData(response?.data?.data)
       setPagination(response.data.pagination)
+            setCount(response.data.totalCount)
     } catch (error) {
       console.error(error)
     }
@@ -182,7 +184,8 @@ const Grn = () => {
             setRefresh={setRefresh}
           />
         </div>
-        <div className='my-2'>
+          <div className="flex justify-end items-center gap-4 mt-2 ml-4 mr-4">
+              <p className='w-40 text-sm'>Total Count: <span className='font-semibold'>{count}</span></p>
           <CompactPagination
             count={pagination?.totalPages || 1}
             page={pagination?.currentPage || 1}

@@ -52,7 +52,7 @@ const InventoryTable = ({ inventoryData }) => {
                 Min Stockn Level
               </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Available Quantity
+                Available Qty
               </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                 Standard Cost

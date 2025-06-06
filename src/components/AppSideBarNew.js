@@ -355,24 +355,24 @@ export const AppSideBarNew = ({ giveAccess }) => {
               )
             }
 
-            if (module.modules_description === 'Product') {
-              return (
-                <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/inventory/items">
-                    {navLink('Product', 'cilIndustry')}
-                  </CNavLink>
-                </CNavItem>
-              )
-            }
-            if (module.modules_description === 'Sales Return') {
-              return (
-                <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/salesReturn">
-                    {navLink('Sales Return', 'cilAt')}
-                  </CNavLink>
-                </CNavItem>
-              )
-            }
+            //if (module.modules_description === 'Product') {
+            //  return (
+            //    <CNavItem key={index}>
+            //      <CNavLink as={NavLink} to="/inventory/items">
+            //        {navLink('Product', 'cilIndustry')}
+            //      </CNavLink>
+            //    </CNavItem>
+            //  )
+            //}
+            //if (module.modules_description === 'Sales Return') {
+            //  return (
+            //    <CNavItem key={index}>
+            //      <CNavLink as={NavLink} to="/salesReturn">
+            //        {navLink('Sales Return', 'cilAt')}
+            //      </CNavLink>
+            //    </CNavItem>
+            //  )
+            //}
             if (module.modules_description === 'Purchase Return') {
               return (
                 <CNavItem key={index}>

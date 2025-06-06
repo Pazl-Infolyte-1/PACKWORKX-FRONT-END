@@ -23,6 +23,8 @@ const PurchaseOrder = () => {
   const [loading, setLoading] = useState(true)
   const { searchQuery, setGlobalSearchQuery, setGlobalPlaceholder } = useSearch()
   const [totalPages, setTotalPages] = useState(0)
+    const [count, setCount] = useState(null)
+
   const [refresh, setRefresh] = useState(false)
   const [paginationParams, setPaginationParams] = useState({
     currentPage: 1,
@@ -49,6 +51,8 @@ const PurchaseOrder = () => {
         status: 'active',
       })
       setData(res.data || [])
+      console.log("ddd",res)
+      setCount(res.totalCount)
       setTotalPages(Math.ceil(res.totalCount / pageParams.pageSize))
     } catch (err) {
       setAlert({
@@ -163,7 +167,8 @@ const PurchaseOrder = () => {
               setRefresh={setRefresh}
             />
 
-            <div className="flex justify-end items-center gap-4 mt-2">
+            <div className="flex justify-end items-center gap-4 mt-2 ml-4 mr-4">
+              <p className='w-40 text-sm'>Total Count: <span className='font-semibold'>{count}</span></p>
               <CompactPagination
                 count={totalPages}
                 page={paginationParams.currentPage}

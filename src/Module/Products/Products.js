@@ -37,6 +37,7 @@ function Products() {
   const { searchQuery, filteredSearchData } = useSearch();
   const [data, setData] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
+    const [count, setCount] = useState(null);
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState(null)
   const [selectedItemId, setSelectedItemId] = useState(null);
@@ -170,6 +171,7 @@ function Products() {
             />
         </div>
   <div className="flex justify-end items-center gap-4 mt-3">
+    <p>{count}</p>
           <CompactPagination
             // count={totalPage}
             // page={currentPage}

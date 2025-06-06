@@ -142,7 +142,11 @@ const RouteProcess = () => {
             setOpenRouteModal={setOpenRouteModal}
           />
         </div>
-        <div className="mt-4">
+        <div className="flex justify-center md:justify-end items-center gap-4 mt-2 ml-4 mr-4">
+        <div className=" flex w-32 items-center gap-1 font-normal text-sm">
+          <span>Total Count:</span>
+          <span className="font-medium">{pagination.total}</span>
+        </div>
           <CompactPagination
             count={pagination?.totalPages || 1}
             page={pagination?.page || 1}

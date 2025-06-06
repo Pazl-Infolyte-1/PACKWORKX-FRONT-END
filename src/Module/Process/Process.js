@@ -46,6 +46,7 @@ const Process = () => {
       })
       setProcessData(response.data.data)
       setPagination(response.data.pagination)
+      console.log("resss",response.data.pagination)
     } catch (error) {
       console.error(error)
     }
@@ -218,27 +219,30 @@ const handleProcessSubmit = async (data) => {
           />
         </div>
 
-        <div className='mt-4'>
-          <CompactPagination
-            count={pagination?.totalPages || 1}
-            page={pagination?.page || 1}
-            onPageChange={(event, value) => {
-              setPagination((prev) => ({
-                ...prev,
-                page: value,
-              }))
-            }}
-            onEntriesChange={(newLimit) => {
-              setLimit(newLimit)
-              // Reset to first page when changing limit
-              setPagination((prev) => ({
-                ...prev,
-                page: 1,
-              }))
-            }}
-            entriesPerPage={limit}
-          />
-        </div>
+     <div className="mt-2 flex items-center justify-between pl-4 pr-4">
+  <p className='w-50 text-sm'>Total Count: <span className="font-semibold">{pagination.total}</span>
+</p>
+
+  <CompactPagination
+    count={pagination?.totalPages || 1}
+    page={pagination?.page || 1}
+    onPageChange={(event, value) => {
+      setPagination((prev) => ({
+        ...prev,
+        page: value,
+      }));
+    }}
+    onEntriesChange={(newLimit) => {
+      setLimit(newLimit);
+      setPagination((prev) => ({
+        ...prev,
+        page: 1,
+      }));
+    }}
+    entriesPerPage={limit}
+  />
+</div>
+
 
         <PopUp
           visible={showAddProcessModal}

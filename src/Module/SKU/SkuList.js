@@ -816,7 +816,8 @@ useEffect(() => {
         </div>
 
         {/* Pagination Section */}
-        <div className="flex justify-end items-center gap-4 mt-[40px]">
+        <div className="flex justify-end items-center gap-4 mt-[40px] pl-4 pr-4">
+          <p className='w-40 text-sm'>Total Count :<span className='font-semibold'> {totalRecords}</span> </p>
             <CompactPagination
                         totalRecords={totalRecords}
                     count={pagination?.totalPages || 1}

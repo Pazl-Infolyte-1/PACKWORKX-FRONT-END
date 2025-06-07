@@ -153,6 +153,8 @@ const GrnItemsFrom = ({
     name: 'grn_items',
   })
 
+  console.log('fields', fields)
+
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value)
   }
@@ -410,6 +412,37 @@ const GrnItemsFrom = ({
                   ))}
                 </tbody>
               </table>
+
+              {/* <table className="flex-1">
+                <tbody className="gap-4">
+                  <tr>
+                    <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                      Total Qty: {fields.total_qty}
+                    </td>
+                    <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                      C-GST: {fields.cgst_amount}
+                    </td>
+                    <td className="px-4 py-2"></td>
+                    <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                      S-GST: {fields.sgst_amount}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2"></td>
+                    <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                      Total: {fields.amount}
+                    </td>
+                    <td className="px-4 py-2"></td>
+                    <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                      Tax Amount: {fields.tax_amount}
+                    </td>
+                    <td className="px-4 py-2"></td>
+                    <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                      Total Incl of GST: {fields.total_amount}
+                    </td>
+                  </tr>
+                </tbody>
+              </table> */}
               <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 {modalContent}
               </Modal>

@@ -47,6 +47,21 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
     setIsModalOpen(true)
   }
 
+  const handlePDFDownload = async () => {
+    try {
+      const response = await apiMethods.downloadPurchaseOrderPDF(cell.id)
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `purchase_order_${cell.purchase_generate_id}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error downloading PDF:', error)
+    }
+  }
+
   return (
     <PopUp
       visible={showPopUp && !editTag} // This ensures proper visibility
@@ -74,6 +89,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
                 >
                   {cell.status === 'active' ? 'Approved' : 'Rejected'}
                 </span>
+                  <ActionButton label={'Download PDF'} variant="edit" height={8} onClick={handlePDFDownload}/>
                 {/* <ActionButton
                   label={'Edit'}
                   variant="edit"

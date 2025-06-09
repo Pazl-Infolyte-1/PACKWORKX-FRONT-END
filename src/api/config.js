@@ -1628,6 +1628,7 @@ export const apiMethods = {
   getWorkOrderInProduction: async (body) => {
     return await apiClient.get('/work-order/production=in_production')
   },
+
   getInventoryInSkuView: async () => {
     try {
       const response = await apiClient.get(`/inventory?search=&page=1&limit=50&subCategoryId=1`)
@@ -1636,6 +1637,11 @@ export const apiMethods = {
       console.error(error)
       throw error
     }
+
+  downloadPurchaseOrderPDF: async (id) => {
+    return await apiClient.get(`/purchase-order/${id}/download`, {
+      responseType: 'blob',
+    })
   },
 }
 

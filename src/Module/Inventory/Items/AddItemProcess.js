@@ -504,13 +504,13 @@ const onSubmit = async (data) => {
     const subCatName = getCurrentSubcategoryName()
     if (!subCatName || !defaultCustomFields[subCatName]) return null
 
+    const defaultFieldsKeys = Object.keys(defaultCustomFields[subCatName])
+    const fieldsPerRow = 3
+    const remainingSlots = fieldsPerRow - (defaultFieldsKeys.length % fieldsPerRow)
+    
     return (
-      <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-3 p-2 border rounded-md">
-        <h3 className="md:col-span-3 text-sm font-semibold">
-          {toTitleCase(subCatName)} Specifications
-        </h3>
-
-        {Object.keys(defaultCustomFields[subCatName]).map((fieldName) => (
+      <>
+        {defaultFieldsKeys.map((fieldName) => (
           <div key={fieldName}>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {fieldName}
@@ -520,7 +520,7 @@ const onSubmit = async (data) => {
             {fieldOptions[fieldName]?.[subCatName] ? (
               <select
                 style={getInputStyle(errors[fieldName])}
-                className="w-full rounded px-3 py-2"
+                className="w-full rounded px-3 py-1"
                 {...register(fieldName, { required: true })}
               >
                 <option value="">Select {fieldName}</option>
@@ -538,12 +538,16 @@ const onSubmit = async (data) => {
                 {...register(fieldName, { required: true })}
               />
             )}
-
-           
-           
           </div>
         ))}
-      </div>
+        
+        {/* Add empty divs to balance the grid if needed */}
+        {remainingSlots !== fieldsPerRow && 
+          Array.from({ length: remainingSlots }, (_, index) => (
+            <div key={`empty-${index}`}></div>
+          ))
+        }
+      </>
     )
   }
 

@@ -44,7 +44,6 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         setIsModalOpen(true)
         return
       }
-      console.log(JSON.parse(item.custom_fields), 'item')
 
   const customFields = item?.custom_fields ? JSON.parse(JSON.parse(item.custom_fields)) : {}
 

@@ -31,8 +31,8 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
     console.log(customFields)
 
     setModalContent(
-      <>
-        <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
+      <div className=' max-h-[200px] overflow-y-scroll'>
+        <h3 className="text-xl font-semibold mb-3 ">Custom Fields</h3>
         {Object.entries(customFields).length > 0 ? (
           Object.entries(customFields).map(([key, value], idx) => (
             <p key={idx}>
@@ -42,7 +42,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
         ) : (
           <p>No custom fields available.</p>
         )}
-      </>,
+      </div>,
     )
     setIsModalOpen(true)
   }

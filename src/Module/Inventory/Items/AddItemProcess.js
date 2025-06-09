@@ -46,6 +46,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       Size: '',
       'Net WT (Kgs)': '',
       Mill: '',
+      UOM: '',
     },
     'corrugation-glue': {
       'Glue Type': '',
@@ -57,18 +58,18 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       Viscosity: '',
       'Expiry Date': '',
     },
-    'stitching-wires' :{
+    'stitching-wires': {
       'Wire Type': '',
-    }
+    },
   }
-
   // Define options for select fields
   const fieldOptions = {
     'Glue Type': {
       'corrugation-glue': ['Starch-based', 'Casein', 'Synthetic'],
       'pasting-glue': ['Animal', 'Synthetic', 'Starch-based', 'Dextrin'],
     },
-    'Wire Type': ['Galvanized', 'Stainless Steel', 'Copper-coated'],
+    'Wire Type': { 'stitching-wires': ['Galvanized', 'Stainless Steel', 'Copper-coated'] },
+    UOM: ['Inch', 'CM', 'MM'],
   }
 
   const toTitleCase = (str) =>
@@ -191,64 +192,63 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
         }
 
         // Handle custom fields
-if (itemData.custom_fields) {
-  try {
-    const customFields =
-      typeof itemData.custom_fields === 'string'
-        ? JSON.parse(itemData.custom_fields)
-        : itemData.custom_fields
+        if (itemData.custom_fields) {
+          try {
+            const customFields =
+              typeof itemData.custom_fields === 'string'
+                ? JSON.parse(itemData.custom_fields)
+                : itemData.custom_fields
 
-    // Parse custom_fields if it's double-encoded
-    const parsedCustomFields = typeof customFields === 'string' 
-      ? JSON.parse(customFields) 
-      : customFields
+            // Parse custom_fields if it's double-encoded
+            const parsedCustomFields =
+              typeof customFields === 'string' ? JSON.parse(customFields) : customFields
 
-    // Get default custom fields from API response if available
-    let defaultFieldsFromAPI = {}
-    if (itemData.default_custom_fields) {
-      try {
-        const defaultFields = typeof itemData.default_custom_fields === 'string'
-          ? JSON.parse(itemData.default_custom_fields)
-          : itemData.default_custom_fields
-        
-        defaultFieldsFromAPI = typeof defaultFields === 'string' 
-          ? JSON.parse(defaultFields) 
-          : defaultFields
-      } catch (parseError) {
-        console.error('Error parsing default_custom_fields:', parseError)
-      }
-    }
+            // Get default custom fields from API response if available
+            let defaultFieldsFromAPI = {}
+            if (itemData.default_custom_fields) {
+              try {
+                const defaultFields =
+                  typeof itemData.default_custom_fields === 'string'
+                    ? JSON.parse(itemData.default_custom_fields)
+                    : itemData.default_custom_fields
 
-    // First check if this is a subcategory with default fields
-    const selectedSubCat = allSubCategories.find((sc) => sc.id == itemData.sub_category)
-    const subCatName = selectedSubCat?.sub_category_name
+                defaultFieldsFromAPI =
+                  typeof defaultFields === 'string' ? JSON.parse(defaultFields) : defaultFields
+              } catch (parseError) {
+                console.error('Error parsing default_custom_fields:', parseError)
+              }
+            }
 
-    if (subCatName && defaultCustomFields[subCatName]) {
-      // Set values for default custom fields from API response
-      Object.keys(defaultCustomFields[subCatName]).forEach((key) => {
-        if (parsedCustomFields[key] !== undefined) {
-          setValue(key, parsedCustomFields[key])
+            // First check if this is a subcategory with default fields
+            const selectedSubCat = allSubCategories.find((sc) => sc.id == itemData.sub_category)
+            const subCatName = selectedSubCat?.sub_category_name
+
+            if (subCatName && defaultCustomFields[subCatName]) {
+              // Set values for default custom fields from API response
+              Object.keys(defaultCustomFields[subCatName]).forEach((key) => {
+                if (parsedCustomFields[key] !== undefined) {
+                  setValue(key, parsedCustomFields[key])
+                }
+              })
+
+              // Then handle any additional custom tags (fields not in default schema)
+              const additionalTags = Object.entries(parsedCustomFields)
+                .filter(([key]) => !defaultCustomFields[subCatName].hasOwnProperty(key))
+                .map(([label, value]) => ({ label, value: String(value) }))
+
+              setTagFields(additionalTags)
+            } else {
+              // For subcategories without default fields, use the tag system
+              const tagsArray = Object.entries(parsedCustomFields).map(([label, value]) => ({
+                label,
+                value: String(value),
+              }))
+              setTagFields(tagsArray)
+            }
+          } catch (parseError) {
+            console.error('Error parsing custom fields:', parseError)
+          }
         }
-      })
-      
-      // Then handle any additional custom tags (fields not in default schema)
-      const additionalTags = Object.entries(parsedCustomFields)
-        .filter(([key]) => !defaultCustomFields[subCatName].hasOwnProperty(key))
-        .map(([label, value]) => ({ label, value: String(value) }))
-      
-      setTagFields(additionalTags)
-    } else {
-      // For subcategories without default fields, use the tag system
-      const tagsArray = Object.entries(parsedCustomFields).map(([label, value]) => ({
-        label,
-        value: String(value),
-      }))
-      setTagFields(tagsArray)
-    }
-  } catch (parseError) {
-    console.error('Error parsing custom fields:', parseError)
-  }
-}
       }
     } catch (error) {
       console.error('Error fetching item data:', error)
@@ -282,91 +282,91 @@ if (itemData.custom_fields) {
     }
   }, [subCategory, isEditing])
 
-const onSubmit = async (data) => {
-  try {
-    setIsSubmitting(true)
+  const onSubmit = async (data) => {
+    try {
+      setIsSubmitting(true)
 
-    const formErrors = Object.keys(errors)
-    if (formErrors.length > 0) {
-      setAlerts([
-        { severity: 'error', message: 'Please fix all validation errors before submitting' },
-      ])
-      setIsSubmitting(false)
-      return
-    }
+      const formErrors = Object.keys(errors)
+      if (formErrors.length > 0) {
+        setAlerts([
+          { severity: 'error', message: 'Please fix all validation errors before submitting' },
+        ])
+        setIsSubmitting(false)
+        return
+      }
 
-    const selectedSubCat =
-      subCategory.find((sc) => sc.id == selectedSubCategory) ||
-      allSubCategories.find((sc) => sc.id == selectedSubCategory)
-    const subCatName = selectedSubCat?.sub_category_name
+      const selectedSubCat =
+        subCategory.find((sc) => sc.id == selectedSubCategory) ||
+        allSubCategories.find((sc) => sc.id == selectedSubCategory)
+      const subCatName = selectedSubCat?.sub_category_name
 
-    // Prepare custom_fields by combining default fields and tag fields
-    let customFields = {}
-    let defaultFields = {}
+      // Prepare custom_fields by combining default fields and tag fields
+      let customFields = {}
+      let defaultFields = {}
 
-    // First add default custom fields if they exist for this subcategory
-    if (subCatName && defaultCustomFields[subCatName]) {
-      Object.keys(defaultCustomFields[subCatName]).forEach((key) => {
-        customFields[key] = data[key] || ''
-        defaultFields[key] = data[key] || ''
+      // First add default custom fields if they exist for this subcategory
+      if (subCatName && defaultCustomFields[subCatName]) {
+        Object.keys(defaultCustomFields[subCatName]).forEach((key) => {
+          customFields[key] = data[key] || ''
+          defaultFields[key] = data[key] || ''
+        })
+      }
+
+      // Then add any additional tag fields
+      tagFields.forEach((field) => {
+        if (field.label) {
+          customFields[field.label] = field.value
+        }
       })
-    }
 
-    // Then add any additional tag fields
-    tagFields.forEach((field) => {
-      if (field.label) {
-        customFields[field.label] = field.value
+      const formattedData = {
+        ...data,
+        custom_fields: JSON.stringify(customFields),
+        default_custom_fields: JSON.stringify(defaultFields), // Add this line
+        min_stock_level: parseFloat(data.min_stock_level) || 0,
+        reorder_level: parseFloat(data.reorder_level) || 0,
+        standard_cost: parseFloat(data.standard_cost) || 0,
+        cgst: parseFloat(data.cgst) || 0,
+        sgst: parseFloat(data.sgst) || 0,
+        category: Number(data.category),
+        sub_category: data.sub_category ? Number(data.sub_category) : null,
       }
-    })
 
-    const formattedData = {
-      ...data,
-      custom_fields: JSON.stringify(customFields),
-      default_custom_fields: JSON.stringify(defaultFields), // Add this line
-      min_stock_level: parseFloat(data.min_stock_level) || 0,
-      reorder_level: parseFloat(data.reorder_level) || 0,
-      standard_cost: parseFloat(data.standard_cost) || 0,
-      cgst: parseFloat(data.cgst) || 0,
-      sgst: parseFloat(data.sgst) || 0,
-      category: Number(data.category),
-      sub_category: data.sub_category ? Number(data.sub_category) : null,
-    }
-
-    let response
-    if (isEditing) {
-      formattedData.id = currentItemId
-      response = await apiMethods.updateItem(currentItemId, formattedData)
-    } else {
-      response = await apiMethods.addItem(formattedData)
-    }
-
-    setAlerts([
-      {
-        severity: 'success',
-        message:
-          response?.data?.message || `Item ${isEditing ? 'updated' : 'added'} successfully`,
-      },
-    ])
-
-    setTimeout(() => {
-      if (fromInventory) {
-        navigate('/inventoryhandling')
+      let response
+      if (isEditing) {
+        formattedData.id = currentItemId
+        response = await apiMethods.updateItem(currentItemId, formattedData)
       } else {
-        setDrawer(false)
+        response = await apiMethods.addItem(formattedData)
       }
-      fetchData()
-    }, 1500)
-  } catch (error) {
-    setAlerts([
-      {
-        severity: 'error',
-        message: error?.response?.data?.message || 'Operation failed',
-      },
-    ])
-  } finally {
-    setIsSubmitting(false)
+
+      setAlerts([
+        {
+          severity: 'success',
+          message:
+            response?.data?.message || `Item ${isEditing ? 'updated' : 'added'} successfully`,
+        },
+      ])
+
+      setTimeout(() => {
+        if (fromInventory) {
+          navigate('/inventoryhandling')
+        } else {
+          setDrawer(false)
+        }
+        fetchData()
+      }, 1500)
+    } catch (error) {
+      setAlerts([
+        {
+          severity: 'error',
+          message: error?.response?.data?.message || 'Operation failed',
+        },
+      ])
+    } finally {
+      setIsSubmitting(false)
+    }
   }
-}
 
   function cleanAndUppercase(text) {
     return text
@@ -380,20 +380,11 @@ const onSubmit = async (data) => {
     { label: 'Reference Number', name: 'item_code', required: true },
     { label: 'Product Name', name: 'item_name', required: true },
     { label: 'HSN Code', name: 'hsn_code' },
-    { label: 'UOM (Unit of Measurments)', name: 'uom', required: true },
     { label: 'CGST %', name: 'cgst', type: 'number', min: 0, max: 100 },
     { label: 'SGST %', name: 'sgst', type: 'number', min: 0, max: 100 },
     { label: 'Manufacturer', name: 'manufacturer' },
     { label: 'Min Stock Level', name: 'min_stock_level', type: 'number', min: 0 },
     { label: 'Reorder Level', name: 'reorder_level', type: 'number', min: 0 },
-    {
-      label: 'Standard Cost',
-      name: 'standard_cost',
-      type: 'number',
-      required: true,
-      min: 0,
-      step: '0.01',
-    },
   ]
 
   const handleCancel = () => {
@@ -507,7 +498,7 @@ const onSubmit = async (data) => {
     const defaultFieldsKeys = Object.keys(defaultCustomFields[subCatName])
     const fieldsPerRow = 3
     const remainingSlots = fieldsPerRow - (defaultFieldsKeys.length % fieldsPerRow)
-    
+
     return (
       <>
         {defaultFieldsKeys.map((fieldName) => (
@@ -517,7 +508,20 @@ const onSubmit = async (data) => {
               <span className="text-red-500"> *</span>
             </label>
 
-            {fieldOptions[fieldName]?.[subCatName] ? (
+            {fieldName === 'UOM' ? (
+              <select
+                style={getInputStyle(errors[fieldName])}
+                className="w-full rounded px-3 py-1"
+                {...register(fieldName, { required: true })}
+              >
+                <option value="">Select UOM</option>
+                {fieldOptions['UOM'].map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            ) : fieldOptions[fieldName]?.[subCatName] ? (
               <select
                 style={getInputStyle(errors[fieldName])}
                 className="w-full rounded px-3 py-1"
@@ -540,13 +544,10 @@ const onSubmit = async (data) => {
             )}
           </div>
         ))}
-        
+
         {/* Add empty divs to balance the grid if needed */}
-        {remainingSlots !== fieldsPerRow && 
-          Array.from({ length: remainingSlots }, (_, index) => (
-            <div key={`empty-${index}`}></div>
-          ))
-        }
+        {remainingSlots !== fieldsPerRow &&
+          Array.from({ length: remainingSlots }, (_, index) => <div key={`empty-${index}`}></div>)}
       </>
     )
   }
@@ -595,6 +596,30 @@ const onSubmit = async (data) => {
             {errors[name] && <p className="text-sm text-red-600 mt-1">{errors[name].message}</p>}
           </div>
         ))}
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Standard Cost</label>
+          <div className="flex">
+            <input
+              type="number"
+              step="0.01"
+              style={getInputStyle(errors.standard_cost)}
+              className="flex-1 rounded-l px-3 py-1 border-r-0"
+              {...register('standard_cost')}
+            />
+            <select
+              className="rounded-r px-3 py-1 border border-l-0 bg-gray-700 text-white text-sm min-w-[80px]"
+              style={{
+                borderColor: getInputStyle(errors.standard_cost)?.borderColor || '#d1d5db',
+                borderLeftWidth: '0',
+              }}
+              {...register('net_weight')}
+            >
+              <option value="kg">Kg</option>
+              <option value="litre">Litre</option>
+            </select>
+          </div>
+        </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Specifications</label>
@@ -691,15 +716,15 @@ const onSubmit = async (data) => {
           <div className="md:col-span-3">
             {selectedSubCategory && (
               <div className="flex justify-between items-center mb-2">
-              <h3 className="text-sm font-semibold">Additional Custom Tags</h3>
-              <button
-                type="button"
-                onClick={handleAddField}
-                className="bg-purple-500 text-white text-sm px-2 py-1 rounded-md shadow-md hover:bg-purple-400"
-              >
-                + Add Custom Tag
-              </button>
-            </div>
+                <h3 className="text-sm font-semibold">Additional Custom Tags</h3>
+                <button
+                  type="button"
+                  onClick={handleAddField}
+                  className="bg-purple-500 text-white text-sm px-2 py-1 rounded-md shadow-md hover:bg-purple-400"
+                >
+                  + Add Custom Tag
+                </button>
+              </div>
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-10">

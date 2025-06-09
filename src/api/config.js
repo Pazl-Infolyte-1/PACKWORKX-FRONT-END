@@ -1526,6 +1526,26 @@ export const apiMethods = {
       throw error
     }
   },
+  getStockAdjustmentsByItemId: async (id) => {
+    try {
+      return await apiClient.get(`/stock-adjustments/items/${id}`)
+    } catch (error) {
+      console.error(
+        'Error fetching stock adjustments by item ID:',
+        error.response?.data || error.message,
+      )
+      throw error
+    }
+  },
+
+  getGRNByPOId: async (poId) => {
+    try {
+      return await apiClient.get(`/stock-adjustments/grn/${poId}`)
+    } catch (error) {
+      console.error('Error fetching GRN by PO ID:', error.response?.data || error.message)
+      throw error
+    }
+  },
 
   updateStockAdjustment: async (id, payload) => {
     try {

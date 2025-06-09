@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   CTable,
   CTableHead,
@@ -6,68 +6,65 @@ import {
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-} from '@coreui/react';
-import { cilPencil, cilTrash } from '@coreui/icons';
-import ThreeDotMenu from '../../components/ThreeDotMenu';
-import { useNavigate } from 'react-router-dom';
-import CustomAlert from '../../components/New/CustomAlert';
-import apiMethods from '../../api/config';
-import ConfirmationModale from '../../components/New/ConfirmationModale';
+} from '@coreui/react'
+import { cilPencil, cilTrash } from '@coreui/icons'
+import ThreeDotMenu from '../../components/ThreeDotMenu'
+import { useNavigate } from 'react-router-dom'
+import CustomAlert from '../../components/New/CustomAlert'
+import apiMethods from '../../api/config'
+import ConfirmationModale from '../../components/New/ConfirmationModale'
 
-const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized,refreshClients }) => {
-  console.log("stock data in table",stockAdjustmentData)
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState({ open: false, id: null });
-  const navigate = useNavigate();
+const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized, refreshClients }) => {
+  console.log('stock data in table', stockAdjustmentData)
+  const [selectedRows, setSelectedRows] = useState([])
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState({ open: false, id: null })
+  const navigate = useNavigate()
   const [alerts, setAlerts] = useState([])
   const handleRowSelect = (id) => {
-    setSelectedRows((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
+    setSelectedRows((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]))
+  }
 
   const handleSelectAll = () => {
     if (selectedRows.length === adjustments.length) {
-      setSelectedRows([]);
+      setSelectedRows([])
     } else {
-      setSelectedRows(adjustments.map((a) => a.id));
+      setSelectedRows(adjustments.map((a) => a.id))
     }
-  };
+  }
 
-    const handleClose = () => {
+  const handleClose = () => {
     setAlerts([])
   }
 
-  
   const closeDeleteModal = () => {
     setIsDeleteModalOpen({ open: false, id: null })
   }
 
   const deleteStock = async () => {
-      if (!isDeleteModalOpen.id) return
-  
-      try {
-        const response = await apiMethods.deleteStockAdjustment(isDeleteModalOpen.id)
-        if (!response?.status) {
-          throw new Error(response?.message || 'Failed to delete client')
-        }
-  console.log("response del",response)
-        setAlerts([{ severity: 'success', message: response?.data?.message }])
-      } catch (error) {
-        console.error('Error deleting client:', error)
-  
-        setAlerts([{ severity: 'error', message: error?.message || 'Something went wrong' }])
-      } finally {
-        setTimeout(() => {
-          setAlerts([])
-          refreshClients()
-        }, 3000)
-  
-        closeDeleteModal()
-        refreshClients()
+    if (!isDeleteModalOpen.id) return
+
+    try {
+      const response = await apiMethods.deleteStockAdjustment(isDeleteModalOpen.id)
+      if (!response?.status) {
+        throw new Error(response?.message || 'Failed to delete client')
       }
+      console.log('response del', response)
+      setAlerts([{ severity: 'success', message: response?.data?.message }])
+    } catch (error) {
+      console.error('Error deleting client:', error)
+
+      setAlerts([{ severity: 'error', message: error?.message || 'Something went wrong' }])
+    } finally {
+      setTimeout(() => {
+        setAlerts([])
+        refreshClients()
+      }, 3000)
+
+      closeDeleteModal()
+      refreshClients()
     }
-  
+  }
+
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -76,29 +73,28 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized,refreshClients 
           <CTable hover className="w-full">
             {/* Render table headers only if not minimized */}
             {!isMinimized && (
-         <CTableHead className="!bg-gray-300 sticky top-0 z-10">
-  <CTableRow>
-    <CTableHeaderCell className="w-48 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
-      Stock Adjustment Id<span className="text-gray-500 ml-1">⌕</span>
-    </CTableHeaderCell>
-    <CTableHeaderCell className="w-32 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
-      Adjustment Date<span className="text-gray-500 ml-1">⌕</span>
-    </CTableHeaderCell>
-    <CTableHeaderCell className="w-40 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
-      Reason<span className="text-gray-500 ml-1">⌕</span>
-    </CTableHeaderCell>
-    <CTableHeaderCell className="w-52 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
-      Remarks<span className="text-gray-500 ml-1">⌕</span>
-    </CTableHeaderCell>
-    <CTableHeaderCell className="w-36 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
-      Status<span className="text-gray-500 ml-1">⌕</span>
-    </CTableHeaderCell>
-    <CTableHeaderCell className="w-36 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
-      Actions
-    </CTableHeaderCell>
-  </CTableRow>
-</CTableHead>
-
+              <CTableHead className="!bg-gray-300 sticky top-0 z-10">
+                <CTableRow>
+                  <CTableHeaderCell className="w-48 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+                    Stock Adjustment Id<span className="text-gray-500 ml-1">⌕</span>
+                  </CTableHeaderCell>
+                  <CTableHeaderCell className="w-32 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+                    Adjustment Date<span className="text-gray-500 ml-1">⌕</span>
+                  </CTableHeaderCell>
+                  {/* <CTableHeaderCell className="w-40 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+                    Reason<span className="text-gray-500 ml-1">⌕</span>
+                  </CTableHeaderCell> */}
+                  <CTableHeaderCell className="w-52 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+                    Remarks<span className="text-gray-500 ml-1">⌕</span>
+                  </CTableHeaderCell>
+                  {/* <CTableHeaderCell className="w-36 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+                    Status<span className="text-gray-500 ml-1">⌕</span>
+                  </CTableHeaderCell> */}
+                  <CTableHeaderCell className="w-36 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+                    Actions
+                  </CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
             )}
 
             <CTableBody>
@@ -130,7 +126,7 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized,refreshClients 
                             //}}
                             className="cursor-pointer flex flex-col"
                           >
-                             {stock.stock_adjustment_generate_id || 'N/A'}
+                            {stock.stock_adjustment_generate_id || 'N/A'}
                           </div>
                         </CTableDataCell>
                       </>
@@ -162,15 +158,15 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized,refreshClients 
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                           {stock.adjustment_date || 'N/A'}
                         </CTableDataCell>
-                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
+                        {/* <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
                           {stock.reason || 'N/A'}
-                        </CTableDataCell>
+                        </CTableDataCell> */}
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
                           {stock.remarks || 'N/A'}
                         </CTableDataCell>
-                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
+                        {/* <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
                           {stock.status || 'N/A'}
-                        </CTableDataCell>
+                        </CTableDataCell> */}
                         <CTableDataCell className="px-4 py-3">
                           <div onClick={(e) => e.stopPropagation()}>
                             <ThreeDotMenu
@@ -186,10 +182,11 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized,refreshClients 
                                 {
                                   label: 'Delete',
                                   icon: cilTrash,
-                                  onClick: () => setIsDeleteModalOpen({
-                                    open: true,
-                                    id: stock.id,
-                                  }),
+                                  onClick: () =>
+                                    setIsDeleteModalOpen({
+                                      open: true,
+                                      id: stock.id,
+                                    }),
                                 },
                               ]}
                             />
@@ -201,7 +198,10 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized,refreshClients 
                 ))
               ) : (
                 <CTableRow>
-                  <CTableDataCell colSpan={isMinimized ? 2 : 8} className="text-center text-sm !text-red-600  py-3">
+                  <CTableDataCell
+                    colSpan={isMinimized ? 2 : 8}
+                    className="text-center text-sm !text-red-600  py-3"
+                  >
                     No Data Found
                   </CTableDataCell>
                 </CTableRow>
@@ -210,7 +210,6 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized,refreshClients 
           </CTable>
         </div>
 
- 
         <ConfirmationModale
           isOpen={isDeleteModalOpen.open}
           onClose={closeDeleteModal}
@@ -220,7 +219,7 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized,refreshClients 
         />
       </div>
     </>
-  );
-};
+  )
+}
 
-export default StockAdjustmentTable;
+export default StockAdjustmentTable

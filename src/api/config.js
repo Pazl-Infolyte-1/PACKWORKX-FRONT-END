@@ -1638,11 +1638,12 @@ export const apiMethods = {
       throw error
     }
 
+  },
+
   downloadPurchaseOrderPDF: async (id) => {
     return await apiClient.get(`/purchase-order/${id}/download`, {
       responseType: 'blob',
     })
   },
 }
-
 export default apiMethods

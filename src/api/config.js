@@ -1628,6 +1628,12 @@ export const apiMethods = {
   getWorkOrderInProduction: async (body) => {
     return await apiClient.get('/work-order/production=in_production')
   },
+
+  downloadPurchaseOrderPDF: async (id) => {
+    return await apiClient.get(`/purchase-order/${id}/download`, {
+      responseType: 'blob',
+    })
+  },
 }
 
 export default apiMethods

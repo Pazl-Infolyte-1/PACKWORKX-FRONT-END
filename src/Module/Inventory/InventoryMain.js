@@ -303,7 +303,7 @@ const handleInventoryExelExport = async () => {
                   <span className="font-bold text-white">
                     {item.category_name.replace(/-/g, ' ')}
                   </span>
-                </div>
+                </div>  
                 <span
                   onClick={(e) => handleSubCategoryClick(e, item.id)}
                   className={`size-8 rounded flex items-center justify-center mr-2 border border-white shadow-lg ${
@@ -513,7 +513,7 @@ const handleInventoryExelExport = async () => {
           </button>
 
           {isStockDropdownOpen && (
-            <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg z-10 border border-gray-200">
+            <div className="absolute right-21 top-9 mt-1 w-48 bg-white rounded-lg shadow-lg z-10 border border-gray-200">
               <button
                 onClick={() => {
                   handleStockFilterChange('in_stock')

@@ -46,6 +46,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       Size: '',
       'Net WT (Kgs)': '',
       Mill: '',
+      UOM: '',
     },
     'corrugation-glue': {
       'Glue Type': '',
@@ -61,14 +62,14 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       'Wire Type': '',
     },
   }
-
   // Define options for select fields
   const fieldOptions = {
     'Glue Type': {
       'corrugation-glue': ['Starch-based', 'Casein', 'Synthetic'],
       'pasting-glue': ['Animal', 'Synthetic', 'Starch-based', 'Dextrin'],
     },
-    'Wire Type': ['Galvanized', 'Stainless Steel', 'Copper-coated'],
+    'Wire Type': { 'stitching-wires': ['Galvanized', 'Stainless Steel', 'Copper-coated'] },
+    UOM: ['Inch', 'CM', 'MM'],
   }
 
   const toTitleCase = (str) =>
@@ -379,7 +380,6 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
     { label: 'Reference Number', name: 'item_code', required: true },
     { label: 'Product Name', name: 'item_name', required: true },
     { label: 'HSN Code', name: 'hsn_code' },
-    { label: 'UOM (Unit of Measurments)', name: 'uom', required: true },
     { label: 'CGST %', name: 'cgst', type: 'number', min: 0, max: 100 },
     { label: 'SGST %', name: 'sgst', type: 'number', min: 0, max: 100 },
     { label: 'Manufacturer', name: 'manufacturer' },
@@ -508,7 +508,20 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
               <span className="text-red-500"> *</span>
             </label>
 
-            {fieldOptions[fieldName]?.[subCatName] ? (
+            {fieldName === 'UOM' ? (
+              <select
+                style={getInputStyle(errors[fieldName])}
+                className="w-full rounded px-3 py-1"
+                {...register(fieldName, { required: true })}
+              >
+                <option value="">Select UOM</option>
+                {fieldOptions['UOM'].map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            ) : fieldOptions[fieldName]?.[subCatName] ? (
               <select
                 style={getInputStyle(errors[fieldName])}
                 className="w-full rounded px-3 py-1"
@@ -607,6 +620,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
             </select>
           </div>
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Specifications</label>
           <input

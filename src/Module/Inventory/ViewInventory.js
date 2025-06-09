@@ -211,7 +211,6 @@ const ViewInventory = ({ item }) => {
 
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-gray-500" />
                         <div>
                           <p className="text-xs text-gray-500 m-0">Standard Cost</p>
                           <p className="text-sm font-medium">
@@ -309,17 +308,20 @@ const ViewInventory = ({ item }) => {
           <div className="min-h-screen p-3">
             <div className="max-w-7xl mx-auto">
               {/* Header */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <h1 className="text-xl font-bold text-gray-900">Purchase Orders</h1>
-                    <div className="">
-                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                      <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  {/* Icon and Title in a row, vertically centered */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                      <FileText className="w-6 h-6 text-white" />
                     </div>
+                    <h1 className="text-xl font-bold text-gray-900">Purchase Orders</h1>
+                  </div>
+
+                  {/* Right side ID and Item Name */}
+                  <div className="text-right">
+                    <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                    <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
                   </div>
                 </div>
               </div>
@@ -471,17 +473,20 @@ const ViewInventory = ({ item }) => {
           <div className="min-h-screen  p-3">
             <div className=" mx-auto">
               {/* Header */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
-                    <Package className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <h1 className="text-xl font-bold text-gray-900">Stock Adjustment</h1>
-                    <div>
-                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                      <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+              <div className="mb-4">
+                <div className="flex items-center  justify-between mb-2">
+                  {/* Left section: Icon + Title */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                      <Package className="w-6 h-6 text-white" />
                     </div>
+                    <h1 className="text-xl font-bold text-gray-900">Stock Adjustment</h1>
+                  </div>
+
+                  {/* Right section: ID and name */}
+                  <div className="text-right">
+                    <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                    <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
                   </div>
                 </div>
               </div>
@@ -622,16 +627,19 @@ const ViewInventory = ({ item }) => {
             <div className="max-w-7xl mx-auto">
               {/* Header */}
               <div className="mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                    <Truck className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <h1 className="text-xl font-bold text-gray-900">Goods Receipt Notes (GRN)</h1>
-                    <div className="">
-                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                      <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                <div className="flex items-center justify-between mb-2">
+                  {/* Left section: Icon + Heading */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                      <Truck className="w-6 h-6 text-white" />
                     </div>
+                    <h1 className="text-xl font-bold text-gray-900">Goods Receipt Notes (GRN)</h1>
+                  </div>
+
+                  {/* Right section: Item ID and Name */}
+                  <div className="text-right">
+                    <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                    <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
                   </div>
                 </div>
               </div>

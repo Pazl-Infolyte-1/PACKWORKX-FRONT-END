@@ -560,7 +560,7 @@ const handleInventoryExelExport = async () => {
       </div>
 
       {/* Pass filtered data to table */}
-      <InventoryTable inventoryData={filteredInventoryData} />
+      <InventoryTable inventoryData={filteredInventoryData} subCategoryId={subCategoryId} />
 
       <div className="fixed bottom-0 left-0 w-full bg-white shadow-md z-50 px-4 py-2">
         <div className="flex justify-between items-center w-full">

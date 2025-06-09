@@ -3,14 +3,17 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { TrashIcon } from '@heroicons/react/solid'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
-// import { set } from 'core-js/core/dict';
 
 const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [itemList, setItemList] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState(null)
-  const debounceTimeouts = useRef({})
+
+  // Debounce refs for quantity and rate
+  const quantityTimeoutRefs = useRef({})
+  const rateTimeoutRefs = useRef({})
+
   const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null
     return (
@@ -26,124 +29,173 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
   }
 
   const openItemDetails = async (item_id) => {
-  try {
-    const response = await apiMethods.getItemList()
-    const items = response?.data?.data || []
-    const item = items.find((i) => i.id === parseInt(item_id))
-    console.log(item, 'item')
-    
-    if (!item) {
+    try {
+      const response = await apiMethods.getItemList()
+      const items = response?.data?.data || []
+      const item = items.find((i) => i.id === parseInt(item_id))
+      console.log(item, 'item')
+
+      if (!item) {
+        setModalContent(
+          <div className="text-center py-4">
+            <p className="text-red-500">Item not found.</p>
+          </div>,
+        )
+        setIsModalOpen(true)
+        return
+      }
+      console.log(JSON.parse(item.custom_fields), 'item')
+
+  const customFields = item?.custom_fields ? JSON.parse(JSON.parse(item.custom_fields)) : {}
+
+
       setModalContent(
-        <div className="text-center py-4">
-          <p className="text-red-500">Item not found.</p>
-        </div>
-      )
-      setIsModalOpen(true)
-      return
-    }
+        <div className="max-h-96 overflow-y-auto">
+          <h3 className="text-xl font-semibold mb-4 text-gray-800">Item Details</h3>
 
-    const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}
-
-    setModalContent(
-      <div className="max-h-96 overflow-y-auto">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">Item Details</h3>
-        
-        {/* Basic Information */}
-        <div className="mb-6">
-          <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Basic Information</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-            <p><strong>Item ID:</strong> {item.id}</p>
-            <p><strong>Item Code:</strong> {item.item_code}</p>
-            <p><strong>Generated ID:</strong> {item.item_generate_id}</p>
-            <p><strong>Item Name:</strong> {item.item_name}</p>
-            <p><strong>Status:</strong> 
-              <span className={`ml-1 px-2 py-1 rounded text-xs ${
-                item.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {item.status}
-              </span>
-            </p>
-            <p><strong>UOM:</strong> {item.uom}</p>
-          </div>
-        </div>
-
-        {/* Description */}
-        {item.description && (
+          {/* Basic Information */}
           <div className="mb-6">
-            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Description</h4>
-            <p className="text-sm">{item.description}</p>
+            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">
+              Basic Information
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <p>
+                <strong>Item ID:</strong> {item.id}
+              </p>
+              <p>
+                <strong>Item Code:</strong> {item.item_code}
+              </p>
+              <p>
+                <strong>Generated ID:</strong> {item.item_generate_id}
+              </p>
+              <p>
+                <strong>Item Name:</strong> {item.item_name}
+              </p>
+              <p>
+                <strong>Status:</strong>
+                <span
+                  className={`ml-1 px-2 py-1 rounded text-xs ${
+                    item.status === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}
+                >
+                  {item.status}
+                </span>
+              </p>
+              <p>
+                <strong>UOM:</strong> {item.uom}
+              </p>
+            </div>
           </div>
-        )}
 
-        {/* Financial Information */}
-        <div className="mb-6">
-          <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Financial Information</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-            <p><strong>Standard Cost:</strong> ₹{item.standard_cost}</p>
-            <p><strong>CGST:</strong> {item.cgst}%</p>
-            <p><strong>SGST:</strong> {item.sgst}%</p>
-            <p><strong>HSN Code:</strong> {item.hsn_code}</p>
+          {/* Description */}
+          {item.description && (
+            <div className="mb-6">
+              <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Description</h4>
+              <p className="text-sm">{item.description}</p>
+            </div>
+          )}
+
+          {/* Financial Information */}
+          <div className="mb-6">
+            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">
+              Financial Information
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <p>
+                <strong>Standard Cost:</strong> ₹{item.standard_cost}
+              </p>
+              <p>
+                <strong>CGST:</strong> {item.cgst}%
+              </p>
+              <p>
+                <strong>SGST:</strong> {item.sgst}%
+              </p>
+              <p>
+                <strong>HSN Code:</strong> {item.hsn_code}
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Stock Information */}
-        <div className="mb-6">
-          <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Stock Information</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-            <p><strong>Min Stock Level:</strong> {item.min_stock_level}</p>
-            <p><strong>Reorder Level:</strong> {item.reorder_level}</p>
+          {/* Stock Information */}
+          <div className="mb-6">
+            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">
+              Stock Information
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <p>
+                <strong>Min Stock Level:</strong> {item.min_stock_level}
+              </p>
+              <p>
+                <strong>Reorder Level:</strong> {item.reorder_level}
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Category Information */}
-        <div className="mb-6">
-          <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Category Information</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-            <p><strong>Category ID:</strong> {item.category}</p>
-            <p><strong>Sub Category ID:</strong> {item.sub_category}</p>
-            <p><strong>Company ID:</strong> {item.company_id}</p>
+          {/* Category Information */}
+          <div className="mb-6">
+            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">
+              Category Information
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <p>
+                <strong>Category ID:</strong> {item.category}
+              </p>
+              <p>
+                <strong>Sub Category ID:</strong> {item.sub_category}
+              </p>
+              <p>
+                <strong>Company ID:</strong> {item.company_id}
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Manufacturing Information */}
-        <div className="mb-6">
-          <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Manufacturing Information</h4>
-          <div className="text-sm">
-            <p><strong>Manufacturer:</strong> {item.manufacturer}</p>
-            {item.specifications && (
-              <p><strong>Specifications:</strong> {item.specifications}</p>
+          {/* Manufacturing Information */}
+          <div className="mb-6">
+            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">
+              Manufacturing Information
+            </h4>
+            <div className="text-sm">
+              <p>
+                <strong>Manufacturer:</strong> {item.manufacturer}
+              </p>
+              {item.specifications && (
+                <p>
+                  <strong>Specifications:</strong> {item.specifications}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Custom Fields */}
+          <div className="mb-6">
+            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Custom Fields</h4>
+            {Object.entries(customFields).length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                {Object.entries(customFields).map(([key, value], idx) => (
+                  <p key={idx}>
+                    <strong>{key}:</strong> {value}
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No custom fields available.</p>
             )}
           </div>
-        </div>
-
-        {/* Custom Fields */}
-        <div className="mb-6">
-          <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Custom Fields</h4>
-          {Object.entries(customFields).length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-              {Object.entries(customFields).map(([key, value], idx) => (
-                <p key={idx}>
-                  <strong>{key}:</strong> {value}
-                </p>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500">No custom fields available.</p>
-          )}
-        </div>
-      </div>
-    )
-    setIsModalOpen(true)
-  } catch (error) {
-    console.error('Error fetching item details:', error)
-    setModalContent(
-      <div className="text-center py-4">
-        <p className="text-red-500">Error loading item details. Please try again.</p>
-      </div>
-    )
-    setIsModalOpen(true)
+        </div>,
+      )
+      setIsModalOpen(true)
+    } catch (error) {
+      console.error('Error fetching item details:', error)
+      setModalContent(
+        <div className="text-center py-4">
+          <p className="text-red-500">Error loading item details. Please try again.</p>
+        </div>,
+      )
+      setIsModalOpen(true)
+    }
   }
-}
 
   // Form with both items and PO totals
   const { control, register, setValue, getValues, reset, watch } = useForm({
@@ -174,7 +226,6 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
   }, [append, fields.length])
 
   // Calculate totals from items without setting values
-  // This prevents the infinite update loop
   const totals = useMemo(() => {
     try {
       return (getValues('items') || []).reduce(
@@ -215,11 +266,10 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         total_incl_gst: 0,
       }
     }
-  }, [formData.items]) // Only depend on the items array, not getValues or fields
+  }, [formData.items])
 
   // Only update form values with totals when totals change
   useEffect(() => {
-    // Update the form values without causing extra re-renders
     setValue('total_qty', totals.total_qty, { shouldDirty: false })
     setValue('cgst_amount', totals.cgst, { shouldDirty: false })
     setValue('sgst_amount', totals.sgst, { shouldDirty: false })
@@ -229,43 +279,15 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
   }, [totals, setValue])
 
   // Initialize form with items
-  // useEffect(() => {
-  //   if (items && items.length > 0) {
-  //     reset({
-  //       items,
-  //       total_qty: 0,
-  //       cgst_amount: 0,
-  //       sgst_amount: 0,
-  //       amount: 0,
-  //       tax_amount: 0,
-  //       total_amount: 0
-  //     });
-
-  //     // Calculate row values but don't cause a loop
-  //     const timeoutId = setTimeout(() => {
-  //       items.forEach((_, index) => {
-  //         calculateRowValues(index);
-  //       });
-  //     }, 0);
-
-  //     return () => clearTimeout(timeoutId);
-  //   }
-  // }, [items, reset]); // Don't include calculateRowValues in dependencies
-  // Initialize form with items
-  // Replace your current useEffect with this:
   useEffect(() => {
     if (items && items.length > 0) {
-      // Reset form with new items
       reset({
         items: items.map((item) => ({
           ...item,
-          // Ensure all required fields are present
           item_id: item.item_id || '',
           quantity: item.quantity || 0,
           standard_cost: item.unit_price || item.standard_cost || 0,
-          // ... other fields
         })),
-        // Reset totals
         total_qty: 0,
         cgst_amount: 0,
         sgst_amount: 0,
@@ -274,25 +296,22 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         total_amount: 0,
       })
 
-      // Calculate initial values
       items.forEach((_, index) => {
         calculateRowValues(index)
       })
     } else if (fields.length === 0) {
-      // Only append empty item if no items exist
       append({ item_id: '', quantity: 1 })
     }
-  }, [items]) // Only depend on items prop
+  }, [items])
+
   // Fetch item list only once
   useEffect(() => {
     fetchItemList()
   }, [])
 
   // Update parent component with form data including totals
-  // Use a ref to prevent unnecessary updates
   const prevTotalsRef = useRef(null)
   useEffect(() => {
-    // Only update if totals have changed
     if (
       setFormValues &&
       (!prevTotalsRef.current || JSON.stringify(prevTotalsRef.current) !== JSON.stringify(totals))
@@ -310,6 +329,21 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
       prevTotalsRef.current = { ...totals }
     }
   }, [totals, formValues, setFormValues])
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      // Clear all quantity timeouts
+      Object.values(quantityTimeoutRefs.current).forEach((timeoutId) => {
+        if (timeoutId) clearTimeout(timeoutId)
+      })
+
+      // Clear all rate timeouts
+      Object.values(rateTimeoutRefs.current).forEach((timeoutId) => {
+        if (timeoutId) clearTimeout(timeoutId)
+      })
+    }
+  }, [])
 
   const fetchItemList = async () => {
     try {
@@ -352,26 +386,12 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         tax_amount: 0,
         total_amount: 0,
       })
-      calculateRowValuesOptimized(index)
+      calculateRowValues(index)
     }
   }
 
-  const incrementQuantity = (index) => {
-    const currentQty = parseFloat(getValues(`items.${index}.quantity`)) || 0
-    setValue(`items.${index}.quantity`, currentQty + 1)
-    calculateRowValuesOptimized(index)
-  }
-
-  const decrementQuantity = (index) => {
-    const currentQty = parseFloat(getValues(`items.${index}.quantity`)) || 0
-    if (currentQty > 0) {
-      setValue(`items.${index}.quantity`, currentQty - 1)
-      calculateRowValuesOptimized(index)
-    }
-  }
-
-  // Memoize this function to prevent recreation on each render
-  const calculateRowValues = React.useCallback(
+  // Simplified calculation function without debouncing
+  const calculateRowValues = useCallback(
     (index) => {
       try {
         const item = getValues(`items.${index}`)
@@ -386,75 +406,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         const taxAmount = parseFloat((sgstAmount + cgstAmount).toFixed(2))
         const totalAmount = parseFloat((amount + taxAmount).toFixed(2))
 
-        setValue(
-          `items.${index}`,
-          {
-            ...item,
-            quantity,
-            unit_price: standardCost,
-            standard_cost: standardCost,
-            sgst,
-            cgst,
-            sgst_amount: sgstAmount,
-            cgst_amount: cgstAmount,
-            amount: amount,
-            tax_amount: taxAmount,
-            total_amount: totalAmount,
-          },
-          { shouldDirty: false },
-        )
-
-        const currentItems = getValues('items')
-        if (
-          setItems &&
-          items &&
-          currentItems &&
-          JSON.stringify(currentItems) !== JSON.stringify(items)
-        ) {
-          setTimeout(() => {
-            setItems(currentItems)
-          }, 0)
-        }
-      } catch (error) {
-        console.error('Calculation error:', error)
-      }
-    },
-    [getValues, setValue, items, setItems],
-  )
-
-  const calculateRowValuesOptimized = useCallback(
-    (index, customRate = null) => {
-      try {
-        const item = getValues(`items.${index}`)
-        const quantity = Math.max(0, parseFloat(item.quantity) || 0)
-        // Use custom rate if provided, otherwise use current value
-        const standardCost =
-          customRate !== null ? customRate : Math.max(0, parseFloat(item.standard_cost) || 0)
-        const sgst = Math.max(0, parseFloat(item.sgst) || 9)
-        const cgst = Math.max(0, parseFloat(item.cgst) || 9)
-
-        const amount = parseFloat((quantity * standardCost).toFixed(2))
-        const sgstAmount = parseFloat(((amount * sgst) / 100).toFixed(2))
-        const cgstAmount = parseFloat(((amount * cgst) / 100).toFixed(2))
-        const taxAmount = parseFloat((sgstAmount + cgstAmount).toFixed(2))
-        const totalAmount = parseFloat((amount + taxAmount).toFixed(2))
-
-        // Only update the calculated fields, not the rate field if it's being typed
-        const updatedItem = {
-          ...item,
-          quantity,
-          unit_price: standardCost,
-          standard_cost: standardCost,
-          sgst,
-          cgst,
-          sgst_amount: sgstAmount,
-          cgst_amount: cgstAmount,
-          amount: amount,
-          tax_amount: taxAmount,
-          total_amount: totalAmount,
-        }
-
-        // Update individual fields instead of the entire object
+        // Update calculated fields
         setValue(`items.${index}.sgst_amount`, sgstAmount, { shouldDirty: false })
         setValue(`items.${index}.cgst_amount`, cgstAmount, { shouldDirty: false })
         setValue(`items.${index}.amount`, amount, { shouldDirty: false })
@@ -480,23 +432,63 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
     [getValues, setValue, items, setItems],
   )
 
-  // Debounced handler for rate changes
-  const handleRateChangeDebounced = useCallback(
-    (index, value) => {
-      // Clear existing timeout for this specific field
-      if (debounceTimeouts.current[index]) {
-        clearTimeout(debounceTimeouts.current[index])
-      }
+  // Debounced quantity change handler
+  const handleQuantityChange = (index, value) => {
+    const numericValue = Math.max(0, parseFloat(value) || 0)
+    setValue(`items.${index}.quantity`, numericValue)
 
-      // Set new timeout
-      debounceTimeouts.current[index] = setTimeout(() => {
-        const numericValue = parseFloat(value) || 0
-        setValue(`items.${index}.standard_cost`, numericValue, { shouldDirty: false })
-        calculateRowValuesOptimized(index, numericValue)
-      }, 300) // Reduced to 300ms for faster response
-    },
-    [setValue, calculateRowValuesOptimized],
-  )
+    // Clear existing timeout for this field
+    if (quantityTimeoutRefs.current[index]) {
+      clearTimeout(quantityTimeoutRefs.current[index])
+    }
+
+    // Set new timeout for 10 seconds
+    quantityTimeoutRefs.current[index] = setTimeout(() => {
+      calculateRowValues(index)
+      delete quantityTimeoutRefs.current[index]
+    }, 1000) // 1 seconds delay
+  }
+
+  const handleQuantityBlur = (index, value) => {
+    // Clear the timeout if user blurs (leaves the field)
+    if (quantityTimeoutRefs.current[index]) {
+      clearTimeout(quantityTimeoutRefs.current[index])
+      delete quantityTimeoutRefs.current[index]
+    }
+
+    const numericValue = Math.max(0, parseFloat(value) || 0)
+    setValue(`items.${index}.quantity`, numericValue)
+    calculateRowValues(index)
+  }
+
+  // Debounced rate change handler
+  const handleRateChange = (index, value) => {
+    const numericValue = Math.max(0, parseFloat(value) || 0)
+    setValue(`items.${index}.standard_cost`, numericValue)
+
+    // Clear existing timeout for this field
+    if (rateTimeoutRefs.current[index]) {
+      clearTimeout(rateTimeoutRefs.current[index])
+    }
+
+    // Set new timeout for 10 seconds
+    rateTimeoutRefs.current[index] = setTimeout(() => {
+      calculateRowValues(index)
+      delete rateTimeoutRefs.current[index]
+    }, 1000) // 1 seconds delay
+  }
+
+  const handleRateBlur = (index, value) => {
+    // Clear the timeout if user blurs (leaves the field)
+    if (rateTimeoutRefs.current[index]) {
+      clearTimeout(rateTimeoutRefs.current[index])
+      delete rateTimeoutRefs.current[index]
+    }
+
+    const numericValue = Math.max(0, parseFloat(value) || 0)
+    setValue(`items.${index}.standard_cost`, numericValue)
+    calculateRowValues(index)
+  }
 
   const addNewItem = () => {
     append({
@@ -577,27 +569,15 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
                     />
                   </td>
                   <td className="px-4 py-2">
-                    <div className="flex items-center space-x-1">
-                      <button
-                        type="button"
-                        onClick={() => decrementQuantity(index)}
-                        className="w-8 h-[40px] bg-gray-100 text-gray-600 font-bold rounded-l-md hover:bg-gray-200 border border-[#c2c2c2]"
-                      >
-                        -
-                      </button>
-                      <input
-                        {...register(`items.${index}.quantity`)}
-                        readOnly
-                        className="w-[60px] h-[40px] text-center border border-[#c2c2c2]"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => incrementQuantity(index)}
-                        className="w-8 h-[40px] bg-gray-100 text-gray-600 font-bold rounded-r-md hover:bg-gray-200 border border-[#c2c2c2]"
-                      >
-                        +
-                      </button>
-                    </div>
+                    <input
+                      {...register(`items.${index}.quantity`)}
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      onChange={(e) => handleQuantityChange(index, e.target.value)}
+                      onBlur={(e) => handleQuantityBlur(index, e.target.value)}
+                      className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
+                    />
                   </td>
                   <td className="px-4 py-2">
                     <input
@@ -605,18 +585,8 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
                       type="number"
                       min="0"
                       step="0.01"
-                      onChange={(e) => {
-                        // Update the display value immediately
-                        const value = e.target.value
-                        // Debounce the calculation
-                        handleRateChangeDebounced(index, value)
-                      }}
-                      onBlur={(e) => {
-                        // Ensure calculation happens on blur as well
-                        const value = parseFloat(e.target.value) || 0
-                        setValue(`items.${index}.standard_cost`, value, { shouldDirty: false })
-                        calculateRowValuesOptimized(index, value)
-                      }}
+                      onChange={(e) => handleRateChange(index, e.target.value)}
+                      onBlur={(e) => handleRateBlur(index, e.target.value)}
                       className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                     />
                   </td>

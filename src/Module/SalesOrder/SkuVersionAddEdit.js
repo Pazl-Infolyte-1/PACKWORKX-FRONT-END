@@ -290,6 +290,15 @@ const handleValueChange = (index, field, value) => {
 };
 
 
+const totalWeight = skuvaluesFromParent?.reduce(
+  (sum, item) => sum + (Number(item.weight) || 0),
+  0
+);
+
+const totalBurstingStrength = skuvaluesFromParent?.reduce(
+  (sum, item) => sum + (Number(item.bursting_strength) || 0),
+  0
+);
 
 
   const handleAddOption = async () => {
@@ -654,7 +663,15 @@ setWorkOrders(prevOrders =>
 
                 </tbody>
               </table>
-              <div className="p-2 flex w-[100%] justify-end">
+
+              <div className="p-2 flex flex-col md:flex-row justify-between items-center w-full gap-4">
+  {/* Total Display on Left */}
+  <div className="text-sm text-gray-700 font-medium">
+    <p>Total Weight: <span className="font-bold">{totalWeight.toFixed(3)} kg</span></p>
+    <p>Total Bursting Strength: <span className="font-bold">{totalBurstingStrength.toFixed(3)} Kg/cm²</span></p>
+  </div>
+
+              <div>
                 <button
                   className={`
                     inline-flex items-center gap-1.5
@@ -694,6 +711,7 @@ setWorkOrders(prevOrders =>
                     </>
                   )}
                 </button>
+                </div>
               </div>
             </div>
           </div>

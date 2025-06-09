@@ -483,7 +483,8 @@ const ViewWorkOrder = () => {
                   <div>
                     <p className="text-xs text-gray-500">SKU</p>
                     <p
-                      onClick={() => navigate(`/SKU/${workOrder.sku_id}`)}
+                    onClick={() => navigate(`/SKU/${workOrder.sku_id}`, { state: { fromWorkOrderView: true,skuId:workOrder.sku_id } })}
+
                       className="text-sm font-medium text-blue-600 hover:text-blue-800 cursor-pointer">{workOrder.sku_name || 'N/A'}</p>
                   </div>
                   <div>

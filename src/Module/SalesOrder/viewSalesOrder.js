@@ -426,7 +426,7 @@ export default function SalesOrderView({ }) {
                   </div>
                   <div>
                     <p className="text-blue-600 underline cursor-pointer"
-                      onClick={() => navigate(`/SKU/${item.id}`)}
+                      onClick={() => navigate(`/SKU/${item.id}`, { state: { fromWorkOrderView: true,skuId:item.sku_id} })}
                     >{item?.sku}</p>
                     <p className="text-gray-600 text-xs">SKU: {item?.sku}</p>
                   </div>

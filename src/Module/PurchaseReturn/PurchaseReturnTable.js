@@ -13,14 +13,9 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import apiMethods from '../../api/config'
 import PopUp from '../../components/New/PopUp'
 
- import PurchaseOrderReturnView from './PurchaseOrderReturnView'
+import PurchaseOrderReturnView from './PurchaseOrderReturnView'
 
-const PurchaseReturnTable = ({ 
-    porData,
-    setPoData,
-    setAlerts,
-    handleEdit
- }) => {
+const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
   const [confirmModal, setConfirmModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [openPOModal, setOpenPoReturnModal] = useState(false)
@@ -29,7 +24,7 @@ const PurchaseReturnTable = ({
     setConfirmModal(false)
   }
 
-  const openDeleteModal = (id) => {    
+  const openDeleteModal = (id) => {
     setDeleteId(id)
     setConfirmModal(true)
   }
@@ -49,26 +44,26 @@ const PurchaseReturnTable = ({
     }
   }
 
-  const handleStatusChange = async (id, newStatus) => {    
-  
-     const currentPor = porData.find(por => por.id === id); // get full PO data
+  const handleStatusChange = async (id, newStatus) => {
+    const currentPor = porData.find((por) => por.id === id) // get full PO data
     const payload = {
       decision: newStatus,
-      grn_id: currentPor.grn_id || [] // send existing items back
-    };
+      grn_id: currentPor.grn_id || [], // send existing items back
+    }
 
-    console.log('Payload for status change:', payload);
-    
-  
+    console.log('Payload for status change:', payload)
+
     try {
-      const response = await apiMethods.updatePoRetrun(id, payload);
-      setAlerts([{ severity: 'success', message: response.data.message }]);
+      const response = await apiMethods.updatePoRetrun(id, payload)
+      setAlerts([{ severity: 'success', message: response.data.message }])
       // setRefresh(prev => !prev);
     } catch (error) {
-      console.error('Error:', error);
-      setAlerts([{ severity: 'error', message: error?.response?.data?.message || 'Failed to update status' }]);
+      console.error('Error:', error)
+      setAlerts([
+        { severity: 'error', message: error?.response?.data?.message || 'Failed to update status' },
+      ])
     }
-  };
+  }
 
   return (
     <>
@@ -94,12 +89,12 @@ const PurchaseReturnTable = ({
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
                 Payment terms
               </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Status 
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Decision 
-              </CTableHeaderCell>
+              {/* <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+                Status
+              </CTableHeaderCell> */}
+              {/* <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
+                Decision
+              </CTableHeaderCell> */}
               <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
                 Created By
               </CTableHeaderCell>
@@ -119,18 +114,14 @@ const PurchaseReturnTable = ({
                     {item.id}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2">{item.po_id}</CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">
-                    {item.return_date}
-                  </CTableDataCell>
+                  <CTableDataCell className="py-3 px-2">{item.return_date}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2">{item.reason}</CTableDataCell>
                   {/* <CTableDataCell className="py-3 px-2">{item.notes}</CTableDataCell> */}
-                  <CTableDataCell className="py-3 px-2">
-                    {item.payment_terms}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">
+                  <CTableDataCell className="py-3 px-2">{item.payment_terms}</CTableDataCell>
+                  {/* <CTableDataCell className="py-3 px-2">
                     {item.status}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">
+                  </CTableDataCell> */}
+                  {/* <CTableDataCell className="py-3 px-2">
                   <select
                     value={item.decision}
                     onChange={(e) => handleStatusChange(item.id, e.target.value)}
@@ -149,7 +140,7 @@ const PurchaseReturnTable = ({
                     <option className="text-gray-700 bg-white" value="disapprove">
                       Inactive
                     </option>
-                  </select>                  </CTableDataCell>
+                  </select>                  </CTableDataCell> */}
                   <CTableDataCell className="py-3 px-2">{item.created_by}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2">
                     <ThreeDotMenu
@@ -197,7 +188,10 @@ const PurchaseReturnTable = ({
           width={'60vw'}
           height="660px"
         >
-          <PurchaseOrderReturnView id={openPOModal.id}  setOpenPoReturnModal={setOpenPoReturnModal} />
+          <PurchaseOrderReturnView
+            id={openPOModal.id}
+            setOpenPoReturnModal={setOpenPoReturnModal}
+          />
         </PopUp>
       </div>
     </>

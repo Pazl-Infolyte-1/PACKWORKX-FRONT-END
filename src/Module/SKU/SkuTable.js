@@ -121,7 +121,7 @@ const navigate = useNavigate()
     isMinimized ? 'h-[515px]' : 'h-[375px]'
   }`}
 >
-          <div className="overflow-y-auto flex-grow" style={{ height: tableHeight }}>
+          <div className="overflow-y-auto flex-grow border" style={{ height: tableHeight }}>
             <CTable hover className="w-full m-0 table-fixed">
             <CTableHead className="!bg-gray-100">
   <CTableRow className='sticky top-0 z-10 bg-gray-100'>

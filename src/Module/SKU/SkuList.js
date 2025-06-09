@@ -24,6 +24,8 @@ import CompactPagination from '../../components/New/CompactPagination'
 import Loader from '../../components/New/Loader'
 import { setSkuPartValue } from '../../action'
 
+
+
 function SkuList() {
   const [skuType, setSkuType] = useState([])
   const [client, setClient] = useState([])
@@ -60,6 +62,9 @@ function SkuList() {
     const [loading, setLoading] = useState(false)
       const [totalRecords, setTotalRecords] = useState(0)
         const deckleSize = useSelector((state) => state.deckleSize)
+  const prevLocationRef = useRef(null);
+const [hasMinimized, setHasMinimized] = useState(false);
+
 
 const navigate=useNavigate()
   const [addNewSkuData, setAddNewSkuData] = useState({
@@ -139,6 +144,32 @@ const navigate=useNavigate()
       window.history.replaceState({}, document.title)
     }
   }, [location.state])
+
+const fetchClient = async () => {
+  if (!skuIdVal) return; // Run only if skuIdVal exists
+
+  try {
+    const data = await apiMethods.singlesku(skuIdVal);
+    setSelectedSku(data);
+    console.log("sku single data", data);
+  } catch (error) {
+    console.error('Error fetching client:', error);
+  }
+};
+
+const fromWorkOrderView = location.state?.fromWorkOrderView;
+const skuIdVal = location.state?.skuId;
+
+useEffect(() => {
+  console.log("fromWorkOrderView:", fromWorkOrderView);
+  console.log("skuIdVal:", skuIdVal);
+
+  if (fromWorkOrderView) {
+    setIsMinimized(true);
+    fetchClient();
+  }
+}, [fromWorkOrderView, skuIdVal]);
+
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -785,7 +816,8 @@ useEffect(() => {
         </div>
 
         {/* Pagination Section */}
-        <div className="flex justify-end items-center gap-4 mt-[40px]">
+        <div className="flex justify-end items-center gap-4 mt-[40px] pl-4 pr-4">
+          <p className='w-40 text-sm'>Total Count :<span className='font-semibold'> {totalRecords}</span> </p>
             <CompactPagination
                         totalRecords={totalRecords}
                     count={pagination?.totalPages || 1}

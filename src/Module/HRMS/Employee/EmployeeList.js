@@ -21,6 +21,8 @@ function EmployeeList() {
   const [employeesData, setEmployeesData] = useState([])
   const [CurrentEmployeeId, setCurrentEmployeeId] = useState(null)
   const [EmployeeResponse, setEmployeeResponse] = useState(null)
+    const [totalCount, setTotalCount] = useState(null)
+
   const [showEmployeeData, setShowEmployeeData] = useState(false)
   const [viewEmployeeData, setViewEmployeeData] = useState(null)
   const { searchQuery, setGlobalPlaceholder, handleSearch } = useSearch()
@@ -336,6 +338,8 @@ function EmployeeList() {
       })
       setEmployeesData(response.data.data)
       setEmployeeResponse(response.data)
+      console.log("ressss",response.data)
+      setTotalCount(response.data.totalRecords)
     } catch (error) {
       console.error('Error fetching employee data:', error)
       setAlerts([
@@ -532,7 +536,7 @@ function EmployeeList() {
 
         <div>
           <div>
-            <div className="overflow-x-auto overflow-y-auto whitespace-nowrap mt-3">
+            <div className="overflow-x-auto overflow-y-auto whitespace-nowrap mt-2">
               <EmployeeTable
                 employeesdata={employeesData}
                 handleEdit={handleEdit}
@@ -548,15 +552,22 @@ function EmployeeList() {
             </div>
           </div>
           {/* Pagination Section */}
-          <div className="flex justify-end items-center gap-4 mt-2 mb-3">
-            <CompactPagination
-              count={EmployeeResponse?.totalPages}
-              page={paginationParams.currentPage}
-              onPageChange={handlePageChange1}
-              onEntriesChange={handleLimitChange1}
-              entriesPerPage={paginationParams.pageSize}
-            />
-          </div>
+       <div className="flex justify-between items-center mt-2 mb-3 pl-4 pr-4">
+  {/* Left: Total Count */}
+  <div className="flex items-center gap-2 text-sm">
+    <p className="inline w-40">Total Count : <span className="font-semibold">{totalCount}</span></p>
+  </div>
+
+  {/* Right: Pagination */}
+  <CompactPagination
+    count={EmployeeResponse?.totalPages}
+    page={paginationParams.currentPage}
+    onPageChange={handlePageChange1}
+    onEntriesChange={handleLimitChange1}
+    entriesPerPage={paginationParams.pageSize}
+  />
+</div>
+
         </div>
         <div>
           <EmployeeForm

@@ -154,7 +154,7 @@ function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, hand
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <ResuableTable data={employeesdata} columns={columns} handleRowClick={(row) => handleView(row.id)} height={'67vh'}/>
+      <ResuableTable data={employeesdata} columns={columns} handleRowClick={(row) => handleView(row.id)} height={'66vh'}/>
       <ConfirmationModale
         isOpen={isConfirmationModaleOpen}
         title="Confirm Change"

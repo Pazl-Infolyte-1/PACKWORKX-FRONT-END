@@ -29,7 +29,7 @@ const InventoryTable = ({ inventoryData }) => {
 
   return (
     <>
-      <div className="w-full overflow-x-auto overflow-y-auto min-h-[430px] border rounded-md shadow-sm mt-1 mb-3">
+      <div className="w-full overflow-x-auto overflow-y-scroll h-[430px] border rounded-md shadow-sm mt-1 mb-3">
         <CTable className="min-w-[1000px] table-fixed border-separate border-spacing-0">
           <CTableHead className="!bg-gray-100">
             <CTableRow>

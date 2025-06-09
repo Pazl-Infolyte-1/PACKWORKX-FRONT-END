@@ -29,7 +29,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
     handleSubmit,
     setValue,
     getValues,
-    formState: { errors },
+    formState: { errors, isSubmitted },
     reset,
   } = useForm({
     defaultValues: {
@@ -196,9 +196,21 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       }
     }
   }, [subCategory, isEditing])
+
 const onSubmit = async (data) => {
   try {
     setIsSubmitting(true)
+    
+    // Check for form errors first
+    const formErrors = Object.keys(errors)
+    if (formErrors.length > 0) {
+      setAlerts([
+        { severity: 'error', message: 'Please fix all validation errors before submitting' },
+      ])
+      setIsSubmitting(false)
+      return
+    }
+
     let response
 
     // Convert tagFields to an object
@@ -401,6 +413,11 @@ const onSubmit = async (data) => {
     }
   }, [selectedSubCategory, subCategory, allSubCategories, isEditing])
 
+  // Helper function to apply red border style - same as ClientForm
+  const getInputStyle = (hasError) => ({
+    border: hasError && isSubmitted ? '1px solid #EF4444' : '1px solid #D1D5DB',
+  })
+
   return (
     <div className="p-6 bg-white rounded">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
@@ -419,10 +436,11 @@ const onSubmit = async (data) => {
               max={max}
               step={step || (type === 'number' ? '0.01' : undefined)}
               readOnly={readOnly}
-              className={`w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500 
+              style={getInputStyle(errors[name])}
+              className={`w-full rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500 
                 ${readOnly ? 'bg-gray-50' : ''}`}
               {...register(name, {
-                required: required ? 'required' : false,
+                required: required ? true : false,
                 min:
                   min !== undefined
                     ? { value: min, message: `Minimum value is ${min}` }
@@ -442,7 +460,8 @@ const onSubmit = async (data) => {
           <label className="block text-sm font-medium text-gray-700 mb-1">Specifications</label>
           <input
             type="text"
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            style={getInputStyle(errors.specifications)}
+            className="w-full rounded px-3 py-2"
             {...register('specifications')}
           />
         </div>
@@ -453,8 +472,9 @@ const onSubmit = async (data) => {
           </label>
           <input
             type="text"
-            className="w-full border border-gray-300 rounded px-3 py-2"
-            {...register('description', { required: 'required' })}
+            style={getInputStyle(errors.description)}
+            className="w-full rounded px-3 py-2"
+            {...register('description', { required: true })}
           />
           {errors.description && (
             <p className="text-sm text-red-600 mt-1">{errors.description.message}</p>
@@ -465,9 +485,10 @@ const onSubmit = async (data) => {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
           <select
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            style={getInputStyle(errors.category)}
+            className="w-full rounded px-3 py-2"
             value={selectedItemType}
-            {...register('category', { required: 'Category is required' })}
+            {...register('category', { required: true })}
             onChange={(e) => {
               const selectedCategoryId = e.target.value
               setSelectedItemType(selectedCategoryId)
@@ -502,9 +523,10 @@ const onSubmit = async (data) => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">SubCategory</label>
             <select
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              style={getInputStyle(errors.sub_category)}
+              className="w-full rounded px-3 py-2"
               value={selectedSubCategory}
-              {...register('sub_category')}
+              {...register('sub_category', { required: true })}
               onChange={(e) => {
                 const selectedId = e.target.value
                 setSelectedSubCategory(selectedId)

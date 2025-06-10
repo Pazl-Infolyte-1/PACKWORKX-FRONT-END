@@ -16,6 +16,9 @@ const AddEditMachine = React.lazy(() => import('./Module/Machine/AddEditMachine.
 const InventoryHandling = React.lazy(() => import('./Module/Inventory/InventoryHandling.js'))
 const InventoryMain = React.lazy(() => import('./Module/Inventory/InventoryMain.js'))
 const Production = React.lazy(() => import('./Module/Production/Index.js'))
+const WorkOrderListProduction = React.lazy(() => import('./Module/Production/WorkOrderLIsting.js'))
+const GroupLayerProduction = React.lazy(() => import('./Module/Production/Group.js'))
+
 const Packages = React.lazy(() => import('./Module/Admin/Packages/Packages.js'))
 const Billing = React.lazy(() => import('./Module/Admin/Billing/Billing.js'))
 const Companies = React.lazy(() => import('./Module/Admin/Companies/Companies.js'))
@@ -94,7 +97,19 @@ const routes = [
   },
   { path: '/inventoryhandling', name: 'Inventory Handling', element: InventoryMain, key: 28 },
     { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 230 },
-  { path: '/production', name: 'Production', element: Production, key: 26 },
+  { path: '/production',
+     name: 'Production',
+      element: Production,
+       key: 26,
+       children:[
+          { path: 'WorkOrders', name: 'WorkOrders', element: WorkOrderListProduction, key: 26 },
+          { path: 'GroupLayers', name: 'GroupLayers', element: GroupLayerProduction, key: 26 },
+          // const tabs = ['Work Orders','Group Layers',  'Allocate RM', 'Returnables', 'Outsource & Preview']//'Allocate SFG'
+
+       ]
+
+
+   },
   { path: '/packages', name: 'Packages', element: Packages, key: 5001 },
   { path: '/process', name: 'Process', element: Process, key: 5007 },
   { path: '/routeprocess', name: 'Route Process', element: RouteProcess, key: 5008 },

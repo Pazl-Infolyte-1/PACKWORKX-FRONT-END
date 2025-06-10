@@ -1625,8 +1625,14 @@ export const apiMethods = {
   addWorkOrderIntoProduction: async (body) => {
     return await apiClient.patch('/work-order/production/batch', body)
   },
-  getWorkOrderInProduction: async (body) => {
-    return await apiClient.get('/work-order/production=in_production')
+  getWorkOrderInGroup: async (params) => {
+    return await apiClient.get('/work-order?production=in_production',{params})
+  },
+  getWorkOrderInCreated: async (params) => {
+    return await apiClient.get('/work-order?production=created',{params})
+  },
+  getWorkOrderCreatedInProduction:async (body) => {
+    return await apiClient.patch('/work-order?production=created',body)
   },
 }
 

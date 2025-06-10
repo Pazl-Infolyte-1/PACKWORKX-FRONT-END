@@ -1,45 +1,84 @@
 import React, { useEffect, useState } from 'react'
-import { CRow, CCol, CCard, CCardBody } from '@coreui/react'
-import { FaClipboardList, FaBox, FaCalendarAlt, FaPlus, FaMinus } from 'react-icons/fa'
+import { FaClipboardList, FaBox, FaCalendarAlt, FaPlus, FaMinus, FaSort } from 'react-icons/fa'
 import apiMethods from '../../api/config'
+import { useSearch } from '../../components/New/SearchContext';
+import { ArrowUpDown } from 'lucide-react';
+import { useNextHandler } from '../../Context/ProductionNextHandlerContext';
+import { useNavigate } from 'react-router-dom';
 
-function WorkOrderListing({ workOrders, activeTab, isNextStepClicked, setActiveTab }) {
+function WorkOrderListing() {
   const [selectedOrders, setSelectedOrders] = useState([])
-  const [error, setError] = useState(null)
+  const [workOrders, setWorkOrders] = useState([]);
+  const [error, setError] = useState(null);
+  const {searchQuery,setGlobalPlaceholder} = useSearch()
+  const { registerNextHandler } = useNextHandler();
+  const navigate = useNavigate();
+
+
 
   useEffect(() => {
-    const handleWorkOrderProduction = async () => {
-      if (isNextStepClicked && activeTab === 'Work Orders') {
-        try {
-          if (selectedOrders.length === 0) {
-            setError('Please select at least one work order')
-            return
-          }
+    setGlobalPlaceholder('Search Work Order...')
 
-          const body = {
-            workOrderIds: selectedOrders,
-            production: 'in_production',
-          }
-
-          const response = await apiMethods.addWorkOrderIntoProduction(body)
-          setActiveTab('Group Layers')
-          console.log('Work orders added to production:', response)
-          setError(null)
-        } catch (err) {
-          console.error('Error adding work orders to production:', err)
-          setError(err.message || 'Failed to add work orders to production')
-        }
-      }
+    return () => {
+      setGlobalPlaceholder('Search...');
     }
+  }, []);
 
-    handleWorkOrderProduction()
-  }, [isNextStepClicked])
+  
+  useEffect(() => {
+    const fetchWorkOrders = async () => {
+      try {
+        const params = {
+          sku_name: searchQuery,
+        }
+        const response = await apiMethods.getWorkOrderInCreated(params);
+        setWorkOrders(response?.data?.workOrders); // or response.data if using axios or similar
+      } catch (error) {
+        console.error('Error fetching work orders:', error);
+        setError(error);
+      }
+    };
+  
+    fetchWorkOrders();
+  }, [searchQuery]);
 
-  // useEffect(() => {
-  //   if (onSelectedOrdersChange) {
-  //     onSelectedOrdersChange(selectedOrders)
-  //   }
-  // }, [selectedOrders, onSelectedOrdersChange])
+
+  
+  
+
+  const handleNext = async () => {
+    try {
+      console.log(selectedOrders)
+
+      if (selectedOrders.length === 0) {
+        setError('Please select at least one work order')
+        return
+      }
+
+      const body = {
+        workOrderIds: selectedOrders,
+        production: 'in_production',
+      }
+
+      const response = await apiMethods.addWorkOrderIntoProduction(body)
+
+      if (response?.success || response?.status === 200) {
+        setError(null);
+        navigate('production/GroupLayers');
+      }
+    } catch (err) {
+      console.error('Error adding work orders to production:', err)
+      setError(err.message || 'Failed to add work orders to production')
+    }
+  };
+
+
+  useEffect(() => {
+    registerNextHandler(handleNext);
+  }, [handleNext]);
+
+
+ 
 
   const handleOrderToggle = (workOrderId) => {
     setSelectedOrders((prev) =>
@@ -52,25 +91,40 @@ function WorkOrderListing({ workOrders, activeTab, isNextStepClicked, setActiveT
   }
 
   return (
-    <CCol xs={12}>
-      <CCard className="border-0 rounded-lg shadow-sm" style={{ backgroundColor: '#ffffff' }}>
-        <CCardBody className="p-0">
+    <div className="w-full h-full min-h-[calc(86vh-200px)]">
+      <div className="bg-white rounded-lg shadow-sm h-full">
+        <div className="p-0">
           {workOrders?.length > 0 ? (
-            <div className="table-responsive">
-              <table className="table table-hover mb-0">
+            <div className="overflow-x-auto">
+              <table className="w-full">
                 <thead>
-                  <tr style={{ backgroundColor: '#f8f9fa' }}>
-                    <th className="text-secondary py-3" style={{ fontWeight: '500', display:'flex', alignItems:'center', justifyContent:'center' }}>Select</th>
-                    <th className="text-secondary py-3" style={{ fontWeight: '500' }}>
+                  <tr className="bg-gray-50">
+                    <th className= "p-3 text-gray-600 text-center font-medium">Select</th>
+                    <th className="p-3 text-gray-600 font-medium text-left">
+                      Sales-ID 
+                    </th>
+                     <th className="p-3 text-gray-600 font-medium text-left">
+                      SO-Reference
+                    </th>
+                    <th className="p-3 text-gray-600 font-medium text-left">
                       Work Order ID
                     </th>
-                    <th className="text-secondary py-3" style={{ fontWeight: '500' }}>
+                    <th className="p-3 text-gray-600 font-medium text-left">
+                      Priority
+                    </th>
+                    <th className="p-3 text-gray-600 font-medium text-left">
                       SKU
+                      <ArrowUpDown className="inline-block ml-2 text-gray-400 w-4 h-4" />
                     </th>
-                    <th className="text-secondary py-3" style={{ fontWeight: '500' }}>
-                      Quantity
+                    <th className="p-3 text-gray-600 font-medium text-left">
+                    Quantity
+                      <ArrowUpDown className="inline-block ml-2 text-gray-400 w-4 h-4" />
                     </th>
-                    <th className="text-secondary py-3" style={{ fontWeight: '500' }}>
+                    <th className="p-3 text-gray-600 font-medium text-left">
+                    Client
+                      <ArrowUpDown className="inline-block ml-2 text-gray-400 w-4 h-4" />
+                    </th>
+                    <th className="p-3 text-gray-600 font-medium text-left">
                       Expected Delivery
                     </th>
                   </tr>
@@ -78,69 +132,69 @@ function WorkOrderListing({ workOrders, activeTab, isNextStepClicked, setActiveT
                 <tbody>
                   {workOrders.map((order) => (
                     <tr
-                      key={order.id}
-                      className={selectedOrders.includes(order.id) ? 'selected-row' : ''}
-                      style={{
-                        backgroundColor: selectedOrders.includes(order.id)
-                          ? '#f8f9fa'
-                          : 'transparent',
-                        transition: 'all 0.2s ease',
-                        borderBottom: '1px solid #f0f0f0',
-                        cursor: 'pointer',
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f8f9fa')}
-                      onMouseLeave={(e) =>
-                        !selectedOrders.includes(order.id) &&
-                        (e.currentTarget.style.backgroundColor = 'transparent')
-                      }
+                      key={order?.id}
+                      className="transition-all duration-200 ease-in-out cursor-pointer hover:bg-gray-50"
                     >
-                      <td
-                        className="py-4 flex align-items-center justify-content-center"
-                        style={{ borderBottom: 'none' }}
-                      >
+                      <td className="p-3 text-center">
                         <input
                           type="checkbox"
-                          checked={selectedOrders.includes(order.id)}
-                          onChange={() => handleOrderToggle(order.id)}
+                          checked={selectedOrders.includes(order?.id)}
+                          onChange={() => handleOrderToggle(order?.id)}
+                          className="w-[18px] h-[18px] cursor-pointer"
                           style={{
-                            width: '18px',
-                            height: '18px',
-                            accentColor: selectedOrders.includes(order.id) ? '#dc3545' : '#8761e5',
-                            cursor: 'pointer',
+                            accentColor: selectedOrders.includes(order?.id) ? '#dc3545' : '#8761e5',
                           }}
                         />
                       </td>
-
-                      <td className="py-3">
-                        <span
-                          style={{
-                            color: '#2c3e50',
-                            fontWeight: '500',
-                            fontSize: '0.95rem',
-                          }}
-                        >
-                          {order.work_generate_id}
+                      
+                      <td className="p-3">
+                        <span className="text-gray-800 font-medium text-[0.95rem]">
+                          {order?.sales_generate_id || 'N/A'}
                         </span>
                       </td>
-                      <td className="py-3">
-                        <div className="d-flex align-items-center gap-2">
-                          <FaBox style={{ color: '#8761e5', fontSize: '0.9rem' }} />
-                          <span style={{ color: '#2c3e50' }}>{order.sku_name}</span>
+
+                                    
+                      <td className="p-3">
+                        <span className="text-gray-800 font-medium text-[0.95rem]">
+                          {order?.sales_ui_id || 'N/A'}
+                        </span>
+                      </td>
+
+                      <td className="p-3">
+                        <span className="text-gray-800 font-medium text-[0.95rem]">
+                          {order?.work_generate_id || 'N/A'}
+                        </span>
+                      </td>
+
+                      <td className="p-3">
+                        <span className="text-gray-800 font-medium text-[0.95rem]">
+                          {order?.priority || 'N/A'}
+                        </span>
+                      </td>
+
+
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <FaBox className="text-purple-500 text-[0.9rem]" />
+                          <span className="text-gray-800">{order?.sku_name || 'N/A'}</span>
                         </div>
                       </td>
-                      <td className="py-3">
-                        <span
-                          style={{
-                            fontWeight: '500',
-                          }}  
-                        >
-                          {order.qty}
+                      <td className="p-3">
+                        <span className="font-medium">
+                          {order?.qty || '-'}
                         </span>
                       </td>
-                      <td className="py-3">
-                        <div className="d-flex align-items-center gap-2 text-secondary">
-                          <FaCalendarAlt style={{ fontSize: '0.9rem', color: '#8761e5' }} />
-                          <span>{formatDate(order.edd)}</span>
+
+
+                      <td className="p-3">
+                        <span className="font-medium">
+                          {order?.client || 'N/A'}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <FaCalendarAlt className="text-[0.9rem] text-purple-500" />
+                          <span>{order?.edd ? formatDate(order.edd) : 'N/A'}</span>
                         </div>
                       </td>
                     </tr>
@@ -149,22 +203,19 @@ function WorkOrderListing({ workOrders, activeTab, isNextStepClicked, setActiveT
               </table>
             </div>
           ) : (
-            <div className="text-center py-5">
-              <div className="text-secondary">
-                <FaClipboardList
-                  className="mb-3"
-                  style={{ fontSize: '2.5rem', color: '#8761e5' }}
-                />
-                <h6 className="mb-2" style={{ color: '#2c3e50', fontWeight: '500' }}>
+            <div className="text-center py-12 w-full flex-1">
+              <div className="text-gray-600">
+                <FaClipboardList className="mb-3 mx-auto text-4xl text-purple-500" />
+                <h6 className="mb-2 text-gray-800 font-medium">
                   No Work Orders Found
                 </h6>
-                <p className="small mb-0">There are no work orders to display at the moment.</p>
+                <p className="text-sm mb-0">There are no work orders to display at the moment.</p>
               </div>
             </div>
           )}
-        </CCardBody>
-      </CCard>
-    </CCol>
+        </div>
+      </div>
+    </div>
   )
 }
 

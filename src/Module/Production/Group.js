@@ -43,6 +43,8 @@ import './styles.css'
 import ProgressBar from './ProgressBar'
 import PopUp from '../../components/New/PopUp'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
+import { useSearch } from '../../components/New/SearchContext'
+import apiMethods from '../../api/config'
 
 const ItemType = 'WORK_ORDER'
 
@@ -63,41 +65,46 @@ const CustomToggle = React.forwardRef(({ onClick }, ref) => (
   </span>
 ))
 
-function LayerDragble({ lg, workOrderId }) {
+function LayerDragble({ lg, workOrderId}) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
-    item: { lg, workOrderId },
+    item: () => {
+      const dragItem = {
+        lg,
+        workOrderId,
+      };
+      console.log('Dragging Layer:', dragItem);
+      return dragItem;
+    }
   }))
-
   return (
     <CCard
       ref={drag}
-      className="p-2.5 mt-2.5 bg-transparent rounded-lg flex "
-    >
+      className={`p-2.5 mt-2.5 rounded-lg flex bg-transparent
+      }`}    >
       <div className='flex justify-between'>
         <div className='flex flex-col items-start  '>
-          <div className="font-semibold">{lg.layer_name}</div>
+          <div className="font-medium">{lg.layer}</div>
           <div className="flex gap-3 mt-3 text-sm">
             {/* <span>Board Size (L x W) : {lg.boardSize.length}-{lg.boardSize.width}</span> */}
             <span>{lg?.color}</span>
-<span>{lg?.gsm} GSM</span>
-<span>{lg?.bf} BF</span>
-<span>{lg?.flute_type}</span>
-<span>{lg?.weight} KG</span>
-<span>{lg?.material} Material</span>
+            <span>{lg?.gsm} GSM</span>
+            <span>{lg?.bf} BF</span>
+            <span>{lg?.flute_type}</span>
+            <span>{lg?.weight?.toFixed(2)} KG</span>
+            <span>{lg?.material} Material</span>
 
           </div>
-          
+
         </div>
         <div className='flex justify-end items-center'>
 
-        <div className="w-11">
+          <div className="w-11">
             <ProgressBar value={39} />
           </div>
         </div>
 
       </div>
-
     </CCard>
   )
 }
@@ -129,12 +136,16 @@ function WorkOrderCard({
 }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
-    item: {
-      order,
-      index,
-      isGroup: true,
-      layers: order.work_order_sku_values,
-    },
+    item: () => {
+      const dragItem = {
+        order,
+        index,
+        isGroup: true,
+        layers: order.work_order_sku_values,
+      };
+      console.log('Dragging Work Order:', dragItem);
+      return dragItem;
+    }
   }))
 
   const toggleCollapse = () => {
@@ -168,7 +179,7 @@ function WorkOrderCard({
                 <h6 className='text-primary'>0/{order.qty}</h6>
                 <div className="w-12">
                   <ProgressBar
-                    value={0/order.qty}
+                    value={0 / order.qty}
                   />
                 </div>
 
@@ -211,7 +222,7 @@ function WorkOrderCard({
 
 
 
-        <CCollapse className="custom-collapse" visible={visibleIndex === index}>
+        {/* <CCollapse className="custom-collapse" visible={visibleIndex === index}>
           <hr />
           {order?.work_order_sku_values?.map((lg) => (
             <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
@@ -233,7 +244,80 @@ function WorkOrderCard({
               }}
             />
           </div>
-        </CCollapse>
+        </CCollapse> */}
+
+<CCollapse className="custom-collapse" visible={visibleIndex === index}>
+  <hr />
+  
+  {/* Render Top Layer separately */}
+  {order?.work_order_sku_values
+    ?.filter((lg) => lg.layer?.toLowerCase() === 'top layer')
+    .map((lg) => (
+      <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
+    ))}
+
+  {/* Group remaining layers */}
+  {(() => {
+    // Exclude Top Layer first
+    const otherLayers = order?.work_order_sku_values?.filter(
+      (lg) => lg.layer?.toLowerCase() !== 'top layer'
+    )
+
+    // Now group Corrugated + Liner layers
+    const pairs = []
+    let currentPair = []
+
+    otherLayers.forEach((lg) => {
+      currentPair.push(lg)
+      if (currentPair.length === 2) {
+        pairs.push(currentPair)
+        currentPair = []
+      }
+    })
+
+    // In case odd number of layers
+    if (currentPair.length > 0) {
+      pairs.push(currentPair)
+    }
+
+    return pairs.map((pair, index) => (
+      <CCard key={index} className="p-2.5 mt-2.5 bg-transparent rounded-lg">
+        <div className="flex flex-col gap-2">
+          {pair.map((lg) => {
+            // Find the other layer in the pair
+            const pairLayer = pair.find(l => l.id !== lg.id);
+            return (
+              <LayerDragble 
+                key={lg.id} 
+                lg={lg} 
+                workOrderId={order.id} 
+              />
+            );
+          })}
+        </div>
+      </CCard>
+    ))
+  })()}
+
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'flex-end',
+      marginTop: '10px',
+      marginBottom: '10px',
+      marginRight: '10px',
+    }}
+  >
+    <FaEye
+      style={{ cursor: 'pointer' }}
+      onClick={() => {
+        setModalWorkOrder(order)
+        setVisible(true)
+      }}
+    />
+  </div>
+</CCollapse>
+
       </CCardBody>
     </CCard>
   )
@@ -468,10 +552,6 @@ function GroupOrderDropZone({
 }
 
 const Group = ({
-  workOrders,
-  setWorkOrders,
-  groupOrders,
-  setGroupOrders,
   autoSyncOrders,
   setVisibleSplit,
 }) => {
@@ -481,6 +561,37 @@ const Group = ({
   const [visible, setVisible] = useState(false)
   const [selectedType, setSelectedType] = useState('')
   const [splitVisible, setSplitVisible] = useState(false)
+  const [workOrders,setWorkOrders] = useState([])
+  const [groupOrders,setGroupOrders] = useState()
+  const {searchQuery,setGlobalPlaceholder} = useSearch()
+  const [error,setError] = useState()
+
+  useEffect(() => {
+    setGlobalPlaceholder('Search Work Order...')
+
+    return () => {
+      setGlobalPlaceholder('Search...');
+    }
+  }, []);
+
+
+  useEffect(() => {
+    const fetchWorkOrders = async () => {
+      try {
+        const params = {
+          sku_name: searchQuery,
+        }
+        const response = await apiMethods.getWorkOrderInGroup(params);
+        setWorkOrders(response?.data?.workOrders); // or response.data if using axios or similar
+      } catch (error) {
+        console.error('Error fetching work orders:', error);
+        setError(error);
+      }
+    };
+  
+    fetchWorkOrders();
+  }, [searchQuery]);
+
 
   const removeWorkOrderFromGroup = (order, groupIndex) => {
     setGroupOrders((prevGroups) =>
@@ -597,12 +708,12 @@ const Group = ({
               <CCardBody>
                 <div className="d-flex justify-content-between align-items-center">
                   <CCardText className="mx-auto text-bold mb-0">Work Orders</CCardText>
-                  <CIcon
+                  {/* <CIcon
                     icon={cilReload}
                     onClick={handleAutoSync}
                     className="me-2 hover-pointer"
                     style={{ fontSize: '1.4rem', fontWeight: 'bold', verticalAlign: 'middle' }}
-                  />
+                  /> */}
                 </div>
               </CCardBody>
             </CCard>
@@ -632,8 +743,8 @@ const Group = ({
 
       <CCol xs={7} className="mt-1">
         <CRow className="mt-2 px-3 py-3">
-          {groupOrders.length > 0 &&
-            groupOrders.map((groupOrder, groupIndex) => (
+          {groupOrders?.length > 0 &&
+            groupOrders?.map((groupOrder, groupIndex) => (
               <GroupOrderDropZone
                 key={groupIndex}
                 groupOrder={groupOrder}

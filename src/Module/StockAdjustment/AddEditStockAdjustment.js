@@ -32,7 +32,7 @@ const AddEditStockAdjustment = () => {
     handleSubmit,
     reset,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitted },
   } = useForm({
     defaultValues: {
       remarks: '',
@@ -47,6 +47,10 @@ const AddEditStockAdjustment = () => {
         },
       ],
     },
+  })
+
+  const getInputStyle = (hasError) => ({
+    border: hasError && isSubmitted ? '1px solid #EF4444' : '1px solid #D1D5DB',
   })
 
   const { fields, append, remove } = useFieldArray({
@@ -313,8 +317,8 @@ const AddEditStockAdjustment = () => {
                     required: true,
                     onChange: (e) => handlePOSelect(e.target.value, index), // optional: if needed
                   })}
-                  className={`w-[180px] h-[40px] rounded-md px-2 
-  ${errors.items?.[index]?.po_id ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'}`}
+                  className={`w-[180px] h-[40px] rounded-md px-2`}
+                  style={getInputStyle(errors?.items?.[index]?.po_id)}
                 >
                   <option value="">Select PO</option>
 
@@ -337,8 +341,8 @@ const AddEditStockAdjustment = () => {
                     required: true,
                     onChange: (e) => handleGRNSelect(e.target.value, index),
                   })}
-                  className={`w-[180px] h-[40px] rounded-md px-2 
-  ${errors.items?.[index]?.grn_id ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'}`}
+                  className={`w-[180px] h-[40px] rounded-md px-2`}
+                  style={getInputStyle(errors?.items?.[index]?.grn_id)}
                 >
                   <option value="">Select GRN</option>
 
@@ -369,16 +373,16 @@ const AddEditStockAdjustment = () => {
                   step="0.01"
                   placeholder="Quantity"
                   {...register(`items.${index}.adjustment_quantity`, { required: true })}
-                  className={`w-[100px] h-[40px] px-2 rounded-md 
-    ${errors.items?.[index]?.adjustment_quantity ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'}`}
+                  className={`w-[100px] h-[40px] px-2 rounded-md`}
+                  style={getInputStyle(errors?.items?.[index]?.adjustment_quantity)}
                 />
 
                 <input
                   type="text"
                   {...register(`items.${index}.reason`, { required: true })}
                   placeholder="Add any Reason"
-                  className={`w-[250px] h-[40px] px-2 rounded-md 
-    ${errors.items?.[index]?.reason ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'}`}
+                  className={`w-[250px] h-[40px] px-2 rounded-md`}
+                  style={getInputStyle(errors?.items?.[index]?.reason)}
                 />
 
                 <button

@@ -8,7 +8,7 @@ import Drawer from '../../components/Drawer/Drawer'
 import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
 import PurchaseReturnForm from './PurchaseReturnForm'
-import AddPurchaseOrderReturn from './AddPurchaseReturn'  
+import AddPurchaseOrderReturn from './AddPurchaseReturn'
 
 const PurchaseOrderReturn = () => {
   const [isPorEdit, setIsPorEdit] = useState(false)
@@ -42,7 +42,6 @@ const PurchaseOrderReturn = () => {
     fetchData()
   }, [limit, searchQuery, pagination.currentPage])
 
-
   //po data
   const poFetchData = async () => {
     try {
@@ -51,8 +50,8 @@ const PurchaseOrderReturn = () => {
         page: pagination.currentPage,
         limit: limit,
       })
-      console.log('podata',response?.data);
-      
+      console.log('podata', response?.data)
+
       setPoData(response?.data || [])
       setPagination(response.data.pagination || { currentPage: 1, totalPages: 1, total: 0 })
     } catch (error) {
@@ -62,25 +61,22 @@ const PurchaseOrderReturn = () => {
 
   useEffect(() => {
     poFetchData()
-    
   }, [limit, searchQuery, pagination.currentPage])
 
   // Fetch details for editing
   const handlePurchaseDetails = async (id, setFormFields, setItems, setGrnId) => {
     try {
-      console.log('id',id);
-      
+      console.log('id', id)
+
       const response = await apiMethods.getPurchaseReturn({ id })
-      console.log('response',response);
-      
-      const approvedList = Array.isArray(response?.data?.approved)
-      ? response.data.approved
-      : []     
-      console.log('approvedList',approvedList);
-      
-      const matchedPor = approvedList.find(item => item.id === id)
-      console.log('matchedpor',matchedPor);
-      
+      console.log('response', response)
+
+      const approvedList = Array.isArray(response?.data?.approved) ? response.data.approved : []
+      console.log('approvedList', approvedList)
+
+      const matchedPor = approvedList.find((item) => item.id === id)
+      console.log('matchedpor', matchedPor)
+
       if (matchedPor) {
         setGrnId(matchedPor.grn_id)
         // Set form fields if needed
@@ -112,7 +108,7 @@ const PurchaseOrderReturn = () => {
 
   // Handle edit button
   const handleEdit = (po_return) => {
-    console.log('po_return',po_return)
+    console.log('po_return', po_return)
     setSelectedPorId(po_return.id)
     setSelectedPoId(po_return.po_id)
     setIsPorEdit(true)
@@ -123,7 +119,6 @@ const PurchaseOrderReturn = () => {
     setIsPorEdit(false)
     setDrawerOpen(true)
     setIsPorEdit(false)
-
   }
 
   const handleCloseDrawer = () => {
@@ -168,11 +163,9 @@ const PurchaseOrderReturn = () => {
             <span className="whitespace-nowrap">Clear</span>
           </button>
           <div className="ml-auto flex gap-2">
-                  <ActionButton label="Add Purchase Return" onClick={handleAddNew} variant="add" />
+            <ActionButton label="Add Purchase Return" onClick={handleAddNew} variant="add" />
           </div>
-        </div>      
-        
-        
+        </div>
 
         <div className="overflow-x-auto overflow-y-auto whitespace-nowrap my-4">
           <PurchaseReturnTable
@@ -205,10 +198,11 @@ const PurchaseOrderReturn = () => {
         <Drawer
           isOpen={drawerOpen}
           onClose={handleCloseDrawer}
-          maxWidth={"1350px"}
-          title={isPorEdit ? "Edit Purchase Order Return" : "Add Purchase Order Return"}
+          maxWidth={'1350px'}
+          title={isPorEdit ? 'Edit Purchase Order Return' : 'Add Purchase Order Return'}
         >
           <AddPurchaseOrderReturn
+            isOpen={drawerOpen}
             isPorEdit={isPorEdit}
             selectedPorId={selectedPorId}
             selectedPoId={selectedPoId}

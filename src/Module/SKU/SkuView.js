@@ -13,6 +13,11 @@ const SkuView = ({ setIsMinimized, selectedSkuData, handleSkuEdit }) => {
   const [activeVersion, setActiveVersion] = useState(null)
   const containerRef = useRef(null)
 const [selectedSku,setSelectedSku]=useState({})
+const [inventoryData, setInventoryData] = useState([]);
+const [selectedItemId, setSelectedItemId] = useState(null);
+
+const selectedItem = inventoryData.find((inv) => inv.item_id === Number(selectedItemId));
+
 const navigate = useNavigate();
 useEffect(() => {
   const fetchClient = async () => {
@@ -81,6 +86,25 @@ useEffect(() => {
     return () => window.removeEventListener('resize', updateHeight)
   }, [])
 
+useEffect(() => {
+  const fetchInventory = async () => {
+    try {
+      const res = await apiMethods.getInventoryInSkuView();
+      console.log("Inventory Response:", res);
+      setInventoryData(res?.data?.inventoryData || []);
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+    }
+  };
+
+  fetchInventory();
+}, []);
+
+useEffect(() => {
+  if (inventoryData.length > 0 && !selectedItemId) {
+    setSelectedItemId(inventoryData[0].item_id);
+  }
+}, [inventoryData]);
   return (
     <div
       className="flex flex-col border border-gray-200 w-full shadow-sm bg-white"
@@ -134,7 +158,7 @@ useEffect(() => {
       {/* Content area with dynamic height */}
       <div className="flex overflow-y-auto" style={{ height: contentHeight }}>
         {/* Left Column */}
-        <div className="w-1/3 border-r border-gray-200 p-4">
+        <div className="w-1/3 border-r h-[90%] border-gray-200 p-4">
           <div className="pb-4 border-b border-gray-200">
             <h2 className="font-normal text-gray-700 mb-4 text-sm border-b border-gray-200">
               {selectedSku.client}
@@ -149,15 +173,6 @@ useEffect(() => {
                 <p className="text-sm font-semibold my-0">{selectedSku.sku_name}</p>
                 <p className="text-sm my-0">{selectedSku.sku_ui_id}</p>
 
-                {/*<div className="flex text-blue-500 text-xs mt-2 gap-2">
-                  <a href="#" className="hover:underline">
-                    Invite to Portal
-                  </a>
-                  <span>|</span>
-                  <a href="#" className="hover:underline">
-                    Send Email
-                  </a>
-                </div>*/}
               </div>
             </div>
           </div>
@@ -773,7 +788,7 @@ useEffect(() => {
         </div>
 
         {/* Right Column */}
-        <div className="w-2/3 px-2 py-1 overflow-y-auto">
+        <div className="w-2/3 px-2 py-1">
           {/*<div className="flex bg-gray-50 p-2 justify-between items-center rounded">
             <div className="flex items-start mb-2">
               <div className="mr-2 text-blue-500">
@@ -802,33 +817,36 @@ useEffect(() => {
 
           <div className="mb-8">
             <h3 className="text-lg font-medium">SKU Values</h3>
-<div className="border rounded overflow-hidden m-0">
+<div className="border rounded m-0">
   <div className="overflow-x-auto">
     <table className="w-full text-sm min-w-[800px]">
       <thead className="bg-gray-50">
         <tr>
           <th className="text-left p-2 text-xs">Layer</th>
-          <th className="text-right p-2 text-xs">GSM</th>
-          <th className="text-right p-2 text-xs">BF</th>
-          <th className="text-right p-2 text-xs">Material</th>
-          <th className="text-right p-2 text-xs">Color</th>
-          <th className="text-right p-2 text-xs">Flute Type</th>
-          <th className="text-right p-2 text-xs">Weight</th>
-          <th className="text-right p-2 text-xs">Bursting Strength</th>
+          <th className="text-left p-2 text-xs">GSM</th>
+          <th className="text-left p-2 text-xs">BF</th>
+          <th className="text-left p-2 text-xs">Material</th>
+          <th className="text-left p-2 text-xs">Color</th>
+          <th className="text-left p-2 text-xs">Flute Type</th>
+          <th className="text-left p-2 text-xs">Weight</th>
+          <th className="text-left p-2 text-xs">Bursting Strength</th>
         </tr>
       </thead>
       <tbody>
         {selectedSku.sku_values &&
           selectedSku.sku_values.map((item, index) => (
             <tr className="border-t" key={index}>
-              <td className="p-3 text-xs">{item.layer || '-'}</td>
-              <td className="text-right p-3 text-xs">{item.gsm || '-'}</td>
-              <td className="text-right p-3 text-xs">{item.bf || '-'}</td>
-              <td className="text-right p-3 text-xs">{item.material || '-'}</td>
-              <td className="text-right p-3 text-xs">{item.color || '-'}</td>
-              <td className="text-right p-3 text-xs">{item.flute_type || '-'}</td>
-              <td className="text-right p-3 text-xs">{item.weight || '-'}</td>
-              <td className="text-right p-3 text-xs">{item.bursting_strength || '-'}</td>
+              <td className="p-3 text-left text-xs">{item.layer || '-'}</td>
+              <td className="text-left p-3 text-xs">{item.gsm || '-'}</td>
+              <td className="text-left p-3 text-xs">{item.bf || '-'}</td>
+              <td className="text-left p-3 text-xs">{item.material || '-'}</td>
+              <td className="text-left p-3 text-xs">{item.color || '-'}</td>
+              <td className="text-left p-3 text-xs">{item.flute_type || '-'}</td>
+           <td className="text-left p-3 text-xs">
+  {item.weight != null ? parseFloat(item.weight).toFixed(3) : '-'}
+</td>
+
+              <td className="text-left p-3 text-xs">{item.bursting_strength || '-'}</td>
             </tr>
           ))}
       </tbody>
@@ -859,7 +877,7 @@ useEffect(() => {
 
       {/* Table Rendering */}
 
-        <div className="overflow-auto border rounded-md">
+        <div className=" border rounded-md">
           <table className="table-auto w-full text-sm border border-gray-300">
             <thead className="bg-gray-100">
               <tr>
@@ -899,6 +917,52 @@ useEffect(() => {
         </div>
 
     </div>)}
+
+  <h3 className="text-lg font-medium m-0 mt-2">Bill of Material</h3>
+<table className="min-w-full mt-2 border text-sm">
+  <thead>
+    <tr className="bg-gray-100 text-left">
+      <th className="p-2 border">Material Name</th>
+      <th className="p-2 border">Standard Cost</th>
+      <th className="p-2 border">Weight In Kg</th>
+      <th className="p-2 border">Amount</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td className="p-2 border">
+        <select
+          className="border p-1 rounded w-full"
+          value={selectedItemId || ''}
+          onChange={(e) => setSelectedItemId(e.target.value)}
+        >
+          <option value="">Select Material</option>
+          {inventoryData.map((inv) => (
+            <option key={inv.item_id} value={inv.item_id}>
+              {inv.item.item_name}
+            </option>
+          ))}
+        </select>
+      </td>
+
+      <td className="p-2 border">
+        {selectedItem ? parseFloat(selectedItem.item.standard_cost).toFixed(2) : '-'}
+      </td>
+
+      <td className="p-2 border">
+        {selectedSku?.total_weight ? parseFloat(selectedSku.total_weight).toFixed(3) : '-'}
+      </td>
+
+      <td className="p-2 border">
+        {selectedItem && selectedSku?.total_weight
+          ? (parseFloat(selectedItem.item.standard_cost) * parseFloat(selectedSku.total_weight)).toFixed(2)
+          : '-'}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
         </div>
       </div>
     </div>

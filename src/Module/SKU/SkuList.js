@@ -111,6 +111,7 @@ const navigate=useNavigate()
     total_bursting_strength:null,
     sku_values: [
       {
+        id:null,
         layer: null,
         gsm: null,
         bf: null,
@@ -525,6 +526,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
 total_bursting_strength:selectedSku.total_bursting_strength ||null,
       sku_values: selectedSku.sku_values || [
         {
+          id:null,
           layer: null,
           gsm: null,
           bf: null,
@@ -655,7 +657,7 @@ useEffect(() => {
 
   return (
     <div className="flex">
-      <div className={`${isMinimized ? 'w-[28%]' : 'w-full'} pb-3`}>
+      <div className={`${isMinimized ? 'w-[24%] h-[515px]' : 'w-full'} pb-6`}>
         {/* Header */}
         <ContentHeader
           heading={'SKU'}
@@ -816,7 +818,7 @@ useEffect(() => {
         </div>
 
         {/* Pagination Section */}
-        <div className="flex justify-end items-center gap-4 mt-[40px] pl-4 pr-4">
+        <div className={`flex justify-end items-center gap-4 pl-4 pr-4 ${isMinimized ? 'mt-[20px]' : 'mt-[40px]'}`}>
           <p className='w-40 text-sm'>Total Count :<span className='font-semibold'> {totalRecords}</span> </p>
             <CompactPagination
                         totalRecords={totalRecords}

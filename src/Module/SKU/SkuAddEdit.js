@@ -105,6 +105,7 @@ console.log("data",rscUnits)
 total_bursting_strength:null,
     sku_values: [
       {
+        id:null,
         layer: null,
         gsm: null,
         bf: null,
@@ -349,28 +350,28 @@ useEffect(() => {
       { id:1,layer: 'Top Layer', type: 'Top Layer' },
       { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
       { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { id:2,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { id:3,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { id:4,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { id:5,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
     ],
     7: [
       { id:1,layer: 'Top Layer', type: 'Top Layer' },
       { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
       { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { id:2,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { id:3,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
-      { id:2,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
-      { id:3,layer: 'Liner Layer 3', type: 'Liner Layer 3' },
+      { id:4,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { id:5,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { id:6,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
+      { id:7,layer: 'Liner Layer 3', type: 'Liner Layer 3' },
     ],
     9: [
       { id:1,layer: 'Top Layer', type: 'Top Layer' },
       { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
       { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { id:2,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { id:3,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
-      { id:2,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
-      { id:3,layer: 'Liner Layer 3', type: 'Liner Layer 3' },
-      { id:2,layer: 'Corrugated Layer 4', type: 'Corrugated Layer 4' },
-      { id:3,layer: 'Liner Layer 4', type: 'Liner Layer 4' },
+      { id:4,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
+      { id:5,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { id:6,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
+      { id:7,layer: 'Liner Layer 3', type: 'Liner Layer 3' },
+      { id:8,layer: 'Corrugated Layer 4', type: 'Corrugated Layer 4' },
+      { id:9,layer: 'Liner Layer 4', type: 'Liner Layer 4' },
     ],
   }
 
@@ -378,6 +379,7 @@ useEffect(() => {
     const layerConfig = plyLayerConfigurations[plyCount] || []
 
     const newSkuValues = layerConfig.map((layer) => ({
+      id:layer.id,
       layer: layer.layer,
       gsm: '',
       bf: '',
@@ -866,7 +868,8 @@ console.log("add sku data",addNewSkuData.client_id)
                           className="p-1 pr-8 border rounded w-full bg-gray-100 cursor-not-allowed"
                           value={item.layer}
                           onChange={(e) => handleSkuValuesChange(index, 'layer', e.target.value)}
-                          readOnly={editTag}
+                          readOnly="true"
+
                         />
                         <img
                           src={updown}
@@ -1125,6 +1128,7 @@ console.log("add sku data",addNewSkuData.client_id)
                             className="p-1 border rounded w-full"
                             value={item.layer}
                             onChange={(e) => handleSkuValuesChange(index, 'layer', e.target.value)}
+                            readOnly="true"
                           />
                         </td>
                         <td className="p-2 text-center w-full sm:w-1/12">
@@ -1149,16 +1153,27 @@ console.log("add sku data",addNewSkuData.client_id)
                             }
                           />
                         </td>
-                        <td className="p-2 text-center w-full sm:w-1/12">
-                          <input
-                            type="text"
-                            placeholder="Color"
-                            className="p-1 border rounded w-full"
-                            value={item.color}
-                            onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
-                          />
-                        </td>
-                         <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
+                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+<select
+     className={`p-1 rounded w-full transition-colors ${
+      errors.sku_values?.[index]?.color
+        ? 'border-2 border-red-500'
+        : 'border border-gray-300'
+    }`}
+  value={item.color}
+  onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
+  disabled={editTag} // use disabled for select instead of readOnly
+>
+  <option value="">Select Color</option>
+  {color.map((c) => (
+    <option key={c.id} value={c.color_name}>
+      {c.color_name}
+    </option>
+  ))}
+</select>
+
+                    </td>
+                        <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
                       {item?.layer?.toLowerCase().includes('corrugated') ? (
                         <div className="relative w-full flex items-center">
                           <select
@@ -1175,7 +1190,7 @@ console.log("add sku data",addNewSkuData.client_id)
                           >
                             <option hidden>Select</option>
   {fluteDropdown.map((flute) => (
-    <option key={flute.id} value={flute.name} disabled>
+    <option key={flute.id} value={flute.name}>
       {flute.name}
     </option>
   ))}
@@ -1205,13 +1220,12 @@ console.log("add sku data",addNewSkuData.client_id)
                             }
                           />
                         </td>
-                        <td className="p-2 text-center w-full sm:w-1/12">
-                          <p>{toThreeDecimalFixed(item.weight) || 'N/A'}</p>
-                        </td>
-                        <td className="p-2 text-center w-full sm:w-1/12">
-                          {/*<p>{toThreeDecimalFixed(item.gsm * item.bf / 1000)}</p>*/}
-                          <p>{item.bursting_strength}</p>
-                        </td>
+ <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                      <p>{toThreeDecimalFixed(item.weight) || 'N/A'}</p>
+                    </td>
+                    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                      <p>{Math.round(item.bursting_strength)}</p>
+                    </td>
                       </tr>
                     ))}
                   </tbody>
@@ -1219,6 +1233,18 @@ console.log("add sku data",addNewSkuData.client_id)
               </div>
             </div>
           )}
+          {addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
+  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-4 mt-4 mb-6">
+    <p className="text-sm font-medium text-gray-700 mb-10">
+      Total Weight:{' '}
+ {addNewSkuData.total_weight}
+    </p>
+    <p className="text-sm font-medium text-gray-700 mb-10">
+      Total Bursting Strength:{' '}
+{addNewSkuData.total_bursting_strength}
+    </p>
+  </div>
+)}
 
           <div className="flex justify-end space-x-4 mt-6">
             <button

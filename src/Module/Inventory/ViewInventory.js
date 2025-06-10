@@ -22,15 +22,9 @@ import {
 } from 'lucide-react'
 import { FaRupeeSign } from 'react-icons/fa'
 
-const ViewInventory = ({ item }) => {
+const ViewInventory = ({ item, totalInventoryValue }) => {
   const [itemDetails, setItemDetails] = useState(null)
-  const menus = [
-    'Products',
-    'Purchase Order',
-    'GRN',
-    'Purchase Returns',
-    'Stock Adjustment',
-  ]
+  const menus = ['Products', 'Purchase Order', 'GRN', 'Purchase Returns', 'Stock Adjustment']
 
   const [activeMenu, setActiveMenu] = useState('Products')
   useEffect(() => {
@@ -151,30 +145,30 @@ const ViewInventory = ({ item }) => {
                 <Package className="w-6 h-6 text-blue-600" />
                 Product Details
               </h2>
-              <p className="text-xl font-bold">{item?.item?.item_generate_id}</p>
+              <div>
+                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                <p className="text-sm font-bold m-0">Qty:{totalInventoryValue[0].total_quantity}</p>
+              </div>
             </div>
 
             {itemDetails?.products ? (
-              <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+              <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden mt-1">
                 {/* Header Section */}
-                <div className="p-2 border-b">
-                  <div className="flex justify-between items-start">
+                <div className="p-1 border-b bg-gray-200">
+                  <div className="flex justify-between items-center">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-800">
                         {itemDetails.products.item_name}
                       </h3>
-                      <p className="text-sm text-gray-600 ">{itemDetails.products.item_code}</p>
+                      <p className="text-sm text-gray-600 m-0">{itemDetails.products.item_code}</p>
                     </div>
-                    <div className="text-right">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          itemDetails.products.status === 'active'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
-                        {itemDetails.products.status.toUpperCase()}
-                      </span>
+                    <div
+                      className={`px-3 py-1 rounded-full text-xs font-medium border  ${getStatusColor(itemDetails.products.status)} bg-white/20 border-white/30`}
+                    >
+                      <div className="flex items-center gap-1">
+                        {getStatusIcon(itemDetails.products.status)}
+                        {itemDetails.products.status}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -448,6 +442,18 @@ const ViewInventory = ({ item }) => {
                             </div>
                           </div>
                         </div>
+                        {/* Footer */}
+                        <div className="flex justify-between items-center pt-3 border-t text-xs text-gray-500">
+                          {console.log(po)}
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>Created: {formatDate(po.created_at)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>PO Date: {formatDate(po.purchaseOrder.po_date)}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -603,6 +609,18 @@ const ViewInventory = ({ item }) => {
                             </div>
                           </div>
                         )}
+
+                        {/* Footer */}
+                        <div className="flex justify-between items-center pt-3 border-t text-xs text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>Created: {formatDate(adj.adjustment.created_at)}</span>
+                          </div>
+                          {/* <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>Updated: {formatDate(adj.adjustment.updated_at)}</span>
+                          </div> */}
+                        </div>
                       </div>
                     </div>
                   ))}

@@ -7,14 +7,14 @@ import Drawer from '../../components/Drawer/Drawer'
 import apiMethods from '../../api/config'
 import SkuPopup from './SkuPopup'
 import SkuTable from './SkuTable'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import SkuAddEdit from './SkuAddEdit'
 import ActionButton from '../../components/New/ActionButton'
 import { AuthContext } from '../../Context/AuthContext'
 import { useSearch } from '../../components/New/SearchContext'
 import CustomAlert from '../../components/New/CustomAlert'
 import createInitialSkuData from './CreateInitialSkuData'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate,Outlet } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import ContentHeader from '../../components/New/ContentHeader'
 import { FiDownload, FiUpload } from 'react-icons/fi'
@@ -111,7 +111,7 @@ const navigate=useNavigate()
     total_bursting_strength:null,
     sku_values: [
       {
-        id:null,
+        layer_id:null,
         layer: null,
         gsm: null,
         bf: null,
@@ -121,6 +121,7 @@ const navigate=useNavigate()
         weight: null,
         bursting_strength: null,
         flute_ratio: null,
+        layer_status:"ungrouped"
       },
     ],
   })
@@ -439,13 +440,24 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
              width: Number(addNewSkuData.width),
              height: Number(addNewSkuData.height)
       }
+      //console.log("numberSkuData",JSON.stringify(numberSkuData))
+ const numberSkuDataFixed = {
+  ...numberSkuData,
+  sku_values: numberSkuData.sku_values.map(({ selected_flute, flute_type, ...rest }) => ({
+    ...rest,
+    flute_type: flute_type === "--" ? null : flute_type,
+  })),
+};
+
+console.log("numberSkuDataFixed", JSON.stringify(numberSkuDataFixed, null, 2));
+
       try {
         let response
 
         if (editTag) {
-          response = await apiMethods.updateSku(numberSkuData)
+          response = await apiMethods.updateSku(numberSkuDataFixed)
         } else {
-          response = await apiMethods.addSku(numberSkuData)
+          response = await apiMethods.addSku(numberSkuDataFixed)
         }
 
         if (response?.data?.message) {
@@ -526,7 +538,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
 total_bursting_strength:selectedSku.total_bursting_strength ||null,
       sku_values: selectedSku.sku_values || [
         {
-          id:null,
+          layer_id:null,
           layer: null,
           gsm: null,
           bf: null,
@@ -536,6 +548,7 @@ total_bursting_strength:selectedSku.total_bursting_strength ||null,
           weight: null,
           bursting_strength: null,
           flute_ratio: null,
+          layer_status: null
         },
       ],
     })
@@ -639,6 +652,17 @@ const clientResponse = await apiMethods.getSkuClients({ limit: 10000 })
   console.log("edittag",editTag)
 console.log("pagination",pagination)
 console.log("sku type",addNewSkuData.sku_type)
+console.log("Minimised",isMinimized)
+
+const { id } = useParams();
+ useEffect(() => {
+    if (id) {
+      setIsMinimized(true);
+    } else {
+      setIsMinimized(false); // Reset to false if ID is not '10'
+    }
+  }, [id]);
+
 useEffect(() => {
   const { fromClientForm, sku_type_for_navigate_from_client } = location.state || {};
 
@@ -654,6 +678,8 @@ useEffect(() => {
     navigate(location.pathname, { replace: true, state: {} });
   }
 }, [location.pathname, location.state]);
+
+
 
   return (
     <div className="flex">
@@ -909,6 +935,7 @@ useEffect(() => {
             setIsMinimized={setIsMinimized}
             handleSkuEdit={handleSkuEdit}
           />
+          {/*<Outlet/>*/}
         </div>
       )}
     </div>

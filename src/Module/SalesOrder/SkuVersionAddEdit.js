@@ -391,14 +391,27 @@ const totalBurstingStrength = skuvaluesFromParent?.reduce(
         setAlerts([{ severity: "error", message: `Maximum SKU version limit of ${skuversionLimit} reached.` }]);
         return; // Exit early, do not proceed
       }
+const cleanedSkuValues = skuvaluesFromParent.map((item) => {
+  const {
+    take_up_factor,
+    selected_flute,
+    flute_type,
+    ...rest
+  } = item;
+
+  return {
+    ...rest,
+    flute_type: flute_type === "--" ? null : flute_type
+  };
+});
 
       const requestBody = {
         sku_id: skuID,
         sku_version: `v${currentVersionCount + 1}_${Date.now()}`,
         client_id: clientID,
-        sku_values: skuvaluesFromParent
+        sku_values: cleanedSkuValues
       };
-
+      console.log("req body",JSON.stringify(requestBody))
       const response = await apiMethods.addSkuVersion(requestBody);
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
 

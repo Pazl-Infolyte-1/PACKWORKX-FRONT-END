@@ -310,7 +310,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === 'Sku Details') {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/SKU">
+                  <CNavLink as={NavLink} to="/sku">
                     {navLink('SKU Details', 'cilList')}
                   </CNavLink>
                 </CNavItem>

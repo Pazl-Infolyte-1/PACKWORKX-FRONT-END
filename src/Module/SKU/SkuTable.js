@@ -16,6 +16,7 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import moment from 'moment'
 
 function SkuTable({
   skudata,
@@ -37,7 +38,7 @@ function SkuTable({
   const tableRef = useRef(null)
   const dispatch = useDispatch()
 const navigate = useNavigate()
-  // Handle window resize to update table height dynamically
+  // Handle window resize to update table height dynamically/
   useEffect(() => {
     const updateHeight = () => {
       const windowHeight = window.innerHeight
@@ -94,19 +95,19 @@ const navigate = useNavigate()
     setDeleteModal(true)
   }
 
-  const formatDate = (dateString) => {
-    if (!dateString) return ''
+  //const formatDate = (dateString) => {
+  //  if (!dateString) return ''
 
-    return new Date(dateString).toLocaleString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    })
-  }
+  //  return new Date(dateString).toLocaleString('en-GB', {
+  //    day: '2-digit',
+  //    month: '2-digit',
+  //    year: 'numeric',
+  //    hour: '2-digit',
+  //    minute: '2-digit',
+  //    second: '2-digit',
+  //    hour12: false,
+  //  })
+  //}
 
   const handleClose = () => {
     setAlerts([])
@@ -151,16 +152,15 @@ const navigate = useNavigate()
               <CTableBody  className='cursor-pointer'>
                 {skudata.length > 0 ? (
                   skudata
-                    .filter((item) => item.status === 'active')
+                    .filter((item) => item?.status === 'active')
                     .map((cell, index) => (
                       <CTableRow
-                        key={index}
+                        key={cell.id}
                         onClick={(e) => {
                           if (!e.target.closest('.dropdown')) {
                             setIsMinimized(true)
                             setSelectedSku(cell)
-                            navigate(`/SKU/${cell?.id}`);
-
+                            navigate(`/sku/${cell?.id}`);
                           }
                         }}
                         className={`border-b text-sm ${
@@ -203,7 +203,7 @@ const navigate = useNavigate()
       {cell.deckle_size}
     </CTableDataCell>
     <CTableDataCell style={{ width: '160px' }} className="text-center text-gray-700">
-      {formatDate(cell.updated_at)}
+    {moment(cell.updated_at).format('DD/MM/YYYY')}
     </CTableDataCell>
     <CTableDataCell style={{ width: '100px' }} className="text-center py-2 text-gray-700">
       <div className="flex justify-center">

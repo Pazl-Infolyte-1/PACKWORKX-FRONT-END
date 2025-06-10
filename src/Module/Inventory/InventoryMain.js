@@ -17,7 +17,7 @@ import { FiDownload } from 'react-icons/fi'
 
 const InventoryMain = () => {
   const [inventoryData, setInventoryData] = useState([])
-  const [filteredInventoryData, setFilteredInventoryData] = useState([]) // Add filtered data state
+  const [filteredInventoryData, setFilteredInventoryData] = useState([])
   const [subCategory, setSubCategory] = useState([])
   const [category, setCategory] = useState([])
   const [categoryId, setCategoryId] = useState(null)
@@ -223,18 +223,18 @@ const InventoryMain = () => {
 
   const clearAllFilters = () => {
     setCategoryId(null)
-    setSubCategoryId(null)
+    setSubCategoryId(1)
     setOpenCategoryId(null)
     setStockFilter(null)
   }
 
   const clearCategoryFilter = () => {
     setCategoryId(null)
-    setSubCategoryId(null) // Clear subcategory when clearing category
+    setSubCategoryId(1)
   }
 
   const clearSubCategoryFilter = () => {
-    setSubCategoryId(null)
+    setSubCategoryId(1)
   }
 
   const clearStockFilter = () => {
@@ -434,11 +434,13 @@ const handleInventoryExelExport = async () => {
             {subCategoryId && (
               <div className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
                 <span className="mr-2">Subcategory: {getSelectedSubCategoryName()}</span>
-                <FaTimes
+                {subCategoryId !== 1 && (
+                  <FaTimes
                   className="cursor-pointer hover:text-green-600"
                   size={12}
                   onClick={clearSubCategoryFilter}
                 />
+                )}
               </div>
             )}
 

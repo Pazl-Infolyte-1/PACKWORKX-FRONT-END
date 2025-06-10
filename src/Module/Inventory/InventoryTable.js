@@ -36,14 +36,22 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
     const customFieldsSet = new Set()
 
     inventoryData.forEach((item) => {
-      if (item.item?.custom_fields) {
+      if (item.item?.default_custom_fields) {
         try {
           // First parse the outer JSON string, then parse the inner JSON string
-          const outerParsed = JSON.parse(item.item.custom_fields)
-          const customFields = typeof outerParsed === 'string' ? JSON.parse(outerParsed) : outerParsed
+          const outerParsed = JSON.parse(item.item.default_custom_fields)
+          const customFields =
+            typeof outerParsed === 'string' ? JSON.parse(outerParsed) : outerParsed
 
           Object.keys(customFields).forEach((key) => {
-            customFieldsSet.add(key)
+            // Transform specific field names
+            let transformedKey = key
+            if (key.toLowerCase() === 'uom') {
+              transformedKey = 'Unit'
+            } else if (key.toLowerCase() === 'size') {
+              transformedKey = 'Deckle'
+            }
+            customFieldsSet.add(transformedKey)
           })
         } catch (error) {
           console.error('Error parsing custom fields:', error)
@@ -56,16 +64,21 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
 
   // Function to get custom field value for an item
   const getCustomFieldValue = (item, fieldKey) => {
-    if (!item.item?.custom_fields) return '--'
+    if (!item.item?.default_custom_fields) return '--'
 
     try {
-      // First parse the outer JSON string, then parse the inner JSON string
-      const outerParsed = JSON.parse(item.item.custom_fields)
+      // First parse the outer JSON string, then parse the inner JSON string if needed
+      const outerParsed = JSON.parse(item.item.default_custom_fields)
       const customFields = typeof outerParsed === 'string' ? JSON.parse(outerParsed) : outerParsed
-      const value = customFields[fieldKey]
+
+      // Handle the transformed field names (Unit and Deckle)
+      let originalKey = fieldKey
+      if (fieldKey === 'Unit') originalKey = 'uom'
+      if (fieldKey === 'Deckle') originalKey = 'size'
+
+      const value = customFields[originalKey]
 
       if (!value) return '--'
-
       // Convert snake_case values to readable format
       return value
         .replace(/_/g, ' ')
@@ -77,7 +90,6 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
       return '--'
     }
   }
-
   return (
     <>
       <div className="w-full overflow-x-auto overflow-y-scroll h-[calc(100vh-310px)] border rounded-md shadow-sm mt-1 mb-3">
@@ -88,34 +100,28 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
                 Product ID <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Product Name <span className="text-gray-500">⌕</span>
-              </CTableHeaderCell>
-              {/* <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Category <span className="text-gray-500">⌕</span>
-              </CTableHeaderCell>
-              <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Sub Category <span className="text-gray-500">⌕</span>
-              </CTableHeaderCell> */}
-              <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Min Stack
+                Reorder Level (Kg)
               </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                 Qty
               </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Standard Cost
+                Rate/Kg
               </CTableHeaderCell>
-              {/* <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Total Value
-              </CTableHeaderCell> */}
-
               {/* Dynamic Custom Field Columns */}
               {customFieldColumns.map((fieldKey, index) => (
                 <CTableHeaderCell
                   key={`custom-${index}`}
                   className="sticky top-0 bg-blue-50 text-center z-10 border-b border-blue-200 whitespace-nowrap text-sm  text-blue-700"
                 >
-                  {fieldKey.replace(/([A-Z])/g, ' $1').trim()}
+                  {fieldKey
+                    .replace(/_/g, ' ')
+                    .replace(/[^a-zA-Z0-9 ]/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .split(' ')
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ')
+                    .trim()}
                 </CTableHeaderCell>
               ))}
 
@@ -142,15 +148,6 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
                   <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
                     {item?.item?.item_generate_id || '--'}
                   </CTableDataCell>
-                  <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
-                    {item?.item?.item_name || '--'}
-                  </CTableDataCell>
-                  {/* <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
-                    {toTitleCase(item.item?.category_info?.category_name) || '--'}
-                  </CTableDataCell>
-                  <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
-                    {toTitleCase(item.item?.sub_category_info?.sub_category_name) || '--'}
-                  </CTableDataCell> */}
                   <CTableDataCell className="whitespace-nowrap">
                     {item.item.min_stock_level && (item.item.uom || item.item.net_weight)
                       ? `${parseFloat(item.item.min_stock_level)} ${item.item.uom || item.item.net_weight}`
@@ -164,16 +161,12 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
                   <CTableDataCell className="whitespace-nowrap">
                     ₹{item.item.standard_cost || '--'}
                   </CTableDataCell>
-                  {/* <CTableDataCell className="whitespace-nowrap">
-                    ₹{item.total_quantity * item.item.standard_cost || '0'}
-                  </CTableDataCell> */}
-                  {/* Dynamic Custom Field Values */}
                   {customFieldColumns.map((fieldKey, fieldIndex) => (
                     <CTableDataCell
                       key={`custom-value-${fieldIndex}`}
                       className="whitespace-nowrap bg-blue-25 text-center"
                     >
-                      <span className="inline-block px-2 py-1 text-xs rounded-full">
+                      <span className="inline-block px-2 py-1 text-sm rounded-full">
                         {getCustomFieldValue(item, fieldKey)}
                       </span>
                     </CTableDataCell>

@@ -5,6 +5,7 @@ const SettingsLayout = React.lazy(() => import('./Module/Settings/SettingsLayout
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Client = React.lazy(() => import('./Module/Client/ClientList.js'))
 const TableView = React.lazy(() => import('./Module/Client/TableView.js'))
+const SkuView = React.lazy(() => import('./Module/SKU/SkuView.js'))
 const OverviewComponent = React.lazy(() => import('./Module/Client/OverviewComponent'))
 const ClientForm = React.lazy(() => import('./Module/Client/ClientForm.js'))
 const SKU = React.lazy(() => import('./Module/SKU/SkuList.js'))
@@ -54,6 +55,7 @@ const Invoice = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceList.j
 const InvoiceView = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceView.js'))
 const InventoryForm =React.lazy(()=>import('./Module/Inventory/Items/AddItemProcess.js'))
 
+
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },
@@ -67,25 +69,25 @@ const routes = [
 
   { path: '/clients/clientForm', name: 'Add Client', element: ClientForm, key: '10-1' },
   //{ path: '/SKU', name: 'SKU', element: SKU, key: 23 },
-  {
-    path: '/SKU',
-    name: 'SKU',
-    element: SKU,
-    key: 23,
-    children: [{ path: ':id', element: TableView, key: 'sku_view' }],
-  },
-  {
-    path: '/sku/add',
-    name: 'Add SKU',
-    element: SkuAddEdit,
-    key: 'SKU_ADD',
-  },
-  {
-    path: '/sku/edit/:id',
-    name: 'Edit SKU',
-    element: SkuAddEdit,
-    key: 'SKU_EDIT',
-  },
+{
+  path: '/sku',
+  name: 'SKU',
+  element: SKU,
+  key: 23,
+  children: [{ path: ':id', element: SkuView, key: 'sku_view' }],
+},
+  //{
+  //  path: '/sku/add',
+  //  name: 'Add SKU',
+  //  element: SkuAddEdit,
+  //  key: 'SKU_ADD',
+  //},
+  //{
+  //  path: '/sku/edit/:id',
+  //  name: 'Edit SKU',
+  //  element: SkuAddEdit,
+  //  key: 'SKU_EDIT',
+  //},
   { path: '/employeelist', name: 'Employee List', element: EmployeeList, key: 21 },
   { path: '/purchaseorder', name: 'Purchase Order', element: PurchaseOrder, key: 29 },
   { path: '/machinedashboard', name: 'Machine Dashboard', element: MachineDashboard, key: 22 },

@@ -1625,8 +1625,8 @@ export const apiMethods = {
   addWorkOrderIntoProduction: async (body) => {
     return await apiClient.patch('/work-order/production/batch', body)
   },
-  getWorkOrderInGroup: async (params) => {
-    return await apiClient.get('/work-order?production=in_production',{params})
+  getWorkOrderInGroup: async () => {
+    return await apiClient.get('/work-order/ungrouped-layers')
   },
   getWorkOrderInCreated: async (params) => {
     return await apiClient.get('/work-order?production=created',{params})
@@ -1637,6 +1637,12 @@ export const apiMethods = {
   removeWorkOrderFromProduction:async (workOrderId,body) => {
     return await apiClient.patch(`/work-order/production/${workOrderId}`, body)
   },
+  createGroupInProduction:async (body)=>{
+    return await apiClient.post('/production/production-group',body)
+  },
+  getProductionGroups:async()=>{
+    return await apiClient.get('/production/production-group?include_work_orders=true')
+  },
   getInventoryInSkuView: async () => {
     try {
       const response = await apiClient.get(`/inventory?search=&page=1&limit=50&subCategoryId=1`)
@@ -1645,13 +1651,16 @@ export const apiMethods = {
       console.error(error)
       throw error
     }
-
   },
 
   downloadPurchaseOrderPDF: async (id) => {
     return await apiClient.get(`/purchase-order/${id}/download`, {
       responseType: 'blob',
     })
+  },
+
+  getVendor: async (params) => {
+    return await apiClient.get('/clients', { params })
   },
   removeWorkOrderFromCreationStageInProduction:async(workorderId,params)=>{
     return await apiClient.patch(`/work-order/production/${workorderId}`,{...params})

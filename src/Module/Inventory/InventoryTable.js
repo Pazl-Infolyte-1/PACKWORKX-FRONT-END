@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { capitalize } from 'lodash'
 
-const InventoryTable = ({ inventoryData, subCategoryId }) => {
+const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) => {
   const [viewItem, setViewItem] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
   const navigate = useNavigate()
@@ -80,7 +80,7 @@ const InventoryTable = ({ inventoryData, subCategoryId }) => {
 
   return (
     <>
-      <div className="w-full overflow-x-auto overflow-y-scroll h-[430px] border rounded-md shadow-sm mt-1 mb-3">
+      <div className="w-full overflow-x-auto overflow-y-scroll h-[calc(100vh-310px)] border rounded-md shadow-sm mt-1 mb-3">
         <CTable className="min-w-[900px] overflow-x-scroll border-separate border-spacing-0">
           <CTableHead className="!bg-gray-100">
             <CTableRow>
@@ -90,12 +90,12 @@ const InventoryTable = ({ inventoryData, subCategoryId }) => {
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                 Product Name <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
-              <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
+              {/* <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                 Category <span className="text-gray-500">⌕</span>
               </CTableHeaderCell>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                 Sub Category <span className="text-gray-500">⌕</span>
-              </CTableHeaderCell>
+              </CTableHeaderCell> */}
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                 Min Stack
               </CTableHeaderCell>
@@ -105,9 +105,9 @@ const InventoryTable = ({ inventoryData, subCategoryId }) => {
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                 Standard Cost
               </CTableHeaderCell>
-              <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
+              {/* <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                 Total Value
-              </CTableHeaderCell>
+              </CTableHeaderCell> */}
 
               {/* Dynamic Custom Field Columns */}
               {customFieldColumns.map((fieldKey, index) => (
@@ -145,14 +145,16 @@ const InventoryTable = ({ inventoryData, subCategoryId }) => {
                   <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
                     {item?.item?.item_name || '--'}
                   </CTableDataCell>
-                  <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
+                  {/* <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
                     {toTitleCase(item.item?.category_info?.category_name) || '--'}
                   </CTableDataCell>
                   <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
                     {toTitleCase(item.item?.sub_category_info?.sub_category_name) || '--'}
-                  </CTableDataCell>
+                  </CTableDataCell> */}
                   <CTableDataCell className="whitespace-nowrap">
-                    {item.item.min_stock_level || '--'}
+                    {item.item.min_stock_level && (item.item.uom || item.item.net_weight)
+                      ? `${parseFloat(item.item.min_stock_level)} ${item.item.uom || item.item.net_weight}`
+                      : '--'}
                   </CTableDataCell>
                   <CTableDataCell className="whitespace-nowrap">
                     {item.total_quantity && (item.item.uom || item.item.net_weight)
@@ -162,9 +164,9 @@ const InventoryTable = ({ inventoryData, subCategoryId }) => {
                   <CTableDataCell className="whitespace-nowrap">
                     ₹{item.item.standard_cost || '--'}
                   </CTableDataCell>
-                  <CTableDataCell className="whitespace-nowrap">
+                  {/* <CTableDataCell className="whitespace-nowrap">
                     ₹{item.total_quantity * item.item.standard_cost || '0'}
-                  </CTableDataCell>
+                  </CTableDataCell> */}
                   {/* Dynamic Custom Field Values */}
                   {customFieldColumns.map((fieldKey, fieldIndex) => (
                     <CTableDataCell
@@ -272,7 +274,7 @@ const InventoryTable = ({ inventoryData, subCategoryId }) => {
         height={'95vh'}
         width={'70vw'}
       >
-        <ViewInventory item={selectedItem} />
+        <ViewInventory item={selectedItem} totalInventoryValue={totalInventoryValue} />
       </PopUp>
     </>
   )

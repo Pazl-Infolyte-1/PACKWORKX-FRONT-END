@@ -45,6 +45,9 @@ import PopUp from '../../components/New/PopUp'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { useSearch } from '../../components/New/SearchContext'
 import apiMethods from '../../api/config'
+import { useGroupLayers } from '../../Context/GroupLayersContext'
+import { useNextHandler } from '../../Context/ProductionNextHandlerContext'
+import { useNavigate } from 'react-router-dom'
 
 const ItemType = 'WORK_ORDER'
 
@@ -65,13 +68,14 @@ const CustomToggle = React.forwardRef(({ onClick }, ref) => (
   </span>
 ))
 
-function LayerDragble({ lg, workOrderId }) {
+function LayerDragble({ lg, workOrderId,order }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
     item: () => {
       const dragItem = {
         lg,
         workOrderId,
+        order
       };
       console.log('Dragging Layer:', dragItem);
       return dragItem;
@@ -81,18 +85,18 @@ function LayerDragble({ lg, workOrderId }) {
   return (
     <CCard
       ref={drag}
-      className="p-2.5 mt-2.5 rounded-lg flex bg-transparent"
+      className="p-2.5 mt-2.5  rounded-lg flex bg-transparent"
     >
       <div className='flex justify-between'>
         <div className='flex flex-col items-start'>
-          <div className="font-medium">{lg.layer}</div>
-          <div className="flex gap-3 mt-3 text-sm">
+          <div className="text-sm font-medium">{lg.layer}</div>
+          <div className="flex gap-3 mt-3 text-xs">
             <span>{lg?.color}</span>
             <span>{lg?.gsm} GSM</span>
             <span>{lg?.bf} BF</span>
-            <span>{lg?.flute_type}</span>
+            {lg?.flute_type && <span>{lg.flute_type} FLUTE</span>}
             <span>{lg?.weight?.toFixed(2)} KG</span>
-            <span>{lg?.material} Material</span>
+            {/* <span>{lg?.material} Material</span> */}
           </div>
         </div>
         <div className='flex justify-end items-center'>
@@ -103,14 +107,15 @@ function LayerDragble({ lg, workOrderId }) {
   )
 }
 
-function PairedLayersDragble({ layers, workOrderId }) {
+function PairedLayersDragble({ layers, workOrderId,order }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
     item: () => {
       const dragItem = {
         layers, // Array of both layers
         workOrderId,
-        isPair: true, // Flag to identify this as a pair
+        order,
+        isGroup: true // Flag to identify this as a pair
       };
       console.log('Dragging Paired Layers:', dragItem);
       return dragItem;
@@ -120,20 +125,20 @@ function PairedLayersDragble({ layers, workOrderId }) {
   return (
     <CCard 
       ref={drag}
-      className="p-2.5 mt-2.5 bg-transparent  rounded-lg border-2 border-dashed border-gray-300"
+      className=" mt-2.5 bg-transparent  rounded-lg border-2 border-dashed border-gray-300"
     >
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         {layers.map((lg) => (
           <div key={lg.id} className="flex justify-between  p-2 rounded">
             <div className='flex flex-col items-start'>
-              <div className="font-medium">{lg.layer}</div>
-              <div className="flex gap-3 mt-2 text-sm">
+              <div className="text-sm font-medium">{lg.layer}</div>
+              <div className="flex gap-3 mt-2 text-xs">
                 <span>{lg?.color}</span>
                 <span>{lg?.gsm} GSM</span>
                 <span>{lg?.bf} BF</span>
-                <span>{lg?.flute_type}</span>
+                {lg?.flute_type && <span>{lg.flute_type} FLUTE</span>}
                 <span>{lg?.weight?.toFixed(2)} KG</span>
-                <span>{lg?.material} Material</span>
+                {/* <span>{lg?.material} Material</span> */}
               </div>
             </div>
           </div>
@@ -171,40 +176,36 @@ function WorkOrderCard({
   setVisible,
   setVisibleSplit,
 }) {
-  const [, drag] = useDrag(() => ({
-    type: ItemType,
-    item: () => {
-      const dragItem = {
-        order,
-        index,
-        isGroup: true,
-        layers: order.work_order_sku_values,
-      };
-      console.log('Dragging Work Order:', dragItem);
-      return dragItem;
-    }
-  }))
+
+  const navigate = useNavigate()
 
   const toggleCollapse = () => {
     setVisibleIndex(visibleIndex === index ? null : index)
   }
 
-  const organizeLayers = (layers,id) => {
+  const handleViewWorkOrder = (id) => {
+    navigate(`/workorderlist/view/${id}`)
+  }
+
+  const handleViewSalesOrder = (id) => {
+    navigate(`/salesorder/view/${id}`)
+  }
+  const organizeLayers = (layers,) => {
     if (!layers || layers.length === 0) return { single: [], pairs: [] };
     
     // Sort layers by ID to ensure correct pairing
-    const sortedLayers = [...layers].sort((a, b) => a.id - b.id);
+    const sortedLayers = [...layers].sort((a, b) => a.layer_id - b.layer_id);
     
     const single = [];
     const pairs = [];
     
     // ID 1 is always single (if it exists)
-    if (sortedLayers.length > 0 && sortedLayers[0].id === 1) {
+    if (sortedLayers.length > 0 && sortedLayers[0].layer_id === 1) {
       single.push(sortedLayers[0]);
     }
     
     // Group remaining layers in pairs: (2,3), (4,5), (6,7), etc.
-    const remainingLayers = sortedLayers.filter(layer => layer.id !== 1);
+    const remainingLayers = sortedLayers.filter(layer => layer.layer_id !== 1);
     
     for (let i = 0; i < remainingLayers.length; i += 2) {
       if (i + 1 < remainingLayers.length) {
@@ -216,9 +217,6 @@ function WorkOrderCard({
       }
     }
 
-    console.log(layers)
-    console.log(single,id)
-    
     return { single, pairs };
   };
 
@@ -226,10 +224,9 @@ function WorkOrderCard({
   return (
     <CCard
       className="mb-2"
-      ref={drag}
       style={{
         backgroundColor: '#f5f4f7',
-        borderRadius: '10px',
+        borderRadius: '5px',
       }}
     >
       <CCardBody>
@@ -238,17 +235,17 @@ function WorkOrderCard({
             <div className=' flex flex-1 justify-between items-start'>
               <span
                 onClick={toggleCollapse}
-                className="flex items-center gap-1.5 whitespace-nowrap font-bold"
+                className="flex items-center gap-1.5 whitespace-nowrap font-bold text-sm"
               >
                 {order.work_generate_id} {visibleIndex === index ? <FaAngleUp /> : <FaAngleDown />}
               </span>
 
 
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-3 text-sm">
                 {/* Progress bar moved to the right side */}
 
                 <h6 className='text-primary'>0/{order.qty}</h6>
-                <div className="w-12">
+                <div className="w-10">
                   <ProgressBar
                     value={0 / order.qty}
                   />
@@ -260,14 +257,14 @@ function WorkOrderCard({
                       label: 'View Work Order',
                       icon: cilBriefcase,
                       onClick: () => {
-                        console.log('View Work Order')
+                        handleViewWorkOrder(order.id)
                       },
                     },
                     {
                       label: 'View Sales Order',
                       icon: cilClipboard,
                       onClick: () => {
-                        console.log('View Sales Order')
+                        handleViewSalesOrder(order.sales_order_id)
                       },
                     },
                     {
@@ -335,13 +332,14 @@ function WorkOrderCard({
               <>
                 {/* Render single layers */}
                 {single.map((lg) => (
-                  <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
+                  <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} order={order} />
                 ))}
                 
                 {/* Render paired layers */}
                 {pairs.map((pair, pairIndex) => (
                   <PairedLayersDragble 
                     key={`pair-${pairIndex}`} 
+                    order={order}
                     layers={pair} 
                     workOrderId={order.id} 
                   />
@@ -380,7 +378,6 @@ function GroupOrderDropZone({
   addWorkOrderToGroup,
   groupVisibleIndex,
   setGroupVisibleIndex,
-  removeWorkOrderFromGroup,
   removeWorkOrderFromPlan,
   setModalWorkOrder,
   setGroupOrders,
@@ -388,12 +385,15 @@ function GroupOrderDropZone({
   setVisible,
   setVisibleSplit,
 }) {
+
+  const navigate = useNavigate()
+  const {removeWorkOrderFromGroup} = useGroupLayers()
   const [, drop] = useDrop(() => ({
     accept: ItemType,
     drop: (item) => {
       if (item.isGroup && item.layers && item.layers.length > 0) {
         item.layers.forEach((layer) => {
-          addWorkOrderToGroup({ lg: layer, workOrderId: item.order.id }, groupIndex)
+          addWorkOrderToGroup({ lg: layer, workOrderId: item.workOrderId, order:item.order }, groupIndex)
         })
       } else {
         addWorkOrderToGroup(item, groupIndex)
@@ -407,7 +407,7 @@ function GroupOrderDropZone({
   }
 
   return (
-    <CCol xs={6} ref={drop} className="mt-3">
+    <CCol xs={5} ref={drop} className="mt-3">
       <CCard className="px-2 py-2" style={{ color: '#F3F2F5', borderRadius: '10px' }}>
         <CCard
           className="text-center mb-3 px-2 p"
@@ -421,7 +421,7 @@ function GroupOrderDropZone({
             boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
             backgroundColor: '#8167e5',
             color: '#ffffff',
-            fontSize: '18px',
+            fontSize: '16px',
             fontFamily: 'Roboto',
             fontWeight: '500',
             lineHeight: '23px',
@@ -429,12 +429,12 @@ function GroupOrderDropZone({
           }}
         >
           <CCardBody className="p-2 d-flex align-items-center justify-content-center">
-            <CCardText className="text-white bold">{groupOrder.name}</CCardText>
+            <CCardText className="text-white bold">{groupOrder.group_name}</CCardText>
           </CCardBody>
         </CCard>
 
-        {groupOrder?.items?.map((item, itemIndex) => {
-          console.log(item)
+        {
+        groupOrder?.group_value?.map((item, itemIndex) => {
           const uniqueIndex = `${groupIndex}-${itemIndex}`
           return (
             <CCard
@@ -465,7 +465,8 @@ function GroupOrderDropZone({
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {item.work_generate_id ? item.work_generate_id : `${item.layer_name}, ${item.id}`}
+                    {console.log(item,'ffffffffffffffffffffffffff')}
+                    { `${item.layer}` }
 
                     {groupVisibleIndex === uniqueIndex ? <FaAngleUp /> : <FaAngleDown />}
                   </span>
@@ -486,7 +487,7 @@ function GroupOrderDropZone({
                   <Dropdown>
                     <Dropdown.Toggle as={CustomToggle} />
                     <Dropdown.Menu>
-                      <Dropdown.Item onClick={() => console.log('View Work Order', item)}>
+                      <Dropdown.Item onClick={() =>navigate(`/workorderlist/view/${item.workOrderId}`)}>
                         <CIcon
                           icon={cilBriefcase}
                           className="me-2"
@@ -494,7 +495,7 @@ function GroupOrderDropZone({
                         />
                         View Work Order
                       </Dropdown.Item>
-                      <Dropdown.Item onClick={() => console.log('View Sales Order', item)}>
+                      <Dropdown.Item onClick={() =>navigate(`/salesorder/view/${item?.order?.order?.sales_order_id}`)}>
                         <CIcon
                           icon={cilClipboard}
                           className="me-2"
@@ -502,7 +503,7 @@ function GroupOrderDropZone({
                         />
                         View Sales Order
                       </Dropdown.Item>
-                      <Dropdown.Item onClick={() => removeWorkOrderFromGroup(item, groupIndex)}>
+                      <Dropdown.Item onClick={() => removeWorkOrderFromGroup(groupIndex,itemIndex)}>
                         <CIcon
                           icon={cilTrash}
                           className="me-2"
@@ -612,10 +613,54 @@ const Group = ({
   const [visible, setVisible] = useState(false)
   const [selectedType, setSelectedType] = useState('')
   const [splitVisible, setSplitVisible] = useState(false)
-  const [workOrders,setWorkOrders] = useState([])
-  const [groupOrders,setGroupOrders] = useState()
+  const [workOrders1,setWorkOrders] = useState([])
+  const [groups1,setGroupOrders] = useState()
+  const { groups,addWorkOrderToGroup,workOrders } = useGroupLayers();
+  const {registerNextHandler} = useNextHandler()
+
   const {searchQuery,setGlobalPlaceholder} = useSearch()
   const [error,setError] = useState()
+
+
+  const SubmitGroups = async () => {
+    try {
+      console.log(groups, 'grrrrrrrrrrrrrrr');
+  
+      if (groups.length === 0) {
+        setError('Please select at least one work order');
+        return;
+      }
+  
+      const payload = groups.map(group => {
+        return {
+          group_name: group?.group_name,
+          group_value: group?.group_value.map(item => ({
+            work_order_id: item?.workOrderId,
+            layer_id: item?.layer_id
+          })),
+          group_Qty: group.group_value.reduce((total, item) => total + (item?.weight || 0), 0)
+        };
+      });
+  
+      console.log('Payload to submit:', payload);
+
+      const response = await apiMethods.createGroupInProduction(payload)
+      console.log(response)
+  
+      // Now you can do your API call here
+      // await api.post('/your-endpoint', payload);
+  
+    } catch (err) {
+      console.error('Error while submitting groups:', err);
+      setError('Something went wrong while submitting');
+    }
+  };
+  
+
+
+  useEffect(() => {
+    registerNextHandler(SubmitGroups);
+  }, [SubmitGroups]);
 
   useEffect(() => {
     setGlobalPlaceholder('Search Work Order...')
@@ -626,22 +671,22 @@ const Group = ({
   }, []);
 
 
-  const fetchWorkOrders = async () => {
-    try {
-      const params = {
-        sku_name: searchQuery,
-      }
-      const response = await apiMethods.getWorkOrderInGroup(params);
-      setWorkOrders(response?.data?.workOrders); // or response.data if using axios or similar
-    } catch (error) {
-      console.error('Error fetching work orders:', error);
-      setError(error);
-    }
-  };
+  // const fetchWorkOrders = async () => {
+  //   try {
+  //     const params = {
+  //       sku_name: searchQuery,
+  //     }
+  //     const response = await apiMethods.getWorkOrderInGroup(params);
+  //     setWorkOrders(response?.data?.workOrders); // or response.data if using axios or similar
+  //   } catch (error) {
+  //     console.error('Error fetching work orders:', error);
+  //     setError(error);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchWorkOrders();
-  }, [searchQuery]);
+  // useEffect(() => {
+  //   fetchWorkOrders();
+  // }, [searchQuery]);
 
 
   const removeWorkOrderFromGroup = (order, groupIndex) => {
@@ -724,72 +769,71 @@ const Group = ({
     })
   }
 
-  const addWorkOrderToGroup = (order, groupIndex) => {
-    setGroupOrders((prevGroups) => {
-      if (prevGroups[groupIndex]?.name === 'Auto Sync') {
-        alert('Cannot manually add work orders to the Auto Sync group.')
-        return prevGroups
-      }
-      const itemToAdd = order.order  //checking whethers its a full workorder
-        ? { ...order.order, workOrderId: order.order.id }
-        : { ...order.lg, workOrderId: order.workOrderId }
+  // const addWorkOrderToGroup = (order, groupIndex) => {
+  //   setGroupOrders((prevGroups) => {
+  //     if (prevGroups[groupIndex]?.name === 'Auto Sync') {
+  //       alert('Cannot manually add work orders to the Auto Sync group.')
+  //       return prevGroups
+  //     }
+  //     const itemToAdd = order.order  //checking whethers its a full workorder
+  //       ? { ...order.order, workOrderId: order.order.id }
+  //       : { ...order.lg, workOrderId: order.workOrderId }
 
-      const isDuplicate = prevGroups[groupIndex].items.some(
-        (item) => item.id === itemToAdd.id && item.workOrderId === itemToAdd.workOrderId,
-      )
+  //     const isDuplicate = prevGroups[groupIndex].items.some(
+  //       (item) => item.id === itemToAdd.id && item.workOrderId === itemToAdd.workOrderId,
+  //     )
 
-      if (isDuplicate) {
-        return prevGroups
-      }
+  //     if (isDuplicate) {
+  //       return prevGroups
+  //     }
 
-      if (order.order) { //filtering out dragges items
-        setWorkOrders((prevOrders) => prevOrders.filter((item) => item.id !== order.order.id))
-      } else if (order.lg) {
-        setWorkOrders((prevOrders) =>
-          prevOrders.map((wo) => {
-            if (wo.id === order.workOrderId) {
-              return {
-                ...wo,
-                layer_group: wo.layer_group.filter((layer) => layer.id !== order.lg.id),
-              }
-            }
-            return wo
-          }),
-        )
-      }
+  //     if (order.order) { //filtering out dragges items
+  //       setWorkOrders((prevOrders) => prevOrders.filter((item) => item.id !== order.order.id))
+  //     } else if (order.lg) {
+  //       setWorkOrders((prevOrders) =>
+  //         prevOrders.map((wo) => {
+  //           if (wo.id === order.workOrderId) {
+  //             return {
+  //               ...wo,
+  //               layer_group: wo.layer_group.filter((layer) => layer.id !== order.lg.id),
+  //             }
+  //           }
+  //           return wo
+  //         }),
+  //       )
+  //     }
 
-      return prevGroups.map((group, index) =>
-        index === groupIndex ? { ...group, items: [...group.items, itemToAdd] } : group,
-      )
-    })
-  }
+  //     return prevGroups.map((group, index) =>
+  //       index === groupIndex ? { ...group, items: [...group.items, itemToAdd] } : group,
+  //     )
+  //   })
+  // }
 
   return (
     <>
-      <CCol xs={5} className="mt-4">
+      <CCol xs={5} className="mt-2">
         <CRow>
           <CCol xs={8}>
             <CCard
-              className="text-black bold"
               style={{
                 cursor: 'pointer',
-                height: '46px',
-                padding: '0px 8px',
+                height: '40px',
+                // padding: '0px 8px',
                 border: '0',
                 boxSizing: 'border-box',
                 borderRadius: '4px',
                 boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
                 backgroundColor: '#c7c7f1',
                 color: '#000000',
-                fontSize: '22px',
+                fontSize: '16px',
                 fontFamily: 'Roboto',
                 fontWeight: '500',
-                lineHeight: '31px',
+                // lineHeight: '31px',
                 outline: 'none',
               }}
             >
               <CCardBody>
-                <div className="flex h-full items-center justify-between">
+                <div className="">
                   <CCardText className=" text-bold ">Work Orders</CCardText>
                   {/* <CIcon
                     icon={cilReload}
@@ -826,8 +870,8 @@ const Group = ({
 
       <CCol xs={7} className="mt-1">
         <CRow className="mt-2 px-3 py-3">
-          {groupOrders?.length > 0 &&
-            groupOrders?.map((groupOrder, groupIndex) => (
+          {groups?.length > 0 &&
+            groups?.map((groupOrder, groupIndex) => (
               <GroupOrderDropZone
                 key={groupIndex}
                 groupOrder={groupOrder}

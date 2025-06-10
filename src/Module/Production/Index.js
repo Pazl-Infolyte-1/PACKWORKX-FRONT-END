@@ -47,6 +47,8 @@ import apiMethods from '../../api/config'
 import WorkOrderLIsting from './WorkOrderLIsting'
 import { NextHandlerProvider } from '../../Context/ProductionNextHandlerContext'
 import SharedNextButton from './SharedNextButton'
+import { GroupLayersProvider, useGroupLayers } from '../../Context/GroupLayersContext'
+import AddGroupButton from './AddGroupButton'
 
 
 
@@ -59,6 +61,14 @@ const Index = () => {
   const [visibleSplit, setVisibleSplit] = useState(false)
   const [groupOrders, setGroupOrders] = useState([])
   const [activeTab, setActiveTab] = useState('Work Orders')
+  const groupLayersContext = useGroupLayers()  
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentPath = location.pathname.split('/').pop();
+
+
+
   const tabs = [
     { label: 'Work Orders', path: 'WorkOrders' },
     { label: 'Group Layers', path: 'GroupLayers' },
@@ -67,10 +77,6 @@ const Index = () => {
     { label: 'Outsource & Preview', path: 'OutsourceAndPreview' },
   ];
 
-
-  const location = useLocation();
-  const navigate = useNavigate();
-  const currentPath = location.pathname.split('/').pop();
 
   useEffect(() => {
     if (!currentPath || currentPath === 'production') {
@@ -110,18 +116,13 @@ const Index = () => {
 
   const activeTabIndex = tabs.findIndex(tab => tab.path === currentPath);
 
-  const handleAddGroup = () => {
-    setGroupOrders((prevGroups) => [
-      ...prevGroups,
-      { name: `Group ${prevGroups.length + 1}`, items: [] },
-    ])
-  }
 
   const handleTabChange = (tabPath) => {
     navigate(`/production/${tabPath}`);
   };
   return (
     <NextHandlerProvider>
+      <GroupLayersProvider>
       <div className='overflow-hidden h-[90vh] flex flex-col'>
         {/* Fixed Header Section */}
         <div className="sticky top-0 bg-white z-[1000] flex-shrink-0">
@@ -129,22 +130,13 @@ const Index = () => {
             <h5>Order Grouping</h5>
             <div className="ms-auto flex flex-row gap-2">
               {activeTab === 'Group Layers' && (
-                <ActionButton
-                  label={" + Add Group "}
-                  onClick={handleAddGroup}
-                  variant='add'
-                />
+                <AddGroupButton/>
               )}
-              {/* <ActionButton
-          label={"Next Step"}
-          // onClick={handleNextClick}
-          variant='delete'
-        /> */}
               <SharedNextButton />
             </div>
           </div>
 
-          <CCol xs={12} className=''>
+          <CCol xs={6} className=''>
             <CNav variant="tabs">
               {tabs.map((tab, index) => {
                 const isDisabled = '';
@@ -245,6 +237,7 @@ const Index = () => {
           setSelectedType={setSelectedType}
         />
       </div>
+      </GroupLayersProvider>
     </NextHandlerProvider>
   )
 }

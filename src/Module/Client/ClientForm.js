@@ -413,7 +413,7 @@ const ClientForm = ({ resetForm, setReloadData }) => {
         reset()
           if (location.state?.fromSKU) {
     console.log("in client form", location.state?.sku_type_for_navigate);
-  navigate('/SKU', {
+  navigate('/sku', {
   state: {
     fromClientForm: true,
     sku_type_for_navigate_from_client: skuType,
@@ -450,7 +450,7 @@ const ClientForm = ({ resetForm, setReloadData }) => {
 const handleCancel = () => {
   if (location.state?.fromSKU) {
     console.log("in client form", location.state?.sku_type_for_navigate);
-    navigate('/SKU', {
+    navigate('/sku', {
       state: {
         fromClientForm: true,
         sku_type_for_navigate_from_client: skuType,

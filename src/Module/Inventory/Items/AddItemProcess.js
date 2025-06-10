@@ -379,6 +379,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
   const formFields = [
     { label: 'Reference Number', name: 'item_code', required: true },
     { label: 'Product Name', name: 'item_name', required: true },
+    { label: 'Description', name: 'description', required: true },
     { label: 'HSN Code', name: 'hsn_code' },
     { label: 'CGST %', name: 'cgst', type: 'number', min: 0, max: 100 },
     { label: 'SGST %', name: 'sgst', type: 'number', min: 0, max: 100 },
@@ -565,7 +566,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       <h2 className="text-lg font-semibold mb-4">{isEditing ? 'Edit Product' : 'Add Product'}</h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-3 gap-2 ">
+      <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-3 gap-3 ">
         {formFields.map(({ label, name, type = 'text', required, min, max, step, readOnly }) => (
           <div key={name}>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -629,21 +630,6 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
             className="w-full rounded px-3 py-1"
             {...register('specifications')}
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description<span className="text-red-500"> *</span>
-          </label>
-          <input
-            type="text"
-            style={getInputStyle(errors.description)}
-            className="w-full rounded px-3 py-1"
-            {...register('description', { required: true })}
-          />
-          {errors.description && (
-            <p className="text-sm text-red-600 mt-1">{errors.description.message}</p>
-          )}
         </div>
 
         <div>
@@ -716,7 +702,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
           <div className="md:col-span-3">
             {selectedSubCategory && (
               <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-semibold">Additional Custom Tags</h3>
+                <h3 className="text-sm font-semibold -mb-2">Additional Custom Tags</h3>
                 <button
                   type="button"
                   onClick={handleAddField}
@@ -727,42 +713,44 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-10">
-              {tagFields.map((field, index) => (
-                <div key={index} className="relative flex flex-col gap-1 w-[200px]">
-                  <input
-                    className="border rounded px-2 py-1 text-sm w-28"
-                    placeholder="Label"
-                    value={field.label}
-                    onChange={(e) => handleTagChange(index, 'label', e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveField(index)}
-                    className="absolute top-2 right-2 text-gray-400 hover:text-red-500 cursor-pointer"
-                  >
-                    ✕
-                  </button>
-                  <input
-                    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    placeholder="Value"
-                    value={field.value}
-                    onChange={(e) => handleTagChange(index, 'value', e.target.value)}
-                    list={`values-${index}`}
-                  />
-                  {/* Add datalist for predefined values if available */}
-                  {subcategoryTagsMap[getCurrentSubcategoryName()] && (
-                    <datalist id={`values-${index}`}>
-                      {subcategoryTagsMap[getCurrentSubcategoryName()]
-                        .filter((tag) => tag.label === field.label)
-                        .map((tag, i) => (
-                          <option key={i} value={tag.value} />
-                        ))}
-                    </datalist>
-                  )}
-                </div>
-              ))}
-            </div>
+            {tagFields.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 mb-10 border rounded-md p-3">
+                {tagFields.map((field, index) => (
+                  <div key={index} className="relative flex flex-col gap-1 min-w-[80px]">
+                    <input
+                      className=" rounded p-1 text-sm w-1/2 block font-medium text-gray-700"
+                      placeholder="Label"
+                      value={field.label}
+                      onChange={(e) => handleTagChange(index, 'label', e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveField(index)}
+                      className="absolute top-0 right-2 text-gray-400 hover:text-red-500 cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                    <input
+                      className="w-full p-1 px-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      placeholder="Value"
+                      value={field.value}
+                      onChange={(e) => handleTagChange(index, 'value', e.target.value)}
+                      list={`values-${index}`}
+                    />
+                    {/* Add datalist for predefined values if available */}
+                    {subcategoryTagsMap[getCurrentSubcategoryName()] && (
+                      <datalist id={`values-${index}`}>
+                        {subcategoryTagsMap[getCurrentSubcategoryName()]
+                          .filter((tag) => tag.label === field.label)
+                          .map((tag, i) => (
+                            <option key={i} value={tag.value} />
+                          ))}
+                      </datalist>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

@@ -32,11 +32,11 @@ function SkuVersionAddEdit({
   const [editedMap, setEditedMap] = useState({});
   const [skuOptions, setSkuOptions] = useState({});
   const [focusedField, setFocusedField] = useState(null);
-  const [allSkuDetails, setAllSkuDetails] = useState(null);
-  const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
-  const [selectedFluteIndex, setSelectedFluteIndex] = useState(null);
-  const [fluteDropdown,setFluteDropdown]=useState([])
-  const [colorList, setColorList] = useState([]);
+    const [allSkuDetails, setAllSkuDetails] = useState(null);
+      const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
+      const [selectedFluteIndex, setSelectedFluteIndex] = useState(null);
+        const [fluteDropdown,setFluteDropdown]=useState([])
+const [colorList, setColorList] = useState([]);
 
     
   const handleCloseSingleViewPopup = () => {
@@ -60,7 +60,7 @@ useEffect(() => {
 // Call this when popup selection happens
 const handleFluteSelection = (selectedFlute, fluteIndex) => {
   if (fluteIndex !== null) {
-    const updatedValues = [...skuValues];
+    const updatedValues = [...skuvaluesFromParent];
     updatedValues[fluteIndex].flute_type = selectedFlute.name;
     updatedValues[fluteIndex].take_up_factor = parseFloat(selectedFlute.take_up_factor);
 
@@ -108,19 +108,12 @@ const handleFluteSelection = (selectedFlute, fluteIndex) => {
       try {
         if (IsEditVersion && skuVersionID) {
           // Case 1: Edit Mode with Version ID
-          // const versionResponse = await apiMethods.getSingleSkuVersion(skuVersionID);
-          const skuPromise = apiMethods.getSingleSkuData(skuID);
-          const versionPromise = apiMethods.getSingleSkuVersion(skuVersionID);
-          
-          const [skuResponse, versionResponse] = await Promise.all([skuPromise, versionPromise]);
-
+          const versionResponse = await apiMethods.getSingleSkuVersion(skuVersionID);
   
           if (versionResponse?.data) {
             setSkuValues(versionResponse?.data?.sku_values || []);
             setClientID(versionResponse?.data?.client_id || "");
             setSkuVersion(versionResponse?.data?.sku_version || "");
-            setAllSkuDetails(skuResponse.data)
-            handleWholeSkuObject(skuResponse.data);
           }
   
         } else if (skuID && skuVersionID) {
@@ -196,7 +189,7 @@ handleWholeSkuObject(skuResponse.data);
 
   //const handleValueChange = (index, field, value) => {
 
-  //  const updatedValues = [...skuValues];
+  //  const updatedValues = [...skuvaluesFromParent];
   //  updatedValues[index][field] = value;
   //  setSkuValues(updatedValues);
   //  setWorkOrders(prevOrders =>
@@ -259,7 +252,7 @@ const recalcRowValues = (item) => {
   }
 };
 const handleValueChange = (index, field, value) => {
-  const updatedValues = [...skuValues];
+  const updatedValues = [...skuvaluesFromParent];
 
   if (field === 'flute_type') {
     const selectedFlute = fluteDropdown.find(f => f.name === value);
@@ -341,19 +334,16 @@ const totalBurstingStrength = skuvaluesFromParent?.reduce(
   };
 
   const handleSubmit = async () => {
-    console.log('hey')
-  
     // Don't proceed if no changes have been made
     if (!hasChanges()) {
       return;
     }
 
-
     const requestBody = {
       sku_id: skuID,
       sku_version: skuVersion,
       client_id: clientID,
-      sku_values: skuValues
+      sku_values: skuvaluesFromParent
     };
 
     if (IsEditVersion && skuVersionID) {
@@ -401,14 +391,27 @@ const totalBurstingStrength = skuvaluesFromParent?.reduce(
         setAlerts([{ severity: "error", message: `Maximum SKU version limit of ${skuversionLimit} reached.` }]);
         return; // Exit early, do not proceed
       }
+const cleanedSkuValues = skuvaluesFromParent.map((item) => {
+  const {
+    take_up_factor,
+    selected_flute,
+    flute_type,
+    ...rest
+  } = item;
+
+  return {
+    ...rest,
+    flute_type: flute_type === "--" ? null : flute_type
+  };
+});
 
       const requestBody = {
         sku_id: skuID,
         sku_version: `v${currentVersionCount + 1}_${Date.now()}`,
         client_id: clientID,
-        sku_values: skuValues
+        sku_values: cleanedSkuValues
       };
-
+      console.log("req body",JSON.stringify(requestBody))
       const response = await apiMethods.addSkuVersion(requestBody);
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
 
@@ -445,12 +448,12 @@ setWorkOrders(prevOrders =>
   }
 
   console.log("all data",allSkuData)
-    console.log("all data 2",skuValues)
+    console.log("all data 2",skuvaluesFromParent)
      console.log('llll')
      console.log("all 888888",allSkuDetails)
   return (
     <>
-      {skuValues?.length > 0 && (
+      {skuvaluesFromParent?.length > 0 && (
         <div className="p-4">
           <h2 className="text-sm font-semibold mb-4">SKU Version Details</h2>
           <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -476,14 +479,14 @@ setWorkOrders(prevOrders =>
                   </tr>
                 </thead>
                 <tbody>
-                {skuValues.map((item, index) => (
+                {skuvaluesFromParent.map((item, index) => (
   <tr key={index} className="flex-wrap">
     <td className="p-2 text-center w-full sm:w-2/12 md:w-2/12 lg:w-2/12 relative">
       <div className="relative w-full">
         <input
           type="text"
           className="p-1 border rounded w-full"
-          value={item?.layer || ""}
+          value={item.layer || ""}
           onFocus={() => setFocusedField({ index, name: 'layer' })}
           onBlur={() => setFocusedField(null)}
           onChange={(e) => handleValueChange(index, 'layer', e.target.value)}
@@ -513,7 +516,7 @@ setWorkOrders(prevOrders =>
         <input
           type="number"
           className="p-1 border rounded text-center w-full"
-          value={item?.gsm || ""}
+          value={item.gsm || ""}
           onFocus={() => setFocusedField({ index, name: 'gsm' })}
           onBlur={() => setFocusedField(null)}
           onChange={(e) => handleValueChange(index, 'gsm', Number(e.target.value))}
@@ -543,7 +546,7 @@ setWorkOrders(prevOrders =>
         <input
           type="number"
           className="p-1 border rounded text-center w-full"
-          value={item?.bf || ""}
+          value={item.bf || ""}
           onFocus={() => setFocusedField({ index, name: 'bf' })}
           onBlur={() => setFocusedField(null)}
           onChange={(e) => handleValueChange(index, 'bf', Number(e.target.value))}
@@ -571,7 +574,7 @@ setWorkOrders(prevOrders =>
   <div className="relative w-full">
     <select
       className="p-1 border rounded w-full text-sm"
-      value={item?.color || ""}
+      value={item.color || ""}
       onChange={(e) => handleValueChange(index, 'color', e.target.value)}
       onFocus={() => setFocusedField({ index, name: 'color' })}
       onBlur={() => setFocusedField(null)}
@@ -591,11 +594,11 @@ setWorkOrders(prevOrders =>
 
   <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
   <div className="relative w-full flex items-center">
-    {item?.layer?.toLowerCase().includes("corrugated") ? (
+    {item.layer?.toLowerCase().includes("corrugated") ? (
       <>
         <select
           className="p-1 border rounded w-full pr-8 appearance-none"
-          value={item?.flute_type || ''}
+          value={item.flute_type || ''}
           onChange={(e) => handleValueChange(index, 'flute_type', e.target.value)}
         >
           <option value="" hidden>Select</option>
@@ -626,7 +629,7 @@ setWorkOrders(prevOrders =>
         <input
           type="text"
           className="p-1 border rounded w-full"
-          value={item?.material || ""}
+          value={item.material || ""}
           onFocus={() => setFocusedField({ index, name: 'material' })}
           onBlur={() => setFocusedField(null)}
           onChange={(e) => handleValueChange(index, 'material', e.target.value)}
@@ -651,11 +654,11 @@ setWorkOrders(prevOrders =>
     </td>
 
     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-      <p>{item?.weight ? Number(item.weight).toFixed(3) : 'N/A'}</p>
+      <p>{item.weight ? Number(item.weight).toFixed(3) : 'N/A'}</p>
     </td>
 
     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-    <p>{item?.bursting_strength ? item.bursting_strength.toFixed(3) : 'N/A'}</p>
+    <p>{item.bursting_strength ? item.bursting_strength.toFixed(3) : 'N/A'}</p>
 
     </td>
   </tr>
@@ -679,13 +682,13 @@ setWorkOrders(prevOrders =>
                     px-3 py-1.5
                     rounded border
                     transition-colors duration-150
-                    ${(!IsEditVersion && hasChanges() && !isLoading) || IsEditVersion
+                    ${hasChanges() && !isLoading 
                       ? 'bg-gray-400 hover:bg-gray-700 cursor-pointer' 
                       : 'bg-gray-300 cursor-not-allowed opacity-50'
                     }
                   `}
                   onClick={handleSubmit}
-                  disabled={!IsEditVersion && (!hasChanges() || isLoading)}
+                  disabled={!hasChanges() || isLoading}
                 >
                   {isLoading ? (
                     <>

@@ -6,7 +6,7 @@ import InventoryTable from './InventoryTable'
 import { BiDollarCircle } from 'react-icons/bi'
 import { FaShieldAlt, FaStar, FaUsers, FaChevronDown, FaChevronUp, FaTimes } from 'react-icons/fa'
 import { CgWorkAlt } from 'react-icons/cg'
-import { MdCategory, MdPushPin, MdRecycling } from 'react-icons/md'
+import { MdCategory, MdOutlineStickyNote2, MdPushPin, MdRecycling } from 'react-icons/md'
 import { cilArrowTop, cilSave } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import ContentHeader from '../../components/New/ContentHeader'
@@ -17,11 +17,11 @@ import { FiDownload } from 'react-icons/fi'
 
 const InventoryMain = () => {
   const [inventoryData, setInventoryData] = useState([])
-  const [filteredInventoryData, setFilteredInventoryData] = useState([]) // Add filtered data state
+  const [filteredInventoryData, setFilteredInventoryData] = useState([])
   const [subCategory, setSubCategory] = useState([])
   const [category, setCategory] = useState([])
   const [categoryId, setCategoryId] = useState(null)
-  const [subCategoryId, setSubCategoryId] = useState(null)
+  const [subCategoryId, setSubCategoryId] = useState(1)
   const icons = [FaShieldAlt, FaStar, FaUsers, MdRecycling, FaChevronUp]
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPage, setTotalPage] = useState(1)
@@ -223,18 +223,18 @@ const InventoryMain = () => {
 
   const clearAllFilters = () => {
     setCategoryId(null)
-    setSubCategoryId(null)
+    setSubCategoryId(1)
     setOpenCategoryId(null)
     setStockFilter(null)
   }
 
   const clearCategoryFilter = () => {
     setCategoryId(null)
-    setSubCategoryId(null) // Clear subcategory when clearing category
+    setSubCategoryId(1)
   }
 
   const clearSubCategoryFilter = () => {
-    setSubCategoryId(null)
+    setSubCategoryId(1)
   }
 
   const clearStockFilter = () => {
@@ -332,6 +332,7 @@ const handleInventoryExelExport = async () => {
                       if (lowerName.includes('corrugation') || lowerName.includes('glue'))
                         return BiDollarCircle
                       if (lowerName.includes('pasting')) return CgWorkAlt
+                      if (lowerName.includes('stitching')) return MdOutlineStickyNote2
                       if (lowerName.includes('pin')) return MdPushPin
                       if (lowerName.includes('dye')) return MdCategory
                       if (lowerName.includes('stereo')) return FaStar
@@ -342,6 +343,7 @@ const handleInventoryExelExport = async () => {
                       if (lowerName.includes('reel')) return '#10b981' // green
                       if (lowerName.includes('corrugation') || lowerName.includes('glue'))
                         return '#3b82f6' // blue
+                      if (lowerName.includes('stitching')) return '#f97316' // orange
                       if (lowerName.includes('pasting')) return '#f59e0b' // amber
                       if (lowerName.includes('pin')) return '#8b5cf6' // purple
                       if (lowerName.includes('dye')) return '#ef4444' // red
@@ -432,11 +434,13 @@ const handleInventoryExelExport = async () => {
             {subCategoryId && (
               <div className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
                 <span className="mr-2">Subcategory: {getSelectedSubCategoryName()}</span>
-                <FaTimes
+                {subCategoryId !== 1 && (
+                  <FaTimes
                   className="cursor-pointer hover:text-green-600"
                   size={12}
                   onClick={clearSubCategoryFilter}
                 />
+                )}
               </div>
             )}
 
@@ -560,7 +564,7 @@ const handleInventoryExelExport = async () => {
       </div>
 
       {/* Pass filtered data to table */}
-      <InventoryTable inventoryData={filteredInventoryData} subCategoryId={subCategoryId} />
+      <InventoryTable inventoryData={filteredInventoryData} subCategoryId={subCategoryId} totalInventoryValue={inventoryData} />
 
       <div className="fixed bottom-0 left-0 w-full bg-white shadow-md z-50 px-4 py-2">
         <div className="flex justify-between items-center w-full">

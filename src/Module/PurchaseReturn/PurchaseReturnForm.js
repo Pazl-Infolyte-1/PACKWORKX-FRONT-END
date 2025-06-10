@@ -4,7 +4,13 @@ import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
 import PurchaseReturnItemForm from './PurchaseReturnItemForm'
 
-const PurchaseReturnForm = ({ isPorEdit, selectedPorId, setDrawer, handlePurchaseDetails, fetchData }) => {
+const PurchaseReturnForm = ({
+  isPorEdit,
+  selectedPorId,
+  setDrawer,
+  handlePurchaseDetails,
+  fetchData,
+}) => {
   const [items, setItems] = useState([])
   const [grnId, setGrnId] = useState(null)
   const [formFields, setFormFields] = useState({})
@@ -14,7 +20,8 @@ const PurchaseReturnForm = ({ isPorEdit, selectedPorId, setDrawer, handlePurchas
     cgst_amount: 0,
     sgst_amount: 0,
     tax_amount: 0,
-    total_amount: 0
+    total_amount: 0,
+    return_qty: 0,
   })
 
   const {
@@ -22,7 +29,7 @@ const PurchaseReturnForm = ({ isPorEdit, selectedPorId, setDrawer, handlePurchas
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm()
 
   const itemsData = watch('items')
@@ -33,9 +40,9 @@ const PurchaseReturnForm = ({ isPorEdit, selectedPorId, setDrawer, handlePurchas
 
   // Populate form fields and items when editing
   useEffect(() => {
-    console.log('isPorEdit',isPorEdit);
-    console.log('selectedPorId',selectedPorId);
-    
+    console.log('isPorEdit', isPorEdit)
+    console.log('selectedPorId', selectedPorId)
+
     if (isPorEdit && selectedPorId) {
       handlePurchaseDetails(
         selectedPorId,
@@ -44,13 +51,13 @@ const PurchaseReturnForm = ({ isPorEdit, selectedPorId, setDrawer, handlePurchas
           setFormFields(fields)
         },
         setItems,
-        setGrnId
+        setGrnId,
       )
     }
   }, [isPorEdit, selectedPorId, handlePurchaseDetails, setValue])
 
   const handleFormSubmit = async (data) => {
-    const checkedItems = items.filter(item => item.selected)
+    const checkedItems = items.filter((item) => item.selected)
     if (checkedItems.length === 0) {
       alert('Please select at least one item to return.')
       return
@@ -60,15 +67,15 @@ const PurchaseReturnForm = ({ isPorEdit, selectedPorId, setDrawer, handlePurchas
       po_id: selectedPorId,
       grn_id: grnId,
       decision: data.decision,
-      reason: data.reason || 'Quality issues',
-      payment_terms: data.payment_terms || '',
-      notes: data.notes || '',
-      items: checkedItems.map(item => ({
-      grn_item_id: item.grn_item_id || null,
-      item_id: item.item_id,
-      return_qty: item.quantity,
-      unit_price: item.unit_price
-      }))
+      reason: data.reason,
+      payment_terms: data.payment_terms,
+      notes: data.notes,
+      items: checkedItems.map((item) => ({
+        grn_item_id: item.grn_item_id || null,
+        item_id: item.item_id,
+        return_qty: item.quantity,
+        unit_price: item.unit_price,
+      })),
     }
 
     try {
@@ -110,9 +117,7 @@ const PurchaseReturnForm = ({ isPorEdit, selectedPorId, setDrawer, handlePurchas
                 className="w-full p-2 border border-gray-300 rounded-md"
                 defaultValue={formFields[name] || ''}
               />
-              {errors[name] && (
-                <p className="text-red-500 text-sm mt-1">{errors[name]?.message}</p>
-              )}
+              {errors[name] && <p className="text-red-500 text-sm mt-1">{errors[name]?.message}</p>}
             </div>
           ))}
 
@@ -137,13 +142,12 @@ const PurchaseReturnForm = ({ isPorEdit, selectedPorId, setDrawer, handlePurchas
             setFormValues={setPoTotals}
           />
         </div>
-       
-        <input type="hidden" {...register("total_qty")} value={poTotals.total_qty} />
-        <input type="hidden" {...register("cgst_amount")} value={poTotals.cgst_amount} />
-        <input type="hidden" {...register("sgst_amount")} value={poTotals.sgst_amount} />
-        <input type="hidden" {...register("tax_amount")} value={poTotals.tax_amount} />
-        <input type="hidden" {...register("total_amount")} value={poTotals.total_amount} />
 
+        <input type="hidden" {...register('total_qty')} value={poTotals.total_qty} />
+        <input type="hidden" {...register('cgst_amount')} value={poTotals.cgst_amount} />
+        <input type="hidden" {...register('sgst_amount')} value={poTotals.sgst_amount} />
+        <input type="hidden" {...register('tax_amount')} value={poTotals.tax_amount} />
+        <input type="hidden" {...register('total_amount')} value={poTotals.total_amount} />
 
         {/* Hidden totals */}
         {Object.entries(poTotals).map(([key, value]) => (

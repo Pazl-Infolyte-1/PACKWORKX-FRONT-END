@@ -116,8 +116,10 @@ const OrderForm = ({
   }, [])
 
   const handleSupplierChange = (e) => {
+    console.log(typeof e.target.value);
+    
     const selectedId = parseInt(e.target.value)
-    const selectedClient = clientData.find((client) => client.client_id === selectedId)
+    const selectedClient = vendor.find((client) => client.client_id === selectedId)
 
     if (selectedClient) {
       setValue('supplier_name', selectedClient.display_name || '')
@@ -290,7 +292,7 @@ const OrderForm = ({
             >
               <option value="">-- Select Supplier --</option>
               {vendor?.map((item) => (
-                <option key={item.client_ui_id} value={item.client_ui_id}>
+                <option key={item.client_ui_id} value={item.client_id}>
                   {item.client_ui_id} - {item.display_name}
                 </option>
               ))}

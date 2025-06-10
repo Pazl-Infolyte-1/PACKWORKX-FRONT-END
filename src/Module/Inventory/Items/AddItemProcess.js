@@ -305,17 +305,25 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       let defaultFields = {}
 
       // First add default custom fields if they exist for this subcategory
-      if (subCatName && defaultCustomFields[subCatName]) {
+     if (subCatName && defaultCustomFields[subCatName]) {
         Object.keys(defaultCustomFields[subCatName]).forEach((key) => {
-          customFields[key] = data[key] || ''
-          defaultFields[key] = data[key] || ''
+          // Special case for "Net WT (Kgs)"
+          const formattedKey = key.toLowerCase() === 'net wt (kgs)' 
+            ? 'net_wt(Kgs)' 
+            : key.toLowerCase().replace(/\s+/g, '_')
+          customFields[formattedKey] = data[key] || ''
+          defaultFields[formattedKey] = data[key] || ''
         })
       }
 
       // Then add any additional tag fields
       tagFields.forEach((field) => {
         if (field.label) {
-          customFields[field.label] = field.value
+          // Special case for "Net WT (Kgs)"
+          const formattedLabel = field.label.toLowerCase() === 'net wt (kgs)' 
+            ? 'net_wt(Kgs)' 
+            : field.label.toLowerCase().replace(/\s+/g, '_')
+          customFields[formattedLabel] = field.value
         }
       })
 
@@ -331,7 +339,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
         category: Number(data.category),
         sub_category: data.sub_category ? Number(data.sub_category) : null,
       }
-
+      
       let response
       if (isEditing) {
         formattedData.id = currentItemId
@@ -357,6 +365,8 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
         fetchData()
       }, 1500)
     } catch (error) {
+      console.error(error);
+      
       setAlerts([
         {
           severity: 'error',
@@ -406,8 +416,8 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
     { label: 'GSM', value: 'gsm_140' },
     { label: 'Deckle Size', value: 'deckle_24' },
     { label: 'Deckle Size', value: 'deckle_36' },
-    { label: 'Color', value: 'color_white' },
-    { label: 'Color', value: 'color_brown' },
+    { label: 'Colors', value: 'color_white' },
+    { label: 'Colors', value: 'color_brown' },
   ]
 
   const corrugationGlueTags = [
@@ -430,8 +440,8 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
     { label: 'Viscosity', value: 'viscosity_3000' },
     { label: 'Drying Time', value: 'dry_quick' },
     { label: 'Drying Time', value: 'dry_normal' },
-    { label: 'Color', value: 'color_white' },
-    { label: 'Color', value: 'color_transparent' },
+    { label: 'Colors', value: 'color_white' },
+    { label: 'Colors', value: 'color_transparent' },
     { label: 'PH Level', value: 'ph_6_5' },
     { label: 'PH Level', value: 'ph_7_5' },
   ]
@@ -450,8 +460,8 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
   ]
 
   const dyeTags = [
-    { label: 'Color', value: 'color_red' },
-    { label: 'Color', value: 'color_green' },
+    { label: 'Colors', value: 'color_red' },
+    { label: 'Colors', value: 'color_green' },
     { label: 'Type', value: 'type_reactive' },
     { label: 'Type', value: 'type_direct' },
     { label: 'Concentration', value: 'concentration_high' },

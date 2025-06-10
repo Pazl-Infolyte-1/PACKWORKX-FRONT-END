@@ -262,15 +262,26 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
                         <div className="grid grid-cols-3 gap-2">
                           {Object.entries(
                             parseCustomFields(JSON.parse(itemDetails.products.custom_fields)),
-                          ).map(([key, value]) => (
-                            <div
-                              key={key}
-                              className="flex gap-2 items-center py-2 px-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
-                            >
-                              <span className="text-sm font-medium text-gray-600">{key}:</span>
-                              <span className="text-sm font-semibold text-gray-900">{value}</span>
-                            </div>
-                          ))}
+                          ).map(([key, value]) => {
+                            // Process the key: remove special characters and capitalize
+                            const processedKey = key
+                              .replace(/[^a-zA-Z0-9 ]/g, ' ') 
+                              .replace(/\s+/g, ' ')
+                              .replace(/\b\w/g, (char) => char.toUpperCase())
+                              .trim()
+
+                            return (
+                              <div
+                                key={key}
+                                className="flex gap-2 items-center py-2 px-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+                              >
+                                <span className="text-sm font-medium text-gray-600">
+                                  {processedKey}:
+                                </span>
+                                <span className="text-sm font-semibold text-gray-900">{value}</span>
+                              </div>
+                            )
+                          })}
                         </div>
                       </div>
                     )}

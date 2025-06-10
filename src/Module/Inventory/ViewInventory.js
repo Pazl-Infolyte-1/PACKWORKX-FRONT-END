@@ -29,8 +29,6 @@ const ViewInventory = ({ item }) => {
     'Purchase Order',
     'GRN',
     'Purchase Returns',
-    'Credit Notes',
-    'Debit Notes',
     'Stock Adjustment',
   ]
 

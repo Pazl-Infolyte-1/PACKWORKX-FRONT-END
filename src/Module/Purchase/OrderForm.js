@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import ActionButton from '../../components/New/ActionButton'
 import ItemForm from './ItemForm'
 import 'core-js/stable'
+import apiMethods from '../../api/config'
 
 const OrderForm = ({
   orderData,
@@ -12,13 +13,15 @@ const OrderForm = ({
   isSubmitting,
   setDrawer,
   clientData,
-  selectedPoId
+  selectedPoId,
 }) => {
   const [formValues, setFormValues] = useState(orderData)
   const [items, setItems] = useState(itemsData || [])
   const [supplierAddresses, setSupplierAddresses] = useState([])
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0)
   const [showAddressModal, setShowAddressModal] = useState(false)
+  const [vendor, setVendor] = useState([])
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
   const [poTotals, setPoTotals] = useState({
     total_qty: 0,
@@ -35,7 +38,7 @@ const OrderForm = ({
     formState: { errors },
     setValue,
     watch,
-    clearErrors, // Add this to clear errors
+    clearErrors,
   } = useForm({
     defaultValues: orderData || {
       po_date: new Date().toISOString().split('T')[0],
@@ -51,20 +54,20 @@ const OrderForm = ({
     },
   })
 
+  // Fixed getInputStyle function
+  const getInputStyle = (hasError) => ({
+    border: hasError && isSubmitted ? '1px solid #EF4444' : '1px solid #D1D5DB',
+    borderColor: hasError && isSubmitted ? '#EF4444' : '#D1D5DB',
+  })
+
   // Reset form when orderData changes (for edit mode)
   useEffect(() => {
     if (orderData) {
-      // Clear all previous errors first
       clearErrors()
-      
-      // Reset form with new data
       reset(orderData)
-      
-      // Set individual values to ensure they're properly set
       Object.keys(orderData).forEach((key) => {
         setValue(key, orderData[key])
       })
-      
       if (orderData.supplier_addresses) {
         setSupplierAddresses(orderData.supplier_addresses)
       }
@@ -74,7 +77,8 @@ const OrderForm = ({
   // Clear form when not in edit mode
   useEffect(() => {
     if (!isEdit) {
-      clearErrors() // Clear errors when switching to add mode
+      clearErrors()
+      setIsSubmitted(false)
       reset({
         po_date: new Date().toISOString().split('T')[0],
         valid_till: '',
@@ -97,6 +101,20 @@ const OrderForm = ({
     setItems(itemsData || [])
   }, [itemsData])
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const params = { limit: 5000, page: 1, entity_type: 'vendor' }
+        const response = await apiMethods.getVendor(params)
+        console.log('response', response.data.data);
+        setVendor(response?.data.data)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    fetchData()
+  }, [])
+
   const handleSupplierChange = (e) => {
     const selectedId = parseInt(e.target.value)
     const selectedClient = clientData.find((client) => client.client_id === selectedId)
@@ -106,11 +124,8 @@ const OrderForm = ({
       setValue('supplier_email', selectedClient.email || '')
       setValue('supplier_contact', selectedClient.mobile || selectedClient.work_phone || '')
       setValue('payment_terms', selectedClient.payment_terms || '')
-
-      // Clear supplier_id error when a valid supplier is selected
       clearErrors('supplier_id')
 
-      // Handle addresses
       const addresses = selectedClient.addresses || []
       setSupplierAddresses(addresses)
       setSelectedAddressIndex(0)
@@ -177,6 +192,7 @@ const OrderForm = ({
     setValue('shipping_address', addressString)
   }
 
+  // This function runs only when form is valid
   const handleFormSubmit = (data) => {
     const formData = {
       orderData: {
@@ -192,6 +208,11 @@ const OrderForm = ({
     }
 
     onSubmit(formData)
+  }
+
+  // This function runs when submit button is clicked (regardless of validation)
+  const handleSubmitClick = () => {
+    setIsSubmitted(true)
   }
 
   const formatAddress = (addressObj) => {
@@ -262,18 +283,19 @@ const OrderForm = ({
               Supplier ID <span className="text-red-500"> *</span>
             </label>
             <select
-              {...register('supplier_id', { required: 'Supplier is required' })}
+              {...register('supplier_id', { required: true })}
               onChange={handleSupplierChange}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              style={getInputStyle(errors.supplier_id)}
+              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             >
               <option value="">-- Select Supplier --</option>
-              {clientData?.map((client) => (
-                <option key={client.client_id} value={client.client_id}>
-                  {client.client_ui_id} - {client.display_name}
+              {vendor?.map((item) => (
+                <option key={item.client_ui_id} value={item.client_ui_id}>
+                  {item.client_ui_id} - {item.display_name}
                 </option>
               ))}
             </select>
-            {errors.supplier_id && (
+            {errors.supplier_id && isSubmitted && (
               <p className="text-red-500 text-sm mt-1">{errors.supplier_id.message}</p>
             )}
           </div>
@@ -284,11 +306,12 @@ const OrderForm = ({
             </label>
             <input
               type="text"
-              {...register('supplier_name', { required: 'Supplier name is required' })}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              {...register('supplier_name', { required: true })}
+              style={getInputStyle(errors.supplier_name)}
+              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               readOnly
             />
-            {errors.supplier_name && (
+            {errors.supplier_name && isSubmitted && (
               <p className="text-red-500 text-sm mt-1">{errors.supplier_name.message}</p>
             )}
           </div>
@@ -299,11 +322,12 @@ const OrderForm = ({
             </label>
             <input
               type="number"
-              {...register('supplier_contact', { required: 'Supplier contact is required' })}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              {...register('supplier_contact', { required: true})}
+              style={getInputStyle(errors.supplier_contact)}
+              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               readOnly
             />
-            {errors.supplier_contact && (
+            {errors.supplier_contact && isSubmitted && (
               <p className="text-red-500 text-sm mt-1">{errors.supplier_contact.message}</p>
             )}
           </div>
@@ -314,11 +338,12 @@ const OrderForm = ({
             </label>
             <input
               type="email"
-              {...register('supplier_email', { required: 'Supplier email is required' })}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              {...register('supplier_email', { required: true })}
+              style={getInputStyle(errors.supplier_email)}
+              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               readOnly
             />
-            {errors.supplier_email && (
+            {errors.supplier_email && isSubmitted && (
               <p className="text-red-500 text-sm mt-1">{errors.supplier_email.message}</p>
             )}
           </div>
@@ -329,10 +354,11 @@ const OrderForm = ({
             </label>
             <input
               type="text"
-              {...register('payment_terms', { required: 'Payment terms are required' })}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              {...register('payment_terms', { required: true })}
+              style={getInputStyle(errors.payment_terms)}
+              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             />
-            {errors.payment_terms && (
+            {errors.payment_terms && isSubmitted && (
               <p className="text-red-500 text-sm mt-1">{errors.payment_terms.message}</p>
             )}
           </div>
@@ -342,8 +368,12 @@ const OrderForm = ({
             <input
               type="date"
               {...register('po_date')}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              style={getInputStyle(errors.po_date)}
+              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             />
+            {errors.po_date && isSubmitted && (
+              <p className="text-red-500 text-sm mt-1">{errors.po_date.message}</p>
+            )}
           </div>
 
           <div className="form-group">
@@ -352,10 +382,11 @@ const OrderForm = ({
             </label>
             <input
               type="date"
-              {...register('valid_till', { required: 'Valid till date is required' })}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              {...register('valid_till', { required: true})}
+              style={getInputStyle(errors.valid_till)}
+              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             />
-            {errors.valid_till && (
+            {errors.valid_till && isSubmitted && (
               <p className="text-red-500 text-sm mt-1">{errors.valid_till.message}</p>
             )}
           </div>
@@ -365,8 +396,12 @@ const OrderForm = ({
             <input
               type="text"
               {...register('freight_terms')}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              style={getInputStyle(errors.freight_terms)}
+              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             />
+            {errors.freight_terms && isSubmitted && (
+              <p className="text-red-500 text-sm mt-1">{errors.freight_terms.message}</p>
+            )}
           </div>
         </div>
 
@@ -534,6 +569,7 @@ const OrderForm = ({
             variant="primary"
             label={isEdit ? 'Update' : 'Submit'}
             isLoading={isSubmitting}
+            onClick={handleSubmitClick}
           />
         </div>
       </div>

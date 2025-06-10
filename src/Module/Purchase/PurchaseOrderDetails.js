@@ -31,8 +31,8 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
     console.log(customFields)
 
     setModalContent(
-      <>
-        <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
+      <div className=' max-h-[200px] overflow-y-scroll'>
+        <h3 className="text-xl font-semibold mb-3 ">Custom Fields</h3>
         {Object.entries(customFields).length > 0 ? (
           Object.entries(customFields).map(([key, value], idx) => (
             <p key={idx}>
@@ -42,9 +42,24 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
         ) : (
           <p>No custom fields available.</p>
         )}
-      </>,
+      </div>,
     )
     setIsModalOpen(true)
+  }
+
+  const handlePDFDownload = async () => {
+    try {
+      const response = await apiMethods.downloadPurchaseOrderPDF(cell.id)
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `purchase_order_${cell.purchase_generate_id}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error downloading PDF:', error)
+    }
   }
 
   return (
@@ -74,6 +89,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
                 >
                   {cell.status === 'active' ? 'Approved' : 'Rejected'}
                 </span>
+                  <ActionButton label={'Download PDF'} variant="edit" height={8} onClick={handlePDFDownload}/>
                 {/* <ActionButton
                   label={'Edit'}
                   variant="edit"

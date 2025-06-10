@@ -65,7 +65,7 @@ const CustomToggle = React.forwardRef(({ onClick }, ref) => (
   </span>
 ))
 
-function LayerDragble({ lg, workOrderId}) {
+function LayerDragble({ lg, workOrderId }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
     item: () => {
@@ -77,34 +77,71 @@ function LayerDragble({ lg, workOrderId}) {
       return dragItem;
     }
   }))
+  
   return (
     <CCard
       ref={drag}
-      className={`p-2.5 mt-2.5 rounded-lg flex bg-transparent
-      }`}    >
+      className="p-2.5 mt-2.5 rounded-lg flex bg-transparent"
+    >
       <div className='flex justify-between'>
-        <div className='flex flex-col items-start  '>
+        <div className='flex flex-col items-start'>
           <div className="font-medium">{lg.layer}</div>
           <div className="flex gap-3 mt-3 text-sm">
-            {/* <span>Board Size (L x W) : {lg.boardSize.length}-{lg.boardSize.width}</span> */}
             <span>{lg?.color}</span>
             <span>{lg?.gsm} GSM</span>
             <span>{lg?.bf} BF</span>
             <span>{lg?.flute_type}</span>
             <span>{lg?.weight?.toFixed(2)} KG</span>
             <span>{lg?.material} Material</span>
-
           </div>
-
         </div>
         <div className='flex justify-end items-center'>
-
-          <div className="w-11">
-            <ProgressBar value={39} />
-          </div>
+          {/* Progress bar if needed */}
         </div>
-
       </div>
+    </CCard>
+  )
+}
+
+function PairedLayersDragble({ layers, workOrderId }) {
+  const [, drag] = useDrag(() => ({
+    type: ItemType,
+    item: () => {
+      const dragItem = {
+        layers, // Array of both layers
+        workOrderId,
+        isPair: true, // Flag to identify this as a pair
+      };
+      console.log('Dragging Paired Layers:', dragItem);
+      return dragItem;
+    }
+  }))
+  
+  return (
+    <CCard 
+      ref={drag}
+      className="p-2.5 mt-2.5 bg-transparent  rounded-lg border-2 border-dashed border-gray-300"
+    >
+      <div className="flex flex-col gap-2">
+        {layers.map((lg) => (
+          <div key={lg.id} className="flex justify-between  p-2 rounded">
+            <div className='flex flex-col items-start'>
+              <div className="font-medium">{lg.layer}</div>
+              <div className="flex gap-3 mt-2 text-sm">
+                <span>{lg?.color}</span>
+                <span>{lg?.gsm} GSM</span>
+                <span>{lg?.bf} BF</span>
+                <span>{lg?.flute_type}</span>
+                <span>{lg?.weight?.toFixed(2)} KG</span>
+                <span>{lg?.material} Material</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* <div className="text-xs text-gray-500 mt-1 text-center">
+        Paired Layers (drag together)
+      </div> */}
     </CCard>
   )
 }
@@ -151,6 +188,40 @@ function WorkOrderCard({
   const toggleCollapse = () => {
     setVisibleIndex(visibleIndex === index ? null : index)
   }
+
+  const organizeLayers = (layers,id) => {
+    if (!layers || layers.length === 0) return { single: [], pairs: [] };
+    
+    // Sort layers by ID to ensure correct pairing
+    const sortedLayers = [...layers].sort((a, b) => a.id - b.id);
+    
+    const single = [];
+    const pairs = [];
+    
+    // ID 1 is always single (if it exists)
+    if (sortedLayers.length > 0 && sortedLayers[0].id === 1) {
+      single.push(sortedLayers[0]);
+    }
+    
+    // Group remaining layers in pairs: (2,3), (4,5), (6,7), etc.
+    const remainingLayers = sortedLayers.filter(layer => layer.id !== 1);
+    
+    for (let i = 0; i < remainingLayers.length; i += 2) {
+      if (i + 1 < remainingLayers.length) {
+        // We have a pair
+        pairs.push([remainingLayers[i], remainingLayers[i + 1]]);
+      } else {
+        // Odd number, last one becomes single
+        single.push(remainingLayers[i]);
+      }
+    }
+
+    console.log(layers)
+    console.log(single,id)
+    
+    return { single, pairs };
+  };
+
 
   return (
     <CCard
@@ -203,7 +274,7 @@ function WorkOrderCard({
                       label: 'Remove from Plan',
                       icon: cilTrash,
                       onClick: () => {
-                        removeWOFromPlan(order)
+                        removeWOFromPlan(order.id)
                       },
                     },
                     {
@@ -250,54 +321,34 @@ function WorkOrderCard({
   <hr />
   
   {/* Render Top Layer separately */}
-  {order?.work_order_sku_values
-    ?.filter((lg) => lg.layer?.toLowerCase() === 'top layer')
-    .map((lg) => (
-      <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
-    ))}
+          {/* {order?.work_order_sku_values
+            ?.filter((lg) => lg.layer?.toLowerCase() === 'top layer')
+            .map((lg) => (
+              <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
+            ))} */}
 
-  {/* Group remaining layers */}
-  {(() => {
-    // Exclude Top Layer first
-    const otherLayers = order?.work_order_sku_values?.filter(
-      (lg) => lg.layer?.toLowerCase() !== 'top layer'
-    )
-
-    // Now group Corrugated + Liner layers
-    const pairs = []
-    let currentPair = []
-
-    otherLayers.forEach((lg) => {
-      currentPair.push(lg)
-      if (currentPair.length === 2) {
-        pairs.push(currentPair)
-        currentPair = []
-      }
-    })
-
-    // In case odd number of layers
-    if (currentPair.length > 0) {
-      pairs.push(currentPair)
-    }
-
-    return pairs.map((pair, index) => (
-      <CCard key={index} className="p-2.5 mt-2.5 bg-transparent rounded-lg">
-        <div className="flex flex-col gap-2">
-          {pair.map((lg) => {
-            // Find the other layer in the pair
-            const pairLayer = pair.find(l => l.id !== lg.id);
+          {/* Group remaining layers */}
+          {(() => {
+            const { single, pairs } = organizeLayers(order?.work_order_sku_values,order.work_generate_id);
+            
             return (
-              <LayerDragble 
-                key={lg.id} 
-                lg={lg} 
-                workOrderId={order.id} 
-              />
+              <>
+                {/* Render single layers */}
+                {single.map((lg) => (
+                  <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
+                ))}
+                
+                {/* Render paired layers */}
+                {pairs.map((pair, pairIndex) => (
+                  <PairedLayersDragble 
+                    key={`pair-${pairIndex}`} 
+                    layers={pair} 
+                    workOrderId={order.id} 
+                  />
+                ))}
+              </>
             );
-          })}
-        </div>
-      </CCard>
-    ))
-  })()}
+          })()}
 
   <div
     style={{
@@ -575,20 +626,20 @@ const Group = ({
   }, []);
 
 
-  useEffect(() => {
-    const fetchWorkOrders = async () => {
-      try {
-        const params = {
-          sku_name: searchQuery,
-        }
-        const response = await apiMethods.getWorkOrderInGroup(params);
-        setWorkOrders(response?.data?.workOrders); // or response.data if using axios or similar
-      } catch (error) {
-        console.error('Error fetching work orders:', error);
-        setError(error);
+  const fetchWorkOrders = async () => {
+    try {
+      const params = {
+        sku_name: searchQuery,
       }
-    };
-  
+      const response = await apiMethods.getWorkOrderInGroup(params);
+      setWorkOrders(response?.data?.workOrders); // or response.data if using axios or similar
+    } catch (error) {
+      console.error('Error fetching work orders:', error);
+      setError(error);
+    }
+  };
+
+  useEffect(() => {
     fetchWorkOrders();
   }, [searchQuery]);
 
@@ -619,9 +670,41 @@ const Group = ({
     )
   }
 
-  const removeWOFromPlan = (order) => {
-    setWorkOrders((prevOrders) => prevOrders.filter((item) => item.id !== order.id))
-  }
+  const removeWOFromPlan = async (id) => {
+    const params = {
+      production: "created",
+    };
+  
+    try {
+      // Optional: set loading state here if needed
+      // setLoading(true);
+  
+      const response = await apiMethods.removeWorkOrderFromCreationStageInProduction(id, params);
+
+  
+      if (response?.data?.success) {
+        // Success - reload work orders
+        fetchWorkOrders();
+  
+        // Optional: show success message
+        console.log('Work Order removed successfully');
+        // showToast('Work Order removed successfully', 'success');
+      } else {
+        // Handle API failure (but no exception)
+        console.error('Failed to remove Work Order:', response?.message || 'Unknown error');
+        // showToast(response?.message || 'Failed to remove Work Order', 'error');
+      }
+  
+    } catch (error) {
+      // Handle exception
+      console.error('Error while removing Work Order:', error);
+      // showToast('An error occurred while removing Work Order', 'error');
+    } finally {
+      // Optional: clear loading state here
+      // setLoading(false);
+    }
+  };
+  
 
   const handleAutoSync = () => {
     setGroupOrders((prevGroups) => {
@@ -685,12 +768,12 @@ const Group = ({
     <>
       <CCol xs={5} className="mt-4">
         <CRow>
-          <CCol xs={12}>
+          <CCol xs={8}>
             <CCard
               className="text-black bold"
               style={{
                 cursor: 'pointer',
-                height: '56px',
+                height: '46px',
                 padding: '0px 8px',
                 border: '0',
                 boxSizing: 'border-box',
@@ -706,8 +789,8 @@ const Group = ({
               }}
             >
               <CCardBody>
-                <div className="d-flex justify-content-between align-items-center">
-                  <CCardText className="mx-auto text-bold mb-0">Work Orders</CCardText>
+                <div className="flex h-full items-center justify-between">
+                  <CCardText className=" text-bold ">Work Orders</CCardText>
                   {/* <CIcon
                     icon={cilReload}
                     onClick={handleAutoSync}
@@ -720,7 +803,7 @@ const Group = ({
           </CCol>
         </CRow>
         <CRow className="mt-3">
-          <CCol xs={12}>
+          <CCol xs={8}>
             {workOrders
               ?.filter((order) => order.work_order_sku_values && order.work_order_sku_values.length > 0)
               ?.map((order) => (

@@ -74,7 +74,7 @@ const Index = () => {
 
   useEffect(() => {
     if (!currentPath || currentPath === 'production') {
-      navigate('WorkOrders');
+      navigate('WorkOrders');   
     }
   }, [currentPath, navigate]);
 
@@ -100,6 +100,13 @@ const Index = () => {
     getWorkOrders()
     // getAutoSyncOrders()
   }, [])
+
+  useEffect(() => {
+    const currentTab = tabs.find(tab => tab.path === currentPath);
+    if (currentTab) {
+      setActiveTab(currentTab.label);
+    }
+  }, [currentPath]);
 
   const activeTabIndex = tabs.findIndex(tab => tab.path === currentPath);
 
@@ -130,7 +137,7 @@ const Index = () => {
               )}
               {/* <ActionButton
           label={"Next Step"}
-          onClick={handleNextClick}
+          // onClick={handleNextClick}
           variant='delete'
         /> */}
               <SharedNextButton />

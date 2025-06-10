@@ -12,9 +12,36 @@ function WorkOrderListing() {
   const [error, setError] = useState(null);
   const {searchQuery,setGlobalPlaceholder} = useSearch()
   const { registerNextHandler } = useNextHandler();
+  const [sortModalPosition, setSortModalPosition] = useState({ x: 0, y: 0, visible: false, column: null });
+  const [sortParams, setSortParams] = useState({ sortBy: null, sortOrder: null });
   const navigate = useNavigate();
 
+  const openSortModal = (column, event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setSortModalPosition({
+      x: rect.left,
+      y: rect.bottom + 5,
+      visible: true,
+      column
+    });
+  }
+  
+  const handleSortChoice = (order) => {
+    setSortModalPosition(prev => ({ ...prev, visible: false }));
+    setSortParams({ sortBy: sortModalPosition.column, sortOrder: order });
+  }
 
+  // Close sort modal when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sortModalPosition.visible && !event.target.closest('.sort-modal')) {
+        setSortModalPosition(prev => ({ ...prev, visible: false }));
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [sortModalPosition.visible]);
 
   useEffect(() => {
     setGlobalPlaceholder('Search Work Order...')
@@ -30,9 +57,11 @@ function WorkOrderListing() {
       try {
         const params = {
           sku_name: searchQuery,
+          ...(sortParams.sortBy && { sortBy: sortParams.sortBy }), //if condition is truth then only the object is spreaded into the object else it will not b spreaded
+          ...(sortParams.sortOrder && { sortOrder: sortParams.sortOrder })
         }
         const response = await apiMethods.getWorkOrderInCreated(params);
-        setWorkOrders(response?.data?.workOrders); // or response.data if using axios or similar
+        setWorkOrders(response?.data?.workOrders);
       } catch (error) {
         console.error('Error fetching work orders:', error);
         setError(error);
@@ -40,7 +69,7 @@ function WorkOrderListing() {
     };
   
     fetchWorkOrders();
-  }, [searchQuery]);
+  }, [searchQuery, sortParams]);
 
 
   
@@ -64,7 +93,7 @@ function WorkOrderListing() {
 
       if (response?.success || response?.status === 200) {
         setError(null);
-        navigate('production/GroupLayers');
+        navigate('/production/GroupLayers');
       }
     } catch (err) {
       console.error('Error adding work orders to production:', err)
@@ -90,6 +119,13 @@ function WorkOrderListing() {
     return dateString ? new Date(dateString).toLocaleDateString('en-GB') : '-'
   }
 
+  const getSortLabel = (column, order) => {
+    if (column === 'qty') {
+      return order === 'asc' ? '1 → 100' : '100 → 1';
+    }
+    return order === 'asc' ? 'A → Z' : 'Z → A';
+  };
+
   return (
     <div className="w-full h-full min-h-[calc(86vh-200px)]">
       <div className="bg-white rounded-lg shadow-sm h-full">
@@ -99,34 +135,39 @@ function WorkOrderListing() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className= "p-3 text-gray-600 text-center font-medium">Select</th>
-                    <th className="p-3 text-gray-600 font-medium text-left">
-                      Sales-ID 
+                    <th className="p-3 text-gray-600 text-center font-medium">Select</th>
+                    <th className="p-3 text-gray-600 font-medium text-left">Sales-ID</th>
+                    <th className="p-3 text-gray-600 font-medium text-left">SO-Reference</th>
+                    <th className="p-3 text-gray-600 font-medium text-left">Work Order ID</th>
+                    <th className="p-3 text-gray-600 font-medium text-left">Priority</th>
+                    <th className="p-3 text-gray-600 font-medium text-left relative">
+                      <div className="flex items-center">
+                        SKU
+                        <ArrowUpDown
+                          onClick={(e) => openSortModal('sku_name', e)}
+                          className="inline-block ml-2 text-gray-400 w-4 h-4 cursor-pointer hover:text-purple-500"
+                        />
+                      </div>
                     </th>
-                     <th className="p-3 text-gray-600 font-medium text-left">
-                      SO-Reference
+                    <th className="p-3 text-gray-600 font-medium text-left relative">
+                      <div className="flex items-center">
+                        Quantity
+                        <ArrowUpDown
+                          onClick={(e) => openSortModal('qty', e)}
+                          className="inline-block ml-2 text-gray-400 w-4 h-4 cursor-pointer hover:text-purple-500"
+                        />
+                      </div>
                     </th>
-                    <th className="p-3 text-gray-600 font-medium text-left">
-                      Work Order ID
+                    <th className="p-3 text-gray-600 font-medium text-left relative">
+                      <div className="flex items-center">
+                        Client
+                        <ArrowUpDown
+                          onClick={(e) => openSortModal('client', e)}
+                          className="inline-block ml-2 text-gray-400 w-4 h-4 cursor-pointer hover:text-purple-500"
+                        />
+                      </div>
                     </th>
-                    <th className="p-3 text-gray-600 font-medium text-left">
-                      Priority
-                    </th>
-                    <th className="p-3 text-gray-600 font-medium text-left">
-                      SKU
-                      <ArrowUpDown className="inline-block ml-2 text-gray-400 w-4 h-4" />
-                    </th>
-                    <th className="p-3 text-gray-600 font-medium text-left">
-                    Quantity
-                      <ArrowUpDown className="inline-block ml-2 text-gray-400 w-4 h-4" />
-                    </th>
-                    <th className="p-3 text-gray-600 font-medium text-left">
-                    Client
-                      <ArrowUpDown className="inline-block ml-2 text-gray-400 w-4 h-4" />
-                    </th>
-                    <th className="p-3 text-gray-600 font-medium text-left">
-                      Expected Delivery
-                    </th>
+                    <th className="p-3 text-gray-600 font-medium text-left">Expected Delivery</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -215,6 +256,30 @@ function WorkOrderListing() {
           )}
         </div>
       </div>
+
+      {sortModalPosition.visible && (
+  <div 
+    className="sort-modal fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[90px]"
+    style={{
+      left: `${sortModalPosition.x}px`,
+      top: `${sortModalPosition.y}px`
+    }}
+  >
+    <button
+      onClick={() => handleSortChoice('asc')}
+      className="w-full px-3 py-1.5 text-left text-xs text-gray-600 hover:bg-gray-50 hover:text-purple-500"
+    >
+      {getSortLabel(sortModalPosition.column, 'asc')}
+    </button>
+    <button
+      onClick={() => handleSortChoice('desc')}
+      className="w-full px-3 py-1.5 text-left text-xs text-gray-600 hover:bg-gray-50 hover:text-purple-500"
+    >
+      {getSortLabel(sortModalPosition.column, 'desc')}
+    </button>
+  </div>
+)}
+
     </div>
   )
 }

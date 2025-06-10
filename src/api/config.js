@@ -1634,7 +1634,9 @@ export const apiMethods = {
   getWorkOrderCreatedInProduction:async (body) => {
     return await apiClient.patch('/work-order?production=created',body)
   },
-
+  removeWorkOrderFromProduction:async (workOrderId,body) => {
+    return await apiClient.patch(`/work-order/production/${workOrderId}`, body)
+  },
   getInventoryInSkuView: async () => {
     try {
       const response = await apiClient.get(`/inventory?search=&page=1&limit=50&subCategoryId=1`)
@@ -1651,5 +1653,8 @@ export const apiMethods = {
       responseType: 'blob',
     })
   },
+  removeWorkOrderFromCreationStageInProduction:async(workorderId,params)=>{
+    return await apiClient.patch(`/work-order/production/${workorderId}`,{...params})
+  }
 }
 export default apiMethods

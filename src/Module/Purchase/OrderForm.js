@@ -116,8 +116,10 @@ const OrderForm = ({
   }, [])
 
   const handleSupplierChange = (e) => {
-    const selectedId = parseInt(e.target.value)
-    const selectedClient = clientData.find((client) => client.client_id === selectedId)
+    console.log(e.target.value);
+    
+    const selectedId = e.target.value
+    const selectedClient = vendor.find((client) => client.client_ui_id === selectedId)
 
     if (selectedClient) {
       setValue('supplier_name', selectedClient.display_name || '')

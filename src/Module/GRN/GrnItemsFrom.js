@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import Select from 'react-select'
 import { ChevronDoubleLeftIcon, TrashIcon } from '@heroicons/react/solid'
 import apiMethods from '../../api/config'
+import PopUp from '../../../src/components/New/PopUp'
 
 const GrnItemsFrom = ({
   grnFormData,
@@ -18,6 +19,7 @@ const GrnItemsFrom = ({
   const [itemList, setItemList] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState(null)
+  const [showModal, setShowModal] = useState(false)
 
   const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null
@@ -39,6 +41,8 @@ const GrnItemsFrom = ({
       const items = response?.data?.data || []
       const item = items.find((i) => i.id === parseInt(item_id))
       const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}
+
+      // setShowModal(true)
 
       setModalContent(
         <>
@@ -82,6 +86,14 @@ const GrnItemsFrom = ({
             quantity_received: 0,
             accepted_quantity: 0,
             rejected_quantity: 0,
+            unit_price: item.unit_price || 0,
+            cgst: item.cgst || 0,
+            sgst: item.sgst || 0,
+            cgst_amount: item.cgst_amount || 0,
+            sgst_amount: item.sgst_amount || 0,
+            amount: item.amount || 0,
+            tax_amount: item.tax_amount || 0,
+            total_amount: item.total_amount || 0,
             batch_no: '',
             notes: '',
             work_order_no: '',
@@ -114,6 +126,14 @@ const GrnItemsFrom = ({
               quantity_received: item.quantity_received || 0,
               accepted_quantity: item.accepted_quantity || 0,
               rejected_quantity: item.rejected_quantity || 0,
+              unit_price: item.unit_price || 0,
+              cgst_amount: item.cgst_amount || 0,
+              sgst_amount: item.sgst_amount || 0,
+              cgst: item.cgst || 0,
+              sgst: item.sgst || 0,
+              amount: item.amount || 0,
+              tax_amount: item.tax_amount || 0,
+              total_amount: item.total_amount || 0,
               batch_no: item.batch_no || '',
               notes: item.notes || '',
               work_order_no: item.work_order_no || '',
@@ -137,27 +157,114 @@ const GrnItemsFrom = ({
               quantity_received: item.quantity_received || 0,
               accepted_quantity: item.accepted_quantity || 0,
               rejected_quantity: item.rejected_quantity || 0,
+              unit_price: item.unit_price || 0,
+              cgst: item.cgst || 0,
+              sgst: item.sgst || 0,
+              cgst_amount: item.cgst_amount || 0,
+              sgst_amount: item.sgst_amount || 0,
+              amount: item.amount || 0,
+              tax_amount: item.tax_amount || 0,
+              total_amount: item.total_amount || 0,
               batch_no: item.batch_no || '',
               notes: item.notes || '',
               work_order_no: item.work_order_no || '',
               location: item.location || '',
             }))
-          : [], // 👈 if not edit, initialize with empty array
+          : [],
     },
   })
 
-  const grnItemsData = watch('grn_items')
+  const grnItemsData = useWatch({ control, name: 'grn_items' })
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'grn_items',
   })
 
-  console.log('fields', fields)
-
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value)
   }
+
+  const lastHash = useRef('')
+
+  useEffect(() => {
+    if (!grnItemsData) return
+
+    const hash = JSON.stringify(grnItemsData)
+    if (hash !== lastHash.current) {
+      lastHash.current = hash
+
+      console.log('grnItemsData', grnItemsData)
+
+      let totalQty = 0
+      let totalCgst = 0
+      let totalSgst = 0
+      let totalTax = 0
+      let totalAmount = 0
+      let grandTotal = 0
+
+      const updatedItems = grnItemsData.map((item, index) => {
+        const quantity = parseFloat(item.quantity_received || 0)
+        console.log('quantity', quantity)
+        const unit_price = parseFloat(item.unit_price)
+        console.log('unit_price', unit_price)
+        const cgst_percentage = parseFloat(item.cgst || 0)
+        const sgst_percentage = parseFloat(item.sgst || 0)
+        // const tax_percentage = parseFloat(item.tax || 0)
+
+        // Calculate tax amounts from unit price and percentage
+        const cgst_per_unit = (unit_price * cgst_percentage) / 100
+        console.log('cgst_per_unit', cgst_per_unit)
+        const sgst_per_unit = (unit_price * sgst_percentage) / 100
+        console.log('sgst_per_unit', sgst_per_unit)
+        // const tax_per_unit = (unit_price * tax_percentage) / 100
+
+        const cgst_total = cgst_per_unit * quantity
+        console.log('cgst_total', cgst_total)
+        const sgst_total = sgst_per_unit * quantity
+        console.log('sgst_total', sgst_total)
+        const tax_total = cgst_total + sgst_total
+
+        const amount_total = unit_price * quantity
+        const total = amount_total + cgst_total + sgst_total
+
+        // ✅ Aggregate totals
+        totalQty += quantity
+        totalCgst += cgst_total
+        totalSgst += sgst_total
+        totalTax += tax_total
+        totalAmount += amount_total
+        grandTotal += total
+
+        console.log('totalQty', totalQty)
+        console.log('totalCgst', totalCgst)
+        console.log('totalSgst', totalSgst)
+        console.log('totalTax', totalTax)
+        console.log('totalAmount', totalAmount)
+        console.log('grandTotal', grandTotal)
+
+        return {
+          ...item,
+          cgst_amount: cgst_total.toFixed(2),
+          sgst_amount: sgst_total.toFixed(2),
+          tax_amount: tax_total.toFixed(2),
+          total_amount: total.toFixed(2),
+          amount: amount_total.toFixed(2), // total for the row *without* tax
+        }
+      })
+
+      setGrnFormData((prevData) => ({
+        ...prevData,
+        items: updatedItems,
+        cgst_amount: totalCgst.toFixed(2),
+        sgst_amount: totalSgst.toFixed(2),
+        tax_amount: totalTax.toFixed(2),
+        amount: totalAmount.toFixed(2),
+        total_amount: grandTotal.toFixed(2),
+        total_qty: totalQty,
+      }))
+    }
+  }, [grnItemsData, setGrnFormData])
 
   const addNewGRNItems = (po_items) => {
     if (!po_items || po_items.length === 0) return
@@ -171,10 +278,7 @@ const GrnItemsFrom = ({
   }
 
   const updateParentFormData = () => {
-    console.log('updateParentFormData function called')
-
     const currentValues = getValues('grn_items')
-    console.log(currentValues)
 
     if (!currentValues || !Array.isArray(currentValues)) return
 
@@ -197,12 +301,27 @@ const GrnItemsFrom = ({
             item_id = poItem.item_id || 0
             quantity_ordered = parseFloat(poItem.quantity) || 0
             grn_item_name = poItem.po_item_name || ''
+            cgst_amount = poItem.cgst_amount || 0
+            cgst = poItem.cgst || 0
+            sgst = poItem.sgst || 0
+            sgst_amount = poItem.sgst_amount || 0
+            tax_amount = poItem.tax_amount || 0
+            total_amount = poItem.total_amount || 0
+            amount = poItem.amount || 0
+            unit_price = poItem.unit_price || 0
 
-            // Update the form values
             setValue(`grn_items[${index}].quantity_ordered`, quantity_ordered)
             setValue(`grn_items[${index}].item_id`, item_id)
             setValue(`grn_items[${index}].item_code`, item_code)
             setValue(`grn_items[${index}].grn_item_name`, grn_item_name)
+            setValue(`grn_items[${index}].unit_price`, unit_price)
+            setValue(`grn_items[${index}].cgst_amount`, cgst_amount)
+            setValue(`grn_items[${index}].cgst`, cgst)
+            setValue(`grn_items[${index}].sgst`, sgst)
+            setValue(`grn_items[${index}].sgst_amount`, sgst_amount)
+            setValue(`grn_items[${index}].amount`, amount)
+            setValue(`grn_items[${index}].tax_amount`, tax_amount)
+            setValue(`grn_items[${index}].total_amount`, total_amount)
           }
         }
       }
@@ -217,6 +336,14 @@ const GrnItemsFrom = ({
         quantity_received: item.quantity_received || 0,
         accepted_quantity: item.accepted_quantity || 0,
         rejected_quantity: item.rejected_quantity || 0,
+        unit_price: item.unit_price || 0,
+        cgst_amount: item.cgst_amount || 0,
+        cgst: item.cgst || 0,
+        sgst: item.sgst || 0,
+        sgst_amount: item.sgst_amount || 0,
+        tax_amount: item.tax_amount || 0,
+        amount: item.amount || 0,
+        total_amount: item.total_amount || 0,
         batch_no: item.batch_no || '',
         notes: item.notes || '',
         work_order_no: item.work_order_no || '',
@@ -253,6 +380,11 @@ const GrnItemsFrom = ({
                     <th className="px-4 py-2 min-w-[100px] text-center">Received Quantity</th>
                     <th className="px-4 py-2 min-w-[100px] text-center">Accepted Quantity</th>
                     <th className="px-4 py-2 min-w-[100px] text-center">Rejected Quantity</th>
+                    <th className="px-4 py-2 min-w-[100px] text-center">Unit Price</th>
+                    <th className="px-4 py-2 min-w-[110px] text-center">C-GST</th>
+                    <th className="px-4 py-2 min-w-[110px] text-center">S-GST</th>
+                    <th className="px-4 py-2 min-w-[110px] text-center">Tax Amount</th>
+                    <th className="px-4 py-2 min-w-[110px] text-center">Total Amount</th>
                     <th className="px-4 py-2 min-w-[200px] text-center">Description</th>
                     <th className="px-4 py-2 min-w-[180px] text-center">Batch No.</th>
                     <th className="px-4 py-2 min-w-[180px] text-center">Work Order No.</th>
@@ -286,7 +418,9 @@ const GrnItemsFrom = ({
                           })}
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
+                        {/* {item[index]?.item_info?.item_generate_id} */}
                       </td>
+
                       <td
                         onClick={() => openItemDetails(getValues(`grn_items.${index}.item_id`))}
                         className="cursor-pointer text-blue-600"
@@ -355,6 +489,52 @@ const GrnItemsFrom = ({
                       </td>
                       <td className="px-4 py-2">
                         <input
+                          type="number"
+                          name="rejected_quantity"
+                          {...register(`grn_items[${index}].unit_price`, {
+                            onChange: () => updateParentFormData(),
+                          })}
+                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                        />
+                      </td>
+                      <td className="px-4 py-2">
+                        <input
+                          type="number"
+                          name="cgst"
+                          readOnly
+                          value={grnFormData?.items?.[index]?.cgst_amount || ''}
+                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                        />
+                      </td>
+                      <td className="px-4 py-2">
+                        <input
+                          type="number"
+                          name="sgst"
+                          disabled
+                          value={grnFormData?.items?.[index]?.sgst_amount || ''}
+                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                        />
+                      </td>
+                      <td className="px-4 py-2">
+                        <input
+                          type="number"
+                          name="tax_amount"
+                          disabled
+                          value={grnFormData?.items?.[index]?.tax_amount || ''}
+                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                        />
+                      </td>
+                      <td className="px-4 py-2">
+                        <input
+                          type="number"
+                          name="total_amount"
+                          disabled
+                          value={grnFormData?.items?.[index]?.total_amount || ''}
+                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                        />
+                      </td>
+                      <td className="px-4 py-2">
+                        <input
                           type="text"
                           name="description"
                           {...register(`grn_items[${index}].description`, {
@@ -413,42 +593,52 @@ const GrnItemsFrom = ({
                 </tbody>
               </table>
 
-              {/* <table className="flex-1">
-                <tbody className="gap-4">
-                  <tr>
-                    <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                      Total Qty: {fields.total_qty}
-                    </td>
-                    <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                      C-GST: {fields.cgst_amount}
-                    </td>
-                    <td className="px-4 py-2"></td>
-                    <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                      S-GST: {fields.sgst_amount}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-2"></td>
-                    <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                      Total: {fields.amount}
-                    </td>
-                    <td className="px-4 py-2"></td>
-                    <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                      Tax Amount: {fields.tax_amount}
-                    </td>
-                    <td className="px-4 py-2"></td>
-                    <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                      Total Incl of GST: {fields.total_amount}
-                    </td>
-                  </tr>
-                </tbody>
-              </table> */}
+              <div className="flex mt-4">
+                <table className="flex-1">
+                  <tbody className="gap-4">
+                    <tr>
+                      <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        Total Qty: {grnFormData.total_qty}
+                      </td>
+                      <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        C-GST: {grnFormData.cgst_amount}
+                      </td>
+                      <td className="px-4 py-2"></td>
+                      <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        S-GST: {grnFormData.sgst_amount}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        Total: {grnFormData.amount}
+                      </td>
+                      <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        Tax Amount: {grnFormData.tax_amount}
+                      </td>
+                      <td className="px-4 py-2"></td>
+                      <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        Total Incl of GST: {grnFormData.total_amount}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
               <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 {modalContent}
               </Modal>
             </div>
           </div>
         </div>
+
+        <PopUp
+          visible={showModal}
+          showCloseButton={true}
+          // setVisible={() => setViewItem(false)}
+          height={'95vh'}
+          width={'70vw'}
+        >
+          {/* <ViewInventory item={selectedItem} /> */}
+        </PopUp>
       </div>
     </>
   )

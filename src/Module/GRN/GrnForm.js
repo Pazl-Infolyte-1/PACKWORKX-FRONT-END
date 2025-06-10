@@ -3,7 +3,16 @@ import apiMethods from '../../api/config'
 import GrnItemsFrom from './GrnItemsFrom'
 import ActionButton from '../../components/New/ActionButton'
 
-const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDrawer, errors }) => {
+const GrnForm = ({
+  grnFormData,
+  setGrnFormData,
+  onSubmit,
+  isEdit,
+  handleCloseDrawer,
+  errors,
+  isSubmitted,
+  setIsSubmitted,
+}) => {
   const [isOpen, setIsOpen] = useState(false)
   const [purchaseOrderData, setPurchaseOrderData] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -11,6 +20,19 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value)
+  }
+
+  const getInputStyle = (fieldName) => {
+    const hasError = isSubmitted && !grnFormData[fieldName]
+    return {
+      border: hasError ? '1px solid #EF4444' : '1px solid #D1D5DB',
+    }
+  }
+  const getInputBorderClass = (fieldName) => {
+    const hasError = isSubmitted && !grnFormData[fieldName]
+    return hasError
+      ? 'w-full h-[40px] px-3 border border-red-500 rounded-md bg-white text-gray-800 flex items-center justify-between cursor-pointer transition-all duration-200'
+      : 'w-full h-[40px] px-3 border border-gray-300 rounded-md bg-white text-gray-800 flex items-center justify-between cursor-pointer transition-all duration-200'
   }
 
   const selectClient = async (id) => {
@@ -40,6 +62,14 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
         quantity_received: 0,
         accepted_quantity: 0,
         rejected_quantity: 0,
+        unit_price: item.unit_price || 0,
+        cgst_amount: item.cgst_amount || 0,
+        cgst: item.cgst || 0,
+        sgst: item.sgst || 0,
+        sgst_amount: item.sgst_amount || 0,
+        amount: item.amount || 0,
+        tax_amount: item.tax_amount || 0,
+        total_amount: item.total_amount || 0,
         batch_no: '',
         notes: '',
         work_order_no: '',
@@ -68,6 +98,7 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
   }
 
   const handleSubmit = (e) => {
+    setIsSubmitted(true)
     e.preventDefault()
     onSubmit(grnFormData)
   }
@@ -102,7 +133,7 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                   </div>
                   <div className="relative w-full" ref={dropdownRef}>
                     <div
-                      className="w-full h-[40px] px-3 border border-gray-300 rounded-md bg-white text-gray-800 flex items-center justify-between cursor-pointer hover:border-[#8167E5] transition-all duration-200"
+                      className={getInputBorderClass('po_id')}
                       onClick={() => setIsOpen(!isOpen)}
                     >
                       <span className="truncate">
@@ -189,11 +220,6 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                       </div>
                     )}
                   </div>
-                  {errors.po_id && (
-                    <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
-                      {errors.po_id}
-                    </span>
-                  )}
                 </div>
 
                 <div className="p-2 rounded-lg flex flex-col">
@@ -208,11 +234,12 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     name="grn_date"
                     value={grnFormData.grn_date || ''}
                     onChange={handleInputChange}
+                    style={getInputStyle('grn_date')}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
-                  {errors.grn_date && (
+                  {/* {errors.grn_date && (
                     <span className="text-red-500 text-sm mt-1 ml-2 mb-2">{errors.grn_date}</span>
-                  )}
+                  )} */}
                 </div>
 
                 <div className="p-2 rounded-lg flex flex-col">
@@ -226,13 +253,14 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     name="delivery_note_no"
                     value={grnFormData.delivery_note_no || ''}
                     onChange={handleInputChange}
+                    style={getInputStyle('delivery_note_no')}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
-                  {errors.delivery_note_no && (
+                  {/* {errors.delivery_note_no && (
                     <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
                       {errors.delivery_note_no}
                     </span>
-                  )}
+                  )} */}
                 </div>
 
                 <div className="p-2 rounded-lg flex flex-col">
@@ -246,13 +274,14 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     name="invoice_no"
                     value={grnFormData.invoice_no || ''}
                     onChange={handleInputChange}
+                    style={getInputStyle('invoice_no')}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
-                  {errors.invoice_no && (
+                  {/* {errors.invoice_no && (
                     <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
                       {errors.invoice_no}
                     </span>
-                  )}
+                  )} */}
                 </div>
                 <div className="p-2 rounded-lg flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
@@ -265,13 +294,14 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     name="invoice_date"
                     value={grnFormData.invoice_date || ''}
                     onChange={handleInputChange}
+                    style={getInputStyle('invoice_date')}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
-                  {errors.invoice_date && (
+                  {/* {errors.invoice_date && (
                     <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
                       {errors.invoice_date}
                     </span>
-                  )}
+                  )} */}
                 </div>
                 <div className="p-2 rounded-lg flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
@@ -284,13 +314,14 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     name="received_by"
                     value={grnFormData.received_by || ''}
                     onChange={handleInputChange}
+                    style={getInputStyle('received_by')}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
-                  {errors.received_by && (
+                  {/* {errors.received_by && (
                     <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
                       {errors.received_by}
                     </span>
-                  )}
+                  )} */}
                 </div>
                 <div className="p-2 rounded-lg flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
@@ -303,13 +334,14 @@ const GrnForm = ({ grnFormData, setGrnFormData, onSubmit, isEdit, handleCloseDra
                     name="notes"
                     value={grnFormData.notes || ''}
                     onChange={handleInputChange}
+                    style={getInputStyle('notes')}
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
-                  {errors.notes && (
+                  {/* {errors.notes && (
                     <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
                       {errors.notes}
                     </span>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>

@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import apiMethods from '../api/config';
 
 const GroupLayersContext = createContext();
 
@@ -9,22 +8,11 @@ export const GroupLayersProvider = ({ children }) => {
   const [groups, setGroups] = useState([]);
   const [workOrders, setWorkOrders] = useState([]);
 
-  const fetchWorkOrders = async () => {
-    try {
-      const response = await apiMethods.getWorkOrderInGroup();
-      setWorkOrders(response?.data?.workOrders);
-    } catch (error) {
-      console.error('Error fetching work orders:', error);
-    }
-  };
 
-  useEffect(() => {
-    fetchWorkOrders();
-  }, []);
 
-  useEffect(() => {
-    console.log(workOrders, groups);
-  }, [workOrders, groups]);
+  // useEffect(() => {
+  //   console.log(workOrders, groups);
+  // }, [workOrders, groups]);
 
   const addGroup = () => {
     setGroups((prev) => [
@@ -118,7 +106,7 @@ export const GroupLayersProvider = ({ children }) => {
           };
         }
         return workOrder;
-      }).filter(workOrder => workOrder.work_order_sku_values.length > 0); // Optional: remove work orders with no layers
+      });
     });
   }
   };
@@ -147,6 +135,8 @@ export const GroupLayersProvider = ({ children }) => {
           const layerExists = workOrder.work_order_sku_values.some(
             (layer) => layer.layer_id === itemToRemove.layer_id
           );
+
+
           
           if (!layerExists) {
             return {
@@ -177,6 +167,7 @@ export const GroupLayersProvider = ({ children }) => {
   const value = {
     workOrders,
     groups,
+    setWorkOrders,
     addGroup,
     updateGroup,
     addWorkOrderToGroup,

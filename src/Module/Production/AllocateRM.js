@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CRow,
   CCol,
@@ -18,6 +18,8 @@ import ProgressBar from './ProgressBar'
 import Dropdown from 'react-bootstrap/Dropdown'
 import AllcoateRMModal from './AllcoateRMModal'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
+import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext'
+import apiMethods from '../../api/config'
 
 const ItemType = 'WORK_ORDER'
 
@@ -222,7 +224,7 @@ function GroupDropZone({
               whiteSpace: 'nowrap', // Prevents text wrapping
             }}
           >
-            {i.order_id ? i.order_id : i.layer_name}{' '}
+            {i?.layer_detail?.layer}
             {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />}
           </span>
 
@@ -320,10 +322,10 @@ function GroupDropZone({
               </>
             ) : (
               <>
-                <span>GSM - {i.gsm}</span>
-                <span>BF - {i.bf}</span>
+                <span>GSM - {i?.layer_detail?.gsm}</span>
+                <span>BF - {i?.layer_detail?.bf}</span>
                 <span>{i.dimensions} PLY</span>
-                <span>{i.color}</span>
+                <span>{i?.layer_detail?.color}</span>
               </>
             )}
           </div>
@@ -363,17 +365,17 @@ function GroupDropZone({
 }
 
 const AllocateRM = ({
-  workOrders,
-  setWorkOrders,
-  groupOrders,
-  setGroupOrders,
-  autoSyncOrders,
-  setVisibleSplit,
+  // workOrders,
+  // setWorkOrders,
+  // // setGroupOrders,
+  // autoSyncOrders,
+  // setVisibleSplit,
 }) => {
   const [visibleGroupIndex, setVisibleGroupIndex] = useState(null)
   const [visibleItemIndex, setVisibleItemIndex] = useState(null)
   const [advanced, setAdvanced] = useState(false)
   const [visibleAllocate, setVisibleAllocate] = useState(false)
+  const [visibleSplit, setVisibleSplit] = useState(false)
   const [sfgData, setSfgData] = useState([
     {
       id: 'Reel 02',
@@ -421,36 +423,51 @@ const AllocateRM = ({
   }
 
   const [openSFG, setOpenSFG] = useState(null)
+  const {groupOrders,setGroupOrders} = useRawMaterialContext()
+
+
+  const fetchWorkOrders = async () => {
+    try {
+      const response = await apiMethods.getProductionGroups();
+      setGroupOrders(response?.data?.data);
+    } catch (error) {
+      console.error("Error fetching work orders:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchWorkOrders();
+  }, []);
+
 
   const addQuantity = (i, groupIndex, item) => {
     console.log('Work Order:', i)
     console.log('Group Index:', groupIndex)
     console.log('Item:', item)
-    console.log('Work Orders:', workOrders)
 
-    setGroupOrders((prevOrders) =>
-      prevOrders.map((order) => {
-        if (order.order_id === i.wo_id) {
-          console.log('Inside the if condition')
-          console.log('Order:', order)
+    // setGroupOrders((prevOrders) =>
+    //   prevOrders.map((order) => {
+    //     if (order.order_id === i.wo_id) {
+    //       console.log('Inside the if condition')
+    //       console.log('Order:', order)
 
-          const updatedItems = order.items.map((orderItem) =>
-            orderItem.id === i.id
-              ? {
-                  ...orderItem,
-                  finished_goods: orderItem.finished_goods + item.sfg['available_qty'],
-                }
-              : orderItem,
-          )
+    //       const updatedItems = order.items.map((orderItem) =>
+    //         orderItem.id === i.id
+    //           ? {
+    //               ...orderItem,
+    //               finished_goods: orderItem.finished_goods + item.sfg['available_qty'],
+    //             }
+    //           : orderItem,
+    //       )
 
-          return {
-            ...order,
-            items: updatedItems,
-          }
-        }
-        return order
-      }),
-    )
+    //       return {
+    //         ...order,
+    //         items: updatedItems,
+    //       }
+    //     }
+    //     return order
+    //   }),
+    // )
     setSfgData((prevSfgData) => prevSfgData.filter((sfg) => sfg.id !== item.sfg['id']))
   }
 
@@ -492,7 +509,8 @@ const AllocateRM = ({
         </CRow>
         <CRow className="mt-3">
           <CCol xs={12}>
-            {groupOrders.map((group, groupIndex) => (
+            {console.log(groupOrders)}
+            {groupOrders?.map((group, groupIndex) => (
               <CCard
                 key={groupIndex}
                 className="mb-2"
@@ -521,7 +539,7 @@ const AllocateRM = ({
                         whiteSpace: 'nowrap', // Prevents text wrapping
                       }}
                     >
-                      {group.name}{' '}
+                      {group.group_name}{' '}
                       {visibleGroupIndex === groupIndex ? <FaAngleUp /> : <FaAngleDown />}
                     </span>
 
@@ -569,7 +587,7 @@ const AllocateRM = ({
                   </div>
 
                   <CCollapse className="custom-collapse" visible={visibleGroupIndex === groupIndex}>
-                    {group?.items?.map((i, itemIndex) => (
+                    {group?.layer_details?.map((i, itemIndex) => (
                       <GroupDropZone
                         key={itemIndex}
                         i={i}

@@ -49,6 +49,7 @@ import { NextHandlerProvider } from '../../Context/ProductionNextHandlerContext'
 import SharedNextButton from './SharedNextButton'
 import { GroupLayersProvider, useGroupLayers } from '../../Context/GroupLayersContext'
 import AddGroupButton from './AddGroupButton'
+import { RawMaterialProvider } from '../../Context/AlocateRawMeterialContext'
 
 
 
@@ -123,6 +124,7 @@ const Index = () => {
   return (
     <NextHandlerProvider>
       <GroupLayersProvider>
+        <RawMaterialProvider>
       <div className='overflow-hidden h-[90vh] flex flex-col'>
         {/* Fixed Header Section */}
         <div className="sticky top-0 bg-white z-[1000] flex-shrink-0">
@@ -237,6 +239,7 @@ const Index = () => {
           setSelectedType={setSelectedType}
         />
       </div>
+      </RawMaterialProvider>
       </GroupLayersProvider>
     </NextHandlerProvider>
   )

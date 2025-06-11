@@ -613,13 +613,27 @@ const Group = ({
   const [visible, setVisible] = useState(false)
   const [selectedType, setSelectedType] = useState('')
   const [splitVisible, setSplitVisible] = useState(false)
-  const [workOrders1,setWorkOrders] = useState([])
+  // const [workOrders1,setWorkOrders] = useState([])
   const [groups1,setGroupOrders] = useState()
-  const { groups,addWorkOrderToGroup,workOrders } = useGroupLayers();
+  const { groups,addWorkOrderToGroup,workOrders,setWorkOrders } = useGroupLayers();
   const {registerNextHandler} = useNextHandler()
 
   const {searchQuery,setGlobalPlaceholder} = useSearch()
   const [error,setError] = useState()
+
+
+  const fetchWorkOrders = async () => {
+    try {
+      const response = await apiMethods.getWorkOrderInGroup();
+      setWorkOrders(response?.data?.workOrders);
+    } catch (error) {
+      console.error('Error fetching work orders:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchWorkOrders();
+  }, []);
 
 
   const SubmitGroups = async () => {
@@ -848,22 +862,45 @@ const Group = ({
         </CRow>
         <CRow className="mt-3">
           <CCol xs={8}>
-            {workOrders
-              ?.filter((order) => order.work_order_sku_values && order.work_order_sku_values.length > 0)
-              ?.map((order) => (
-                <WorkOrderCard
-                  key={order.id}
-                  order={order}
-                  index={order.id}
-                  visibleIndex={visibleIndex}
-                  setVisibleIndex={setVisibleIndex}
-                  removeWOFromPlan={removeWOFromPlan}
-                  setModalWorkOrder={setModalWorkOrder}
-                  modalWorkOrder={modalWorkOrder}
-                  setVisible={setVisible}
-                  setVisibleSplit={setVisibleSplit}
-                />
-              ))}
+            {workOrders?.length === 0 ? (
+              <CCard
+                className="mb-2"
+                style={{
+                  backgroundColor: '#f5f4f7',
+                  borderRadius: '5px',
+                  padding: '20px',
+                  textAlign: 'center'
+                }}
+              >
+                <CCardBody>
+                  <div className="flex flex-col items-center justify-center">
+                    <CIcon
+                      icon={cilBriefcase}
+                      style={{ fontSize: '2rem', color: '#8167e5', marginBottom: '10px' }}
+                    />
+                    <span className="text-gray-600 font-medium">No Work Orders in Production</span>
+                    <span className="text-gray-500 text-sm mt-1">Add work orders to begin production planning</span>
+                  </div>
+                </CCardBody>
+              </CCard>
+            ) : (
+              workOrders
+                ?.filter((order) => order.work_order_sku_values && order.work_order_sku_values.length > 0)
+                ?.map((order) => (
+                  <WorkOrderCard
+                    key={order.id}
+                    order={order}
+                    index={order.id}
+                    visibleIndex={visibleIndex}
+                    setVisibleIndex={setVisibleIndex}
+                    removeWOFromPlan={removeWOFromPlan}
+                    setModalWorkOrder={setModalWorkOrder}
+                    modalWorkOrder={modalWorkOrder}
+                    setVisible={setVisible}
+                    setVisibleSplit={setVisibleSplit}
+                  />
+                ))
+            )}
           </CCol>
         </CRow>
       </CCol>

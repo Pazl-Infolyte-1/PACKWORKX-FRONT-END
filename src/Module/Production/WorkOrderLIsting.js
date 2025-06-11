@@ -127,7 +127,7 @@ function WorkOrderListing() {
   };
 
   return (
-    <div className="w-full h-full min-h-[calc(86vh-200px)]">
+    <div className="w-full min-h-[calc(86vh-200px)]">
       <div className="bg-white rounded-lg shadow-sm h-full">
         <div className="p-0">
           {workOrders?.length > 0 ? (

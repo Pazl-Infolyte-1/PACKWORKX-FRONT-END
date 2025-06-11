@@ -19,7 +19,7 @@ const InventoryMain = React.lazy(() => import('./Module/Inventory/InventoryMain.
 const Production = React.lazy(() => import('./Module/Production/Index.js'))
 const WorkOrderListProduction = React.lazy(() => import('./Module/Production/WorkOrderLIsting.js'))
 const GroupLayerProduction = React.lazy(() => import('./Module/Production/Group.js'))
-
+const RawMeterialProduction = React.lazy(() => import('./Module/Production/AllocateRM.js'))
 const Packages = React.lazy(() => import('./Module/Admin/Packages/Packages.js'))
 const Billing = React.lazy(() => import('./Module/Admin/Billing/Billing.js'))
 const Companies = React.lazy(() => import('./Module/Admin/Companies/Companies.js'))
@@ -104,10 +104,10 @@ const routes = [
       element: Production,
        key: 26,
        children:[
-          { path: 'WorkOrders', name: 'WorkOrders', element: WorkOrderListProduction, key: 26 },
-          { path: 'GroupLayers', name: 'GroupLayers', element: GroupLayerProduction, key: 26 },
+          { path: 'WorkOrders', name: 'WorkOrders', element: WorkOrderListProduction, key: '' },
+          { path: 'GroupLayers', name: 'GroupLayers', element: GroupLayerProduction, key: '' },
+          { path: 'AllocateRM', name: 'AllocateRM', element: RawMeterialProduction, key: '' },
           // const tabs = ['Work Orders','Group Layers',  'Allocate RM', 'Returnables', 'Outsource & Preview']//'Allocate SFG'
-
        ]
 
 

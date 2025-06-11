@@ -51,6 +51,7 @@ const StockTableView = React.lazy(() => import('./Module/StockAdjustment/StockTa
 const Invoice = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceList.js'))
 const InvoiceView = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceView.js'))
 const InventoryForm =React.lazy(()=>import('./Module/Inventory/Items/AddItemProcess.js'))
+const DebitNote= React.lazy(() => import('./Module/DebitNote/DebitNote.js'))
 
 
 const routes = [
@@ -148,6 +149,7 @@ const routes = [
   { path: '/designation', name: 'Designation', element: Designation, key: '' },
   { path: '/department', name: 'Department', element: Department, key: '' },
   { path: '/role', name: 'role', element: Role, key: '' },
+  { path: '/debitnote', name: 'Debit Note', element: DebitNote, key: '' },
 
   { path: '/users', name: 'user', element: DropDownController, key: 6000 },
   {

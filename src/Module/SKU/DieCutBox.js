@@ -14,7 +14,6 @@ import SelectionCards from '../../components/New/SelectionCards'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
 import RoutePopup from './RoutePopup'
 import { useDispatch, useSelector } from 'react-redux'
-import apiMethods from '../../api/config'
 import { useNavigate } from 'react-router-dom'
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';

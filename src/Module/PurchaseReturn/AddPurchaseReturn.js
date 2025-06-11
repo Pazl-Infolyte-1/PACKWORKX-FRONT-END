@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
 import ReturnItemForm from './ReturnItemForm'
 import CustomAlert from '../../components/New/CustomAlert'
@@ -334,7 +333,7 @@ const AddPurchaseOrderReturn = ({
     const checkedItemCodes = checkedItems.map((item) => item.item_code)
 
     ////////////////////////////////////////////////////////////////////////////////////////
-    // const response = await apiMethods.getinventory();
+    // const response = await workOrderApi.getinventory();
     // const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : [];
     // let allAvailable = true;
     // for (const checkedItem of checkedItems) {
@@ -416,10 +415,10 @@ const AddPurchaseOrderReturn = ({
   // useEffect(() => {
   //   const fetchVendors = async () => {
   //     try {
-  //       const initial = await apiMethods.getClients();
+  //       const initial = await workOrderApi.getClients();
   //       const count = initial?.length || 100;
 
-  //       const fullData = await apiMethods.getClients({ limit: count });
+  //       const fullData = await workOrderApi.getClients({ limit: count });
   //       const clientsArray = fullData.data;
 
   //       if (Array.isArray(clientsArray)) {

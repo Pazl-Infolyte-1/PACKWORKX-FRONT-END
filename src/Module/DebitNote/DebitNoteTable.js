@@ -10,10 +10,10 @@ import React, { useState } from 'react'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
-import apiMethods from '../../api/config'
 import PopUp from '../../components/New/PopUp'
 import DebitNoteView from './DebitNoteView'
 import ReusableTable from '../SalesOrder/ReusableTable'
+import { debitApi } from '../../api/debit'
 
 const DebitNoteTable = ({ debitNoteData, setDebitNoteData, setAlerts, handleEdit, setRefresh }) => {
   const [confirmModal, setConfirmModal] = useState(false)
@@ -29,7 +29,7 @@ const DebitNoteTable = ({ debitNoteData, setDebitNoteData, setAlerts, handleEdit
 
   const handleDelete = async () => {
     try {
-      const response = await apiMethods.deleteDebitNote(deleteId)
+      const response = await debitApi.deleteDebitNote(deleteId)
       if (response.status === 200) {
         setConfirmModal(false)
         setDebitNoteData((prev) => prev.filter((item) => item.id !== deleteId))

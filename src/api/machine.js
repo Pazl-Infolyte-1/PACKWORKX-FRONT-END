@@ -140,4 +140,14 @@ export const machineApi = {
       console.error(error)
     }
   },
+    assignMachineProcess: async (payload) => {
+    return await apiClient.post('/machines/assign', payload)
+  },
+  updateAssignMachine: async (payload, Id) => {
+    return await apiClient.put(`/machines/assign/${Id}`, payload)
+  },
+    deleteAssignMachine: async (id) => {
+    return await apiClient.delete(`/machines/assign/${id}`)
+  },
+
 }

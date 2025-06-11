@@ -4,7 +4,6 @@ import StockManagementTable from './StockManagementTable';
 
 import CustomAlert from "../../components/New/CustomAlert";
 import SearchBar from "../../components/New/SearchBar";
-import apiMethods from "../../api/config";
 import ActionButton from "../../components/New/ActionButton";
 import Loader from "../../components/New/Loader";
 import CommonPagination from '../../components/New/Pagination';

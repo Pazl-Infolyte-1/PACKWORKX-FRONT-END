@@ -19,8 +19,7 @@ import ActionButton from '../../components/New/ActionButton'
 import { useEffect, useRef, useState } from 'react'
 import CommonPagination from '../../components/New/Pagination'
 import { IoSearch } from 'react-icons/io5'
-import apiMethods from '../../api/config'
-import clientApi from '../../api/client'
+import {clientApi} from '../../api/client'
 import { useDispatch, useSelector } from 'react-redux';
 import { setCompositeArray } from '../../action'; // adjust path
 import { skuApi } from '../../api/sku'

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import Select from 'react-select'
-import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
 import { FiEdit, FiPlus, FiSave, FiX } from 'react-icons/fi'
 import CustomAlert from '../../components/New/CustomAlert'
@@ -277,7 +276,7 @@ function AddAssign({
           machine_id: selectedMachine.value,
           process_id: selectedProcess.value,
         }
-        response = await apiMethods.updateAssignMachine(assignmentPayload, isAddModalOpen.id)
+        response = await machineApi.updateAssignMachine(assignmentPayload, isAddModalOpen.id)
       } else {
         assignmentPayload = {
           assignments: [
@@ -287,7 +286,7 @@ function AddAssign({
             },
           ],
         }
-        response = await apiMethods.assignMachineProcess(assignmentPayload)
+        response = await machineApi.assignMachineProcess(assignmentPayload)
       }
 
       // Then save the values if we're editing them and fields exist
@@ -300,9 +299,9 @@ function AddAssign({
         }
         let response
         if (machineValues) {
-        response = await apiMethods.updateProcessValues(valuesPayload)
+        response = await machineApi.updateProcessValues(valuesPayload)
         } else {
-          response = await apiMethods.saveProcessValues(valuesPayload)
+          response = await machineApi.saveProcessValues(valuesPayload)
         }
       }
 

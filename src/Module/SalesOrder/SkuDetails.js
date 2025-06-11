@@ -3,7 +3,6 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import ActionPopup from './ActionPopup'
 import { useEffect, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
 import Select from "react-select";
 import { Controller } from "react-hook-form";
 import { skuApi } from '../../api/sku'

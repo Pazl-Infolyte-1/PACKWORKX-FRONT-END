@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import apiMethods from '../../api/config'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
 
 const GrnView = ({ id, setOpenPoReturnModal }) => {

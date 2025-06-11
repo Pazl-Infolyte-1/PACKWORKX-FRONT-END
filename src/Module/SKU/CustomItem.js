@@ -18,7 +18,6 @@ import PopUp from '../../components/New/PopUp'
 import { useDispatch, useSelector } from 'react-redux'
 import RoutePopup from './RoutePopup'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
-import apiMethods from '../../api/config'
 import { useNavigate } from 'react-router-dom'
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';

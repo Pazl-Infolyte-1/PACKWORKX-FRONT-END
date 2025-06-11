@@ -7,7 +7,6 @@ import Loader from '../../components/New/Loader';
 import CompactPagination from '../../components/New/CompactPagination';
 import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup';
 import Drawer1 from '../../components/Drawer/Drawer1';
-import apiMethods from '../../api/config';
 import { useSearch } from '../../components/New/SearchContext';
 import { useNavigate } from 'react-router-dom';
 import ProductTable from './ProductTable';

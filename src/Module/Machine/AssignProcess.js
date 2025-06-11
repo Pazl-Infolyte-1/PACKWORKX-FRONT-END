@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
 import PopUp from '../../components/New/PopUp'
-import apiMethods from '../../api/config'
 import AddAssign from './AddAssign'
 import AssignCard from './AssignCard'
 import { machineApi } from '../../api/machine'

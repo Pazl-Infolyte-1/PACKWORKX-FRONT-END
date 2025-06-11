@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import apiMethods from '../../api/config'
 import { machineApi } from '../../api/machine'
 
 function ViewMachineData({ Id }) {

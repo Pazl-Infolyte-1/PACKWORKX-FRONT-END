@@ -153,4 +153,62 @@ export const skuApi = {
   getSkuValuesOptions: async (id) => {
     return await apiClient.get(`sku-details/${id}/options`)
   },
+    getFluteType: async () => {
+    try {
+      return await apiClient.get('/common-service/flute')
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  updateDie: async (id, formData) => {
+    try {
+      return await apiClient.put(`/common-service/die/update/${id}`, formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  addDie: async (formData) => {
+    try {
+      return await apiClient.post('/common-service/die/create', formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+    updateFlute: async (id, formData) => {
+    try {
+      return await apiClient.put(`/common-service/flute/update/${id}`, formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+    addFlute: async (formData) => {
+    try {
+      return await apiClient.post('/common-service/flute/create', formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+    getDies: async (params) => {
+    try {
+      return await apiClient.get('/common-service/die', { params })
+    } catch (error) {
+      console.error(error)
+    }
+  },
+    deleteDie: async (id) => {
+    try {
+      return await apiClient.delete(`/common-service/die/delete/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  deleteFlute: async (id) => {
+    try {
+      return await apiClient.delete(`/common-service/flute/delete/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
 }

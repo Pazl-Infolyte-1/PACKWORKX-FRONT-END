@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import ProcessDropDown from '../Machine/ProcessDropDown'
 import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
+import { machineApi } from '../../api/machine'
 
 function AddProcessField({
   fieldData,
@@ -57,7 +57,7 @@ function AddProcessField({
     if (!processId) return
 
     try {
-      const response = await apiMethods.getProcessFields(processId)
+      const response = await machineApi.getProcessFields(processId)
       setSelectedProcess(response.data.data)
     } catch (error) {
       console.error('Error fetching process fields:', error)
@@ -103,16 +103,16 @@ function AddProcessField({
           process_name_id: selectedProcessId,
           process_value: { ...processInputs },
         }
-        const response = await apiMethods.updateProcessValues(payload)
+        const response = await machineApi.updateProcessValues(payload)
 
-        const refreshResult = await apiMethods.getProcessValues()
+        const refreshResult = await machineApi.getProcessValues()
         setAllprocessValue(refreshResult.data.data)
       } else {
         const payload = {
           process_name_id: selectedProcessId,
           process_value: { ...processInputs },
         }
-        await apiMethods.saveProcessValues(payload)
+        await machineApi.saveProcessValues(payload)
       }
 
       // Trigger parent refresh

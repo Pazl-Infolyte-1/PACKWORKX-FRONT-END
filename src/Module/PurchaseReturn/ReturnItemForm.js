@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useForm, useFieldArray, useWatch } from 'react-hook-form'
-import apiMethods from '../../api/config'
 import { inventoryApi } from '../../api/inventory'
 import { itemApi } from '../../api/item'
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import clientApi from '../../api/client'
+import {clientApi} from '../../api/client'
 import ClientTable from './ClientTable'
 import ClientForm from './ClientForm'
 import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'

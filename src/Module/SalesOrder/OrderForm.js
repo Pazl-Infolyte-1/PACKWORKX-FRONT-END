@@ -1,6 +1,5 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import SkuDetails from './SkuDetails'
-import apiMethods from '../../api/config';
 import ActionButton from '../../components/New/ActionButton';
 import { useSelector } from 'react-redux';
 import SalesOrderSkuform from './SalesOrderSkuform';

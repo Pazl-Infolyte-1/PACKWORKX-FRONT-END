@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { TrashIcon } from '@heroicons/react/solid'
 import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
 import { itemApi } from '../../api/item'
 
 const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {

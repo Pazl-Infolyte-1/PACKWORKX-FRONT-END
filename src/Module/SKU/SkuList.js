@@ -4,7 +4,6 @@ import { MdTakeoutDining, MdOutlineSettingsInputComposite, MdClearAll } from 're
 import { AiFillCarryOut, AiFillCodeSandboxCircle } from 'react-icons/ai'
 
 import Drawer from '../../components/Drawer/Drawer'
-import apiMethods from '../../api/config'
 import SkuPopup from './SkuPopup'
 import SkuTable from './SkuTable'
 import { useLocation } from 'react-router-dom'
@@ -152,7 +151,7 @@ const fetchClient = async () => {
   if (!skuIdVal) return; // Run only if skuIdVal exists
 
   try {
-    const data = await apiMethods.singlesku(skuIdVal);
+    const data = await skuApi.singlesku(skuIdVal);
     setSelectedSku(data);
     console.log("sku single data", data);
   } catch (error) {

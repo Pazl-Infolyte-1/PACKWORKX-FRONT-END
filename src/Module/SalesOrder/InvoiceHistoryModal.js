@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import apiMethods from '../../api/config';
 import { workOrderApi } from '../../api/workOrder';
 
 const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {

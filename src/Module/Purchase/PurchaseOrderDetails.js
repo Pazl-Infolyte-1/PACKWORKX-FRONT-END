@@ -2,7 +2,6 @@
 import PopUp from '../../components/New/PopUp'
 import ActionButton from '../../components/New/ActionButton'
 import React, { useState, useEffect, useMemo } from 'react'
-import apiMethods from '../../api/config'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
 import { itemApi } from '../../api/item'
 

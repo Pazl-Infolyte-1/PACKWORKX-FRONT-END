@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import apiMethods from '../../api/config'
 import {
   CTable,
   CTableHead,
@@ -17,6 +16,7 @@ import PopUp from '../../components/New/PopUp'
 import DieForm from './AddEditDies'
 import { Pagination, Stack } from '@mui/material'
 import { IoSearch } from 'react-icons/io5'
+import {skuApi} from "../../api/sku"
 
 const DiePopupTable = ({ setSelectedDiePopup, selectedDiePopup, setisSingleViewPopup,client }) => {
 
@@ -54,7 +54,7 @@ const DiePopupTable = ({ setSelectedDiePopup, selectedDiePopup, setisSingleViewP
   useEffect(() => {
     const fetchDies = async () => {
       try {
-        const dieResponse = await apiMethods.getDies({
+        const dieResponse = await skuApi.getDies({
           search: debouncedSearch.trim() || undefined,
         })
   
@@ -89,7 +89,7 @@ const DiePopupTable = ({ setSelectedDiePopup, selectedDiePopup, setisSingleViewP
     if (!dieToDelete) return
 
     try {
-      const response = await apiMethods.deleteDie(dieToDelete.id)
+      const response = await skuApi.deleteDie(dieToDelete.id)
       if (response.status === 200 || response.status === 204) {
         if (selectedDiePopup?.id === dieToDelete.id) {
           setSelectedDiePopup(null)

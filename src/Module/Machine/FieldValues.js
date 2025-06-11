@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import apiMethods from '../../api/config'
 import { CiSettings, CiCircleAlert } from 'react-icons/ci'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilPen, cilTrash } from '@coreui/icons'
@@ -44,7 +43,7 @@ function FieldValues({
     if (!processId) return
 
     try {
-      const response = await apiMethods.getProcessFields(processId)
+      const response = await machineApi.getProcessFields(processId)
       setProcessFields((prev) => ({
         ...prev,
         [processId]: response?.data?.data,
@@ -135,7 +134,7 @@ function FieldValues({
   }
 
   const handleDeleteProcess = async () => {
-    await apiMethods.deleteProcess(deleteProcess.id)
+    await machineApi.deleteProcess(deleteProcess.id)
     setDeleteProcess({ open: false, id: null })
     fetchData()
   }

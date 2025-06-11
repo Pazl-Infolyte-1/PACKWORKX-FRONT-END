@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom"; // to extract `id` from the URL
 import CIcon from "@coreui/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import apiMethods from "../../api/config";
 import InvoiceModal from "../WorkOrder/InvoiceModal";
 import { salesOrderApi } from "../../api/salesOrder";
 import { workOrderApi } from "../../api/workOrder";

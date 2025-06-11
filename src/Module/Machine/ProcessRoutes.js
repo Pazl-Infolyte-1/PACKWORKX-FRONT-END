@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import {
   ArrowRight,
@@ -12,7 +11,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { machineApi } from '../../api/machine'
+import {machineApi} from '../../api/machine'
 
 function ProcessRoutes({ openRoutes, setOpenRoutes, setAlerts }) {
   const [routeProcessDetails, setRouteProcessDetails] = useState([])

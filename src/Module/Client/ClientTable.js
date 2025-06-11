@@ -15,7 +15,7 @@ import ClientForm from './ClientForm'
 import Drawer from '../../components/Drawer/Drawer'
 import ClientSingleViewCard from './ClientSingleViewCard'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
+import { cilBan, cilCheckCircle, cilHandPointRight, cilPencil, cilPowerStandby, cilTrash } from '@coreui/icons'
 import CustomAlert from '../../components/New/CustomAlert'
 import { useNavigate } from 'react-router-dom'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
@@ -223,8 +223,8 @@ const response = await apiMethods.clientStatusSwitch(newStatus, clientId)
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
                           {client.mobile || 'N/A'}
                         </CTableDataCell>
-           <CTableDataCell className="px-4 py-3 text-sm">
-<select
+        <CTableDataCell className="px-4 py-3 text-sm">
+          {/*<select
   value={client.status === 'active' || client.status === 'inactive' ? client.status : ''}
   onClick={(e) => e.stopPropagation()}
   onChange={(e) => handleStatusChange(client.client_id, e.target.value)}
@@ -234,9 +234,20 @@ const response = await apiMethods.clientStatusSwitch(newStatus, clientId)
   <option value="" disabled hidden>Select Status</option>
   <option value="active">active</option>
   <option value="inactive">In active</option>
-</select>
-
+</select>*/}
+  <span
+    className={`inline-block text-center px-2 py-1 rounded-full text-xs font-semibold w-[70px] ${
+      client.status === 'active'
+        ? 'bg-green-100 text-green-800'
+        : client.status === 'inactive'
+        ? 'bg-red-100 text-red-800'
+        : 'bg-gray-100 text-gray-800'
+    }`}
+  >
+    {client.status}
+  </span>
 </CTableDataCell>
+
 
 
                         <CTableDataCell className="px-4 py-3">
@@ -259,6 +270,14 @@ const response = await apiMethods.clientStatusSwitch(newStatus, clientId)
                                     id: client.client_id,
                                   }),
                                 },
+                            {
+      label: client.status === 'active' ? 'Set Inactive' : 'Set Active',
+      icon: client.status === 'active' ? cilBan : cilCheckCircle,
+      onClick: () => handleStatusChange(
+        client.client_id,
+        client.status === 'active' ? 'inactive' : 'active'
+      ),
+    },
                               ]}
                             />
                           </div>

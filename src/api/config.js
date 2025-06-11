@@ -1633,10 +1633,39 @@ export const apiMethods = {
   addWorkOrderIntoProduction: async (body) => {
     return await apiClient.patch('/work-order/production/batch', body)
   },
-  getWorkOrderInProduction: async (body) => {
-    return await apiClient.get('/work-order/production=in_production')
+  getWorkOrderInGroup: async () => {
+    return await apiClient.get('/work-order/ungrouped-layers')
   },
-
+  getWorkOrderInCreated: async (params) => {
+    return await apiClient.get('/work-order?production=created',{params})
+  },
+  getWorkOrderCreatedInProduction:async (body) => {
+    return await apiClient.patch('/work-order?production=created',body)
+  },
+  removeWorkOrderFromProduction:async (workOrderId,body) => {
+    return await apiClient.patch(`/work-order/production/${workOrderId}`, body)
+  },
+  createGroupInProduction:async (body)=>{
+    return await apiClient.post('/production/production-group',body)
+  },
+  getProductionGroups:async()=>{
+    return await apiClient.get('/production/production-group?include_work_orders=true')
+  },
+  getDeckleOptions:async()=>{
+    return await apiClient.get('/items/reels/deckle')
+  },
+  getColorOptions:async()=>{
+    return await apiClient.get('/items/reels/color')
+  },
+    getGsmOptions:async()=>{
+    return await apiClient.get('/items/reels/gsm')
+  },
+    getBfOptions:async()=>{
+    return await apiClient.get('/items/reels/bf')
+  },
+  getReelsInRawMeterial:async (params)=>{
+    return await apiClient.get('/inventory/reels',{params})
+  },
   getInventoryInSkuView: async () => {
     try {
       const response = await apiClient.get(`/inventory?search=&page=1&limit=50&subCategoryId=1`)
@@ -1645,7 +1674,6 @@ export const apiMethods = {
       console.error(error)
       throw error
     }
-
   },
 
   downloadPurchaseOrderPDF: async (id) => {
@@ -1657,5 +1685,8 @@ export const apiMethods = {
   getVendor: async (params) => {
     return await apiClient.get('/clients', { params })
   },
+  removeWorkOrderFromCreationStageInProduction:async(workorderId,params)=>{
+    return await apiClient.patch(`/work-order/production/${workorderId}`,{...params})
+  }
 }
 export default apiMethods

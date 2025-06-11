@@ -5,6 +5,7 @@ const SettingsLayout = React.lazy(() => import('./Module/Settings/SettingsLayout
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Client = React.lazy(() => import('./Module/Client/ClientList.js'))
 const TableView = React.lazy(() => import('./Module/Client/TableView.js'))
+const SkuView = React.lazy(() => import('./Module/SKU/SkuView.js'))
 const OverviewComponent = React.lazy(() => import('./Module/Client/OverviewComponent'))
 const ClientForm = React.lazy(() => import('./Module/Client/ClientForm.js'))
 const SKU = React.lazy(() => import('./Module/SKU/SkuList.js'))
@@ -16,6 +17,9 @@ const AddEditMachine = React.lazy(() => import('./Module/Machine/AddEditMachine.
 const InventoryHandling = React.lazy(() => import('./Module/Inventory/InventoryHandling.js'))
 const InventoryMain = React.lazy(() => import('./Module/Inventory/InventoryMain.js'))
 const Production = React.lazy(() => import('./Module/Production/Index.js'))
+const WorkOrderListProduction = React.lazy(() => import('./Module/Production/WorkOrderLIsting.js'))
+const GroupLayerProduction = React.lazy(() => import('./Module/Production/Group.js'))
+const RawMeterialProduction = React.lazy(() => import('./Module/Production/AllocateRM.js'))
 const Packages = React.lazy(() => import('./Module/Admin/Packages/Packages.js'))
 const Billing = React.lazy(() => import('./Module/Admin/Billing/Billing.js'))
 const Companies = React.lazy(() => import('./Module/Admin/Companies/Companies.js'))
@@ -53,6 +57,7 @@ const InventoryForm =React.lazy(()=>import('./Module/Inventory/Items/AddItemProc
 const DebitNote= React.lazy(() => import('./Module/DebitNote/DebitNote.js'))
 const DebitNoteForm= React.lazy(() => import('./Module/DebitNote/DebitNoteForm.js'))
 
+
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },
@@ -66,25 +71,25 @@ const routes = [
 
   { path: '/clients/clientForm', name: 'Add Client', element: ClientForm, key: '10-1' },
   //{ path: '/SKU', name: 'SKU', element: SKU, key: 23 },
-  {
-    path: '/SKU',
-    name: 'SKU',
-    element: SKU,
-    key: 23,
-    children: [{ path: ':id', element: TableView, key: 'sku_view' }],
-  },
-  {
-    path: '/sku/add',
-    name: 'Add SKU',
-    element: SkuAddEdit,
-    key: 'SKU_ADD',
-  },
-  {
-    path: '/sku/edit/:id',
-    name: 'Edit SKU',
-    element: SkuAddEdit,
-    key: 'SKU_EDIT',
-  },
+{
+  path: '/sku',
+  name: 'SKU',
+  element: SKU,
+  key: 23,
+  children: [{ path: ':id', element: SkuView, key: 'sku_view' }],
+},
+  //{
+  //  path: '/sku/add',
+  //  name: 'Add SKU',
+  //  element: SkuAddEdit,
+  //  key: 'SKU_ADD',
+  //},
+  //{
+  //  path: '/sku/edit/:id',
+  //  name: 'Edit SKU',
+  //  element: SkuAddEdit,
+  //  key: 'SKU_EDIT',
+  //},
   { path: '/employeelist', name: 'Employee List', element: EmployeeList, key: 21 },
   { path: '/purchaseorder', name: 'Purchase Order', element: PurchaseOrder, key: 29 },
   { path: '/machinedashboard', name: 'Machine Dashboard', element: MachineDashboard, key: 22 },
@@ -96,7 +101,19 @@ const routes = [
   },
   { path: '/inventoryhandling', name: 'Inventory Handling', element: InventoryMain, key: 28 },
     { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 230 },
-  { path: '/production', name: 'Production', element: Production, key: 26 },
+  { path: '/production',
+     name: 'Production',
+      element: Production,
+       key: 26,
+       children:[
+          { path: 'WorkOrders', name: 'WorkOrders', element: WorkOrderListProduction, key: '' },
+          { path: 'GroupLayers', name: 'GroupLayers', element: GroupLayerProduction, key: '' },
+          { path: 'AllocateRM', name: 'AllocateRM', element: RawMeterialProduction, key: '' },
+          // const tabs = ['Work Orders','Group Layers',  'Allocate RM', 'Returnables', 'Outsource & Preview']//'Allocate SFG'
+       ]
+
+
+   },
   { path: '/packages', name: 'Packages', element: Packages, key: 5001 },
   { path: '/process', name: 'Process', element: Process, key: 5007 },
   { path: '/routeprocess', name: 'Route Process', element: RouteProcess, key: 5008 },

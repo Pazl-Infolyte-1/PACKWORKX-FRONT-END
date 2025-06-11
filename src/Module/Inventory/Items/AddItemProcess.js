@@ -192,54 +192,55 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
         }
 
         // Handle custom fields
-        if (itemData.custom_fields) {
+        if (itemData.custom_fields || itemData.default_custom_fields) {
           try {
-            const customFields =
-              typeof itemData.custom_fields === 'string'
+            // Parse custom_fields
+            const customFields = itemData.custom_fields
+              ? typeof itemData.custom_fields === 'string'
                 ? JSON.parse(itemData.custom_fields)
                 : itemData.custom_fields
+              : {}
 
-            // Parse custom_fields if it's double-encoded
-            const parsedCustomFields =
-              typeof customFields === 'string' ? JSON.parse(customFields) : customFields
+            // Parse default_custom_fields
+            const defaultFields = itemData.default_custom_fields
+              ? typeof itemData.default_custom_fields === 'string'
+                ? JSON.parse(itemData.default_custom_fields)
+                : itemData.default_custom_fields
+              : {}
 
-            // Get default custom fields from API response if available
-            let defaultFieldsFromAPI = {}
-            if (itemData.default_custom_fields) {
-              try {
-                const defaultFields =
-                  typeof itemData.default_custom_fields === 'string'
-                    ? JSON.parse(itemData.default_custom_fields)
-                    : itemData.default_custom_fields
-
-                defaultFieldsFromAPI =
-                  typeof defaultFields === 'string' ? JSON.parse(defaultFields) : defaultFields
-              } catch (parseError) {
-                console.error('Error parsing default_custom_fields:', parseError)
-              }
-            }
-
-            // First check if this is a subcategory with default fields
+            // Check if this is a subcategory with default fields
             const selectedSubCat = allSubCategories.find((sc) => sc.id == itemData.sub_category)
             const subCatName = selectedSubCat?.sub_category_name
 
             if (subCatName && defaultCustomFields[subCatName]) {
               // Set values for default custom fields from API response
               Object.keys(defaultCustomFields[subCatName]).forEach((key) => {
-                if (parsedCustomFields[key] !== undefined) {
-                  setValue(key, parsedCustomFields[key])
+                // Find the corresponding key in the defaultFields (might have different case/format)
+                const apiKey = Object.keys(defaultFields).find(
+                  (k) => k.toLowerCase() === key.toLowerCase().replace(/\s+/g, '_'),
+                )
+
+                // Set the value if found in the API response
+                if (apiKey && defaultFields[apiKey]) {
+                  setValue(key, defaultFields[apiKey])
                 }
               })
 
-              // Then handle any additional custom tags (fields not in default schema)
-              const additionalTags = Object.entries(parsedCustomFields)
-                .filter(([key]) => !defaultCustomFields[subCatName].hasOwnProperty(key))
+              // Handle any additional custom tags (fields not in default schema)
+              const additionalTags = Object.entries(customFields)
+                .filter(([key]) => {
+                  // Check if key is not in default fields (case insensitive)
+                  const defaultKey = Object.keys(defaultCustomFields[subCatName]).find(
+                    (k) => k.toLowerCase().replace(/\s+/g, '_') === key.toLowerCase(),
+                  )
+                  return !defaultKey
+                })
                 .map(([label, value]) => ({ label, value: String(value) }))
 
               setTagFields(additionalTags)
             } else {
               // For subcategories without default fields, use the tag system
-              const tagsArray = Object.entries(parsedCustomFields).map(([label, value]) => ({
+              const tagsArray = Object.entries(customFields).map(([label, value]) => ({
                 label,
                 value: String(value),
               }))
@@ -300,37 +301,41 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
         allSubCategories.find((sc) => sc.id == selectedSubCategory)
       const subCatName = selectedSubCat?.sub_category_name
 
-      // Prepare custom_fields by combining default fields and tag fields
+      // Prepare custom_fields and default_custom_fields
       let customFields = {}
       let defaultFields = {}
 
       // First add default custom fields if they exist for this subcategory
-     if (subCatName && defaultCustomFields[subCatName]) {
+      if (subCatName && defaultCustomFields[subCatName]) {
         Object.keys(defaultCustomFields[subCatName]).forEach((key) => {
-          // Special case for "Net WT (Kgs)"
-          const formattedKey = key.toLowerCase() === 'net wt (kgs)' 
-            ? 'net_wt(Kgs)' 
-            : key.toLowerCase().replace(/\s+/g, '_')
-          customFields[formattedKey] = data[key] || ''
-          defaultFields[formattedKey] = data[key] || ''
+          // Format the key to match the desired format (lowercase with underscores)
+          const formattedKey = key.toLowerCase().replace(/\s+/g, '_')
+          // Special case for "net_wt(Kgs)"
+          const finalKey = formattedKey === 'net_wt(kgs)' ? 'net_wt(Kgs)' : formattedKey
+
+          if (data[key] !== undefined) {
+            defaultFields[finalKey] = String(data[key])
+            customFields[finalKey] = String(data[key])
+          }
         })
       }
 
-      // Then add any additional tag fields
+      // Then add any additional tag fields to custom_fields
       tagFields.forEach((field) => {
-        if (field.label) {
-          // Special case for "Net WT (Kgs)"
-          const formattedLabel = field.label.toLowerCase() === 'net wt (kgs)' 
-            ? 'net_wt(Kgs)' 
-            : field.label.toLowerCase().replace(/\s+/g, '_')
-          customFields[formattedLabel] = field.value
+        if (field.label && field.value) {
+          // Format the label to match the desired format (lowercase with underscores)
+          const formattedLabel = field.label.toLowerCase().replace(/\s+/g, '_')
+          // Special case for "net_wt(Kgs)"
+          const finalLabel = formattedLabel === 'net_wt(kgs)' ? 'net_wt(Kgs)' : formattedLabel
+
+          customFields[finalLabel] = String(field.value)
         }
       })
 
       const formattedData = {
         ...data,
-        custom_fields: JSON.stringify(customFields),
-        default_custom_fields: JSON.stringify(defaultFields), // Add this line
+        custom_fields: customFields, // Directly use the object
+        default_custom_fields: defaultFields, // Directly use the object
         min_stock_level: parseFloat(data.min_stock_level) || 0,
         reorder_level: parseFloat(data.reorder_level) || 0,
         standard_cost: parseFloat(data.standard_cost) || 0,
@@ -339,8 +344,9 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
         category: Number(data.category),
         sub_category: data.sub_category ? Number(data.sub_category) : null,
       }
-      
+
       let response
+
       if (isEditing) {
         formattedData.id = currentItemId
         response = await apiMethods.updateItem(currentItemId, formattedData)
@@ -365,8 +371,8 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
         fetchData()
       }, 1500)
     } catch (error) {
-      console.error(error);
-      
+      console.error(error)
+
       setAlerts([
         {
           severity: 'error',
@@ -377,6 +383,8 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       setIsSubmitting(false)
     }
   }
+
+  console.log(typeof selectedSubCategory)
 
   function cleanAndUppercase(text) {
     return text
@@ -562,7 +570,6 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       </>
     )
   }
-
   const getInputStyle = (hasError) => ({
     border: hasError && isSubmitted ? '1px solid #EF4444' : '1px solid #D1D5DB',
   })
@@ -626,8 +633,12 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
               }}
               {...register('net_weight')}
             >
-              <option value="kg">Kg</option>
-              <option value="litre">Litre</option>
+              {(!selectedSubCategory || ['1', '5', '9', '4'].includes(selectedSubCategory)) && (
+                <option value="kg">Kg</option>
+              )}
+              {(!selectedSubCategory || ['2', '5', '3', '4'].includes(selectedSubCategory)) && (
+                <option value="litre">Litre</option>
+              )}
             </select>
           </div>
         </div>

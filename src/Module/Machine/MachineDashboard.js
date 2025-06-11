@@ -31,6 +31,7 @@ import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import CompactPagination from '../../components/New/CompactPagination'
 import { FiDownload, FiUpload } from 'react-icons/fi'
 import ProcessRoutes from './ProcessRoutes'
+import { machineApi } from '../../api/machine'
 
 export default function MachineMaster() {
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
@@ -113,7 +114,7 @@ export default function MachineMaster() {
     const fetchData = async () => {
       setIsLoading(true)
       try {
-        const response = await apiMethods.getMachine({
+        const response = await machineApi.getMachine({
           page: pagination.page,
           limit: limit,
           search: searchQuery,
@@ -201,7 +202,7 @@ export default function MachineMaster() {
 
   const handleStatusChange = async (Id, newStatus) => {
     try {
-      const response = await apiMethods.updateMachineStatus(Id, { machine_status: newStatus })
+      const response = await machineApi.updateMachineStatus(Id, { machine_status: newStatus })
       setAlerts([
         {
           severity: 'success',

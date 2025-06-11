@@ -14,6 +14,7 @@ import apiMethods from '../../api/config'
 import PopUp from '../../components/New/PopUp'
 
 import PurchaseOrderReturnView from './PurchaseOrderReturnView'
+import { purchaseOrderApi } from '../../api/purchaseOrder'
 
 const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
   const [confirmModal, setConfirmModal] = useState(false)
@@ -31,7 +32,7 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
 
   const handleDelete = async () => {
     try {
-      const response = await apiMethods.deletePoReturn(deleteId)
+      const response = await purchaseOrderApi.deletePoReturn(deleteId)
       if (response.status === 200) {
         setConfirmModal(false)
         setPoData((prev) => prev.filter((item) => item.id !== deleteId))

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import ContentHeader from '../../components/New/ContentHeader'
 import InvoiceTable from './InvoiceTable'
-import apiMethods from '../../api/config'
 import { Outlet, useLocation, useParams } from 'react-router-dom'
 import CompactPagination from '../../components/New/CompactPagination'
 import { useSearch } from '../../components/New/SearchContext'
+import { workOrderApi } from '../../api/workOrder'
 
 function InvoiceList() {
   const [isMiniMised, setIsMinimised] = useState()
@@ -23,7 +23,7 @@ function InvoiceList() {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const response = await apiMethods.getInvoiceList({
+        const response = await workOrderApi.getInvoiceList({
           search: searchQuery,
           page: pagination.page,
           limit: pagination.limit

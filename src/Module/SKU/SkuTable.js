@@ -16,6 +16,7 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { skuApi } from '../../api/sku'
 
 function SkuTable({
   skudata,
@@ -74,7 +75,7 @@ const navigate = useNavigate()
 
   const handleSkuDelete = async () => {
     try {
-      const response = await apiMethods.deleteSku(deleteId)
+      const response = await skuApi.deleteSku(deleteId)
       setDeleteModal(false)
       setSkuData((prevTypes) => prevTypes.filter((type) => type.id !== deleteId))
       setAlerts([{ severity: 'success', message: response.message }])

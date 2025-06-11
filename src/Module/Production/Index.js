@@ -45,6 +45,7 @@ import ActionButton from '../../components/New/ActionButton'
 import Outsource_Preview from './Outsource_Preview'
 import apiMethods from '../../api/config'
 import WorkOrderLIsting from './WorkOrderLIsting'
+import { workOrderApi } from '../../api/workOrder'
 
 
 const Index = () => {
@@ -61,7 +62,7 @@ const Index = () => {
   useEffect(() => {
     async function getWorkOrders() {
       try {
-        const response = await apiMethods.getWorkOrders()
+        const response = await workOrderApi.getWorkOrders()
         setWorkOrders(response?.data?.workOrders)
       } catch (error) {
         console.error('Error fetching work orders:', error)

@@ -8,7 +8,6 @@ import {
   CTableDataCell,
   CButton,
 } from '@coreui/react'
-import apiMethods from '../../api/config'
 import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'
 import '../../components/New/CustomPopupModal/CustomPopup.css'
 import ClientForm from './ClientForm'
@@ -21,6 +20,7 @@ import { useNavigate } from 'react-router-dom'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import PopUp from '../../components/New/PopUp'
 import { TiFlowSwitch } from 'react-icons/ti'
+import { clientApi } from '../../api/client'
 
 function ClientTable({ clientdata, refreshClients, isMinimized,setSingleStatusUpdate }) {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -50,7 +50,7 @@ function ClientTable({ clientdata, refreshClients, isMinimized,setSingleStatusUp
     if (!isDeleteModalOpen.id) return
 
     try {
-      const response = await apiMethods.deleteClient(isDeleteModalOpen.id)
+      const response = await clientApi.deleteClient(isDeleteModalOpen.id)
       if (!response?.status) {
         throw new Error(response?.message || 'Failed to delete client')
       }
@@ -93,7 +93,7 @@ function ClientTable({ clientdata, refreshClients, isMinimized,setSingleStatusUp
 
 const handleStatusChange = async (clientId, newStatus) => {
   try {
-const response = await apiMethods.clientStatusSwitch(newStatus, clientId)
+const response = await clientApi.clientStatusSwitch(newStatus, clientId)
     console.log('✅ Status update response:', response)    // Optionally refetch or update local state here
     setSingleStatusUpdate(response.data.status)
   } catch (error) {

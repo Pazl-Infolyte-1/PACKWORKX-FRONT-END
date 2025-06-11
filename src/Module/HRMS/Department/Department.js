@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import ActionButton from '../../../components/New/ActionButton'
 import DepartmentTable from './DepartmentTable'
-import apiMethods from '../../../api/config'
 import ConfirmationModale from '../../../components/New/ConfirmationModale'
 import CustomAlert from '../../../components/New/CustomAlert'
 import AddEditDepartmentForm from './AddEditDepartmentForm'
 import ContentHeader from '../../../components/New/ContentHeader'
+import { employeeApi } from '../../../api/employee'
 
 function Department() {
   const [departments, setDepartments] = useState([])
@@ -19,7 +19,7 @@ function Department() {
 
   const fetchData = async () => {
     try {
-      const response = await apiMethods.getDepartmentsList()
+      const response = await employeeApi.getDepartmentsList()
       if (response?.data?.success) {
         setDepartments(response?.data?.data)
       }
@@ -56,7 +56,7 @@ function Department() {
 
   const onDeleteConfirmation = async () => {
     try {
-      const response = await apiMethods.deleteDepartment(selectedDepartmentId)
+      const response = await employeeApi.deleteDepartment(selectedDepartmentId)
       await fetchData()
       setIsConfirmationModaleOpen(false)
       setAlerts([

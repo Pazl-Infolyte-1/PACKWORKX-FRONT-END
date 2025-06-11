@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import { AuthContext } from '../../Context/AuthContext'
 import apiMethods from '../../api/config'
+import { commonApi } from '../../api/common'
 
 const AddNameForm = ({
   isVisible,
@@ -16,7 +17,7 @@ const AddNameForm = ({
 
   const handleAddCategory = async () => {
     if (newCategoryName.trim()) {
-      await apiMethods.addDropdownName({ dropdown_name: newCategoryName, client_id: user.id })
+      await commonApi.addDropdownName({ dropdown_name: newCategoryName, client_id: user.id })
       setNewCategoryName('')
       setIsAddingCategory(false)
       setRefresh((prev) => !prev)

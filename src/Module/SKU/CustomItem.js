@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom'
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { machineApi } from '../../api/machine'
 
 
 function CustomItem({
@@ -240,7 +241,7 @@ const navigate=useNavigate()
       }
 
       try {
-        const response = await apiMethods.getRouteList(params)
+        const response = await machineApi.getRouteList(params)
         setFullRouteResponse(response)
         setDisplayAsChips(response.data.routes)
       } catch (err) {

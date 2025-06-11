@@ -7,6 +7,7 @@ import ActionButton from '../../components/New/ActionButton'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import MachineValues from './MachineValues'
 import AddMachineField from './AddMachineField'
+import { machineApi } from '../../api/machine'
 
 function FieldValues({
   openFieldValuesModal,
@@ -29,7 +30,7 @@ function FieldValues({
   const fetchData = async () => {
     setLoading(true)
     try {
-      const response = await apiMethods.getAllAssign()
+      const response = await machineApi.getAllAssign()
       setAssignProcess(response.data.data)
     } catch (error) {
       console.error(error)

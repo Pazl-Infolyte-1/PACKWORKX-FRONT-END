@@ -3,6 +3,8 @@ import { ChevronUp, ChevronDown, Mail, MoreHorizontal } from 'lucide-react'
 import apiMethods from '../../api/config'
 import { useNavigate } from 'react-router-dom'
 import moment from 'moment/moment'
+import { inventoryApi } from '../../api/inventory'
+import { skuApi } from '../../api/sku'
 
 const SkuView = ({ setIsMinimized, selectedSkuData, handleSkuEdit }) => {
   const [activeTab, setActiveTab] = useState('Overview')
@@ -43,7 +45,7 @@ useEffect(() => {
       setActiveVersion(null);
 
         if (!selectedSku?.id) return
-        const response = await apiMethods.getSkuVersions(selectedSku.id)
+        const response = await skuApi.getSkuVersions(selectedSku.id)
         const versions = response?.data?.data || []
         setSkuVersions(versions)
 
@@ -89,7 +91,7 @@ useEffect(() => {
 useEffect(() => {
   const fetchInventory = async () => {
     try {
-      const res = await apiMethods.getInventoryInSkuView();
+      const res = await inventoryApi.getInventoryInSkuView();
       console.log("Inventory Response:", res);
       setInventoryData(res?.data?.inventoryData || []);
     } catch (error) {

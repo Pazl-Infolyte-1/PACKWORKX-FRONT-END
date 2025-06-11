@@ -9,15 +9,15 @@ import {
 } from '@coreui/react'
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import ThreeDotMenu from '../../../components/ThreeDotMenu'
-import apiMethods from '../../../api/config'
 import Loading from '../../../components/New/Loading'
 import PackagesDetails from './PackagesDetails'
 import CustomAlert from '../../../components/New/CustomAlert'
 import Packages from './Packages'
+import { companyApi } from '../../../api/company'
 
 function PackagesTable({ packagedata = [], onEdit, setData, loading, showPopUp, setShowPopUp, setAlerts, alerts }) {
   const handleDelete = async (id) => {
-    await apiMethods.DeletePacakges(id)
+    await companyApi.DeletePacakges(id)
     setData((prev) => prev.filter((item) => item.package.id !== id))
     setAlerts([{ severity: 'success', message: 'Package deleted successfully!' }])
   }

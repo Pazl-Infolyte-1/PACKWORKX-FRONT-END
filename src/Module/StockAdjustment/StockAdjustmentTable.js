@@ -44,7 +44,7 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized, refreshClients
     if (!isDeleteModalOpen.id) return
 
     try {
-      const response = await apiMethods.deleteStockAdjustment(isDeleteModalOpen.id)
+      const response = await inventoryApi.deleteStockAdjustment(isDeleteModalOpen.id)
       if (!response?.status) {
         throw new Error(response?.message || 'Failed to delete client')
       }

@@ -3,6 +3,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { TrashIcon } from '@heroicons/react/solid'
 import ActionButton from '../../components/New/ActionButton'
 import apiMethods from '../../api/config'
+import { itemApi } from '../../api/item'
 
 const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -30,7 +31,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
 
   const openItemDetails = async (item_id) => {
     try {
-      const response = await apiMethods.getItemList()
+      const response = await itemApi.getItemList()
       const items = response?.data?.data || []
       const item = items.find((i) => i.id === parseInt(item_id))
       console.log(item, 'item')
@@ -347,7 +348,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
   const fetchItemList = async () => {
     try {
       setIsLoading(true)
-      const response = await apiMethods.getItemList({
+      const response = await itemApi.getItemList({
         search: '',
         client: '',
         page: 1,

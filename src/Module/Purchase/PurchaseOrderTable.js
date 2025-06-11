@@ -14,6 +14,7 @@ import ThreeDotMenu from '../../components/ThreeDotMenu'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import ReusableTable from '../SalesOrder/ReusableTable'
+import { purchaseOrderApi } from '../../api/purchaseOrder'
 
 function PurchaseOrderTable({
   data = [],
@@ -99,7 +100,7 @@ function PurchaseOrderTable({
     }
 
     try {
-      await apiMethods.deletePurchaseOrder(deleteId)
+      await purchaseOrderApi.deletePurchaseOrder(deleteId)
       setPoData((prev) => prev.filter((po) => po.id !== deleteId))
       setAlerts([{ severity: 'success', message: 'Purchase Order deleted successfully!' }])
       setTimeout(() => {
@@ -129,7 +130,7 @@ function PurchaseOrderTable({
     }
 
     try {
-      const response = await apiMethods.updatePurchaseOrder(id, payload)
+      const response = await purchaseOrderApi.updatePurchaseOrder(id, payload)
       setAlerts([{ severity: 'success', message: response.data.message }])
       setRefresh((prev) => !prev)
     } catch (error) {

@@ -9,6 +9,7 @@ import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
 import PurchaseReturnForm from './PurchaseReturnForm'
 import AddPurchaseOrderReturn from './AddPurchaseReturn'
+import { purchaseOrderApi } from '../../api/purchaseOrder'
 
 const PurchaseOrderReturn = () => {
   const [isPorEdit, setIsPorEdit] = useState(false)
@@ -26,7 +27,7 @@ const PurchaseOrderReturn = () => {
   // Fetch data
   const fetchData = async () => {
     try {
-      const response = await apiMethods.getPurchaseReturn({
+      const response = await purchaseOrderApi.getPurchaseReturn({
         search: searchQuery,
         page: pagination.currentPage,
         limit: limit,
@@ -45,7 +46,7 @@ const PurchaseOrderReturn = () => {
   //po data
   const poFetchData = async () => {
     try {
-      const response = await apiMethods.getPurchaseOrders({
+      const response = await purchaseOrderApi.getPurchaseOrders({
         search: searchQuery,
         page: pagination.currentPage,
         limit: limit,
@@ -68,7 +69,7 @@ const PurchaseOrderReturn = () => {
     try {
       console.log('id', id)
 
-      const response = await apiMethods.getPurchaseReturn({ id })
+      const response = await purchaseOrderApi.getPurchaseReturn({ id })
       console.log('response', response)
 
       const approvedList = Array.isArray(response?.data?.approved) ? response.data.approved : []

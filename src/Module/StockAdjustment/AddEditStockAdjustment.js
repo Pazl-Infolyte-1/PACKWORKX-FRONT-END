@@ -10,6 +10,9 @@ import {
   setStockAdjustmentPOArray,
   setStockAdjustmentGRNArray,
 } from '../../action'
+import { grnApi } from '../../api/grn'
+import { inventoryApi } from '../../api/inventory'
+import { itemApi } from '../../api/item'
 const AddEditStockAdjustment = () => {
   const location = useLocation()
   const initialStock = location.state?.stock
@@ -70,7 +73,7 @@ const AddEditStockAdjustment = () => {
   useEffect(() => {
     const fetchStock = async () => {
       try {
-        const response = await apiMethods.singleStockAdjustment(stock.id)
+        const response = await inventoryApi.singleStockAdjustment(stock.id)
         const data = response?.data
         setSingleData(data)
 
@@ -126,7 +129,7 @@ const AddEditStockAdjustment = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await apiMethods.getItemList({ limit: 10000 })
+        const response = await itemApi.getItemList({ limit: 10000 })
         setProduct(response.data.data)
         console.log('product data', response.data.data)
       } catch (error) {
@@ -156,7 +159,7 @@ const AddEditStockAdjustment = () => {
 
     if (singleData?.id) {
       // Update existing stock adjustment
-      apiMethods
+      inventoryApi
         .updateStockAdjustment(singleData.id, parsedData)
         .then((response) => {
           console.log('Stock adjustment updated successfully:', response.data)
@@ -168,7 +171,7 @@ const AddEditStockAdjustment = () => {
         })
     } else {
       // Create new stock adjustment
-      apiMethods
+      inventoryApi
         .postStockAdjustment(parsedData)
         .then((response) => {
           console.log('Stock adjustment created successfully:', response.data)
@@ -221,7 +224,7 @@ const AddEditStockAdjustment = () => {
 
   const getPurchaseOrderItem = async (selectedProductId, rowIndex) => {
     try {
-      const response = await apiMethods.getStockAdjustmentsByItemId(selectedProductId)
+      const response = await inventoryApi.getStockAdjustmentsByItemId(selectedProductId)
       const data = response?.data?.data?.purchase_orders_items || []
 
       setPOItem((prev) => ({
@@ -248,7 +251,7 @@ const AddEditStockAdjustment = () => {
 
   const getGRNByPOId = async (selectedPOId, rowIndex) => {
     try {
-      const response = await apiMethods.getGRNByPOId(selectedPOId)
+      const response = await grnApi.getGRNByPOId(selectedPOId)
       const data = response?.data.data.grns || []
       console.log('GRN Items Response:', data)
       setGRNItems((prev) => ({

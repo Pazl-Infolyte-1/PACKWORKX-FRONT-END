@@ -6,7 +6,7 @@ import AddressForm from './AddressForm'
 import ContactPersonsForm from './ContactPersonsForm'
 import GSTModal from './GSTComponent'
 import { FormProvider, useForm } from 'react-hook-form'
-import apiMethods from '../../api/config'
+import clientApi from '../../api/client'
 import CustomAlert from '../../components/New/CustomAlert'
 import ActionButton from '../../components/New/ActionButton'
 import Loader from '../../components/New/Loader'
@@ -260,7 +260,7 @@ const ClientForm = ({ resetForm, setReloadData }) => {
   const handleSearch = async () => {
     setLoading(true)
     try {
-      const response = await apiMethods.getGst(gstNumber)
+      const response = await clientApi.getGst(gstNumber)
       setGstData(response)
 
       const tradeName = response?.gstDetails?.data?.tradeNam || ''
@@ -386,13 +386,13 @@ const ClientForm = ({ resetForm, setReloadData }) => {
           })),
         }
 
-        response = await apiMethods.editClient(clientId, filteredData1)
+        response = await clientApi.editClient(clientId, filteredData1)
         successMessage = 'Client Edited successfully!'
         if (response.status === 200 || response.status === 201) {
           setReloadData((prev) => !prev)
         }
       } else {
-        response = await apiMethods.postClient(filteredData)
+        response = await clientApi.postClient(filteredData)
         if (response.status === 200 || response.status === 201) {
           setReloadData((prev) => !prev)
         }

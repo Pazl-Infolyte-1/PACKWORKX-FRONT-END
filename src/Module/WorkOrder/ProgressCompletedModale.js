@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Package } from 'lucide-react';
-import apiMethods from '../../api/config'
+import { workOrderApi } from '../../api/workOrder';
 
 
 export default function ProgressCompletedModal({ qty, isOpen, onClose, id, progress, setCellData, setAlerts,setWorkOrder }) {
@@ -36,7 +36,7 @@ export default function ProgressCompletedModal({ qty, isOpen, onClose, id, progr
       };
       console.log(body);
       
-      const response = await apiMethods.workOrderStatusUpdate(id, body);
+      const response = await workOrderApi.workOrderStatusUpdate(id, body);
       
       // Update UI if cellData is a state
       if(setCellData){

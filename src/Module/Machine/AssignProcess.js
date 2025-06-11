@@ -4,6 +4,7 @@ import PopUp from '../../components/New/PopUp'
 import apiMethods from '../../api/config'
 import AddAssign from './AddAssign'
 import AssignCard from './AssignCard'
+import { machineApi } from '../../api/machine'
 
 function AssignProcess({ refresh, setRefresh, setAlerts, isEdit, setIsEdit, preSelectedMachineId }) {
   const [assignProcess, setAssignProcess] = useState([])
@@ -14,7 +15,7 @@ function AssignProcess({ refresh, setRefresh, setAlerts, isEdit, setIsEdit, preS
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getAllAssign()
+        const response = await machineApi.getAllAssign()
         setAssignProcess(response.data.data)
       } catch (error) {
         console.error(error)

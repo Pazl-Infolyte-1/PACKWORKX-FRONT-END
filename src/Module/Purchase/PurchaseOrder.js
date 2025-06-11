@@ -12,6 +12,7 @@ import CompactPagination from '../../components/New/CompactPagination'
 import { useSearch } from '../../components/New/SearchContext'
 import ContentHeader from '../../components/New/ContentHeader'
 import { debounce } from 'lodash'
+import { purchaseOrderApi } from '../../api/purchaseOrder'
 
 const PurchaseOrder = () => {
   const [data, setData] = useState([])
@@ -44,7 +45,7 @@ const PurchaseOrder = () => {
   const fetchData = useCallback(async (search, pageParams) => {
     setLoading(true)
     try {
-      const res = await apiMethods.getPurchaseOrders({
+      const res = await purchaseOrderApi.getPurchaseOrders({
         search,
         page: pageParams.currentPage,
         limit: pageParams.pageSize,

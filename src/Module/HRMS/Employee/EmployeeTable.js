@@ -11,10 +11,10 @@ import {
 import ThreeDotMenu from '../../../components/ThreeDotMenu'
 import { cilActionRedo, cilActionUndo, cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../../components/New/ConfirmationModale'
-import apiMethods from '../../../api/config'
 import CustomAlert from '../../../components/New/CustomAlert'
 import ResuableTable from '../../SalesOrder/ReusableTable'
 import Loading from '../../../components/New/Loading'
+import { employeeApi } from '../../../api/employee'
 function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, handleView, loading }) {
   const [isConfirmationModaleOpen, setIsConfirmationModaleOpen] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState('')
@@ -33,7 +33,7 @@ function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, hand
     try {
       const toggledStatus = selectedEmployee.user_status === 'Active' ? 'inactive' : 'active'
 
-      const response = await apiMethods.updateEmployeeStatus(selectedEmployee.id, {
+      const response = await employeeApi.updateEmployeeStatus(selectedEmployee.id, {
         status: toggledStatus,
       })
 

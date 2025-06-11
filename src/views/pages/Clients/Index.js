@@ -3,10 +3,10 @@ import Forms from '../../common/Forms'
 import Table from '../../common/Table'
 import { CButton } from '@coreui/react'
 import FilterComponent from '../../common/FilterComponent'
-import apiMethods from '../../../api/config'
 import routes from '../../../routes'
 import { useLocation } from 'react-router-dom'
 import { GiConsoleController } from 'react-icons/gi'
+import { commonApi } from '../../../api/common'
 
 const Index = () => {
   const location = useLocation()
@@ -33,7 +33,7 @@ const Index = () => {
 
         console.log('Api Running')
 
-        const response = await apiMethods.getFormFields(pathKey)
+        const response = await commonApi.getFormFields(pathKey)
         console.log('API Response:', response)
         setFormFields(response.data)
       } catch (error) {

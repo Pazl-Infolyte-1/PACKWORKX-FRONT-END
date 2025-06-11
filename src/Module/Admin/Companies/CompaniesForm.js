@@ -3,8 +3,8 @@ import Drawer from '../../../components/Drawer/Drawer'
 import { CCardBody, CRow, CCol, CFormInput, CFormSelect, CButton } from '@coreui/react'
 import ActionButton from '../../../components/New/ActionButton'
 import { useForm } from "react-hook-form";
-import apiMethods from '../../../api/config';
 import CustomAlert from '../../../components/New/CustomAlert';
+import { companyApi } from '../../../api/company';
 
 function CompaniesForm({ isDrawerOpen, setDrawerOpen,refreshTable,editdata }) {
 
@@ -57,8 +57,8 @@ function CompaniesForm({ isDrawerOpen, setDrawerOpen,refreshTable,editdata }) {
     formattedData.logo = "https://techvibe.com/logo.png"; // Handle file upload properly
 
     const apiCall = editdata
-      ? apiMethods.updateCompany(editdata.id, formattedData) // Call update API
-      : apiMethods.createCompany(formattedData); // Call create API
+      ? companyApi.updateCompany(editdata.id, formattedData) // Call update API
+      : companyApi.createCompany(formattedData); // Call create API
 
     apiCall
       .then((response) => {

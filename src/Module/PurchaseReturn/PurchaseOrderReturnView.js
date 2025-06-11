@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import apiMethods from '../../api/config'
+import { purchaseOrderApi } from '../../api/purchaseOrder'
 
 const GrnView = ({ id, setOpenPoReturnModal }) => {
   const [poDetails, setPoDetails] = useState(null)
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getPurchaseReturn();
+        const response = await purchaseOrderApi.getPurchaseReturn();
         const poReturnList = Array.isArray(response?.data?.approved) ? response.data.approved : response.data.disapproved || [];
         console.log('poReturnList', poReturnList);
         

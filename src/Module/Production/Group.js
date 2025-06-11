@@ -112,7 +112,7 @@ function PairedLayersDragble({ layers, workOrderId,order }) {
     type: ItemType,
     item: () => {
       const dragItem = {
-        layers, // Array of both layers
+        layers,
         workOrderId,
         order,
         isGroup: true // Flag to identify this as a pair
@@ -371,7 +371,6 @@ function WorkOrderCard({
     </CCard>
   )
 }
-
 function GroupOrderDropZone({
   groupOrder,
   groupIndex,
@@ -392,9 +391,13 @@ function GroupOrderDropZone({
     accept: ItemType,
     drop: (item) => {
       if (item.isGroup && item.layers && item.layers.length > 0) {
-        item.layers.forEach((layer) => {
-          addWorkOrderToGroup({ lg: layer, workOrderId: item.workOrderId, order:item.order }, groupIndex)
-        })
+        // For paired layers, add as a single group item
+        addWorkOrderToGroup({ 
+          layers: item.layers, 
+          workOrderId: item.workOrderId, 
+          order: item.order,
+          isGroup: true 
+        }, groupIndex)
       } else {
         addWorkOrderToGroup(item, groupIndex)
       }
@@ -407,7 +410,7 @@ function GroupOrderDropZone({
   }
 
   return (
-    <CCol xs={5} ref={drop} className="mt-3">
+    <CCol xs={4} ref={drop} className="mt-3">
       <CCard className="px-2 py-2" style={{ color: '#F3F2F5', borderRadius: '10px' }}>
         <CCard
           className="text-center mb-3 px-2 p"
@@ -436,6 +439,8 @@ function GroupOrderDropZone({
         {
         groupOrder?.group_value?.map((item, itemIndex) => {
           const uniqueIndex = `${groupIndex}-${itemIndex}`
+          const isPairedGroup = item.isGroup && item.layers && item.layers.length > 1
+          
           return (
             <CCard
               key={uniqueIndex}
@@ -444,143 +449,280 @@ function GroupOrderDropZone({
                 backgroundColor: '#ffffff',
                 borderRadius: '10px',
                 boxShadow: '0px 2px 10px rgba(3,3,3,0.1)',
+            fontSize: '12px',
+
               }}
             >
-              <CCardBody>
+<CCardBody>
                 <div
                   style={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     cursor: 'pointer',
                     width: '100%',
+                    minHeight: '40px',
                   }}
                 >
-                  <span
+                  {/* Layer Names Section */}
+                  <div
                     onClick={() => toggleCollapse(itemIndex)}
                     style={{
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      whiteSpace: 'nowrap',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      flex: 1,
+                      paddingRight: '20px',
                     }}
                   >
                     {console.log(item,'ffffffffffffffffffffffffff')}
-                    { `${item.layer}` }
+                    { isPairedGroup 
+                      ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            {item.layers.map((layer, idx) => (
+                              <div key={idx} style={{ display: 'flex', flexDirection: 'column' }}>
+                                <div>
+                                  {layer.layer}
+                                </div>
+                                
+                                {/* Show data under each layer when expanded */}
+                                {groupVisibleIndex === uniqueIndex && (
+                                  <div 
+                                  className='w-full'
+                                    style={{
+                                      
+                                      padding: '5px',
+                                      borderRadius: '4px',
+                                      
+                                      borderLeft: '3px solid #8167e5',
+                                      fontSize: '10px',
+                                      marginTop: '6px',
+                                      marginBottom: '8px'
+                                    }}
+                                  >
+                                    <div className="row text-sm">
+                                      <div className="col-12 mb-2">
+                                        <strong>SKU:</strong> {layer.sku_name || 'N/A'}
+                                      </div>
+                                      <div className="col-6 mb-2">
+                                        <strong>Dimensions:</strong> {layer.Dimensions || 'N/A'} mm
+                                      </div>
+                                      <div className="col-6 mb-2">
+                                        <strong>Route:</strong> {layer.Route || 'N/A'}
+                                      </div>
+                                      <div className="col-6 mb-2">
+                                        <strong>Start:</strong> {formatDate(layer.planned_start_date) || 'N/A'}
+                                      </div>
+                                      <div className="col-6 mb-2">
+                                        <strong>End:</strong> {formatDate(layer.planned_end_date) || 'N/A'}
+                                      </div>
+                                      <div className="col-6 mb-2">
+                                        <strong>Qty:</strong> {layer.qty || 'N/A'}
+                                      </div>
+                                      <div className="col-6 mb-2">
+                                        <strong>To Manufacture:</strong> {layer.qty_to_manufacture || 'N/A'}
+                                      </div>
+                                    </div>
 
-                    {groupVisibleIndex === uniqueIndex ? <FaAngleUp /> : <FaAngleDown />}
-                  </span>
+                                    <div className="d-flex align-items-center gap-2 mt-2" style={{ fontSize: '14px' }}>
+                                      <label htmlFor={`finishedGoods-${idx}`} className="mb-0">
+                                        <strong>Finished Goods:</strong>
+                                      </label>
+                                      <input
+                                        id={`finishedGoods-${idx}`}
+                                        type="number"
+                                        defaultValue={138}
+                                        className="form-control form-control-sm"
+                                        // style={{ width: '80px' }}
+                                      />
+                                      <button 
+                                        className="btn btn-sm btn-success"
+                                        style={{ padding: '2px 8px' }}
+                                      >
+                                        ✔
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
 
-                  <span
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      fontSize: '16px',
-                      lineHeight: '21px',
-                      gap: '4px',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {item.qty ? `${item.qty} / ${item.qty}` : ''}
-                  </span>
+                                {/* Divider line between layers */}
+                                {idx < item.layers.length - 1 && (
+                                  <hr style={{ 
+                                    margin: '8px 0', 
+                                    border: 'none', 
+                                    borderTop: '1px solid #dee2e6',
+                                    width: '100%'
+                                  }} />
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )
+                      : (
+                          <div>
+                            <div>
+                              {item.layer}
+                            </div>
+                            {/* Show data under single layer when expanded */}
+                            {groupVisibleIndex === uniqueIndex && (
+                              <div 
+                                style={{
+                                  
+                                  padding: '12px',
+                                  borderRadius: '4px',
+                                  
+                                  borderLeft: '3px solid #8167e5',
+                                  fontSize: '13px',
+                                  marginTop: '6px'
+                                }}
+                              >
+                                <div className="row text-sm">
+                                  <div className="col-12 mb-2">
+                                    <strong>SKU:</strong> {item.sku_name || 'N/A'}
+                                  </div>
+                                  <div className="col-6 mb-2">
+                                    <strong>Project:</strong> {item.layer || 'N/A'}
+                                  </div>
+                                  <div className="col-6 mb-2">
+                                    <strong>Dimensions:</strong> {item.Dimensions || 'N/A'} mm
+                                  </div>
+                                  <div className="col-6 mb-2">
+                                    <strong>Start:</strong> {formatDate(item.planned_start_date) || 'N/A'}
+                                  </div>
+                                  <div className="col-6 mb-2">
+                                    <strong>End:</strong> {formatDate(item.planned_end_date) || 'N/A'}
+                                  </div>
+                                  <div className="col-6 mb-2">
+                                    <strong>Qty:</strong> {item.qty || 'N/A'}
+                                  </div>
+                                  <div className="col-6 mb-2">
+                                    <strong>Route:</strong> {item.Route || 'N/A'}
+                                  </div>
+                                  <div className="col-12 mb-2">
+                                    <strong>To Manufacture:</strong> {item.qty_to_manufacture || 'N/A'}
+                                  </div>
+                                </div>
 
-                  <Dropdown>
-                    <Dropdown.Toggle as={CustomToggle} />
-                    <Dropdown.Menu>
-                      <Dropdown.Item onClick={() =>navigate(`/workorderlist/view/${item.workOrderId}`)}>
-                        <CIcon
-                          icon={cilBriefcase}
-                          className="me-2"
-                          style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                        />
-                        View Work Order
-                      </Dropdown.Item>
-                      <Dropdown.Item onClick={() =>navigate(`/salesorder/view/${item?.order?.order?.sales_order_id}`)}>
-                        <CIcon
-                          icon={cilClipboard}
-                          className="me-2"
-                          style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                        />
-                        View Sales Order
-                      </Dropdown.Item>
-                      <Dropdown.Item onClick={() => removeWorkOrderFromGroup(groupIndex,itemIndex)}>
-                        <CIcon
-                          icon={cilTrash}
-                          className="me-2"
-                          style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                        />
-                        Remove from Group
-                      </Dropdown.Item>
-                      <Dropdown.Item onClick={() => removeWorkOrderFromPlan(item, groupIndex)}>
-                        <CIcon
-                          icon={cilMinus}
-                          className="me-2"
-                          style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                        />
-                        Remove from Plan
-                      </Dropdown.Item>
-                      <Dropdown.Item onClick={() => setVisibleSplit(true)}>
-                        <CIcon
-                          icon={cilCut}
-                          className="me-2"
-                          style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                        />
-                        Split Work Order
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </div>
+                                <div className="d-flex align-items-center gap-2 mt-2" style={{ fontSize: '14px' }}>
+                                  <label htmlFor="finishedGoods" className="mb-0">
+                                    <strong>Finished Goods:</strong>
+                                  </label>
+                                  <input
+                                    id="finishedGoods"
+                                    type="number"
+                                    defaultValue={138}
+                                    className="form-control form-control-sm"
+                                    // style={{ width: '80px' }}
+                                  />
+                                  <button 
+                                    className="btn btn-sm btn-success"
+                                    style={{ padding: '2px 8px' }}
+                                  >
+                                    ✔
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                    }
+                  </div>
 
-                <CCollapse className="custom-collapse" visible={groupVisibleIndex === uniqueIndex}>
-                  <dl className="text-gray-700 grid grid-cols-1 gap-1 mt-4">
-                    <dt className="sr-only">Sku Name</dt>
-                    <dd>{item.sku_name}</dd>
+                  {/* Right Side Controls */}
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '12px',
+                    flexShrink: 0
+                  }}>
+                    {/* Quantity Display */}
+                    <span
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        fontSize: '16px',
+                        lineHeight: '21px',
+                        gap: '4px',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {isPairedGroup 
+                        ? item.layers[0].qty ? `${item.layers[0].qty} / ${item.layers[0].qty}` : ''
+                        : item.qty ? `${item.qty} / ${item.qty}` : ''
+                      }
+                    </span>
 
-                    <dt className="sr-only">Project</dt>
-                    <dd>{item.layer || 'N/A'}</dd>
-
-                    <dt className="sr-only"> Dimensions</dt>
-                    <dd> Dimensions (mm) - {item.Dimensions || 'N/A'}</dd>
-
-                    <dt className="sr-only">Planned Start</dt>
-                    <dd> Planned Start - {formatDate(item.planned_start_date) || 'N/A'}</dd>
-
-                    <dt className="sr-only">Planned End</dt>
-                    <dd> Planned End  - {formatDate(item.planned_end_date) || 'N/A'}</dd>
-
-                    <dt className="sr-only">Quantity</dt>
-                    <dd>Qty - {item.qty}</dd>
-
-                    <dt className="sr-only">Route</dt>
-                    <dd>Route -  {item.Route || "N/A"}</dd>
-
-                    <div className="flex items-center gap-2 text-sm">
-                      <label htmlFor="finishedGoods" className="font-medium">
-                        Finished Goods -
-                      </label>
-
-                      <input
-                        id="finishedGoods"
-                        type="number"
-                        defaultValue={138}
-                        className="w-16 px-1 py-0.5 text-sm border rounded"
-                      />
-
-                      <button className="p-1 bg-green-600 hover:bg-green-700 rounded text-white">
-                        ✔
-                      </button>
+                    {/* Toggle Icon */}
+                    <div 
+                      onClick={() => toggleCollapse(itemIndex)}
+                      style={{ 
+                        cursor: 'pointer',
+                        padding: '4px',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      {groupVisibleIndex === uniqueIndex ? <FaAngleUp /> : <FaAngleDown />}
                     </div>
 
+                    {/* Dropdown Menu */}
+                    <Dropdown>
+                      <Dropdown.Toggle as={CustomToggle} />
+                      <Dropdown.Menu>
+                        <Dropdown.Item onClick={() =>navigate(`/workorderlist/view/${item.workOrderId}`)}>
+                          <CIcon
+                            icon={cilBriefcase}
+                            className="me-2"
+                            style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                          />
+                          View Work Order
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() =>navigate(`/salesorder/view/${item?.order?.order?.sales_order_id || item?.order?.sales_order_id}`)}>
+                          <CIcon
+                            icon={cilClipboard}
+                            className="me-2"
+                            style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                          />
+                          View Sales Order
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => removeWorkOrderFromGroup(groupIndex,itemIndex)}>
+                          <CIcon
+                            icon={cilTrash}
+                            className="me-2"
+                            style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                          />
+                          Remove from Group
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => removeWorkOrderFromPlan(item, groupIndex)}>
+                          <CIcon
+                            icon={cilMinus}
+                            className="me-2"
+                            style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                          />
+                          Remove from Plan
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => setVisibleSplit(true)}>
+                          <CIcon
+                            icon={cilCut}
+                            className="me-2"
+                            style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                          />
+                          Split Work Order
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
+                </div>
 
-                    <dt className="sr-only">Qty To Manufacture</dt>
-                    <dd>Qty To Manufacture: {item.qty_to_manufacture || "N/A"}</dd>
-                  </dl>
-
+                {/* Eye Icon */}
+                {groupVisibleIndex === uniqueIndex && (
                   <div
                     style={{
                       display: 'flex',
                       justifyContent: 'flex-end',
-                      marginTop: '10px',
+                      marginTop: '15px',
                       marginBottom: '10px',
                       marginRight: '10px',
                     }}
@@ -593,7 +735,7 @@ function GroupOrderDropZone({
                       }}
                     />
                   </div>
-                </CCollapse>
+                )}
               </CCardBody>
             </CCard>
           )
@@ -638,37 +780,53 @@ const Group = ({
 
   const SubmitGroups = async () => {
     try {
-      console.log(groups, 'grrrrrrrrrrrrrrr');
-  
       if (groups.length === 0) {
         setError('Please select at least one work order');
         return;
       }
   
       const payload = groups.map(group => {
+        const groupItems = group.group_value.flatMap(item => {
+          // Case 1: Grouped item with 'layers' (multiple layer objects)
+          if (item?.layers && Array.isArray(item.layers)) {
+            return item.layers.map(layer => ({
+              work_order_id: item.workOrderId,
+              layer_id: layer.layer_id
+            }));
+          }
+  
+          // Case 2: Single layer object directly
+          return {
+            work_order_id: item.workOrderId,
+            layer_id: item.layer_id
+          };
+        });
+  
+        const groupQty = group.group_value.reduce((total, item) => {
+          if (item?.layers && Array.isArray(item.layers)) {
+            return total + item.layers.reduce((subTotal, layer) => subTotal + (layer.weight || 0), 0);
+          }
+          return total + (item.weight || 0);
+        }, 0);
+  
         return {
-          group_name: group?.group_name,
-          group_value: group?.group_value.map(item => ({
-            work_order_id: item?.workOrderId,
-            layer_id: item?.layer_id
-          })),
-          group_Qty: group.group_value.reduce((total, item) => total + (item?.weight || 0), 0)
+          group_name: group.group_name,
+          group_value: groupItems,
+          group_Qty: groupQty
         };
       });
   
       console.log('Payload to submit:', payload);
-
-      const response = await apiMethods.createGroupInProduction(payload)
-      console.log(response)
   
-      // Now you can do your API call here
-      // await api.post('/your-endpoint', payload);
+      const response = await apiMethods.createGroupInProduction(payload);
+      console.log(response);
   
     } catch (err) {
       console.error('Error while submitting groups:', err);
       setError('Something went wrong while submitting');
     }
   };
+  
   
 
 
@@ -825,9 +983,9 @@ const Group = ({
 
   return (
     <>
-      <CCol xs={5} className="mt-2">
-        <CRow>
-          <CCol xs={8}>
+      <CCol xs={3} className="mt-2">
+        <CRow className=''>
+          <CCol>
             <CCard
               style={{
                 cursor: 'pointer',
@@ -861,7 +1019,7 @@ const Group = ({
           </CCol>
         </CRow>
         <CRow className="mt-3">
-          <CCol xs={8}>
+          <CCol>
             {workOrders?.length === 0 ? (
               <CCard
                 className="mb-2"
@@ -905,7 +1063,7 @@ const Group = ({
         </CRow>
       </CCol>
 
-      <CCol xs={7} className="mt-1">
+      <CCol  className="mt-1">
         <CRow className="mt-2 px-3 py-3">
           {groups?.length > 0 &&
             groups?.map((groupOrder, groupIndex) => (

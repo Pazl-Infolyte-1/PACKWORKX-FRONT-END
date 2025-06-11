@@ -537,14 +537,13 @@ function GroupOrderDropZone({
                       paddingRight: '20px',
                     }}
                   >
-                    {console.log(item,'ffffffffffffffffffffffffff')}
                     { isPairedGroup 
                       ? (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                             {item.layers.map((layer, idx) => (
                               <div key={idx} style={{ display: 'flex', flexDirection: 'column' }}>
                                 <div className='font-medium'>
-                                  {layer.layer}
+                                  {`${layer.layer}, ${item?.order?.work_generate_id}`}
                                 </div>
                                 
                                 {/* Show data under each layer when expanded */}
@@ -617,8 +616,12 @@ function GroupOrderDropZone({
                         )
                       : (
                           <div>
+                                                {console.log(item,'ffffffffffffffffffffffffff')}
+
                             <div className='font-medium'>
-                              {item.layer}
+                              {`${item.layer}, ${item.order?.order?.work_generate_id}`}
+                              
+
                             </div>
                             {/* Show data under single layer when expanded */}
                             {groupVisibleIndex === uniqueIndex && (

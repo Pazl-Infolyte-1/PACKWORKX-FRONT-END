@@ -1,131 +1,118 @@
-import React from 'react'
-import PopUp from '../../components/New/PopUp'
-import { CButton, CCard, CCardBody, CCardHeader, CModalBody, CModalFooter } from '@coreui/react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Select,
-  MenuItem,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-  Box,
-  CardHeader,
-  CardContent,
-  Card,
-  Divider,
-
-} from "@mui/material";
-import { FaLock } from 'react-icons/fa'
+import React, { useState } from 'react';
+import { Lock } from 'lucide-react';
 
 const AllcoateRMModal = ({ visibleAllocate, setVisibleAllocate }) => {
+  const [allocateAmount, setAllocateAmount] = useState('50 Kg');
+
+  const workOrders = [
+    { id: 'WO - 2005', quantity: 10 },
+    { id: 'WO - 2006', quantity: 250 },
+    { id: 'WO - 2007', quantity: 100 },
+    { id: 'WO - 2008', quantity: 50 }
+  ];
+
+  if (!visibleAllocate) return null;
+
   return (
-    <div>
-      <PopUp visible={visibleAllocate} setVisible={setVisibleAllocate} width="700px"
-        height="680px"
-        header={<div style={{color: "#030303",
-          fontSize: "25px",
-         marginLeft:"20px",
-          fontWeight: 700,
-          }}>Allocation - Reel 02</div>}
-        showCloseButton={false}>
-        <Box className="p-6  rounded-xl ">
+    <div className="fixed inset-0 z-[2000] overflow-y-auto">
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={() => setVisibleAllocate(false)} />
+      
+      {/* Modal */}
+      <div className="flex min-h-full items-center justify-center p-4">
+        <div className="relative w-[600px] max-h-[750px] bg-white shadow-lg overflow-hidden">
+          {/* Header Section */}
+          <div className="p-4 pb-2 border-b border-gray-200">
+            <h1 className="text-lg font-semibold text-gray-800 mb-5">
+              Allocation - Reel 02
+            </h1>
+            
+            {/* Quantity Information */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Total Quantity</span>
+                <div className="bg-gray-100 px-3 py-1.5 rounded-md text-sm text-gray-600 w-24 text-right pr-2">
+                  500 Kg
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Available Quantity</span>
+                <div className="bg-gray-100 px-3 py-1.5 rounded-md text-sm text-gray-600 w-24 text-right pr-2">
+                  90 Kg
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">How much do you want to allocate</span>
+                <input 
+                  type="text" 
+                  value={allocateAmount}
+                  onChange={(e) => setAllocateAmount(e.target.value)}
+                  className="bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-md text-sm text-blue-600 w-24 text-right pr-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                />
+              </div>
+            </div>
+          </div>
 
-          <Box className="mb-2 flex gap-40 items-center">
-          <Typography className="text-black text-[20px]">Total Quantity:</Typography>
+          {/* Content Section */}
+          <div className="p-6">
+            {/* Blocked Quantity Section */}
+            <div className="mt-2 w-[400px] mx-auto">
+              <h2 className="text-base font-semibold text-gray-800 mb-4">
+                Blocked Quantity
+              </h2>
+              
+              {/* Table */}
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                {/* Table Header */}
+                <div className="flex bg-gray-100 border-b border-gray-200">
+                  <div className="flex-1 px-4 py-3 text-sm font-semibold text-gray-700 text-left">
+                    Work Order
+                  </div>
+                  <div className="w-px bg-gray-300"></div>
+                  <div className="flex-1 px-4 py-3 text-sm font-semibold text-gray-700 text-center">
+                    Quantity (Kg)
+                  </div>
+                </div>
+                
+                {/* Table Rows */}
+                <div className="bg-white">
+                  {workOrders.map((order, index) => (
+                    <div key={index} className={`flex`}>
+                      <div className="flex-1 px-4 py-3">
+                        <a href="#" className="text-sm text-blue-600 hover:underline">
+                          {order.id}
+                        </a>
+                      </div>
+                      <div className="w-px bg-gray-200"></div>
+                      <div className="flex-1 px-4 py-3 flex items-center justify-end gap-2">
+                        <span className="text-sm text-gray-800">{order.quantity}</span>
+                        <Lock className="w-4 h-4 text-gray-600" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-            <input
-              type="text"
-              value="500 Kg"
-              disabled
-              className="bg-[#eeeeee] text-[#858585] p-2 rounded-xl w-15 text-left h-9 "
-            />
-          </Box>
-
-          <Box className="mb-2 flex gap-32 items-center">
-            <Typography className="text-black text-[20px]">Available Quantity:</Typography>
-            <input
-              type="text"
-              value="90 Kg"
-              disabled
-              className="bg-[#eeeeee] text-[#858585] p-2 rounded-xl w-15 text-left h-9"
-            />
-          </Box>
-
-          <Box className="mb-2 flex gap-2 items-center">
-            <Typography className="text-black text-[20px] pr-1">How much do you want to allocate:</Typography>
-            <input
-  type="text"
-  value="50 Kg"
-  disabled
-  className="bg-[#eeeeee] text-[#858585] p-2 rounded-xl w-15 text-left h-9"
-/>
-
-          </Box>
-
-          <Typography variant="h6" style={{color: "#030303",
-          fontSize: "25px",
-         marginTop:"20px",
-          fontWeight:" 700"}}>
-  Blocked Quantity
-</Typography>
-
-          <Card className="w-full max-w-lg shadow-lg p-3 ml-20">
-            <CardContent>
-              {/* Container with a single vertical line */}
-              <Box className="relative w-full">
-                {/* Single Vertical Line */}
-                <Box className="absolute left-1/2 top-0 w-px bg-[#e0dfdf] h-full"></Box>
-
-                {/* Header */}
-                <Box className="flex w-full font-bold pb-2 text-center">
-                  <p className="w-1/2 text-left text-[#030303] text-[20px] ">Work Order</p>
-                  <p className="w-1/2 text-[#030303] text-[20px]">Quantity (Kg)</p>
-                </Box>
-                <Divider />
-
-                {/* Work Orders List */}
-                {[
-                  { id: "1005", qty: 100 },
-                  { id: "1006", qty: 250 },
-                  { id: "1007", qty: 100 },
-                  { id: "1008", qty: 500 },
-                ].map((wo) => (
-                  <Box key={wo.id} className="flex py-2 text-center items-center">
-                    <Typography className="w-1/2 Poppins underline text-[#8167e5] cursor-pointer text-left">
-                      WO – {wo.id}
-                    </Typography>
-                    <Box className="w-1/2 flex justify-center items-center gap-4 text-[#9b9b9b]">
-                      {wo.qty} <FaLock className="text-blue-900" />
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            </CardContent>
-          </Card>
-
-          <Box className="flex justify-center  mt-3">
-            <Button
-              style={{ backgroundColor: "#e3e7fd", color: "#21338e", borderRadius: "15px",width:"220px",marginLeft:"50px"}}
-
-              onClick={() => setVisibleIndex(false)}
-            >
-              Cancel
-            </Button>
-            <Button style={{ backgroundColor: "#023f81", color: "#ffffff", borderRadius: "15px" ,width:"220px", marginLeft:"60px"}} color="primary">
-              Confirm
-            </Button>
-          </Box>
-        </Box>
-      </PopUp>
-
+            {/* Action Buttons */}
+            <div className="flex gap-3 mt-8 justify-center">
+              <button 
+                onClick={() => setVisibleAllocate(false)}
+                className="w-32 py-2 bg-gray-200 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+              <button className="w-32 py-2 bg-blue-800 text-white rounded-full text-sm font-medium hover:bg-blue-900 transition-colors">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  )
+  );
 }
 
-export default AllcoateRMModal
+export default AllcoateRMModal;

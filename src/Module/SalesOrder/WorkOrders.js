@@ -203,11 +203,24 @@ const handleCancel = () => {
 
     e.preventDefault() // Prevent default form submission
 
+    console.log("worl order data",workOrdersData.length)
+console.log("work oders length",workOrders.length)
+if(workOrdersData.length+workOrders.length !== workOrdersData.length && !isWorkOrderList){
+  console.log("error")
+     setAlerts([
+          {
+            severity: "error",
+            message: "Add the current form to Add Work Order.",
+          },
+        ]);
+        return null;
+}
     if (isWorkOrderList) {
       const isValid = validateForm(workOrders[0]); // Validate first order only
       if (isValid) {
         console.log(workOrders[0])
         workOrderListSubmit(workOrders[0]);
+        console.log("worl order",workOrders[0])
       }
     } else {
       const filledWorkOrders = workOrders.filter(order =>
@@ -254,7 +267,7 @@ const handleCancel = () => {
     handleWorkOrderChange(orderId, 'planned_end_date', value)
   }
 
-
+console.log("work oders length",workOrders.length)
   const handleSubmitWorkOrderForm = (id) => {
     // Find the work order with the matching id
     const selectedWorkOrder = workOrders.find(order => order.id === id);
@@ -274,15 +287,23 @@ const handleCancel = () => {
         select_plant,
       } = selectedWorkOrder;
 
+        console.log("sku_name:", sku_name);
+    console.log("sku_version:", sku_version);
+    console.log("qty:", qty);
+    console.log("edd:", edd);
+    console.log("description:", description);
+    console.log("planned_start_date:", planned_start_date);
+    console.log("acceptable_excess_units:", acceptable_excess_units);
+    console.log("planned_end_date:", planned_end_date);
       // Check if any of the fields are empty
       if (
         !sku_name ||
-        !sku_version ||
+        //!sku_version ||
         !qty ||
         !edd ||
-        !description ||
+        //!description ||
         !planned_start_date ||
-        !acceptable_excess_units ||
+        //!acceptable_excess_units ||
         !planned_end_date
       ) {
         setAlerts([
@@ -467,6 +488,8 @@ const handleCancel = () => {
         work_order_sku_values:[]
       },
     ])
+
+    console.log("add length",workOrders)
   }
 
   // Function to delete a work order
@@ -866,7 +889,7 @@ console.log("whole sku",wholeSkuObject)
 
             {/* Button & Icon Container */}
             <div className="flex items-center gap-2">
-              {workOrders.length > 1 && (
+              {!isWorkOrderList && (
                 <TrashIcon
                   onClick={(e) => {
                     e.stopPropagation();
@@ -875,6 +898,7 @@ console.log("whole sku",wholeSkuObject)
                   className="text-[#ff2d55] w-3.5 h-3.5 cursor-pointer hover:text-red-700 transition-colors"
                 />
               )}
+              
               {/* Icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"

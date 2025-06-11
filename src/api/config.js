@@ -1361,6 +1361,14 @@ export const apiMethods = {
     }
   },
 
+  getPurchaseReturnById: async (id) => {
+    try {
+      return await apiClient.get(`/purchase-order-return/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
   getDropDown: async () => {
     return await apiClient.get('/common-service/dropdown-name')
   },

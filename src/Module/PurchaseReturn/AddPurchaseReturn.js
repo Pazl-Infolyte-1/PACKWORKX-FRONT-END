@@ -394,19 +394,19 @@ const AddPurchaseOrderReturn = ({
 
     try {
       const response = await apiMethods.submitPurchaseOrderReturn(payload)
-      setAlerts({
-        severity: 'success',
-        message: response?.data?.message || 'PO Return Created Successfully',
-      })
+      // setAlerts({
+      //   severity: 'success',
+      //   message: response?.data?.message || 'PO Return Created Successfully',
+      // })
 
       setDrawer(false)
     } catch (error) {
       console.error('Submission error:', error)
       console.error(error.response?.data || error.message)
-      setAlerts({
-        severity: 'error',
-        message: response?.data?.message || 'Something went wrong',
-      })
+      // setAlerts({
+      //   severity: 'error',
+      //   message: response?.data?.message || 'Something went wrong',
+      // })
     }
   }
 
@@ -852,7 +852,7 @@ const AddPurchaseOrderReturn = ({
                 reset()
                 setDrawer(false)
               }}
-              className="p-2 border border-gray-300 rounded w-24 hover:bg-gray-100 transition"
+              className="p-1 border border-gray-300 rounded w-24 hover:bg-gray-100 transition"
             >
               Cancel
             </button>

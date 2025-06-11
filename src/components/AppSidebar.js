@@ -13,10 +13,10 @@ import CIcon from '@coreui/icons-react'
 //import { AppSidebarNav } from './AppSidebarNav'
 // import { logo } from 'src/assets/brand/logo'
 import { sygnet } from 'src/assets/brand/sygnet'
-import apiMethods from '../api/config'
 import { AppSideBarNew } from './AppSideBarNew'
 import { cibAboutMe, cibAdobePhotoshop, cibHouzz } from '@coreui/icons'
 import {Link} from 'react-router-dom';
+import { authApi } from '../api/auth'
 
 // Define static menu items
 const staticMenuItems = []
@@ -42,7 +42,7 @@ const AppSidebar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getSideBarMenu()
+        const response = await authApi.getSideBarMenu()
 
         if (response && response.data) {
           // Create a new array reference to ensure state update

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import apiMethods from '../../../api/config'
 import CustomAlert from '../../../components/New/CustomAlert'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { commonApi } from '../../../api/common'
+import { itemApi } from '../../../api/item'
 
 const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
   const [alerts, setAlerts] = useState([])
@@ -101,10 +102,10 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
   useEffect(() => {
     const fetchCategoryAndSubCategory = async () => {
       try {
-        const categoryResponse = await apiMethods.getCategoryList()
+        const categoryResponse = await itemApi.getCategoryList()
         setCategory(categoryResponse.data.data)
         try {
-          const allSubCategoriesResponse = await apiMethods.subCategoryDropdown()
+          const allSubCategoriesResponse = await commonApi.subCategoryDropdown()
           setAllSubCategories(allSubCategoriesResponse?.data?.data || [])
         } catch (subCatErr) {
           setAlerts([
@@ -156,7 +157,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
 
   const fetchItemData = async (id) => {
     try {
-      const response = await apiMethods.singleItem(id)
+      const response = await commonApi.singleItem(id)
       const itemData = response?.data
 
       if (itemData) {
@@ -343,9 +344,9 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       let response
       if (isEditing) {
         formattedData.id = currentItemId
-        response = await apiMethods.updateItem(currentItemId, formattedData)
+        response = await itemApi.updateItem(currentItemId, formattedData)
       } else {
-        response = await apiMethods.addItem(formattedData)
+        response = await itemApi.addItem(formattedData)
       }
 
       setAlerts([

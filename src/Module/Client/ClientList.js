@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import apiMethods from '../../api/config'
+import clientApi from '../../api/client'
 import ClientTable from './ClientTable'
 import ClientForm from './ClientForm'
 import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'
@@ -98,7 +98,7 @@ function ClientList() {
           entity_type: selectedFilter,
           status:status
         }
-        const response = await apiMethods.getClients(queryParams)
+        const response = await clientApi.getClients(queryParams)
         setData(response?.data || [])
         setTotalPage(response.totalPages || 1)
         setTotalRecords(response?.totalRecords || 0)
@@ -193,7 +193,7 @@ function ClientList() {
         ...(searchQuery && { search: searchQuery }),
         entity_type: selectedFilter,
       }
-      const response = await apiMethods.downloadClientExcel(queryParams)
+      const response = await clientApi.downloadClientExcel(queryParams)
       const blob = new Blob([response], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       })

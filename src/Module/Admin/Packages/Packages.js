@@ -4,9 +4,9 @@ import CommonPagination from '../../../components/New/Pagination'
 import PackagesTable from './PackagesTable'
 import ActionButton from '../../../components/New/ActionButton'
 import SearchBar from '../../../components/New/SearchBar'
-import apiMethods from '../../../api/config'
 import { useSearch } from '../../../components/New/SearchContext'
 import CustomAlert from '../../../components/New/CustomAlert'
+import { companyApi } from '../../../api/company'
 
 function Packages() {
   const [data, setData] = useState([])
@@ -47,7 +47,7 @@ function Packages() {
   const fetchData = async (pageNumber, limit) => {
     setLoading(true)
     try {
-      const response = await apiMethods.getPackages({
+      const response = await companyApi.getPackages({
         page: pageNumber || pagination.page,
         limit: limit,
         search: searchQuery,
@@ -119,7 +119,7 @@ function Packages() {
       }
 
       if (isEdit && selectedPackage) {
-        const response = await apiMethods.UpdatePacakges(selectedPackage.id, payload)
+        const response = await companyApi.UpdatePacakges(selectedPackage.id, payload)
         if (response.status === 200) {
           setAlerts([{ severity: 'success', message: 'Package updated successfully!' }])
           fetchData()
@@ -131,7 +131,7 @@ function Packages() {
           setAlerts([{ severity: 'error', message: 'Something went wrong' }])
         }
       } else {
-        const response = await apiMethods.AddPacakges(payload)
+        const response = await companyApi.AddPacakges(payload)
         if (response.status === 201) {
           setAlerts([{ severity: 'success', message: 'Package added successfully!' }])
           fetchData()

@@ -5,6 +5,7 @@ import CustomAlert from "../../components/New/CustomAlert";
 import PopUp from "../../components/New/PopUp";
 import VersionChoicePopup from "./VersionChoicePopup";
 import FluteTypeView from "../SKU/FluteTypeView";
+import { skuApi } from "../../api/sku";
 
 
 function SkuVersionAddEdit({
@@ -108,7 +109,7 @@ const handleFluteSelection = (selectedFlute, fluteIndex) => {
       try {
         if (IsEditVersion && skuVersionID) {
           // Case 1: Edit Mode with Version ID
-          const versionResponse = await apiMethods.getSingleSkuVersion(skuVersionID);
+          const versionResponse = await skuApi.getSingleSkuVersion(skuVersionID);
   
           if (versionResponse?.data) {
             setSkuValues(versionResponse?.data?.sku_values || []);
@@ -121,8 +122,8 @@ const handleFluteSelection = (selectedFlute, fluteIndex) => {
           console.log("Handling skuID + skuVersionID case (not edit mode)");
           // Add your custom logic here for this case
           // Example:
-       const skuPromise = apiMethods.getSingleSkuData(skuID);
-const versionPromise = apiMethods.getSingleSkuVersion(skuVersionID);
+       const skuPromise = skuApi.getSingleSkuData(skuID);
+const versionPromise = skuApi.getSingleSkuVersion(skuVersionID);
 
 const [skuResponse, versionResponse] = await Promise.all([skuPromise, versionPromise]);
 setAllSkuDetails(skuResponse.data)
@@ -139,7 +140,7 @@ handleWholeSkuObject(skuResponse.data);
           if (skuResponse?.data && versionResponse?.data) {
             setSkuValues(versionResponse?.data?.sku_values || []);
             setClientID(skuResponse?.data?.client_id || "");
-            setSkuOptions((await apiMethods.getSkuValuesOptions(skuID))?.data?.options || {});
+            setSkuOptions((await skuApi.getSkuValuesOptions(skuID))?.data?.options || {});
             setSkuversionLimit(skuResponse.data.sku_version_limit);
             setSkuInitalData(versionResponse?.data?.sku_values || []);
             const skuversionID = `V${versionResponse?.data?.data?.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
@@ -149,8 +150,8 @@ handleWholeSkuObject(skuResponse.data);
   
         } else {
           // Case 3: Only skuID is available (create new)
-          const response = await apiMethods.getSingleSkuData(skuID);
-          const OptionResponse = await apiMethods.getSkuValuesOptions(skuID);
+          const response = await skuApi.getSingleSkuData(skuID);
+          const OptionResponse = await skuApi.getSkuValuesOptions(skuID);
           setSkuOptions(OptionResponse?.data?.options || {});
   
           if (response?.data?.sku_values && Array.isArray(response.data.sku_values)) {
@@ -171,7 +172,7 @@ handleWholeSkuObject(skuResponse.data);
           }
   
           // Generate new SKU version ID
-          const versionsResponse = await apiMethods.getSkuVersions(skuID);
+          const versionsResponse = await skuApi.getSkuVersions(skuID);
           // setCurrentVersionCount(versionsResponse?.data?.data?.length || 0);
           const skuversionID = `V${versionsResponse.data.data.length + 1}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
           setSkuVersion(skuversionID);
@@ -313,10 +314,10 @@ const totalBurstingStrength = skuvaluesFromParent?.reduce(
         field_options: field_options
       };
 
-      const response = await apiMethods.postSkuValuesOptions(requestBody);
+      const response = await skuApi.postSkuValuesOptions(requestBody);
 
 
-      const optionResponse = await apiMethods.getSkuValuesOptions(skuID);
+      const optionResponse = await skuApi.getSkuValuesOptions(skuID);
       setSkuOptions(optionResponse?.data?.options || {});
             
       setTimeout(() => {
@@ -349,13 +350,13 @@ const totalBurstingStrength = skuvaluesFromParent?.reduce(
     if (IsEditVersion && skuVersionID) {
       // Edit mode
       try {
-        const response = await apiMethods.updateSkuVersion(skuVersionID, requestBody);
+        const response = await skuApi.updateSkuVersion(skuVersionID, requestBody);
         setAlerts([{ severity: "success", message: response?.data?.message || "SKU Version updated successfully" }]);
         setTimeout(() => {
           setVisible(false)
         }, 1000);
 
-        const updatedVersionsResponse = await apiMethods.getSkuVersions(skuID);
+        const updatedVersionsResponse = await skuApi.getSkuVersions(skuID);
         if (updatedVersionsResponse?.data?.data) {
           setSkuVersionsMap(prev => ({
             ...prev,
@@ -384,7 +385,7 @@ const totalBurstingStrength = skuvaluesFromParent?.reduce(
   const handleAddVersion = async () => {
     try {
       // Get the current versions before submitting
-      const versionsResponse = await apiMethods.getSkuVersions(skuID);
+      const versionsResponse = await skuApi.getSkuVersions(skuID);
       const currentVersionCount = versionsResponse?.data?.data?.length || 0;
 
       if (skuversionLimit && currentVersionCount >= skuversionLimit) {
@@ -399,10 +400,10 @@ const totalBurstingStrength = skuvaluesFromParent?.reduce(
         sku_values: skuvaluesFromParent
       };
 
-      const response = await apiMethods.addSkuVersion(requestBody);
+      const response = await skuApi.addSkuVersion(requestBody);
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
 
-      const updatedVersionsResponse = await apiMethods.getSkuVersions(skuID);
+      const updatedVersionsResponse = await skuApi.getSkuVersions(skuID);
       if (updatedVersionsResponse?.data?.data) {
         setSkuVersionsMap(prev => ({
           ...prev,

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import ActionButton from '../../../components/New/ActionButton'
 import RoleTable from './RoleTable'
-import apiMethods from '../../../api/config'
 import ConfirmationModale from '../../../components/New/ConfirmationModale'
 import CustomAlert from '../../../components/New/CustomAlert'
 import AddEditRoleForm from './AddEditRoleForm'
 import ContentHeader from '../../../components/New/ContentHeader'
+import { employeeApi } from '../../../api/employee'
 
 function Role() {
   const [roles, setRoles] = useState([])
@@ -20,7 +20,7 @@ function Role() {
   const fetchData = async () => {
     setLoading(true)
     try {
-      const response = await apiMethods.getRoles()
+      const response = await employeeApi.getRoles()
 
       if (response.data.success) {
         setRoles(response?.data?.data)
@@ -60,7 +60,7 @@ function Role() {
     } else {
       // If needed, fetch the specific role data from API
       try {
-        const response = await apiMethods.getRoleById(id)
+        const response = await employeeApi.getRoleById(id)
         if (response.data.success) {
           setSelectedRole(response.data.data)
           setIsEdit(true)
@@ -86,7 +86,7 @@ function Role() {
 
   const onDeleteConfirmation = async () => {
     try {
-      const response = await apiMethods.deleteRole(selectedRoleId)
+      const response = await employeeApi.deleteRole(selectedRoleId)
       await fetchData()
       setIsConfirmationModaleOpen(false)
       setAlerts([

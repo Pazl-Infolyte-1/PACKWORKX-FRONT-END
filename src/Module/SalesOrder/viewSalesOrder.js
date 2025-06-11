@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import apiMethods from "../../api/config";
 import InvoiceModal from "../WorkOrder/InvoiceModal";
+import { salesOrderApi } from "../../api/salesOrder";
+import { workOrderApi } from "../../api/workOrder";
 
 export default function SalesOrderView({ }) {
   const navigate = useNavigate();
@@ -22,7 +24,7 @@ export default function SalesOrderView({ }) {
   useEffect(() => {
     const fetchSalesOrderData = async () => {
       try {
-        const response = await apiMethods.getSaleOrderData(id);
+        const response = await salesOrderApi.getSaleOrderData(id);
         setSalesOrderData(response?.data);
       } catch (error) {
         console.error("Error viewing sales order:", error);
@@ -37,7 +39,7 @@ export default function SalesOrderView({ }) {
 
       const getInvoiceData = async () => {
         try {
-          const response = await apiMethods.getInvoice({
+          const response = await workOrderApi.getInvoice({
             sale_id: id
           });
           setinVoiceHistory(response.data.invoices);

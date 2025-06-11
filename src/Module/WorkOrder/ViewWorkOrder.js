@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import apiMethods from "../../api/config";
 import {
   AlertCircle,
   Calendar,
@@ -21,6 +20,7 @@ import InvoiceCreationModal from "../SalesOrder/InvoiceCreationModal";
 import InvoiceModal from "./InvoiceModal";
 import CustomAlert from "../../components/New/CustomAlert";
 import ProgressCompletedModal from "./ProgressCompletedModale";
+import { workOrderApi } from "../../api/workOrder";
 
 // Format dates
 const formatDate = (dateString) => {
@@ -162,7 +162,7 @@ const ViewWorkOrder = () => {
   const handleCreateInvoice = async (invoiceData) => {
     try {
       console.log(invoiceData)
-      const response = await apiMethods.createInvoiceWorkOrder(invoiceData);
+      const response = await workOrderApi.createInvoiceWorkOrder(invoiceData);
       console.log('Invoice created successfully:', response);
 
       // Optionally refresh work order data or navigate to invoice
@@ -177,7 +177,7 @@ const ViewWorkOrder = () => {
   useEffect(() => {
     const getInvoiceData = async () => {
       try {
-        const response = await apiMethods.getInvoice({
+        const response = await workOrderApi.getInvoice({
           work_id: id
         });
         setinVoiceHistory(response.data.invoices);
@@ -260,7 +260,7 @@ const ViewWorkOrder = () => {
     const fetchWorkOrder = async () => {
       try {
         setLoading(true);
-        const response = await apiMethods.getWorkOrderById(id);
+        const response = await workOrderApi.getWorkOrderById(id);
         setWorkOrder(response.data);
         setLoading(false);
       } catch (error) {
@@ -282,7 +282,7 @@ const ViewWorkOrder = () => {
   useEffect(() => {
     const fetchProgressOptions = async () => {
       try {
-        const response = await apiMethods.getWorkOrderProgressDropDownOptions();
+        const response = await workOrderApi.getWorkOrderProgressDropDownOptions();
         const data = response?.data?.data || [];
         const options = data.map((item) => item.work_order_status);
         setProgressOptions(options);
@@ -315,7 +315,7 @@ const ViewWorkOrder = () => {
       const body = { progress: newProgress }
 
       try {
-        const response = await apiMethods.workOrderStatusUpdate(id, body)
+        const response = await workOrderApi.workOrderStatusUpdate(id, body)
 
         // Update UI if cellData is a state
         setAlerts([

@@ -3,6 +3,8 @@ import PopUp from '../../components/New/PopUp'
 import ActionButton from '../../components/New/ActionButton'
 import React, { useState, useEffect, useMemo } from 'react'
 import apiMethods from '../../api/config'
+import { purchaseOrderApi } from '../../api/purchaseOrder'
+import { itemApi } from '../../api/item'
 
 function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSkuEdit }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -23,7 +25,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
   }
 
   const openItemDetails = async (id) => {
-    const response = await apiMethods.getItemList()
+    const response = await itemApi.getItemList()
     const items = response?.data?.data || []
     console.log(items, 'item')
     const item = items.find((i) => i.id === parseInt(id))
@@ -49,7 +51,7 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
 
   const handlePDFDownload = async () => {
     try {
-      const response = await apiMethods.downloadPurchaseOrderPDF(cell.id)
+      const response = await purchaseOrderApi.downloadPurchaseOrderPDF(cell.id)
       const blob = new Blob([response.data], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')

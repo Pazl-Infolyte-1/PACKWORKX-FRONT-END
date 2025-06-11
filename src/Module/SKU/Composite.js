@@ -30,6 +30,8 @@ import { useNavigate } from 'react-router-dom'
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { machineApi } from '../../api/machine'
+import { skuApi } from '../../api/sku'
 
 
 const compositeTypes = [
@@ -144,7 +146,7 @@ const MenuProps = {
   //this is for add sku with ratio dropw=down
   const fetchSkuList = async () => {
     try {
-      const response = await apiMethods.getSkuListOptions()
+      const response = await skuApi.getSkuListOptions()
       setSkuList(response.data) // Assuming data is inside 'data'
     } catch (error) {
       console.error('Failed to fetch SKU list:', error)
@@ -158,7 +160,7 @@ const MenuProps = {
   //this is for popup table summary
   const fetchSkuListTablePopup = async () => {
     try {
-      const response = await apiMethods.getSkuList({
+      const response = await skuApi.getSkuList({
         page: pagination.currentPage,
         limit: limit,
         search: searchQuery || '',
@@ -234,7 +236,7 @@ useEffect(() => {
     if (addNewSkuData?.part_value?.length > 0) {
       const fetchSkuList = async () => {
         try {
-          const response = await apiMethods.getSkuListOptions()
+          const response = await skuApi.getSkuListOptions()
           const skuData = response.data
           setSkuDropdown(skuData)
 
@@ -390,7 +392,7 @@ useEffect(() => {
       }
 
       try {
-        const response = await apiMethods.getRouteList(params)
+        const response = await machineApi.getRouteList(params)
         setFullRouteResponse(response) // ✅ Save full response here
         setDisplayAsChips(response.data.routes)
       } catch (err) {

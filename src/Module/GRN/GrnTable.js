@@ -10,10 +10,10 @@ import React, { useState } from 'react'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
-import apiMethods from '../../api/config'
 import PopUp from '../../components/New/PopUp'
 import GrnView from './GrnView'
 import ReusableTable from '../SalesOrder/ReusableTable'
+import { grnApi } from '../../api/grn'
 
 const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh }) => {
   const [confirmModal, setConfirmModal] = useState(false)
@@ -31,7 +31,7 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh }) =>
 
   const handleDelete = async () => {
     try {
-      const response = await apiMethods.deleteGrn(deleteId)
+      const response = await grnApi.deleteGrn(deleteId)
       if (response.status === 200) {
         setConfirmModal(false)
         setGrnData((prev) => prev.filter((item) => item.id !== deleteId))
@@ -67,7 +67,7 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh }) =>
     }
 
     try {
-      const response = await apiMethods.editGrn(payload)
+      const response = await grnApi.editGrn(payload)
       console.log('Response:', response)
 
       setAlerts([{ severity: 'success', message: 'Status updated successfully' }])

@@ -23,6 +23,8 @@ import CommonPagination from '../../components/New/Pagination'
 import CompactPagination from '../../components/New/CompactPagination'
 import Loader from '../../components/New/Loader'
 import { setSkuPartValue } from '../../action'
+import { clientApi } from '../../api/client'
+import { skuApi } from '../../api/sku'
 
 
 
@@ -443,9 +445,9 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
         let response
 
         if (editTag) {
-          response = await apiMethods.updateSku(numberSkuData)
+          response = await skuApi.updateSku(numberSkuData)
         } else {
-          response = await apiMethods.addSku(numberSkuData)
+          response = await skuApi.addSku(numberSkuData)
         }
 
         if (response?.data?.message) {
@@ -549,14 +551,14 @@ total_bursting_strength:selectedSku.total_bursting_strength ||null,
       return
     }
     try {
-      const response = await apiMethods.getSkuList({
+      const response = await skuApi.getSkuList({
         search: searchQuery || '',
         client: clientName || '',
         sku_type: selectedSkuType || '',
         page: pagination?.currentPage || 1,
         limit: message ? 10000 : limit,
       })
-const clientResponse = await apiMethods.getSkuClients({ limit: 10000 }) 
+const clientResponse = await clientApi.getSkuClients({ limit: 10000 }) 
 
       setSkuData(response.data)
       setClient(clientResponse.data)
@@ -597,7 +599,7 @@ const clientResponse = await apiMethods.getSkuClients({ limit: 10000 })
   }
 
   const handleSkuExelExport = async () => {
-    await apiMethods.getSkuExcelExport({
+    await skuApi.getSkuExcelExport({
       search: searchQuery,
       sku_type: selectedSkuType,
       client: selectedClient,

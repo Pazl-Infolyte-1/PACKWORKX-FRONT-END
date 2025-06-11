@@ -13,6 +13,7 @@ import Loader from '../../components/New/Loader'
 import CompactPagination from '../../components/New/CompactPagination'
 import { FaUserGroup } from 'react-icons/fa6'
 import { FaUserCheck, FaUserSlash } from 'react-icons/fa'
+import { inventoryApi } from '../../api/inventory'
 
 function StockAdjustment() {
   const [stockadjustments, setStockadjustments] = useState([])
@@ -54,7 +55,7 @@ const navigate=useNavigate()
 useEffect(() => {
   const fetchStockAdjustments = async () => {
     try {
- const response = await apiMethods.getStockAdjustments(currentPage, entriesPerPage);
+ const response = await inventoryApi.getStockAdjustments(currentPage, entriesPerPage);
       console.log('Stock Adjustments:', response.data);
             setTotalPages(response?.data?.pagination?.totalPages);
       setTotalRecords(response?.data?.pagination?.totalRecords);

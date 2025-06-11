@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { CRow, CCol, CCard, CCardBody } from '@coreui/react'
 import { FaClipboardList, FaBox, FaCalendarAlt, FaPlus, FaMinus } from 'react-icons/fa'
 import apiMethods from '../../api/config'
+import { workOrderApi } from '../../api/workOrder'
 
 function WorkOrderListing({ workOrders, activeTab, isNextStepClicked, setActiveTab }) {
   const [selectedOrders, setSelectedOrders] = useState([])
@@ -21,7 +22,7 @@ function WorkOrderListing({ workOrders, activeTab, isNextStepClicked, setActiveT
             production: 'in_production',
           }
 
-          const response = await apiMethods.addWorkOrderIntoProduction(body)
+          const response = await workOrderApi.addWorkOrderIntoProduction(body)
           setActiveTab('Group Layers')
           console.log('Work orders added to production:', response)
           setError(null)

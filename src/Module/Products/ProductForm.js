@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import apiMethods from '../../api/config'
 import CustomAlert from '../../components/New/CustomAlert'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { itemApi } from '../../api/item'
 
 const AddItemProcess = ({ isEdit, selectedItemID, setDrawerOpen, fetchData }) => {
   const [alerts, setAlerts] = useState([])
@@ -29,7 +30,7 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawerOpen, fetchData }) =>
 
   const fetchItemData = async (id) => {
     try {
-      const response = await apiMethods.getItemData(id)
+      const response = await itemApi.getItemData(id)
       if (response?.data?.data) {
         const itemData = response.data.data
         reset(itemData)
@@ -61,10 +62,10 @@ const AddItemProcess = ({ isEdit, selectedItemID, setDrawerOpen, fetchData }) =>
 
       if (isEdit) {
         formattedData.id = selectedItemID
-        response = await apiMethods.updateItem(selectedItemID, formattedData)
+        response = await itemApi.updateItem(selectedItemID, formattedData)
         console.log('Update response:', response)
       } else {
-        response = await apiMethods.addItem(formattedData)
+        response = await itemApi.addItem(formattedData)
         console.log('Add response:', response)
       }
 

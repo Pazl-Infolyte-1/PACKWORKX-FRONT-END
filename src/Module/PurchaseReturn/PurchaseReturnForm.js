@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
 import PurchaseReturnItemForm from './PurchaseReturnItemForm'
+import { purchaseOrderApi } from '../../api/purchaseOrder'
 
 const PurchaseReturnForm = ({
   isPorEdit,
@@ -79,7 +80,7 @@ const PurchaseReturnForm = ({
     }
 
     try {
-      await apiMethods.submitPurchaseOrderReturn(payload)
+      await purchaseOrderApi.submitPurchaseOrderReturn(payload)
       alert('Purchase Order Return submitted successfully!')
       setDrawer(false)
       if (fetchData) fetchData()

@@ -30,6 +30,8 @@ import { useNavigate } from 'react-router-dom'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
+import { machineApi } from '../../api/machine'
+import { commonApi } from '../../api/common'
 
 function RSCBox({
   dropdownRef,
@@ -423,7 +425,7 @@ function RSCBox({
       }
 
       try {
-        const response = await apiMethods.getRouteList(params)
+        const response = await machineApi.getRouteList(params)
         setFullRouteResponse(response)
         setDisplayAsChips(response.data.routes)
       } catch (err) {
@@ -590,7 +592,7 @@ function RSCBox({
       formData.append('file', file)
 
       try {
-        const response = await apiMethods.uploadFile(formData)
+        const response = await commonApi.uploadFile(formData)
         const fileUrl = response?.data?.data?.file_url
 
         if (fileUrl) {

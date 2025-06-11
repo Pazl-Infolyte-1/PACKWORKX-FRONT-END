@@ -13,6 +13,8 @@ import { useNavigate } from 'react-router-dom';
 import ProductTable from './ProductTable';
 import ProductView from './ProductView';
 import ProductForm from './ProductForm';
+import { clientApi } from '../../api/client';
+import { itemApi } from '../../api/item';
 
 
 
@@ -58,7 +60,7 @@ function Products() {
           ...(searchQuery && { search: searchQuery }),
           entity_type: selectedFilter,
         };
-        const response = await apiMethods.downloadClientExcel(queryParams);
+        const response = await clientApi.downloadClientExcel(queryParams);
         const blob = new Blob([response], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
@@ -79,7 +81,7 @@ function Products() {
    const fetchData = async () => {
      setLoading(true);
      try {
-       const response = await apiMethods.getItemList({
+       const response = await itemApi.getItemList({
          page: paginationParams.currentPage,
          limit: paginationParams.pageSize,
          client: searchQuery,

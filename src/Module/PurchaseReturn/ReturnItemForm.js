@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useForm, useFieldArray, useWatch } from 'react-hook-form'
 import apiMethods from '../../api/config'
+import { inventoryApi } from '../../api/inventory'
+import { itemApi } from '../../api/item'
 
 const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
   console.log('Item in return items form', items)
@@ -36,7 +38,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
 
   const openItemDetails = async (item_id) => {
     try {
-      const response = await apiMethods.getItemList()
+      const response = await itemApi.getItemList()
       const items = response?.data?.data || []
       const item = items.find((i) => i.id === parseInt(item_id))
       const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}
@@ -74,7 +76,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
     lastItemsHash.current = currentHash
 
     const fetchAndFormat = async () => {
-      const response = await apiMethods.getinventory()
+      const response = await inventoryApi.getinventory()
       const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : []
 
       const updatedItems = items.map((item) => {

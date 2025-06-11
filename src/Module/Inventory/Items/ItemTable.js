@@ -12,9 +12,9 @@ import {
 } from '@coreui/react'
 
 import ThreeDotMenu from '../../../components/ThreeDotMenu'
-import apiMethods from '../../../api/config'
 import Loading from '../../../components/New/Loading'
 import ReusableTable from '../../SalesOrder/ReusableTable'
+import { itemApi } from '../../../api/item'
 
 function ItemsTable({
   data = [],
@@ -33,7 +33,7 @@ function ItemsTable({
 
     try {
       const payload = { status: newStatus } // change `decision` to `status` if updating item status
-      const response = await apiMethods.updateItem(id, payload)
+      const response = await itemApi.updateItem(id, payload)
       console.log('Response:', response)
       setRefresh((prev) => !prev)
 

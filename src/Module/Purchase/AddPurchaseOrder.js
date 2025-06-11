@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import OrderForm from './OrderForm'
-import apiMethods from '../../api/config'
+import clientApi from '../../api/client'
 import Loader from '../../components/New/Loader'
 import CustomAlert from '../../components/New/CustomAlert'
+import { purchaseOrderApi } from '../../api/purchaseOrder'
 
 const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefresh }) => {
   const [loading, setLoading] = useState(false)
@@ -25,7 +26,7 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefre
   useEffect(() => {
     const fetchVendors = async () => {
       try {
-        const fullData = await apiMethods.getClients()
+        const fullData = await clientApi.getClients()
         const clientsArray = fullData.data
 
         if (Array.isArray(clientsArray)) {
@@ -69,7 +70,7 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefre
   const fetchPoDetails = async () => {
     setLoading(true)
     try {
-      const response = await apiMethods.getPurchaseOrderById(selectedPoId)
+      const response = await purchaseOrderApi.getPurchaseOrderById(selectedPoId)
       console.log(response, 'singlepo')
       if (response.data) {
         const { items, ...orderDetails } = response.data
@@ -103,7 +104,7 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefre
 
       let response
       if (isEdit) {
-        response = await apiMethods.updatePurchaseOrder(selectedPoId, payload)
+        response = await purchaseOrderApi.updatePurchaseOrder(selectedPoId, payload)
         console.log(response.data, 'updated')
 
         setAlerts([
@@ -114,7 +115,7 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefre
         }, 1000)
         setRefresh((prev) => !prev)
       } else {
-        response = await apiMethods.createPurchaseOrder(payload)
+        response = await purchaseOrderApi.createPurchaseOrder(payload)
         setAlerts([
           { severity: 'success', message: response?.data?.message || 'Successfully created' },
         ])

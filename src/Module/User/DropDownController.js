@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import CategoryList from './CategoryList.js'
 import CategoryOptions from './CategoryOption.js'
 import EmptyState from './EmptyState.js'
-import apiMethods from '../../api/config'
 import { AuthContext } from '../../Context/AuthContext.js'
+import { commonApi } from '../../api/common.js'
 
 const Setting = () => {
   const [selectedCategory, setSelectedCategory] = useState(null)
@@ -20,7 +20,7 @@ const Setting = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getDropDown()
+        const response = await commonApi.getDropDown()
         setCategories(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -32,7 +32,7 @@ const Setting = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getDropDownValue()
+        const response = await commonApi.getDropDownValue()
         setDropDownValue(response.data)
       } catch (error) {
         console.error(error)
@@ -66,7 +66,7 @@ const Setting = () => {
         dropdown_value: newOptionText.trim(),
       }
 
-      const response = await apiMethods.addDropDownValue(payload)
+      const response = await commonApi.addDropDownValue(payload)
       if (response.status === 200 || response.status === 201) {
         setRefresh((prev) => !prev)
       }
@@ -107,7 +107,7 @@ const Setting = () => {
         dropdown_id: item.dropdown_id,
         dropdown_value: editData,
       }
-      const response = await apiMethods.updateDropDownValue(payload)
+      const response = await commonApi.updateDropDownValue(payload)
       if (response.status === 200 || response.status === 201) {
         setRefresh((prev) => !prev)
       }
@@ -134,7 +134,7 @@ const Setting = () => {
   }, [isMobileMenuOpen])
 
   const handleDeleteOption = async (optionId) => {
-    const response = await apiMethods.deleteDropDownValue(optionId)
+    const response = await commonApi.deleteDropDownValue(optionId)
     if (response.status === 200 || response.status === 201) {
       setRefresh((prev) => !prev)
     }

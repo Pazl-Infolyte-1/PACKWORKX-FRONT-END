@@ -12,10 +12,10 @@ import ThreeDotMenu from '../../../components/ThreeDotMenu';
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons';
 import CompaniesForm from './CompaniesForm';
 import DeleteModal from '../../../components/New/DeleteModal';
-import apiMethods from '../../../api/config';
 import CustomPopup from '../../../components/New/CustomPopupModal/CustomPopup';
 import CompaniesSingleViewCard from './CompaniesSingleViewCard';
 import PopUp from '../../../components/New/PopUp';
+import { companyApi } from '../../../api/company';
 
 
 const CompaniesTable = ({ cellData,refreshTable }) => {
@@ -46,7 +46,7 @@ const CompaniesTable = ({ cellData,refreshTable }) => {
       console.log("Attempting to delete Company:", selectedCompanyDeleteId);
       const CompanyId = selectedCompanyDeleteId; 
   
-      const response = await apiMethods.deleteCompany(CompanyId);
+      const response = await companyApi.deleteCompany(CompanyId);
   
       //if (!response?.status) {
       //  // If API responds with { "status": false }, treat it as an error
@@ -101,7 +101,7 @@ const handleEditClick = async (companyId) => {
   console.log('Edit clicked for company ID:', companyId);
   
   try {
-    const response = await apiMethods.getCompanies({}, companyId); // Fetch data
+    const response = await companyApi.getCompanies({}, companyId); // Fetch data
     console.log('Fetched Company Data:', response);
 
     setEditingData(response?.data || {}); // Set the data

@@ -8,6 +8,8 @@ import apiMethods from '../../api/config'
 import CustomAlert from '../../components/New/CustomAlert'
 import ActionButton from '../../components/New/ActionButton'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { salesOrderApi } from '../../api/salesOrder'
+import { workOrderApi } from '../../api/workOrder'
  
 const AddSalesOrder = () => {
  
@@ -180,7 +182,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
       if (isEdit && selectedSalesOrderID) {
         setLoading(true);
         try {
-          const response = await apiMethods.getSaleOrderData(selectedSalesOrderID);
+          const response = await salesOrderApi.getSaleOrderData(selectedSalesOrderID);
           setExistingSalesOrderData(response.data);
  
           setSalesDetailsForm((prev) => {
@@ -248,10 +250,10 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
       let response;
  
       if (isEdit) {
-        response = await apiMethods.editSalesOrder(selectedSalesOrderID, payload);
+        response = await salesOrderApi.editSalesOrder(selectedSalesOrderID, payload);
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfully updated" }]);
       } else {
-        response = await apiMethods.addSalesOrder(payload);
+        response = await salesOrderApi.addSalesOrder(payload);
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
       }
    
@@ -277,7 +279,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
  
   const workOrderListSubmit = async (formData) => {
     try {
-      const response = await apiMethods.createWorkOrder(formData);
+      const response = await workOrderApi.createWorkOrder(formData);
       console.log('Response:', response);
  
       // await fetchData()
@@ -332,13 +334,13 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
  
       // API call to add the complete sales order
       if (isEdit) {
-        response = await apiMethods.editSalesOrder(selectedSalesOrderID, finalSalesOrder);
+        response = await salesOrderApi.editSalesOrder(selectedSalesOrderID, finalSalesOrder);
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
         setTimeout(() => {
           // setDrawer(false)
         }, 1000);
       } else {
-         response = await apiMethods.addSalesOrder(finalSalesOrder);
+         response = await salesOrderApi.addSalesOrder(finalSalesOrder);
          setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
          setTimeout(() => {
           //  setDrawer(false)

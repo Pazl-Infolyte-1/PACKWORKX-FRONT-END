@@ -1,7 +1,7 @@
   import React from 'react'
   import PopUp from '../../components/New/PopUp'
   import ActionButton from '../../components/New/ActionButton'
-  import apiMethods from '../../api/config'
+  // import apiMethods from '../../api/config'
 
   function WorkOrderDetails({ showPopUp, setShowPopUp, cell }) {
     return (

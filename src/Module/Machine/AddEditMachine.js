@@ -8,6 +8,7 @@ import Select from 'react-select'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilArrowBottom, cilArrowTop } from '@coreui/icons'
 import { GripVertical } from 'lucide-react'
+import { machineApi } from '../../api/machine'
 
 
 
@@ -282,7 +283,7 @@ const handleIntegerInput = (e, field) => {
       const fetchData = async () => {
         try {
           setIsLoading(true)
-          const response = await apiMethods.getMachineById(Id)
+          const response = await machineApi.getMachineById(Id)
           const machineData = response.data.data
 
           // Set basic machine data
@@ -375,8 +376,8 @@ const handleIntegerInput = (e, field) => {
       machineData.machine_route = data.machine_route || []
 
       const apiCall = isEdit
-        ? apiMethods.editMachine(Id, machineData)
-        : apiMethods.AddMachine(machineData)
+        ? machineApi.editMachine(Id, machineData)
+        : machineApi.AddMachine(machineData)
 
       const response = await apiCall
       setAlerts([{ severity: 'success', message: response.data.message }])

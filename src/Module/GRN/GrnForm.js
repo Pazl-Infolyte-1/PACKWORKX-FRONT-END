@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
-import apiMethods from '../../api/config'
 import GrnItemsFrom from './GrnItemsFrom'
 import ActionButton from '../../components/New/ActionButton'
+import { purchaseOrderApi } from '../../api/purchaseOrder'
 
 const GrnForm = ({
   grnFormData,
@@ -39,7 +39,7 @@ const GrnForm = ({
     const event = { target: { name: 'po_id', value: id } }
 
     try {
-      const response = await apiMethods.getPurchaseOrderById(id)
+      const response = await purchaseOrderApi.getPurchaseOrderById(id)
       const poData = response.data
       console.log('PO Data:', poData)
 
@@ -106,8 +106,7 @@ const GrnForm = ({
   useEffect(() => {
     const fetchPurchaseOrderData = async () => {
       try {
-        const response = await apiMethods.getAllPurchaseOrderIds()
-        // const response = await apiMethods.getPurchaseOrders({limit:20000})
+        const response = await purchaseOrderApi.getAllPurchaseOrderIds()
         setPurchaseOrderData(response.data.data)
       } catch (error) {
         console.error(error)

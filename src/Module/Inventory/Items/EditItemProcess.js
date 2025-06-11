@@ -2,7 +2,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import ProcessDropDown from '../../Machine/ProcessDropDown'
 import ActionButton from '../../../components/New/ActionButton'
-import apiMethods from '../../../api/config'
+import { machineApi } from '../../../api/machine'
 
 const AddFieldForm = ({ processData, setProcessData, closeModal }) => {
   const [selectedProcess, setSelectedProcess] = useState('')
@@ -20,7 +20,7 @@ const AddFieldForm = ({ processData, setProcessData, closeModal }) => {
     }
 
     try {
-      const res = await apiMethods.addFields(payload) // Replace with actual endpoint
+      const res = await machineApi.addFields(payload) // Replace with actual endpoint
       console.log('Field added successfully:', res.data)
 
       // Optionally update local state

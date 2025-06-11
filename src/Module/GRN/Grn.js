@@ -19,11 +19,12 @@ const Grn = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 })
   const [limit, setLimit] = useState(50)
-    const [count, setCount] = useState(null)
+  const [count, setCount] = useState(null)
   const searchBarRef = useRef(null)
   const [errors, setErrors] = useState({})
   const { searchQuery, setGlobalPlaceholder } = useSearch()
   const [refresh, setRefresh] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
   useEffect(() => {
     setGlobalPlaceholder('Search GRN...')
@@ -42,7 +43,7 @@ const Grn = () => {
       })
       setGrnData(response?.data?.data)
       setPagination(response.data.pagination)
-            setCount(response.data.totalCount)
+      setCount(response.data.totalCount)
     } catch (error) {
       console.error(error)
     }
@@ -59,13 +60,19 @@ const Grn = () => {
     delivery_note_no: '',
     invoice_no: '',
     invoice_date: '',
+    amount: 0,
+    cgst_amount: 0,
+    sgst_amount: 0,
+    tax_amount: 0,
+    total_amount: 0,
+    total_qty: 0,
     received_by: '',
     notes: '',
     items: [],
   })
 
   const handleEdit = (item) => {
-    console.log('Edit item', item)
+    console.log('Edit item', item.GRNItems)
     setGrnFormData({
       id: item.id,
       po_id: item.po_id,
@@ -73,6 +80,12 @@ const Grn = () => {
       delivery_note_no: item.delivery_note_no,
       invoice_no: item.invoice_no,
       invoice_date: item.invoice_date,
+      amount: item.amount,
+      cgst_amount: item.cgst_amount,
+      sgst_amount: item.sgst_amount,
+      tax_amount: item.tax_amount,
+      total_amount: item.total_amount,
+      total_qty: item.total_qty,
       received_by: item.received_by,
       notes: item.notes,
       items: item.GRNItems,
@@ -86,12 +99,19 @@ const Grn = () => {
   }
   const handleCloseDrawer = () => {
     setDrawerOpen(false)
+    setIsSubmitted(false)
     setGrnFormData({
       po_id: null,
       grn_date: '',
       delivery_note_no: '',
       invoice_no: '',
       invoice_date: '',
+      amount: 0,
+      cgst_amount: 0,
+      sgst_amount: 0,
+      tax_amount: 0,
+      total_amount: 0,
+      total_qty: 0,
       received_by: '',
       notes: '',
       items: [],
@@ -122,6 +142,7 @@ const Grn = () => {
         { severity: 'error', message: 'Please fill all the required fields' },
       ])
     } else {
+      console.log('Submited form DAta', data)
       setAlerts([])
       try {
         if (isEdit) {
@@ -129,7 +150,10 @@ const Grn = () => {
           const response = await apiMethods.editGrn(data)
           setAlerts((prev) => [
             ...prev,
-            { severity: 'success', message: response?.data?.message || 'GRN Uopdated Successfully' },
+            {
+              severity: 'success',
+              message: response?.data?.message || 'GRN Uopdated Successfully',
+            },
           ])
         } else {
           const response = await apiMethods.postGrn(data)
@@ -144,6 +168,12 @@ const Grn = () => {
           delivery_note_no: '',
           invoice_no: '',
           invoice_date: '',
+          amount: 0,
+          cgst_amount: 0,
+          sgst_amount: 0,
+          tax_amount: 0,
+          total_amount: 0,
+          total_qty: 0,
           received_by: '',
           notes: '',
           items: [],
@@ -184,8 +214,10 @@ const Grn = () => {
             setRefresh={setRefresh}
           />
         </div>
-          <div className="flex justify-end items-center gap-4 mt-2 ml-4 mr-4">
-              <p className='w-40 text-sm'>Total Count: <span className='font-semibold'>{count}</span></p>
+        <div className="flex justify-end items-center gap-4 mt-2 ml-4 mr-4">
+          <p className="w-40 text-sm">
+            Total Count: <span className="font-semibold">{count}</span>
+          </p>
           <CompactPagination
             count={pagination?.totalPages || 1}
             page={pagination?.currentPage || 1}
@@ -219,6 +251,8 @@ const Grn = () => {
             handleCloseDrawer={handleCloseDrawer}
             errors={errors}
             setErrors={setErrors}
+            isSubmitted={isSubmitted}
+            setIsSubmitted={setIsSubmitted}
           />
         </Drawer>
       </div>

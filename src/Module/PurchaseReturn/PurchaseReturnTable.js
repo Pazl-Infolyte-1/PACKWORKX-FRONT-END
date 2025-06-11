@@ -106,12 +106,12 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
           <CTableBody>
             {porData && porData.length > 0 ? (
               porData.map((item) => (
-                <CTableRow key={item.id} className="border-b text-center">
+                <CTableRow key={item.purchase_return_generate_id} className="border-b text-center">
                   <CTableDataCell
                     onClick={() => setOpenPoReturnModal({ open: true, id: item.id })}
                     className="py-3 px-2 !text-blue-600 cursor-pointer underline text-start"
                   >
-                    {item.id}
+                    {item.purchase_return_generate_id}
                   </CTableDataCell>
                   <CTableDataCell className="py-3 px-2">{item.po_id}</CTableDataCell>
                   <CTableDataCell className="py-3 px-2">{item.return_date}</CTableDataCell>

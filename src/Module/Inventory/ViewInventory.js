@@ -22,17 +22,9 @@ import {
 } from 'lucide-react'
 import { FaRupeeSign } from 'react-icons/fa'
 
-const ViewInventory = ({ item }) => {
+const ViewInventory = ({ item, totalInventoryValue }) => {
   const [itemDetails, setItemDetails] = useState(null)
-  const menus = [
-    'Products',
-    'Purchase Order',
-    'GRN',
-    'Purchase Returns',
-    'Credit Notes',
-    'Debit Notes',
-    'Stock Adjustment',
-  ]
+  const menus = ['Products', 'Purchase Order', 'GRN', 'Purchase Returns', 'Stock Adjustment']
 
   const [activeMenu, setActiveMenu] = useState('Products')
   useEffect(() => {
@@ -153,30 +145,30 @@ const ViewInventory = ({ item }) => {
                 <Package className="w-6 h-6 text-blue-600" />
                 Product Details
               </h2>
-              <p className="text-xl font-bold">{item?.item?.item_generate_id}</p>
+              <div>
+                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                <p className="text-sm font-bold m-0">Qty:{totalInventoryValue[0].total_quantity}</p>
+              </div>
             </div>
 
             {itemDetails?.products ? (
-              <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+              <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden mt-1">
                 {/* Header Section */}
-                <div className="p-2 border-b">
-                  <div className="flex justify-between items-start">
+                <div className="p-1 border-b bg-gray-200">
+                  <div className="flex justify-between items-center">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-800">
                         {itemDetails.products.item_name}
                       </h3>
-                      <p className="text-sm text-gray-600 ">{itemDetails.products.item_code}</p>
+                      <p className="text-sm text-gray-600 m-0">{itemDetails.products.item_code}</p>
                     </div>
-                    <div className="text-right">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          itemDetails.products.status === 'active'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
-                        {itemDetails.products.status.toUpperCase()}
-                      </span>
+                    <div
+                      className={`px-3 py-1 rounded-full text-xs font-medium border  ${getStatusColor(itemDetails.products.status)} bg-white/20 border-white/30`}
+                    >
+                      <div className="flex items-center gap-1">
+                        {getStatusIcon(itemDetails.products.status)}
+                        {itemDetails.products.status}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -211,7 +203,6 @@ const ViewInventory = ({ item }) => {
 
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-gray-500" />
                         <div>
                           <p className="text-xs text-gray-500 m-0">Standard Cost</p>
                           <p className="text-sm font-medium">
@@ -271,15 +262,26 @@ const ViewInventory = ({ item }) => {
                         <div className="grid grid-cols-3 gap-2">
                           {Object.entries(
                             parseCustomFields(JSON.parse(itemDetails.products.custom_fields)),
-                          ).map(([key, value]) => (
-                            <div
-                              key={key}
-                              className="flex gap-2 items-center py-2 px-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
-                            >
-                              <span className="text-sm font-medium text-gray-600">{key}:</span>
-                              <span className="text-sm font-semibold text-gray-900">{value}</span>
-                            </div>
-                          ))}
+                          ).map(([key, value]) => {
+                            // Process the key: remove special characters and capitalize
+                            const processedKey = key
+                              .replace(/[^a-zA-Z0-9 ]/g, ' ') 
+                              .replace(/\s+/g, ' ')
+                              .replace(/\b\w/g, (char) => char.toUpperCase())
+                              .trim()
+
+                            return (
+                              <div
+                                key={key}
+                                className="flex gap-2 items-center py-2 px-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+                              >
+                                <span className="text-sm font-medium text-gray-600">
+                                  {processedKey}:
+                                </span>
+                                <span className="text-sm font-semibold text-gray-900">{value}</span>
+                              </div>
+                            )
+                          })}
                         </div>
                       </div>
                     )}
@@ -309,17 +311,20 @@ const ViewInventory = ({ item }) => {
           <div className="min-h-screen p-3">
             <div className="max-w-7xl mx-auto">
               {/* Header */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <h1 className="text-xl font-bold text-gray-900">Purchase Orders</h1>
-                    <div className="">
-                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                      <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  {/* Icon and Title in a row, vertically centered */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                      <FileText className="w-6 h-6 text-white" />
                     </div>
+                    <h1 className="text-xl font-bold text-gray-900">Purchase Orders</h1>
+                  </div>
+
+                  {/* Right side ID and Item Name */}
+                  <div className="text-right">
+                    <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                    <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
                   </div>
                 </div>
               </div>
@@ -448,6 +453,18 @@ const ViewInventory = ({ item }) => {
                             </div>
                           </div>
                         </div>
+                        {/* Footer */}
+                        <div className="flex justify-between items-center pt-3 border-t text-xs text-gray-500">
+                          {console.log(po)}
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>Created: {formatDate(po.created_at)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>PO Date: {formatDate(po.purchaseOrder.po_date)}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -471,17 +488,20 @@ const ViewInventory = ({ item }) => {
           <div className="min-h-screen  p-3">
             <div className=" mx-auto">
               {/* Header */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
-                    <Package className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <h1 className="text-xl font-bold text-gray-900">Stock Adjustment</h1>
-                    <div>
-                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                      <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+              <div className="mb-4">
+                <div className="flex items-center  justify-between mb-2">
+                  {/* Left section: Icon + Title */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                      <Package className="w-6 h-6 text-white" />
                     </div>
+                    <h1 className="text-xl font-bold text-gray-900">Stock Adjustment</h1>
+                  </div>
+
+                  {/* Right section: ID and name */}
+                  <div className="text-right">
+                    <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                    <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
                   </div>
                 </div>
               </div>
@@ -600,6 +620,18 @@ const ViewInventory = ({ item }) => {
                             </div>
                           </div>
                         )}
+
+                        {/* Footer */}
+                        <div className="flex justify-between items-center pt-3 border-t text-xs text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>Created: {formatDate(adj.adjustment.created_at)}</span>
+                          </div>
+                          {/* <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>Updated: {formatDate(adj.adjustment.updated_at)}</span>
+                          </div> */}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -622,16 +654,19 @@ const ViewInventory = ({ item }) => {
             <div className="max-w-7xl mx-auto">
               {/* Header */}
               <div className="mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                    <Truck className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <h1 className="text-xl font-bold text-gray-900">Goods Receipt Notes (GRN)</h1>
-                    <div className="">
-                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                      <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                <div className="flex items-center justify-between mb-2">
+                  {/* Left section: Icon + Heading */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                      <Truck className="w-6 h-6 text-white" />
                     </div>
+                    <h1 className="text-xl font-bold text-gray-900">Goods Receipt Notes (GRN)</h1>
+                  </div>
+
+                  {/* Right section: Item ID and Name */}
+                  <div className="text-right">
+                    <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                    <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
                   </div>
                 </div>
               </div>

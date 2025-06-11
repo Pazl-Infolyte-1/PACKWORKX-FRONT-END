@@ -3,26 +3,35 @@ import { useForm } from 'react-hook-form'
 import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
 import ReturnItemForm from './ReturnItemForm'
-import CustomAlert from '../../components/New/CustomAlert';
+import CustomAlert from '../../components/New/CustomAlert'
+import { set } from 'lodash'
 
-const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer, selectedPorId, poData }) => {
+const AddPurchaseOrderReturn = ({
+  isEdit,
+  selectedPoId,
+  setDrawer,
+  selectedPorId,
+  poData,
+  isOpen,
+}) => {
   const [items, setItems] = useState([])
   const [grnId, setGrnId] = useState(null)
-  const [clientData,setClientData]=useState([]);
-  const [supplierAddresses, setSupplierAddresses] = useState([]);
-  const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
-  const [showAddressModal, setShowAddressModal] = useState(false);
-  const [selectedPoIdState, setSelectedPoIdState] = useState(null);
-  const [filteredPoData, setFilteredPoData] = useState([]);
-  const [alerts, setAlerts] = useState([]);
-
+  const [clientData, setClientData] = useState([])
+  const [supplierAddresses, setSupplierAddresses] = useState([])
+  const [selectedAddressIndex, setSelectedAddressIndex] = useState(0)
+  const [showAddressModal, setShowAddressModal] = useState(false)
+  const [selectedPoIdState, setSelectedPoIdState] = useState(null)
+  const [filteredPoData, setFilteredPoData] = useState([])
+  const [alerts, setAlerts] = useState([])
+  const [grnData, setGrnData] = useState([])
 
   const [poTotals, setPoTotals] = useState({
     total_qty: 0,
     cgst_amount: 0,
     sgst_amount: 0,
     tax_amount: 0,
-    total_amount: 0
+    total_amount: 0,
+    return_qty: 0,
   })
 
   const {
@@ -30,49 +39,56 @@ const AddPurchaseOrderReturn = ({ isEdit, selectedPoId, setDrawer, selectedPorId
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting }
+    reset,
+    formState: { errors, isSubmitting, isSubmitted },
   } = useForm()
 
   const itemsData = watch('items')
+  // useEffect(() => {
+  //   if (itemsData) setItems(itemsData)
+  // }, [itemsData])
+  const handleClose = () => {
+    setAlerts([])
+  }
+
   useEffect(() => {
-    if (itemsData) setItems(itemsData)
-  }, [itemsData])
-const handleClose = () => {
-    setAlerts([]);
-  };
+    if (!isOpen) {
+      reset()
+    }
+  }, [isOpen, reset])
 
   useEffect(() => {
     const handleCheck = async () => {
-      const fetchGrnData = await apiMethods.getGrn();
-      const grnData = Array.isArray(fetchGrnData?.data?.data) ? fetchGrnData.data.data : [];
-      const grnPoIds = grnData.map(grn => grn.po_id);
-      const filtered = poData.filter(po =>
-        grnPoIds.includes(po.id) 
-      );
-      setFilteredPoData(filtered);
-    };
+      const fetchGrnData = await apiMethods.getGrn()
+      const grnData = Array.isArray(fetchGrnData?.data?.data) ? fetchGrnData.data.data : []
+      const grnPoIds = grnData.map((grn) => grn.po_id)
+      const filtered = poData.filter((po) => grnPoIds.includes(po.id))
+      setFilteredPoData(filtered)
+    }
 
-    if (poData?.length) handleCheck();
-  }, [poData]);
+    if (poData?.length) handleCheck()
+  }, [poData])
 
   const handlePurchaseDetails = async (poId) => {
-    // try {
-    //   const response = await apiMethods.getinventory()
-    //   const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : []
-    //   const matchedInventory = inventoryList.find(item => item.po_id === poId)
-    //   console.log('inventoryList:', inventoryList);
-      
+    try {
+      const response = await apiMethods.getinventory()
+      console.log('Response from getinventory:', response.data.data.inventoryData)
+      const inventoryList = Array.isArray(response?.data?.data?.inventoryData)
+        ? response.data.data?.inventoryData
+        : []
 
-    //   if (matchedInventory) {
-    //     const grn_id = matchedInventory.grn_id
-    //     setGrnId(grn_id)
-    //     await handlePurchaseReturnDetails(poId, grn_id)
-    //   } else {
-    //     console.warn('No inventory found for PO ID:', poId)
-    //   }
-    // } catch (error) {
-    //   console.error('Error fetching inventory:', error)
-    // }
+      const matchedInventory = inventoryList.find((item) => item.po_id === poId)
+
+      if (matchedInventory) {
+        const grn_id = matchedInventory.grn_id
+        setGrnId(grn_id)
+        await handlePurchaseReturnDetails(poId, grn_id)
+      } else {
+        console.warn('No inventory found for PO ID:', poId)
+      }
+    } catch (error) {
+      console.error('Error fetching inventory:', error)
+    }
   }
 
   const handlePurchaseReturnDetails = async (po_id, grn_id) => {
@@ -81,20 +97,15 @@ const handleClose = () => {
       const { purchaseOrder, purchaseOrderItemDetails } = response.data
 
       if (purchaseOrder) {
-        const fields = [
-          'supplier_id', 'supplier_name', 'supplier_contact', 'supplier_email',
-          'shipping_address', 'payment_terms', 'po_date', 'valid_till',
-          'freight_terms', 'decision', 'reason', 'notes'
-        ]
-        fields.forEach(field => setValue(field, purchaseOrder[field] || ''))
+        const fields = ['po_id', 'grn_id', 'payment_terms', 'reason', 'notes']
+        fields.forEach((field) => setValue(field, purchaseOrder[field] || ''))
 
-        console.log("purchaseOrder",fields);
-        
+        console.log('purchaseOrder', fields)
       }
 
-      if (Array.isArray(purchaseOrderItemDetails)) {
-        setItems(purchaseOrderItemDetails)
-      }
+      // if (Array.isArray(purchaseOrderItemDetails)) {
+      //   setItems(purchaseOrderItemDetails)
+      // }
     } catch (error) {
       console.error('Error fetching PO return details:', error)
     }
@@ -103,22 +114,22 @@ const handleClose = () => {
   const getGrnItemDetails = async (grnId) => {
     try {
       // Fetch GRN data using your API method
-      const response = await apiMethods.getGrnById(grnId);
-      
+      const response = await apiMethods.getGrnById(grnId)
+
       // Extract GRN details from response
-      const grnDetails = response?.data?.data || {};
-      
+      const grnDetails = response?.data?.data || {}
+
       // Extract GRN items array
-      const grnItems = grnDetails?.GRNItems || [];
-      
-      console.log('GRN Details:', grnDetails);
-      console.log('GRN Items:', grnItems);
-      
+      const grnItems = grnDetails?.GRNItems || []
+
+      console.log('GRN Details:', grnDetails)
+      console.log('GRN Items:', grnItems)
+
       // Process each GRN item to get their details
       if (grnItems.length > 0) {
         grnItems.forEach((item, index) => {
-          console.log(`GRN Item #${index + 1} Details:`, item);
-          
+          console.log(`GRN Item #${index + 1} Details:`, item)
+
           // Access specific properties of each GRN item
           const {
             id,
@@ -130,8 +141,8 @@ const handleClose = () => {
             rate,
             amount,
             // Add any other properties you need to access
-          } = item;
-          
+          } = item
+
           console.log(`
             Item ID: ${item_id}
             Item Code: ${item_code}
@@ -139,61 +150,63 @@ const handleClose = () => {
             Quantity: ${quantity}
             Rate: ${rate}
             Amount: ${amount}
-          `);
-        });
-        
-        return grnItems; // Return the array of GRN items
+          `)
+        })
+
+        return grnItems // Return the array of GRN items
       } else {
-        console.log('No GRN items found for this GRN ID');
-        return [];
+        console.log('No GRN items found for this GRN ID')
+        return []
       }
     } catch (error) {
-      console.error('Failed to fetch GRN data:', error);
-      return [];
+      console.error('Failed to fetch GRN data:', error)
+      return []
     }
-  };
-  
+  }
+
+  const getInputStyle = (hasError) => ({
+    border: hasError && isSubmitted ? '1px solid #EF4444' : '1px solid #D1D5DB',
+  })
+
   // Example of how to use this function:
   // Call this function with the GRN ID you want to get details for
   // const grnItems = await getGrnItemDetails(6); // where 6 is your GRN ID
-  
+
   // You can also integrate this into your existing handleGrnData function:
-  const handleGrndata = async (grnId, checkedItemCodes) => { 
-    try { 
+  const handleGrndata = async (grnId, checkedItemCodes) => {
+    try {
       // Get all GRN items first
-      const grnItems = + getGrnItemDetails(grnId);
-      
+      const grnItems = +getGrnItemDetails(grnId)
+
       // Then filter them if needed
-      const filteredGrnItems = checkedItemCodes.length > 0
-        ? grnItems.filter(item => checkedItemCodes.includes(item.item_code))
-        : grnItems;
-      
-      console.log('Filtered GRN Items:', filteredGrnItems);
-      
-      return filteredGrnItems;
-    } catch (error) { 
-      console.error('Failed to process GRN data:', error);
-      return [];
-    } 
+      const filteredGrnItems =
+        checkedItemCodes.length > 0
+          ? grnItems.filter((item) => checkedItemCodes.includes(item.item_code))
+          : grnItems
+
+      console.log('Filtered GRN Items:', filteredGrnItems)
+
+      return filteredGrnItems
+    } catch (error) {
+      console.error('Failed to process GRN data:', error)
+      return []
+    }
   }
 
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // const handlePoChange = (e) => {
+  //   const selectedId = parseInt(e.target.value);
+  //   console.log("selectedId",selectedId);
 
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////  
-// const handlePoChange = (e) => {
-//   const selectedId = parseInt(e.target.value);
-//   console.log("selectedId",selectedId);
-  
-//       // if(selectedId) {
-//         // selectedPoId = selectedId;
-//           handlePurchaseDetails(selectedId);
-//           setValue('po_id', e.target.value);
-//       // }else{
-//       //   selectedPoId
-//       //   console.log("selectedPoId else",selectedPoId);
-//       // }
-//   };
+  //       // if(selectedId) {
+  //         // selectedPoId = selectedId;
+  //           handlePurchaseDetails(selectedId);
+  //           setValue('po_id', e.target.value);
+  //       // }else{
+  //       //   selectedPoId
+  //       //   console.log("selectedPoId else",selectedPoId);
+  //       // }
+  //   };
 
   // const handlePoChange = (e) => {
   //   const selectedId = parseInt(e.target.value);
@@ -202,56 +215,146 @@ const handleClose = () => {
   // };
 
   const handlePoChange = (e) => {
-  const selectedId = parseInt(e.target.value);
-  setSelectedPoIdState(selectedId);
-  handlePurchaseDetails(selectedId);
-  setValue('po_id', e.target.value);
-};
+    setItems([])
+    setValue('items', [])
+    setValue('grn_id', null)
+    const selectedId = parseInt(e.target.value)
+    setSelectedPoIdState(selectedId)
+    // handlePurchaseDetails(selectedId)
+    setValue('po_id', e.target.value)
+    getPOItemsById(selectedId)
+  }
 
+  const handleGrnChange = (e) => {
+    const selectedGrnId = parseInt(e.target.value)
+    console.log('selected grn ', selectedGrnId)
+    setGrnId(selectedGrnId)
+    setValue('grn_id', selectedGrnId)
+    getGRNItemsForReturn(selectedGrnId)
+  }
+  const getGRNItemsForReturn = async (grnId) => {
+    try {
+      const response = await apiMethods.getPurchaseOrderDetails({
+        po_id: selectedPoIdState,
+        grn_id: grnId,
+      })
+      const grnItems = response?.data.purchaseOrderItemDetails || []
+      console.log('GRN Items for Return:', grnItems)
+      const filteredGRNItems = grnItems.filter((grn) => grn.grn_item_id != null)
+      console.log('Filtered GRN Items:', filteredGRNItems)
+      reset({ items: filteredGRNItems })
 
+      // Optional: if you're managing separate local state for any reason
+      setItems(filteredGRNItems)
+      // setGrnItemsForReturn(grnItems)
+    } catch (error) {
+      console.error('Error fetching GRN items for return:', error)
+    }
+  }
+
+  const getGRNData = async (poId, poItems) => {
+    try {
+      const response = await apiMethods.getGRNByPOId(poId)
+      const grn = response.data?.data.grns || []
+
+      console.log('GRN Data Response:', grn)
+
+      // const matchedGrn = allGrns.find((grn) => grn.po_id === poId)
+
+      if (grn) {
+        setGrnData(grn)
+        setGrnId(grn.id)
+        // setValue('grn_id', grn.id)
+        console.log('Filtered GRN Data:', grn)
+        // const matchedPOItems = poItems.filter(
+        //   (po) =>
+        //     Array.isArray(grnData.GRNItems) &&
+        //     grnData.GRNItems.some((g) => g.item_id === po.item_id),
+        // )
+
+        // console.log('Matched PO Items:', matchedPOItems)
+        // setValue('items', JSON.stringify(matchedPOItems))
+        // setItems(matchedPOItems)
+      } else {
+        console.warn('No GRN found matching the PO ID:', poId)
+        // setAlerts('No matching GRN found.')
+      }
+    } catch (error) {
+      setAlerts({
+        severity: 'error',
+        message: 'Something went wrong',
+      })
+      console.error(error.response?.data || error.message)
+    }
+  }
+
+  const getPOItemsById = async (poId) => {
+    try {
+      const response = await apiMethods.getPurchaseOrderById(poId)
+      console.log('PO Items Response:', response.data)
+
+      const POData = response?.data || []
+      const poItems = POData?.PurchaseOrderItems || []
+
+      console.log('PO Items:', poItems)
+
+      // setValue('grn_id', POData?.grn_id || null)
+      getGRNData(poId, poItems)
+
+      // Important part
+      // setValue('items', JSON.stringify(poItems))
+
+      // setItems(poItems)
+    } catch (error) {
+      console.error('Error fetching PO items:', error)
+    }
+  }
 
   useEffect(() => {
-        setValue('po_id', selectedPoId);
+    setValue('po_id', selectedPoId)
     if (isEdit && selectedPoId) {
-      handlePurchaseDetails(selectedPoId);
-    } else if (selectedPorId) {
-      handlePurchaseDetails(selectedPorId);
-    }else{
-      handlePurchaseDetails(selectedPoId);
+      getPOItemsById(selectedPoId)
+      // handlePurchaseDetails(selectedPoId)
+    } else if (selectedPoIdState) {
+      getPOItemsById(selectedPorId)
+      // handlePurchaseDetails(selectedPorId)
+    } else {
+      // getPOItemsById(selectedPoId)
+      // // handlePurchaseDetails(selectedPoId)
     }
-  }, [isEdit, selectedPoId, selectedPorId]);
+  }, [isEdit, selectedPoId, selectedPoId])
 
   const handleFormSubmit = async (data) => {
-    console.log('Form submit data:', data);
+    console.log('Form submit data:', data)
     // return;
-    const checkedItems = items.filter(item => item.selected)
-    const checkedItemCodes = checkedItems.map(item => item.item_code)
-    
-////////////////////////////////////////////////////////////////////////////////////////
-// const response = await apiMethods.getinventory();
-// const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : [];
-// let allAvailable = true;
-// for (const checkedItem of checkedItems) {
-//   const matchedInventory = inventoryList.find(inv => inv.item_id === checkedItem.item_id);
+    const checkedItems = items.filter((item) => item.selected)
+    const checkedItemCodes = checkedItems.map((item) => item.item_code)
 
-//   if (!matchedInventory || matchedInventory.quantity_available === 0) {
-//     allAvailable = false;
-//     console.warn(`Item ID ${checkedItem.item_id} is not available in inventory.`);
-//     break;
-//   }
-// }
-// const message = allAvailable
-//   ? "Purchase return created successfully"
-//   : "Some item quantities are zero or unavailable, so return not possible";
-// alert(message);
-// console.log(message);
-/////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////
+    // const response = await apiMethods.getinventory();
+    // const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : [];
+    // let allAvailable = true;
+    // for (const checkedItem of checkedItems) {
+    //   const matchedInventory = inventoryList.find(inv => inv.item_id === checkedItem.item_id);
+
+    //   if (!matchedInventory || matchedInventory.quantity_available === 0) {
+    //     allAvailable = false;
+    //     console.warn(`Item ID ${checkedItem.item_id} is not available in inventory.`);
+    //     break;
+    //   }
+    // }
+    // const message = allAvailable
+    //   ? "Purchase return created successfully"
+    //   : "Some item quantities are zero or unavailable, so return not possible";
+    // alert(message);
+    // console.log(message);
+    /////////////////////////////////////////////////////////////////////////////////////////////////
 
     // if (checkedItems.length === 0) {
-      //   alert('Please select at least one item to return.')
-      //   return
-      // }
-      // const grnDetails = await handleGrndata(grnId, checkedItemCodes)
+    //   alert('Please select at least one item to return.')
+    //   return
+    // }
+    // const grnDetails = await handleGrndata(grnId, checkedItemCodes)
 
     // Fetch GRN details first to enrich or validate data
 
@@ -273,43 +376,49 @@ const handleClose = () => {
     const payload = {
       po_id: data.po_id || selectedPoId,
       grn_id: grnId,
-      decision: data.decision,
       reason: data.reason || 'Quality issues',
       payment_terms: data.payment_terms || '',
       notes: data.notes || '',
-      items: checkedItems.map(item => ({
+      items: checkedItems.map((item) => ({
         grn_item_id: item.grn_item_id || null,
         item_id: item.item_id,
-        return_qty: item.quantity,
-        unit_price: item.unit_price
-      }))
+        return_qty: item.return_qty,
+        unit_price: item.unit_price,
+        reason: item.reason,
+        notes: item.notes,
+      })),
     }
 
-    console.log('Final Payload:', payload);
+    console.log('Final Payload:', payload)
     // return;
 
     try {
       const response = await apiMethods.submitPurchaseOrderReturn(payload)
-      setAlerts('Purchase Order Return submitted successfully!');
+      setAlerts({
+        severity: 'success',
+        message: response?.data?.message || 'PO Return Created Successfully',
+      })
 
       setDrawer(false)
     } catch (error) {
       console.error('Submission error:', error)
-      console.error(error.response?.data || error.message);
-      setAlerts('Failed to submit purchase order return.')
+      console.error(error.response?.data || error.message)
+      setAlerts({
+        severity: 'error',
+        message: response?.data?.message || 'Something went wrong',
+      })
     }
   }
-
 
   // useEffect(() => {
   //   const fetchVendors = async () => {
   //     try {
-  //       const initial = await apiMethods.getClients(); 
-  //       const count = initial?.length || 100; 
-  
+  //       const initial = await apiMethods.getClients();
+  //       const count = initial?.length || 100;
+
   //       const fullData = await apiMethods.getClients({ limit: count });
   //       const clientsArray = fullData.data;
-  
+
   //       if (Array.isArray(clientsArray)) {
   //         const vendorList = clientsArray.filter(client => client.entity_type === "Vendor");
   //         console.log('vendorList:', vendorList);
@@ -321,30 +430,27 @@ const handleClose = () => {
   //       console.error('Error in useEffect:', error);
   //     }
   //   };
-  
+
   //   fetchVendors();
   // }, []);
 
-
-
-  // change address 
+  // change address
   const handleSupplierChange = (e) => {
-    const selectedId = parseInt(e.target.value);
-    const selectedClient = clientData.find(client => client.client_id === selectedId);
+    const selectedId = parseInt(e.target.value)
+    const selectedClient = clientData.find((client) => client.client_id === selectedId)
 
     if (selectedClient) {
-      setValue('supplier_name', selectedClient.display_name || '');
-      setValue('supplier_email', selectedClient.email || '');
-      setValue('supplier_contact', selectedClient.mobile || selectedClient.work_phone || '');
-      setValue('payment_terms', selectedClient.payment_terms || '');
+      setValue('supplier_name', selectedClient.display_name || '')
+      setValue('supplier_email', selectedClient.email || '')
+      setValue('supplier_contact', selectedClient.mobile || selectedClient.work_phone || '')
+      setValue('payment_terms', selectedClient.payment_terms || '')
 
       // Handle addresses
-      const addresses = selectedClient.addresses || [];
-      setSupplierAddresses(addresses);
-      setSelectedAddressIndex(0);
+      const addresses = selectedClient.addresses || []
+      setSupplierAddresses(addresses)
+      setSelectedAddressIndex(0)
 
-
-    const addressObj = addresses[0] || {};
+      const addressObj = addresses[0] || {}
       const addressString = [
         addressObj.attention,
         addressObj.address_line,
@@ -354,28 +460,24 @@ const handleClose = () => {
         addressObj.state,
         addressObj.country,
         addressObj.pinCode,
-        addressObj.phone
-      ].filter(Boolean).join(', ');
+        addressObj.phone,
+      ]
+        .filter(Boolean)
+        .join(', ')
 
-      setValue('shipping_address', addressString);
+      setValue('shipping_address', addressString)
     } else {
-      setSupplierAddresses([]);
-      setSelectedAddressIndex(0);
-      setValue('shipping_address', '');
+      setSupplierAddresses([])
+      setSelectedAddressIndex(0)
+      setValue('shipping_address', '')
     }
-  };
-
-
-
-
-
-
+  }
 
   const handleAddressChange = (e) => {
-  const idx = parseInt(e.target.value, 10);
-  setSelectedAddressIndex(idx);
+    const idx = parseInt(e.target.value, 10)
+    setSelectedAddressIndex(idx)
 
-  const addressObj = supplierAddresses[idx] || {};
+    const addressObj = supplierAddresses[idx] || {}
     const addressString = [
       addressObj.attention,
       addressObj.address_line,
@@ -385,32 +487,54 @@ const handleClose = () => {
       addressObj.state,
       addressObj.country,
       addressObj.pinCode,
-      addressObj.phone
-    ].filter(Boolean).join(', ');
+      addressObj.phone,
+    ]
+      .filter(Boolean)
+      .join(', ')
 
-    setValue('shipping_address', addressString);
-  };
-
+    setValue('shipping_address', addressString)
+  }
 
   const formatAddress = (addressObj) => {
-  if (!addressObj) return '';
-  return (
-    <>
-      {addressObj.attention && <strong>{addressObj.attention}</strong>}<br />
-      {addressObj.street1 && <>{addressObj.street1}<br /></>}
-      {addressObj.street2 && <>{addressObj.street2}<br /></>}
-      {addressObj.city && <>{addressObj.city}, </>}
-      {addressObj.state && <>{addressObj.state} </>}
-      {addressObj.pinCode && <>{addressObj.pinCode}<br /></>}
-      {addressObj.country && <>{addressObj.country}<br /></>}
-      {addressObj.phone && <>Phone : {addressObj.phone}</>}
-    </>
-  );
-};
+    if (!addressObj) return ''
+    return (
+      <>
+        {addressObj.attention && <strong>{addressObj.attention}</strong>}
+        <br />
+        {addressObj.street1 && (
+          <>
+            {addressObj.street1}
+            <br />
+          </>
+        )}
+        {addressObj.street2 && (
+          <>
+            {addressObj.street2}
+            <br />
+          </>
+        )}
+        {addressObj.city && <>{addressObj.city}, </>}
+        {addressObj.state && <>{addressObj.state} </>}
+        {addressObj.pinCode && (
+          <>
+            {addressObj.pinCode}
+            <br />
+          </>
+        )}
+        {addressObj.country && (
+          <>
+            {addressObj.country}
+            <br />
+          </>
+        )}
+        {addressObj.phone && <>Phone : {addressObj.phone}</>}
+      </>
+    )
+  }
 
-// When confirming address selection in modal
+  // When confirming address selection in modal
   const handleAddressSelect = () => {
-    const addressObj = supplierAddresses[selectedAddressIndex] || {};
+    const addressObj = supplierAddresses[selectedAddressIndex] || {}
     const addressString = [
       addressObj.attention,
       addressObj.address_line,
@@ -420,27 +544,24 @@ const handleClose = () => {
       addressObj.state,
       addressObj.country,
       addressObj.pinCode,
-      addressObj.phone
-    ].filter(Boolean).join(', ');
-    setValue('shipping_address', addressString);
-    setShowAddressModal(false);
-  };
-
-
-
-
+      addressObj.phone,
+    ]
+      .filter(Boolean)
+      .join(', ')
+    setValue('shipping_address', addressString)
+    setShowAddressModal(false)
+  }
 
   return (
     <>
-    <CustomAlert alerts={alerts} handleClose={handleClose} />
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <h2 className="text-lg font-semibold mb-4">Purchase Order Details</h2>
+      <CustomAlert alerts={alerts} handleClose={handleClose} />
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <h2 className="text-lg font-semibold mb-4">Purchase Order Details</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-          {/* Supplier Dropdown */}
-          {/* <div className="form-group">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Supplier Dropdown */}
+            {/* <div className="form-group">
             <label className="block text-sm font-medium text-gray-700 mb-1">Supplier ID </label>
             <select
               {...register('supplier_id')}
@@ -459,91 +580,125 @@ const handleClose = () => {
             )}
           </div> */}
 
-          {/* purchase order id */}
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Purchase Order ID <span className="text-red-500"> *</span>
-            </label>
-            <select
-              {...register('po_id', { required: 'required' })}
-              onChange={handlePoChange}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            >
-              <option value="">-- Select Purchase Order --</option>
+            {/* purchase order id */}
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Purchase Order ID <span className="text-red-500"> *</span>
+              </label>
+              <select
+                {...register('po_id', { required: 'required' })}
+                onChange={handlePoChange}
+                style={getInputStyle(errors?.po_id)}
+                className="w-full p-2 border-gray-300 rounded-md"
+              >
+                <option value="">-- Select Purchase Order --</option>
 
-              {isEdit && selectedPoId && (
-                <option value={selectedPoId}>{selectedPoId}</option>
+                {isEdit && selectedPoId && <option value={selectedPoId}>{selectedPoId}</option>}
+
+                {filteredPoData?.map((po) => (
+                  <option key={po.id} value={po.id}>
+                    {po.purchase_generate_id}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                GRN ID <span className="text-red-500"> *</span>
+              </label>
+              <select
+                {...register('grn_id', { required: 'required' })}
+                onChange={handleGrnChange}
+                style={getInputStyle(errors?.grn_id)}
+                className="w-full p-2 border-gray-300 rounded-md"
+              >
+                <option value="">-- Select GRN --</option>
+
+                {isEdit && selectedPoId && <option value={selectedPoId}>{selectedPoId}</option>}
+
+                {grnData?.map((grn) => (
+                  <option key={grn.id} value={grn.id}>
+                    {grn.grn_generate_id}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Name </label>
+              <input
+                type="text"
+                {...register('supplier_name')}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                readOnly
+              />
+              {errors.supplier_name && (
+                <p className="text-red-500 text-sm mt-1">{errors.supplier_name.message}</p>
               )}
+            </div>
 
-              {filteredPoData?.map((po) => (
-                <option key={po.id} value={po.id}>
-                  {po.id}
-                </option>
-              ))}
-            </select>
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Supplier Contact{' '}
+              </label>
+              <input
+                type="number"
+                {...register('supplier_contact')}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                readOnly
+              />
+              {errors.supplier_contact && (
+                <p className="text-red-500 text-sm mt-1">{errors.supplier_contact.message}</p>
+              )}
+            </div>
 
-            {errors.po_id && (
-              <p className="text-red-500 text-sm mt-1">{errors.po_id.message}</p>
-            )}
-          </div>
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Supplier E-mail
+              </label>
+              <input
+                type="email"
+                {...register('supplier_email')}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                readOnly
+              />
+              {errors.supplier_email && (
+                <p className="text-red-500 text-sm mt-1">{errors.supplier_email.message}</p>
+              )}
+            </div> */}
 
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Payment Terms</label>
+              <input
+                type="text"
+                {...register('payment_terms', { required: 'required' })}
+                style={getInputStyle(errors?.payment_terms)}
+                className="w-full p-2 border-gray-300 rounded-md"
+              />
+            </div>
 
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+              <input
+                type="text"
+                {...register('reason', { required: 'required' })}
+                style={getInputStyle(errors?.reason)}
+                className="w-full p-2 border-gray-300 rounded-md"
+              />
+            </div>
 
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Name </label>
-            <input
-              type="text"
-              {...register('supplier_name')}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              readOnly
-            />
-            {errors.supplier_name && (
-              <p className="text-red-500 text-sm mt-1">{errors.supplier_name.message}</p>
-            )}
-          </div>
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+              <input
+                type="text"
+                {...register('notes', { required: 'required' })}
+                style={getInputStyle(errors?.notes)}
+                className="w-full p-2 border-gray-300 rounded-md"
+              />
+            </div>
 
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Contact </label>
-            <input
-              type="number"
-              {...register('supplier_contact')}
-              className="w-full p-2 border border-gray-300 rounded-md"
-               readOnly
-            />
-            {errors.supplier_contact && (
-              <p className="text-red-500 text-sm mt-1">{errors.supplier_contact.message}</p>
-            )}
-            
-          </div>
-
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier E-mail</label>
-            <input
-              type="email"
-              {...register('supplier_email')}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              readOnly
-            />
-            {errors.supplier_email && (
-              <p className="text-red-500 text-sm mt-1">{errors.supplier_email.message}</p>
-            )}
-          </div>
-
-          
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Terms</label>
-            <input
-              type="text"
-              {...register('payment_terms')}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              readOnly
-            />
-            {errors.payment_terms && (
-              <p className="text-red-500 text-sm mt-1">{errors.payment_terms.message}</p>
-            )}
-          </div>
-
-          {/* <div className="form-group">
+            {/* <div className="form-group">
             <label className="block text-sm font-medium text-gray-700 mb-1">PO Date</label>
             <input
               type="date"
@@ -552,43 +707,45 @@ const handleClose = () => {
             />
           </div> */}
 
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Valid Till <span className="text-red-500"> *</span> </label>
-            <input
-              type="date"
-              {...register('valid_till', { required: 'required' })}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            />
-            {errors.valid_till && (
-              <p className="text-red-500 text-sm mt-1">{errors.valid_till.message}</p>
-            )}
-          </div>
+            {/* <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Valid Till <span className="text-red-500"> *</span>{' '}
+              </label>
+              <input
+                type="date"
+                {...register('valid_till', { required: 'required' })}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+              {errors.valid_till && (
+                <p className="text-red-500 text-sm mt-1">{errors.valid_till.message}</p>
+              )}
+            </div>
 
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Freight Terms</label>
-            <input
-              type="text"
-              {...register('freight_terms')}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Decision</label>
-            <select
-            disabled
-              {...register('decision')}
-              defaultValue="approve"
-              className="w-full p-2 border border-gray-300 rounded-md"
-            >
-              <option value="approve">Approve</option>
-              <option value="disapprove">Disapprove</option>
-            </select>
-          </div>
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Freight Terms</label>
+              <input
+                type="text"
+                {...register('freight_terms')}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Decision</label>
+              <select
+                disabled
+                {...register('decision')}
+                defaultValue="approve"
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                <option value="approve">Approve</option>
+                <option value="disapprove">Disapprove</option>
+              </select>
+            </div> */}
           </div>
 
           {/* Address */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
           <div className="form-group">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Billing Address
@@ -673,38 +830,41 @@ const handleClose = () => {
           </div>
         </div> */}
 
-        <div className="mt-6">
-          <ReturnItemForm
-            items={items}
-            setItems={setItems}
-            formValues={poTotals}
-            setFormValues={setPoTotals}
-             isEdit={isEdit}
-          />
-        </div>
+          <div className="mt-6">
+            <ReturnItemForm
+              items={items}
+              setItems={setItems}
+              formValues={poTotals}
+              setFormValues={setPoTotals}
+              isEdit={isEdit}
+            />
+          </div>
 
-        {/* Hidden totals */}
-        {Object.entries(poTotals).map(([key, value]) => (
-          <input type="hidden" key={key} {...register(key)} value={value} />
-        ))}
+          {/* Hidden totals */}
+          {Object.entries(poTotals).map(([key, value]) => (
+            <input type="hidden" key={key} {...register(key)} value={value} />
+          ))}
 
-        <div className="mt-6 flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={() => setDrawer(false)}
-            className="p-2 border border-gray-300 rounded w-24 hover:bg-gray-100 transition"
-          >
-            Cancel
-          </button>
-          <ActionButton
-            type="submit"
-            variant="primary"
-            label={isEdit ? "Update" : "Submit"}
-            isLoading={isSubmitting}
-          />
+          <div className="mt-6 flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                reset()
+                setDrawer(false)
+              }}
+              className="p-2 border border-gray-300 rounded w-24 hover:bg-gray-100 transition"
+            >
+              Cancel
+            </button>
+            <ActionButton
+              type="submit"
+              variant="primary"
+              label={isEdit ? 'Update' : 'Submit'}
+              isLoading={isSubmitting}
+            />
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
     </>
   )
 }

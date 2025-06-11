@@ -1645,5 +1645,9 @@ export const apiMethods = {
       responseType: 'blob',
     })
   },
+
+  getVendor: async (params) => {
+    return await apiClient.get('/clients', { params })
+  },
 }
 export default apiMethods

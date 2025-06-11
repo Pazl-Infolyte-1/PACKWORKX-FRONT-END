@@ -292,6 +292,11 @@ export const GroupLayersProvider = ({ children }) => {
     });
   };
 
+  // Add refresh function
+  const refreshData = async () => {
+      setGroups([]);
+  };
+
   const value = {
     workOrders,
     groups,
@@ -299,7 +304,8 @@ export const GroupLayersProvider = ({ children }) => {
     addGroup,
     updateGroup,
     addWorkOrderToGroup,
-    removeWorkOrderFromGroup
+    removeWorkOrderFromGroup,
+    refreshData
   };
 
   return (

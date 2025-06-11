@@ -1643,6 +1643,21 @@ export const apiMethods = {
   getProductionGroups:async()=>{
     return await apiClient.get('/production/production-group?include_work_orders=true')
   },
+  getDeckleOptions:async()=>{
+    return await apiClient.get('/items/reels/deckle')
+  },
+  getColorOptions:async()=>{
+    return await apiClient.get('/items/reels/color')
+  },
+    getGsmOptions:async()=>{
+    return await apiClient.get('/items/reels/gsm')
+  },
+    getBfOptions:async()=>{
+    return await apiClient.get('/items/reels/bf')
+  },
+  getReelsInRawMeterial:async (params)=>{
+    return await apiClient.get('/inventory/reels',{params})
+  },
   getInventoryInSkuView: async () => {
     try {
       const response = await apiClient.get(`/inventory?search=&page=1&limit=50&subCategoryId=1`)

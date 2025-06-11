@@ -324,7 +324,7 @@ function GroupDropZone({
               <>
                 <span>GSM - {i?.layer_detail?.gsm}</span>
                 <span>BF - {i?.layer_detail?.bf}</span>
-                <span>{i.dimensions} PLY</span>
+                <span>{i.weight} kg</span>
                 <span>{i?.layer_detail?.color}</span>
               </>
             )}
@@ -376,6 +376,82 @@ const AllocateRM = ({
   const [advanced, setAdvanced] = useState(false)
   const [visibleAllocate, setVisibleAllocate] = useState(false)
   const [visibleSplit, setVisibleSplit] = useState(false)
+
+  const [deckleOptions, setDeckleOptions] = useState([]);
+  const [colorOptions, setColorOptions] = useState([]);
+  const [gsmOptions, setGsmOptions] = useState([]);
+  const [bfOptions, setBfOptions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Add state for selected filter values
+  const [selectedFilters, setSelectedFilters] = useState({
+    gsm: '',
+    bf: '',
+    color: '',
+    deckle: ''
+  });
+
+  const handleFilterChange = (filterName, value) => {
+    setSelectedFilters(prev => ({
+      ...prev,
+      [filterName]: value
+    }));
+  };
+
+  const fetchReels = async (params) => {
+    try {
+      // Format the parameters correctly
+      const formattedParams = {
+        gsm: params.gsm || '',
+        bf: params.bf || '',
+        color: params.color || '',
+        deckle: params.deckle || ''
+      };
+
+      const response = await apiMethods.getReelsInRawMeterial(formattedParams);
+      if (response) {
+        console.log(response)
+      }
+    } catch (error) {
+      console.error('Error fetching reels:', error);
+      setError(error?.response?.data?.message || 'Failed to fetch reels data');
+    }
+  };
+
+  // Update useEffect to watch selectedFilters
+  useEffect(() => {
+    fetchReels(selectedFilters);
+  }, [selectedFilters]);
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const [deckleRes, colorRes, gsmRes, bfRes] = await Promise.allSettled([
+          apiMethods.getDeckleOptions(),
+          apiMethods.getColorOptions(),
+          apiMethods.getGsmOptions(),
+          apiMethods.getBfOptions(),
+        ]);
+
+        console.log(deckleRes.value?.data?.data, colorRes, gsmRes, bfRes)
+        
+
+        setDeckleOptions(deckleRes?.value?.data?.data);
+        setColorOptions(colorRes?.value?.data?.data);
+        setGsmOptions(gsmRes?.value?.data?.data);
+        setBfOptions(bfRes?.value?.data?.data);
+      } catch (error) {
+        console.error('Error fetching dropdown options:', error);
+      }
+    };
+
+    fetchOptions();
+  }, []);
+
+
+
+
   const [sfgData, setSfgData] = useState([
     {
       id: 'Reel 02',
@@ -633,29 +709,65 @@ const AllocateRM = ({
               <CRow className="align-items-center mt-3">
                 <CCol md="2">
                   <label>GSM</label>
-                  <CFormSelect style={selectStyles}>
-                    <option>180</option>
+                  <CFormSelect 
+                    style={selectStyles}
+                    value={selectedFilters.gsm}
+                    onChange={(e) => handleFilterChange('gsm', e.target.value)}
+                  >
+                    <option disabled selected value=""> GSM</option>
+                    {gsmOptions?.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </CFormSelect>
                 </CCol>
                 <CCol md="2">
                   <label>BF</label>
-                  <CFormSelect style={selectStyles}>
-                    <option>24</option>
+                  <CFormSelect 
+                    style={selectStyles}
+                    value={selectedFilters.bf}
+                    onChange={(e) => handleFilterChange('bf', e.target.value)}
+                  >
+                    <option disabled selected value=""> BF</option>
+                    {bfOptions?.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </CFormSelect>
                 </CCol>
                 <CCol md="2">
                   <label>Color</label>
-                  <CFormSelect style={selectStyles}>
-                    <option>90</option>
+                  <CFormSelect 
+                    style={selectStyles}
+                    value={selectedFilters.color}
+                    onChange={(e) => handleFilterChange('color', e.target.value)}
+                  >
+                    <option disabled selected value=""> Color</option>
+                    {colorOptions?.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </CFormSelect>
                 </CCol>
                 <CCol md="2">
                   <label>Deckle</label>
-                  <CFormSelect style={selectStyles}>
-                    <option>25</option>
+                  <CFormSelect 
+                    style={selectStyles}
+                    value={selectedFilters.deckle}
+                    onChange={(e) => handleFilterChange('deckle', e.target.value)}
+                  >
+                    <option disabled selected value=""> Deckle</option>
+                    {deckleOptions?.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </CFormSelect>
                 </CCol>
-
+{/* 
                 <CCol md="2" className="d-flex justify-content-end">
                   <CButton
                     color="light"
@@ -664,7 +776,7 @@ const AllocateRM = ({
                   >
                     Advanced {advanced ? <FaAngleUp /> : <FaAngleDown />}
                   </CButton>
-                </CCol>
+                </CCol> */}
               </CRow>
               {advanced && (
                 <CRow className="mt-3">

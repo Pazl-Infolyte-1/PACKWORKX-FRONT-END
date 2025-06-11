@@ -38,6 +38,7 @@ import {
   cilTrash,
   cilQrCode,
   cilLink,
+  cilPencil,
 } from '@coreui/icons'
 import './styles.css'
 import ProgressBar from './ProgressBar'
@@ -386,7 +387,32 @@ function GroupOrderDropZone({
 }) {
 
   const navigate = useNavigate()
-  const {removeWorkOrderFromGroup} = useGroupLayers()
+  const {removeWorkOrderFromGroup, updateGroup} = useGroupLayers()
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedName, setEditedName] = useState(groupOrder.group_name)
+
+  const handleNameEdit = () => {
+    setIsEditing(true)
+  }
+
+  const handleNameSave = () => {
+    updateGroup(groupOrder.id, { group_name: editedName })
+    setIsEditing(false)
+  }
+
+  const handleNameChange = (e) => {
+    setEditedName(e.target.value)
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleNameSave()
+    } else if (e.key === 'Escape') {
+      setIsEditing(false)
+      setEditedName(groupOrder.group_name)
+    }
+  }
+
   const [, drop] = useDrop(() => ({
     accept: ItemType,
     drop: (item) => {
@@ -432,7 +458,42 @@ function GroupOrderDropZone({
           }}
         >
           <CCardBody className="p-2 d-flex align-items-center justify-content-center">
-            <CCardText className="text-white bold">{groupOrder.group_name}</CCardText>
+            <div className="d-flex align-items-center justify-content-between w-100">
+              {isEditing ? (
+                <input
+                  value={editedName}
+                  onChange={handleNameChange}
+                  onKeyDown={handleKeyPress}
+                  onBlur={handleNameSave}
+                  autoFocus
+                  style={{ 
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'white',
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    width: '100%',
+                    outline: 'none',
+                    textAlign: 'center'
+                  }}
+                />
+              ) : (
+                <>
+                  <CCardText className="text-white bold mb-0">{groupOrder.group_name}</CCardText>
+                  <CIcon
+                    icon={cilPencil}
+                    className="hover-pointer"
+                    style={{ 
+                      fontSize: '1rem',
+                      color: 'white',
+                      opacity: 0.8,
+                      marginLeft: '8px'
+                    }}
+                    onClick={handleNameEdit}
+                  />
+                </>
+              )}
+            </div>
           </CCardBody>
         </CCard>
 
@@ -441,6 +502,7 @@ function GroupOrderDropZone({
           const uniqueIndex = `${groupIndex}-${itemIndex}`
           const isPairedGroup = item.isGroup && item.layers && item.layers.length > 1
           
+          {console.log(groupOrder)}
           return (
             <CCard
               key={uniqueIndex}
@@ -461,7 +523,7 @@ function GroupOrderDropZone({
                     alignItems: 'flex-start',
                     cursor: 'pointer',
                     width: '100%',
-                    minHeight: '40px',
+                    minHeight: '10px',
                   }}
                 >
                   {/* Layer Names Section */}
@@ -481,7 +543,7 @@ function GroupOrderDropZone({
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                             {item.layers.map((layer, idx) => (
                               <div key={idx} style={{ display: 'flex', flexDirection: 'column' }}>
-                                <div>
+                                <div className='font-medium'>
                                   {layer.layer}
                                 </div>
                                 
@@ -490,41 +552,36 @@ function GroupOrderDropZone({
                                   <div 
                                   className='w-full'
                                     style={{
-                                      
                                       padding: '5px',
                                       borderRadius: '4px',
-                                      
                                       borderLeft: '3px solid #8167e5',
                                       fontSize: '10px',
                                       marginTop: '6px',
                                       marginBottom: '8px'
                                     }}
                                   >
-                                    <div className="row text-sm">
-                                      <div className="col-12 mb-2">
-                                        <strong>SKU:</strong> {layer.sku_name || 'N/A'}
+                                    <div className=" text-xs">
+                                      <div className=" mb-2">
+                                        <strong>Layer:</strong> {layer.layer || 'N/A'}
                                       </div>
-                                      <div className="col-6 mb-2">
-                                        <strong>Dimensions:</strong> {layer.Dimensions || 'N/A'} mm
+                                      <div className="mb-2">
+                                        <strong>Gsm:</strong> {layer.gsm || 'N/A'} mm
                                       </div>
-                                      <div className="col-6 mb-2">
-                                        <strong>Route:</strong> {layer.Route || 'N/A'}
+                                      <div className="mb-2">
+                                        <strong>Bf:</strong> {layer.bf || 'N/A'}
                                       </div>
-                                      <div className="col-6 mb-2">
-                                        <strong>Start:</strong> {formatDate(layer.planned_start_date) || 'N/A'}
+                                      <div className="mb-2">
+                                        <strong>material:</strong> {formatDate(layer.material) || 'N/A'}
                                       </div>
-                                      <div className="col-6 mb-2">
-                                        <strong>End:</strong> {formatDate(layer.planned_end_date) || 'N/A'}
+                                      <div className="mb-2">
+                                        <strong>weight:</strong> {formatDate(layer.weight) || 'N/A'}
                                       </div>
-                                      <div className="col-6 mb-2">
-                                        <strong>Qty:</strong> {layer.qty || 'N/A'}
-                                      </div>
-                                      <div className="col-6 mb-2">
-                                        <strong>To Manufacture:</strong> {layer.qty_to_manufacture || 'N/A'}
+                                      <div className="mb-2">
+                                        <strong>bursting_strength:</strong> {layer.bursting_strength || 'N/A'}
                                       </div>
                                     </div>
 
-                                    <div className="d-flex align-items-center gap-2 mt-2" style={{ fontSize: '14px' }}>
+                                    {/* <div className="d-flex align-items-center text-xs gap-2 mt-2" style={{ fontSize: '14px' }}>
                                       <label htmlFor={`finishedGoods-${idx}`} className="mb-0">
                                         <strong>Finished Goods:</strong>
                                       </label>
@@ -541,7 +598,7 @@ function GroupOrderDropZone({
                                       >
                                         ✔
                                       </button>
-                                    </div>
+                                    </div> */}
                                   </div>
                                 )}
 
@@ -560,7 +617,7 @@ function GroupOrderDropZone({
                         )
                       : (
                           <div>
-                            <div>
+                            <div className='font-medium'>
                               {item.layer}
                             </div>
                             {/* Show data under single layer when expanded */}
@@ -568,42 +625,39 @@ function GroupOrderDropZone({
                               <div 
                                 style={{
                                   
-                                  padding: '12px',
+                                  padding: '5px',
                                   borderRadius: '4px',
                                   
                                   borderLeft: '3px solid #8167e5',
-                                  fontSize: '13px',
+                                  fontSize: '10px',
                                   marginTop: '6px'
                                 }}
                               >
-                                <div className="row text-sm">
+                                <div className="row text-xs">
                                   <div className="col-12 mb-2">
-                                    <strong>SKU:</strong> {item.sku_name || 'N/A'}
+                                    <strong>layer:</strong> {item.layer || 'N/A'}
                                   </div>
-                                  <div className="col-6 mb-2">
-                                    <strong>Project:</strong> {item.layer || 'N/A'}
+                                  <div className=" mb-2">
+                                    <strong>Gsm:</strong> {item.gsm || 'N/A'}
                                   </div>
-                                  <div className="col-6 mb-2">
-                                    <strong>Dimensions:</strong> {item.Dimensions || 'N/A'} mm
+                                  <div className=" mb-2">
+                                    <strong>Bf:</strong> {item.bf || 'N/A'} mm
                                   </div>
-                                  <div className="col-6 mb-2">
-                                    <strong>Start:</strong> {formatDate(item.planned_start_date) || 'N/A'}
+                                  <div className=" mb-2">
+                                    <strong>material:</strong> {item.material || 'N/A'}
                                   </div>
-                                  <div className="col-6 mb-2">
-                                    <strong>End:</strong> {formatDate(item.planned_end_date) || 'N/A'}
+                                  <div className=" mb-2">
+                                    <strong>color:</strong>{item.color || 'N/A'}
                                   </div>
-                                  <div className="col-6 mb-2">
-                                    <strong>Qty:</strong> {item.qty || 'N/A'}
+                                  <div className=" mb-2">
+                                    <strong>weight:</strong> {item.weight || 'N/A'}
                                   </div>
-                                  <div className="col-6 mb-2">
-                                    <strong>Route:</strong> {item.Route || 'N/A'}
-                                  </div>
-                                  <div className="col-12 mb-2">
-                                    <strong>To Manufacture:</strong> {item.qty_to_manufacture || 'N/A'}
+                                  <div className=" mb-2">
+                                    <strong>bursting_strength:</strong> {item.bursting_strength || 'N/A'}
                                   </div>
                                 </div>
 
-                                <div className="d-flex align-items-center gap-2 mt-2" style={{ fontSize: '14px' }}>
+                                {/* <div className="d-flex align-items-center gap-2 mt-2" style={{ fontSize: '14px' }}>
                                   <label htmlFor="finishedGoods" className="mb-0">
                                     <strong>Finished Goods:</strong>
                                   </label>
@@ -620,7 +674,7 @@ function GroupOrderDropZone({
                                   >
                                     ✔
                                   </button>
-                                </div>
+                                </div> */}
                               </div>
                             )}
                           </div>
@@ -717,7 +771,7 @@ function GroupOrderDropZone({
                 </div>
 
                 {/* Eye Icon */}
-                {groupVisibleIndex === uniqueIndex && (
+                {/* {groupVisibleIndex === uniqueIndex && (
                   <div
                     style={{
                       display: 'flex',
@@ -735,7 +789,7 @@ function GroupOrderDropZone({
                       }}
                     />
                   </div>
-                )}
+                )} */}
               </CCardBody>
             </CCard>
           )
@@ -755,9 +809,10 @@ const Group = ({
   const [visible, setVisible] = useState(false)
   const [selectedType, setSelectedType] = useState('')
   const [splitVisible, setSplitVisible] = useState(false)
+  const navigate = useNavigate()
   // const [workOrders1,setWorkOrders] = useState([])
   const [groups1,setGroupOrders] = useState()
-  const { groups,addWorkOrderToGroup,workOrders,setWorkOrders } = useGroupLayers();
+  const { groups,addWorkOrderToGroup,workOrders,setWorkOrders,refreshData } = useGroupLayers();
   const {registerNextHandler} = useNextHandler()
 
   const {searchQuery,setGlobalPlaceholder} = useSearch()
@@ -774,6 +829,7 @@ const Group = ({
   };
 
   useEffect(() => {
+    refreshData(); 
     fetchWorkOrders();
   }, []);
 
@@ -820,7 +876,9 @@ const Group = ({
   
       const response = await apiMethods.createGroupInProduction(payload);
       console.log(response);
-  
+      
+      navigate('/production/AllocateRM');
+
     } catch (err) {
       console.error('Error while submitting groups:', err);
       setError('Something went wrong while submitting');

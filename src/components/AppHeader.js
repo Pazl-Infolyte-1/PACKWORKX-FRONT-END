@@ -29,6 +29,7 @@ import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import SearchBar from './New/SearchBar'
 import { MdOutlineMenu } from 'react-icons/md'
+import NotificationPanel from './NotificationPanel'
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -52,7 +53,7 @@ const AppHeader = () => {
             console.log('Raw button clicked')
             dispatch({ type: 'set', sidebarShow: !sidebarShow })
           }}
-          className={`${sidebarShow ? 'ml-3' : "ml-2"} p-2 text-white`}
+          className={`${sidebarShow ? 'ml-3' : 'ml-2'} p-2 text-white`}
         >
           <CIcon icon={cilMenu} size="lg" />
         </button>
@@ -76,20 +77,8 @@ const AppHeader = () => {
         </CHeaderNav>
         <CHeaderNav className="ms-auto">
           <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilBell} size="lg" className="text-white" />
-            </CNavLink>
+            <NotificationPanel />
           </CNavItem>
-          {/* <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilList} size="lg" className="text-white" />
-            </CNavLink>
-          </CNavItem> */}
-          {/* <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilEnvelopeOpen} size="lg" className="text-white" />
-            </CNavLink>
-          </CNavItem> */}
         </CHeaderNav>
         <CHeaderNav className="pe-0">
           <li className="nav-item py-1">
@@ -115,7 +104,7 @@ const AppHeader = () => {
               >
                 <CIcon className="me-2" icon={cilSun} size="lg" /> Light
               </CDropdownItem>
-               {/* <CDropdownItem
+              {/* <CDropdownItem
                 active={colorMode === 'dark'}
                 className="d-flex align-items-center"
                 as="button"

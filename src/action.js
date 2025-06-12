@@ -36,3 +36,23 @@ export const setStockAdjustmentGRNArray = (payload) => ({
   type: 'SET_STOCK_ADJUSTMENT_GRN_ARRAY',
   payload, // Array of selected stock adjustment GRN IDs
 })
+
+export const setAllNotifications = (payload) => ({
+  type: 'All_NOTIFICATION',
+  payload,
+})
+
+export const setNotification = (payload) => ({
+  type: 'SET_NOTIFICATION',
+  payload,
+})
+
+export const clearNotification = (id) => ({
+  type: 'CLEAR_NOTIFICATION',
+  payload: id,
+})
+
+export const clearAllNotifications = () => ({
+  type: 'CLEAR_ALL_NOTIFICATIONS',
+  payload: [],
+})

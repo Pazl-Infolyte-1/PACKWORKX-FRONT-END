@@ -6,7 +6,10 @@ import CustomAlert from '../../components/New/CustomAlert'
 import { set } from 'lodash'
 import { grnApi } from '../../api/grn'
 import { inventoryApi } from '../../api/inventory'
+import { commonApi } from '../../api/common'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
+import { setAllNotifications } from '../../action'
+import { useDispatch } from 'react-redux'
 
 const AddPurchaseOrderReturn = ({
   isEdit,
@@ -35,6 +38,8 @@ const AddPurchaseOrderReturn = ({
     total_amount: 0,
     return_qty: 0,
   })
+
+  const dispatch = useDispatch()
 
   const {
     register,
@@ -326,9 +331,23 @@ const AddPurchaseOrderReturn = ({
     }
   }, [isEdit, selectedPoId, selectedPoId])
 
+  const handleThrowAlerts = async (items) => {
+    try {
+      const results = await Promise.all(
+        items.map((item) => commonApi.throwAlert(item.item_id).catch((err) => ({ error: err }))),
+      )
+
+      const all_notofications = await commonApi.getNotifications()
+      console.log('All Notifications:', all_notofications.data.data)
+      dispatch(setAllNotifications(all_notofications?.data?.data || []))
+    } catch (error) {
+      console.error('Error in handleThrowAlerts:', error)
+    }
+  }
+
   const handleFormSubmit = async (data) => {
     console.log('Form submit data:', data)
-    // return;
+
     const checkedItems = items.filter((item) => item.selected)
     const checkedItemCodes = checkedItems.map((item) => item.item_code)
 
@@ -392,23 +411,31 @@ const AddPurchaseOrderReturn = ({
     }
 
     console.log('Final Payload:', payload)
-    // return;
 
     try {
-      const response = await apiMethods.submitPurchaseOrderReturn(payload)
-      // setAlerts({
-      //   severity: 'success',
-      //   message: response?.data?.message || 'PO Return Created Successfully',
-      // })
+      // ✅ Submit PO return first
+      const response = await purchaseOrderApi.submitPurchaseOrderReturn(payload)
+      console.log('PO Return Response:', response)
+
+      // ✅ Throw alerts for each item AFTER successful PO return
+      await handleThrowAlerts(payload.items)
+
+      setAlerts([
+        {
+          severity: 'success',
+          message: response?.data?.message || 'PO Return Created Successfully',
+        },
+      ])
 
       setDrawer(false)
     } catch (error) {
       console.error('Submission error:', error)
-      console.error(error.response?.data || error.message)
-      // setAlerts({
-      //   severity: 'error',
-      //   message: response?.data?.message || 'Something went wrong',
-      // })
+      setAlerts([
+        {
+          severity: 'error',
+          message: error.response?.data?.error || 'Something went wrong',
+        },
+      ])
     }
   }
 

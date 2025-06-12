@@ -73,7 +73,7 @@ function Template() {
   }
 
   return (
-    <div >
+    <div>
       <div className="p-6 max-w-full overflow-x-hidden">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Purchase Order Templates</h1>
@@ -87,7 +87,8 @@ function Template() {
           {templates.map((template) => (
             <div
               key={template.id}
-              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 max-w-full"
+              onClick={() => handleTemplateSelect(template)}
+              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 max-w-full cursor-pointer"
             >
               <div className="p-4 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">Template {template.id}</h3>
@@ -99,27 +100,15 @@ function Template() {
                 <div className="bg-gray-100 rounded-lg p-2 mb-4 h-48 overflow-hidden relative">
                   <div
                     className="absolute top-0 left-0 w-full h-full"
-                    style={{ 
+                    style={{
                       transform: 'scale(0.25)',
                       transformOrigin: 'top left',
                       width: '400%',
                       height: '400%',
-                      overflow: 'hidden'
+                      overflow: 'hidden',
                     }}
                     dangerouslySetInnerHTML={{ __html: template.content }}
                   />
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleTemplateSelect(template)}
-                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
-                  >
-                    Preview
-                  </button>
-                  <button className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-200 font-medium">
-                    Use Template
-                  </button>
                 </div>
               </div>
             </div>

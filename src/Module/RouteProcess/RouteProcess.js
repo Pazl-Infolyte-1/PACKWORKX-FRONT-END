@@ -78,15 +78,16 @@ const RouteProcess = () => {
     try {
       if (isEdit) {
         const response = await routeApi.EditRoute(data)
+        
         setAlerts((prev) => [
           ...prev,
-          { severity: 'success', message: response.data.message || 'Route Updated Successfully' },
+          { severity: 'success', message: response.data.message ||  'Route Updated Successfully' },
         ])
       } else {
         const response = await routeApi.AddRoute(data)
         setAlerts((prev) => [
           ...prev,
-          { severity: 'success', message: response.data.message || 'Route Added Successfully' },
+          { severity: 'success', message: response?.data?.message || 'Route Added Successfully' },
         ])
       }
     } catch (error) {

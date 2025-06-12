@@ -44,6 +44,7 @@ const initialState = {
   productArray: [],
   stockAdjustmentPOArray: [],
   stockAdjustmentGRNArray: [],
+  all_notification: [],
 }
 
 const changeState = (state = initialState, { type, payload, ...rest }) => {
@@ -206,6 +207,44 @@ const changeState = (state = initialState, { type, payload, ...rest }) => {
         auth: {
           ...state.auth,
           stockAdjustmentGRNArray: payload,
+        },
+      }
+
+    case 'All_NOTIFICATION':
+      return {
+        ...state,
+        auth: {
+          ...state.auth,
+          all_notification: payload,
+        },
+      }
+
+    case 'SET_NOTIFICATION':
+      return {
+        ...state,
+        auth: {
+          ...state.auth,
+          all_notification: [...state.auth.all_notification, payload],
+        },
+      }
+
+    case 'CLEAR_NOTIFICATION':
+      return {
+        ...state,
+        auth: {
+          ...state.auth,
+          all_notification: state.auth.all_notification.filter(
+            (notification) => notification.id !== payload,
+          ),
+        },
+      }
+
+    case 'CLEAR_ALL_NOTIFICATIONS':
+      return {
+        ...state,
+        auth: {
+          ...state.auth,
+          all_notification: [],
         },
       }
 

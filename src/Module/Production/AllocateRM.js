@@ -850,7 +850,7 @@ const AllocateRM = ({
                   borderRadius: '2px',
                 }}
               ></div>
-              {sfgData.map((sfg, index) => (
+              {sfgData?.map((sfg, index) => (
                 
                 <SFGDragableCard
                   sfg={sfg}

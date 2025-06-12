@@ -19,7 +19,7 @@ import Dropdown from 'react-bootstrap/Dropdown'
 import AllcoateRMModal from './AllcoateRMModal'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext'
-import apiMethods from '../../api/config'
+import { productionApi } from '../../api/production'
 
 const ItemType = 'WORK_ORDER'
 
@@ -412,7 +412,7 @@ const AllocateRM = ({
         deckle: params.deckle || ''
       };
 
-      const response = await apiMethods.getReelsInRawMeterial(formattedParams);
+      const response = await productionApi.getReelsInRawMeterial(formattedParams);
       if (response) {
         setSfgData(response?.data.data.inventoryData)
       }
@@ -431,10 +431,10 @@ const AllocateRM = ({
     const fetchOptions = async () => {
       try {
         const [deckleRes, colorRes, gsmRes, bfRes] = await Promise.allSettled([
-          apiMethods.getDeckleOptions(),
-          apiMethods.getColorOptions(),
-          apiMethods.getGsmOptions(),
-          apiMethods.getBfOptions(),
+          productionApi.getDeckleOptions(),
+          productionApi.getColorOptions(),
+          productionApi.getGsmOptions(),
+          productionApi.getBfOptions(),
         ]);
 
         // console.log(deckleRes.value?.data?.data, colorRes, gsmRes, bfRes)
@@ -507,7 +507,7 @@ const AllocateRM = ({
 
   const fetchWorkOrders = async () => {
     try {
-      const response = await apiMethods.getProductionGroups();
+      const response = await productionApi.getProductionGroups();
       setGroupOrders(response?.data?.data);
     } catch (error) {
       console.error("Error fetching work orders:", error);

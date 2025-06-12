@@ -45,10 +45,10 @@ import ProgressBar from './ProgressBar'
 import PopUp from '../../components/New/PopUp'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { useSearch } from '../../components/New/SearchContext'
-import apiMethods from '../../api/config'
 import { useGroupLayers } from '../../Context/GroupLayersContext'
 import { useNextHandler } from '../../Context/ProductionNextHandlerContext'
 import { useNavigate } from 'react-router-dom'
+import { productionApi } from '../../api/production'
 
 const ItemType = 'WORK_ORDER'
 
@@ -824,7 +824,7 @@ const Group = ({
 
   const fetchWorkOrders = async () => {
     try {
-      const response = await apiMethods.getWorkOrderInGroup();
+      const response = await productionApi.getWorkOrderInGroup();
       setWorkOrders(response?.data?.workOrders);
     } catch (error) {
       console.error('Error fetching work orders:', error);
@@ -877,7 +877,7 @@ const Group = ({
   
       console.log('Payload to submit:', payload);
   
-      const response = await apiMethods.createGroupInProduction(payload);
+      const response = await productionApi.createGroupInProduction(payload);
       console.log(response);
       
       navigate('/production/AllocateRM');
@@ -957,7 +957,7 @@ const Group = ({
       // Optional: set loading state here if needed
       // setLoading(true);
   
-      const response = await apiMethods.removeWorkOrderFromCreationStageInProduction(id, params);
+      const response = await productionApi.removeWorkOrderFromCreationStageInProduction(id, params);
 
   
       if (response?.data?.success) {

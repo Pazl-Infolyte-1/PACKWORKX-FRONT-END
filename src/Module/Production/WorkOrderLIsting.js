@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { FaClipboardList, FaBox, FaCalendarAlt, FaPlus, FaMinus, FaSort } from 'react-icons/fa'
-import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext';
 import { ArrowUpDown } from 'lucide-react';
 import { useNextHandler } from '../../Context/ProductionNextHandlerContext';
 import { useNavigate } from 'react-router-dom';
+import { productionApi } from '../../api/production';
 
 function WorkOrderListing() {
   const [selectedOrders, setSelectedOrders] = useState([])
@@ -60,7 +60,7 @@ function WorkOrderListing() {
           ...(sortParams.sortBy && { sortBy: sortParams.sortBy }), //if condition is truth then only the object is spreaded into the object else it will not b spreaded
           ...(sortParams.sortOrder && { sortOrder: sortParams.sortOrder })
         }
-        const response = await apiMethods.getWorkOrderInCreated(params);
+        const response = await productionApi.getWorkOrderInCreated(params);
         setWorkOrders(response?.data?.workOrders);
       } catch (error) {
         console.error('Error fetching work orders:', error);
@@ -89,7 +89,7 @@ function WorkOrderListing() {
         production: 'in_production',
       }
 
-      const response = await apiMethods.addWorkOrderIntoProduction(body)
+      const response = await productionApi.addWorkOrderIntoProduction(body)
 
       if (response?.success || response?.status === 200) {
         setError(null);

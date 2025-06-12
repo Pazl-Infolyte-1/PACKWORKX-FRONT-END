@@ -6,13 +6,15 @@ const GrnView = ({ id, setOpenPoReturnModal }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await purchaseOrderApi.getPurchaseReturn();
-        const poReturnList = Array.isArray(response?.data?.approved) ? response.data.approved : response.data.disapproved || [];
-        console.log('poReturnList', poReturnList);
-        
-        const matchedpoReturnList = poReturnList.find(item => item.id === id)
-       console.log('matchedpoReturnList', matchedpoReturnList);
-       
+        const response = await purchaseOrderApi.getPurchaseReturn()
+        const poReturnList = Array.isArray(response?.data?.approved)
+          ? response.data.approved
+          : response.data.disapproved || []
+        console.log('poReturnList', poReturnList)
+
+        const matchedpoReturnList = poReturnList.find((item) => item.id === id)
+        console.log('matchedpoReturnList', matchedpoReturnList)
+
         setPoDetails(matchedpoReturnList)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -28,7 +30,9 @@ const GrnView = ({ id, setOpenPoReturnModal }) => {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-indigo-800">Purchase Order Return Details</h2>
             <div className="bg-indigo-100 px-4 py-2 rounded-full">
-              <span className="font-semibold text-indigo-800">Purchase Order Return ID: #{poDetails?.id}</span>
+              <span className="font-semibold text-indigo-800">
+                Purchase Order Return ID: #{poDetails?.id}
+              </span>
             </div>
           </div>
           <div className="mt-2 flex items-center">
@@ -73,12 +77,12 @@ const GrnView = ({ id, setOpenPoReturnModal }) => {
             </h3>
             <div className="bg-indigo-50 p-4 rounded-lg">
               <p className="text-xl font-medium text-indigo-900">
-                Purchase Order  Id: {poDetails?.po_id}
+                Purchase Order Id: {poDetails?.po_id}
               </p>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <div>
                   <p className="text-sm text-gray-500">Purchase Order Return ID:</p>
-                  <p className="font-medium">{poDetails?.id}</p>
+                  <p className="font-medium">{poDetails?.purchase_return_generate_id}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Return Date</p>
@@ -102,22 +106,23 @@ const GrnView = ({ id, setOpenPoReturnModal }) => {
 
           {poDetails?.items && poDetails?.items.length > 0 ? (
             <div className="bg-white p-5 rounded-lg shadow-sm col-span-2 md:col-span-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Purchase order Return Items</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                Purchase order Return Items
+              </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {/* Purchase oreder Return Item Id */}
+                      {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         PO Return Item Id
-                      </th>
+                      </th> */}
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {/* Purchase oreder Return Id */}
                         PO Return Id
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Item Id
-                      </th>
+                      </th> */}
                       {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Item Code
                       </th> */}
@@ -128,10 +133,10 @@ const GrnView = ({ id, setOpenPoReturnModal }) => {
                         Reason
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                       Unit Price
+                        Unit Price
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                       Amount
+                        Amount
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Tax Amount
@@ -144,15 +149,15 @@ const GrnView = ({ id, setOpenPoReturnModal }) => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {poDetails?.items.map((order, index) => (
                       <tr key={index}>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {/* <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
                           #{order?.id}
-                        </td>
+                        </td> */}
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                          {order.por_id}
+                          {order.po_return_id}
                         </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                        {/* <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                           {order.item_id}
-                        </td>
+                        </td> */}
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                           {order.return_qty}
                         </td>

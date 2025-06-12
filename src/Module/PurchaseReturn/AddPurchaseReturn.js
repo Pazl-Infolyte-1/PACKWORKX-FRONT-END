@@ -10,6 +10,7 @@ import { commonApi } from '../../api/common'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
 import { setAllNotifications } from '../../action'
 import { useDispatch } from 'react-redux'
+import { CornerDownLeft } from 'lucide-react'
 
 const AddPurchaseOrderReturn = ({
   isEdit,
@@ -18,6 +19,7 @@ const AddPurchaseOrderReturn = ({
   selectedPorId,
   poData,
   isOpen,
+  resetTrigger,
 }) => {
   const [items, setItems] = useState([])
   const [grnId, setGrnId] = useState(null)
@@ -29,6 +31,8 @@ const AddPurchaseOrderReturn = ({
   const [filteredPoData, setFilteredPoData] = useState([])
   const [alerts, setAlerts] = useState([])
   const [grnData, setGrnData] = useState([])
+  const [selectedGrnID, setSelectedGrnID] = useState(0)
+  const [poIDForReturn, setPoIDForReturn] = useState(0)
 
   const [poTotals, setPoTotals] = useState({
     total_qty: 0,
@@ -43,12 +47,31 @@ const AddPurchaseOrderReturn = ({
 
   const {
     register,
+    control,
+    reset,
+    watch,
     handleSubmit,
     setValue,
-    watch,
-    reset,
-    formState: { errors, isSubmitting, isSubmitted },
-  } = useForm()
+    errors,
+    isSubmitted,
+    isSubmitting,
+    formState,
+  } = useForm({
+    defaultValues: {
+      po_id: '',
+      grn_id: '',
+      payment_terms: '',
+      reason: '',
+      notes: '',
+      items: [],
+      total_qty: 0,
+      cgst_amount: 0,
+      sgst_amount: 0,
+      tax_amount: 0,
+      total_amount: 0,
+      return_qty: 0,
+    },
+  })
 
   const itemsData = watch('items')
   // useEffect(() => {
@@ -65,58 +88,122 @@ const AddPurchaseOrderReturn = ({
   }, [isOpen, reset])
 
   useEffect(() => {
-    const handleCheck = async () => {
-      const fetchGrnData = await grnApi.getGrn()
-      const grnData = Array.isArray(fetchGrnData?.data?.data) ? fetchGrnData.data.data : []
-      const grnPoIds = grnData.map((grn) => grn.po_id)
-      const filtered = poData.filter((po) => grnPoIds.includes(po.id))
-      setFilteredPoData(filtered)
+    if (resetTrigger) {
+      reset() // 🔔 call react-hook-form reset or clear your internal state
+      onResetComplete()
     }
+  }, [resetTrigger])
 
+  useEffect(() => {
+    if (!isOpen) {
+      reset({
+        po_id: '',
+        grn_id: '',
+        payment_terms: '',
+        reason: '',
+        notes: '',
+        items: [],
+        total_qty: 0,
+        cgst_amount: 0,
+        sgst_amount: 0,
+        tax_amount: 0,
+        total_amount: 0,
+        return_qty: 0,
+      })
+      setItems([])
+      setPoTotals({
+        total_qty: 0,
+        cgst_amount: 0,
+        sgst_amount: 0,
+        tax_amount: 0,
+        total_amount: 0,
+        return_qty: 0,
+      })
+    }
+  }, [isOpen, reset])
+
+  // ✅ Reset form on Cancel button click
+  const handleCancel = () => {
+    reset({
+      po_id: '',
+      grn_id: '',
+      payment_terms: '',
+      reason: '',
+      notes: '',
+      items: [],
+      total_qty: 0,
+      cgst_amount: 0,
+      sgst_amount: 0,
+      tax_amount: 0,
+      total_amount: 0,
+      return_qty: 0,
+    })
+    setDrawer(false)
+    setItems([])
+    setPoTotals({
+      total_qty: 0,
+      cgst_amount: 0,
+      sgst_amount: 0,
+      tax_amount: 0,
+      total_amount: 0,
+      return_qty: 0,
+    })
+  }
+
+  useEffect(() => {
+    const handleCheck = async () => {
+      const response = await purchaseOrderApi.getPOForReturn()
+      console.log('Response from getPOForReturn:', response?.data?.data || [])
+      setFilteredPoData(response?.data?.data || [])
+    }
     if (poData?.length) handleCheck()
   }, [poData])
 
-  const handlePurchaseDetails = async (poId) => {
-    try {
-      const response = await inventoryApi.getinventory()
-      console.log('Response from getinventory:', response.data.data.inventoryData)
-      const inventoryList = Array.isArray(response?.data?.data?.inventoryData)
-        ? response.data.data?.inventoryData
-        : []
+  useEffect(() => {
+    console.log('Filtered PO Data use effecttttttttttttttttttttt :', filteredPoData)
+  }, [filteredPoData])
 
-      const matchedInventory = inventoryList.find((item) => item.po_id === poId)
+  // const handlePurchaseDetails = async (poId) => {
+  //   try {
+  //     const response = await inventoryApi.getinventory()
+  //     console.log('Response from getinventory:', response.data.data.inventoryData)
+  //     const inventoryList = Array.isArray(response?.data?.data?.inventoryData)
+  //       ? response.data.data?.inventoryData
+  //       : []
 
-      if (matchedInventory) {
-        const grn_id = matchedInventory.grn_id
-        setGrnId(grn_id)
-        await handlePurchaseReturnDetails(poId, grn_id)
-      } else {
-        console.warn('No inventory found for PO ID:', poId)
-      }
-    } catch (error) {
-      console.error('Error fetching inventory:', error)
-    }
-  }
+  //     const matchedInventory = inventoryList.find((item) => item.po_id === poId)
 
-  const handlePurchaseReturnDetails = async (po_id, grn_id) => {
-    try {
-      const response = await purchaseOrderApi.getPurchaseOrderDetails({ po_id, grn_id })
-      const { purchaseOrder, purchaseOrderItemDetails } = response.data
+  //     if (matchedInventory) {
+  //       const grn_id = matchedInventory.grn_id
+  //       setGrnId(grn_id)
+  //       await handlePurchaseReturnDetails(poId, grn_id)
+  //     } else {
+  //       console.warn('No inventory found for PO ID:', poId)
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching inventory:', error)
+  //   }
+  // }
 
-      if (purchaseOrder) {
-        const fields = ['po_id', 'grn_id', 'payment_terms', 'reason', 'notes']
-        fields.forEach((field) => setValue(field, purchaseOrder[field] || ''))
+  // const handlePurchaseReturnDetails = async (po_id, grn_id) => {
+  //   try {
+  //     const response = await purchaseOrderApi.getPurchaseOrderDetails({ po_id, grn_id })
+  //     const { purchaseOrder, purchaseOrderItemDetails } = response.data
 
-        console.log('purchaseOrder', fields)
-      }
+  //     if (purchaseOrder) {
+  //       const fields = ['po_id', 'grn_id', 'payment_terms', 'reason', 'notes']
+  //       fields.forEach((field) => setValue(field, purchaseOrder[field] || ''))
 
-      // if (Array.isArray(purchaseOrderItemDetails)) {
-      //   setItems(purchaseOrderItemDetails)
-      // }
-    } catch (error) {
-      console.error('Error fetching PO return details:', error)
-    }
-  }
+  //       console.log('purchaseOrder', fields)
+  //     }
+
+  //     // if (Array.isArray(purchaseOrderItemDetails)) {
+  //     //   setItems(purchaseOrderItemDetails)
+  //     // }
+  //   } catch (error) {
+  //     console.error('Error fetching PO return details:', error)
+  //   }
+  // }
 
   const getGrnItemDetails = async (grnId) => {
     try {
@@ -220,29 +307,49 @@ const AddPurchaseOrderReturn = ({
   //   handlePurchaseDetails(selectedId);
   //   setValue('po_id', e.target.value);
   // };
+  useEffect(() => {
+    if (selectedPoId) {
+      getPOItemsById(selectedPoId)
+    }
+  }, [selectedPoId])
 
   const handlePoChange = (e) => {
+    const selectedId = parseInt(e.target.value) || null
+    console.log('Selected PO ID:', selectedId)
+
     setItems([])
     setValue('items', [])
     setValue('grn_id', null)
-    const selectedId = parseInt(e.target.value)
+
     setSelectedPoIdState(selectedId)
-    // handlePurchaseDetails(selectedId)
-    setValue('po_id', e.target.value)
-    getPOItemsById(selectedId)
+    setValue('po_id', selectedId)
+    setPoIDForReturn(selectedId)
+
+    if (selectedId) {
+      // getPOItemsById(selectedId)
+      getGRNData(selectedId)
+    }
   }
 
+  useEffect(() => {
+    console.log('Selected PO ID State use effect value:', selectedPoIdState)
+  }, [selectedPoIdState])
+
   const handleGrnChange = (e) => {
-    const selectedGrnId = parseInt(e.target.value)
-    console.log('selected grn ', selectedGrnId)
-    setGrnId(selectedGrnId)
-    setValue('grn_id', selectedGrnId)
-    getGRNItemsForReturn(selectedGrnId)
+    const selectedGrnIdValue = parseInt(e.target.value)
+    console.log('selected grn ', selectedGrnIdValue)
+    setGrnId(selectedGrnIdValue)
+    setValue('grn_id', selectedGrnIdValue)
+    getGRNItemsForReturn(selectedPoIdState, selectedGrnIdValue)
+    setSelectedGrnID(selectedGrnIdValue)
   }
-  const getGRNItemsForReturn = async (grnId) => {
+  const getGRNItemsForReturn = async (poId, grnId) => {
+    console.log('Fetching GRN items for return with GRN ID:', grnId)
+    console.log('selectedPoIdState PO ID State grn get items function value:', selectedPoIdState)
+    console.log('selectedPoId PO ID State grn get items function value:', selectedPoId)
     try {
       const response = await purchaseOrderApi.getPurchaseOrderDetails({
-        po_id: selectedPoIdState,
+        po_id: poId || selectedPoId,
         grn_id: grnId,
       })
       const grnItems = response?.data.purchaseOrderItemDetails || []
@@ -259,7 +366,7 @@ const AddPurchaseOrderReturn = ({
     }
   }
 
-  const getGRNData = async (poId, poItems) => {
+  const getGRNData = async (poId) => {
     try {
       const response = await grnApi.getGRNByPOId(poId)
       const grn = response.data?.data.grns || []
@@ -270,18 +377,14 @@ const AddPurchaseOrderReturn = ({
 
       if (grn) {
         setGrnData(grn)
-        setGrnId(grn.id)
-        // setValue('grn_id', grn.id)
-        console.log('Filtered GRN Data:', grn)
-        // const matchedPOItems = poItems.filter(
-        //   (po) =>
-        //     Array.isArray(grnData.GRNItems) &&
-        //     grnData.GRNItems.some((g) => g.item_id === po.item_id),
-        // )
 
-        // console.log('Matched PO Items:', matchedPOItems)
-        // setValue('items', JSON.stringify(matchedPOItems))
-        // setItems(matchedPOItems)
+        if (grn.length === 1) {
+          const id = grn[0].id
+          setGrnId(id)
+          setSelectedGrnID(id)
+          setValue('grn_id', id)
+          getGRNItemsForReturn(poId, id)
+        }
       } else {
         console.warn('No GRN found matching the PO ID:', poId)
         // setAlerts('No matching GRN found.')
@@ -299,6 +402,8 @@ const AddPurchaseOrderReturn = ({
     try {
       const response = await purchaseOrderApi.getPurchaseOrderById(poId)
       console.log('PO Items Response:', response.data)
+      console.log('Selected PO ID state grn items     =====     ', selectedPoIdState)
+      console.log('poIDForReturn  PO ID grn items:', poIDForReturn)
 
       const POData = response?.data || []
       const poItems = POData?.PurchaseOrderItems || []
@@ -320,16 +425,9 @@ const AddPurchaseOrderReturn = ({
   useEffect(() => {
     setValue('po_id', selectedPoId)
     if (isEdit && selectedPoId) {
-      getPOItemsById(selectedPoId)
-      // handlePurchaseDetails(selectedPoId)
-    } else if (selectedPoIdState) {
-      getPOItemsById(selectedPorId)
-      // handlePurchaseDetails(selectedPorId)
-    } else {
-      // getPOItemsById(selectedPoId)
-      // // handlePurchaseDetails(selectedPoId)
+      getGRNData(selectedPoId)
     }
-  }, [isEdit, selectedPoId, selectedPoId])
+  }, [isEdit, selectedPoId])
 
   const handleThrowAlerts = async (items) => {
     try {
@@ -343,6 +441,14 @@ const AddPurchaseOrderReturn = ({
     } catch (error) {
       console.error('Error in handleThrowAlerts:', error)
     }
+  }
+
+  const handleFormReset = () => {
+    reset()
+    setSelectedPoIdState('')
+    setSelectedGrnID('')
+    setGrnData([])
+    setItems([])
   }
 
   const handleFormSubmit = async (data) => {
@@ -396,7 +502,7 @@ const AddPurchaseOrderReturn = ({
 
     const payload = {
       po_id: data.po_id || selectedPoId,
-      grn_id: grnId,
+      grn_id: grnId || selectedGrnID,
       reason: data.reason || 'Quality issues',
       payment_terms: data.payment_terms || '',
       notes: data.notes || '',
@@ -426,7 +532,7 @@ const AddPurchaseOrderReturn = ({
           message: response?.data?.message || 'PO Return Created Successfully',
         },
       ])
-
+      handleFormReset()
       setDrawer(false)
     } catch (error) {
       console.error('Submission error:', error)
@@ -438,30 +544,6 @@ const AddPurchaseOrderReturn = ({
       ])
     }
   }
-
-  // useEffect(() => {
-  //   const fetchVendors = async () => {
-  //     try {
-  //       const initial = await workOrderApi.getClients();
-  //       const count = initial?.length || 100;
-
-  //       const fullData = await workOrderApi.getClients({ limit: count });
-  //       const clientsArray = fullData.data;
-
-  //       if (Array.isArray(clientsArray)) {
-  //         const vendorList = clientsArray.filter(client => client.entity_type === "Vendor");
-  //         console.log('vendorList:', vendorList);
-  //         setClientData(vendorList);
-  //       } else {
-  //         console.error('Expected an array but received:', clientsArray);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error in useEffect:', error);
-  //     }
-  //   };
-
-  //   fetchVendors();
-  // }, []);
 
   // change address
   const handleSupplierChange = (e) => {
@@ -616,13 +698,12 @@ const AddPurchaseOrderReturn = ({
               </label>
               <select
                 {...register('po_id', { required: 'required' })}
+                value={selectedPoId || selectedPoIdState || ''} // ✅ Controlled by state
                 onChange={handlePoChange}
                 style={getInputStyle(errors?.po_id)}
                 className="w-full p-2 border-gray-300 rounded-md"
               >
                 <option value="">-- Select Purchase Order --</option>
-
-                {isEdit && selectedPoId && <option value={selectedPoId}>{selectedPoId}</option>}
 
                 {filteredPoData?.map((po) => (
                   <option key={po.id} value={po.id}>
@@ -641,11 +722,9 @@ const AddPurchaseOrderReturn = ({
                 onChange={handleGrnChange}
                 style={getInputStyle(errors?.grn_id)}
                 className="w-full p-2 border-gray-300 rounded-md"
+                value={selectedGrnID || ''}
               >
                 <option value="">-- Select GRN --</option>
-
-                {isEdit && selectedPoId && <option value={selectedPoId}>{selectedPoId}</option>}
-
                 {grnData?.map((grn) => (
                   <option key={grn.id} value={grn.id}>
                     {grn.grn_generate_id}
@@ -878,8 +957,8 @@ const AddPurchaseOrderReturn = ({
             <button
               type="button"
               onClick={() => {
-                reset()
-                setDrawer(false)
+                handleCancel()
+                handleFormReset()
               }}
               className="p-1 border border-gray-300 rounded w-24 hover:bg-gray-100 transition"
             >

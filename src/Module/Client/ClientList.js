@@ -252,7 +252,7 @@ function ClientList() {
           {showAddDropdown && (
             <div
               ref={dropdownRef}
-              className="absolute right-4 mt-1 w-32 bg-white rounded-md shadow-lg z-50 border border-gray-200"
+              className="absolute right-4 mt-1 w-32 bg-white rounded-md shadow-lg z-50 border border-gray-200 mr-4"
             >
               <ul className="py-1 m-1">
                 <li

@@ -190,14 +190,14 @@ function WorkOrderListing() {
                       
                       <td className="p-3">
                         <span className="text-gray-800 font-medium text-[0.95rem]">
-                          {order?.sales_generate_id || 'N/A'}
+                          {order?.salesOrder?.sales_generate_id || 'N/A'}
                         </span>
                       </td>
 
                                     
                       <td className="p-3">
                         <span className="text-gray-800 font-medium text-[0.95rem]">
-                          {order?.sales_ui_id || 'N/A'}
+                          {order?.salesOrder?.sales_ui_id || 'N/A'}
                         </span>
                       </td>
 

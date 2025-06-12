@@ -6,6 +6,7 @@ import ConfirmationModale from '../../../components/New/ConfirmationModale'
 import CustomAlert from '../../../components/New/CustomAlert'
 import AddEditDepartmentForm from './AddEditDepartmentForm'
 import ContentHeader from '../../../components/New/ContentHeader'
+import { useSearch } from '../../../components/New/SearchContext'
 
 function Department() {
   const [departments, setDepartments] = useState([])
@@ -16,23 +17,33 @@ function Department() {
   const [showForm, setShowForm] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [selectedDepartment, setSelectedDepartment] = useState(null)
-
-  const fetchData = async () => {
-    try {
-      const response = await apiMethods.getDepartmentsList()
-      if (response?.data?.success) {
-        setDepartments(response?.data?.data)
-      }
-    } catch (error) {
-      console.error('Error fetching departments:', error)
-    } finally {
-      setLoading(false)
+     const { setGlobalPlaceholder, searchQuery  } = useSearch()
+      useEffect(() => {
+    // Set the placeholder when component mounts
+    setGlobalPlaceholder("Search Department....")
+    
+    // Clean up when component unmounts
+    return () => {
+      setGlobalPlaceholder("Search...") // Reset to default
     }
+  }, [setGlobalPlaceholder])
+const fetchData = async () => {
+  try {
+    const response = await apiMethods.getDepartmentsListDisplay(searchQuery);
+    if (response?.data?.success) {
+      setDepartments(response.data.data);
+    }
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+  } finally {
+    setLoading(false);
   }
+};
+
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [searchQuery])
 
   const handleAddDepartment = () => {
     setIsEdit(false)

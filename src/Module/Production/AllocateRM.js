@@ -21,7 +21,7 @@ import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext'
 import { productionApi } from '../../api/production'
 
-const ItemType = 'WORK_ORDER'
+const ItemType = 'RawMeterial'
 
 const CustomToggle = React.forwardRef(({ onClick }, ref) => (
   <span
@@ -46,11 +46,11 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
     type: ItemType,
     item: { sfg },
   }))
-  const toggleCollapse = (item_id) => {
-    setOpenSFG((prevId) => (prevId === item_id ? null : item_id)) // Toggle behavior
+  const toggleCollapse = (id) => {
+    setOpenSFG((prevId) => (prevId === id ? null : id)) // Toggle behavior
   }
   return (
-    <CCard className="mt-3" ref={drag} key={sfg.item_id}>
+    <CCard className="mt-3" ref={drag} key={sfg.id}>
       <CCardBody>
         <div
           style={{
@@ -61,7 +61,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
           }}
         >
           <span
-            onClick={() => toggleCollapse(sfg.item_id)}
+            onClick={() => toggleCollapse(sfg.id)}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -69,7 +69,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
               whiteSpace: 'nowrap', // Prevents text from wrapping
             }}
           >
-            Reel {sfg.item_id} {openSFG === sfg.item_id ? <FaAngleUp /> : <FaAngleDown />}
+            Reel {sfg.id} {openSFG === sfg.id ? <FaAngleUp /> : <FaAngleDown />}
           </span>
           <span
             style={{
@@ -114,54 +114,54 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
           </span>
         </div>
 
-        <CCollapse className="custom-collapse" visible={openSFG === sfg.item_id}>
+        <CCollapse className="custom-collapse" visible={openSFG === sfg.id}>
           <CRow className="align-items-center text-sm mt-3 mb-2">
-            <CCol md="2">
-              <span>GSM : {sfg?.item?.custom_fields?.gsm}</span>
+            <CCol md="2" className="text-nowrap">
+              <span>GSM: {sfg?.item?.default_custom_fields?.gsm}</span>
             </CCol>
-            <CCol md="2">
-              <span>BF : {sfg?.item?.custom_fields?.bf}</span>
+            <CCol md="2" className="text-nowrap">
+              <span>BF: {sfg?.item?.default_custom_fields?.bf}</span>
             </CCol>
-            <CCol md="2">
-              <span>Deckle : {sfg?.item?.custom_fields?.deckle_size}</span>
+            <CCol md="2" className="text-nowrap">
+              <span>Deckle: {sfg?.item?.default_custom_fields?.deckle_size}</span>
             </CCol>
-            <CCol md="3">
-              <span>Available Qty (KG) : {sfg.available_qty}</span>
+            <CCol md="3" className="text-nowrap">
+              <span>Available Qty: {sfg.quantity_available} KG</span>
             </CCol>
-            <CCol md="3">
-              <span>Blocked Qty (KG) : {sfg.blocked_qty}</span>
+            <CCol md="3" className="text-nowrap">
+              <span>Blocked Qty: {sfg.blocked_qty} KG</span>
             </CCol>
           </CRow>
           <hr />
           <CRow className="mt-3">
-            <CCol xs={6}>
+            <CCol xs={12}>
               {sfg?.work_orders?.map((wo, index) => (
                 <CCard
                   key={index}
                   style={{
-                    height: '63px',
+                    height: '50px',
                     backgroundColor: '#ffffff',
                     borderRadius: '10px',
                     boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.16)',
                     marginTop: '10px',
-                    padding: '8px', // Reduced padding to fit content
+                    padding: '4px',
                     display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center', // Centers content vertically
-                    alignItems: 'center', // Centers content horizontally
-                    overflow: 'hidden', // Prevents overflow
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    overflow: 'hidden',
                   }}
                 >
-                  <CRow className="w-100 text-center p-1">
-                    <CCol xs={6} className="flex flex-col items-center">
+                  <div className="d-flex justify-content-between w-100 px-3">
+                    <div className="text-center" style={{ width: '50%' }}>
                       <span className="font-semibold text-sm">Work Order</span>
-                      <div className="mt-1 text-xs">{wo.wo_id}</div>
-                    </CCol>
-                    <CCol xs={6} className="flex flex-col items-center">
+                      <div className="text-xs">{wo.wo_id}</div>
+                    </div>
+                    <div className="text-center" style={{ width: '50%' }}>
                       <span className="font-semibold text-sm">Quantity (KG)</span>
-                      <div className="mt-1 text-xs">{wo.quantity}</div>
-                    </CCol>
-                  </CRow>
+                      <div className="text-xs">{wo.quantity}</div>
+                    </div>
+                  </div>
                 </CCard>
               ))}
             </CCol>
@@ -226,8 +226,7 @@ function GroupDropZone({
               whiteSpace: 'nowrap', // Prevents text wrapping
             }}
           >
-            {console.log()}
-            {`${i?.layer_detail?.layer}, ${i?.layer_detail?.layer}`}
+            {`${i?.layer_detail?.layer}`}
             {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />}
           </span>
 
@@ -257,11 +256,11 @@ function GroupDropZone({
               </>
             ) : (
               <>
-                {`80 / 100`}
+                {/* {`80 / 100`} */}
                 <div
                   style={{ marginLeft: '10px', marginRight: '10px', width: '45px', height: '40px' }}
                 >
-                  <ProgressBar value={80} />
+                  {/* <ProgressBar value={80} /> */}
                 </div>
               </>
             )}
@@ -415,7 +414,7 @@ const AllocateRM = ({
 
       const response = await productionApi.getReelsInRawMeterial(formattedParams);
       if (response) {
-        setSfgData(response?.data.data.inventoryData)
+        setSfgData(response?.data?.data)
       }
     } catch (error) {
       console.error('Error fetching reels:', error);

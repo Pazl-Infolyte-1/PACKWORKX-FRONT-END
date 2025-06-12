@@ -126,7 +126,7 @@ const Index = () => {
         <RawMaterialProvider>
       <div className='overflow-hidden h-[90vh] flex flex-col'>
         {/* Fixed Header Section */}
-        <div className="sticky top-0 bg-white z-[1000] flex-shrink-0">
+        <div className="sticky top-0 bg-white z-[900] flex-shrink-0">
           <div className="d-flex justify-content-between align-items-center mb-3 pt-0.5">
             <h5>Order Grouping</h5>
             <div className="ms-auto flex flex-row gap-2">

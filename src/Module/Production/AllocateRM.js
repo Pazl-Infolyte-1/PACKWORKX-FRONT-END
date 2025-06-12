@@ -19,7 +19,7 @@ import Dropdown from 'react-bootstrap/Dropdown'
 import AllcoateRMModal from './AllcoateRMModal'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext'
-import apiMethods from '../../api/config'
+import { productionApi } from '../../api/production'
 
 const ItemType = 'WORK_ORDER'
 
@@ -41,15 +41,16 @@ const CustomToggle = React.forwardRef(({ onClick }, ref) => (
 ))
 
 function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
+  console.log(sfg,'ffffffffffffff')
   const [, drag] = useDrag(() => ({
     type: ItemType,
     item: { sfg },
   }))
-  const toggleCollapse = (id) => {
-    setOpenSFG((prevId) => (prevId === id ? null : id)) // Toggle behavior
+  const toggleCollapse = (item_id) => {
+    setOpenSFG((prevId) => (prevId === item_id ? null : item_id)) // Toggle behavior
   }
   return (
-    <CCard className="mt-3" ref={drag} key={sfg.id}>
+    <CCard className="mt-3" ref={drag} key={sfg.item_id}>
       <CCardBody>
         <div
           style={{
@@ -60,7 +61,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
           }}
         >
           <span
-            onClick={() => toggleCollapse(sfg.id)}
+            onClick={() => toggleCollapse(sfg.item_id)}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -68,7 +69,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
               whiteSpace: 'nowrap', // Prevents text from wrapping
             }}
           >
-            {sfg.id} {openSFG === sfg.id ? <FaAngleUp /> : <FaAngleDown />}
+            Reel {sfg.item_id} {openSFG === sfg.item_id ? <FaAngleUp /> : <FaAngleDown />}
           </span>
           <span
             style={{
@@ -113,16 +114,16 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
           </span>
         </div>
 
-        <CCollapse className="custom-collapse" visible={openSFG === sfg.id}>
-          <CRow className="align-items-center mt-3 mb-2">
+        <CCollapse className="custom-collapse" visible={openSFG === sfg.item_id}>
+          <CRow className="align-items-center text-sm mt-3 mb-2">
             <CCol md="2">
-              <span>{sfg.gsm} GSM</span>
+              <span>GSM : {sfg?.item?.custom_fields?.gsm}</span>
             </CCol>
             <CCol md="2">
-              <span>{sfg.bf} BF</span>
+              <span>BF : {sfg?.item?.custom_fields?.bf}</span>
             </CCol>
             <CCol md="2">
-              <span>Deckle : {sfg.deckle}</span>
+              <span>Deckle : {sfg?.item?.custom_fields?.deckle_size}</span>
             </CCol>
             <CCol md="3">
               <span>Available Qty (KG) : {sfg.available_qty}</span>
@@ -134,7 +135,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
           <hr />
           <CRow className="mt-3">
             <CCol xs={6}>
-              {sfg.work_orders.map((wo, index) => (
+              {sfg?.work_orders?.map((wo, index) => (
                 <CCard
                   key={index}
                   style={{
@@ -173,6 +174,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
 
 function GroupDropZone({
   i,
+  group,
   itemIndex,
   groupIndex,
   addQuantity,
@@ -224,7 +226,8 @@ function GroupDropZone({
               whiteSpace: 'nowrap', // Prevents text wrapping
             }}
           >
-            {i?.layer_detail?.layer}
+            {console.log()}
+            {`${i?.layer_detail?.layer}, ${i?.layer_detail?.layer}`}
             {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />}
           </span>
 
@@ -409,9 +412,9 @@ const AllocateRM = ({
         deckle: params.deckle || ''
       };
 
-      const response = await apiMethods.getReelsInRawMeterial(formattedParams);
+      const response = await productionApi.getReelsInRawMeterial(formattedParams);
       if (response) {
-        console.log(response)
+        setSfgData(response?.data.data.inventoryData)
       }
     } catch (error) {
       console.error('Error fetching reels:', error);
@@ -428,13 +431,13 @@ const AllocateRM = ({
     const fetchOptions = async () => {
       try {
         const [deckleRes, colorRes, gsmRes, bfRes] = await Promise.allSettled([
-          apiMethods.getDeckleOptions(),
-          apiMethods.getColorOptions(),
-          apiMethods.getGsmOptions(),
-          apiMethods.getBfOptions(),
+          productionApi.getDeckleOptions(),
+          productionApi.getColorOptions(),
+          productionApi.getGsmOptions(),
+          productionApi.getBfOptions(),
         ]);
 
-        console.log(deckleRes.value?.data?.data, colorRes, gsmRes, bfRes)
+        // console.log(deckleRes.value?.data?.data, colorRes, gsmRes, bfRes)
         
 
         setDeckleOptions(deckleRes?.value?.data?.data);
@@ -504,7 +507,7 @@ const AllocateRM = ({
 
   const fetchWorkOrders = async () => {
     try {
-      const response = await apiMethods.getProductionGroups();
+      const response = await productionApi.getProductionGroups();
       setGroupOrders(response?.data?.data);
     } catch (error) {
       console.error("Error fetching work orders:", error);
@@ -585,7 +588,7 @@ const AllocateRM = ({
         </CRow>
         <CRow className="mt-3">
           <CCol xs={12}>
-            {console.log(groupOrders)}
+            {/* {console.log(groupOrders)} */}
             {groupOrders?.map((group, groupIndex) => (
               <CCard
                 key={groupIndex}
@@ -666,6 +669,7 @@ const AllocateRM = ({
                     {group?.layer_details?.map((i, itemIndex) => (
                       <GroupDropZone
                         key={itemIndex}
+                        group={group}
                         i={i}
                         itemIndex={itemIndex}
                         groupIndex={groupIndex}
@@ -714,7 +718,7 @@ const AllocateRM = ({
                     value={selectedFilters.gsm}
                     onChange={(e) => handleFilterChange('gsm', e.target.value)}
                   >
-                    <option disabled selected value=""> GSM</option>
+                    <option value="">GSM</option>
                     {gsmOptions?.map((option, index) => (
                       <option key={index} value={option}>
                         {option}
@@ -729,7 +733,7 @@ const AllocateRM = ({
                     value={selectedFilters.bf}
                     onChange={(e) => handleFilterChange('bf', e.target.value)}
                   >
-                    <option disabled selected value=""> BF</option>
+                    <option value="">BF</option>
                     {bfOptions?.map((option, index) => (
                       <option key={index} value={option}>
                         {option}
@@ -744,7 +748,7 @@ const AllocateRM = ({
                     value={selectedFilters.color}
                     onChange={(e) => handleFilterChange('color', e.target.value)}
                   >
-                    <option disabled selected value=""> Color</option>
+                    <option value="">Color</option>
                     {colorOptions?.map((option, index) => (
                       <option key={index} value={option}>
                         {option}
@@ -759,7 +763,7 @@ const AllocateRM = ({
                     value={selectedFilters.deckle}
                     onChange={(e) => handleFilterChange('deckle', e.target.value)}
                   >
-                    <option disabled selected value=""> Deckle</option>
+                    <option value="">Deckle</option>
                     {deckleOptions?.map((option, index) => (
                       <option key={index} value={option}>
                         {option}
@@ -836,6 +840,7 @@ const AllocateRM = ({
                 }}
               ></div>
               {sfgData.map((sfg, index) => (
+                
                 <SFGDragableCard
                   sfg={sfg}
                   key={index}

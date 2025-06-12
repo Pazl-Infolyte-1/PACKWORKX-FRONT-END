@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import { ChevronUp, ChevronDown, Mail, MoreHorizontal } from 'lucide-react'
-import apiMethods from '../../api/config'
 import { useNavigate,useLocation, useParams } from 'react-router-dom'
 import moment from 'moment/moment'
 import { inventoryApi } from '../../api/inventory'
@@ -26,7 +25,7 @@ useEffect(() => {
   const fetchClient = async () => {
     if (!id) return;
     try {
-      const data = await apiMethods.singlesku(id);
+      const data = await skuApi.singlesku(id);
       setSelectedSku(data);
       console.log("sku singke darta",data)
       // navigate(`/sku/${selectedSkuData.id}`);

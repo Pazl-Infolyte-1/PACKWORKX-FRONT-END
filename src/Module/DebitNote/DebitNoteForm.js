@@ -3,6 +3,7 @@ import ActionButton from '../../components/New/ActionButton'
 import { useNavigate } from 'react-router-dom'
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io'
 import { MdKeyboardArrowDown } from 'react-icons/md'
+import { debitApi } from '../../api/debit'
 
 const DebitNoteForm = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -55,7 +56,7 @@ const DebitNoteForm = () => {
   const handleSelectReturn = async (id) => {
     const event = { target: { name: 'po_return_id', value: id } }
     try {
-      const response = await apiMethods.getPurchaseReturnById(id)
+      const response = await debitApi.getPurchaseReturnById(id)
       const prData = response.data.data
       console.log(prData)
 

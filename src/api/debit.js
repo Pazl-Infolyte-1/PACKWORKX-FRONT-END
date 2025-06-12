@@ -1,56 +1,54 @@
-
 import { apiClient } from './config'
 
 export const debitApi = {
-  getDebitNotes: async (search,page,limits) => {
+  getDebitNotes: async (search, page, limits) => {
     try {
-      return "success"
+      return 'success'
     } catch (error) {
       console.error(error)
     }
   },
   editDebitNote: async (id) => {
     try {
-      return "success"
+      return 'success'
     } catch (error) {
       console.error(error)
     }
   },
-  postDebitNote:async (id) => {
+  postDebitNote: async (id) => {
     try {
-      return "success"
+      return 'success'
     } catch (error) {
       console.error(error)
     }
   },
-getAllPurchaseReturnIds: async (search,page,limits) => {
+  getAllPurchaseReturnIds: async (search, page, limits) => {
     try {
-      return "success"
+      return 'success'
     } catch (error) {
       console.error(error)
     }
   },
-getPurchaseReturnById:async (id) => {
+  getPurchaseReturnById: async (id) => {
     try {
-      return "success"
+      return await apiClient.get(`/purchase-order-return/${id}`)
     } catch (error) {
       console.error(error)
     }
   },
-  deleteDebitNote:async (id) => {
+
+  deleteDebitNote: async (id) => {
     try {
-      return "success"
+      return 'success'
     } catch (error) {
       console.error(error)
     }
   },
-  getDebitNoteById:async (id) => {
+  getDebitNoteById: async (id) => {
     try {
-      return "success"
+      return 'success'
     } catch (error) {
       console.error(error)
     }
   },
 }
-
-

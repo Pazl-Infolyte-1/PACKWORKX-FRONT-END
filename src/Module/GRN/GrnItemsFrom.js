@@ -39,10 +39,8 @@ const GrnItemsFrom = ({
     try {
       const response = await itemApi.getItemList()
       const items = response?.data?.data || []
-      const item = items.find((i) => i.id === parseInt(item_id))
-      const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}
-
-      // setShowModal(true)
+      const item = items.find((i) => i.item_generate_id === item_id)
+      const customFields = item?.custom_fields
 
       setModalContent(
         <>
@@ -76,29 +74,35 @@ const GrnItemsFrom = ({
         const selectedPo = purchaseOrderData.find((po) => po.id === grnFormData.po_id)
 
         if (selectedPo?.PurchaseOrderItems?.length > 0) {
-          const newItems = selectedPo.PurchaseOrderItems.map((item) => ({
-            po_item_id: item.id || 0,
-            item_id: item.item_id || 0,
-            item_code: item.item_code || '',
-            grn_item_name: item.po_item_name || '',
-            description: item.description || '',
-            quantity_ordered: parseFloat(item.quantity) || 0,
-            quantity_received: 0,
-            accepted_quantity: 0,
-            rejected_quantity: 0,
-            unit_price: item.unit_price || 0,
-            cgst: item.cgst || 0,
-            sgst: item.sgst || 0,
-            cgst_amount: item.cgst_amount || 0,
-            sgst_amount: item.sgst_amount || 0,
-            amount: item.amount || 0,
-            tax_amount: item.tax_amount || 0,
-            total_amount: item.total_amount || 0,
-            batch_no: '',
-            notes: '',
-            work_order_no: '',
-            location: '',
-          }))
+          const newItems = selectedPo.PurchaseOrderItems.map((item) => {
+            const orderedQuantity = parseFloat(item.quantity) || 0
+            return {
+              po_item_id: item.id || 0,
+              item_id: item.item_id || 0,
+              item_code: item.item_code || '',
+              grn_item_name: item.po_item_name || '',
+              description: item.description || '',
+              quantity_ordered: orderedQuantity,
+              quantity_received: orderedQuantity, // Initialize with ordered quantity
+              accepted_quantity: orderedQuantity, // Initialize with ordered quantity
+              rejected_quantity: 0,
+              unit_price: item.unit_price || 0,
+              cgst: item.cgst || 0,
+              sgst: item.sgst || 0,
+              cgst_amount: item.cgst_amount || 0,
+              sgst_amount: item.sgst_amount || 0,
+              amount: item.amount || 0,
+              tax_amount: item.tax_amount || 0,
+              total_amount: item.total_amount || 0,
+              batch_no: '',
+              notes: '',
+              work_order_no: '',
+              location: '',
+            }
+          })
+          {
+            console.log(item.item_generate_id, 'item.item_generate_id')
+          }
           append(newItems)
         }
       }
@@ -123,8 +127,9 @@ const GrnItemsFrom = ({
               grn_item_name: item.grn_item_name || '',
               description: item.description || '',
               quantity_ordered: item.quantity_ordered || 0,
-              quantity_received: item.quantity_received || 0,
-              accepted_quantity: item.accepted_quantity || 0,
+              // If no received/accepted quantity exists, use ordered quantity as default
+              quantity_received: item.quantity_received || item.quantity_ordered || 0,
+              accepted_quantity: item.accepted_quantity || item.quantity_ordered || 0,
               rejected_quantity: item.rejected_quantity || 0,
               unit_price: item.unit_price || 0,
               cgst_amount: item.cgst_amount || 0,
@@ -154,8 +159,9 @@ const GrnItemsFrom = ({
               grn_item_name: item.grn_item_name || '',
               description: item.description || '',
               quantity_ordered: item.quantity_ordered || 0,
-              quantity_received: item.quantity_received || 0,
-              accepted_quantity: item.accepted_quantity || 0,
+              // Initialize with ordered quantity if received/accepted quantities don't exist
+              quantity_received: item.quantity_received || item.quantity_ordered || 0,
+              accepted_quantity: item.accepted_quantity || item.quantity_ordered || 0,
               rejected_quantity: item.rejected_quantity || 0,
               unit_price: item.unit_price || 0,
               cgst: item.cgst || 0,
@@ -205,24 +211,17 @@ const GrnItemsFrom = ({
 
       const updatedItems = grnItemsData.map((item, index) => {
         const quantity = parseFloat(item.quantity_received || 0)
-        console.log('quantity', quantity)
         const unit_price = parseFloat(item.unit_price)
-        console.log('unit_price', unit_price)
         const cgst_percentage = parseFloat(item.cgst || 0)
         const sgst_percentage = parseFloat(item.sgst || 0)
         // const tax_percentage = parseFloat(item.tax || 0)
 
         // Calculate tax amounts from unit price and percentage
         const cgst_per_unit = (unit_price * cgst_percentage) / 100
-        console.log('cgst_per_unit', cgst_per_unit)
         const sgst_per_unit = (unit_price * sgst_percentage) / 100
-        console.log('sgst_per_unit', sgst_per_unit)
-        // const tax_per_unit = (unit_price * tax_percentage) / 100
 
         const cgst_total = cgst_per_unit * quantity
-        console.log('cgst_total', cgst_total)
         const sgst_total = sgst_per_unit * quantity
-        console.log('sgst_total', sgst_total)
         const tax_total = cgst_total + sgst_total
 
         const amount_total = unit_price * quantity
@@ -235,13 +234,6 @@ const GrnItemsFrom = ({
         totalTax += tax_total
         totalAmount += amount_total
         grandTotal += total
-
-        console.log('totalQty', totalQty)
-        console.log('totalCgst', totalCgst)
-        console.log('totalSgst', totalSgst)
-        console.log('totalTax', totalTax)
-        console.log('totalAmount', totalAmount)
-        console.log('grandTotal', grandTotal)
 
         return {
           ...item,
@@ -371,32 +363,32 @@ const GrnItemsFrom = ({
               <table className="min-w-full bg-white rounded-lg max-h-[1250px] border-collapse">
                 {/* Table Head */}
                 <thead className="sticky top-0 bg-white z-10 text-center">
-                  <tr className="border-b-2">
-                    <th className="px-4 py-2 min-w-[100px] text-center">PO Item</th>
-                    <th className="px-4 py-2 min-w-[100px] text-center">Item Id</th>
+                  <tr className="border-b-2 text-sm">
+                    {/* <th className="px-4 py-2 min-w-[100px] text-center">PO Item</th> */}
+                    <th className="px-2 py-1 min-w-[100px] text-center">Item Id</th>
                     <td></td>
-                    <th className="px-4 py-2 min-w-[180px] text-center">Item Code</th>
-                    <th className="px-4 py-2 min-w-[100px] text-center">Ordered Quantity</th>
-                    <th className="px-4 py-2 min-w-[100px] text-center">Received Quantity</th>
-                    <th className="px-4 py-2 min-w-[100px] text-center">Accepted Quantity</th>
-                    <th className="px-4 py-2 min-w-[100px] text-center">Rejected Quantity</th>
-                    <th className="px-4 py-2 min-w-[100px] text-center">Unit Price</th>
-                    <th className="px-4 py-2 min-w-[110px] text-center">C-GST</th>
-                    <th className="px-4 py-2 min-w-[110px] text-center">S-GST</th>
-                    <th className="px-4 py-2 min-w-[110px] text-center">Tax Amount</th>
-                    <th className="px-4 py-2 min-w-[110px] text-center">Total Amount</th>
-                    <th className="px-4 py-2 min-w-[200px] text-center">Description</th>
-                    <th className="px-4 py-2 min-w-[180px] text-center">Batch No.</th>
-                    <th className="px-4 py-2 min-w-[180px] text-center">Work Order No.</th>
-                    <th className="px-4 py-2 min-w-[180px] text-center">Location</th>
-                    <th className="px-4 py-2 min-w-[200px] text-center">Notes</th>
-                    <th className="px-4 py-2 min-w-[100px] text-center">Action</th>
+                    {/* <th className="px-2 py-1 min-w-[180px] text-center">Item Code</th> */}
+                    <th className="px-2 py-1 min-w-[100px] text-center">Ordered Quantity</th>
+                    <th className="px-2 py-1 min-w-[100px] text-center">Received Quantity</th>
+                    <th className="px-2 py-1 min-w-[100px] text-center">Accepted Quantity</th>
+                    <th className="px-2 py-1 min-w-[100px] text-center">Rejected Quantity</th>
+                    <th className="px-2 py-1 min-w-[100px] text-center">Unit Price</th>
+                    {/* <th className="px-2 py-1 min-w-[110px] text-center">C-GST</th> */}
+                    {/* <th className="px-2 py-1 min-w-[110px] text-center">S-GST</th> */}
+                    <th className="px-2 py-1 min-w-[110px] text-center">Tax Amount</th>
+                    <th className="px-2 py-1 min-w-[110px] text-center">Total Amount</th>
+                    <th className="px-2 py-1 min-w-[180px] text-center">Description</th>
+                    {/* <th className="px-2 py-1 min-w-[180px] text-center">Batch No.</th> */}
+                    {/* <th className="px-2 py-1 min-w-[180px] text-center">Work Order No.</th> */}
+                    {/* <th className="px-2 py-1 min-w-[180px] text-center">Location</th> */}
+                    <th className="px-2 py-1 min-w-[180px] text-center">Notes</th>
+                    <th className="px-2 py-1 min-w-[50px] text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {fields.map((item, index) => (
                     <tr key={item.id} className="hover:bg-gray-50 border-t">
-                      <td className="px-4 py-2 w-40">
+                      {/* <td className="px-4 py-2 w-40">
                         <input
                           type="text"
                           name="po_item_id"
@@ -406,29 +398,26 @@ const GrnItemsFrom = ({
                           })}
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
-                      </td>
-
-                      <td className="px-4 py-2">
+                      </td> */}
+                      <td className="px-1 py-1">
                         <input
                           type="text"
                           name="item_id"
                           disabled
-                          {...register(`grn_items[${index}].item_id`, {
-                            onChange: () => updateParentFormData(),
-                          })}
+                          value={grnFormData?.items?.[index]?.item_generate_id || ''}
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
-                        {/* {item[index]?.item_info?.item_generate_id} */}
                       </td>
-
+                      {console.log(getValues(`grn_items.${index}`), 'item_id')}
                       <td
-                        onClick={() => openItemDetails(getValues(`grn_items.${index}.item_id`))}
+                        onClick={() =>
+                          openItemDetails(getValues(`grn_items.${index}.item_generate_id`))
+                        }
                         className="cursor-pointer text-blue-600"
                       >
                         ℹ️
                       </td>
-
-                      <td className="px-4 py-2">
+                      {/* <td className="px-1 py-1">
                         <input
                           type="text"
                           name="item_code"
@@ -438,12 +427,10 @@ const GrnItemsFrom = ({
                           })}
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
-                      </td>
-
+                      </td> */}
                       {/* Rate Per SKU Input */}
-
                       {/* Acceptable SKU Units Input */}
-                      <td className="px-4 py-2">
+                      <td className="px-1 py-1">
                         <input
                           type="number"
                           name="quantity_ordered"
@@ -454,30 +441,43 @@ const GrnItemsFrom = ({
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
                       </td>
-
                       {/* Total Amount */}
-                      <td className="px-4 py-2">
+                      <td className="px-1 py-1">
                         <input
                           type="number"
                           name="quantity_received"
-                          {...register(`grn_items[${index}].quantity_received`, {
-                            onChange: () => updateParentFormData(),
+                          {...register(`grn_items.${index}.quantity_received`, {
+                            onChange: () => {
+                              // Remove the line that automatically updates accepted quantity
+                              updateParentFormData()
+                            },
                           })}
+                          // Add this line to show ordered quantity as value
+                          value={
+                            watch(`grn_items.${index}.quantity_received`) ||
+                            watch(`grn_items.${index}.quantity_ordered`) ||
+                            ''
+                          }
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
                       </td>
-
-                      <td className="px-4 py-2">
+                      <td className="px-1 py-1">
                         <input
                           type="number"
                           name="accepted_quantity"
-                          {...register(`grn_items[${index}].accepted_quantity`, {
+                          {...register(`grn_items.${index}.accepted_quantity`, {
                             onChange: () => updateParentFormData(),
                           })}
+                          // Add this line to show ordered quantity as value
+                          value={
+                            watch(`grn_items.${index}.accepted_quantity`) ||
+                            watch(`grn_items.${index}.quantity_ordered`) ||
+                            ''
+                          }
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-1 py-1">
                         <input
                           type="number"
                           name="rejected_quantity"
@@ -487,17 +487,17 @@ const GrnItemsFrom = ({
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-1 py-1">
                         <input
                           type="number"
-                          name="rejected_quantity"
+                          name="unit_price"
                           {...register(`grn_items[${index}].unit_price`, {
                             onChange: () => updateParentFormData(),
                           })}
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
                       </td>
-                      <td className="px-4 py-2">
+                      {/* <td className="px-1 py-1">
                         <input
                           type="number"
                           name="cgst"
@@ -506,7 +506,7 @@ const GrnItemsFrom = ({
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-1 py-1">
                         <input
                           type="number"
                           name="sgst"
@@ -514,8 +514,8 @@ const GrnItemsFrom = ({
                           value={grnFormData?.items?.[index]?.sgst_amount || ''}
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
-                      </td>
-                      <td className="px-4 py-2">
+                      </td> */}
+                      <td className="px-1 py-1">
                         <input
                           type="number"
                           name="tax_amount"
@@ -524,7 +524,7 @@ const GrnItemsFrom = ({
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-1 py-1">
                         <input
                           type="number"
                           name="total_amount"
@@ -533,7 +533,7 @@ const GrnItemsFrom = ({
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-1 py-1">
                         <input
                           type="text"
                           name="description"
@@ -543,7 +543,7 @@ const GrnItemsFrom = ({
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
                       </td>
-                      <td className="px-4 py-2">
+                      {/* <td className="px-1 py-1">
                         <input
                           type="text"
                           name="batch_no"
@@ -553,17 +553,17 @@ const GrnItemsFrom = ({
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-1 py-1">
                         <input
                           type="text"
                           name="work_order_no"
                           {...register(`grn_items[${index}].work_order_no`, {
                             onChange: () => updateParentFormData(),
                           })}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-self"
                         />
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-1 py-1">
                         <input
                           type="text"
                           name="location"
@@ -572,8 +572,8 @@ const GrnItemsFrom = ({
                           })}
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
-                      </td>
-                      <td className="px-4 py-2">
+                      </td> */}
+                      <td className="px-1 py-1">
                         <input
                           type="text"
                           name="notes"
@@ -583,7 +583,7 @@ const GrnItemsFrom = ({
                           className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                         />
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-1 py-1 flex justify-center items-center">
                         <button type="button" onClick={() => removeGrnItem(index)}>
                           <TrashIcon className="text-[#ff2d55] w-6 h-6 cursor-pointer" />
                         </button>

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { cilSettings, cilUser, cilBell, cilLanguage, cilSearch, cilMenu,cilOptions,cilApplicationsSettings  } from '@coreui/icons';
+import { cilSettings, cilUser, cilBell, cilLanguage, cilMenu,cilApplicationsSettings, cibMarketo  } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import EmptyState from '../User/EmptyState';
 import SearchBar from '../../components/New/SearchBar';
+import { CgTemplate } from "react-icons/cg";
 
 const SettingsLayout = () => {
   const location = useLocation();
@@ -15,6 +16,7 @@ const SettingsLayout = () => {
     { path: '/settings/language', label: 'Language Settings', icon: cilLanguage },
     { path: '/settings/superAdmin', label: 'Super Admin', icon: cilUser },
     { path: '/settings/dropdown', label: 'Dropdown Settings', icon: cilApplicationsSettings  },
+    { path: '/settings/template', label: 'Template', icon: cibMarketo  },
 
   ];
 
@@ -23,7 +25,7 @@ const SettingsLayout = () => {
   const isChildRouteSelected = menuItems.some(item => location.pathname === item.path);
 
   return (
-    <div className="flex flex-col md:flex-row h-[80vh] overflow-hidden w-full xxxl:h-[90vh] bg-gray-100">
+    <div className="flex flex-col md:flex-row overflow-hidden w-full bg-gray-700 h-[calc(95vh-64px)]">
       {/* Mobile Dropdown Menu */}
       <div className="md:hidden p-4 border-b border-gray-200 flex justify-between items-center">
         <h1 className="text-lg font-semibold text-gray-800">Settings</h1>

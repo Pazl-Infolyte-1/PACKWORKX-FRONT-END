@@ -102,7 +102,7 @@ function NotificationSetting() {
  
                   {/* Enable Email Queue */}
                   <div>
-                    <label className="block text-gray-500 mb-2 flex items-center">
+                    <label className="text-gray-500 mb-2 flex items-center">
                       Enable Email Queue
                       <span className="ml-1 w-5 h-5 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm">
                         ?

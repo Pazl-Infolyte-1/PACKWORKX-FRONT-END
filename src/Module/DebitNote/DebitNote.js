@@ -6,6 +6,7 @@ import DebitNoteTable from './DebitNoteTable'
 // import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
 import { useNavigate } from 'react-router-dom'
+import { debitApi } from '../../api/debit'
 
 const DebitNote = () => {
   const [alerts, setAlerts] = useState([])

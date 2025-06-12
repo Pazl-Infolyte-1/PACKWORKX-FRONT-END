@@ -25,9 +25,15 @@ export const machineApi = {
     return await apiClient.put(`/machines/master/update/${id}`, data)
   },
 
-  deleteMachine: async (id) => {
-    return await apiClient.delete(`/machines/master/delete/${id}`)
-  },
+deleteMachine: async (id) => {
+  try {
+    return await apiClient.delete(`/machines/master/delete/${id}`);
+  } catch (error) {
+    console.error('Error deleting machine:', error);
+    throw error; // Re-throw the error so the caller can handle it
+  }
+},
+
   updateMachineStatus: async (id, data) => {
     return await apiClient.patch(`/machines/master/${id}/status`, data)
   },

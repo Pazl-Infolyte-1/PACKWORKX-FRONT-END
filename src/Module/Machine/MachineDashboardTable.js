@@ -32,7 +32,15 @@ const MachineDashboardTable = ({
   const handledeleteConfirmClick = async () => {
     setIsLoading(true)
     const response = await machineApi.deleteMachine(deleteId)
+    console.log("ressss",response)
     if (response.status === 200) {
+         setAlerts([
+        {
+          severity: 'success',
+          message: response.data.message
+        },
+      ])
+      console.log()
       setIsLoading(false)
       setIsConfirmationModalOpen(false)
       setDeleteId(null)

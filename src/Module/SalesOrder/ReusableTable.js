@@ -137,7 +137,7 @@ export default function ReusableTable({
                 data.map((row, rowIndex) => (
                   <React.Fragment key={rowIndex}>
                     <CTableRow
-                      className={`border-b text-sm text-gray-900 hover:bg-gray-50 transition-colors ${expandableConfig ? 'cursor-pointer' : ''}`}
+                      className={`border-b text-sm text-gray-900 hover:bg-gray-50 transition-colors cursor-pointer ${expandableConfig ? 'cursor-pointer' : ''}`}
                       onClick={(e) => handleRowClick1(row, e, rowIndex)}
                     >
                       {columns?.map((col) => {

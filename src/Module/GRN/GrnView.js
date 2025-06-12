@@ -108,15 +108,15 @@ const GrnView = ({ id, handleEdit, setOpenGrnModal }) => {
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Grn Item Id
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Po Item Id
-                      </th>
+                      </th> */}
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Item Id
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Item Code
-                      </th>
+                      </th> */}
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Ordered Quantity
                       </th>
@@ -129,9 +129,9 @@ const GrnView = ({ id, handleEdit, setOpenGrnModal }) => {
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Rejected Quantity
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Batch No
-                      </th>
+                      </th> */}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -140,15 +140,15 @@ const GrnView = ({ id, handleEdit, setOpenGrnModal }) => {
                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
                           #{order?.id}
                         </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                        {/* <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                           {order.po_item_id}
-                        </td>
+                        </td> */}
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                          {order.item_id}
+                          {order.item_info?.item_generate_id}
                         </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                        {/* <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                           {order.item_code}
-                        </td>
+                        </td> */}
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                           {order.quantity_ordered}
                         </td>
@@ -161,9 +161,9 @@ const GrnView = ({ id, handleEdit, setOpenGrnModal }) => {
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                           {order.rejected_quantity}
                         </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                        {/* <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                           {order.batch_no}
-                        </td>
+                        </td> */}
                       </tr>
                     ))}
                   </tbody>

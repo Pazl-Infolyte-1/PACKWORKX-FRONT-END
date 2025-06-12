@@ -48,6 +48,7 @@ function LayerDragble({ lg, workOrderId,order }) {
   }
   
   function PairedLayersDragble({ layers, workOrderId,order }) {
+
     const [, drag] = useDrag(() => ({
       type: ItemType,
       item: () => {
@@ -116,35 +117,52 @@ export default function WorkOrderCard({
     const handleViewSalesOrder = (id) => {
       navigate(`/salesorder/view/${id}`)
     }
-    const organizeLayers = (layers,) => {
-      if (!layers || layers.length === 0) return { single: [], pairs: [] };
-      
-      // Sort layers by ID to ensure correct pairing
-      const sortedLayers = [...layers].sort((a, b) => a.layer_id - b.layer_id);
-      
-      const single = [];
-      const pairs = [];
-      
-      // ID 1 is always single (if it exists)
-      if (sortedLayers.length > 0 && sortedLayers[0].layer_id === 1) {
-        single.push(sortedLayers[0]);
-      }
-      
-      // Group remaining layers in pairs: (2,3), (4,5), (6,7), etc.
-      const remainingLayers = sortedLayers.filter(layer => layer.layer_id !== 1);
-      
-      for (let i = 0; i < remainingLayers.length; i += 2) {
-        if (i + 1 < remainingLayers.length) {
-          // We have a pair
-          pairs.push([remainingLayers[i], remainingLayers[i + 1]]);
-        } else {
-          // Odd number, last one becomes single
-          single.push(remainingLayers[i]);
+    const organizeLayers = (layers) => {
+        if (!layers || layers.length === 0) return { single: [], pairs: [] };
+        
+        // Sort layers by ID to ensure correct pairing
+        const sortedLayers = [...layers].sort((a, b) => a.layer_id - b.layer_id);
+        
+        const single = [];
+        const pairs = [];
+        
+        // ID 1 is always single (if it exists)
+        const layer1 = sortedLayers.find(layer => layer.layer_id === 1);
+        if (layer1) {
+          single.push(layer1);
         }
-      }
-  
-      return { single, pairs };
-    };
+        
+        // Get remaining layers (excluding layer 1)
+        const remainingLayers = sortedLayers.filter(layer => layer.layer_id !== 1);
+        
+        // Group layers based on their original pairing logic
+        // Layers should be paired as: (2,3), (4,5), (6,7), etc.
+        const layerMap = new Map();
+        remainingLayers.forEach(layer => {
+          layerMap.set(layer.layer_id, layer);
+        });
+        
+        // Check for pairs starting from layer_id 2
+        for (let i = 2; i <= Math.max(...remainingLayers.map(l => l.layer_id)); i += 2) {
+          const firstLayer = layerMap.get(i);
+          const secondLayer = layerMap.get(i + 1);
+          
+          if (firstLayer && secondLayer) {
+            // Both layers exist, create a pair
+            pairs.push([firstLayer, secondLayer]);
+          } else if (firstLayer) {
+            // Only first layer exists, add as single
+            single.push(firstLayer);
+          } else if (secondLayer) {
+            // Only second layer exists, add as single
+            single.push(secondLayer);
+          }
+        }
+        
+        console.log('Organized layers - single:', single, 'pairs:', pairs);
+        
+        return { single, pairs };
+      };
   
   
     return (
@@ -251,33 +269,37 @@ export default function WorkOrderCard({
               ))} */}
   
             {/* Group remaining layers */}
-            {(() => {
-              const { single, pairs } = organizeLayers(order?.work_order_sku_values,order.work_generate_id);
-              
-              return (
-                <>
-                  {/* Render single layers */}
-                  {single.map((lg) => (
-                    <LayerDragble 
-                      key={`single-${lg.id}`} 
-                      lg={lg} 
-                      workOrderId={order.id} 
-                      order={order} 
-                    />
-                  ))}
-                  
-                  {/* Render paired layers */}
-                  {pairs.map((pair, pairIndex) => (
-                    <PairedLayersDragble 
-                      key={`pair-${pairIndex}-${pair[0].id}-${pair[1].id}`} 
-                      order={order}
-                      layers={pair} 
-                      workOrderId={order.id} 
-                    />
-                  ))}
-                </>
-              );
-            })()}
+
+{(() => {
+  const { single, pairs } = organizeLayers(order?.work_order_sku_values, order.work_generate_id);
+  
+  return (
+    <>
+      {/* Render single layers */}
+      {single.map((lg) => (
+        <LayerDragble 
+          key={`single-${order.id}-${lg.layer_id}`} // More specific key
+          lg={lg} 
+          workOrderId={order.id} 
+          order={order} 
+        />
+      ))}
+      
+      {pairs.map((pair) => {
+        const pairKey = `pair-${order.id}-${pair.map(p => p.layer_id).sort().join('-')}`;
+        
+        return (
+          <PairedLayersDragble 
+            key={pairKey}
+            order={order}
+            layers={pair} 
+            workOrderId={order.id} 
+          />
+        );
+      })}
+    </>
+  );
+})()}
   
     <div
       style={{

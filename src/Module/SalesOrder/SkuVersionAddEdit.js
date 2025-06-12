@@ -414,7 +414,7 @@ const cleanedSkuValues = skuvaluesFromParent.map((item) => {
         sku_values: cleanedSkuValues
       };
       console.log("req body",JSON.stringify(requestBody))
-      const response = await apiMethods.addSkuVersion(requestBody);
+      const response = await skuApi.addSkuVersion(requestBody);
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
 
       const updatedVersionsResponse = await skuApi.getSkuVersions(skuID);

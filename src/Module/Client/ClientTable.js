@@ -94,7 +94,9 @@ function ClientTable({ clientdata, refreshClients, isMinimized,setSingleStatusUp
 const handleStatusChange = async (clientId, newStatus) => {
   try {
 const response = await clientApi.clientStatusSwitch(newStatus, clientId)
-    console.log('✅ Status update response:', response)    // Optionally refetch or update local state here
+    console.log('✅ Status update response:', response.data.message)
+          setAlerts([{ severity: 'success', message: response.data.message }])
+    // Optionally refetch or update local state here
     setSingleStatusUpdate(response.data.status)
   } catch (error) {
     console.error('Status update failed:', error)

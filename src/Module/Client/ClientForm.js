@@ -12,6 +12,7 @@ import Loader from '../../components/New/Loader'
 import { CRow, CCol, CNav, CNavItem, CNavLink } from '@coreui/react'
 import { useFieldArray } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { clientApi } from '../../api/client'
 
 const ClientForm = ({ resetForm, setReloadData }) => {
   const [activeTab, setActiveTab] = useState('Other Details')
@@ -143,7 +144,7 @@ const ClientForm = ({ resetForm, setReloadData }) => {
           website_url: editData.website_url || '',
           department: editData.department || '',
           designation: editData.designation || '',
-          opening_balance: editData.opening_balance || '',
+          opening_balance: editData.opening_balance || 0,
           twitter: editData.twitter || '',
           skype: editData.skype || '',
           facebook: editData.facebook || '',

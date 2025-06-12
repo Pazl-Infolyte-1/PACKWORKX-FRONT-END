@@ -843,48 +843,45 @@ const Group = ({
 
   const SubmitGroups = async () => {
     try {
-      if (groups.length === 0) {
-        setError('Please select at least one work order');
-        return;
-      }
-  
-      const payload = groups.map(group => {
-        const groupItems = group.group_value.flatMap(item => {
-          // Case 1: Grouped item with 'layers' (multiple layer objects)
-          if (item?.layers && Array.isArray(item.layers)) {
-            return item.layers.map(layer => ({
-              work_order_id: item.workOrderId,
-              layer_id: layer.layer_id
-            }));
-          }
-  
-          // Case 2: Single layer object directly
+      if (groups.length !== 0) {
+        const payload = groups.map(group => {
+          const groupItems = group?.group_value?.flatMap(item => {
+            // Case 1: Grouped item with 'layers' (multiple layer objects)
+            if (item?.layers && Array.isArray(item?.layers)) {
+              return item?.layers?.map(layer => ({
+                work_order_id: item?.workOrderId,
+                layer_id: layer?.layer_id
+              }));
+            }
+    
+            // Case 2: Single layer object directly
+            return {
+              work_order_id: item?.workOrderId,
+              layer_id: item?.layer_id
+            };
+          });
+    
+          const groupQty = group?.group_value?.reduce((total, item) => {
+            if (item?.layers && Array.isArray(item.layers)) {
+              return total + item?.layers?.reduce((subTotal, layer) => subTotal + (layer?.weight || 0), 0);
+            }
+            return total + (item?.weight || 0);
+          }, 0);
+    
           return {
-            work_order_id: item.workOrderId,
-            layer_id: item.layer_id
+            group_name: group?.group_name,
+            group_value: groupItems,
+            group_Qty: groupQty,
+            // allocated_quantity:0
+
           };
         });
-  
-        const groupQty = group.group_value.reduce((total, item) => {
-          if (item?.layers && Array.isArray(item.layers)) {
-            return total + item.layers.reduce((subTotal, layer) => subTotal + (layer.weight || 0), 0);
-          }
-          return total + (item.weight || 0);
-        }, 0);
-  
-        return {
-          group_name: group.group_name,
-          group_value: groupItems,
-          group_Qty: groupQty,
-          // allocated_quantity:0
-
-        };
-      });
-  
-      console.log('Payload to submit:', payload);
-  
-      const response = await productionApi.createGroupInProduction(payload);
-      console.log(response);
+    
+        console.log('Payload to submit:', payload);
+    
+        const response = await productionApi.createGroupInProduction(payload);
+        console.log(response);
+      }
       
       navigate('/production/AllocateRM');
 
@@ -1067,23 +1064,26 @@ const Group = ({
                   </div>
                 </CCardBody>
               </CCard>
-            ) : (
+            ) : 
+            (
               workOrders
                 ?.filter((order) => order.work_order_sku_values && order.work_order_sku_values.length > 0)
-                ?.map((order) => (
-                  <WorkOrderCard
-                    key={order.id}
-                    order={order}
-                    index={order.id}
-                    visibleIndex={visibleIndex}
-                    setVisibleIndex={setVisibleIndex}
-                    removeWOFromPlan={removeWOFromPlan}
-                    setModalWorkOrder={setModalWorkOrder}
-                    modalWorkOrder={modalWorkOrder}
-                    setVisible={setVisible}
-                    setVisibleSplit={setVisibleSplit}
-                  />
-                ))
+                ?.map((order) => {
+                  return (
+                    <WorkOrderCard
+                      key={order.id}
+                      order={order}
+                      index={order.id}
+                      visibleIndex={visibleIndex}
+                      setVisibleIndex={setVisibleIndex}
+                      removeWOFromPlan={removeWOFromPlan}
+                      setModalWorkOrder={setModalWorkOrder}
+                      modalWorkOrder={modalWorkOrder}
+                      setVisible={setVisible}
+                      setVisibleSplit={setVisibleSplit}
+                    />
+                  );
+                })
             )}
           </CCol>
         </CRow>

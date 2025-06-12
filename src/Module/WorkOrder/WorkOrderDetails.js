@@ -1,6 +1,8 @@
   import React from 'react'
   import PopUp from '../../components/New/PopUp'
   import ActionButton from '../../components/New/ActionButton'
+  import moment from 'moment';
+
 
   function WorkOrderDetails({ showPopUp, setShowPopUp, cell }) {
     return (
@@ -64,30 +66,41 @@
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">EDD</span>
-                    <span className="text-gray-800 mt-1">{apiMethods.formatDate(cell.edd)}</span>
+                    <span className="text-gray-800 mt-1">
+                      {/*{apiMethods.formatDate(cell.edd)}*/}
+                        {moment(cell.edd).format('DD/MM/YYYY')}
+
+                      </span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Planned start date</span>
                     <span className="text-gray-800 mt-1">
-                      {apiMethods.formatDate(cell.planned_start_date)}
+                      {/*{apiMethods.formatDate(cell.planned_start_date)}*/}
+                                              {moment(cell.planned_start_date).format('DD/MM/YYYY')}
+
                     </span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Planned end date</span>
                     <span className="text-gray-800 mt-1">
-                      {apiMethods.formatDate(cell.planned_end_date)}
+                      {/*{apiMethods.formatDate(cell.planned_end_date)}*/}
+                                                                    {moment(cell.planned_end_date).format('DD/MM/YYYY')}
                     </span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Created at</span>
                     <span className="text-gray-800 mt-1">
-                      {apiMethods.formatDate(cell.created_at)}
+                      {/*{apiMethods.formatDate(cell.created_at)}*/}
+                       {moment(cell.created_at).format('DD/MM/YYYY')}
+
                     </span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Updated at</span>
                     <span className="text-gray-800 mt-1">
-                      {apiMethods.formatDate(cell.updated_at)}
+                      {/*{apiMethods.formatDate(cell.updated_at)}*/}
+                        {moment(cell.updated_at).format('DD/MM/YYYY')}
+
                     </span>
                   </div>
                 </div>

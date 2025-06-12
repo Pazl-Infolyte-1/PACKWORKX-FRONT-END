@@ -84,6 +84,7 @@ function RSCBox({
   const [fullRouteResponse, setFullRouteResponse] = useState(null)
   const [displayAsChips, setDisplayAsChips] = useState([])
   const [isUploading, setIsUploading] = useState(false)
+  const [helperBoard,setHelperBoard] = useState(0)
   //const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
   const [fileNames, setFileNames] = useState([])
   const ITEM_HEIGHT = 48
@@ -125,7 +126,9 @@ function RSCBox({
     const flapWidth = Number(parseFloat(data.flap_width)) || 0
 
     const lengthBoardSize = ((length + width) * 2) + lengthTrimmingTolerance + flapWidth
-    const widthBoardSize = (width + height) + widthTrimmingTolerance
+    const widthBoardSize = ((width + height)*upsval) + widthTrimmingTolerance
+        const widthBoardSizeHelper= ((width + height)*1) + widthTrimmingTolerance
+setHelperBoard(widthBoardSizeHelper)
     const totalBoardSize = lengthBoardSize * widthBoardSize
     //const deckleSizeVal = widthBoardSize * upsval
     const EPSILON = 0.001
@@ -1133,6 +1136,11 @@ console.log("unit///",rscUnits)
                 readOnly
               />
             </div>
+              <p className="text-[10px] text-gray-500 mt-1">
+                {/*Deckle should be greater than (({Math.round(Number(addNewSkuData?.length) * 100) / 100 || ''} + {Math.round(Number(addNewSkuData?.height) * 100) / 100 || ''}) × {Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}) + 20*/}
+                {/*Board width per UPS {Math.round((addNewSkuData.width_board_size_cm2)/(((addNewSkuData?.ups) * 100)/100))}*/}
+                Board width per UPS {helperBoard}
+              </p>
           </div>
         </Tooltip>
 

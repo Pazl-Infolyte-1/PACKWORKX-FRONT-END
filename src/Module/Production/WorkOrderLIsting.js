@@ -77,24 +77,19 @@ function WorkOrderListing() {
 
   const handleNext = async () => {
     try {
-      console.log(selectedOrders)
+      if (selectedOrders.length > 0) {
+        const body = {
+          workOrderIds: selectedOrders,
+          production: 'in_production',
+        }
 
-      if (selectedOrders.length === 0) {
-        setError('Please select at least one work order')
-        return
+        const response = await productionApi.addWorkOrderIntoProduction(body)
+
+        if (response?.success || response?.status === 200) {
+          setError(null);
+        }
       }
-
-      const body = {
-        workOrderIds: selectedOrders,
-        production: 'in_production',
-      }
-
-      const response = await productionApi.addWorkOrderIntoProduction(body)
-
-      if (response?.success || response?.status === 200) {
-        setError(null);
-        navigate('/production/GroupLayers');
-      }
+      navigate('/production/GroupLayers');
     } catch (err) {
       console.error('Error adding work orders to production:', err)
       setError(err.message || 'Failed to add work orders to production')

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CRow,
   CCol,
@@ -18,6 +18,8 @@ import ProgressBar from './ProgressBar'
 import Dropdown from 'react-bootstrap/Dropdown'
 import AllcoateRMModal from './AllcoateRMModal'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
+import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext'
+import apiMethods from '../../api/config'
 
 const ItemType = 'WORK_ORDER'
 
@@ -222,7 +224,7 @@ function GroupDropZone({
               whiteSpace: 'nowrap', // Prevents text wrapping
             }}
           >
-            {i.order_id ? i.order_id : i.layer_name}{' '}
+            {i?.layer_detail?.layer}
             {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />}
           </span>
 
@@ -320,10 +322,10 @@ function GroupDropZone({
               </>
             ) : (
               <>
-                <span>GSM - {i.gsm}</span>
-                <span>BF - {i.bf}</span>
-                <span>{i.dimensions} PLY</span>
-                <span>{i.color}</span>
+                <span>GSM - {i?.layer_detail?.gsm}</span>
+                <span>BF - {i?.layer_detail?.bf}</span>
+                <span>{i.weight} kg</span>
+                <span>{i?.layer_detail?.color}</span>
               </>
             )}
           </div>
@@ -363,17 +365,93 @@ function GroupDropZone({
 }
 
 const AllocateRM = ({
-  workOrders,
-  setWorkOrders,
-  groupOrders,
-  setGroupOrders,
-  autoSyncOrders,
-  setVisibleSplit,
+  // workOrders,
+  // setWorkOrders,
+  // // setGroupOrders,
+  // autoSyncOrders,
+  // setVisibleSplit,
 }) => {
   const [visibleGroupIndex, setVisibleGroupIndex] = useState(null)
   const [visibleItemIndex, setVisibleItemIndex] = useState(null)
   const [advanced, setAdvanced] = useState(false)
   const [visibleAllocate, setVisibleAllocate] = useState(false)
+  const [visibleSplit, setVisibleSplit] = useState(false)
+
+  const [deckleOptions, setDeckleOptions] = useState([]);
+  const [colorOptions, setColorOptions] = useState([]);
+  const [gsmOptions, setGsmOptions] = useState([]);
+  const [bfOptions, setBfOptions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Add state for selected filter values
+  const [selectedFilters, setSelectedFilters] = useState({
+    gsm: '',
+    bf: '',
+    color: '',
+    deckle: ''
+  });
+
+  const handleFilterChange = (filterName, value) => {
+    setSelectedFilters(prev => ({
+      ...prev,
+      [filterName]: value
+    }));
+  };
+
+  const fetchReels = async (params) => {
+    try {
+      // Format the parameters correctly
+      const formattedParams = {
+        gsm: params.gsm || '',
+        bf: params.bf || '',
+        color: params.color || '',
+        deckle: params.deckle || ''
+      };
+
+      const response = await apiMethods.getReelsInRawMeterial(formattedParams);
+      if (response) {
+        console.log(response)
+      }
+    } catch (error) {
+      console.error('Error fetching reels:', error);
+      setError(error?.response?.data?.message || 'Failed to fetch reels data');
+    }
+  };
+
+  // Update useEffect to watch selectedFilters
+  useEffect(() => {
+    fetchReels(selectedFilters);
+  }, [selectedFilters]);
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const [deckleRes, colorRes, gsmRes, bfRes] = await Promise.allSettled([
+          apiMethods.getDeckleOptions(),
+          apiMethods.getColorOptions(),
+          apiMethods.getGsmOptions(),
+          apiMethods.getBfOptions(),
+        ]);
+
+        console.log(deckleRes.value?.data?.data, colorRes, gsmRes, bfRes)
+        
+
+        setDeckleOptions(deckleRes?.value?.data?.data);
+        setColorOptions(colorRes?.value?.data?.data);
+        setGsmOptions(gsmRes?.value?.data?.data);
+        setBfOptions(bfRes?.value?.data?.data);
+      } catch (error) {
+        console.error('Error fetching dropdown options:', error);
+      }
+    };
+
+    fetchOptions();
+  }, []);
+
+
+
+
   const [sfgData, setSfgData] = useState([
     {
       id: 'Reel 02',
@@ -421,36 +499,51 @@ const AllocateRM = ({
   }
 
   const [openSFG, setOpenSFG] = useState(null)
+  const {groupOrders,setGroupOrders} = useRawMaterialContext()
+
+
+  const fetchWorkOrders = async () => {
+    try {
+      const response = await apiMethods.getProductionGroups();
+      setGroupOrders(response?.data?.data);
+    } catch (error) {
+      console.error("Error fetching work orders:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchWorkOrders();
+  }, []);
+
 
   const addQuantity = (i, groupIndex, item) => {
     console.log('Work Order:', i)
     console.log('Group Index:', groupIndex)
     console.log('Item:', item)
-    console.log('Work Orders:', workOrders)
 
-    setGroupOrders((prevOrders) =>
-      prevOrders.map((order) => {
-        if (order.order_id === i.wo_id) {
-          console.log('Inside the if condition')
-          console.log('Order:', order)
+    // setGroupOrders((prevOrders) =>
+    //   prevOrders.map((order) => {
+    //     if (order.order_id === i.wo_id) {
+    //       console.log('Inside the if condition')
+    //       console.log('Order:', order)
 
-          const updatedItems = order.items.map((orderItem) =>
-            orderItem.id === i.id
-              ? {
-                  ...orderItem,
-                  finished_goods: orderItem.finished_goods + item.sfg['available_qty'],
-                }
-              : orderItem,
-          )
+    //       const updatedItems = order.items.map((orderItem) =>
+    //         orderItem.id === i.id
+    //           ? {
+    //               ...orderItem,
+    //               finished_goods: orderItem.finished_goods + item.sfg['available_qty'],
+    //             }
+    //           : orderItem,
+    //       )
 
-          return {
-            ...order,
-            items: updatedItems,
-          }
-        }
-        return order
-      }),
-    )
+    //       return {
+    //         ...order,
+    //         items: updatedItems,
+    //       }
+    //     }
+    //     return order
+    //   }),
+    // )
     setSfgData((prevSfgData) => prevSfgData.filter((sfg) => sfg.id !== item.sfg['id']))
   }
 
@@ -492,7 +585,8 @@ const AllocateRM = ({
         </CRow>
         <CRow className="mt-3">
           <CCol xs={12}>
-            {groupOrders.map((group, groupIndex) => (
+            {console.log(groupOrders)}
+            {groupOrders?.map((group, groupIndex) => (
               <CCard
                 key={groupIndex}
                 className="mb-2"
@@ -521,7 +615,7 @@ const AllocateRM = ({
                         whiteSpace: 'nowrap', // Prevents text wrapping
                       }}
                     >
-                      {group.name}{' '}
+                      {group.group_name}{' '}
                       {visibleGroupIndex === groupIndex ? <FaAngleUp /> : <FaAngleDown />}
                     </span>
 
@@ -569,7 +663,7 @@ const AllocateRM = ({
                   </div>
 
                   <CCollapse className="custom-collapse" visible={visibleGroupIndex === groupIndex}>
-                    {group?.items?.map((i, itemIndex) => (
+                    {group?.layer_details?.map((i, itemIndex) => (
                       <GroupDropZone
                         key={itemIndex}
                         i={i}
@@ -615,29 +709,65 @@ const AllocateRM = ({
               <CRow className="align-items-center mt-3">
                 <CCol md="2">
                   <label>GSM</label>
-                  <CFormSelect style={selectStyles}>
-                    <option>180</option>
+                  <CFormSelect 
+                    style={selectStyles}
+                    value={selectedFilters.gsm}
+                    onChange={(e) => handleFilterChange('gsm', e.target.value)}
+                  >
+                    <option disabled selected value=""> GSM</option>
+                    {gsmOptions?.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </CFormSelect>
                 </CCol>
                 <CCol md="2">
                   <label>BF</label>
-                  <CFormSelect style={selectStyles}>
-                    <option>24</option>
+                  <CFormSelect 
+                    style={selectStyles}
+                    value={selectedFilters.bf}
+                    onChange={(e) => handleFilterChange('bf', e.target.value)}
+                  >
+                    <option disabled selected value=""> BF</option>
+                    {bfOptions?.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </CFormSelect>
                 </CCol>
                 <CCol md="2">
                   <label>Color</label>
-                  <CFormSelect style={selectStyles}>
-                    <option>90</option>
+                  <CFormSelect 
+                    style={selectStyles}
+                    value={selectedFilters.color}
+                    onChange={(e) => handleFilterChange('color', e.target.value)}
+                  >
+                    <option disabled selected value=""> Color</option>
+                    {colorOptions?.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </CFormSelect>
                 </CCol>
                 <CCol md="2">
                   <label>Deckle</label>
-                  <CFormSelect style={selectStyles}>
-                    <option>25</option>
+                  <CFormSelect 
+                    style={selectStyles}
+                    value={selectedFilters.deckle}
+                    onChange={(e) => handleFilterChange('deckle', e.target.value)}
+                  >
+                    <option disabled selected value=""> Deckle</option>
+                    {deckleOptions?.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </CFormSelect>
                 </CCol>
-
+{/* 
                 <CCol md="2" className="d-flex justify-content-end">
                   <CButton
                     color="light"
@@ -646,7 +776,7 @@ const AllocateRM = ({
                   >
                     Advanced {advanced ? <FaAngleUp /> : <FaAngleDown />}
                   </CButton>
-                </CCol>
+                </CCol> */}
               </CRow>
               {advanced && (
                 <CRow className="mt-3">

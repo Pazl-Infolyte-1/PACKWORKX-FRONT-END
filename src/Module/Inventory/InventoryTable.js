@@ -27,69 +27,71 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
 
-  const customFieldColumns = useMemo(() => {
-    // Extract unique custom field keys when subcategory filter is applied
-    if (!subCategoryId || !inventoryData || inventoryData.length === 0) {
-      return []
-    }
+ const customFieldColumns = useMemo(() => {
+  // Extract unique custom field keys when subcategory filter is applied
+  if (!subCategoryId || !inventoryData || inventoryData.length === 0) {
+    return []
+  }
 
-    const customFieldsSet = new Set()
+  const customFieldsSet = new Set()
 
-    inventoryData.forEach((item) => {
-      if (item.item?.default_custom_fields) {
-        try {
-          // First parse the outer JSON string, then parse the inner JSON string
-          const outerParsed = JSON.parse(item.item.default_custom_fields)
-          const customFields =
-            typeof outerParsed === 'string' ? JSON.parse(outerParsed) : outerParsed
+  inventoryData.forEach((item) => {
+    if (item.item?.default_custom_fields) {
+      try {
+        // Check if default_custom_fields is already an object or needs parsing
+        const customFields = typeof item.item.default_custom_fields === 'string' 
+          ? JSON.parse(item.item.default_custom_fields) 
+          : item.item.default_custom_fields
 
-          Object.keys(customFields).forEach((key) => {
-            // Transform specific field names
-            let transformedKey = key
-            if (key.toLowerCase() === 'uom') {
-              transformedKey = 'Unit'
-            } else if (key.toLowerCase() === 'size') {
-              transformedKey = 'Deckle'
-            }
-            customFieldsSet.add(transformedKey)
-          })
-        } catch (error) {
-          console.error('Error parsing custom fields:', error)
-        }
+        Object.keys(customFields).forEach((key) => {
+          // Transform specific field names
+          let transformedKey = key
+          if (key.toLowerCase() === 'uom') {
+            transformedKey = 'Unit'
+          } else if (key.toLowerCase() === 'size') {
+            transformedKey = 'Deckle'
+          }
+          customFieldsSet.add(transformedKey)
+        })
+      } catch (error) {
+        console.error('Error parsing custom fields:', error)
       }
-    })
+    }
+  })
 
-    return Array.from(customFieldsSet)
-  }, [inventoryData, subCategoryId])
+  return Array.from(customFieldsSet)
+}, [inventoryData, subCategoryId])
 
   // Function to get custom field value for an item
   const getCustomFieldValue = (item, fieldKey) => {
-    if (!item.item?.default_custom_fields) return '--'
+  if (!item.item?.default_custom_fields) return '--'
 
-    try {
-      // First parse the outer JSON string, then parse the inner JSON string if needed
-      const outerParsed = JSON.parse(item.item.default_custom_fields)
-      const customFields = typeof outerParsed === 'string' ? JSON.parse(outerParsed) : outerParsed
+  try {
+    // Check if default_custom_fields is already an object or needs parsing
+    const customFields = typeof item.item.default_custom_fields === 'string' 
+      ? JSON.parse(item.item.default_custom_fields) 
+      : item.item.default_custom_fields
 
-      // Handle the transformed field names (Unit and Deckle)
-      let originalKey = fieldKey
-      if (fieldKey === 'Unit') originalKey = 'uom'
-      if (fieldKey === 'Deckle') originalKey = 'size'
+    // Handle the transformed field names (Unit and Deckle)
+    let originalKey = fieldKey
+    if (fieldKey === 'Unit') originalKey = 'uom'
+    if (fieldKey === 'Deckle') originalKey = 'size'
 
-      const value = customFields[originalKey]
+    const value = customFields[originalKey]
 
-      if (!value) return '--'
-      // Convert snake_case values to readable format
-      return value
-        .replace(/_/g, ' ')
-        .split(' ')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
-    } catch (error) {
-      console.error('Error parsing custom fields:', error)
-      return '--'
-    }
+    if (!value) return '--'
+    
+    // Convert snake_case values to readable format
+    return value
+      .replace(/_/g, ' ')
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+  } catch (error) {
+    console.error('Error parsing custom fields:', error)
+    return '--'
   }
+}
   return (
     <>
       <div className="w-full overflow-x-auto overflow-y-scroll h-[calc(100vh-310px)] border rounded-md shadow-sm mt-1 mb-3">

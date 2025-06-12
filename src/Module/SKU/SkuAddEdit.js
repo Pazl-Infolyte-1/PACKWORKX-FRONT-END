@@ -106,7 +106,7 @@ console.log("data",rscUnits)
 total_bursting_strength:null,
     sku_values: [
       {
-        id:null,
+        layer_id:null,
         layer: null,
         gsm: null,
         bf: null,
@@ -115,6 +115,7 @@ total_bursting_strength:null,
         flute_type: null,
         weight: null,
         bursting_strength: null,
+        layer_status:"ungrouped"
         //flute_ratio: null,
       },
     ],
@@ -339,40 +340,40 @@ useEffect(() => {
 
   const plyLayerConfigurations = {
     2: [
-      { id:1,layer: 'Top Layer', type: 'Top Layer' },
-      { id:2,layer: 'Corrugated Layer', type: 'Corrugated Layer' },
+      { layer_id:1,layer: 'Top Layer', type: 'Top Layer',layer_status:"ungrouped" },
+      { layer_id:2,layer: 'Corrugated Layer', type: 'Corrugated Layer',layer_status:"ungrouped" },
     ],
     3: [
-      { id:1,layer: 'Top Layer', type: 'Top Layer' },
-      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
+      { layer_id:1,layer: 'Top Layer', type: 'Top Layer',layer_status:"ungrouped" },
+      { layer_id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1',layer_status:"ungrouped" },
+      { layer_id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1',layer_status:"ungrouped" },
     ],
     5: [
-      { id:1,layer: 'Top Layer', type: 'Top Layer' },
-      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { id:4,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { id:5,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
+      { layer_id:1,layer: 'Top Layer', type: 'Top Layer',layer_status:"ungrouped" },
+      { layer_id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1',layer_status:"ungrouped" },
+      { layer_id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1',layer_status:"ungrouped" },
+      { layer_id:4,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2',layer_status:"ungrouped" },
+      { layer_id:5,layer: 'Liner Layer 2', type: 'Liner Layer 2',layer_status:"ungrouped" },
     ],
     7: [
-      { id:1,layer: 'Top Layer', type: 'Top Layer' },
-      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { id:4,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { id:5,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
-      { id:6,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
-      { id:7,layer: 'Liner Layer 3', type: 'Liner Layer 3' },
+      { layer_id:1,layer: 'Top Layer', type: 'Top Layer',layer_status:"ungrouped" },
+      { layer_id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1',layer_status:"ungrouped" },
+      { layer_id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1',layer_status:"ungrouped" },
+      { layer_id:4,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2',layer_status:"ungrouped" },
+      { layer_id:5,layer: 'Liner Layer 2', type: 'Liner Layer 2',layer_status:"ungrouped" },
+      { layer_id:6,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3',layer_status:"ungrouped" },
+      { layer_id:7,layer: 'Liner Layer 3', type: 'Liner Layer 3',layer_status:"ungrouped" },
     ],
     9: [
-      { id:1,layer: 'Top Layer', type: 'Top Layer' },
-      { id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1' },
-      { id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1' },
-      { id:4,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2' },
-      { id:5,layer: 'Liner Layer 2', type: 'Liner Layer 2' },
-      { id:6,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3' },
-      { id:7,layer: 'Liner Layer 3', type: 'Liner Layer 3' },
-      { id:8,layer: 'Corrugated Layer 4', type: 'Corrugated Layer 4' },
-      { id:9,layer: 'Liner Layer 4', type: 'Liner Layer 4' },
+      { layer_id:1,layer: 'Top Layer', type: 'Top Layer',layer_status:"ungrouped" },
+      { layer_id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1',layer_status:"ungrouped" },
+      { layer_id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1',layer_status:"ungrouped" },
+      { layer_id:4,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2',layer_status:"ungrouped" },
+      { layer_id:5,layer: 'Liner Layer 2', type: 'Liner Layer 2',layer_status:"ungrouped" },
+      { layer_id:6,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3',layer_status:"ungrouped" },
+      { layer_id:7,layer: 'Liner Layer 3', type: 'Liner Layer 3',layer_status:"ungrouped" },
+      { layer_id:8,layer: 'Corrugated Layer 4', type: 'Corrugated Layer 4',layer_status:"ungrouped" },
+      { layer_id:9,layer: 'Liner Layer 4', type: 'Liner Layer 4',layer_status:"ungrouped" },
     ],
   }
 
@@ -380,7 +381,7 @@ useEffect(() => {
     const layerConfig = plyLayerConfigurations[plyCount] || []
 
     const newSkuValues = layerConfig.map((layer) => ({
-      id:layer.id,
+      layer_id:layer.layer_id,
       layer: layer.layer,
       gsm: '',
       bf: '',
@@ -390,6 +391,7 @@ useEffect(() => {
       weight: '',
       bursting_strength: '',
       //flute_ratio: '',
+      layer_status:layer.layer_status
     }))
 
     setAddNewSkuData((prevData) => ({

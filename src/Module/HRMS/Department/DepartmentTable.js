@@ -27,7 +27,7 @@ function DepartmentTable({ departments, loading, onEdit, onDelete }) {
   }
 
   const columns = [
-    { key: 'id', header: 'ID', field: 'id' },
+    //{ key: 'id', header: 'ID', field: 'id' },
     { key: 'department_name', header: 'Department Name', field: 'department_name' },
     {
       key: 'Parent_Department',

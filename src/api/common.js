@@ -72,7 +72,7 @@ export const commonApi = {
       console.error(error)
     }
   },
-    getCurrency: async () => {
+  getCurrency: async () => {
     try {
       return await apiClient.get('/common-service/currency')
     } catch (error) {
@@ -87,7 +87,7 @@ export const commonApi = {
       console.error(error)
     }
   },
-    uploadFile: async (file) => {
+  uploadFile: async (file) => {
     try {
       return await apiClient.post('/file/upload', file, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -96,7 +96,7 @@ export const commonApi = {
       console.error(error)
     }
   },
-    getFormFields: async (id) => {
+  getFormFields: async (id) => {
     try {
       const response = await apiClient.get(`/form-fields/${id}`)
       return response.data
@@ -104,7 +104,7 @@ export const commonApi = {
       throw error
     }
   },
-    getColors: async () => {
+  getColors: async () => {
     try {
       return await apiClient.get(`/common-service/colors`)
     } catch (error) {
@@ -112,4 +112,25 @@ export const commonApi = {
     }
   },
 
+  getNotifications: async (params) => {
+    try {
+      return await apiClient.get('/inventory/notifications')
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  clearNotifications: async (id) => {
+    try {
+      return await apiClient.patch(`/inventory/notifications/${id}`, { status: 'dismissed' })
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  throwAlert: async (id) => {
+    try {
+      return await apiClient.post(`/inventory/alert/`, { item_id: id })
+    } catch (error) {
+      console.error(error)
+    }
+  },
 }

@@ -4,14 +4,11 @@ import CustomAlert from '../../components/New/CustomAlert'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  setProductArray,
-  setStockAdjustmentPOArray,
-  setStockAdjustmentGRNArray,
-} from '../../action'
+import { setProductArray, setNotification, setAllNotifications } from '../../action'
 import { grnApi } from '../../api/grn'
 import { inventoryApi } from '../../api/inventory'
 import { itemApi } from '../../api/item'
+import { commonApi } from '../../api/common'
 const AddEditStockAdjustment = () => {
   const location = useLocation()
   const initialStock = location.state?.stock
@@ -139,8 +136,21 @@ const AddEditStockAdjustment = () => {
     fetchProduct()
   }, [])
 
-  const onSubmit = (data) => {
+  const handleThrowAlert = async (id) => {
+    try {
+      const response = await commonApi.throwAlert(id)
+      console.log('product data', response.data.data)
+      const all_notofications = await commonApi.getNotifications()
+      console.log('All Notifications:', all_notofications.data.data)
+      dispatch(setAllNotifications(all_notofications?.data?.data || []))
+    } catch (error) {
+      console.error('Error in handleThrowAlert:', error)
+    }
+  }
+
+  const onSubmit = async (data) => {
     console.log('Form Data:', data)
+
     const parsedData = {
       ...data,
       remarks: data.remarks,
@@ -156,35 +166,40 @@ const AddEditStockAdjustment = () => {
 
     console.log('Submitted Adjustment Data:', parsedData)
 
-    if (singleData?.id) {
-      // Update existing stock adjustment
-      inventoryApi
-        .updateStockAdjustment(singleData.id, parsedData)
-        .then((response) => {
-          console.log('Stock adjustment updated successfully:', response.data)
-          dispatch(setProductArray([]))
+    try {
+      if (singleData?.id) {
+        // ✅ Update existing stock adjustment
+        const response = await apiMethods.updateStockAdjustment(singleData.id, parsedData)
+        console.log('Stock adjustment updated successfully:', response.data)
+        dispatch(setProductArray([]))
+
+        const decreaseItems = parsedData.items.filter((item) => item.type === 'decrease')
+        await Promise.all(decreaseItems.map((item) => handleThrowAlert(item.item_id)))
+
+        navigate('/stockadjustment')
+      } else {
+        // ✅ Create new stock adjustment
+        const response = await apiMethods.postStockAdjustment(parsedData)
+        console.log('Stock adjustment created successfully:', response.data)
+        dispatch(setProductArray([]))
+        setAlerts([{ severity: 'success', message: response.data?.message }])
+
+        const decreaseItems = parsedData.items.filter((item) => item.type === 'decrease')
+        await Promise.all(decreaseItems.map((item) => handleThrowAlert(item.item_id)))
+
+        setTimeout(() => {
+          setAlerts([])
           navigate('/stockadjustment')
-        })
-        .catch((error) => {
-          console.error('Error updating stock adjustment:', error)
-        })
-    } else {
-      // Create new stock adjustment
-      inventoryApi
-        .postStockAdjustment(parsedData)
-        .then((response) => {
-          console.log('Stock adjustment created successfully:', response.data)
-          dispatch(setProductArray([]))
-          setAlerts([{ severity: 'success', message: response.data?.message }])
-          setTimeout(() => {
-            setAlerts([])
-            navigate('/stockadjustment')
-          }, 2000)
-        })
-        .catch((error) => {
-          setAlerts([{ severity: 'error', message: error?.response.data?.message }])
-          console.error('Error creating stock adjustment:', error)
-        })
+        }, 2000)
+      }
+    } catch (error) {
+      console.error('Error submitting stock adjustment:', error)
+      setAlerts([
+        {
+          severity: 'error',
+          message: error?.response?.data?.message || 'Failed to submit stock adjustment',
+        },
+      ])
     }
   }
 
@@ -300,7 +315,7 @@ const AddEditStockAdjustment = () => {
   ${errors.items?.[index]?.item_id ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'}`}
                 >
                   <option value="">Select Product</option>
-                  {product.map((prod) => {
+                  {product?.map((prod) => {
                     const currentItemId = watchedItems?.[index]?.item_id?.toString() || ''
                     const isSelectedHere = currentItemId === prod?.id?.toString()
                     const isDisabledGlobally =

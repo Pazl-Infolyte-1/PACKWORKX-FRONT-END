@@ -9,7 +9,6 @@ import { useSearch } from '../../components/New/SearchContext'
 import SalesOrderTable from './SalesOrderTable'
 import SearchBar from '../../components/New/SearchBar'
 import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import SalesOrderView from './viewSalesOrder'
@@ -186,7 +185,7 @@ function ListOfSalesOrder() {
 
   // const handleView = async (id) => {
   //   try {
-  //     const response = await apiMethods.getSaleOrderData(id)
+  //     const response = await salesOrderApi.getSaleOrderData(id)
   //     SetselectedSalesOrderData(response?.data)
   //     setIsminimiseTable(true)
   //     SetviewSalesOrder(true)

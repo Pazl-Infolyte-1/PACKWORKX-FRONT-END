@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import OrderForm from './OrderForm'
-import clientApi from '../../api/client'
+import {clientApi} from '../../api/client'
 import Loader from '../../components/New/Loader'
 import CustomAlert from '../../components/New/CustomAlert'
 import { purchaseOrderApi } from '../../api/purchaseOrder'

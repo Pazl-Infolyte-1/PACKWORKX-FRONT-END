@@ -10,7 +10,6 @@ import React, { useState } from 'react'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
-import apiMethods from '../../api/config'
 import PopUp from '../../components/New/PopUp'
 
 import PurchaseOrderReturnView from './PurchaseOrderReturnView'
@@ -55,7 +54,7 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
     console.log('Payload for status change:', payload)
 
     try {
-      const response = await apiMethods.updatePoRetrun(id, payload)
+      const response = await purchaseOrderApi.updatePoRetrun(id, payload)
       setAlerts([{ severity: 'success', message: response.data.message }])
       // setRefresh(prev => !prev);
     } catch (error) {

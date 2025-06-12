@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { CRow, CCol, CCard, CCardBody } from '@coreui/react'
 import { FaClipboardList, FaBox, FaCalendarAlt, FaPlus, FaMinus } from 'react-icons/fa'
-import apiMethods from '../../api/config'
 import { workOrderApi } from '../../api/workOrder'
 
 function WorkOrderListing({ workOrders, activeTab, isNextStepClicked, setActiveTab }) {

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { CButton } from '@coreui/react'
 import CustomAlert from '../../components/New/CustomAlert'
-import apiMethods from '../../api/config'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'

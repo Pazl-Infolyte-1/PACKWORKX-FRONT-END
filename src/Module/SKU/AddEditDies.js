@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ActionButton from "../../components/New/ActionButton";
-import apiMethods from "../../api/config";
+import {skuApi} from "../../api/sku"
 
 const DieForm = ({ dieToEdit, setRefresh, onClose, setisSingleViewPopup,client }) => {
 
@@ -59,9 +59,9 @@ const DieForm = ({ dieToEdit, setRefresh, onClose, setisSingleViewPopup,client }
     e.preventDefault();
     try {
       if (isEditMode) {
-        await apiMethods.updateDie(dieToEdit.id, formData);
+        await skuApi.updateDie(dieToEdit.id, formData);
       } else {
-        await apiMethods.addDie(formData);
+        await skuApi.addDie(formData);
       }
       
       // Refresh the list and close the form

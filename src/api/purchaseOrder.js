@@ -167,4 +167,11 @@ export const purchaseOrderApi = {
       responseType: 'blob',
     })
   },
+  updatePoRetrun:async (id,val) => {
+    try {
+      return "success"
+    } catch (error) {
+      console.error(error)
+    }
+  },
 }

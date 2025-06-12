@@ -43,7 +43,6 @@ import { FaLock } from 'react-icons/fa'
 import SplitWorkOrder from './SplitWorkOrder'
 import ActionButton from '../../components/New/ActionButton'
 import Outsource_Preview from './Outsource_Preview'
-import apiMethods from '../../api/config'
 import WorkOrderLIsting from './WorkOrderLIsting'
 import { workOrderApi } from '../../api/workOrder'
 

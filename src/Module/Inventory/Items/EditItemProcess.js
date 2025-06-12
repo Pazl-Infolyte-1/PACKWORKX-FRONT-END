@@ -2,7 +2,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import ProcessDropDown from '../../Machine/ProcessDropDown'
 import ActionButton from '../../../components/New/ActionButton'
-import { machineApi } from '../../../api/machine'
+import machineApi from '../../../api/machine/machineApi'
 
 const AddFieldForm = ({ processData, setProcessData, closeModal }) => {
   const [selectedProcess, setSelectedProcess] = useState('')

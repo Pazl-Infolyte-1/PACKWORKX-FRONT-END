@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
 import StockAdjustmentTable from './StockAdjustmentTable'
-import apiMethods from '../../api/config'
 import Drawer from '../../components/Drawer/Drawer'
 import CustomAlert from '../../components/New/CustomAlert'
 import AddEditStockAdjustment from './AddEditStockAdjustment'
@@ -14,6 +13,7 @@ import CompactPagination from '../../components/New/CompactPagination'
 import { FaUserGroup } from 'react-icons/fa6'
 import { FaUserCheck, FaUserSlash } from 'react-icons/fa'
 import { inventoryApi } from '../../api/inventory'
+import { stockAdjustmentApi } from '../../api/stockAdjustment'
 
 function StockAdjustment() {
   const [stockadjustments, setStockadjustments] = useState([])
@@ -78,7 +78,7 @@ useEffect(() => {
 
   const handleDelete = async (id) => {
     try {
-      await apiMethods.deleteStockadjustment(id)
+      await stockAdjustmentApi.deleteStockadjustment(id)
       setAlerts([{ severity: 'success', message: 'Deleted successfully' }])
       setRefresh((prev) => !prev)
     } catch (error) {
@@ -103,7 +103,7 @@ const handleEntriesChange = (newEntries) => {
 
   const downloadExcelSheet = async () => {
     try {
-      const response = await apiMethods.downloadStockAdjustmentExcel({ search: searchQuery })
+      const response = await stockAdjustmentApi.downloadStockAdjustmentExcel({ search: searchQuery })
       const blob = new Blob([response], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       })

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
+import { debitApi } from '../../api/debit'
 
 const DebitNoteForm = ({
   debitNoteData,
@@ -18,7 +18,7 @@ const DebitNoteForm = ({
   useEffect(() => {
     const fetchReturnData = async () => {
       try {
-        const response = await apiMethods.getAllPurchaseReturnIds()
+        const response = await debitApi.getAllPurchaseReturnIds()
         setReturnData(response.data.data)
       } catch (error) {
         console.error(error)
@@ -35,7 +35,7 @@ const DebitNoteForm = ({
   const handleSelectReturn = async (id) => {
     const event = { target: { name: 'po_return_id', value: id } }
     try {
-      const response = await apiMethods.getPurchaseReturnById(id)
+      const response = await debitApi.getPurchaseReturnById(id)
       const prData = response.data
 
       setDebitNoteData((prevData) => ({

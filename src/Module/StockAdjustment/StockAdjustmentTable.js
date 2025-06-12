@@ -11,7 +11,6 @@ import { cilPencil, cilTrash } from '@coreui/icons'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { useNavigate } from 'react-router-dom'
 import CustomAlert from '../../components/New/CustomAlert'
-import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 
 const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized, refreshClients }) => {

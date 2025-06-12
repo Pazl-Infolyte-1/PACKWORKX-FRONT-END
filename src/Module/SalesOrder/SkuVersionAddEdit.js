@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import apiMethods from "../../api/config";
 import { FaEye, FaSpinner } from "react-icons/fa";
 import CustomAlert from "../../components/New/CustomAlert";
 import PopUp from "../../components/New/PopUp";
 import VersionChoicePopup from "./VersionChoicePopup";
 import FluteTypeView from "../SKU/FluteTypeView";
 import { skuApi } from "../../api/sku";
+import { commonApi } from "../../api/common";
+
 
 
 function SkuVersionAddEdit({
@@ -47,7 +48,7 @@ const [colorList, setColorList] = useState([]);
 useEffect(() => {
   const colorData = async () => {
     try {
-      const response = await apiMethods.getColors();
+      const response = await commonApi.getColors();
       setColorList(response.data.data); // contains objects with color_name
       console.log("color data", response.data.data);
     } catch (error) {
@@ -95,7 +96,7 @@ const handleFluteSelection = (selectedFlute, fluteIndex) => {
 
   const fetchFluteList = async () => {
     try {
-      const response = await apiMethods.getFluteType()
+      const response = await skuApi.getFluteType()
       setFluteDropdown(response.data.data)
       console.log("flute",response.data.data)
       console.log("flute type",JSON.stringify(response.data.data))

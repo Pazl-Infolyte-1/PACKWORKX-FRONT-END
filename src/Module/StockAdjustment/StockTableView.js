@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilLink } from '@coreui/icons'
 import { useNavigate, useParams } from 'react-router-dom'
-import apiMethods from '../../api/config'
 import StockOverview from './StockOverview'
 import { inventoryApi } from '../../api/inventory'
 

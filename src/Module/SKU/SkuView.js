@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import { ChevronUp, ChevronDown, Mail, MoreHorizontal } from 'lucide-react'
-import apiMethods from '../../api/config'
 import { useNavigate } from 'react-router-dom'
 import moment from 'moment/moment'
 import { inventoryApi } from '../../api/inventory'
@@ -26,7 +25,7 @@ useEffect(() => {
     if (!selectedSkuData?.id) return;
 
     try {
-      const data = await apiMethods.singlesku(selectedSkuData.id);
+      const data = await skuApi.singlesku(selectedSkuData.id);
       setSelectedSku(data);
       console.log("sku singke darta",data)
        navigate(`/SKU/${selectedSkuData.id}`);

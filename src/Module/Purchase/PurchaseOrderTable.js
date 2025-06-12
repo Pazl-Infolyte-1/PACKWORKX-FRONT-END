@@ -8,7 +8,6 @@ import {
   CTableDataCell,
 } from '@coreui/react'
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
-import apiMethods from '../../api/config'
 import PurchaseOrderDetails from './PurchaseOrderDetails'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import ConfirmationModale from '../../components/New/ConfirmationModale'

@@ -5,8 +5,8 @@ import CompactPagination from '../../components/New/CompactPagination'
 import Drawer from '../../components/Drawer/Drawer'
 import DebitNoteTable from './DebitNoteTable'
 import DebitNoteForm from './DebitNoteForm'
-import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
+import { debitApi } from '../../api/debit'
 
 const DebitNote = () => {
   const [alerts, setAlerts] = useState([])
@@ -28,7 +28,7 @@ const DebitNote = () => {
   const fetchData = async () => {
     
     try {
-      const response = await apiMethods.getDebitNotes({
+      const response = await debitApi.getDebitNotes({
         search: searchQuery,
         page: pagination.currentPage,
         limit: limit,
@@ -98,9 +98,9 @@ const DebitNote = () => {
         let response
         if (isEdit) {
           data.id = debitNoteFormData.id
-          response = await apiMethods.editDebitNote(data)
+          response = await debitApi.editDebitNote(data)
         } else {
-          response = await apiMethods.postDebitNote(data)
+          response = await debitApi.postDebitNote(data)
         }
         setAlerts([{ severity: 'success', message: response?.data?.message || 'Success' }])
         await fetchData()

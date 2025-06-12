@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Select from 'react-select';
 import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form';
-import apiMethods from '../../api/config';
 import InvoiceHistoryModal from './InvoiceHistoryModal';
 import { skuApi } from '../../api/sku';
 

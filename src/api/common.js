@@ -104,4 +104,12 @@ export const commonApi = {
       throw error
     }
   },
+    getColors: async () => {
+    try {
+      return await apiClient.get(`/common-service/colors`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
 }

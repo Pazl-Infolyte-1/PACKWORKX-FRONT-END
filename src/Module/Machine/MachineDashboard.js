@@ -12,7 +12,6 @@ import PopUp from '../../components/New/PopUp'
 import ViewMachineData from './ViewMachineData'
 import ActionButton from '../../components/New/ActionButton'
 import SearchBar from '../../components/New/SearchBar'
-import apiMethods from '../../api/config'
 import AddEditMachine from './AddEditMachine'
 import { useSearch } from '../../components/New/SearchContext'
 import AssignProcess from './AssignProcess'
@@ -140,7 +139,7 @@ export default function MachineMaster() {
   const handleEditProcess = async (processId) => {
     try {
       setIsLoading(true)
-      const response = await apiMethods.getProcess({
+      const response = await machineApi.getProcess({
         limit: 20000,
       })
 
@@ -175,12 +174,12 @@ export default function MachineMaster() {
   const handleProcessSubmit = async (data) => {
     try {
       if (isEdit) {
-        const response = await apiMethods.EditProcess(data)
+        const response = await machineApi.EditProcess(data)
         setAlerts([
           { severity: 'success', message: response.data.message || 'Process Updated Successfully' },
         ])
       } else {
-        const response = await apiMethods.AddProcess(data)
+        const response = await machineApi.AddProcess(data)
         setAlerts([
           { severity: 'success', message: response.data.message || 'Process Added Successfully' },
         ])

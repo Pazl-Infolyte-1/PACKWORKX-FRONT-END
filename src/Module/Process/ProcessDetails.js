@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import apiMethods from '../../api/config'
 import Loading from '../../components/New/Loading'
+import { machineApi } from '../../api/machine'
 
 function ProcessDetails({ id }) {
   const [processDetails, setProcessDetails] = useState(null)
@@ -9,7 +9,7 @@ function ProcessDetails({ id }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getProcessDetails(id)
+        const response = await machineApi.getProcessDetails(id)
         setProcessDetails(response?.data?.data)
       } catch (error) {
         console.error('Error fetching data:', error)

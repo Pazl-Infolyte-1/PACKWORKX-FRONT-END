@@ -2,7 +2,6 @@ import { useState } from 'react'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilFlipToBack, cilGraph, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
-import apiMethods from '../../api/config'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import { machineApi } from '../../api/machine'
 

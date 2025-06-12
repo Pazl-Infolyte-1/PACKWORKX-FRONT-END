@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form'
 import ActionButton from '../../components/New/ActionButton'
 import ItemForm from './ItemForm'
 import 'core-js/stable'
-import apiMethods from '../../api/config'
 import { clientApi } from '../../api/client'
 
 const OrderForm = ({

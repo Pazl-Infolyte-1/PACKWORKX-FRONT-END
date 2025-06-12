@@ -41,12 +41,13 @@ const GrnForm = ({
     try {
       const response = await purchaseOrderApi.getPurchaseOrderById(id)
       const poData = response.data
-      console.log('PO Data:', poData)
+      console.log('PO Data:', poData?.items)
 
       // Update the main form data with PO information
       setGrnFormData((prevData) => ({
         ...prevData,
         po_id: id,
+        item_generate_id:poData?.items[0]?.item_info?.item_generate_id,
         supplier_id: poData.supplier_id,
         supplier_name: poData.supplier_name,
       }))
@@ -56,6 +57,7 @@ const GrnForm = ({
         po_item_id: item.id,
         item_id: item.item_id,
         item_code: item.item_code,
+        item_generate_id: item.item_info?.item_generate_id,
         grn_item_name: item.po_item_name || '',
         description: item.description || '',
         quantity_ordered: parseFloat(item.quantity) || 0,
@@ -119,14 +121,14 @@ const GrnForm = ({
     <>
       <form onSubmit={handleSubmit}>
         <div>
-          <div className="p-2 mt-2 flex flex-1 rounded-lg border border-[#c2c2c2] w-full ">
+          <div className="p-1 mt-2 flex flex-1 rounded-lg border border-[#c2c2c2] w-full ">
             <div className="w-full">
               <h2 className="text-lg font-semibold">GRN Details</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
                 {/* Item 1 - Split into Two Inputs */}
-                <div className="p-2 rounded-lg flex flex-col">
-                  <div className="flex items-center gap-2 mb-2">
-                    <label className="text-black font-normal leading-6 mb-2 text-left">
+                <div className="p-1 rounded-lg flex flex-col">
+                  <div className="flex items-center gap-2 ">
+                    <label className="text-black font-normal leading-6  text-left">
                       Purchase Order <span className="text-red-500">*</span>
                     </label>
                   </div>
@@ -175,7 +177,7 @@ const GrnForm = ({
 
                     {isOpen && (
                       <div className="absolute w-full mt-1 border border-gray-200 rounded-md bg-white z-10 max-h-[300px] overflow-y-auto shadow-md">
-                        <div className="sticky top-0 bg-white p-2 border-b border-gray-200">
+                        <div className="sticky top-0 bg-white p-1 border-b border-gray-200">
                           <div className="relative">
                             <input
                               type="text"
@@ -221,8 +223,8 @@ const GrnForm = ({
                   </div>
                 </div>
 
-                <div className="p-2 rounded-lg flex flex-col">
-                  <div className="flex items-center gap-2 mb-2">
+                <div className="p-1 rounded-lg flex flex-col">
+                  <div className="flex items-center gap-2 ">
                     <label className="text-black font-normal leading-6 text-left">
                       Grn Date <span className="text-red-500">*</span>
                     </label>
@@ -237,13 +239,13 @@ const GrnForm = ({
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
                   {/* {errors.grn_date && (
-                    <span className="text-red-500 text-sm mt-1 ml-2 mb-2">{errors.grn_date}</span>
+                    <span className="text-red-500 text-sm mt-1 ml-2 ">{errors.grn_date}</span>
                   )} */}
                 </div>
 
-                <div className="p-2 rounded-lg flex flex-col">
-                  <div className="flex items-center gap-2 mb-2">
-                    <label className="text-black font-normal leading-6 mb-2 text-left">
+                <div className="p-1 rounded-lg flex flex-col">
+                  <div className="flex items-center gap-2 ">
+                    <label className="text-black font-normal leading-6  text-left">
                       Delivery Note No. <span className="text-red-500">*</span>
                     </label>
                   </div>
@@ -256,15 +258,15 @@ const GrnForm = ({
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
                   {/* {errors.delivery_note_no && (
-                    <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
+                    <span className="text-red-500 text-sm ml-2 mt-1  align-middle">
                       {errors.delivery_note_no}
                     </span>
                   )} */}
                 </div>
 
-                <div className="p-2 rounded-lg flex flex-col">
-                  <div className="flex items-center gap-2 mb-2">
-                    <label className="text-black font-normal leading-6 mb-2 text-left">
+                <div className="p-1 rounded-lg flex flex-col">
+                  <div className="flex items-center gap-2 ">
+                    <label className="text-black font-normal leading-6  text-left">
                       Invoice No. <span className="text-red-500">*</span>
                     </label>
                   </div>
@@ -277,14 +279,14 @@ const GrnForm = ({
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
                   {/* {errors.invoice_no && (
-                    <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
+                    <span className="text-red-500 text-sm ml-2 mt-1  align-middle">
                       {errors.invoice_no}
                     </span>
                   )} */}
                 </div>
-                <div className="p-2 rounded-lg flex flex-col">
-                  <div className="flex items-center gap-2 mb-2">
-                    <label className="text-black font-normal leading-6 mb-2 text-left">
+                <div className="p-1 rounded-lg flex flex-col">
+                  <div className="flex items-center gap-2 ">
+                    <label className="text-black font-normal leading-6  text-left">
                       Invoice Date <span className="text-red-500">*</span>
                     </label>
                   </div>
@@ -297,14 +299,14 @@ const GrnForm = ({
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
                   {/* {errors.invoice_date && (
-                    <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
+                    <span className="text-red-500 text-sm ml-2 mt-1  align-middle">
                       {errors.invoice_date}
                     </span>
                   )} */}
                 </div>
-                <div className="p-2 rounded-lg flex flex-col">
-                  <div className="flex items-center gap-2 mb-2">
-                    <label className="text-black font-normal leading-6 mb-2 text-left">
+                <div className="p-1 rounded-lg flex flex-col">
+                  <div className="flex items-center gap-2 ">
+                    <label className="text-black font-normal leading-6  text-left">
                       Received By <span className="text-red-500">*</span>
                     </label>
                   </div>
@@ -317,14 +319,14 @@ const GrnForm = ({
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
                   {/* {errors.received_by && (
-                    <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
+                    <span className="text-red-500 text-sm ml-2 mt-1  align-middle">
                       {errors.received_by}
                     </span>
                   )} */}
                 </div>
-                <div className="p-2 rounded-lg flex flex-col">
-                  <div className="flex items-center gap-2 mb-2">
-                    <label className="text-black font-normal leading-6 mb-2 text-left">
+                <div className="p-1 rounded-lg flex flex-col">
+                  <div className="flex items-center gap-2 ">
+                    <label className="text-black font-normal leading-6  text-left">
                       Notes <span className="text-red-500">*</span>
                     </label>
                   </div>
@@ -337,7 +339,7 @@ const GrnForm = ({
                     className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
                   />
                   {/* {errors.notes && (
-                    <span className="text-red-500 text-sm ml-2 mt-1 mb-2 align-middle">
+                    <span className="text-red-500 text-sm ml-2 mt-1  align-middle">
                       {errors.notes}
                     </span>
                   )} */}
@@ -360,7 +362,7 @@ const GrnForm = ({
 
               <button
                 type="submit"
-                className="px-4 py-2 bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
+                className="px-4 py-1 bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
               >
                 Submit
               </button>

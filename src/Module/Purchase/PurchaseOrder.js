@@ -23,7 +23,7 @@ const PurchaseOrder = () => {
   const [loading, setLoading] = useState(true)
   const { searchQuery, setGlobalSearchQuery, setGlobalPlaceholder } = useSearch()
   const [totalPages, setTotalPages] = useState(0)
-    const [count, setCount] = useState(null)
+  const [count, setCount] = useState(null)
 
   const [refresh, setRefresh] = useState(false)
   const [paginationParams, setPaginationParams] = useState({
@@ -51,7 +51,7 @@ const PurchaseOrder = () => {
         status: 'active',
       })
       setData(res.data || [])
-      console.log("ddd",res)
+      console.log('ddd', res)
       setCount(res.totalCount)
       setTotalPages(Math.ceil(res.totalCount / pageParams.pageSize))
     } catch (err) {
@@ -67,7 +67,7 @@ const PurchaseOrder = () => {
 
   // Create debounced version of fetchData
   const debouncedFetchData = useRef(
-    debounce((search, params) => fetchData(search, params), 500)
+    debounce((search, params) => fetchData(search, params), 500),
   ).current
 
   // Fetch data when dependencies change
@@ -83,7 +83,7 @@ const PurchaseOrder = () => {
   }, [debouncedFetchData])
 
   const handlePageChange = (event, newPage) => {
-    setPaginationParams(prev => ({
+    setPaginationParams((prev) => ({
       ...prev,
       currentPage: newPage,
     }))
@@ -114,37 +114,35 @@ const PurchaseOrder = () => {
     setReturnDrawerOpen(true)
   }
 
-const handleSuccess = (updatedData) => {
-  console.log('Updated Data:', updatedData);
-  
-  setRefresh(prev => !prev) // Trigger refresh
-  setAlert({ 
-    show: true, 
-    message: updatedData || `Purchase Order ${isEdit ? 'updated' : 'created'} successfully`, 
-    type: 'success' 
-  })
-  
-  // If editing, update the local data state
-  if (isEdit && updatedData) {
-    setData(prevData => 
-      prevData.map(item => 
-        item.id === updatedData.id ? updatedData : item
+  const handleSuccess = (updatedData) => {
+    console.log('Updated Data:', updatedData)
+
+    setRefresh((prev) => !prev) // Trigger refresh
+    setAlert({
+      show: true,
+      message: updatedData || `Purchase Order ${isEdit ? 'updated' : 'created'} successfully`,
+      type: 'success',
+    })
+
+    // If editing, update the local data state
+    if (isEdit && updatedData) {
+      setData((prevData) =>
+        prevData.map((item) => (item.id === updatedData.id ? updatedData : item)),
       )
-    )
+    }
+
+    setDrawerOpen(false)
+    setReturnDrawerOpen(false)
   }
-  
-  setDrawerOpen(false)
-  setReturnDrawerOpen(false)
-}
 
   const closeAlert = () => {
-    setAlert(prev => ({ ...prev, show: false }))
+    setAlert((prev) => ({ ...prev, show: false }))
   }
 
   const handleSearchChange = (value) => {
     setGlobalSearchQuery(value)
     // Reset to first page when searching
-    setPaginationParams(prev => ({
+    setPaginationParams((prev) => ({
       ...prev,
       currentPage: 1,
     }))
@@ -160,17 +158,10 @@ const handleSuccess = (updatedData) => {
   return (
     <div className="p-1">
       {alert.show && (
-        <CustomAlert 
-          message={alert.message} 
-          severity={alert.type} 
-          onClose={closeAlert} 
-        />
+        <CustomAlert message={alert.message} severity={alert.type} onClose={closeAlert} />
       )}
       <div className="h-full w-full flex flex-col">
-        <ContentHeader 
-          heading={'Purchase Order'} 
-          onAddClick={handleAddNew} 
-        />
+        <ContentHeader heading={'Purchase Order'} onAddClick={handleAddNew} />
 
         {loading ? (
           <Loader />
@@ -184,7 +175,9 @@ const handleSuccess = (updatedData) => {
             />
 
             <div className="flex justify-end items-center gap-4 mt-2 ml-4 mr-4">
-              <p className='w-40 text-sm'>Total Count: <span className='font-semibold'>{count}</span></p>
+              <p className="w-40 text-sm">
+                Total Count: <span className="font-semibold">{count}</span>
+              </p>
               <CompactPagination
                 count={totalPages}
                 page={paginationParams.currentPage}
@@ -202,28 +195,28 @@ const handleSuccess = (updatedData) => {
           maxWidth={'1350px'}
           title={isEdit ? 'Edit Purchase Order' : 'Add Purchase Order'}
         >
-          {
-            isDrawerOpen &&
+          {isDrawerOpen && (
             <AddPurchaseOrder
-            isEdit={isEdit}
-            selectedPoId={selectedPoId}
-            setDrawer={setDrawerOpen}
-            onSuccess={handleSuccess}
-            setRefresh={setRefresh}
-          />
-          }
+              isEdit={isEdit}
+              selectedPoId={selectedPoId}
+              setDrawer={setDrawerOpen}
+              onSuccess={handleSuccess}
+              setRefresh={setRefresh}
+            />
+          )}
         </Drawer>
 
         <Drawer
           isOpen={isReturnDrawerOpen}
           onClose={() => setReturnDrawerOpen(false)}
-          maxWidth={'1270px'}
+          maxWidth={'1350px'}
           title={'Purchase Order Return'}
         >
           <AddPurchaseOrderReturn
             selectedPoId={selectedPoId}
             setDrawer={setReturnDrawerOpen}
             onSuccess={handleSuccess}
+            poData={data}
           />
         </Drawer>
       </div>

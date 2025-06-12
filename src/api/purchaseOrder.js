@@ -124,6 +124,7 @@ export const purchaseOrderApi = {
   },
 
   getPurchaseOrderDetails: async ({ po_id, grn_id }) => {
+    console.log('Fetching purchase order details for PO ID:', po_id, 'and GRN ID:', grn_id)
     try {
       return await apiClient.get('/purchase-order/details/po', {
         params: {
@@ -167,11 +168,19 @@ export const purchaseOrderApi = {
       responseType: 'blob',
     })
   },
-  updatePoRetrun:async (id,val) => {
+  updatePoRetrun: async (id, val) => {
     try {
-      return "success"
+      return 'success'
     } catch (error) {
       console.error(error)
+    }
+  },
+  getPOForReturn: async () => {
+    try {
+      return await apiClient.get('/purchase-order/get/id')
+    } catch (error) {
+      console.error('Error fetching PO for return:', error.response?.data || error.message)
+      throw error
     }
   },
 }

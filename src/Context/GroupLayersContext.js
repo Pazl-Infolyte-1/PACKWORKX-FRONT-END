@@ -9,15 +9,23 @@ export const GroupLayersProvider = ({ children }) => {
   const [workOrders, setWorkOrders] = useState([]);
 
   const addGroup = () => {
+    const random = Math.floor(100 + Math.random() * 900);
+    const seconds = new Date().getSeconds();
+    const uniqueCode = (random + seconds) % 10000; // Keep it under 4 digits
+    console.log(uniqueCode)
+    const groupName = `GRP-#${uniqueCode.toString().padStart(3, '0')}`;
     setGroups((prev) => [
       ...prev,
       {
         id: Date.now(),
-        group_name: `Group ${prev.length + 1}`,
+        group_name: groupName,
         group_value: [],
       },
     ]);
   };
+  
+  
+  
 
   const updateGroup = (groupId, newData) => {
     setGroups((prevGroups) =>

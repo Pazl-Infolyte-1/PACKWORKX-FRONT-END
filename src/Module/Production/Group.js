@@ -871,7 +871,9 @@ const Group = ({
         return {
           group_name: group.group_name,
           group_value: groupItems,
-          group_Qty: groupQty
+          group_Qty: groupQty,
+          // allocated_quantity:0
+
         };
       });
   

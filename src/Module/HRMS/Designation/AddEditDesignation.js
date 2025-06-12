@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PopUp from '../../../components/New/PopUp'
-import apiMethods from '../../../api/config'
+import { employeeApi } from '../../../api/employee'
 
 function AddEditDesignation({ showForm, setShowForm, isEdit, designationData, onSuccess }) {
   const [designations, setDesignations] = useState([])
@@ -17,7 +17,7 @@ function AddEditDesignation({ showForm, setShowForm, isEdit, designationData, on
   useEffect(() => {
     const fetchDesignations = async () => {
       try {
-        const response = await apiMethods.getDesignationList()
+        const response = await employeeApi.getDesignationList()
         setDesignations(response.data.data)
       } catch (error) {
         console.error('Error fetching designations:', error)
@@ -89,10 +89,10 @@ function AddEditDesignation({ showForm, setShowForm, isEdit, designationData, on
 
       if (isEdit) {
         // Edit existing designation
-        response = await apiMethods.editDesignation(designationData.id, formData)
+        response = await employeeApi.editDesignation(designationData.id, formData)
       } else {
         // Create new designation
-        response = await apiMethods.postDesignation(formData)
+        response = await employeeApi.postDesignation(formData)
       }
 
       if (response.data.success) {

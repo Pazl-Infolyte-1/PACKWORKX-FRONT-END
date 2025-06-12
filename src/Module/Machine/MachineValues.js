@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { FiEdit, FiChevronDown, FiChevronUp } from 'react-icons/fi'
 import ActionButton from '../../components/New/ActionButton'
 import CustomAlert from '../../components/New/CustomAlert'
-import apiMethods from '../../api/config'
 import Loading from '../../components/New/Loading'
+import {machineApi} from '../../api/machine'
+
 
 function MachineValues({
   handleAddField,
@@ -28,13 +29,14 @@ function MachineValues({
 
     setIsLoading(true)
     try {
-      const allValuesResponse = await apiMethods.getProcessValues()
+      const allValuesResponse = await machineApi.getProcessValues()
       const allValues = allValuesResponse.data.data
       
       // Save all values for future reference
       if (setAllMachineValue) {
         setAllMachineValue(allValues)
       }
+
 
       const matchingProcess = allValues.find(
         (process) => process.process_name_id === currentProcessId,

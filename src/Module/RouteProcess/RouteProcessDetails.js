@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import apiMethods from '../../api/config'
 import Loading from '../../components/New/Loading'
 import { FaArrowDown } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
 import { cilPencil } from '@coreui/icons'
 import { Button } from 'react-bootstrap'
+import {routeApi} from "../../api/route"
 
 const RouteProcessDetails = ({ id, handleEdit, setOpenRouteModal }) => {
   const [routeProcessDetails, setRouteProcessDetails] = useState(null)
@@ -13,7 +13,7 @@ const RouteProcessDetails = ({ id, handleEdit, setOpenRouteModal }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getRouteById(id)
+        const response = await routeApi.getRouteById(id)
         setRouteProcessDetails(response?.data?.data)
       } catch (error) {
         console.error('Error fetching data:', error)

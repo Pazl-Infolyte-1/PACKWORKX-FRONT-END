@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import apiMethods from '../../api/config'
+import { debitApi } from '../../api/debit'
 
 const DebitNoteView = ({ id, handleEdit, setOpenDebitNoteModal }) => {
   const [debitNoteDetails, setDebitNoteDetails] = useState(null)
@@ -7,7 +7,7 @@ const DebitNoteView = ({ id, handleEdit, setOpenDebitNoteModal }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getDebitNoteById(id)
+        const response = await debitApi.getDebitNoteById(id)
         setDebitNoteDetails(response?.data?.data)
       } catch (error) {
         console.error('Error fetching debit note data:', error)

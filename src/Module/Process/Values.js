@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { FiEdit, FiChevronDown, FiChevronUp } from 'react-icons/fi'
 import ActionButton from '../../components/New/ActionButton'
 import CustomAlert from '../../components/New/CustomAlert'
-import apiMethods from '../../api/config'
 import Loading from '../../components/New/Loading'
+import { machineApi } from '../../api/machine'
+
 
 function Values({
   handleAddField,
@@ -20,7 +21,7 @@ function Values({
   const fetchProcessValue = async () => {
     setIsLoading(true)
     try {
-      const allValues = await apiMethods.getProcessValues()
+      const allValues = await machineApi.getProcessValues()
 
       if (setAllprocessValue) {
         setAllprocessValue(allValues.data.data)
@@ -31,7 +32,7 @@ function Values({
       )
 
       const idToPass = matchingProcess ? matchingProcess.id : openValuesModal.id
-      const response = await apiMethods.getProcessDetails(idToPass)
+      const response = await machineApi.getProcessDetails(idToPass)
       setProcessValue(response?.data?.data)
     } catch (error) {
       console.error('Fetch error:', error)

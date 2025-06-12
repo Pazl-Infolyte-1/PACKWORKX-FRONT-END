@@ -7,10 +7,10 @@ import PopUp from '../../components/New/ModifiedPopup'
 import GrnTable from './GrnTable'
 import Drawer from '../../components/Drawer/Drawer'
 import GrnForm from './GrnForm'
-import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
 import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
+import { grnApi } from '../../api/grn'
 
 const Grn = () => {
   const [alerts, setAlerts] = useState([])
@@ -36,7 +36,7 @@ const Grn = () => {
 
   const fetchData = async () => {
     try {
-      const response = await apiMethods.getGrn({
+      const response = await grnApi.getGrn({
         search: searchQuery,
         page: pagination.currentPage,
         limit: limit,
@@ -147,7 +147,7 @@ const Grn = () => {
       try {
         if (isEdit) {
           data.id = grnFormData.id
-          const response = await apiMethods.editGrn(data)
+          const response = await grnApi.editGrn(data)
           setAlerts((prev) => [
             ...prev,
             {
@@ -156,7 +156,7 @@ const Grn = () => {
             },
           ])
         } else {
-          const response = await apiMethods.postGrn(data)
+          const response = await grnApi.postGrn(data)
           setAlerts((prev) => [
             ...prev,
             { severity: 'success', message: response?.data?.message || 'GRN Added Successfully' },

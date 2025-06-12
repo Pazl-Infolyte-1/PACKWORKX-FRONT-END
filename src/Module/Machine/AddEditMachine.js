@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
 import { useLocation, useNavigate } from 'react-router-dom'
 import CustomAlert from '../../components/New/CustomAlert'
 import Select from 'react-select'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilArrowBottom, cilArrowTop } from '@coreui/icons'
 import { GripVertical } from 'lucide-react'
+import { machineApi } from '../../api/machine'
 
 
 
@@ -180,7 +180,7 @@ const handleIntegerInput = (e, field) => {
   useEffect(() => {
     const fetchProcesses = async () => {
       try {
-        const response = await apiMethods.getProcess({ limit: 20000 })
+        const response = await machineApi.getProcess({ limit: 20000 })
         setProcesses(response.data.data)
       } catch (error) {
         console.error('Error fetching processes:', error)
@@ -192,7 +192,7 @@ const handleIntegerInput = (e, field) => {
   // Fetch process fields and values
   const fetchProcessFieldsAndValues = async (processId) => {
     try {
-      const fieldsResponse = await apiMethods.getProcessFields(processId)
+      const fieldsResponse = await machineApi.getProcessFields(processId)
       const fields = fieldsResponse.data.data || []
 
       setProcessFieldsMap((prev) => ({
@@ -200,7 +200,7 @@ const handleIntegerInput = (e, field) => {
         [processId]: fields,
       }))
 
-      const valuesResponse = await apiMethods.getProcessValues()
+      const valuesResponse = await machineApi.getProcessValues()
       const processValues = valuesResponse.data.data.find((p) => p.process_name_id === processId)
 
       const currentProcessValues = watch('processValues') || {}
@@ -282,7 +282,7 @@ const handleIntegerInput = (e, field) => {
       const fetchData = async () => {
         try {
           setIsLoading(true)
-          const response = await apiMethods.getMachineById(Id)
+          const response = await machineApi.getMachineById(Id)
           const machineData = response.data.data
 
           // Set basic machine data
@@ -326,7 +326,7 @@ const handleIntegerInput = (e, field) => {
             // Fetch process fields for all assigned processes
             await Promise.all(
               machineData.machine_process.map(async (process) => {
-                const fieldsResponse = await apiMethods.getProcessFields(process.process_id)
+                const fieldsResponse = await machineApi.getProcessFields(process.process_id)
                 setProcessFieldsMap((prev) => ({
                   ...prev,
                   [process.process_id]: fieldsResponse.data.data || [],
@@ -375,8 +375,8 @@ const handleIntegerInput = (e, field) => {
       machineData.machine_route = data.machine_route || []
 
       const apiCall = isEdit
-        ? apiMethods.editMachine(Id, machineData)
-        : apiMethods.AddMachine(machineData)
+        ? machineApi.editMachine(Id, machineData)
+        : machineApi.AddMachine(machineData)
 
       const response = await apiCall
       setAlerts([{ severity: 'success', message: response.data.message }])

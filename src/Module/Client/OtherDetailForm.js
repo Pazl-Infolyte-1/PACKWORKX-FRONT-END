@@ -1,6 +1,6 @@
 import { useFormContext } from 'react-hook-form'
-import apiMethods from '../../api/config'
 import { useState } from 'react'
+import { commonApi } from '../../api/common'
 
 const OtherDetailForm = () => {
   const {
@@ -34,7 +34,7 @@ const OtherDetailForm = () => {
       formData.append('file', file)
 
       try {
-        const response = await apiMethods.uploadFile(formData)
+        const response = await commonApi.uploadFile(formData)
         const fileUrl = response?.data?.data?.file_url
 
         if (fileUrl) {

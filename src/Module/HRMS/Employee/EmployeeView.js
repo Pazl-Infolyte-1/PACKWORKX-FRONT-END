@@ -106,28 +106,28 @@ function EmployeeView({ employeeData, showEmployeeData, setVisible }) {
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Employment Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500">Employee ID</span>
+                    <span className="text-sm font-medium text-gray-500">Emp ID</span>
                     <span className="text-gray-800 mt-1">{employeeData.employee_id}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500">Department ID</span>
-                    <span className="text-gray-800 mt-1">{employeeData.department_id}</span>
+                    <span className="text-sm font-medium text-gray-500">Department</span>
+                    <span className="text-gray-800 mt-1">{employeeData.department_name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500">Designation ID</span>
-                    <span className="text-gray-800 mt-1">{employeeData.designation_id}</span>
+                    <span className="text-sm font-medium text-gray-500">Designation</span>
+                    <span className="text-gray-800 mt-1">{employeeData.designation_name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500">Role ID</span>
-                    <span className="text-gray-800 mt-1">{employeeData.role_id}</span>
+                    <span className="text-sm font-medium text-gray-500">Role</span>
+                    <span className="text-gray-800 mt-1">{employeeData.role_name}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Employment Type</span>
                     <span className="text-gray-800 mt-1">{employeeData.employment_type}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500">User ID</span>
-                    <span className="text-gray-800 mt-1">{employeeData.user_id}</span>
+                    <span className="text-sm font-medium text-gray-500">Skills</span>
+                    <span className="text-gray-800 mt-1">{employeeData.skills}</span>
                   </div>
                 </div>
               </div>

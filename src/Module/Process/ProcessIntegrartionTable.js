@@ -7,12 +7,12 @@ import {
   CTableRow,
 } from '@coreui/react'
 import React, { useState } from 'react'
-import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilFlipToBack, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 import ReusableTable from '../SalesOrder/ReusableTable'
+import { machineApi } from '../../api/machine'
 
 function ProcessIntegrartionTable({
   processData,
@@ -31,7 +31,7 @@ function ProcessIntegrartionTable({
 
   const handleDelete = async () => {
     try {
-      const response = await apiMethods.deleteProcess(deleteId)
+      const response = await machineApi.deleteProcess(deleteId)
       if (response.status === 200) {
         setConfirmModal(false)
         setProcessData((prev) => prev.filter((item) => item.id !== deleteId))
@@ -197,7 +197,7 @@ function ProcessIntegrartionTable({
     //               {item.process_name}
     //             </CTableDataCell>
     //             <CTableDataCell className="py-3 px-2  font-semibold">
-    //               {/*{apiMethods.formatDate(item.created_at)}*/}
+    //               {/*{machineApi.formatDate(item.created_at)}*/}
     //               {new Date(item.created_at).toLocaleString()}
     //             </CTableDataCell>
     //             <CTableDataCell className="py-3 px-2 text-center">

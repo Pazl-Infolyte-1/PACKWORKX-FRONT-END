@@ -2,8 +2,8 @@ import { useState } from 'react'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilFlipToBack, cilGraph, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
-import apiMethods from '../../api/config'
 import ReusableTable from '../SalesOrder/ReusableTable'
+import { machineApi } from '../../api/machine'
 
 const MachineDashboardTable = ({
   cellData,
@@ -31,7 +31,7 @@ const MachineDashboardTable = ({
 
   const handledeleteConfirmClick = async () => {
     setIsLoading(true)
-    const response = await apiMethods.deleteMachine(deleteId)
+    const response = await machineApi.deleteMachine(deleteId)
     if (response.status === 200) {
       setIsLoading(false)
       setIsConfirmationModalOpen(false)
@@ -41,7 +41,7 @@ const MachineDashboardTable = ({
   }
   const handleStatusChange = async (Id, newStatus) => {
     try {
-      const response = await apiMethods.updateMachineStatus(Id, { machine_status: newStatus })
+      const response = await machineApi.updateMachineStatus(Id, { machine_status: newStatus })
       setAlerts([
         {
           severity: 'success',

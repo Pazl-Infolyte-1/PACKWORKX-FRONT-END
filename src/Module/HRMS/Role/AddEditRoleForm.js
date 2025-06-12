@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PopUp from '../../../components/New/PopUp'
-import apiMethods from '../../../api/config'
+import { employeeApi } from '../../../api/employee'
 
 function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess }) {
   const [formData, setFormData] = useState({
@@ -57,9 +57,9 @@ function AddEditRoleForm({ showForm, isEdit, setShowForm, roleData, onSuccess })
       let response
 
       if (isEdit) {
-        response = await apiMethods.updateRole(roleData.id, formData)
+        response = await employeeApi.updateRole(roleData.id, formData)
       } else {
-        response = await apiMethods.postRole(formData)
+        response = await employeeApi.postRole(formData)
       }
 
       if (response.data.success) {

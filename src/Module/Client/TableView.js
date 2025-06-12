@@ -4,7 +4,7 @@ import Comments from './Comments'
 import CIcon from '@coreui/icons-react'
 import { cilLink } from '@coreui/icons'
 import { useNavigate, useParams } from 'react-router-dom'
-import apiMethods from '../../api/config'
+import { clientApi } from '../../api/client'
 
 const tabs = ['Overview']
 const TableView = () => {
@@ -17,7 +17,7 @@ const TableView = () => {
   useEffect(() => {
     const fetchClient = async () => {
       try {
-        const data = await apiMethods.singleclients(id)
+        const data = await clientApi.singleclients(id)
         setTableData(data?.data)
         setClient(data?.data)
       } catch (error) {

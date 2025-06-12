@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useContext } from 'react'
 import AddNameForm from './AddNameForm'
-import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ActionButton from '../../components/New/ActionButton'
+import { commonApi } from '../../api/common'
 
 const CategoryList = ({
   categories,
@@ -40,7 +40,7 @@ const CategoryList = ({
       dropdown_name: editedCategoryName,
     }
     if (editedCategoryName.trim()) {
-      const response = await apiMethods.editDropdownName(payload)
+      const response = await commonApi.editDropdownName(payload)
       if (response.status === 200 || response.status === 201) {
         setRefresh((prev) => !prev)
         setEditingCategoryId(null)
@@ -92,7 +92,7 @@ const CategoryList = ({
   const handleDeleteCategory = async () => {
     try {
       setIsLoading(true)
-      const response = await apiMethods.deleteDropdownName(openDeleteModal.id)
+      const response = await commonApi.deleteDropdownName(openDeleteModal.id)
       if (response.status === 200) {
         setRefresh((prev) => !prev)
       }

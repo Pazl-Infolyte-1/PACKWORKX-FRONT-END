@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import ActionButton from '../../../components/New/ActionButton'
 import DesignationTable from './DesignationTable'
-import apiMethods from '../../../api/config'
 import ConfirmationModale from '../../../components/New/ConfirmationModale'
 import CustomAlert from '../../../components/New/CustomAlert'
 import AddEditDesignation from './AddEditDesignation'
 import ContentHeader from '../../../components/New/ContentHeader'
+import { employeeApi } from '../../../api/employee'
+import { useSearch } from '../../../components/New/SearchContext'
 
 const Designation = () => {
   const [designations, setDesignations] = useState([])
@@ -16,10 +17,20 @@ const Designation = () => {
   const [showForm, setShowForm] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [selectedDesignation, setSelectedDesignation] = useState(null)
+       const { setGlobalPlaceholder, searchQuery  } = useSearch()
+       useEffect(() => {
+      // Set the placeholder when component mounts
+      setGlobalPlaceholder("Search Designation....")
+      
+      // Clean up when component unmounts
+      return () => {
+        setGlobalPlaceholder("Search...") // Reset to default
+      }
+    }, [setGlobalPlaceholder])
 
   const fetchData = async () => {
     try {
-      const response = await apiMethods.getDesignationList()
+      const response = await employeeApi.getDesignationList()
       if (response.data.success) {
         setDesignations(response.data.data)
       }
@@ -32,7 +43,7 @@ const Designation = () => {
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [searchQuery])
 
   const handleAddDesignation = () => {
     setIsEdit(false)
@@ -56,7 +67,7 @@ const Designation = () => {
 
   const OnDeleteConfirmation = async () => {
     try {
-      const response = await apiMethods.deleteDesignation(selectedDesignationId)
+      const response = await employeeApi.deleteDesignation(selectedDesignationId)
       await fetchData()
       setIsConfirmationModaleOpen(false)
       setAlerts([

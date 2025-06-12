@@ -1,7 +1,6 @@
 import React from 'react'
 import PopUp from '../../../components/New/PopUp'
 import ActionButton from '../../../components/New/ActionButton'
-import apiMethods from '../../../api/config'
 
 function PackagesDetails({ showPopUp, cell, setShowPopUp, onEdit }) {
   
@@ -74,11 +73,11 @@ function PackagesDetails({ showPopUp, cell, setShowPopUp, onEdit }) {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium text-gray-500">Created at</span>
-                  <span className="text-gray-800 mt-1">{apiMethods.formatDate(cell.created_at)}</span>
+                  {/* <span className="text-gray-800 mt-1">{formatDate(cell.created_at)}</span> */}
                 </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium text-gray-500">Updated at</span>
-                  <span className="text-gray-800 mt-1">{apiMethods.formatDate(cell.updated_at)}</span>
+                  {/* <span className="text-gray-800 mt-1">{formatDate(cell.updated_at)}</span> */}
                 </div>
               </div>
             </div>

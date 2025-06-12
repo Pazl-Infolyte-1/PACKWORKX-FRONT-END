@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import apiMethods from '../../api/config'
 import {
   CTable,
   CTableBody,
@@ -13,6 +12,8 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CIcon from '@coreui/icons-react'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
+import {routeApi} from "../../api/route"
+
 
 const RouteProcessTable = ({
   routeProcessData,
@@ -35,7 +36,7 @@ const RouteProcessTable = ({
 
   const handleDelete = async () => {
     try {
-      const response = await apiMethods.DeleteRoute(deleteId)
+      const response = await routeApi.DeleteRoute(deleteId)
       if (response.status === 200) {
         setConfirmModal(false)
         setRouteProcessData((prev) => prev.filter((item) => item.id !== deleteId))

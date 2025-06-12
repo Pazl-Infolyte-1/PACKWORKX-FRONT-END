@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import apiMethods from '../../api/config';
 import CIcon from '@coreui/icons-react';
 import { cilEnvelopeOpen, cilPencil, cilPrint } from '@coreui/icons';
 import html2pdf from 'html2pdf.js';
+import { workOrderApi } from '../../api/workOrder';
 
 
 function InvoiceView() {
@@ -14,7 +14,7 @@ function InvoiceView() {
     useEffect(() => {
         const fetchSalesOrderData = async () => {
             try {
-                const response = await apiMethods.getInvoiceById(id)
+                const response = await workOrderApi.getInvoiceById(id)
                 setInvoice(response?.data);
             } catch (error) {
                 console.error("Error viewing sales order:", error);

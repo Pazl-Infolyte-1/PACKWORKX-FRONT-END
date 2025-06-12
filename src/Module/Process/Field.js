@@ -10,11 +10,12 @@ import React, { useEffect, useState } from 'react'
 import { FiEdit, FiTrash2 } from 'react-icons/fi'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
 import CustomAlert from '../../components/New/CustomAlert'
 import PopUp from '../../components/New/PopUp'
 import AddFieldForm from './AddFieldForm'
 import Loading from '../../components/New/Loading'
+import { machineApi } from '../../api/machine'
+
 
 function Field({
   AllfieldData,
@@ -43,7 +44,7 @@ function Field({
     const fetchFieldData = async () => {
       setIsLoading(true)
       try {
-        const response = await apiMethods.getAllFiledsById(openFieldModal.id)
+        const response = await machineApi.getAllFiledsById(openFieldModal.id)
         setFieldData(response.data.data)
       } catch (error) {
         console.error('Error fetching field data:', error)
@@ -62,7 +63,7 @@ function Field({
     const fetchProcessData = async () => {
       setIsLoading(true)
       try {
-        const response = await apiMethods.getProcess()
+        const response = await machineApi.getProcess()
         setProcessData(response.data.data || [])
       } catch (error) {
         console.error('Error fetching process data:', error)
@@ -115,7 +116,7 @@ function Field({
 
     setIsDeleting(true)
     try {
-      const response = await apiMethods.deleteField(deleteId)
+      const response = await machineApi.deleteField(deleteId)
       setAlerts([
         { severity: 'success', message: response.data.message || 'Field deleted successfully' },
       ])

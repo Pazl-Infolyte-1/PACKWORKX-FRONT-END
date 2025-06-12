@@ -8,7 +8,6 @@ import AddSalesOrder from '../SalesOrder/AddSalesOrder'
 import ActionButton from '../../components/New/ActionButton'
 import { cilFilter } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import apiMethods from '../../api/config'
 import WorkOrderDetails from './WorkOrderDetails'
 import WorkOrderEditForm from './WorkOrderEditForm'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
@@ -17,6 +16,7 @@ import ContentHeader from '../../components/New/ContentHeader'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { FiDownload, FiUpload } from 'react-icons/fi'
 import CompactPagination from '../../components/New/CompactPagination'
+import { workOrderApi } from '../../api/workOrder'
 
 const WorkOrders = () => {
   const [data, setData] = useState([])
@@ -59,7 +59,7 @@ const WorkOrders = () => {
   const  fetchData = async () => {
     try {
       setLoading(true)
-      const response = await apiMethods.getWorkOrders({
+      const response = await workOrderApi.getWorkOrders({
         manufacture:manufactureFilter ,
         sku_name: searchQuery,
         page: pagination?.page,
@@ -116,7 +116,7 @@ const WorkOrders = () => {
   const ConfirmDelete = async () => {
     if (deleteId !== null) {
       try {
-        const response = await apiMethods.deleteWorkOrder(deleteId); // correct usage
+        const response = await workOrderApi.deleteWorkOrder(deleteId); // correct usage
         if (response?.status === 200 || response?.success) {
           await fetchData()
           setAlerts([{ severity: "success", message: "Work Order Deleted Successfully" }]);
@@ -151,7 +151,7 @@ const WorkOrders = () => {
 
    const downloadWorkOrderExcelSheet = async () => {
     try {
-      const response = await apiMethods.downloadWorkOrder();
+      const response = await workOrderApi.downloadWorkOrder();
       if (response?.status === 200) {
         
         const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' });

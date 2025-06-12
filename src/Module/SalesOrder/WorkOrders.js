@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { TrashIcon } from '@heroicons/react/solid'
 import VersionsPopup from './VersionsPopup'
 import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
 import SkuVersionAddEdit from './SkuVersionAddEdit'
 import VersionChoicePopup from './VersionChoicePopup'
 import PopUp from '../../components/New/PopUp'
 import { useLocation, useNavigate } from 'react-router-dom'
 import CustomAlert from '../../components/New/CustomAlert'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
+import { salesOrderApi } from '../../api/salesOrder'
+import { skuApi } from '../../api/sku'
 
 const accordionCardSummary = {
   data: [
@@ -105,7 +106,7 @@ const handleCancel = () => {
   useEffect(() => {
     const fetchSalesOrders = async () => {
       try {
-        const response = await apiMethods.getSalesOrderList();
+        const response = await salesOrderApi.getSalesOrderList();
         // console.log(response,'looooooooooooooooooooooooooooooooooooooooooooooooooooooooooo')
         setSalesOrder(response.data.data);
       } catch (error) {
@@ -203,11 +204,24 @@ const handleCancel = () => {
 
     e.preventDefault() // Prevent default form submission
 
+    console.log("worl order data",workOrdersData.length)
+console.log("work oders length",workOrders.length)
+if(workOrdersData.length+workOrders.length !== workOrdersData.length && !isWorkOrderList){
+  console.log("error")
+     setAlerts([
+          {
+            severity: "error",
+            message: "Add the current form to Add Work Order.",
+          },
+        ]);
+        return null;
+}
     if (isWorkOrderList) {
       const isValid = validateForm(workOrders[0]); // Validate first order only
       if (isValid) {
         console.log(workOrders[0])
         workOrderListSubmit(workOrders[0]);
+        console.log("worl order",workOrders[0])
       }
     } else {
       const filledWorkOrders = workOrders.filter(order =>
@@ -254,7 +268,7 @@ const handleCancel = () => {
     handleWorkOrderChange(orderId, 'planned_end_date', value)
   }
 
-
+console.log("work oders length",workOrders.length)
   const handleSubmitWorkOrderForm = (id) => {
     // Find the work order with the matching id
     const selectedWorkOrder = workOrders.find(order => order.id === id);
@@ -274,15 +288,23 @@ const handleCancel = () => {
         select_plant,
       } = selectedWorkOrder;
 
+        console.log("sku_name:", sku_name);
+    console.log("sku_version:", sku_version);
+    console.log("qty:", qty);
+    console.log("edd:", edd);
+    console.log("description:", description);
+    console.log("planned_start_date:", planned_start_date);
+    console.log("acceptable_excess_units:", acceptable_excess_units);
+    console.log("planned_end_date:", planned_end_date);
       // Check if any of the fields are empty
       if (
         !sku_name ||
-        !sku_version ||
+        //!sku_version ||
         !qty ||
         !edd ||
-        !description ||
+        //!description ||
         !planned_start_date ||
-        !acceptable_excess_units ||
+        //!acceptable_excess_units ||
         !planned_end_date
       ) {
         setAlerts([
@@ -311,7 +333,7 @@ const handleCancel = () => {
     const fetchSkuList = async () => {
       try {
         // const response = await apiMethods.getSkuListOptions()
-        const response = await apiMethods.getSkuList({
+        const response = await skuApi.getSkuList({
           search: '',
           client: '',
           sku_type: '',
@@ -332,7 +354,7 @@ const handleCancel = () => {
   const getskuversions = async (selectedId) => {
     try {
       if (selectedId) {
-        const response = await apiMethods.getSkuVersions(selectedId)
+        const response = await skuApi.getSkuVersions(selectedId)
         return response
       }
       return
@@ -430,7 +452,7 @@ const handleCancel = () => {
     handleWorkOrderChange(orderId, 'client_id', clientID);
 
     try {
-      const response = await apiMethods.getSaleOrderData(value);
+      const response = await salesOrderApi.getSaleOrderData(value);
       const skuDetails = response.data?.SalesSkuDetails || [];
 
       // Attach to order row (maybe in a workOrders state?)
@@ -467,6 +489,8 @@ const handleCancel = () => {
         work_order_sku_values:[]
       },
     ])
+
+    console.log("add length",workOrders)
   }
 
   // Function to delete a work order
@@ -498,13 +522,13 @@ const handleCancel = () => {
 
   const handleDeleteVersion = async (versionId,skuid) => {
     try {
-      const response = await apiMethods.deleteSkuVersion(versionId)
+      const response = await skuApi.deleteSkuVersion(versionId)
       // console.log("Version deleted successfully:", response)
       setVersionAlerts([{ severity: "success", message: "Version deleted successfully" }]);
 
       // Show success alert (optional)
 
-      const updatedVersionsResponse = await apiMethods.getSkuVersions(selectedSkuID)
+      const updatedVersionsResponse = await skuApi.getSkuVersions(selectedSkuID)
 
       // Update the skuVersionsMap with the refreshed data
       if (updatedVersionsResponse?.data?.data) {
@@ -866,7 +890,7 @@ console.log("whole sku",wholeSkuObject)
 
             {/* Button & Icon Container */}
             <div className="flex items-center gap-2">
-              {workOrders.length > 1 && (
+              {!isWorkOrderList && (
                 <TrashIcon
                   onClick={(e) => {
                     e.stopPropagation();
@@ -875,6 +899,7 @@ console.log("whole sku",wholeSkuObject)
                   className="text-[#ff2d55] w-3.5 h-3.5 cursor-pointer hover:text-red-700 transition-colors"
                 />
               )}
+              
               {/* Icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"

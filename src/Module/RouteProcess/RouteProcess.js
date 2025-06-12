@@ -6,11 +6,12 @@ import RouteProcessTable from './RouteProcessTable'
 import CommonPagination from '../../components/New/Pagination'
 import PopUp from '../../components/New/PopUp'
 import { RouteProcessForm } from './RouteProcessForm'
-import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
 import RouteProcessDetails from './RouteProcessDetails'
 import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
+import {routeApi} from "../../api/route"
+import {machineApi} from "../../api/machine"
 
 const RouteProcess = () => {
   const [showAddRouteProcessModal, setShowAddRouteProcessModal] = useState(false)
@@ -41,7 +42,7 @@ const RouteProcess = () => {
 
   const fetchData = async () => {
     try {
-      const response = await apiMethods.getRoute({
+      const response = await routeApi.getRoute({
         search: searchQuery,
         page: pagination.page,
         limit: limit,
@@ -60,7 +61,7 @@ const RouteProcess = () => {
   useEffect(() => {
     const fetchProcessData = async () => {
       try {
-        const response = await apiMethods.getProcess({
+        const response = await machineApi.getProcess({
           search: searchQuery,
           page: 1,
           limit: 10000,
@@ -76,13 +77,13 @@ const RouteProcess = () => {
   const handleProcessSubmit = async (data) => {
     try {
       if (isEdit) {
-        const response = await apiMethods.EditRoute(data)
+        const response = await routeApi.EditRoute(data)
         setAlerts((prev) => [
           ...prev,
           { severity: 'success', message: response.data.message || 'Route Updated Successfully' },
         ])
       } else {
-        const response = await apiMethods.AddRoute(data)
+        const response = await routeApi.AddRoute(data)
         setAlerts((prev) => [
           ...prev,
           { severity: 'success', message: response.data.message || 'Route Added Successfully' },

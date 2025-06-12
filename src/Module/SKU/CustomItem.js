@@ -18,11 +18,11 @@ import PopUp from '../../components/New/PopUp'
 import { useDispatch, useSelector } from 'react-redux'
 import RoutePopup from './RoutePopup'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
-import apiMethods from '../../api/config'
 import { useNavigate } from 'react-router-dom'
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { machineApi } from '../../api/machine'
 
 
 function CustomItem({
@@ -240,7 +240,7 @@ const navigate=useNavigate()
       }
 
       try {
-        const response = await apiMethods.getRouteList(params)
+        const response = await machineApi.getRouteList(params)
         setFullRouteResponse(response)
         setDisplayAsChips(response.data.routes)
       } catch (err) {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import ProcessDropDown from './ProcessDropDown'
 import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
+import { machineApi } from '../../api/machine'
 
 function AddMachineField({
   fieldData,
@@ -190,7 +190,7 @@ function AddMachineField({
         const refreshResult = await apiMethods.getProcessValues()
         setAllMachineValue && setAllMachineValue(refreshResult.data.data)
       } else {
-        await apiMethods.saveProcessValues(payload)
+        await machineApi.saveProcessValues(payload)
       }
 
       setRefresh && setRefresh((prev) => !prev)

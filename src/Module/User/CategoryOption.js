@@ -2,8 +2,6 @@
 import React, { useEffect, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
 import AddOptionForm from './AddOptionForm'
-import OptionsList from './OptionList'
-import apiMethods from '../../api/config'
 
 const CategoryOptions = ({
   category,

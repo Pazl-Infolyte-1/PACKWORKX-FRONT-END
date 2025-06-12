@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import apiMethods from '../../api/config';
+import { workOrderApi } from '../../api/workOrder';
 
 const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
 
@@ -20,7 +20,7 @@ const InvoiceHistoryModal = ({ isOpen, onClose,sku,skuList }) => {
       // Call your API here
       const fetchInvoiceHistory = async () => {
         try {
-          const response = await apiMethods.getInvoiceHistory(matchedSku.id);
+          const response = await workOrderApi.getInvoiceHistory(matchedSku.id);
           setInvoiceData(response?.data);
         } catch (error) {
           console.error('Failed to fetch invoice history:', error);

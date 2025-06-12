@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
 import ReturnItemForm from './ReturnItemForm'
 import CustomAlert from '../../components/New/CustomAlert'
 import { set } from 'lodash'
+import { grnApi } from '../../api/grn'
+import { inventoryApi } from '../../api/inventory'
+import { purchaseOrderApi } from '../../api/purchaseOrder'
 
 const AddPurchaseOrderReturn = ({
   isEdit,
@@ -59,7 +61,7 @@ const AddPurchaseOrderReturn = ({
 
   useEffect(() => {
     const handleCheck = async () => {
-      const fetchGrnData = await apiMethods.getGrn()
+      const fetchGrnData = await grnApi.getGrn()
       const grnData = Array.isArray(fetchGrnData?.data?.data) ? fetchGrnData.data.data : []
       const grnPoIds = grnData.map((grn) => grn.po_id)
       const filtered = poData.filter((po) => grnPoIds.includes(po.id))
@@ -71,7 +73,7 @@ const AddPurchaseOrderReturn = ({
 
   const handlePurchaseDetails = async (poId) => {
     try {
-      const response = await apiMethods.getinventory()
+      const response = await inventoryApi.getinventory()
       console.log('Response from getinventory:', response.data.data.inventoryData)
       const inventoryList = Array.isArray(response?.data?.data?.inventoryData)
         ? response.data.data?.inventoryData
@@ -93,7 +95,7 @@ const AddPurchaseOrderReturn = ({
 
   const handlePurchaseReturnDetails = async (po_id, grn_id) => {
     try {
-      const response = await apiMethods.getPurchaseOrderDetails({ po_id, grn_id })
+      const response = await purchaseOrderApi.getPurchaseOrderDetails({ po_id, grn_id })
       const { purchaseOrder, purchaseOrderItemDetails } = response.data
 
       if (purchaseOrder) {
@@ -114,7 +116,7 @@ const AddPurchaseOrderReturn = ({
   const getGrnItemDetails = async (grnId) => {
     try {
       // Fetch GRN data using your API method
-      const response = await apiMethods.getGrnById(grnId)
+      const response = await grnApi.getGrnById(grnId)
 
       // Extract GRN details from response
       const grnDetails = response?.data?.data || {}
@@ -234,7 +236,7 @@ const AddPurchaseOrderReturn = ({
   }
   const getGRNItemsForReturn = async (grnId) => {
     try {
-      const response = await apiMethods.getPurchaseOrderDetails({
+      const response = await purchaseOrderApi.getPurchaseOrderDetails({
         po_id: selectedPoIdState,
         grn_id: grnId,
       })
@@ -254,7 +256,7 @@ const AddPurchaseOrderReturn = ({
 
   const getGRNData = async (poId, poItems) => {
     try {
-      const response = await apiMethods.getGRNByPOId(poId)
+      const response = await grnApi.getGRNByPOId(poId)
       const grn = response.data?.data.grns || []
 
       console.log('GRN Data Response:', grn)
@@ -290,7 +292,7 @@ const AddPurchaseOrderReturn = ({
 
   const getPOItemsById = async (poId) => {
     try {
-      const response = await apiMethods.getPurchaseOrderById(poId)
+      const response = await purchaseOrderApi.getPurchaseOrderById(poId)
       console.log('PO Items Response:', response.data)
 
       const POData = response?.data || []
@@ -331,7 +333,7 @@ const AddPurchaseOrderReturn = ({
     const checkedItemCodes = checkedItems.map((item) => item.item_code)
 
     ////////////////////////////////////////////////////////////////////////////////////////
-    // const response = await apiMethods.getinventory();
+    // const response = await workOrderApi.getinventory();
     // const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : [];
     // let allAvailable = true;
     // for (const checkedItem of checkedItems) {
@@ -394,29 +396,29 @@ const AddPurchaseOrderReturn = ({
 
     try {
       const response = await apiMethods.submitPurchaseOrderReturn(payload)
-      setAlerts({
-        severity: 'success',
-        message: response?.data?.message || 'PO Return Created Successfully',
-      })
+      // setAlerts({
+      //   severity: 'success',
+      //   message: response?.data?.message || 'PO Return Created Successfully',
+      // })
 
       setDrawer(false)
     } catch (error) {
       console.error('Submission error:', error)
       console.error(error.response?.data || error.message)
-      setAlerts({
-        severity: 'error',
-        message: response?.data?.message || 'Something went wrong',
-      })
+      // setAlerts({
+      //   severity: 'error',
+      //   message: response?.data?.message || 'Something went wrong',
+      // })
     }
   }
 
   // useEffect(() => {
   //   const fetchVendors = async () => {
   //     try {
-  //       const initial = await apiMethods.getClients();
+  //       const initial = await workOrderApi.getClients();
   //       const count = initial?.length || 100;
 
-  //       const fullData = await apiMethods.getClients({ limit: count });
+  //       const fullData = await workOrderApi.getClients({ limit: count });
   //       const clientsArray = fullData.data;
 
   //       if (Array.isArray(clientsArray)) {
@@ -852,7 +854,7 @@ const AddPurchaseOrderReturn = ({
                 reset()
                 setDrawer(false)
               }}
-              className="p-2 border border-gray-300 rounded w-24 hover:bg-gray-100 transition"
+              className="p-1 border border-gray-300 rounded w-24 hover:bg-gray-100 transition"
             >
               Cancel
             </button>

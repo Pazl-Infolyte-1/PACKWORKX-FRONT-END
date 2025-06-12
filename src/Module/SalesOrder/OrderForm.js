@@ -1,11 +1,11 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import SkuDetails from './SkuDetails'
-import apiMethods from '../../api/config';
 import ActionButton from '../../components/New/ActionButton';
 import { useSelector } from 'react-redux';
 import SalesOrderSkuform from './SalesOrderSkuform';
 import { useSearch } from '../../components/New/SearchContext';
 import { useNavigate } from 'react-router-dom';
+import { clientApi } from '../../api/client';
 
 const OrderForm = forwardRef(({
   formData,
@@ -202,7 +202,7 @@ const OrderForm = forwardRef(({
             limit: 10000,
           };
 
-          const response = await apiMethods.getSkuClients(params);
+          const response = await clientApi.getSkuClients(params);
           setClients(response.data); // Assuming response.data contains the client list
         } catch (error) {
           console.error("Error fetching clients:", error);

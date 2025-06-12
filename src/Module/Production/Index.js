@@ -43,7 +43,6 @@ import { FaLock } from 'react-icons/fa'
 import SplitWorkOrder from './SplitWorkOrder'
 import ActionButton from '../../components/New/ActionButton'
 import Outsource_Preview from './Outsource_Preview'
-import apiMethods from '../../api/config'
 import WorkOrderLIsting from './WorkOrderLIsting'
 import { NextHandlerProvider } from '../../Context/ProductionNextHandlerContext'
 import SharedNextButton from './SharedNextButton'
@@ -88,7 +87,7 @@ const Index = () => {
   useEffect(() => {
     async function getWorkOrders() {
       try {
-        const response = await apiMethods.getWorkOrders()
+        const response = await workOrderApi.getWorkOrders()
         setWorkOrders(response?.data?.workOrders)
       } catch (error) {
         console.error('Error fetching work orders:', error)

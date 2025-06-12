@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { CCol, CRow, CFormCheck, CFormInput, CFormSelect } from '@coreui/react'
 import Drawer from '../../../components/Drawer/Drawer'
 import ActionButton from '../../../components/New/ActionButton'
-import apiMethods from '../../../api/config'
+import { commonApi } from '../../../api/common'
 
 function PackagesForm({
   isDrawerOpen,
@@ -68,10 +68,10 @@ function PackagesForm({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const currency = await apiMethods.getCurrency()
+        const currency = await commonApi.getCurrency()
         setCurrency(currency.data.data)
 
-        const module = await apiMethods.getModule()
+        const module = await commonApi.getModule()
         setModules(module.data.data)
         if (formData.module_in_package?.length === module.data.length) {
           setSelectAll(true)

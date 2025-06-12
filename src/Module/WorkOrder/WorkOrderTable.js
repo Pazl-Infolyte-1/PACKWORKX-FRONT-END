@@ -10,12 +10,12 @@ import {
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import apiMethods from '../../api/config'
 import WorkOrderDetails from './WorkOrderDetails'
 import Loading from '../../components/New/Loading'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import { data, useNavigate } from 'react-router-dom'
 import ProgressCompletedModal from './ProgressCompletedModale'
+import { workOrderApi } from '../../api/workOrder'
 
 const WorkOrderTable = ({
   cellData,
@@ -37,7 +37,7 @@ const WorkOrderTable = ({
   useEffect(() => {
     const fetchProgressOptions = async () => {
       try {
-        const response = await apiMethods.getWorkOrderProgressDropDownOptions()
+        const response = await workOrderApi.getWorkOrderProgressDropDownOptions()
         const data = response?.data?.data || []
         const options = data.map((item) => item.work_order_status)
         setProgressOptions(options)
@@ -55,7 +55,7 @@ const WorkOrderTable = ({
     const body = { priority: newValue }
 
     try {
-      const response = await apiMethods.workOrderStatusUpdate(id, body)
+      const response = await workOrderApi.workOrderStatusUpdate(id, body)
 
       setCellData((prev) => prev.map((r) => (r.id === id ? { ...r, priority: newValue } : r)))
       setAlerts([
@@ -87,7 +87,7 @@ const WorkOrderTable = ({
       const body = { progress: newValue }
 
       try {
-        const response = await apiMethods.workOrderStatusUpdate(id, body)
+        const response = await workOrderApi.workOrderStatusUpdate(id, body)
 
         // Update UI if cellData is a state
         setCellData((prev) => prev.map((r) => (r.id === id ? { ...r, progress: newValue } : r)))

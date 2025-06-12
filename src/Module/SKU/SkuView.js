@@ -25,7 +25,7 @@ useEffect(() => {
   const fetchClient = async () => {
     if (!id) return;
     try {
-      const data = await skuApi.singlesku(id);
+      const data = await skuApi.singleSku(id);
       setSelectedSku(data);
       console.log("sku singke darta",data)
       // navigate(`/sku/${selectedSkuData.id}`);

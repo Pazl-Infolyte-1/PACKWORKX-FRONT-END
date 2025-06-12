@@ -6,6 +6,7 @@ import CustomAlert from '../../../components/New/CustomAlert'
 import AddEditDesignation from './AddEditDesignation'
 import ContentHeader from '../../../components/New/ContentHeader'
 import { employeeApi } from '../../../api/employee'
+import { useSearch } from '../../../components/New/SearchContext'
 
 const Designation = () => {
   const [designations, setDesignations] = useState([])
@@ -16,6 +17,16 @@ const Designation = () => {
   const [showForm, setShowForm] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [selectedDesignation, setSelectedDesignation] = useState(null)
+       const { setGlobalPlaceholder, searchQuery  } = useSearch()
+       useEffect(() => {
+      // Set the placeholder when component mounts
+      setGlobalPlaceholder("Search Designation....")
+      
+      // Clean up when component unmounts
+      return () => {
+        setGlobalPlaceholder("Search...") // Reset to default
+      }
+    }, [setGlobalPlaceholder])
 
   const fetchData = async () => {
     try {
@@ -32,7 +43,7 @@ const Designation = () => {
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [searchQuery])
 
   const handleAddDesignation = () => {
     setIsEdit(false)

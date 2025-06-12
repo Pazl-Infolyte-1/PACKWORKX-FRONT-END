@@ -5,10 +5,11 @@ import ActionButton from '../../components/New/ActionButton'
 import CommonPagination from '../../components/New/Pagination'
 import PurchaseReturnTable from './PurchaseReturnTable'
 import Drawer from '../../components/Drawer/Drawer'
-import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
 import PurchaseReturnForm from './PurchaseReturnForm'
 import AddPurchaseOrderReturn from './AddPurchaseReturn'
+import ContentHeader from '../../components/New/ContentHeader'
+import CompactPagination from '../../components/New/CompactPagination'
 
 const PurchaseOrderReturn = () => {
   const [isPorEdit, setIsPorEdit] = useState(false)
@@ -26,7 +27,7 @@ const PurchaseOrderReturn = () => {
   // Fetch data
   const fetchData = async () => {
     try {
-      const response = await apiMethods.getPurchaseReturn({
+      const response = await purchaseOrderApi.getPurchaseReturn({
         search: searchQuery,
         page: pagination.currentPage,
         limit: limit,
@@ -45,7 +46,7 @@ const PurchaseOrderReturn = () => {
   //po data
   const poFetchData = async () => {
     try {
-      const response = await apiMethods.getPurchaseOrders({
+      const response = await purchaseOrderApi.getPurchaseOrders({
         search: searchQuery,
         page: pagination.currentPage,
         limit: limit,
@@ -68,7 +69,7 @@ const PurchaseOrderReturn = () => {
     try {
       console.log('id', id)
 
-      const response = await apiMethods.getPurchaseReturn({ id })
+      const response = await purchaseOrderApi.getPurchaseReturn({ id })
       console.log('response', response)
 
       const approvedList = Array.isArray(response?.data?.approved) ? response.data.approved : []
@@ -136,38 +137,10 @@ const PurchaseOrderReturn = () => {
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
-      <div className="flex flex-col lg:flex-row item-center gap-5 relative my-3">
-        <h3 className="text-xl font-semibold mb-3">Purchase Return</h3>
-      </div>
-      <div className="bg-white p-3 rounded-lg w-full h-full">
-        <div className="flex items-center">
-          <SearchBar data={porData} text={'Purchase Return'} ref={searchBarRef} />
-          <button
-            className="ml-4 border border-[#e7e5e4] bg-white text-gray-700 px-4 h-[35px] rounded-md hover:bg-gray-200 transition-colors duration-200 flex items-center gap-1"
-            onClick={clearFilters}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-            <span className="whitespace-nowrap">Clear</span>
-          </button>
-          <div className="ml-auto flex gap-2">
-            <ActionButton label="Add Purchase Return" onClick={handleAddNew} variant="add" />
-          </div>
-        </div>
+      <ContentHeader heading={'Purchase Return'} onAddClick={handleAddNew} />
 
-        <div className="overflow-x-auto overflow-y-auto whitespace-nowrap my-4">
+      <div>
+        <div>
           <PurchaseReturnTable
             porData={porData}
             setPorData={setPorData}
@@ -175,24 +148,24 @@ const PurchaseOrderReturn = () => {
             handleEdit={handleEdit}
           />
         </div>
-        <div>
-          <CommonPagination
+        <div className='mt-2'>
+          <CompactPagination
             count={pagination?.totalPages || 1}
             page={pagination?.currentPage || 1}
-            onChange={(event, value) => {
+            onPageChange={(event, value) => {
               setPagination((prev) => ({
                 ...prev,
                 currentPage: value,
               }))
             }}
-            onLimitChange={(newLimit) => {
+            onEntriesChange={(newLimit) => {
               setLimit(newLimit)
               setPagination((prev) => ({
                 ...prev,
                 currentPage: 1,
               }))
             }}
-            limit={limit}
+            entriesPerPage={limit}
           />
         </div>
         <Drawer

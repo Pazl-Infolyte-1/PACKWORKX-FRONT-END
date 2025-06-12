@@ -17,6 +17,9 @@ const AddEditMachine = React.lazy(() => import('./Module/Machine/AddEditMachine.
 const InventoryHandling = React.lazy(() => import('./Module/Inventory/InventoryHandling.js'))
 const InventoryMain = React.lazy(() => import('./Module/Inventory/InventoryMain.js'))
 const Production = React.lazy(() => import('./Module/Production/Index.js'))
+const WorkOrderListProduction = React.lazy(() => import('./Module/Production/WorkOrderLIsting.js'))
+const GroupLayerProduction = React.lazy(() => import('./Module/Production/Group.js'))
+const RawMeterialProduction = React.lazy(() => import('./Module/Production/AllocateRM.js'))
 const Packages = React.lazy(() => import('./Module/Admin/Packages/Packages.js'))
 const Billing = React.lazy(() => import('./Module/Admin/Billing/Billing.js'))
 const Companies = React.lazy(() => import('./Module/Admin/Companies/Companies.js'))
@@ -52,6 +55,8 @@ const Invoice = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceList.j
 const InvoiceView = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceView.js'))
 const InventoryForm =React.lazy(()=>import('./Module/Inventory/Items/AddItemProcess.js'))
 const DebitNote= React.lazy(() => import('./Module/DebitNote/DebitNote.js'))
+const DebitNoteForm= React.lazy(() => import('./Module/DebitNote/DebitNoteForm.js'))
+
 
 
 const routes = [
@@ -97,7 +102,19 @@ const routes = [
   },
   { path: '/inventoryhandling', name: 'Inventory Handling', element: InventoryMain, key: 28 },
     { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 230 },
-  { path: '/production', name: 'Production', element: Production, key: 26 },
+  { path: '/production',
+     name: 'Production',
+      element: Production,
+       key: 26,
+       children:[
+          { path: 'WorkOrders', name: 'WorkOrders', element: WorkOrderListProduction, key: '' },
+          { path: 'GroupLayers', name: 'GroupLayers', element: GroupLayerProduction, key: '' },
+          { path: 'AllocateRM', name: 'AllocateRM', element: RawMeterialProduction, key: '' },
+          // const tabs = ['Work Orders','Group Layers',  'Allocate RM', 'Returnables', 'Outsource & Preview']//'Allocate SFG'
+       ]
+
+
+   },
   { path: '/packages', name: 'Packages', element: Packages, key: 5001 },
   { path: '/process', name: 'Process', element: Process, key: 5007 },
   { path: '/routeprocess', name: 'Route Process', element: RouteProcess, key: 5008 },
@@ -150,6 +167,7 @@ const routes = [
   { path: '/department', name: 'Department', element: Department, key: '' },
   { path: '/role', name: 'role', element: Role, key: '' },
   { path: '/debitnote', name: 'Debit Note', element: DebitNote, key: '' },
+  { path: '/debitnote/add-form', name: 'Add Debit Note', element: DebitNoteForm, key: '' },
 
   { path: '/users', name: 'user', element: DropDownController, key: 6000 },
   {

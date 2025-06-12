@@ -1,7 +1,6 @@
 import { useState, useEffect, use, useRef } from 'react'
 import { IoCheckmarkCircleOutline } from 'react-icons/io5'
 import { TbSmartHome } from 'react-icons/tb'
-import apiMethods from '../../../api/config'
 import CompactPagination from '../../../components/New/CompactPagination'
 import EmployeeForm from './EmployeeForm'
 import EmployeeTable from './EmployeeTable'
@@ -12,6 +11,9 @@ import { useSearch } from '../../../components/New/SearchContext'
 import CustomAlert from '../../../components/New/CustomAlert'
 import ContentHeader from '../../../components/New/ContentHeader'
 import { FiDownload, FiUpload } from 'react-icons/fi'
+import { companyApi } from '../../../api/company'
+import { commonApi } from '../../../api/common'
+import { employeeApi } from '../../../api/employee'
 
 function EmployeeList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -87,11 +89,11 @@ function EmployeeList() {
           designationsResponse,
           rolesResponse,
         ] = await Promise.all([
-          apiMethods.getCountries(),
-          apiMethods.getCompanyAddress(),
-          apiMethods.getDepartmentsList(),
-          apiMethods.getDesignation(),
-          apiMethods.getRoles(),
+          commonApi.getCountries(),
+          companyApi.getCompanyAddress(),
+          employeeApi.getDepartmentsList(),
+          employeeApi.getDesignation(),
+          employeeApi.getRoles(),
         ])
 
         setDropdownOptions({
@@ -134,7 +136,7 @@ function EmployeeList() {
     setCurrentEmployeeId(userId)
 
     try {
-      const response = await apiMethods.getEmployeeData(id)
+      const response = await employeeApi.getEmployeeData(id)
 
       if (!response || !response.data || !response.data.data) {
         console.error('Invalid API response structure:', response)
@@ -217,8 +219,8 @@ function EmployeeList() {
 
     try {
       const response = isEdit
-        ? await apiMethods.editEmployee(CurrentEmployeeId, formData)
-        : await apiMethods.createNewEmployee(formData)
+        ? await employeeApi.editEmployee(CurrentEmployeeId, formData)
+        : await employeeApi.createNewEmployee(formData)
 
       if (response?.status === 200 || response?.status === 201) {
         setAlerts([
@@ -328,7 +330,7 @@ function EmployeeList() {
   const fetchEmployeeData = async () => {
     setLoading(true)
     try {
-      const response = await apiMethods.GetEmployeelist({
+      const response = await employeeApi.GetEmployeelist({
         search: searchQuery || filters.department || filters.role,
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,
@@ -359,7 +361,7 @@ function EmployeeList() {
   const handleView = async (id) => {
     try {
       console.log('Requesting for data for employee')
-      const response = await apiMethods.getEmployeeData(id)
+      const response = await employeeApi.getEmployeeData(id)
       setViewEmployeeData(response.data.data)
       setShowEmployeeData(true)
     } catch (err) {

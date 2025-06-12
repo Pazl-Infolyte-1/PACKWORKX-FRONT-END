@@ -1,7 +1,6 @@
 // Updated InventoryMain component with click-outside functionality for dropdowns
 
 import { useEffect, useState, useRef } from 'react'
-import apiMethods from '../../api/config'
 import InventoryTable from './InventoryTable'
 import { BiDollarCircle } from 'react-icons/bi'
 import { FaShieldAlt, FaStar, FaUsers, FaChevronDown, FaChevronUp, FaTimes } from 'react-icons/fa'
@@ -14,6 +13,9 @@ import { useNavigate } from 'react-router-dom'
 import CompactPagination from '../../components/New/CompactPagination'
 import { useSearch } from '../../components/New/SearchContext'
 import { FiDownload } from 'react-icons/fi'
+import { commonApi } from '../../api/common'
+import { inventoryApi } from '../../api/inventory'
+import { itemApi } from '../../api/item'
 
 const InventoryMain = () => {
   const [inventoryData, setInventoryData] = useState([])
@@ -128,7 +130,7 @@ const InventoryMain = () => {
     // In the fetchInventory function, modify the API call parameters:
     const fetchInventory = async () => {
       try {
-        const response = await apiMethods.getinventoryWithParams(
+        const response = await inventoryApi.getinventoryWithParams(
           categoryId,
           currentPage,
           entriesPerPage,
@@ -175,8 +177,8 @@ const InventoryMain = () => {
     const fetchCategoryData = async () => {
       try {
         const [categoryRes, subCategoryRes] = await Promise.all([
-          apiMethods.getCategoryList(),
-          apiMethods.getSubCategory(),
+          itemApi.getCategoryList(),
+          itemApi.getSubCategory(),
         ])
 
         setCategory(categoryRes.data.data)
@@ -205,7 +207,7 @@ const InventoryMain = () => {
         setOpenCategoryId(null)
         setSubCategories([])
       } else {
-        const res = await apiMethods.subCategoryDropdown(categoryId)
+        const res = await commonApi.subCategoryDropdown(categoryId)
         setSubCategories(res.data.data)
         setOpenCategoryId(categoryId)
       }
@@ -249,7 +251,7 @@ const handleInventoryExelExport = async () => {
     searchQuery,
     subCategoryId,
   };
-  await apiMethods.getInventoryExcelExport(params);
+  await inventoryApi.getInventoryExcelExport(params);
 }
 
   return (

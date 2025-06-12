@@ -1,5 +1,4 @@
 import { useEffect,useState } from "react"
-import apiMethods from "../../api/config"
 import {
 	CTable,
 	CTableHead,

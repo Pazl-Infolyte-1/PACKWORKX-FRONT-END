@@ -4,7 +4,6 @@ import { MdTakeoutDining, MdOutlineSettingsInputComposite, MdClearAll } from 're
 import { AiFillCarryOut, AiFillCodeSandboxCircle } from 'react-icons/ai'
 
 import Drawer from '../../components/Drawer/Drawer'
-import apiMethods from '../../api/config'
 import SkuPopup from './SkuPopup'
 import SkuTable from './SkuTable'
 import { useLocation, useParams } from 'react-router-dom'
@@ -23,6 +22,8 @@ import CommonPagination from '../../components/New/Pagination'
 import CompactPagination from '../../components/New/CompactPagination'
 import Loader from '../../components/New/Loader'
 import { setSkuPartValue } from '../../action'
+import { clientApi } from '../../api/client'
+import { skuApi } from '../../api/sku'
 
 
 
@@ -151,7 +152,7 @@ const fetchClient = async () => {
   if (!skuIdVal) return; // Run only if skuIdVal exists
 
   try {
-    const data = await apiMethods.singlesku(skuIdVal);
+    const data = await skuApi.singlesku(skuIdVal);
     setSelectedSku(data);
     console.log("sku single data", data);
   } catch (error) {
@@ -562,14 +563,14 @@ total_bursting_strength:selectedSku.total_bursting_strength ||null,
       return
     }
     try {
-      const response = await apiMethods.getSkuList({
+      const response = await skuApi.getSkuList({
         search: searchQuery || '',
         client: clientName || '',
         sku_type: selectedSkuType || '',
         page: pagination?.currentPage || 1,
         limit: message ? 10000 : limit,
       })
-const clientResponse = await apiMethods.getSkuClients({ limit: 10000 }) 
+const clientResponse = await clientApi.getSkuClients({ limit: 10000 }) 
 
       setSkuData(response.data)
       setClient(clientResponse.data)
@@ -610,7 +611,7 @@ const clientResponse = await apiMethods.getSkuClients({ limit: 10000 })
   }
 
   const handleSkuExelExport = async () => {
-    await apiMethods.getSkuExcelExport({
+    await skuApi.getSkuExcelExport({
       search: searchQuery,
       sku_type: selectedSkuType,
       client: selectedClient,

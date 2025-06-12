@@ -4,7 +4,6 @@ import CommonPagination from '../../../components/New/Pagination'
 import { useSearch } from '../../../components/New/SearchContext'
 import SearchBar from '../../../components/New/SearchBar'
 import ActionButton from '../../../components/New/ActionButton'
-import apiMethods from '../../../api/config'
 import ConfirmationModale from '../../../components/New/ConfirmationModale'
 import CustomAlert from '../../../components/New/CustomAlert'
 import ItemTable from './ItemTable'
@@ -12,6 +11,7 @@ import ViewItemDetails from './ViewItemDetails'
 import AddItemProcess from './AddItemProcess'
 import ContentHeader from '../../../components/New/ContentHeader'
 import CompactPagination from '../../../components/New/CompactPagination'
+import { itemApi } from '../../../api/item'
 
 function Items() {
   const [data, setData] = useState([])
@@ -42,7 +42,7 @@ function Items() {
   const fetchData = async () => {
     setLoading(true)
     try {
-      const response = await apiMethods.getItemList({
+      const response = await itemApi.getItemList({
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,
         search: searchQuery,
@@ -91,7 +91,7 @@ function Items() {
 
   const OnDeleteConfirmation = async () => {
     try {
-      const response = await apiMethods.deleteItem(selectedItemId)
+      const response = await itemApi.deleteItem(selectedItemId)
       if (response?.status === 200) {
         fetchData()
         setAlerts([{ severity: 'success', message: 'Item deleted successfully' }])
@@ -109,7 +109,7 @@ function Items() {
 
   const handleView = async (id) => {
     try {
-      const response = await apiMethods.getItemData(id)
+      const response = await itemApi.getItemData(id)
       setSelectedItemData(response?.data.data)
       setViewItem(true)
     } catch (error) {

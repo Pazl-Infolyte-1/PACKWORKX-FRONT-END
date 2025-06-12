@@ -3,8 +3,8 @@ import ActionButton from '../../components/New/ActionButton'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import Select from 'react-select'
 import { ChevronDoubleLeftIcon, TrashIcon } from '@heroicons/react/solid'
-import apiMethods from '../../api/config'
 import PopUp from '../../../src/components/New/PopUp'
+import { itemApi } from '../../api/item'
 
 const GrnItemsFrom = ({
   grnFormData,
@@ -37,7 +37,7 @@ const GrnItemsFrom = ({
 
   const openItemDetails = async (item_id) => {
     try {
-      const response = await apiMethods.getItemList()
+      const response = await itemApi.getItemList()
       const items = response?.data?.data || []
       const item = items.find((i) => i.id === parseInt(item_id))
       const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}

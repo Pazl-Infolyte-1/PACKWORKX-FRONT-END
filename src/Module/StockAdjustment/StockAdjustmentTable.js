@@ -11,7 +11,6 @@ import { cilPencil, cilTrash } from '@coreui/icons'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { useNavigate } from 'react-router-dom'
 import CustomAlert from '../../components/New/CustomAlert'
-import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 
 const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized, refreshClients }) => {
@@ -44,7 +43,7 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized, refreshClients
     if (!isDeleteModalOpen.id) return
 
     try {
-      const response = await apiMethods.deleteStockAdjustment(isDeleteModalOpen.id)
+      const response = await inventoryApi.deleteStockAdjustment(isDeleteModalOpen.id)
       if (!response?.status) {
         throw new Error(response?.message || 'Failed to delete client')
       }

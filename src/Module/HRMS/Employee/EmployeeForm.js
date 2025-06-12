@@ -14,12 +14,14 @@ import profile from '../../../assets/images/profile.png'
 import Drawer from '../../../components/Drawer/Drawer'
 import ActionButton from '../../../components/New/ActionButton'
 import axios from 'axios'
-import apiMethods from '../../../api/config'
 import AddEditDepartmentForm from '../Department/AddEditDepartmentForm'
 import AddEditDesignation from '../Designation/AddEditDesignation'
 import AddEditRoleForm from '../Role/AddEditRoleForm'
 import { FaMapMarkerAlt } from 'react-icons/fa'
 import ConfirmationModale from '../../../components/New/ConfirmationModale'
+import { employeeApi } from '../../../api/employee'
+import { commonApi } from '../../../api/common'
+import { machineApi } from '../../../api/machine'
 
 const REPORTING_OPTIONS = [
   { id: 1, name: 'Jane Smith' },
@@ -128,7 +130,7 @@ function EmployeeForm({
           search: machineSearchQuery,
           limit: 200,
         }
-        const response = await apiMethods.getMachine(params)
+        const response = await machineApi.getMachine(params)
         setMachineList(response?.data?.data)
       } catch (error) {
         console.error('Error fetching machine data:', error)
@@ -265,7 +267,7 @@ function EmployeeForm({
       const formData = new FormData()
       formData.append('file', file)
 
-      const apiResponse = await apiMethods.uploadFile(formData)
+      const apiResponse = await commonApi.uploadFile(formData)
 
       if (!apiResponse || !apiResponse.data || !apiResponse.data.data) {
         throw new Error('Invalid response from the server')
@@ -385,7 +387,7 @@ function EmployeeForm({
 
   const handleDepartmentFormSuccess = async () => {
     // Refresh the data
-    const response = await apiMethods.getDepartmentsList()
+    const response = await employeeApi.getDepartmentsList()
     const data = response?.data?.data
     setDropdownOptions((prev) => ({
       ...prev,
@@ -402,7 +404,7 @@ function EmployeeForm({
   }
   const handleRoleFormSuccess = async () => {
     // Refresh the data
-    const response = await apiMethods.getRoles()
+    const response = await employeeApi.getRoles()
     const data = response?.data?.data
     setDropdownOptions((prev) => ({
       ...prev,
@@ -419,7 +421,7 @@ function EmployeeForm({
   }
   const handleDesignationFormSuccess = async () => {
     // Refresh the data
-    const response = await apiMethods.getDesignationList()
+    const response = await employeeApi.getDesignationList()
     const data = response?.data?.data
     setDropdownOptions((prev) => ({
       ...prev,

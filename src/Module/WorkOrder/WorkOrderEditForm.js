@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import PopUp from '../../components/New/PopUp';
-import apiMethods from '../../api/config';
+import { salesOrderApi } from '../../api/salesOrder';
+import { skuApi } from '../../api/sku';
+import { workOrderApi } from '../../api/workOrder';
 
 function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFormVisible, fetchData }) {
     const [workOrderData, setWorkOrderData] = useState(null);
@@ -115,7 +117,7 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
           try {
             // 1. Fetch full SKU list
             // const skuResponse = await apiMethods.getSkuListOptions();
-            const skuResponse = await apiMethods.getSkuList({
+            const skuResponse = await skuApi.getSkuList({
                 search: '',
                 client:'',
                 sku_type:'',
@@ -128,13 +130,13 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
             // 2. Fetch work order by ID
             if (!selectedWorkOrderId) return;
       
-            const workOrderResponse = await apiMethods.getWorkOrderById(selectedWorkOrderId);
+            const workOrderResponse = await workOrderApi.getWorkOrderById(selectedWorkOrderId);
             const workOrder = workOrderResponse?.data;
             setWorkOrderData(workOrder);
             setFormValues({ ...workOrder });
       
             // 3. Fetch Sales Order data using sales_order_id
-            const salesOrderResponse = await apiMethods.getSaleOrderData(workOrder?.sales_order_id);
+            const salesOrderResponse = await salesOrderApi.getSaleOrderData(workOrder?.sales_order_id);
             const salesSkuDetails = salesOrderResponse.data.SalesSkuDetails;
       
             // 4. Extract allowed SKU names from sales order
@@ -164,7 +166,7 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
         const fetchSkuVersions = async () => {
             if (formValues.sku_id) {
                 try {
-                    const response = await apiMethods.getSkuVersions(formValues.sku_id);
+                    const response = await skuApi.getSkuVersions(formValues.sku_id);
                     setSkuVersion(response?.data?.data); // Assuming response.data contains the versions
                 } catch (error) {
                     console.error("Failed to fetch SKU versions:", error);
@@ -225,7 +227,7 @@ function WorkOrderEditForm({ isEditFormVisible, selectedWorkOrderId, setIsEditFo
   setIsSubmitting(true);
   try {
     console.log('Submitted data:', formValues);
-    await apiMethods.editWorkOrder(formValues.id, formValues);
+    await workOrderApi.editWorkOrder(formValues.id, formValues);
     
     setIsEditFormVisible(false);
     fetchData(); // Refresh data after successful submit

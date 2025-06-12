@@ -3,8 +3,8 @@ import { IoTrash } from 'react-icons/io5'
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io'
 import { FiCopy } from 'react-icons/fi'
 import { useEffect, useState } from 'react'
-import apiMethods from '../../api/config'
 import get from 'lodash/get'
+import { commonApi } from '../../api/common'
 
 const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
   const {
@@ -43,7 +43,7 @@ const AddressForm = ({ fields, remove, expandedIndices, toggleExpand }) => {
   useEffect(() => {
     const fetchStates = async () => {
       try {
-        const response = await apiMethods.getState()
+        const response = await commonApi.getState()
         setStateOptions(response.data.data)
       } catch (error) {
         console.error('Error fetching states:', error)

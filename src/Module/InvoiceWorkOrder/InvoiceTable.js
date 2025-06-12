@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import apiMethods from '../../api/config';
 import ReusableTable from '../SalesOrder/ReusableTable';
 import { useNavigate } from 'react-router-dom';
 

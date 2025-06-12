@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilLink } from '@coreui/icons'
 import { useNavigate, useParams } from 'react-router-dom'
-import apiMethods from '../../api/config'
 import StockOverview from './StockOverview'
+import { inventoryApi } from '../../api/inventory'
 
 const tabs = ['Overview']
 const StockTableView = () => {
@@ -16,7 +16,7 @@ const StockTableView = () => {
   useEffect(() => {
 	const fetchClient = async () => {
 	  try {
-		const data = await apiMethods.singleStockAdjustment(id)
+		const data = await inventoryApi.singleStockAdjustment(id)
 		setTableData(data?.data)
 		setStock(data?.data)
 	  } catch (error) {

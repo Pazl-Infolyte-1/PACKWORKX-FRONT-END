@@ -5,13 +5,13 @@ import AddPurchaseOrderReturn from '../PurchaseReturn/AddPurchaseReturn'
 import Drawer from '../../components/Drawer/Drawer'
 import CustomAlert from '../../components/New/CustomAlert'
 import SearchBar from '../../components/New/SearchBar'
-import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
 import Loader from '../../components/New/Loader'
 import CompactPagination from '../../components/New/CompactPagination'
 import { useSearch } from '../../components/New/SearchContext'
 import ContentHeader from '../../components/New/ContentHeader'
 import { debounce } from 'lodash'
+import { purchaseOrderApi } from '../../api/purchaseOrder'
 
 const PurchaseOrder = () => {
   const [data, setData] = useState([])
@@ -44,7 +44,7 @@ const PurchaseOrder = () => {
   const fetchData = useCallback(async (search, pageParams) => {
     setLoading(true)
     try {
-      const res = await apiMethods.getPurchaseOrders({
+      const res = await purchaseOrderApi.getPurchaseOrders({
         search,
         page: pageParams.currentPage,
         limit: pageParams.pageSize,

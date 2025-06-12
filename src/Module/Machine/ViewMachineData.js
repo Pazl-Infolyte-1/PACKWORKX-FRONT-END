@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import apiMethods from '../../api/config'
+import { machineApi } from '../../api/machine'
 
 function ViewMachineData({ Id }) {
   const [machineData, setMachineData] = useState(null)
@@ -9,7 +9,7 @@ function ViewMachineData({ Id }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getMachineById(Id)
+        const response = await machineApi.getMachineById(Id)
         setMachineData(response.data.data)
       } catch (error) {
         console.error('Error fetching data:', error)

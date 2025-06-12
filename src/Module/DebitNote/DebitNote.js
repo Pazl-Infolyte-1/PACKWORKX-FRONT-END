@@ -2,23 +2,19 @@ import React, { useEffect, useRef, useState } from 'react'
 import CustomAlert from '../../components/New/CustomAlert'
 import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
-import Drawer from '../../components/Drawer/Drawer'
 import DebitNoteTable from './DebitNoteTable'
-import DebitNoteForm from './DebitNoteForm'
 import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
+import { useNavigate } from 'react-router-dom'
 
 const DebitNote = () => {
   const [alerts, setAlerts] = useState([])
-  const [isEdit, setIsEdit] = useState(false)
   const [debitNoteData, setDebitNoteData] = useState([])
-  const [drawerOpen, setDrawerOpen] = useState(false)
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 })
   const [limit, setLimit] = useState(50)
   const [count, setCount] = useState(null)
-  const [errors, setErrors] = useState({})
   const { searchQuery, setGlobalPlaceholder } = useSearch()
-  const [refresh, setRefresh] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     setGlobalPlaceholder('Search Debit Notes...')
@@ -26,9 +22,8 @@ const DebitNote = () => {
   }, [])
 
   const fetchData = async () => {
-    
     try {
-      const response = await apiMethods.getDebitNotes({
+      const response = await debitApi.getDebitNotes({
         search: searchQuery,
         page: pagination.currentPage,
         limit: limit,
@@ -98,9 +93,9 @@ const DebitNote = () => {
         let response
         if (isEdit) {
           data.id = debitNoteFormData.id
-          response = await apiMethods.editDebitNote(data)
+          response = await debitApi.editDebitNote(data)
         } else {
-          response = await apiMethods.postDebitNote(data)
+          response = await debitApi.postDebitNote(data)
         }
         setAlerts([{ severity: 'success', message: response?.data?.message || 'Success' }])
         await fetchData()
@@ -118,46 +113,29 @@ const DebitNote = () => {
       <ContentHeader
         heading={'Debit Notes'}
         onAddClick={() => {
-          setIsEdit(false)
-          setDrawerOpen(true)
+          navigate('/debitnote/add-form')
         }}
       />
       <div className="">
         <DebitNoteTable
           debitNoteData={debitNoteData}
-          handleEdit={handleEdit}
           setAlerts={setAlerts}
-          setRefresh={setRefresh}
         />
         <div className="flex justify-end items-center gap-4 mt-2 ml-4 mr-4">
-          <p className='w-40 text-sm'>Total Count: <span className='font-semibold'>{count}</span></p>
+          <p className="w-40 text-sm">
+            Total Count: <span className="font-semibold">{count}</span>
+          </p>
           <CompactPagination
             count={pagination.totalPages || 1}
             page={pagination.currentPage || 1}
-            onPageChange={(e, value) => setPagination(prev => ({ ...prev, currentPage: value }))}
+            onPageChange={(e, value) => setPagination((prev) => ({ ...prev, currentPage: value }))}
             onEntriesChange={(newLimit) => {
               setLimit(newLimit)
-              setPagination(prev => ({ ...prev, page: 1 }))
+              setPagination((prev) => ({ ...prev, page: 1 }))
             }}
             entriesPerPage={limit}
           />
         </div>
-        <Drawer
-          isOpen={drawerOpen}
-          onClose={handleCloseDrawer}
-          maxWidth={'1350px'}
-          title={isEdit ? 'Edit Debit Note' : 'New Debit Note'}
-        >
-          <DebitNoteForm
-            debitNoteFormData={debitNoteFormData}
-            setDebitNoteFormData={setDebitNoteFormData}
-            onSubmit={handleSubmit}
-            isEdit={isEdit}
-            handleCloseDrawer={handleCloseDrawer}
-            errors={errors}
-            setErrors={setErrors}
-          />
-        </Drawer>
       </div>
     </>
   )

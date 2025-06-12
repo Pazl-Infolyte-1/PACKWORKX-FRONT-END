@@ -9,7 +9,6 @@ import { useSearch } from '../../components/New/SearchContext'
 import SalesOrderTable from './SalesOrderTable'
 import SearchBar from '../../components/New/SearchBar'
 import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import SalesOrderView from './viewSalesOrder'
@@ -17,6 +16,7 @@ import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { FiDownload, FiUpload } from 'react-icons/fi'
+import { salesOrderApi } from '../../api/salesOrder'
 
 function ListOfSalesOrder() {
   const [data, setData] = useState([])
@@ -65,7 +65,7 @@ function ListOfSalesOrder() {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      await apiMethods.updateSalesOrderStatus(orderId, { sales_status: newStatus });
+      await salesOrderApi.updateSalesOrderStatus(orderId, { sales_status: newStatus });
       setAlerts([{ severity: "success", message: `Status successfully changed to "${newStatus}".` }]);
 
       // Optionally refresh the list or update the local state here   
@@ -78,7 +78,7 @@ function ListOfSalesOrder() {
   };
   const downloadSalesOrderExcelSheet = async () => {
     try {
-      const response = await apiMethods.downloadSalesOrder();
+      const response = await salesOrderApi.downloadSalesOrder();
   
       if (response?.status === 200) {
         const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' });
@@ -117,7 +117,7 @@ function ListOfSalesOrder() {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const response = await apiMethods.getSalesOrderList({
+      const response = await salesOrderApi.getSalesOrderList({
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,
         client: searchQuery,
@@ -125,7 +125,6 @@ function ListOfSalesOrder() {
       })
       setData(response?.data?.data)
       setApiResponse(response?.data)
-      console.log("mmmm",response?.data)
       // setFilteredData(response.data.data)
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -166,7 +165,7 @@ function ListOfSalesOrder() {
 
   const OnDeleteConfirmation = async () => {
     try {
-      const response = await apiMethods.DeleteSalesOrder(selectedSalesOrder)
+      const response = await salesOrderApi.DeleteSalesOrder(selectedSalesOrder)
       if (response?.status === 200) {
         await fetchData()
         setAlerts([{ severity: "success", message: "Sales Order Deleted Successfully" }]);
@@ -185,7 +184,7 @@ function ListOfSalesOrder() {
 
   // const handleView = async (id) => {
   //   try {
-  //     const response = await apiMethods.getSaleOrderData(id)
+  //     const response = await salesOrderApi.getSaleOrderData(id)
   //     SetselectedSalesOrderData(response?.data)
   //     setIsminimiseTable(true)
   //     SetviewSalesOrder(true)
@@ -197,7 +196,7 @@ function ListOfSalesOrder() {
 
   const handleView = async (id) => {
     try {
-      const response = await apiMethods.getSaleOrderData(id)
+      const response = await salesOrderApi.getSaleOrderData(id)
       SetselectedSalesOrderData(response?.data)
       // setIsminimiseTable(true)
       naviagte(`view/${id}`)

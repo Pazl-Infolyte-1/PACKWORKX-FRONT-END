@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
 import { AuthContext } from '../../Context/AuthContext'
-import apiMethods from '../../api/config'
 import RSCBox from './RSCBox'
 import CorrugatedSheet from './CorrugatedSheet'
 import DieCutBox from './DieCutBox'
@@ -15,6 +14,8 @@ import updown from '../../assets/images/updown.png'
 import { version } from 'core-js'
 import { setRscDeckleSize } from '../../action';
 import { setSkuPartValue } from '../../action'
+import { skuApi } from '../../api/sku'
+
 
 function SkuAddEdit({
   isopenval,
@@ -124,7 +125,7 @@ total_bursting_strength:null,
     const fetchData = async () => {
       try {
         if (addNewSkuData?.id) {
-          const response = await apiMethods.getSkuVersions(addNewSkuData?.id)
+          const response = await skuApi.getSkuVersions(addNewSkuData?.id)
           setVersion(response.data.data)
           // Set default values when editing
           setDefaultSkuValues(addNewSkuData.sku_values)
@@ -158,7 +159,7 @@ total_bursting_strength:null,
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getSkuType()
+        const response = await skuApi.getSkuType()
         setSkuType(response.data)
       } catch (error) {
         console.error(error)

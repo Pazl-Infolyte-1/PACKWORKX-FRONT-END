@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import ProcessDropDown from '../Machine/ProcessDropDown'
 import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
 import CustomAlert from '../../components/New/CustomAlert'
-
+import {machineApi} from "../../api/machine"
 const AddFieldForm = ({
   processData,
   setRefresh,
@@ -67,8 +66,8 @@ const AddFieldForm = ({
 
     try {
       const res = isEdit
-        ? await apiMethods.updateField(payload)
-        : await apiMethods.addFields(payload)
+        ? await machineApi.updateField(payload)
+        : await machineApi.addFields(payload)
 
       // Show success message
       if (res.status === 201 || res.status === 200) {

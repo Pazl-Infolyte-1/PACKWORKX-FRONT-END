@@ -7,7 +7,6 @@ import CommonPagination from '../../components/New/Pagination'
 import { FiFilter } from 'react-icons/fi'
 import ActionButton from '../../components/New/ActionButton'
 import SearchBar from '../../components/New/SearchBar'
-import apiMethods from '../../api/config'
 import ReelsDetails from './ReelsDetails'
 import RawMaterialsDetails from './RawMaterialsDetails'
 import CorrugationGlueDetails from './CorrugationGlueDetails'
@@ -18,6 +17,8 @@ import ContentHeader from '../../components/New/ContentHeader'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import CompactPagination from '../../components/New/CompactPagination'
 import InventoryTable from './InventoryTable'
+import { inventoryApi } from '../../api/inventory'
+import { itemApi } from '../../api/item'
 
 const InventoryDashboard = () => {
   const [isfinishedgoodpopup, setfinishedgoodpopup] = useState(false)
@@ -147,7 +148,7 @@ const [subCategoryId,setSubCategoryId]=useState(null)
     const item_id = inventoryItem.item_id
 
     // Fetch all items
-    const response = await apiMethods.getItemList()
+    const response = await itemApi.getItemList()
     const items = response?.data?.data || []
 
     // Find the full item details based on item_id
@@ -161,7 +162,7 @@ const [subCategoryId,setSubCategoryId]=useState(null)
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await apiMethods.getinventory()
+        const response = await inventoryApi.getinventory()
         if (response.data.success) {
           setInventoryData(response.data.data)
         }
@@ -196,7 +197,7 @@ const [subCategoryId,setSubCategoryId]=useState(null)
   useEffect(() => {
     const fetchItemData = async () => {
       try {
-        const response = await apiMethods.getItemList({
+        const response = await itemApi.getItemList({
           page: paginationParams.currentPage,
           limit: paginationParams.pageSize,
           // client: searchQuery,
@@ -364,7 +365,7 @@ const [subCategoryId,setSubCategoryId]=useState(null)
           try {
             // You might want to optimize this by fetching all items once
             // and storing them in a state or context
-            const response = await apiMethods.getItemList()
+            const response = await itemApi.getItemList()
             const items = response?.data?.data || []
             const fullItem = items.find((i) => i.id === parseInt(item.id))
 

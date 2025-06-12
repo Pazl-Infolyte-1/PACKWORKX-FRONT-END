@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
@@ -14,7 +13,7 @@ import {
   CTableHeaderCell,
   CTableDataCell,
 } from '@coreui/react'
-
+import {skuApi} from "../../api/sku"
 const FluteTypeView = ({ onSelect }) => {
   const [flutesList, setFlutesList] = useState([])
   const [openDelModal, setOpenDelModal] = useState(false)
@@ -28,7 +27,7 @@ const FluteTypeView = ({ onSelect }) => {
 
   const fetchFluteList = async () => {
     try {
-      const response = await apiMethods.getFluteType()
+      const response = await skuApi.getFluteType()
       setFlutesList(response.data.data)
     } catch (error) {
       console.error(error)
@@ -37,7 +36,7 @@ const FluteTypeView = ({ onSelect }) => {
 
   const handleDelFlute = async () => {
     try {
-      await apiMethods.deleteFlute(fluteToDelete.id)
+      await skuApi.deleteFlute(fluteToDelete.id)
       setOpenDelModal(false)
       fetchFluteList()
     } catch (error) {

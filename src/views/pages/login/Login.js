@@ -16,7 +16,7 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-import { apiMethods } from '../../../api/config'
+import { authApi } from '../../../api/auth'
 import { useDispatch } from 'react-redux'
 
 const Login = () => {
@@ -43,7 +43,7 @@ const Login = () => {
     setLoading(true)
 
     try {
-      const response = await apiMethods.login({
+      const response = await authApi.login({
         email: formData.email,
         password: formData.password,
       })

@@ -21,11 +21,12 @@ import ClientForm from '../Client/ClientForm'
 import ChipSelectorWithBrowse from '../../components/New/ChipSelectorWithBrowse'
 import { useDispatch, useSelector } from 'react-redux'
 import RoutePopup from './RoutePopup'
-import apiMethods from '../../api/config'
 import { useNavigate } from 'react-router-dom'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
+import { machineApi } from '../../api/machine'
+import { commonApi } from '../../api/common'
 
 function CorrugatedSheet({
   editTag,
@@ -280,7 +281,7 @@ function CorrugatedSheet({
       }
 
       try {
-        const response = await apiMethods.getRouteList(params)
+        const response = await machineApi.getRouteList(params)
         setFullRouteResponse(response)
         setDisplayAsChips(response.data.routes)
       } catch (err) {
@@ -427,7 +428,7 @@ function CorrugatedSheet({
       formData.append('file', file)
 
       try {
-        const response = await apiMethods.uploadFile(formData)
+        const response = await commonApi.uploadFile(formData)
         const fileUrl = response?.data?.data?.file_url
 
         if (fileUrl) {

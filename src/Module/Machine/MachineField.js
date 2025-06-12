@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
 import ProcessDropDown from './ProcessDropDown'
 import {
@@ -12,6 +11,8 @@ import {
 } from '@coreui/react'
 import { FiEdit, FiTrash2 } from 'react-icons/fi'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
+import { machineApi } from '../../api/machine'
+
 
 function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
   const [fields, setFields] = useState([])
@@ -32,7 +33,7 @@ function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
     const fetchFields = async () => {
       setLoading(true)
       try {
-        const response = await apiMethods.getAllFiledsById(openMachineFieldModal.id)
+        const response = await machineApi.getAllFiledsById(openMachineFieldModal.id)
         setFields(response.data.data || [])
       } catch (error) {
         console.error('Error fetching fields:', error)
@@ -50,7 +51,7 @@ function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getProcess({
+        const response = await machineApi.getProcess({
           limit: 20000,
         })
         setProcessData(response.data.data)
@@ -96,12 +97,12 @@ function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
       if (isEdit && currentFieldId) {
         payload.id = currentFieldId
 
-        response = await apiMethods.updateField(payload)
+        response = await machineApi.updateField(payload)
         setAlerts([
           { severity: 'success', message: response.data.message || 'Field updated successfully' },
         ])
       } else {
-        response = await apiMethods.addFields(payload)
+        response = await machineApi.addFields(payload)
         setAlerts([
           { severity: 'success', message: response.data.message || 'Field added successfully' },
         ])
@@ -147,7 +148,7 @@ function MachineField({ openMachineFieldModal, isEdit, setIsEdit, setAlerts }) {
     if (!fieldToDelete) return
 
     try {
-      const response = await apiMethods.deleteField(fieldToDelete)
+      const response = await machineApi.deleteField(fieldToDelete)
       setRefresh((prev) => !prev)
       setAlerts([
         { severity: 'success', message: response.data.message || 'Field deleted successfully' },

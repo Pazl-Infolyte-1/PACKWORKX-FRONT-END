@@ -20,8 +20,8 @@ import CommonPagination from '../../../components/New/Pagination'
 import CompaniesForm from './CompaniesForm'
 import ActionButton from '../../../components/New/ActionButton'
 import SearchBar from '../../../components/New/SearchBar'
-import apiMethods from '../../../api/config'
 import Loader from '../../../components/New/Loader'
+import { companyApi } from '../../../api/company'
 const CompanyManagement = () => {
   const [showForm, setShowForm] = useState(false)
   const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -51,7 +51,7 @@ const CompanyManagement = () => {
         // entity_type: selectedFilter,
       };
 
-      const response = await apiMethods.getCompanies(queryParams);
+      const response = await companyApi.getCompanies(queryParams);
       console.log("Company Data:", response);
       setData(response?.data || []);
       // setTotalPage(response.totalPages);

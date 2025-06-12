@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import Select from 'react-select'
-import apiMethods from '../../api/config'
 import ActionButton from '../../components/New/ActionButton'
 import { FiEdit, FiPlus, FiSave, FiX } from 'react-icons/fi'
 import CustomAlert from '../../components/New/CustomAlert'
 import Loading from '../../components/New/Loading'
+import { machineApi } from '../../api/machine'
 
 function AddAssign({
   isAddModalOpen,
@@ -34,10 +34,10 @@ function AddAssign({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const machine = await apiMethods.getMachine({
+        const machine = await machineApi.getMachine({
           limit: 20000,
         })
-        const process = await apiMethods.getProcess({
+        const process = await machineApi.getProcess({
           limit: 20000,
         })
         setProcess(process.data.data)
@@ -54,7 +54,7 @@ function AddAssign({
     const fetchAssignedProcesses = async () => {
       if (isEdit && isAddModalOpen && isAddModalOpen.id) {
         try {
-          const response = await apiMethods.getByMachineId(isAddModalOpen.id)
+          const response = await machineApi.getByMachineId(isAddModalOpen.id)
           setAssignedProcesses(response.data.data || [])
         } catch (error) {
           console.error('Error fetching assigned processes:', error)
@@ -71,7 +71,7 @@ function AddAssign({
       if (selectedMachine) {
         setLoading(true)
         try {
-          const response = await apiMethods.getByMachineId(selectedMachine.value)
+          const response = await machineApi.getByMachineId(selectedMachine.value)
           setMachineProcesses(response.data.data || [])
         } catch (error) {
           console.error('Error fetching machine processes:', error)
@@ -146,7 +146,7 @@ function AddAssign({
     setFieldsLoading(true)
     try {
       // First fetch the fields for this process
-      const fieldsResponse = await apiMethods.getProcessFields(processId)
+      const fieldsResponse = await machineApi.getProcessFields(processId)
       const fields = fieldsResponse.data.data || []
       setProcessFields(fields)
 
@@ -162,7 +162,7 @@ function AddAssign({
       }
 
       // Then fetch the values
-      const valuesResponse = await apiMethods.getProcessValues()
+      const valuesResponse = await machineApi.getProcessValues()
       const allValues = valuesResponse.data.data
 
       const matchingProcess = allValues.find((process) => process.process_name_id === processId)
@@ -276,7 +276,7 @@ function AddAssign({
           machine_id: selectedMachine.value,
           process_id: selectedProcess.value,
         }
-        response = await apiMethods.updateAssignMachine(assignmentPayload, isAddModalOpen.id)
+        response = await machineApi.updateAssignMachine(assignmentPayload, isAddModalOpen.id)
       } else {
         assignmentPayload = {
           assignments: [
@@ -286,7 +286,7 @@ function AddAssign({
             },
           ],
         }
-        response = await apiMethods.assignMachineProcess(assignmentPayload)
+        response = await machineApi.assignMachineProcess(assignmentPayload)
       }
 
       // Then save the values if we're editing them and fields exist
@@ -299,9 +299,9 @@ function AddAssign({
         }
         let response
         if (machineValues) {
-        response = await apiMethods.updateProcessValues(valuesPayload)
+        response = await machineApi.updateProcessValues(valuesPayload)
         } else {
-          response = await apiMethods.saveProcessValues(valuesPayload)
+          response = await machineApi.saveProcessValues(valuesPayload)
         }
       }
 

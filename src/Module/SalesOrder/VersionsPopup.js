@@ -13,7 +13,6 @@ import ActionButton from '../../components/New/ActionButton';
 import { BiSolidDownArrow, BiSolidUpArrow, BiTrash } from 'react-icons/bi';
 import { cilPencil, cilTrash } from '@coreui/icons';
 import ThreeDotMenu from '../../components/ThreeDotMenu';
-import apiMethods from '../../api/config';
 import CustomAlert from '../../components/New/CustomAlert';
 
 function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversions,handleDeleteVersion,setIsEdit,setSelectedSkuVersionID,formVisibility,alerts,setAlerts }) {
@@ -147,15 +146,15 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
                         <CTableDataCell className="min-w-[80px] border-none">
                     <ThreeDotMenu
                       value={[
-                        // {
-                        //   label: 'Edit',
-                        //   icon: cilPencil,
-                        //   onClick: () => {
-                        //     setSelectedSkuVersionID(version.id)
-                        //     setIsEdit(true)
-                        //     formVisibility(true)
-                        //   },
-                        // },
+                        {
+                          label: 'Edit',
+                          icon: cilPencil,
+                          onClick: () => {
+                            setSelectedSkuVersionID(version.id)
+                            setIsEdit(true)
+                            formVisibility(true)
+                          },
+                        },
                         {
                           label: 'Delete',
                           icon: cilTrash,

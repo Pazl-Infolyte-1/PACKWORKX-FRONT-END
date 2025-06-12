@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PopUp from '../../../components/New/PopUp'
-import apiMethods from '../../../api/config'
+import { employeeApi } from '../../../api/employee'
 
 function AddEditDepartmentForm({ showForm, setShowForm, isEdit, departmentData, onSuccess }) {
   const [departments, setDepartments] = useState([])
@@ -17,7 +17,7 @@ function AddEditDepartmentForm({ showForm, setShowForm, isEdit, departmentData, 
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await apiMethods.getDepartmentsList()
+        const response = await employeeApi.getDepartmentsList()
         setDepartments(response.data.data)
       } catch (error) {
         console.error('Error fetching departments:', error)
@@ -91,10 +91,10 @@ function AddEditDepartmentForm({ showForm, setShowForm, isEdit, departmentData, 
 
       if (isEdit) {
         // Edit existing department
-        response = await apiMethods.updateDepartment(departmentData.id, formData)
+        response = await employeeApi.updateDepartment(departmentData.id, formData)
       } else {
         // Create new department
-        response = await apiMethods.postDepartment(formData)
+        response = await employeeApi.postDepartment(formData)
       }
 
       if (response.data.success) {

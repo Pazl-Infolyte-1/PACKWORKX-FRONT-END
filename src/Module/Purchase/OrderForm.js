@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import ActionButton from '../../components/New/ActionButton'
 import ItemForm from './ItemForm'
 import 'core-js/stable'
-import apiMethods from '../../api/config'
+import { clientApi } from '../../api/client'
 
 const OrderForm = ({
   orderData,
@@ -105,7 +105,7 @@ const OrderForm = ({
     const fetchData = async () => {
       try {
         const params = { limit: 5000, page: 1, entity_type: 'vendor' }
-        const response = await apiMethods.getVendor(params)
+        const response = await clientApi.getVendor(params)
         console.log('response', response.data.data);
         setVendor(response?.data.data)
       } catch (error) {

@@ -9,7 +9,6 @@ import {
 } from '@coreui/react'
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import { TiFlowSwitch } from 'react-icons/ti'
-import apiMethods from '../../api/config'
 import SkuDetails from './SkuDetails'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
@@ -75,7 +74,7 @@ const navigate = useNavigate()
 
   const handleSkuDelete = async () => {
     try {
-      const response = await apiMethods.deleteSku(deleteId)
+      const response = await skuApi.deleteSku(deleteId)
       setDeleteModal(false)
       setSkuData((prevTypes) => prevTypes.filter((type) => type.id !== deleteId))
       setAlerts([{ severity: 'success', message: response.message }])

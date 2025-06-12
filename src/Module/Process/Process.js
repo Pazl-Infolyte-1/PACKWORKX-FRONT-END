@@ -4,7 +4,6 @@ import ActionButton from '../../components/New/ActionButton'
 import ProcessIntegrartionTable from './ProcessIntegrartionTable'
 import CommonPagination from '../../components/New/Pagination'
 import SearchBar from '../../components/New/SearchBar'
-import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
 import CustomAlert from '../../components/New/CustomAlert'
 import AddProcessField from './AddProcessField'
@@ -15,6 +14,8 @@ import ProcessDetails from './ProcessDetails'
 import Values from './Values'
 import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
+import { machineApi } from '../../api/machine'
+
 
 const Process = () => {
   const [showAddProcessModal, setShowAddProcessModal] = useState(false)
@@ -39,7 +40,7 @@ const Process = () => {
 
   const fetchData = async () => {
     try {
-      const response = await apiMethods.getProcess({
+      const response = await machineApi.getProcess({
         search: searchQuery,
         page: pagination.page,
         limit: limit,
@@ -70,7 +71,7 @@ const Process = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getAllFileds()
+        const response = await machineApi.getAllFileds()
         setFieldData(response.data.data)
       } catch (error) {
         console.error(error)
@@ -81,7 +82,7 @@ const Process = () => {
 
   const fetchAllProcessValue = async () => {
     try {
-      const response = await apiMethods.getProcessValues()
+      const response = await machineApi.getProcessValues()
       setAllprocessValue(response.data.data)
     } catch (error) {
       console.error('Fetch error:', error)
@@ -108,12 +109,12 @@ const handleProcessSubmit = async (data) => {
   try {
     let processResponse;
     if (isEdit) {
-      processResponse = await apiMethods.EditProcess({
+      processResponse = await machineApi.EditProcess({
         id: data.id,
         process_name: data.process_name
       });
     } else {
-      processResponse = await apiMethods.AddProcess({
+      processResponse = await machineApi.AddProcess({
         process_name: data.process_name
       });
     }
@@ -133,7 +134,7 @@ const handleProcessSubmit = async (data) => {
         };
         
         try {
-          const res = await apiMethods.addFields(payload);
+          const res = await machineApi.addFields(payload);
         } catch (error) {
           console.error('Error saving individual field:', error);
           throw error;

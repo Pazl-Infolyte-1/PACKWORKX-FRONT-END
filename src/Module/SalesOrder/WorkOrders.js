@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { TrashIcon } from '@heroicons/react/solid'
 import VersionsPopup from './VersionsPopup'
 import ActionButton from '../../components/New/ActionButton'
-import apiMethods from '../../api/config'
 import SkuVersionAddEdit from './SkuVersionAddEdit'
 import VersionChoicePopup from './VersionChoicePopup'
 import PopUp from '../../components/New/PopUp'
 import { useLocation, useNavigate } from 'react-router-dom'
 import CustomAlert from '../../components/New/CustomAlert'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
+import { salesOrderApi } from '../../api/salesOrder'
+import { skuApi } from '../../api/sku'
 
 const accordionCardSummary = {
   data: [
@@ -105,7 +106,7 @@ const handleCancel = () => {
   useEffect(() => {
     const fetchSalesOrders = async () => {
       try {
-        const response = await apiMethods.getSalesOrderList();
+        const response = await salesOrderApi.getSalesOrderList();
         // console.log(response,'looooooooooooooooooooooooooooooooooooooooooooooooooooooooooo')
         setSalesOrder(response.data.data);
       } catch (error) {
@@ -332,7 +333,7 @@ console.log("work oders length",workOrders.length)
     const fetchSkuList = async () => {
       try {
         // const response = await apiMethods.getSkuListOptions()
-        const response = await apiMethods.getSkuList({
+        const response = await skuApi.getSkuList({
           search: '',
           client: '',
           sku_type: '',
@@ -353,7 +354,7 @@ console.log("work oders length",workOrders.length)
   const getskuversions = async (selectedId) => {
     try {
       if (selectedId) {
-        const response = await apiMethods.getSkuVersions(selectedId)
+        const response = await skuApi.getSkuVersions(selectedId)
         return response
       }
       return
@@ -451,7 +452,7 @@ console.log("work oders length",workOrders.length)
     handleWorkOrderChange(orderId, 'client_id', clientID);
 
     try {
-      const response = await apiMethods.getSaleOrderData(value);
+      const response = await salesOrderApi.getSaleOrderData(value);
       const skuDetails = response.data?.SalesSkuDetails || [];
 
       // Attach to order row (maybe in a workOrders state?)
@@ -521,13 +522,13 @@ console.log("work oders length",workOrders.length)
 
   const handleDeleteVersion = async (versionId,skuid) => {
     try {
-      const response = await apiMethods.deleteSkuVersion(versionId)
+      const response = await skuApi.deleteSkuVersion(versionId)
       // console.log("Version deleted successfully:", response)
       setVersionAlerts([{ severity: "success", message: "Version deleted successfully" }]);
 
       // Show success alert (optional)
 
-      const updatedVersionsResponse = await apiMethods.getSkuVersions(selectedSkuID)
+      const updatedVersionsResponse = await skuApi.getSkuVersions(selectedSkuID)
 
       // Update the skuVersionsMap with the refreshed data
       if (updatedVersionsResponse?.data?.data) {

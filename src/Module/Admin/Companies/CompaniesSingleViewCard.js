@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import apiMethods from '../../../api/config';
+import { companyApi } from '../../../api/company';
 
 const ClientSingleViewCard = ({ companyId, handleEdit }) => {
 console.log("companyId is",companyId)
@@ -10,7 +10,7 @@ const[singleViewDatas,setSingleViewDatas]=useState(null)
 	  const queryParams = {
 	  };
 
-	  const response = await apiMethods.getCompanies(queryParams,companyId);
+	  const response = await companyApi.getCompanies(queryParams,companyId);
 	  console.log("Company Data:", response);
 	  setSingleViewDatas(response?.data || []);
 	  // setTotalPage(response.totalPages);

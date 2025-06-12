@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import apiMethods from '../../api/config'
+import {skuApi} from "../../api/sku"
 
 export default function FluteParametersForm({ setOpenAddEditModal, fluteToEdit }) {
   const [formData, setFormData] = useState({
@@ -37,10 +37,10 @@ export default function FluteParametersForm({ setOpenAddEditModal, fluteToEdit }
     try {
       if (fluteToEdit) {
         // Update existing flute
-        await apiMethods.updateFlute(fluteToEdit.id, formData);
+        await skuApi.updateFlute(fluteToEdit.id, formData);
       } else {
         // Add new flute
-        await apiMethods.addFlute(formData);
+        await skuApi.addFlute(formData);
       }
       setOpenAddEditModal(false);
     } catch (error) {

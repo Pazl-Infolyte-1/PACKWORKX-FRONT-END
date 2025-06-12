@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import apiMethods from '../../api/config'
+import { grnApi } from '../../api/grn'
 
 const GrnView = ({ id, handleEdit, setOpenGrnModal }) => {
   const [grnDetails, setGrnDetails] = useState(null)
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiMethods.getGrnById(id)
+        const response = await grnApi.getGrnById(id)
         setGrnDetails(response?.data?.data)
       } catch (error) {
         console.error('Error fetching data:', error)

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import apiMethods from '../../api/config'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import {
   ArrowRight,
@@ -12,6 +11,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
+import {machineApi} from '../../api/machine'
 
 function ProcessRoutes({ openRoutes, setOpenRoutes, setAlerts }) {
   const [routeProcessDetails, setRouteProcessDetails] = useState([])
@@ -24,7 +24,7 @@ function ProcessRoutes({ openRoutes, setOpenRoutes, setAlerts }) {
   useEffect(() => {
     const fetchRoutes = async () => {
       try {
-        const response = await apiMethods.getMachineRoute()
+        const response = await machineApi.getMachineRoute()
         setRouteProcessDetails(response?.data?.machineRouteProcesses || [])
       } catch (error) {
         console.error('Failed to fetch route data:', error)
@@ -119,9 +119,9 @@ function ProcessRoutes({ openRoutes, setOpenRoutes, setAlerts }) {
 
       let response
       if (isEdit) {
-        response = await apiMethods.updateRouteProcesses(processRoute?.id, payload)
+        response = await machineApi.updateRouteProcesses(processRoute?.id, payload)
       } else {
-        response = await apiMethods.saveRouteProcesses(payload)
+        response = await machineApi.saveRouteProcesses(payload)
       }
 
       setIsEdit(false)
@@ -133,7 +133,7 @@ function ProcessRoutes({ openRoutes, setOpenRoutes, setAlerts }) {
       ])
       setOpenRoutes({ show: false, id: null })
       // Refresh the data
-      const routes = await apiMethods.getRouteList()
+      const routes = await machineApi.getRouteList()
       setRouteProcessDetails(routes?.data?.machineRouteProcesses || [])
     } catch (error) {
       setAlerts([
@@ -147,7 +147,7 @@ function ProcessRoutes({ openRoutes, setOpenRoutes, setAlerts }) {
   }
 
   const handleDelete = async () => {
-    const deleteProcessRoute = await apiMethods.deleteRoute(processRoute?.id)
+    const deleteProcessRoute = await machineApi.deleteRoute(processRoute?.id)
      setAlerts([
         {
           severity: 'success',
@@ -155,7 +155,7 @@ function ProcessRoutes({ openRoutes, setOpenRoutes, setAlerts }) {
         },
       ])
     setOpenDeleteModal(false)
-    const response = await apiMethods.getRouteList()
+    const response = await machineApi.getRouteList()
     setRouteProcessDetails(response?.data?.machineRouteProcesses || [])
     setSelectedProcesses([])
   }

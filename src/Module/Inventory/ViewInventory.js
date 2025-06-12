@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import apiMethods from '../../api/config'
 import {
   AlertCircle,
   Calendar,
@@ -21,6 +20,7 @@ import {
   User,
 } from 'lucide-react'
 import { FaRupeeSign } from 'react-icons/fa'
+import { inventoryApi } from '../../api/inventory'
 
 const ViewInventory = ({ item, totalInventoryValue }) => {
   const [itemDetails, setItemDetails] = useState(null)
@@ -32,7 +32,7 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
       if (!item?.item_id) return
 
       try {
-        const response = await apiMethods.singleInventoryView(item.item_id)
+        const response = await inventoryApi.singleInventoryView(item.item_id)
         setItemDetails(response.data)
       } catch (error) {
         console.error('Error fetching single inventory view:', error)

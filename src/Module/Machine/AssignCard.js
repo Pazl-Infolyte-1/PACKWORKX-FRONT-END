@@ -2,8 +2,9 @@ import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import { cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import { useState } from 'react'
-import apiMethods from '../../api/config'
 import CIcon from '@coreui/icons-react'
+import { machineApi } from '../../api/machine'
+
 
 const AssignCard = ({
   machine,
@@ -22,7 +23,7 @@ const AssignCard = ({
   
   const handleDelete = async () => {
     try {
-      const response = await apiMethods.deleteAssignMachine(deleteAssgined.id)
+      const response = await machineApi.deleteAssignMachine(deleteAssgined.id)
       setRefresh((prev) => !prev)
       setDeleteAssgined({ show: false, id: null })
       setAlerts([

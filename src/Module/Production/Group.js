@@ -49,6 +49,7 @@ import { useGroupLayers } from '../../Context/GroupLayersContext'
 import { useNextHandler } from '../../Context/ProductionNextHandlerContext'
 import { useNavigate } from 'react-router-dom'
 import { productionApi } from '../../api/production'
+import WorkOrderCard from './GroupComponents/WorkOrderCard'
 
 const ItemType = 'WORK_ORDER'
 
@@ -69,309 +70,299 @@ const CustomToggle = React.forwardRef(({ onClick }, ref) => (
   </span>
 ))
 
-function LayerDragble({ lg, workOrderId,order }) {
-  const [, drag] = useDrag(() => ({
-    type: ItemType,
-    item: () => {
-      const dragItem = {
-        lg,
-        workOrderId,
-        order
-      };
-      console.log('Dragging Layer:', dragItem);
-      return dragItem;
-    }
-  }))
+// function LayerDragble({ lg, workOrderId,order }) {
+//   const [, drag] = useDrag(() => ({
+//     type: ItemType,
+//     item: () => {
+//       const dragItem = {
+//         lg,
+//         workOrderId,
+//         order
+//       };
+//       console.log('Dragging Layer:', dragItem);
+//       return dragItem;
+//     }
+//   }))
   
-  return (
-    <CCard
-      ref={drag}
-      className="p-2.5 mt-2.5  rounded-lg flex bg-transparent"
-    >
-      <div className='flex justify-between'>
-        <div className='flex flex-col items-start'>
-          <div className="text-sm font-medium">{lg.layer}</div>
-          <div className="flex gap-3 mt-3 text-xs">
-            <span>{lg?.color}</span>
-            <span>{lg?.gsm} GSM</span>
-            <span>{lg?.bf} BF</span>
-            {lg?.flute_type && <span>{lg.flute_type} FLUTE</span>}
-            <span>{lg?.weight?.toFixed(2)} KG</span>
-            {/* <span>{lg?.material} Material</span> */}
-          </div>
-        </div>
-        <div className='flex justify-end items-center'>
-          {/* Progress bar if needed */}
-        </div>
-      </div>
-    </CCard>
-  )
-}
+//   return (
+//     <CCard
+//       ref={drag}
+//       className="p-2.5 mt-2.5  rounded-lg flex bg-transparent"
+//     >
+//       <div className='flex justify-between'>
+//         <div className='flex flex-col items-start'>
+//           <div className="text-sm font-medium">{lg.layer}</div>
+//           <div className="flex gap-3 mt-3 text-xs">
+//             <span>{lg?.color}</span>
+//             <span>{lg?.gsm} GSM</span>
+//             <span>{lg?.bf} BF</span>
+//             {lg?.flute_type && <span>{lg.flute_type} FLUTE</span>}
+//             <span>{lg?.weight?.toFixed(2)} KG</span>
+//             {/* <span>{lg?.material} Material</span> */}
+//           </div>
+//         </div>
+//         <div className='flex justify-end items-center'>
+//           {/* Progress bar if needed */}
+//         </div>
+//       </div>
+//     </CCard>
+//   )
+// }
 
-function PairedLayersDragble({ layers, workOrderId,order }) {
-  const [, drag] = useDrag(() => ({
-    type: ItemType,
-    item: () => {
-      const dragItem = {
-        layers,
-        workOrderId,
-        order,
-        isGroup: true // Flag to identify this as a pair
-      };
-      console.log('Dragging Paired Layers:', dragItem);
-      return dragItem;
-    }
-  }))
+// function PairedLayersDragble({ layers, workOrderId,order }) {
+//   const [, drag] = useDrag(() => ({
+//     type: ItemType,
+//     item: () => {
+//       const dragItem = {
+//         layers,
+//         workOrderId,
+//         order,
+//         isGroup: true // Flag to identify this as a pair
+//       };
+//       console.log('Dragging Paired Layers:', dragItem);
+//       return dragItem;
+//     }
+//   }))
   
-  return (
-    <CCard 
-      ref={drag}
-      className=" mt-2.5 bg-transparent  rounded-lg border-2 border-dashed border-gray-300"
-    >
-      <div className="flex flex-col gap-3">
-        {layers.map((lg) => (
-          <div key={lg.id} className="flex justify-between  p-2 rounded">
-            <div className='flex flex-col items-start'>
-              <div className="text-sm font-medium">{lg.layer}</div>
-              <div className="flex gap-3 mt-2 text-xs">
-                <span>{lg?.color}</span>
-                <span>{lg?.gsm} GSM</span>
-                <span>{lg?.bf} BF</span>
-                {lg?.flute_type && <span>{lg.flute_type} FLUTE</span>}
-                <span>{lg?.weight?.toFixed(2)} KG</span>
-                {/* <span>{lg?.material} Material</span> */}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      {/* <div className="text-xs text-gray-500 mt-1 text-center">
-        Paired Layers (drag together)
-      </div> */}
-    </CCard>
-  )
-}
-
-function formatDate(dateString) {
-  if (!dateString) return 'N/A';
-
-  const date = new Date(dateString);
-  if (isNaN(date)) return 'Invalid Date';
-
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-  const year = date.getFullYear();
-
-  return `${day}/${month}/${year}`;
-}
+//   return (
+//     <CCard 
+//       ref={drag}
+//       className=" mt-2.5 bg-transparent  rounded-lg border-2 border-dashed border-gray-300"
+//     >
+//       <div className="flex flex-col gap-3">
+//         {layers.map((lg) => (
+//           <div key={lg.id} className="flex justify-between  p-2 rounded">
+//             <div className='flex flex-col items-start'>
+//               <div className="text-sm font-medium">{lg.layer}</div>
+//               <div className="flex gap-3 mt-2 text-xs">
+//                 <span>{lg?.color}</span>
+//                 <span>{lg?.gsm} GSM</span>
+//                 <span>{lg?.bf} BF</span>
+//                 {lg?.flute_type && <span>{lg.flute_type} FLUTE</span>}
+//                 <span>{lg?.weight?.toFixed(2)} KG</span>
+//                 {/* <span>{lg?.material} Material</span> */}
+//               </div>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//       {/* <div className="text-xs text-gray-500 mt-1 text-center">
+//         Paired Layers (drag together)
+//       </div> */}
+//     </CCard>
+//   )
+// }
 
 
-function WorkOrderCard({
-  order,
-  index,
-  visibleIndex,
-  setVisibleIndex,
-  removeWOFromPlan,
-  setModalWorkOrder,
-  modalWorkOrder,
-  setVisible,
-  setVisibleSplit,
-}) {
 
-  const navigate = useNavigate()
 
-  const toggleCollapse = () => {
-    setVisibleIndex(visibleIndex === index ? null : index)
-  }
+// function WorkOrderCard({
+//   order,
+//   index,
+//   visibleIndex,
+//   setVisibleIndex,
+//   removeWOFromPlan,
+//   setModalWorkOrder,
+//   modalWorkOrder,
+//   setVisible,
+//   setVisibleSplit,
+// }) {
 
-  const handleViewWorkOrder = (id) => {
-    navigate(`/workorderlist/view/${id}`)
-  }
+//   const navigate = useNavigate()
 
-  const handleViewSalesOrder = (id) => {
-    navigate(`/salesorder/view/${id}`)
-  }
-  const organizeLayers = (layers,) => {
-    if (!layers || layers.length === 0) return { single: [], pairs: [] };
+//   const toggleCollapse = () => {
+//     setVisibleIndex(visibleIndex === index ? null : index)
+//   }
+
+//   const handleViewWorkOrder = (id) => {
+//     navigate(`/workorderlist/view/${id}`)
+//   }
+
+//   const handleViewSalesOrder = (id) => {
+//     navigate(`/salesorder/view/${id}`)
+//   }
+//   const organizeLayers = (layers,) => {
+//     if (!layers || layers.length === 0) return { single: [], pairs: [] };
     
-    // Sort layers by ID to ensure correct pairing
-    const sortedLayers = [...layers].sort((a, b) => a.layer_id - b.layer_id);
+//     // Sort layers by ID to ensure correct pairing
+//     const sortedLayers = [...layers].sort((a, b) => a.layer_id - b.layer_id);
     
-    const single = [];
-    const pairs = [];
+//     const single = [];
+//     const pairs = [];
     
-    // ID 1 is always single (if it exists)
-    if (sortedLayers.length > 0 && sortedLayers[0].layer_id === 1) {
-      single.push(sortedLayers[0]);
-    }
+//     // ID 1 is always single (if it exists)
+//     if (sortedLayers.length > 0 && sortedLayers[0].layer_id === 1) {
+//       single.push(sortedLayers[0]);
+//     }
     
-    // Group remaining layers in pairs: (2,3), (4,5), (6,7), etc.
-    const remainingLayers = sortedLayers.filter(layer => layer.layer_id !== 1);
+//     // Group remaining layers in pairs: (2,3), (4,5), (6,7), etc.
+//     const remainingLayers = sortedLayers.filter(layer => layer.layer_id !== 1);
     
-    for (let i = 0; i < remainingLayers.length; i += 2) {
-      if (i + 1 < remainingLayers.length) {
-        // We have a pair
-        pairs.push([remainingLayers[i], remainingLayers[i + 1]]);
-      } else {
-        // Odd number, last one becomes single
-        single.push(remainingLayers[i]);
-      }
-    }
+//     for (let i = 0; i < remainingLayers.length; i += 2) {
+//       if (i + 1 < remainingLayers.length) {
+//         // We have a pair
+//         pairs.push([remainingLayers[i], remainingLayers[i + 1]]);
+//       } else {
+//         // Odd number, last one becomes single
+//         single.push(remainingLayers[i]);
+//       }
+//     }
 
-    return { single, pairs };
-  };
-
-
-  return (
-    <CCard
-      className="mb-2"
-      style={{
-        backgroundColor: '#f5f4f7',
-        borderRadius: '5px',
-      }}
-    >
-      <CCardBody>
-        <div className="cursor-pointer flex flex-col">
-          <div className="flex justify-between items-center">
-            <div className=' flex flex-1 justify-between items-start'>
-              <span
-                onClick={toggleCollapse}
-                className="flex items-center gap-1.5 whitespace-nowrap font-bold text-sm"
-              >
-                {order.work_generate_id} {visibleIndex === index ? <FaAngleUp /> : <FaAngleDown />}
-              </span>
+//     return { single, pairs };
+//   };
 
 
-              <div className="flex items-start gap-3 text-sm">
-                {/* Progress bar moved to the right side */}
-
-                <h6 className='text-primary'>0/{order.qty}</h6>
-                <div className="w-10">
-                  <ProgressBar
-                    value={0 / order.qty}
-                  />
-                </div>
-
-                <ThreeDotMenu
-                  value={[
-                    {
-                      label: 'View Work Order',
-                      icon: cilBriefcase,
-                      onClick: () => {
-                        handleViewWorkOrder(order.id)
-                      },
-                    },
-                    {
-                      label: 'View Sales Order',
-                      icon: cilClipboard,
-                      onClick: () => {
-                        handleViewSalesOrder(order.sales_order_id)
-                      },
-                    },
-                    {
-                      label: 'Remove from Plan',
-                      icon: cilTrash,
-                      onClick: () => {
-                        removeWOFromPlan(order.id)
-                      },
-                    },
-                    {
-                      label: 'Split Work Order',
-                      icon: cilCut,
-                      onClick: () => {
-                        setVisibleSplit(true)
-                      },
-                    },
-                  ]}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+//   return (
+//     <CCard
+//       className="mb-2"
+//       style={{
+//         backgroundColor: '#f5f4f7',
+//         borderRadius: '5px',
+//       }}
+//     >
+//       <CCardBody>
+//         <div className="cursor-pointer flex flex-col">
+//           <div className="flex justify-between items-center">
+//             <div className=' flex flex-1 justify-between items-start'>
+//               <span
+//                 onClick={toggleCollapse}
+//                 className="flex items-center gap-1.5 whitespace-nowrap font-bold text-sm"
+//               >
+//                 {order.work_generate_id} {visibleIndex === index ? <FaAngleUp /> : <FaAngleDown />}
+//               </span>
 
 
+//               <div className="flex items-start gap-3 text-sm">
+//                 {/* Progress bar moved to the right side */}
 
-        {/* <CCollapse className="custom-collapse" visible={visibleIndex === index}>
-          <hr />
-          {order?.work_order_sku_values?.map((lg) => (
-            <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
-          ))}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              marginTop: '10px',
-              marginBottom: '10px',
-              marginRight: '10px',
-            }}
-          >
-            <FaEye
-              style={{ cursor: 'pointer' }}
-              onClick={() => {
-                setModalWorkOrder(order)
-                setVisible(true)
-              }}
-            />
-          </div>
-        </CCollapse> */}
+//                 <h6 className='text-primary'>0/{order.qty}</h6>
+//                 <div className="w-10">
+//                   <ProgressBar
+//                     value={0 / order.qty}
+//                   />
+//                 </div>
 
-<CCollapse className="custom-collapse" visible={visibleIndex === index}>
-  <hr />
+//                 <ThreeDotMenu
+//                   value={[
+//                     {
+//                       label: 'View Work Order',
+//                       icon: cilBriefcase,
+//                       onClick: () => {
+//                         handleViewWorkOrder(order.id)
+//                       },
+//                     },
+//                     {
+//                       label: 'View Sales Order',
+//                       icon: cilClipboard,
+//                       onClick: () => {
+//                         handleViewSalesOrder(order.sales_order_id)
+//                       },
+//                     },
+//                     {
+//                       label: 'Remove from Plan',
+//                       icon: cilTrash,
+//                       onClick: () => {
+//                         removeWOFromPlan(order.id)
+//                       },
+//                     },
+//                     {
+//                       label: 'Split Work Order',
+//                       icon: cilCut,
+//                       onClick: () => {
+//                         setVisibleSplit(true)
+//                       },
+//                     },
+//                   ]}
+//                 />
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+
+
+
+//         {/* <CCollapse className="custom-collapse" visible={visibleIndex === index}>
+//           <hr />
+//           {order?.work_order_sku_values?.map((lg) => (
+//             <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
+//           ))}
+//           <div
+//             style={{
+//               display: 'flex',
+//               justifyContent: 'flex-end',
+//               marginTop: '10px',
+//               marginBottom: '10px',
+//               marginRight: '10px',
+//             }}
+//           >
+//             <FaEye
+//               style={{ cursor: 'pointer' }}
+//               onClick={() => {
+//                 setModalWorkOrder(order)
+//                 setVisible(true)
+//               }}
+//             />
+//           </div>
+//         </CCollapse> */}
+
+// <CCollapse className="custom-collapse" visible={visibleIndex === index}>
+//   <hr />
   
-  {/* Render Top Layer separately */}
-          {/* {order?.work_order_sku_values
-            ?.filter((lg) => lg.layer?.toLowerCase() === 'top layer')
-            .map((lg) => (
-              <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
-            ))} */}
+//   {/* Render Top Layer separately */}
+//           {/* {order?.work_order_sku_values
+//             ?.filter((lg) => lg.layer?.toLowerCase() === 'top layer')
+//             .map((lg) => (
+//               <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} />
+//             ))} */}
 
-          {/* Group remaining layers */}
-          {(() => {
-            const { single, pairs } = organizeLayers(order?.work_order_sku_values,order.work_generate_id);
+//           {/* Group remaining layers */}
+//           {(() => {
+//             const { single, pairs } = organizeLayers(order?.work_order_sku_values,order.work_generate_id);
             
-            return (
-              <>
-                {/* Render single layers */}
-                {single.map((lg) => (
-                  <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} order={order} />
-                ))}
+//             return (
+//               <>
+//                 {/* Render single layers */}
+//                 {single.map((lg) => (
+//                   <LayerDragble key={lg.id} lg={lg} workOrderId={order.id} order={order} />
+//                 ))}
                 
-                {/* Render paired layers */}
-                {pairs.map((pair, pairIndex) => (
-                  <PairedLayersDragble 
-                    key={`pair-${pairIndex}`} 
-                    order={order}
-                    layers={pair} 
-                    workOrderId={order.id} 
-                  />
-                ))}
-              </>
-            );
-          })()}
+//                 {/* Render paired layers */}
+//                 {pairs.map((pair, pairIndex) => (
+//                   <PairedLayersDragble 
+//                     key={`pair-${pairIndex}`} 
+//                     order={order}
+//                     layers={pair} 
+//                     workOrderId={order.id} 
+//                   />
+//                 ))}
+//               </>
+//             );
+//           })()}
 
-  <div
-    style={{
-      display: 'flex',
-      justifyContent: 'flex-end',
-      marginTop: '10px',
-      marginBottom: '10px',
-      marginRight: '10px',
-    }}
-  >
-    <FaEye
-      style={{ cursor: 'pointer' }}
-      onClick={() => {
-        setModalWorkOrder(order)
-        setVisible(true)
-      }}
-    />
-  </div>
-</CCollapse>
+//   <div
+//     style={{
+//       display: 'flex',
+//       justifyContent: 'flex-end',
+//       marginTop: '10px',
+//       marginBottom: '10px',
+//       marginRight: '10px',
+//     }}
+//   >
+//     <FaEye
+//       style={{ cursor: 'pointer' }}
+//       onClick={() => {
+//         setModalWorkOrder(order)
+//         setVisible(true)
+//       }}
+//     />
+//   </div>
+// </CCollapse>
 
-      </CCardBody>
-    </CCard>
-  )
-}
+//       </CCardBody>
+//     </CCard>
+//   )
+// }
+
 function GroupOrderDropZone({
   groupOrder,
   groupIndex,
@@ -802,6 +793,19 @@ function GroupOrderDropZone({
   )
 }
 
+function formatDate(dateString) {
+  if (!dateString) return 'N/A';
+
+  const date = new Date(dateString);
+  if (isNaN(date)) return 'Invalid Date';
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}
+
 const Group = ({
   autoSyncOrders,
   setVisibleSplit,
@@ -985,7 +989,6 @@ const Group = ({
     }
   };
   
-
   const handleAutoSync = () => {
     setGroupOrders((prevGroups) => {
       const isAutoSyncPresent = prevGroups.some((group) => group.name === 'Auto Sync')
@@ -1003,46 +1006,6 @@ const Group = ({
       return [autoSyncOrders, ...prevGroups]
     })
   }
-
-  // const addWorkOrderToGroup = (order, groupIndex) => {
-  //   setGroupOrders((prevGroups) => {
-  //     if (prevGroups[groupIndex]?.name === 'Auto Sync') {
-  //       alert('Cannot manually add work orders to the Auto Sync group.')
-  //       return prevGroups
-  //     }
-  //     const itemToAdd = order.order  //checking whethers its a full workorder
-  //       ? { ...order.order, workOrderId: order.order.id }
-  //       : { ...order.lg, workOrderId: order.workOrderId }
-
-  //     const isDuplicate = prevGroups[groupIndex].items.some(
-  //       (item) => item.id === itemToAdd.id && item.workOrderId === itemToAdd.workOrderId,
-  //     )
-
-  //     if (isDuplicate) {
-  //       return prevGroups
-  //     }
-
-  //     if (order.order) { //filtering out dragges items
-  //       setWorkOrders((prevOrders) => prevOrders.filter((item) => item.id !== order.order.id))
-  //     } else if (order.lg) {
-  //       setWorkOrders((prevOrders) =>
-  //         prevOrders.map((wo) => {
-  //           if (wo.id === order.workOrderId) {
-  //             return {
-  //               ...wo,
-  //               layer_group: wo.layer_group.filter((layer) => layer.id !== order.lg.id),
-  //             }
-  //           }
-  //           return wo
-  //         }),
-  //       )
-  //     }
-
-  //     return prevGroups.map((group, index) =>
-  //       index === groupIndex ? { ...group, items: [...group.items, itemToAdd] } : group,
-  //     )
-  //   })
-  // }
 
   return (
     <>

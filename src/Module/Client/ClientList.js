@@ -302,7 +302,7 @@ function ClientList() {
             isMinimized={isMinimized}
           />
         </div>
-        {!isDrawerOpen && (
+        {/*{!isDrawerOpen && (
           <CustomPopup
             isOpen={isPopupOpen}
             onClose={() => setPopupOpen(false)}
@@ -330,9 +330,9 @@ function ClientList() {
               ))}
             </div>
           </CustomPopup>
-        )}
+        )}*/}
 
-        <Drawer1
+        {/*<Drawer1
           isOpen={isDrawerOpen}
           onClose={() => setDrawerOpen(false)}
           maxWidth="1280px"
@@ -345,7 +345,7 @@ function ClientList() {
             resetForm={isDrawerOpen}
             setReloadData={setReloadData}
           />
-        </Drawer1>
+        </Drawer1>*/}
       </div>
 
       <div className="flex-1 transition-all duration-300">

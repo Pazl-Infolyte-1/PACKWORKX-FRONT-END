@@ -5,7 +5,7 @@ import { itemApi } from '../../api/item'
 
 const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
   console.log('Item in return items form', items)
-  const { register, control, reset, getValues } = useForm({
+  const { register, control, reset, getValues, setValue } = useForm({
     defaultValues: {
       items: [],
     },
@@ -20,6 +20,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
   const lastHash = useRef('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState(null)
+  const isInitialized = useRef(false)
 
   const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null
@@ -34,6 +35,10 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
       </div>
     )
   }
+
+  useEffect(() => {
+    return () => reset()
+  }, [])
 
   const openItemDetails = async (item_id) => {
     try {
@@ -64,9 +69,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
 
   const lastItemsHash = useRef('')
 
-  // Fetch available quantities and reset form
-  const isFirstRun = useRef(true)
-
+  // Initial data fetch and setup
   useEffect(() => {
     if (!Array.isArray(items) || items.length === 0) return
 
@@ -91,7 +94,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
         grn_item_id: item.grn_item_id ?? 0,
         item_code: item.item_code ?? '',
         quantity: parseFloat(item.quantity ?? 0),
-        return_qty: parseFloat(item.quantity ?? 0),
+        return_qty: item.return_qty || item.quantity || 0, // Use original return_qty or default to quantity
         uom: item.uom ?? '',
         unit_price: parseFloat(item.unit_price ?? 0),
         cgst: parseFloat(item.cgst ?? 0),
@@ -108,18 +111,19 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
 
       console.log('Formatted items:', formatted)
 
-      // ✅ Use reset only during first render or controlled change
-      if (isFirstRun.current) {
+      // Only reset on initial load
+      if (!isInitialized.current) {
         reset({ items: formatted })
-        isFirstRun.current = false
+        isInitialized.current = true
       }
     }
 
     fetchAndFormat()
   }, [items])
 
+  // Handle calculations without resetting form
   useEffect(() => {
-    if (!watchedItems) return
+    if (!watchedItems || !isInitialized.current) return
 
     console.log('watchedItems', watchedItems)
 
@@ -135,24 +139,19 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
     let grandTotal = 0
     let returnQty = 0
 
-    const updatedItems = watchedItems.map((item) => {
+    const updatedItems = watchedItems.map((item, index) => {
       const quantity = parseFloat(item.quantity || 0)
-      console.log('quantity', quantity)
       const unit_price = parseFloat(item.unit_price || 0)
-      console.log('unit_price', unit_price)
       const cgst_percentage = parseFloat(item.cgst || 0)
       const sgst_percentage = parseFloat(item.sgst || 0)
       const return_qty = parseFloat(item.return_qty || 0)
 
       const cgst_per_unit = (unit_price * cgst_percentage) / 100
-      console.log('cgst_per_unit', cgst_per_unit)
       const sgst_per_unit = (unit_price * sgst_percentage) / 100
-      console.log('sgst_per_unit', sgst_per_unit)
 
       const cgst_total = cgst_per_unit * return_qty
       const sgst_total = sgst_per_unit * return_qty
       const tax_total = cgst_total + sgst_total
-      console.log('tax_total', tax_total)
 
       const amount_total = unit_price * return_qty
       const total = amount_total + cgst_total + sgst_total
@@ -165,24 +164,47 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
       grandTotal += total
       returnQty += return_qty
 
+      // Update calculated fields without triggering reset
+      const newCgstAmount = cgst_total.toFixed(2)
+      const newSgstAmount = sgst_total.toFixed(2)
+      const newTaxAmount = tax_total.toFixed(2)
+      const newTotalAmount = total.toFixed(2)
+      const newAmount = amount_total.toFixed(2)
+
+      // Only update if values have changed to avoid unnecessary re-renders
+      if (parseFloat(item.cgst_amount || 0).toFixed(2) !== newCgstAmount) {
+        setValue(`items.${index}.cgst_amount`, parseFloat(newCgstAmount))
+      }
+      if (parseFloat(item.sgst_amount || 0).toFixed(2) !== newSgstAmount) {
+        setValue(`items.${index}.sgst_amount`, parseFloat(newSgstAmount))
+      }
+      if (parseFloat(item.tax_amount || 0).toFixed(2) !== newTaxAmount) {
+        setValue(`items.${index}.tax_amount`, parseFloat(newTaxAmount))
+      }
+      if (parseFloat(item.total_amount || 0).toFixed(2) !== newTotalAmount) {
+        setValue(`items.${index}.total_amount`, parseFloat(newTotalAmount))
+      }
+
       return {
         ...item,
-        cgst_amount: cgst_total.toFixed(2),
-        sgst_amount: sgst_total.toFixed(2),
-        tax_amount: tax_total.toFixed(2),
-        total_amount: total.toFixed(2),
-        amount: amount_total.toFixed(2),
+        cgst_amount: newCgstAmount,
+        sgst_amount: newSgstAmount,
+        tax_amount: newTaxAmount,
+        total_amount: newTotalAmount,
+        amount: newAmount,
       }
     })
 
     console.log('updatedItems', updatedItems)
 
-    // ✅ Avoid unnecessary re-renders
-    if (JSON.stringify(items) !== JSON.stringify(updatedItems)) {
+    // Update parent state only if there are significant changes
+    const currentItemsString = JSON.stringify(items)
+    const updatedItemsString = JSON.stringify(updatedItems)
+    if (currentItemsString !== updatedItemsString) {
       setItems(updatedItems)
-      reset({ items: updatedItems })
     }
 
+    // Update form values
     setFormValues((prev) => ({
       ...prev,
       total_qty: totalQty,
@@ -192,230 +214,171 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
       total_amount: grandTotal.toFixed(2),
       return_qty: returnQty,
     }))
-  }, [watchedItems])
+  }, [watchedItems, setValue])
 
   return (
     <div className="p-2">
       <div className="overflow-x-auto">
-        <table className="min-w-full table-auto border">
+        <table className="w-full table-auto border" style={{ tableLayout: 'fixed' }}>
           <thead className="bg-gray-100">
             <tr className="text-center">
-              <th>Select</th>
-              <th>GRN Item ID</th>
-              <th>Item ID</th>
-              <td></td>
-              <th>Code</th>
-              <th>Available Quantity</th>
-              <th>Return Quantity</th>
-              <th>UOM</th>
-              <th>Price</th>
-              <th>CGST</th>
-              <th>SGST</th>
-              <th>Tax Price</th>
-              <th>Total Price</th>
-              <th>Reason</th>
-              <th>Notes</th>
-              <th>Action</th>
+              <th className="w-12">Select</th>
+              <th className="w-8"></th> {/* Info icon column */}
+              <th className="w-24">Code</th>
+              <th className="w-20">Qty</th>
+              <th className="w-24">Return Qty</th>
+              <th className="w-20">Price</th>
+              <th className="w-16">CGST</th>
+              <th className="w-16">SGST</th>
+              <th className="w-20">Tax</th>
+              <th className="w-24">Total</th>
+              <th className="w-32">Reason</th>
+              <th className="w-32">Notes</th>
+              <th className="w-12">Action</th>
             </tr>
           </thead>
           <tbody>
-            {fields.map((item, index) => {
-              const quantity = watchedItems?.[index]?.quantity || 0
-              const unit_price = watchedItems?.[index]?.unit_price || 0
-              const tax_amount = watchedItems?.[index]?.tax_amount || 0
-              const total = quantity * unit_price + tax_amount
+            {fields.map((item, index) => (
+              <tr key={item.id} className="text-center">
+                {/* Checkbox */}
+                <td className="px-1 py-2">
+                  <input
+                    type="checkbox"
+                    {...register(`items.${index}.selected`)}
+                    className="h-4 w-4"
+                  />
+                </td>
 
-              return (
-                <tr key={item.id} className="text-center">
-                  <td>
-                    <input
-                      type="checkbox"
-                      readOnly
-                      {...register(`items.${index}.selected`)}
-                      className="h-4 w-4"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      readOnly
-                      {...register(`items.${index}.grn_item_id`)}
-                      className="border px-2 py-1"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      readOnly
-                      {...register(`items.${index}.item_id`)}
-                      className="border px-2 py-1"
-                    />
-                  </td>
-                  <td
-                    onClick={() => {
-                      const itemId = getValues(`items.${index}.item_id`)
-                      if (itemId) {
-                        openItemDetails(itemId)
-                      } else {
-                        console.warn('Item ID is empty')
-                      }
-                    }}
+                {/* Info icon */}
+                <td className="px-1 py-2">
+                  <span
+                    onClick={() => openItemDetails(getValues(`items.${index}.item_id`))}
                     className="cursor-pointer text-blue-600"
                   >
                     ℹ️
-                  </td>
+                  </span>
+                </td>
 
-                  <td>
-                    <input
-                      type="text"
-                      readOnly
-                      {...register(`items.${index}.item_code`)}
-                      className="border px-2 py-1"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      readOnly
-                      // {...register(`items.${index}.available_quantity`)}
-                      {...register(`items.${index}.quantity`)}
-                      className="border px-2 py-1 bg-gray-100"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.01"
-                      {...register(`items.${index}.return_qty`, { valueAsNumber: true })}
-                      className="border px-2 py-1"
-                    />
-                  </td>
+                {/* Item Code */}
+                <td className="px-1 py-2 truncate">
+                  <input
+                    type="text"
+                    readOnly
+                    {...register(`items.${index}.item_code`)}
+                    className="w-full border px-2 py-1 text-sm rounded-md bg-gray-100"
+                  />
+                </td>
 
-                  <td>
-                    <input
-                      type="text"
-                      readOnly
-                      {...register(`items.${index}.uom`)}
-                      className="border px-2 py-1"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.01"
-                      readOnly
-                      {...register(`items.${index}.unit_price`, { valueAsNumber: true })}
-                      className="border px-2 py-1"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.01"
-                      readOnly
-                      {...register(`items.${index}.cgst_amount`, { valueAsNumber: true })}
-                      className="border px-2 py-1"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.01"
-                      readOnly
-                      {...register(`items.${index}.sgst_amount`, { valueAsNumber: true })}
-                      className="border px-2 py-1"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.01"
-                      readOnly
-                      {...register(`items.${index}.tax_amount`, { valueAsNumber: true })}
-                      className="border px-2 py-1"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      {...register(`items.${index}.total_amount`, { valueAsNumber: true })}
-                      readOnly
-                      className="border px-2 py-1 bg-gray-100"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      {...register(`items.${index}.reason`)}
-                      className="border px-2 py-1"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      {...register(`items.${index}.notes`)}
-                      className="border px-2 py-1"
-                    />
-                  </td>
+                {/* Quantity */}
+                <td className="px-1 py-2">
+                  <input
+                    type="number"
+                    readOnly
+                    {...register(`items.${index}.quantity`)}
+                    className="w-full border px-1 py-1 bg-gray-100 text-sm rounded-md"
+                  />
+                </td>
 
-                  <td>
-                    <button type="button" onClick={() => remove(index)} className="text-red-500">
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              )
-            })}
+                {/* Return Quantity */}
+                <td className="px-1 py-2">
+                  <input
+                    type="number"
+                    step="0.01"
+                    {...register(`items.${index}.return_qty`)}
+                    className="w-full border px-1 py-1 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </td>
+
+                {/* Unit Price */}
+                <td className="px-1 py-2">
+                  <input
+                    type="number"
+                    step="0.01"
+                    readOnly
+                    {...register(`items.${index}.unit_price`, { valueAsNumber: true })}
+                    className="w-full border px-2 py-1 text-sm rounded-md bg-gray-100"
+                  />
+                </td>
+
+                {/* CGST */}
+                <td className="px-1 py-2">
+                  <input
+                    type="number"
+                    step="0.01"
+                    readOnly
+                    {...register(`items.${index}.cgst_amount`, { valueAsNumber: true })}
+                    className="w-full border px-2 py-1 text-sm rounded-md bg-gray-100"
+                  />
+                </td>
+
+                {/* SGST */}
+                <td className="px-1 py-2">
+                  <input
+                    type="number"
+                    step="0.01"
+                    readOnly
+                    {...register(`items.${index}.sgst_amount`, { valueAsNumber: true })}
+                    className="w-full border px-2 py-1 text-sm rounded-md bg-gray-100"
+                  />
+                </td>
+
+                {/* Tax Amount */}
+                <td className="px-1 py-2">
+                  <input
+                    type="number"
+                    step="0.01"
+                    readOnly
+                    {...register(`items.${index}.tax_amount`, { valueAsNumber: true })}
+                    className="w-full border px-2 py-1 text-sm rounded-md bg-gray-100"
+                  />
+                </td>
+
+                {/* Total Amount */}
+                <td className="px-1 py-2">
+                  <input
+                    type="number"
+                    readOnly
+                    {...register(`items.${index}.total_amount`, { valueAsNumber: true })}
+                    className="w-full border px-1 py-1 bg-gray-100 text-sm rounded-md"
+                  />
+                </td>
+
+                {/* Reason */}
+                <td className="px-1 py-2">
+                  <input
+                    type="text"
+                    {...register(`items.${index}.reason`)}
+                    className="w-full border px-2 py-1 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter reason..."
+                  />
+                </td>
+
+                {/* Notes */}
+                <td className="px-1 py-2">
+                  <input
+                    type="text"
+                    {...register(`items.${index}.notes`)}
+                    className="w-full border px-2 py-1 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter notes..."
+                  />
+                </td>
+
+                {/* Action */}
+                <td className="px-1 py-2">
+                  <button
+                    type="button"
+                    onClick={() => remove(index)}
+                    className="text-red-500 text-sm hover:text-red-700"
+                  >
+                    ✕
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
-
         <div className="flex mt-4">
           <table className="flex-1">
-            {/* <tbody className="gap-4">
-              <tr>
-                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  Total Qty: {formValues.total_quantity}
-                  <input type="hidden" {...register('total_qty')} />
-                </td>
-                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  Tax Amount: {formValues.tax_price?.toFixed(2)}
-                  <input type="hidden" {...register('taxPrice')} />
-                </td>
-                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  Return Qty: {formValues.return_qty?.toFixed(2)}
-                  <input type="hidden" {...register('return_qty')} />
-                </td>
-                <td className="px-4 py-2"></td>
-                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  Total Incl of GST: {formValues.grand_total?.toFixed(2)}
-                  <input type="hidden" {...register('total_amount')} />
-                  {/* <input
-                    type="hidden"
-                    {...register('tax_amount')}
-                    value={formValues.cgst + formValues.sgst}
-                  /> 
-                </td>
-                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  S-GST: {formValues.sgst.toFixed(2)}
-                  <input type="hidden" {...register('sgst_amount')} />
-                </td> 
-               <tr>
-                <td className="px-4 py-2"></td>
-                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  Total: {formValues.total?.toFixed(2)}
-                </td> 
-                <td className="px-4 py-2"></td>
-                <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                  Total Incl of GST: {formValues.grand_total?.toFixed(2)}
-                  <input type="hidden" {...register('total_amount')} />
-                   <input
-                    type="hidden"
-                    {...register('tax_amount')}
-                    value={formValues.cgst + formValues.sgst}
-                  /> 
-                </td>
-              </tr> 
-            </tbody> */}
             <tbody className="gap-4">
               <tr>
                 <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">

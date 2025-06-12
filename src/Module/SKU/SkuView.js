@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { ChevronUp, ChevronDown, Mail, MoreHorizontal } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import apiMethods from '../../api/config'
+import { useNavigate,useLocation, useParams } from 'react-router-dom'
 import moment from 'moment/moment'
 import { inventoryApi } from '../../api/inventory'
 import { skuApi } from '../../api/sku'
@@ -16,26 +17,34 @@ const SkuView = ({ setIsMinimized, selectedSkuData, handleSkuEdit }) => {
 const [selectedSku,setSelectedSku]=useState({})
 const [inventoryData, setInventoryData] = useState([]);
 const [selectedItemId, setSelectedItemId] = useState(null);
+  const { id } = useParams()
 
 const selectedItem = inventoryData.find((inv) => inv.item_id === Number(selectedItemId));
 
 const navigate = useNavigate();
 useEffect(() => {
   const fetchClient = async () => {
-    if (!selectedSkuData?.id) return;
-
+    if (!id) return;
     try {
-      const data = await skuApi.singlesku(selectedSkuData.id);
+      const data = await apiMethods.singlesku(id);
       setSelectedSku(data);
       console.log("sku singke darta",data)
-       navigate(`/SKU/${selectedSkuData.id}`);
+      // navigate(`/sku/${selectedSkuData.id}`);
     } catch (error) {
       console.error('Error fetching client:', error);
     }
   };
 
   fetchClient();
-}, [selectedSkuData?.id]);
+}, [id]);
+
+ useEffect(() => {
+    if (id) {
+      setIsMinimized(true);
+    } else {
+      setIsMinimized(false); // Reset to false if ID is not '10'
+    }
+  }, [id]);
 
   useEffect(() => {
     const fetchSkuVersions = async () => {
@@ -129,7 +138,7 @@ useEffect(() => {
           <button
          onClick={() => {
   setIsMinimized(false);
-  navigate("/SKU");
+  navigate("/sku");
 }}
 
             className="px-2 py-1 border rounded text-sm"
@@ -159,7 +168,7 @@ useEffect(() => {
       {/* Content area with dynamic height */}
       <div className="flex overflow-y-auto" style={{ height: contentHeight }}>
         {/* Left Column */}
-        <div className="w-1/3 border-r h-[90%] border-gray-200 p-4">
+        <div className="w-1/3 border-r h-[2000px] border-gray-200 p-4">
           <div className="pb-4 border-b border-gray-200">
             <h2 className="font-normal text-gray-700 mb-4 text-sm border-b border-gray-200">
               {selectedSku.client}

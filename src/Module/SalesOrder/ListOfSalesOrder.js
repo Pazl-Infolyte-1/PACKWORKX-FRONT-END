@@ -125,7 +125,6 @@ function ListOfSalesOrder() {
       })
       setData(response?.data?.data)
       setApiResponse(response?.data)
-      console.log("mmmm",response?.data)
       // setFilteredData(response.data.data)
     } catch (error) {
       console.error('Error fetching data:', error)

@@ -146,15 +146,15 @@ function VersionsPopup({ visible, setVisible, versionData, skuName, getskuversio
                         <CTableDataCell className="min-w-[80px] border-none">
                     <ThreeDotMenu
                       value={[
-                        // {
-                        //   label: 'Edit',
-                        //   icon: cilPencil,
-                        //   onClick: () => {
-                        //     setSelectedSkuVersionID(version.id)
-                        //     setIsEdit(true)
-                        //     formVisibility(true)
-                        //   },
-                        // },
+                        {
+                          label: 'Edit',
+                          icon: cilPencil,
+                          onClick: () => {
+                            setSelectedSkuVersionID(version.id)
+                            setIsEdit(true)
+                            formVisibility(true)
+                          },
+                        },
                         {
                           label: 'Delete',
                           icon: cilTrash,

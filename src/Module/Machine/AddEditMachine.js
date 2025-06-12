@@ -443,7 +443,7 @@ return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-6 rounded-lg gap-6">
           {/* Column 1 - Machine Details */}
           <div className="space-y-4">
-            <div>
+            <div>progress
               <RequiredFieldLabel label="Machine Name" isRequired={true} />
               <input
                 {...register('machine_name', { required: 'required' })}

@@ -29,7 +29,7 @@ function Department() {
   }, [setGlobalPlaceholder])
 const fetchData = async () => {
   try {
-    const response = await apiMethods.getDepartmentsListDisplay(searchQuery);
+    const response = await employeeApi.getDepartmentsListDisplay(searchQuery);
     if (response?.data?.success) {
       setDepartments(response.data.data);
     }

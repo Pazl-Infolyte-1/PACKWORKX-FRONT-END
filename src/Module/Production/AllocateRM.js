@@ -392,7 +392,8 @@ const AllocateRM = ({
     gsm: '',
     bf: '',
     color: '',
-    deckle: ''
+    deckle: '',
+    rawMeterial:'',
   });
 
   const handleFilterChange = (filterName, value) => {
@@ -711,6 +712,16 @@ const AllocateRM = ({
               ></div>
 
               <CRow className="align-items-center mt-3">
+              <CCol md="2">
+                  <label>Raw Meterial</label>
+                  <CFormSelect 
+                    style={selectStyles}
+                    // value={selectedFilters.gsm}
+                    // onChange={(e) => handleFilterChange('rawMeterial', e.target.value)}
+                  >
+                    <option value="Reel">Reel</option>
+                  </CFormSelect>
+                </CCol>
                 <CCol md="2">
                   <label>GSM</label>
                   <CFormSelect 
@@ -839,7 +850,7 @@ const AllocateRM = ({
                   borderRadius: '2px',
                 }}
               ></div>
-              {sfgData.map((sfg, index) => (
+              {sfgData?.map((sfg, index) => (
                 
                 <SFGDragableCard
                   sfg={sfg}

@@ -160,4 +160,14 @@ export const clientApi = {
   getVendor: async (params) => {
     return await apiClient.get('/clients', { params })
   },
+
+    singleclients: async (id) => {
+    try {
+      const response = await apiClient.get(`/clients/${id}`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
 }

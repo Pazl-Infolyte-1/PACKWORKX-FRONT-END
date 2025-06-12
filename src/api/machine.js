@@ -149,5 +149,25 @@ export const machineApi = {
     deleteAssignMachine: async (id) => {
     return await apiClient.delete(`/machines/assign/${id}`)
   },
+  AddProcess: async (formData) => {
+    return await apiClient.post('/machines/process', formData)
+  },
+  EditProcess: async (formData) => {
+    try {
+      return await apiClient.put(`/machines/process/${formData.id}`, formData)
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
+  deleteProcess: async (id) => {
+    return await apiClient.delete(`/machines/process/${id}`)
+  },
+    getProcessDetails: async (id) => {
+    try {
+      return await apiClient.get(`/machines/process-values/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
 }

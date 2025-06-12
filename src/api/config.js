@@ -13,6 +13,8 @@ const apiClient = axios.create({
   },
 })
 
+
+
 // Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
@@ -39,5 +41,7 @@ apiClient.interceptors.response.use(
     return Promise.reject(error)
   },
 )
+
+
 
 export { apiClient, GST_URL }

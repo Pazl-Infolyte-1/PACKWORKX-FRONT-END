@@ -33,6 +33,7 @@ const MachineDashboardTable = ({
     setIsLoading(true)
     const response = await machineApi.deleteMachine(deleteId)
     if (response.status === 200) {
+      console.log()
       setIsLoading(false)
       setIsConfirmationModalOpen(false)
       setDeleteId(null)

@@ -15,6 +15,7 @@ import { version } from 'core-js'
 import { setRscDeckleSize } from '../../action';
 import { setSkuPartValue } from '../../action'
 import { skuApi } from '../../api/sku'
+import { commonApi } from '../../api/common'
 
 
 function SkuAddEdit({
@@ -732,7 +733,7 @@ useEffect(() => {
 useEffect(() => {
   const colorData = async () => {
     try {
-      const response = await apiMethods.getColors();
+      const response = await commonApi.getColors();
       setColor(response.data.data); // ✅ use response.data.data
       console.log("color data", response.data.data);
     } catch (error) {
@@ -769,7 +770,7 @@ useEffect(() => {
 
   const fetchFluteList = async () => {
     try {
-      const response = await apiMethods.getFluteType()
+      const response = await skuApi.getFluteType()
       setFluteDropdown(response.data.data)
       console.log("flute",response.data.data)
       console.log("flute type",JSON.stringify(response.data.data))

@@ -30,7 +30,7 @@ const Designation = () => {
 
   const fetchData = async () => {
     try {
-      const response = await employeeApi.getDesignationList()
+      const response = await employeeApi.getDesignationListDisplay(searchQuery)
       if (response.data.success) {
         setDesignations(response.data.data)
       }

@@ -27,7 +27,7 @@ function DesignationTable({ designations, loading, onEdit, onDelete }) {
   }
 
   const columns = [
-    { key: 'id', header: 'ID', field: 'id' },
+    //{ key: 'id', header: 'ID', field: 'id' },
     { key: 'name', header: 'Designation Name', field: 'name' },
     {
       key: 'Parent_Department',

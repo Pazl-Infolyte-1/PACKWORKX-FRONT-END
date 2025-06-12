@@ -1064,23 +1064,26 @@ const Group = ({
                   </div>
                 </CCardBody>
               </CCard>
-            ) : (
+            ) : 
+            (
               workOrders
                 ?.filter((order) => order.work_order_sku_values && order.work_order_sku_values.length > 0)
-                ?.map((order) => (
-                  <WorkOrderCard
-                    key={order.id}
-                    order={order}
-                    index={order.id}
-                    visibleIndex={visibleIndex}
-                    setVisibleIndex={setVisibleIndex}
-                    removeWOFromPlan={removeWOFromPlan}
-                    setModalWorkOrder={setModalWorkOrder}
-                    modalWorkOrder={modalWorkOrder}
-                    setVisible={setVisible}
-                    setVisibleSplit={setVisibleSplit}
-                  />
-                ))
+                ?.map((order) => {
+                  return (
+                    <WorkOrderCard
+                      key={order.id}
+                      order={order}
+                      index={order.id}
+                      visibleIndex={visibleIndex}
+                      setVisibleIndex={setVisibleIndex}
+                      removeWOFromPlan={removeWOFromPlan}
+                      setModalWorkOrder={setModalWorkOrder}
+                      modalWorkOrder={modalWorkOrder}
+                      setVisible={setVisible}
+                      setVisibleSplit={setVisibleSplit}
+                    />
+                  );
+                })
             )}
           </CCol>
         </CRow>

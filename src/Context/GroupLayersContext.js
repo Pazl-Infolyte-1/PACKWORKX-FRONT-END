@@ -95,6 +95,7 @@ export const GroupLayersProvider = ({ children }) => {
         // Check for duplicates - for paired layers, check if any layer already exists
         const isDuplicate = prevGroups[groupIndex].group_value.some((item) => {
           if (item.isGroup) {
+            // For paired layers, check if the workOrderId matches and if any layer_id matches
             return item.workOrderId === itemToAdd.workOrderId && 
                    item.layers.some(existingLayer => 
                      order.layers.some(newLayer => 
@@ -102,6 +103,7 @@ export const GroupLayersProvider = ({ children }) => {
                      )
                    );
           } else {
+            // For single layers, check if the layer_id and workOrderId match
             return order.layers.some(layer => 
               item.layer_id === layer.layer_id && item.workOrderId === itemToAdd.workOrderId
             );

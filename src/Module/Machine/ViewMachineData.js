@@ -21,8 +21,8 @@ function ViewMachineData({ Id }) {
   useEffect(() => {
     const fetchValues = async () => {
       try {
-        const response = await apiMethods.getProcessValues()
-        const Process = await apiMethods.getByMachineId(Id)
+        const response = await machineApi.getProcessValues()
+        const Process = await machineApi.getByMachineId(Id)
         setAllProcess(Process.data.data)
 
         const allValues = response.data.data

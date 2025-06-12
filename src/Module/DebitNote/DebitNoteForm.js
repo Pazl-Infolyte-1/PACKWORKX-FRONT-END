@@ -123,7 +123,7 @@ console.log(debitNoteFormData);
         //   debitNoteFormData.id = debitNoteFormData.id
         //   response = await apiMethods.editDebitNote(debitNoteFormData)
         // } else {
-        response = await apiMethods.postDebitNote(debitNoteFormData)
+        response = await debitApi.postDebitNote(debitNoteFormData)
         // }
         // setAlerts([{ severity: 'success', message: response?.data?.message || 'Success' }])
         // await fetchData()

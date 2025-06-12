@@ -16,6 +16,7 @@ import CustomAlert from '../../components/New/CustomAlert'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
+import { skuApi } from '../../api/sku'
 
 function SkuTable({
   skudata,

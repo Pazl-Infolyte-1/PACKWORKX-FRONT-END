@@ -456,9 +456,9 @@ console.log("numberSkuDataFixed", JSON.stringify(numberSkuDataFixed, null, 2));
         let response
 
         if (editTag) {
-          response = await apiMethods.updateSku(numberSkuDataFixed)
+          response = await skuApi.updateSku(numberSkuDataFixed)
         } else {
-          response = await apiMethods.addSku(numberSkuDataFixed)
+          response = await skuApi.addSku(numberSkuDataFixed)
         }
 
         if (response?.data?.message) {

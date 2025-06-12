@@ -37,7 +37,7 @@ function ProcessRoutes({ openRoutes, setOpenRoutes, setAlerts }) {
   useEffect(() => {
     const fetchProcess = async () => {
       try {
-        const response = await apiMethods.getByMachineId(openRoutes?.id)
+        const response = await machineApi.getByMachineId(openRoutes?.id)
         setAllProcess(
           response?.data?.data?.map((p) => ({
             id: p.process_id || p.id,

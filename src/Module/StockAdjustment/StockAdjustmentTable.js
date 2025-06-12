@@ -12,6 +12,7 @@ import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { useNavigate } from 'react-router-dom'
 import CustomAlert from '../../components/New/CustomAlert'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
+import { inventoryApi } from '../../api/inventory'
 
 const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized, refreshClients }) => {
   console.log('stock data in table', stockAdjustmentData)

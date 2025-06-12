@@ -86,7 +86,7 @@ function AddMachineField({
     if (isEditing) {
       const fetchData = async () => {
         try {
-          const response = await apiMethods.getProcessValues();
+          const response = await machineApi.getProcessValues();
           const data = response.data.data;
           
           if (selectedProcessId) {
@@ -111,7 +111,7 @@ function AddMachineField({
     const actualProcessId = processId.processId || processId;
     
     try {
-      const response = await apiMethods.getProcessFields(actualProcessId)
+      const response = await machineApi.getProcessFields(actualProcessId)
       
       if (response?.data?.data && Array.isArray(response.data.data)) {
         setSelectedProcess(response.data.data)
@@ -186,8 +186,8 @@ function AddMachineField({
       }
 
       if (isEditing) {
-        const response = await apiMethods.updateProcessValues(payload)
-        const refreshResult = await apiMethods.getProcessValues()
+        const response = await machineApi.updateProcessValues(payload)
+        const refreshResult = await machineApi.getProcessValues()
         setAllMachineValue && setAllMachineValue(refreshResult.data.data)
       } else {
         await machineApi.saveProcessValues(payload)

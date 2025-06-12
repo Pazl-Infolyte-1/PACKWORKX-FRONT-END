@@ -9,6 +9,7 @@ import { grnApi } from '../../api/grn'
 import { inventoryApi } from '../../api/inventory'
 import { itemApi } from '../../api/item'
 import { commonApi } from '../../api/common'
+import { stockAdjustmentApi } from '../../api/stockAdjustment'
 const AddEditStockAdjustment = () => {
   const location = useLocation()
   const initialStock = location.state?.stock
@@ -169,7 +170,7 @@ const AddEditStockAdjustment = () => {
     try {
       if (singleData?.id) {
         // ✅ Update existing stock adjustment
-        const response = await apiMethods.updateStockAdjustment(singleData.id, parsedData)
+        const response = await stockAdjustmentApi.updateStockAdjustment(singleData.id, parsedData)
         console.log('Stock adjustment updated successfully:', response.data)
         dispatch(setProductArray([]))
 
@@ -179,7 +180,7 @@ const AddEditStockAdjustment = () => {
         navigate('/stockadjustment')
       } else {
         // ✅ Create new stock adjustment
-        const response = await apiMethods.postStockAdjustment(parsedData)
+        const response = await stockAdjustmentApi.postStockAdjustment(parsedData)
         console.log('Stock adjustment created successfully:', response.data)
         dispatch(setProductArray([]))
         setAlerts([{ severity: 'success', message: response.data?.message }])

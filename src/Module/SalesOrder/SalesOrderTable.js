@@ -54,10 +54,10 @@ function SalesOrderTable({
     //   header: '', // empty header for checkbox column
     //   type: 'checkbox',
     // },
-      { key: 'sales_generate_id', header: 'Sales ID', field: 'sales_generate_id' },  
-      { key: 'sales_ui_id', header: 'SO-Reference', field: 'sales_ui_id' },  
-      { key: 'client', header: 'Client', field: 'client' },
-      { key: 'skuCount', header: 'Work Orders', field: 'workOrders' },
+      { key: 'sales_generate_id', header: 'Sales ID', field: 'sales_generate_id', searchIcon: true  },  
+      { key: 'sales_ui_id', header: 'SO-Reference', field: 'sales_ui_id', searchIcon: true  },  
+      { key: 'client', header: 'Client', field: 'client', searchIcon: true  },
+      { key: 'skuCount', header: 'Work Orders', field: 'workOrders', searchIcon: true  },
       { key: 'estimated', header: 'Expected Delivery Date', type:"date", field: 'estimated'  },
       { key: 'created_at', header: 'Created Date', field: 'created_at',type:"date" },
       {
@@ -65,7 +65,9 @@ function SalesOrderTable({
         header: 'Sales Status',
         field: 'sales_status',
         type: 'dropdown',
+        searchIcon: true ,
         options: ['Pending', 'In-progress', 'Completed', 'Rejected'],
+        
         getOptionClass: (val) => {
           switch (val) {
             case 'Pending':

@@ -873,7 +873,7 @@ console.log("whole sku",wholeSkuObject)
         </div>
 
         {workOrders.length > 0 && (
-    <div className=" rounded-md border border-gray-200 shadow-sm min-h-[350px]">
+    <div className=" rounded-md border border-gray-200 shadow-sm">
       {workOrders.map((order, index) => (
         <div
           key={order.id}

@@ -5,10 +5,12 @@ export const salesOrderApi = {
     try {
       return await apiClient.get('/sale-order', {
         params: {
-          client: params.client || '',
-          sku: params.sku || '',
-          manufacture: params.manufacture || '',
-          sales_status: params.sales_status || '',
+          search: params.search || '',
+          //sales_generate_id:params.sales_generate_id || '',
+          //sales_ui_id:params.sales_ui_id || '',
+          //sku: params.sku || '',
+          //manufacture: params.manufacture || '',
+          //sales_status: params.sales_status || '',
           page: params.page || 1,
           limit: params.limit || 25,
         },

@@ -324,7 +324,7 @@ const AddEditStockAdjustment = () => {
 
                     return (
                       <option key={prod?.id} value={prod.id} disabled={isDisabledGlobally}>
-                        {prod?.item_name}
+                        {prod?.item_generate_id}
                       </option>
                     )
                   })}
@@ -332,7 +332,6 @@ const AddEditStockAdjustment = () => {
 
                 <select
                   {...register(`items.${index}.po_id`, {
-                    required: true,
                     onChange: (e) => handlePOSelect(e.target.value, index), // optional: if needed
                   })}
                   className={`w-[180px] h-[40px] rounded-md px-2`}
@@ -356,7 +355,6 @@ const AddEditStockAdjustment = () => {
 
                 <select
                   {...register(`items.${index}.grn_id`, {
-                    required: true,
                     onChange: (e) => handleGRNSelect(e.target.value, index),
                   })}
                   className={`w-[180px] h-[40px] rounded-md px-2`}

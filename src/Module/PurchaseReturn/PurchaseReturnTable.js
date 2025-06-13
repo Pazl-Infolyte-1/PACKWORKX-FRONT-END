@@ -65,14 +65,17 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
       ])
     }
   }
-
+  console.log('Purchase Return Data:', porData) // 👈 Logs the porData prop to check its structure
   const columns = [
     { key: 'purchase_return_generate_id', header: 'ID', field: 'purchase_return_generate_id' },
     {
-      key: 'po_id',
+      key: 'PurchaseOrder.purchase_generate_id',
       header: <>PO ID</>,
-      field: 'po_id',
+      render: (row) => {
+        return row?.PurchaseOrder?.purchase_generate_id || '-'
+      },
     },
+
     {
       key: 'return_date',
       header: 'Return Date ',
@@ -92,7 +95,7 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
     {
       key: 'created_by',
       header: 'Created By',
-      field: 'created_by',
+      render: (row) => row?.created_by_user?.name || '-',
     },
     {
       key: 'actions',
@@ -102,11 +105,11 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
       render: (row) => (
         <ThreeDotMenu
           value={[
-            // {
-            //   label: 'View',
-            //   icon: cilHandPointRight,
-            //   // onClick: () => setShowPopUp(row.id),
-            // },
+            {
+              label: 'View',
+              icon: cilHandPointRight,
+              onClick: () => setOpenPoReturnModal({ open: true, id: row.id }),
+            },
             // {
             //   label: 'Edit',
             //   icon: cilPencil,
@@ -126,7 +129,11 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
   return (
     <>
       <div>
-        <ReusableTable data={porData} columns={columns} />
+        <ReusableTable
+          data={porData}
+          columns={columns}
+          handleRowClick={(row) => setOpenPoReturnModal({ open: true, id: row.id })}
+        />
       </div>
       <ConfirmationModale
         isOpen={confirmModal}

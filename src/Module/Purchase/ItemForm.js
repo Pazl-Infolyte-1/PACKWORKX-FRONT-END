@@ -45,8 +45,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         return
       }
 
-  const customFields = item?.custom_fields ? JSON.parse(JSON.parse(item.custom_fields)) : {}
-
+      const customFields = item?.custom_fields ? JSON.parse(JSON.parse(item.custom_fields)) : {}
 
       setModalContent(
         <div className="max-h-96 overflow-y-auto">
@@ -522,52 +521,51 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
           <table className="min-w-full bg-white rounded-lg">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-2">Product</th>
-                <td></td>
-                <th className="px-4 py-2">Item Code</th>
-                <th className="px-4 py-2">Quantity</th>
-                <th className="px-4 py-2">Rate</th>
-                <th className="px-4 py-2">S-GST %</th>
-                <th className="px-4 py-2">C-GST %</th>
-                <th className="px-4 py-2">Amount</th>
-                <th className="px-4 py-2">Tax</th>
-                <th className="px-4 py-2">Total</th>
-                <th className="px-4 py-2">Action</th>
+                <th className="px-2 py-2 w-[115px]">Product</th>
+                <th className="w-[30px]"></th>
+                {/* <th className="px-2 py-2 w-[65px]">Item Code</th> */}
+                <th className="px-2 py-2 w-[65px]">Quantity</th>
+                <th className="px-2 py-2 w-[65px]">Rate</th>
+                <th className="px-2 py-2 w-[65px]">S-GST %</th>
+                <th className="px-2 py-2 w-[65px]">C-GST %</th>
+                <th className="px-2 py-2 w-[65px]">Amount</th>
+                <th className="px-2 py-2 w-[65px]">Tax</th>
+                <th className="px-2 py-2 w-[65px]">Total</th>
+                <th className="px-2 py-2 w-[65px]">Action</th>
               </tr>
             </thead>
             <tbody>
               {fields.map((field, index) => (
                 <tr key={field.id}>
-                  <td className="px-4 py-2">
+                  <td className="px-2 py-2 w-[115px]">
                     <select
                       {...register(`items.${index}.item_id`)}
                       onChange={(e) => handleItemChange(index, e.target.value)}
-                      className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
+                      className="w-[115px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                       value={getValues(`items.${index}.item_id`)}
                     >
-                      <option value="">{isLoading ? 'Loading...' : 'Select Item'}</option>
+                      <option value="">{isLoading ? 'Loading...' : 'Select'}</option>
                       {itemList.map((item) => (
                         <option key={item.id} value={item.id}>
-                          {item.item_name}
+                          {item.item_generate_id}
                         </option>
                       ))}
                     </select>
                   </td>
                   <td
                     onClick={() => openItemDetails(getValues(`items.${index}.item_id`))}
-                    className="cursor-pointer text-blue-600"
+                    className="w-[100px] cursor-pointer text-blue-600 text-center"
                   >
                     ℹ️
                   </td>
-                  <td className="px-4 py-2">
+                  {/* <td className="px-2 py-2 w-[65px]">
                     <input
                       {...register(`items.${index}.item_code`)}
                       readOnly
-                      placeholder="Item Code"
-                      className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
+                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                     />
-                  </td>
-                  <td className="px-4 py-2">
+                  </td> */}
+                  <td className="px-2 py-2 w-[65px]">
                     <input
                       {...register(`items.${index}.quantity`)}
                       type="number"
@@ -575,10 +573,10 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
                       step="0.01"
                       onChange={(e) => handleQuantityChange(index, e.target.value)}
                       onBlur={(e) => handleQuantityBlur(index, e.target.value)}
-                      className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
+                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                     />
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-2 py-2 w-[65px]">
                     <input
                       {...register(`items.${index}.standard_cost`)}
                       type="number"
@@ -586,47 +584,47 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
                       step="0.01"
                       onChange={(e) => handleRateChange(index, e.target.value)}
                       onBlur={(e) => handleRateBlur(index, e.target.value)}
-                      className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
+                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                     />
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-2 py-2 w-[65px]">
                     <input
                       {...register(`items.${index}.sgst`)}
                       readOnly
-                      className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-gray-50"
+                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-gray-50"
                     />
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-2 py-2 w-[65px]">
                     <input
                       {...register(`items.${index}.cgst`)}
                       readOnly
-                      className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-gray-50"
+                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-gray-50"
                     />
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-2 py-2 w-[65px]">
                     <input
                       {...register(`items.${index}.amount`)}
                       readOnly
-                      className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
+                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                     />
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-2 py-2 w-[65px]">
                     <input
                       {...register(`items.${index}.tax_amount`)}
                       readOnly
-                      className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
+                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                     />
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-2 py-2 w-[65px]">
                     <input
                       {...register(`items.${index}.total_amount`)}
                       readOnly
-                      className="w-[110px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
+                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
                     />
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-2 py-2 w-[65px]">
                     <button type="button" onClick={() => remove(index)}>
-                      <TrashIcon className="text-[#ff2d55] w-6 h-6 cursor-pointer" />
+                      <TrashIcon className="text-[#ff2d55] w-5 h-5 cursor-pointer" />
                     </button>
                   </td>
                 </tr>

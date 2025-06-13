@@ -354,6 +354,8 @@ const handleIntegerInput = (e, field) => {
   }, [isEdit, reset, processes])
 
   const onSubmit = async (data) => {
+    console.log("clicked")
+
     setIsSubmitted(true)
     try {
       setIsLoading(true)
@@ -443,7 +445,7 @@ return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-6 rounded-lg gap-6">
           {/* Column 1 - Machine Details */}
           <div className="space-y-4">
-            <div>progress
+            <div>
               <RequiredFieldLabel label="Machine Name" isRequired={true} />
               <input
                 {...register('machine_name', { required: 'required' })}
@@ -495,11 +497,12 @@ return (
 
          <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
-        Board Size (Length × Width) <span className="text-red-500">*</span>
+        Board Size (Length × Width) 
+        {/*<span className="text-red-500">*</span>*/}
       </label>
       <div className="flex items-center rounded border border-gray-300 overflow-hidden w-full h-[36px]">
         <input
-  {...register('board_length', { required: true })}
+  {...register('board_length')}
   placeholder="Length"
   className="w-1/3 px-2 py-1 text-sm focus:outline-none"
   type="text"
@@ -509,7 +512,7 @@ return (
 
         <span className="text-gray-600 text-sm px-1">×</span>
      <input
-  {...register('board_width', { required: true })}
+  {...register('board_width')}
   placeholder="Width"
   className="w-1/3 px-2 py-1 text-sm focus:outline-none"
   type="text"
@@ -557,9 +560,9 @@ return (
               <RequiredFieldLabel label="IP Address" />
               <input
                 {...register('ip_address')}
-                className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full border p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="text"
-                style={getInputStyle('ip_address')}
+                //style={getInputStyle('ip_address')}
               />
             </div>
 
@@ -595,9 +598,9 @@ return (
               <RequiredFieldLabel label="Purchase Date" />
               <input
                 {...register('purchase_date')}
-                className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full p-1 border rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
-                style={getInputStyle('purchase_date')}
+                //style={getInputStyle('purchase_date')}
               />
             </div>
 
@@ -605,9 +608,9 @@ return (
               <RequiredFieldLabel label="Installation Date" />
               <input
                 {...register('installation_date')}
-                className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full p-1 border rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
-                style={getInputStyle('installation_date')}
+                //style={getInputStyle('installation_date')}
               />
             </div>
 
@@ -615,9 +618,9 @@ return (
               <RequiredFieldLabel label="Last Maintenance" />
               <input
                 {...register('last_maintenance')}
-                className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full p-1 border rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
-                style={getInputStyle('last_maintenance')}
+                //style={getInputStyle('last_maintenance')}
               />
             </div>
 
@@ -625,9 +628,9 @@ return (
               <RequiredFieldLabel label="Next Maintenance Due" />
               <input
                 {...register('next_maintenance_due')}
-                className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full p-1 border rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
-                style={getInputStyle('next_maintenance_due')}
+                //style={getInputStyle('next_maintenance_due')}
               />
             </div>
 
@@ -635,9 +638,9 @@ return (
               <RequiredFieldLabel label="Warranty Expiry" />
               <input
                 {...register('warranty_expiry')}
-                className="w-full p-1 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full p-1 border rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 type="date"
-                style={getInputStyle('warranty_expiry')}
+                //style={getInputStyle('warranty_expiry')}
               />
             </div>
           </div>
@@ -799,7 +802,6 @@ return (
                     )
 
                     const allProcess = processes.find((p) => p.id === processId)
-
                     const process = selectedProcess || {
                       label: allProcess?.process_name || `Process ${processId}`,
                       value: processId,

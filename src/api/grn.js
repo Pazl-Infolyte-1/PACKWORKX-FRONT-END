@@ -49,4 +49,23 @@ export const grnApi = {
       throw error
     }
   },
+  getProductsForStockAdjustment: async (grnId) => {
+    try {
+      return await apiClient.get(`/stock-adjustments/items`)
+    } catch (error) {
+      console.error(
+        'Error fetching products for stock adjustment:',
+        error.response?.data || error.message,
+      )
+      throw error
+    }
+  },
+  getInventoryByItemId: async (itemId) => {
+    try {
+      return await apiClient.get(`/stock-adjustments/items/${itemId}`)
+    } catch (error) {
+      console.error('Error fetching inventory by item ID:', error.response?.data || error.message)
+      throw error
+    }
+  },
 }

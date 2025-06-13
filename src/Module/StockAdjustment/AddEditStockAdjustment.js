@@ -10,6 +10,7 @@ import { inventoryApi } from '../../api/inventory'
 import { itemApi } from '../../api/item'
 import { commonApi } from '../../api/common'
 import { stockAdjustmentApi } from '../../api/stockAdjustment'
+import { Inventory } from '@mui/icons-material'
 const AddEditStockAdjustment = () => {
   const location = useLocation()
   const initialStock = location.state?.stock
@@ -23,6 +24,7 @@ const AddEditStockAdjustment = () => {
   const [POItem, setPOItem] = useState({})
   const selectedPOIds = useSelector((state) => state?.auth?.stockAdjustmentPOArray || [])
   const [GRNItems, setGRNItems] = useState({})
+  const [InventoryItems, setInventoryItems] = useState({})
   const selectedGRNIds = useSelector((state) => state?.auth?.stockAdjustmentGRNArray || [])
 
   const navigate = useNavigate()
@@ -32,6 +34,7 @@ const AddEditStockAdjustment = () => {
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors, isSubmitted },
   } = useForm({
     defaultValues: {
@@ -39,11 +42,11 @@ const AddEditStockAdjustment = () => {
       items: [
         {
           item_id: null,
-          po_id: null,
-          grn_id: null,
+          inventory_id: null,
+          quantity_available: null,
           type: 'increase',
           reason: '',
-          adjustment_quantity: '',
+          adjustment_quantity: null,
         },
       ],
     },
@@ -74,19 +77,23 @@ const AddEditStockAdjustment = () => {
         const data = response?.data
         setSingleData(data)
 
-        // Prepare items for form, including id
         const items = await Promise.all(
           data?.StockAdjustmentItems?.map(async (item, index) => {
-            await getPurchaseOrderItem(item.item_id, index)
-            await getGRNByPOId(item.po_id, index)
+            await getInventoryByItemId(item.item_id, index)
+            console.log('Inventory Items:', InventoryItems)
+
+            const AvailableQuantity = InventoryItems?.[index]?.find(
+              (inv) => inv.id === item.inventory_id,
+            )?.quantity_available
+            console.log('Available Quantity:', AvailableQuantity)
 
             return {
               item_id: item.item_id || null,
               type: item.type || 'increase',
-              po_id: item.po_id,
-              grn_id: item.grn_id,
+              inventory_id: item.inventory_id,
               reason: item.reason,
               adjustment_quantity: item.adjustment_quantity || '',
+              quantity_available: AvailableQuantity || null,
             }
           }) || [],
         )
@@ -103,11 +110,11 @@ const AddEditStockAdjustment = () => {
               : [
                   {
                     item_id: null,
-                    po_id: null,
-                    grn_id: null,
+                    inventory_id: null,
+                    quantity_available: null,
                     type: 'increase',
                     reason: '',
-                    adjustment_quantity: '',
+                    adjustment_quantity: null,
                   },
                 ],
         })
@@ -126,9 +133,9 @@ const AddEditStockAdjustment = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await itemApi.getItemList({ limit: 10000 })
-        setProduct(response.data.data)
-        console.log('product data', response.data.data)
+        const response = await grnApi.getProductsForStockAdjustment()
+        console.log('Product Data:', response.data)
+        setProduct(response?.data)
       } catch (error) {
         console.error('Error fetching items:', error)
       }
@@ -157,15 +164,37 @@ const AddEditStockAdjustment = () => {
       remarks: data.remarks,
       items: data.items.map((item) => ({
         item_id: item.item_id,
-        po_id: item.po_id,
-        grn_id: item.grn_id,
+        inventory_id: item.inventory_id,
         type: item.type,
         reason: item.reason,
         adjustment_quantity: parseFloat(item.adjustment_quantity),
+        quantity_available: item.quantity_available,
       })),
     }
 
     console.log('Submitted Adjustment Data:', parsedData)
+
+    const invalidItem = parsedData.items.find(
+      (item) => item.type === 'decrease' && item.adjustment_quantity > item.quantity_available,
+    )
+    console.log('Invalid Item:', invalidItem)
+
+    if (invalidItem) {
+      const MatchedProduct = product.find((prod) => prod.id === parseInt(invalidItem.item_id))
+      console.log('Matched Product:', MatchedProduct)
+
+      const itemName = MatchedProduct?.item_generate_id || `Item ${invalidItem.item_id}`
+
+      setAlerts([
+        {
+          severity: 'error',
+          message: `Adjustment quantity for "${itemName}" cannot exceed available quantity (${invalidItem.quantity_available}).`,
+        },
+      ])
+      return
+    }
+
+    console.log('Submitting stock adjustment with data:', parsedData)
 
     try {
       if (singleData?.id) {
@@ -230,11 +259,26 @@ const AddEditStockAdjustment = () => {
       console.log('Updated Product Array:', updatedArray)
     }
 
-    getPurchaseOrderItem(selectedProductId, rowIndex)
-    setGRNItems((prev) => ({
-      ...prev,
-      [rowIndex]: [],
-    }))
+    // getPurchaseOrderItem(selectedProductId, rowIndex)
+    // setGRNItems((prev) => ({
+    //   ...prev,
+    //   [rowIndex]: [],
+    // }))
+    getInventoryByItemId(selectedProductId, rowIndex)
+  }
+
+  const getInventoryByItemId = async (selectedProductId, rowIndex) => {
+    try {
+      const response = await grnApi.getInventoryByItemId(selectedProductId)
+      console.log('Inventory Data:', response?.data?.data)
+      setInventoryItems((prev) => ({
+        ...prev,
+        [rowIndex]: response?.data?.data || [],
+      }))
+    } catch (error) {
+      console.error('Error fetching inventory by item ID:', error)
+      setAlerts([{ severity: 'error', message: 'Failed to fetch inventory data' }])
+    }
   }
 
   const getPurchaseOrderItem = async (selectedProductId, rowIndex) => {
@@ -252,16 +296,16 @@ const AddEditStockAdjustment = () => {
     }
   }
 
-  const handlePOSelect = (selectedPOId, rowIndex) => {
-    // if (!selectedPOId) return
-    // // Ensure selectedPOIds is an array
-    // const poIds = selectedPOIds || []
-    // if (!poIds.includes(selectedPOId)) {
-    //   const updatedArray = [...poIds, selectedPOId]
-    //   dispatch(setStockAdjustmentPOArray(updatedArray))
-    //   console.log('Updated PO Array:', updatedArray)
-    // }
-    getGRNByPOId(selectedPOId, rowIndex)
+  const handleINVSelect = (selectedInventoryId, rowIndex) => {
+    const inventoryArray = InventoryItems[rowIndex] || []
+
+    const selectedInventory = inventoryArray.find((inv) => inv.id === parseInt(selectedInventoryId))
+
+    if (!selectedInventory) {
+      console.error('Inventory not found for ID:', selectedInventoryId)
+      return
+    }
+    setValue(`items[${rowIndex}].quantity_available`, selectedInventory?.quantity_available)
   }
 
   const getGRNByPOId = async (selectedPOId, rowIndex) => {
@@ -331,29 +375,29 @@ const AddEditStockAdjustment = () => {
                 </select>
 
                 <select
-                  {...register(`items.${index}.po_id`, {
-                    onChange: (e) => handlePOSelect(e.target.value, index), // optional: if needed
+                  {...register(`items.${index}.inventory_id`, {
+                    onChange: (e) => handleINVSelect(e.target.value, index), // optional: if needed
                   })}
                   className={`w-[180px] h-[40px] rounded-md px-2`}
-                  style={getInputStyle(errors?.items?.[index]?.po_id)}
+                  style={getInputStyle(errors?.items?.[index]?.id)}
                 >
-                  <option value="">Select PO</option>
+                  <option value="">Select INV</option>
 
-                  {(POItem?.[index] || []).map((po) => {
-                    // const currentPOId = watchedItems?.[index]?.po_id?.toString() || ''
-                    // const isSelectedHere = currentPOId === po?.id?.toString()
+                  {(InventoryItems?.[index] || []).map((inv) => {
+                    // const currentPOId = watchedItems?.[index]?.inventory_id?.toString() || ''
+                    // const isSelectedHere = currentPOId === inv?.id?.toString()
                     // const isDisabledGlobally =
-                    //   selectedPOIds.includes(po?.id.toString()) && !isSelectedHere
+                    //   selectedPOIds.includes(inv?.id.toString()) && !isSelectedHere
 
                     return (
-                      <option key={po?.id} value={po.po_id}>
-                        {po?.PurchaseOrder?.purchase_generate_id}
+                      <option key={inv?.id} value={inv.id}>
+                        {inv?.inventory_generate_id}
                       </option>
                     )
                   })}
                 </select>
 
-                <select
+                {/* <select
                   {...register(`items.${index}.grn_id`, {
                     onChange: (e) => handleGRNSelect(e.target.value, index),
                   })}
@@ -374,7 +418,7 @@ const AddEditStockAdjustment = () => {
                       </option>
                     )
                   })}
-                </select>
+                </select> */}
 
                 <select
                   {...register(`items.${index}.type`)}
@@ -384,6 +428,15 @@ const AddEditStockAdjustment = () => {
                   <option value="decrease">Decrease</option>
                 </select>
 
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Available Qty"
+                  readOnly
+                  {...register(`items.${index}.quantity_available`)}
+                  className={`w-[100px] h-[40px] px-2 rounded-md`}
+                  style={getInputStyle(errors?.items?.[index]?.available_quantity)}
+                />
                 <input
                   type="number"
                   step="0.01"

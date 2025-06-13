@@ -62,7 +62,7 @@ import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext';
         <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={() => setVisibleAllocate(false)} />
 
         <div className="flex min-h-full items-center justify-center p-4">
-          <div className="relative w-[600px] max-h-[750px] bg-white shadow-lg overflow-hidden rounded-xl">
+          <div className="relative w-[600px] h-[690px] bg-white shadow-lg overflow-hidden rounded-xl">
             <div className="p-4 pb-2 border-b border-gray-200">
               <h1 className="text-lg font-semibold text-gray-800 mb-5">
                 Allocation - Reel 02
@@ -118,7 +118,7 @@ import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext';
                     </div>
                   </div>
 
-                  <div className="bg-white max-h-[250px] custom-scrollbar overflow-y-auto">
+                  <div className="bg-white h-[250px] custom-scrollbar overflow-y-auto">
                     {historyData?.map((order, index) => (
                       <div key={index} className="flex">
                         <div className="flex-1 px-4 py-3">

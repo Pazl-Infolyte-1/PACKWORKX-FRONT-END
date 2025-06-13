@@ -20,6 +20,7 @@ import AllcoateRMModal from './AllcoateRMModal'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext'
 import { productionApi } from '../../api/production'
+import GroupData from './RawmeterialComponents/GroupData'
 
 const ItemType = 'RawMeterial'
 
@@ -361,6 +362,7 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
   const [visibleItemIndex, setVisibleItemIndex] = useState(null)
   const [visibleAllocate, setVisibleAllocate] = useState(false)
   const [droppedItem, setDroppedItem] = useState(null); // 👈 to store dropped item
+  const [groupDetailsModal,setGroupDetailsModal] = useState({visible:false,id:null,data:[]})
 
   const addQuantity = (groupIndex, item) => {
     console.log('Group Index:', groupIndex)
@@ -370,6 +372,11 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
     // Your allocation logic here
   }
 
+ const handleViewGroupClick = async (id)=>{
+  const response = await productionApi.getSingleGroupDetails(id)
+  setGroupDetailsModal({visible:true,id:id,data:response?.data?.data})
+ }
+
   const [{ isOver }, drop] = useDrop(() => ({
     accept: ItemType,
     drop: (item) => {
@@ -378,6 +385,10 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
 
     }
   }));
+
+  useEffect(()=>{
+    console.log(group)
+  },[group])
 
   return (
     <CCard
@@ -421,31 +432,18 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
               whiteSpace: 'nowrap',
             }}
           >
-            {group?.items?.reduce(
-              (sum, g) => (g.finished_goods ? sum + g.finished_goods : sum + 0),
-              0,
-            )}{' '}
+{group.allocated_Qty}
             /
-            {group?.items?.reduce((sum, g) => (g.quantity ? sum + g.quantity : sum + 0), 0)}
+            {group.group_Qty}
+
             <div style={{ marginLeft: '10px', width: '45px', height: '40px' }}>
               <ProgressBar
                 value={Math.min(
                   Math.max(
                     (() => {
-                      const totalFinishedGoods = group?.items?.reduce(
-                        (sum, g) => sum + (g.finished_goods || 0),
-                        0,
-                      )
-                      const totalQuantity = group?.items?.reduce(
-                        (sum, g) => sum + (g.quantity || 0),
-                        0,
-                      )
-
-                      if (totalQuantity < 1) return 0
-
-                      const percentage = (totalFinishedGoods / totalQuantity) * 100
-
-                      return parseFloat(percentage.toFixed(1))
+                      if (group.group_Qty < 1) return 0;
+                      const percentage = (group.allocated_Qty / group.group_Qty) * 100;
+                      return parseFloat(percentage.toFixed(1));
                     })(),
                     0,
                   ),
@@ -478,6 +476,12 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
             <FaEye
               style={{ cursor: 'pointer' }}
               onClick={() => {
+                handleViewGroupClick(group.id)
+                // setGroupDetailsModal((d) => ({
+                //   ...d,
+                //   visible: true,
+                //   id: group.id
+                // }))
                 // setModalWorkOrder(order)
                 //   setVisible(true)
               }}
@@ -495,7 +499,19 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
           droppedItem={droppedItem}
         />
       )}
+      {groupDetailsModal.visible&&(
+        <GroupData
+        isVisible={groupDetailsModal.visible}
+        setVisible={setGroupDetailsModal}
+        groupID={groupDetailsModal.id}
+        data={groupDetailsModal.data}
+        onClose={() => setGroupDetailsModal(prev => ({ ...prev, visible: false , id:null}))}
+        />
+      )
+
+      }
     </CCard>
+
   );
 }
 

@@ -60,8 +60,8 @@ const WorkOrders = () => {
     try {
       setLoading(true)
       const response = await workOrderApi.getWorkOrders({
-        manufacture:manufactureFilter ,
-        sku_name: searchQuery,
+        //manufacture:manufactureFilter ,
+        search: searchQuery,
         page: pagination?.page,
         limit: limit,
       })

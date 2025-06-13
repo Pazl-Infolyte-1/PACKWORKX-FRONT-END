@@ -346,7 +346,7 @@ const ViewWorkOrder = () => {
   const handleDownloadQR = async () => {
     try {
       // Get the QR code URL
-      const qrCodeUrl = workOrder.qr_code || 'https://imgs.search.brave.com/znAUNdoz16sc9KdnG_yAXIp1PbojCOj3klSxYEmJySw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5zbmwubm8vbWVk/aWEvMTk0Nzc2L3N0/YW5kYXJkX3FyLWtv/ZGUucG5n';
+      const qrCodeUrl = workOrder.qr_code_url;
       
       // Fetch the image
       const response = await fetch(qrCodeUrl);
@@ -374,7 +374,7 @@ const ViewWorkOrder = () => {
       setAlerts([
         { 
           severity: 'error', 
-          message: 'Failed to download QR code. Please try again.' 
+          message: 'Failed to download QR code. Pleaseg try again.' 
         }
       ]);
     }
@@ -797,7 +797,7 @@ const ViewWorkOrder = () => {
     {workOrder.qr_code || 'https://imgs.search.brave.com/znAUNdoz16sc9KdnG_yAXIp1PbojCOj3klSxYEmJySw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5zbmwubm8vbWVk/aWEvMTk0Nzc2L3N0/YW5kYXJkX3FyLWtv/ZGUucG5n' ? (
       <>
         <img 
-          src={workOrder.qr_code || 'https://imgs.search.brave.com/znAUNdoz16sc9KdnG_yAXIp1PbojCOj3klSxYEmJySw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5zbmwubm8vbWVk/aWEvMTk0Nzc2L3N0/YW5kYXJkX3FyLWtv/ZGUucG5n'} 
+          src={workOrder.qr_code_url} 
           alt="Work Order QR Code" 
           className="w-48 h-48 object-contain mb-3"
         />

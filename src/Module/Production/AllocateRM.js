@@ -147,7 +147,6 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
                     height: '50px',
                     backgroundColor: '#ffffff',
                     borderRadius: '10px',
-                    boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.16)',
                     marginTop: '10px',
                     padding: '4px',
                     display: 'flex',
@@ -155,6 +154,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     overflow: 'hidden',
+                    border: 'none'
                   }}
                 >
                   <div className="d-flex justify-content-between w-100 px-3">
@@ -193,42 +193,44 @@ function GroupDropZone({
       key={itemIndex}
       className="mb-2"
       style={{
-        marginTop: '10px',
+        marginTop: '6px',
         backgroundColor: '#f5f4f7',
-        borderRadius: '10px',
+        borderRadius: '8px',
+        padding: '4px',
+        border: 'none'
       }}
     >
-      <CCardBody>
+      <CCardBody style={{ padding: '8px' }}>
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             cursor: 'pointer',
-            width: '100%', // Ensures proper space allocation
+            width: '100%',
           }}
         >
-          {/* Keep order_id and icon in the same row */}
           <span
             onClick={() => toggleItemCollapse(itemIndex)}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '6px', // Adds space between text and icon
-              whiteSpace: 'nowrap', // Prevents text wrapping
+              gap: '4px',
+              whiteSpace: 'nowrap',
+              fontSize: '0.9rem',
+              fontWeight: '500',
             }}
           >
             {`${i?.layer_detail?.layer}`}
-            {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />}
+            {visibleItemIndex === itemIndex ? <FaAngleUp size={14} /> : <FaAngleDown size={14} />}
           </span>
 
-          {/* Ensure finished_goods / quantity stay aligned */}
           <span
             style={{
               display: 'flex',
               alignItems: 'center',
-              fontSize: '16px',
-              lineHeight: '21px',
+              fontSize: '0.85rem',
+              lineHeight: '1',
               whiteSpace: 'nowrap',
             }}
           >
@@ -236,7 +238,7 @@ function GroupDropZone({
               <>
                 {`${i.finished_goods} / ${i.quantity}`}
                 <div
-                  style={{ marginLeft: '10px', marginRight: '10px', width: '45px', height: '40px' }}
+                  style={{ marginLeft: '8px', marginRight: '8px', width: '35px', height: '30px' }}
                 >
                   <ProgressBar
                     value={Math.min(
@@ -248,11 +250,9 @@ function GroupDropZone({
               </>
             ) : (
               <>
-                {/* {`80 / 100`} */}
                 <div
-                  style={{ marginLeft: '10px', marginRight: '10px', width: '45px', height: '40px' }}
+                  style={{ marginLeft: '8px', marginRight: '8px', width: '35px', height: '30px' }}
                 >
-                  {/* <ProgressBar value={80} /> */}
                 </div>
               </>
             )}
@@ -263,7 +263,7 @@ function GroupDropZone({
                   <CIcon
                     icon={cilBriefcase}
                     className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                    style={{ color: '#8167e5', fontSize: '1.2rem', fontWeight: 'bold' }}
                   />
                   View Work Order
                 </Dropdown.Item>
@@ -271,7 +271,7 @@ function GroupDropZone({
                   <CIcon
                     icon={cilClipboard}
                     className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                    style={{ color: '#8167e5', fontSize: '1.2rem', fontWeight: 'bold' }}
                   />
                   View Sales Order
                 </Dropdown.Item>
@@ -279,7 +279,7 @@ function GroupDropZone({
                   <CIcon
                     icon={cilTrash}
                     className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                    style={{ color: '#8167e5', fontSize: '1.2rem', fontWeight: 'bold' }}
                   />
                   Remove from Plan
                 </Dropdown.Item>
@@ -287,7 +287,7 @@ function GroupDropZone({
                   <CIcon
                     icon={cilCut}
                     className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                    style={{ color: '#8167e5', fontSize: '1.2rem', fontWeight: 'bold' }}
                   />
                   Split Work Order
                 </Dropdown.Item>
@@ -299,10 +299,11 @@ function GroupDropZone({
         <CCollapse className="custom-collapse" visible={visibleItemIndex === itemIndex}>
           <div
             style={{
-              marginTop: '10px',
+              marginTop: '6px',
               display: 'flex',
               justifyContent: 'space-between',
-              gap: '8px',
+              gap: '6px',
+              fontSize: '0.85rem',
             }}
           >
             {i.sku_name ? (
@@ -326,22 +327,23 @@ function GroupDropZone({
           {i.layer_group
             ? i.layer_group.map((lg) => (
                 <CCard
-                  key={lg.layer_name} // Added a unique key
+                  key={lg.layer_name}
                   style={{
-                    padding: '10px',
-                    marginTop: '10px',
+                    padding: '6px',
+                    marginTop: '6px',
                     backgroundColor: '#f5f4f7',
-                    borderRadius: '10px',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
                   }}
                 >
                   {lg.layer_name}
                   <br />
                   <div
                     style={{
-                      marginTop: '10px',
+                      marginTop: '6px',
                       display: 'flex',
                       justifyContent: 'space-between',
-                      gap: '8px',
+                      gap: '6px',
                     }}
                   >
                     <span>Board Size (L x W) : {lg.dimensions}</span>
@@ -383,8 +385,6 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
-      // canDrop: monitor.canDrop(),
-      // draggedItem: monitor.getItem(), // 👈 Get the dragged item info
     }),
   }))
 
@@ -395,12 +395,13 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
       className="mb-2"
       style={{
         backgroundColor: isOver ? '#e0e0e0' : '#f5f4f7',
-        borderRadius: '10px',
+        borderRadius: '8px',
         border: isOver ? '2px dashed #8167e5' : 'none',
         transition: 'all 0.3s ease',
+        padding: '4px',
       }}
     >
-      <CCardBody>
+      <CCardBody style={{ padding: '8px' }}>
         <div
           style={{
             display: 'flex',
@@ -415,12 +416,14 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '4px',
               whiteSpace: 'nowrap',
+              fontSize: '0.9rem',
+              fontWeight: '500',
             }}
           >
             {group.group_name}{' '}
-            {visibleGroupIndex === groupIndex ? <FaAngleUp /> : <FaAngleDown />}
+            {visibleGroupIndex === groupIndex ? <FaAngleUp size={14} /> : <FaAngleDown size={14} />}
           </span>
 
           <span
@@ -428,13 +431,14 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
               display: 'flex',
               alignItems: 'center',
               whiteSpace: 'nowrap',
+              fontSize: '0.85rem',
             }}
           >
             {group.allocated_Qty}
             /
             {group.group_Qty}
 
-            <div style={{ marginLeft: '10px', width: '45px', height: '40px' }}>
+            <div style={{ marginLeft: '8px', width: '35px', height: '30px' }}>
               <ProgressBar
                 value={Math.min(
                   Math.max(
@@ -466,12 +470,13 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
             style={{
               display: 'flex',
               justifyContent: 'flex-end',
-              marginTop: '10px',
-              marginBottom: '10px',
-              marginRight: '10px',
+              marginTop: '6px',
+              marginBottom: '4px',
+              marginRight: '8px',
             }}
           >
             <FaEye
+              size={14}
               style={{ cursor: 'pointer' }}
               onClick={() => {
                 handleViewGroupClick(group.id)
@@ -555,7 +560,6 @@ const AllocateRM = ({}) => {
     border: '0',
     boxSizing: 'border-box',
     borderRadius: '10px',
-    boxShadow: '0px 2px 8px rgba(0,0,0,0.16)',
     backgroundColor: '#ffffff',
     color: '#030303',
     fontSize: '14px',
@@ -570,37 +574,21 @@ const AllocateRM = ({}) => {
 
   return (
     <>
-      <CCol xs={5} className="mt-4">
+      <CCol xs={4} className="mt-4">
         <CRow>
           <CCol xs={12}>
-            <CCard
-              className="text-black bold"
-              style={{
-                cursor: 'pointer',
-                height: '56px',
-                padding: '0px 8px',
-                border: '0',
-                boxSizing: 'border-box',
-                borderRadius: '4px',
-                boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
-                backgroundColor: '#c7c7f1',
-                color: '#000000',
-                fontSize: '22px',
-                fontFamily: 'Roboto',
-                fontWeight: '500',
-                lineHeight: '31px',
-                outline: 'none',
-              }}
+            <div
+              className="text-black bold w-full bg-[#c7c7f1] text-md p-2 font-[Roboto]"
             >
               <CCardBody>
                 <div className="d-flex justify-content-between align-items-center">
-                  <CCardText className="mx-auto text-bold">Grouped Work Orders</CCardText>
+                  <CCardText className=" ">Grouped Work Orders</CCardText>
                 </div>
               </CCardBody>
-            </CCard>
+            </div>
           </CCol>
         </CRow>
-        <CRow className="mt-3 custom-srollbar" style={{ maxHeight: 'calc(90vh - 200px)', overflowY: 'auto' }}>
+        <CRow className="mt-3 custom-srollbar" style={{ height: 'calc(95vh - 200px)', overflowY: 'auto' }}>
           <CCol xs={12}>
             {groupOrders?.map((group, groupIndex) => (
               <GroupRawMeterialDropZone
@@ -615,23 +603,27 @@ const AllocateRM = ({}) => {
         </CRow>
       </CCol>
 
-      <CCol xs={7} className="mt-1">
-        <CRow className="mt-2 px-3 py-3">
+      <CCol xs={8} className="mt-1">
+        <CRow className="mt-2 px-2 py-3">
           <CCard
             className="mb-2"
             style={{
               backgroundColor: '#f5f4f7',
               borderRadius: '10px',
+              height: 'calc(95vh - 200px)',
+              display: 'flex',
+              flexDirection: 'column',
+              border: 'none'
             }}
           >
-            <CCardBody>
+            <CCardBody style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div className="d-flex fw-bold justify-content-center align-items-center">
                 Raw Material
               </div>
               <div
                 style={{
-                  height: '6px',
-                  marginTop: '10px',
+                  height: '4px',
+                  marginTop: '8px',
                   backgroundColor: '#e5e7eb',
                   borderRadius: '2px',
                 }}
@@ -707,7 +699,7 @@ const AllocateRM = ({}) => {
                   </CFormSelect>
                 </CCol>
               </CRow>
-              <CRow className="align-items-center mt-3">
+              <CRow className="align-items-center mt-2">
                 <CCol md="2">
                   <label>Die</label>
                   <CFormSelect style={selectStyles}>
@@ -742,13 +734,13 @@ const AllocateRM = ({}) => {
 
               <div
                 style={{
-                  height: '6px',
-                  marginTop: '10px',
+                  height: '4px',
+                  marginTop: '8px',
                   backgroundColor: '#e5e7eb',
                   borderRadius: '2px',
                 }}
               ></div>
-              <div style={{ maxHeight: 'calc(96vh - 400px)', overflowY: 'auto' }}>
+              <div style={{ flex: 1, overflowY: 'auto', marginTop: '8px' }}>
                 {sfgData?.map((sfg, index) => (
                   <SFGDragableCard
                     sfg={sfg}

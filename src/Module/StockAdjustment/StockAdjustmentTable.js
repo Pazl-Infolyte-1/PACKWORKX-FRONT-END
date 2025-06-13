@@ -7,7 +7,7 @@ import {
   CTableBody,
   CTableDataCell,
 } from '@coreui/react'
-import { cilPencil, cilTrash } from '@coreui/icons'
+import { cilEco, cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { useNavigate } from 'react-router-dom'
 import CustomAlert from '../../components/New/CustomAlert'
@@ -172,21 +172,12 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized, refreshClients
                             <ThreeDotMenu
                               value={[
                                 {
-                                  label: 'Edit',
-                                  icon: cilPencil,
-                                  onClick: () => {
-                                    console.log('Edit', stock)
-                                    navigate('/stockadjustment/stock_form', { state: { stock } })
+                                  label: 'View',
+                                  icon: cilHandPointRight,
+                                  onClick: (e) => {
+                                    // e.stopPropagation()
+                                    navigate(`/stockadjustment/${stock.id}`)
                                   },
-                                },
-                                {
-                                  label: 'Delete',
-                                  icon: cilTrash,
-                                  onClick: () =>
-                                    setIsDeleteModalOpen({
-                                      open: true,
-                                      id: stock.id,
-                                    }),
                                 },
                               ]}
                             />

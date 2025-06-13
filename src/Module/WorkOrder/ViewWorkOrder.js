@@ -343,12 +343,15 @@ const ViewWorkOrder = () => {
   }
 
   // Update the handleDownloadQR function
-  const handleDownloadQR = async () => {
+  const handleDownloadQR = async (url) => {
     try {
       // Get the QR code URL
-      const qrCodeUrl = workOrder.qr_code_url;
+      const qrCodeUrl = `https://dev-packwork.pazl.info/api/file/download-qr?url=${url}`;
+      console.log(qrCodeUrl)
+
+      // file/download-qr?url=https://buzzdatabasebackup.s3.us-east-1.amazonaws.com/packworkz/uploads/1749793375012-wo__WO_00011_1749793374890.png
       
-      // Fetch the image
+      // // Fetch the image
       const response = await fetch(qrCodeUrl);
       const blob = await response.blob();
       
@@ -366,7 +369,7 @@ const ViewWorkOrder = () => {
       document.body.appendChild(link);
       link.click();
       
-      // Clean up
+      // // Clean up
       document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
@@ -647,8 +650,38 @@ const ViewWorkOrder = () => {
 
           {/* Right Column - Related Info */}
           <div>
+          <div className=" overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+  <div className="p-3 border-b border-gray-200">
+    <h3 className="text-sm font-medium text-gray-700">Work Order QR Code</h3>
+  </div>
+  <div className="flex flex-col items-center p-4">
+    {workOrder.qr_code || 'https://imgs.search.brave.com/znAUNdoz16sc9KdnG_yAXIp1PbojCOj3klSxYEmJySw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5zbmwubm8vbWVk/aWEvMTk0Nzc2L3N0/YW5kYXJkX3FyLWtv/ZGUucG5n' ? (
+      <>
+        <img 
+          src={workOrder.qr_code_url} 
+          alt="Work Order QR Code" 
+          className="w-48 h-48 object-contain mb-3"
+        />
+        <button 
+          onClick={()=>handleDownloadQR(workOrder.qr_code_url)}
+          className="px-3 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50"
+        >
+          <Download size={14} className="inline mr-1" />
+          Download QR Code
+        </button>
+      </>
+    ) : (
+      <div className="flex flex-col items-center justify-center w-48 h-48 bg-gray-50 rounded-lg border border-gray-200 mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v4m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+        </svg>
+        <p className="mt-2 text-xs text-gray-500">No QR Code Available</p>
+      </div>
+    )}
+  </div>
+</div>
             {/* Actions */}
-            <div className="overflow-visible bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div className="overflow-visible mt-2 bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="p-3 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">Actions</h3>
               </div>
@@ -789,36 +822,7 @@ const ViewWorkOrder = () => {
 
 
 {/* Work Order QR Code - Moved to bottom */}
-<div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-  <div className="p-3 border-b border-gray-200">
-    <h3 className="text-sm font-medium text-gray-700">Work Order QR Code</h3>
-  </div>
-  <div className="flex flex-col items-center p-4">
-    {workOrder.qr_code || 'https://imgs.search.brave.com/znAUNdoz16sc9KdnG_yAXIp1PbojCOj3klSxYEmJySw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5zbmwubm8vbWVk/aWEvMTk0Nzc2L3N0/YW5kYXJkX3FyLWtv/ZGUucG5n' ? (
-      <>
-        <img 
-          src={workOrder.qr_code_url} 
-          alt="Work Order QR Code" 
-          className="w-48 h-48 object-contain mb-3"
-        />
-        <button 
-          onClick={handleDownloadQR}
-          className="px-3 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50"
-        >
-          <Download size={14} className="inline mr-1" />
-          Download QR Code
-        </button>
-      </>
-    ) : (
-      <div className="flex flex-col items-center justify-center w-48 h-48 bg-gray-50 rounded-lg border border-gray-200 mb-3">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v4m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-        </svg>
-        <p className="mt-2 text-xs text-gray-500">No QR Code Available</p>
-      </div>
-    )}
-  </div>
-</div>
+
 
 
             {/* Modals */}

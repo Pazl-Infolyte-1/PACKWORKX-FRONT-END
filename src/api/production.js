@@ -51,7 +51,6 @@ export const productionApi = {
   getSingleGroupDetails:async(id)=>{
     return await apiClient.get(`/production/production-group/${id}/allocations`)
   }
-
 }
 
 

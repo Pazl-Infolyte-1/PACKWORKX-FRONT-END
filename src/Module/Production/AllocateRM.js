@@ -361,34 +361,32 @@ function GroupDropZone({
 function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggleGroupCollapse }) {
   const [visibleItemIndex, setVisibleItemIndex] = useState(null)
   const [visibleAllocate, setVisibleAllocate] = useState(false)
-  const [droppedItem, setDroppedItem] = useState(null); // 👈 to store dropped item
-  const [groupDetailsModal,setGroupDetailsModal] = useState({visible:false,id:null,data:[]})
+  const [droppedItem, setDroppedItem] = useState(null)
+  const [groupDetailsModal, setGroupDetailsModal] = useState({visible:false, id:null, data:[]})
 
   const addQuantity = (groupIndex, item) => {
     console.log('Group Index:', groupIndex)
     console.log('Item:', item)
-
     setVisibleAllocate(true)
-    // Your allocation logic here
   }
 
- const handleViewGroupClick = async (id)=>{
-  const response = await productionApi.getSingleGroupDetails(id)
-  setGroupDetailsModal({visible:true,id:id,data:response?.data?.data})
- }
+  const handleViewGroupClick = async (id) => {
+    const response = await productionApi.getSingleGroupDetails(id)
+    setGroupDetailsModal({visible:true, id:id, data:response?.data?.data})
+  }
 
-  const [{ isOver }, drop] = useDrop(() => ({
+  const [{ isOver, canDrop, draggedItem }, drop] = useDrop(() => ({
     accept: ItemType,
     drop: (item) => {
-      setDroppedItem(item); // 👈 save dropped item
-    setVisibleAllocate(true)
-
-    }
-  }));
-
-  useEffect(()=>{
-    console.log(group)
-  },[group])
+      setDroppedItem(item)
+      setVisibleAllocate(true)
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      // canDrop: monitor.canDrop(),
+      // draggedItem: monitor.getItem(), // 👈 Get the dragged item info
+    }),
+  }))
 
   return (
     <CCard
@@ -432,7 +430,7 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
               whiteSpace: 'nowrap',
             }}
           >
-{group.allocated_Qty}
+            {group.allocated_Qty}
             /
             {group.group_Qty}
 
@@ -477,13 +475,6 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
               style={{ cursor: 'pointer' }}
               onClick={() => {
                 handleViewGroupClick(group.id)
-                // setGroupDetailsModal((d) => ({
-                //   ...d,
-                //   visible: true,
-                //   id: group.id
-                // }))
-                // setModalWorkOrder(order)
-                //   setVisible(true)
               }}
             />
           </div>
@@ -499,7 +490,8 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
           droppedItem={droppedItem}
         />
       )}
-      {groupDetailsModal.visible&&(
+      
+      {groupDetailsModal.visible && (
         <GroupData
         isVisible={groupDetailsModal.visible}
         setVisible={setGroupDetailsModal}
@@ -507,11 +499,8 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
         data={groupDetailsModal.data}
         onClose={() => setGroupDetailsModal(prev => ({ ...prev, visible: false , id:null}))}
         />
-      )
-
-      }
+      )}
     </CCard>
-
   );
 }
 
@@ -611,7 +600,7 @@ const AllocateRM = ({}) => {
             </CCard>
           </CCol>
         </CRow>
-        <CRow className="mt-3">
+        <CRow className="mt-3 custom-srollbar" style={{ maxHeight: 'calc(90vh - 200px)', overflowY: 'auto' }}>
           <CCol xs={12}>
             {groupOrders?.map((group, groupIndex) => (
               <GroupRawMeterialDropZone
@@ -754,19 +743,21 @@ const AllocateRM = ({}) => {
               <div
                 style={{
                   height: '6px',
-                  marginTop: '20px',
+                  marginTop: '10px',
                   backgroundColor: '#e5e7eb',
                   borderRadius: '2px',
                 }}
               ></div>
-              {sfgData?.map((sfg, index) => (
-                <SFGDragableCard
-                  sfg={sfg}
-                  key={index}
-                  openSFG={openSFG}
-                  setOpenSFG={setOpenSFG}
-                />
-              ))}
+              <div style={{ maxHeight: 'calc(96vh - 400px)', overflowY: 'auto' }}>
+                {sfgData?.map((sfg, index) => (
+                  <SFGDragableCard
+                    sfg={sfg}
+                    key={index}
+                    openSFG={openSFG}
+                    setOpenSFG={setOpenSFG}
+                  />
+                ))}
+              </div>
             </CCardBody>
           </CCard>
         </CRow>

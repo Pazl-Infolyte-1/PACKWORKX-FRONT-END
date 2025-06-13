@@ -943,7 +943,7 @@ const Group = ({
 
   const removeWorkOrderFromPlan = (order, groupIndex) => {
     setGroupOrders((prevGroups) =>
-      prevGroups.map((group, index) =>
+      prevGroups?.map((group, index) =>
         index === groupIndex
           ? { ...group, items: group.items.filter((item) => item.id !== order.id) }
           : group,

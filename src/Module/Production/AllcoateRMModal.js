@@ -110,7 +110,7 @@ import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext';
                 <div className="border border-gray-200 rounded-lg overflow-hidden">
                   <div className="flex bg-gray-100 border-b border-gray-200">
                     <div className="flex-1 px-4 py-3 text-sm font-semibold text-gray-700 text-left">
-                      Work Order
+                      Groups
                     </div>
                     <div className=" bg-gray-300"></div>
                     <div className="flex-1 px-4 py-3 text-sm font-semibold text-gray-700 text-center">
@@ -119,20 +119,26 @@ import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext';
                   </div>
 
                   <div className="bg-white h-[250px] custom-scrollbar overflow-y-auto">
-                    {historyData?.map((order, index) => (
-                      <div key={index} className="flex">
-                        <div className="flex-1 px-4 py-3">
-                          <span className="text-sm text-blue-600 hover:underline cursor-pointer">
-                            {order.group_id}
-                          </span>
+                    {historyData && historyData.length > 0 ? (
+                      historyData.map((order, index) => (
+                        <div key={index} className="flex">
+                          <div className="flex-1 px-4 py-3">
+                            <span className="text-sm text-blue-600 hover:underline cursor-pointer">
+                              GRP=#{order.group_id}
+                            </span>
+                          </div>
+                          <div className="w-px bg-gray-200"></div>
+                          <div className="flex-1 px-4 py-3 flex items-center justify-end gap-2">
+                            <span className="text-sm text-gray-800">{order.allocated_Qty}</span>
+                            <Lock className="w-4 h-4 text-gray-600" />
+                          </div>
                         </div>
-                        <div className="w-px bg-gray-200"></div>
-                        <div className="flex-1 px-4 py-3 flex items-center justify-end gap-2">
-                          <span className="text-sm text-gray-800">{order.allocated_Qty}</span>
-                          <Lock className="w-4 h-4 text-gray-600" />
-                        </div>
+                      ))
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <span className="text-sm text-gray-500">No history available</span>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               </div>

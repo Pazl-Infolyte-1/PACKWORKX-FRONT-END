@@ -89,14 +89,7 @@ export const employeeApi = {
     const response = await apiClient.get('/designations')
     return response
   },
-  getDesignationListDisplay: async (search) => {
-  try {
-    const params = search ? { search } : {};
-    return await apiClient.get(`/designations`, { params });
-  } catch (error) {
-    console.error('Error in getDepartmentsListDisplay:', error);
-  }
-},
+
   deleteDesignation: async (id) => {
     const response = await apiClient.delete(`/designations/${id}`)
     return response

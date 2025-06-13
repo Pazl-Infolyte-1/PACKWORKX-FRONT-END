@@ -24,6 +24,7 @@ const PurchaseOrderReturn = () => {
   const searchBarRef = useRef(null)
   const { searchQuery } = useSearch()
   const [selectedPoId, setSelectedPoId] = useState(null)
+  const [resetTrigger, setResetTrigger] = useState(false)
 
   // Fetch data
   const fetchData = async () => {
@@ -127,6 +128,7 @@ const PurchaseOrderReturn = () => {
     setDrawerOpen(false)
     setIsPorEdit(false)
     setSelectedPorId(null)
+    setSelectedPoId(null)
   }
 
   const clearFilters = () => {
@@ -149,7 +151,7 @@ const PurchaseOrderReturn = () => {
             handleEdit={handleEdit}
           />
         </div>
-        <div className='mt-2'>
+        <div className="mt-2">
           <CompactPagination
             count={pagination?.totalPages || 1}
             page={pagination?.currentPage || 1}
@@ -176,6 +178,8 @@ const PurchaseOrderReturn = () => {
           title={isPorEdit ? 'Edit Purchase Order Return' : 'Add Purchase Order Return'}
         >
           <AddPurchaseOrderReturn
+            key={drawerOpen ? 'open' : 'closed'}
+            onResetComplete={() => setResetTrigger(false)} // 👈 Force remount on close
             isOpen={drawerOpen}
             isPorEdit={isPorEdit}
             selectedPorId={selectedPorId}
@@ -184,6 +188,7 @@ const PurchaseOrderReturn = () => {
             handlePurchaseDetails={handlePurchaseDetails}
             fetchData={fetchData}
             poData={poData}
+            resetTrigger={resetTrigger}
           />
         </Drawer>
       </div>

@@ -112,7 +112,7 @@ export default function ReusableTable({
                   return (
                     <CTableHeaderCell
                       key={col.key}
-                      className="px-3 py-2.5 text-xs !bg-gray-50 !text-gray-800 font-bold uppercase tracking-wider text-left border-b border-gray-200"
+  className="px-3 py-2.5 text-xs !bg-gray-50 !text-gray-800 font-bold uppercase tracking-wider text-left border-b border-gray-200 whitespace-nowrap"
                     >
                       {isCheckbox ? (
                         <input
@@ -125,7 +125,13 @@ export default function ReusableTable({
                           className="form-checkbox h-4 w-4 text-blue-600 cursor-pointer transition-all"
                         />
                       ) : (
-                        col.header
+                      <div className="flex items-center gap-[10px]">
+  <span>{col.header}</span>
+  {col.searchIcon && (
+    <span className="text-gray-500">⌕</span>
+  )}
+</div>
+
                       )}
                     </CTableHeaderCell>
                   )

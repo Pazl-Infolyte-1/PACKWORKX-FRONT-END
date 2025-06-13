@@ -118,11 +118,11 @@ const WorkOrderTable = ({
     //   header: '', // empty header for checkbox column
     //   type: 'checkbox',
     // },
-    { key: 'work_generate_id', header: 'Number', field: 'work_generate_id', cellClass: '' },
-    { key: 'sales_generate_id', header: 'SALES-ID', field: 'salesOrder.sales_generate_id', cellClass: '' },
-    { key: 'sales_ui_id', header: 'SO-Reference', field: 'salesOrder.sales_ui_id', cellClass: '' },
-    { key: 'sku_name', header: 'SKU Name', field: 'sku_name' },
-    { key: 'manufacture', header: 'Manufacture', field: 'manufacture' },
+    { key: 'work_generate_id', header: 'Number', field: 'work_generate_id', cellClass: '', searchIcon: true },
+    { key: 'sales_generate_id', header: 'SALES-ID', field: 'salesOrder.sales_generate_id', cellClass: '', searchIcon: true },
+    { key: 'sales_ui_id', header: 'SO-Reference', field: 'salesOrder.sales_ui_id', cellClass: '', searchIcon: true },
+    { key: 'sku_name', header: 'SKU Name', field: 'sku_name', searchIcon: true },
+    { key: 'manufacture', header: 'Manufacture', field: 'manufacture', searchIcon: true  },
     { key: 'created_at', header: 'Created Date', field: 'created_at', type: 'date' },
     { key: 'qty', header: 'Qty', type: 'number', field: 'qty' },
     {
@@ -170,6 +170,7 @@ const WorkOrderTable = ({
       onChange: (row, newValue) => {
         handleProgressChange(newValue, row.id)
       },
+       searchIcon: true
     },
 
     {
@@ -217,39 +218,7 @@ const WorkOrderTable = ({
     )
   ),
 },
-    // {
-    //   key: 'actions',
-    //   header: 'action',
-    //   field: 'actions',
-    //   type: 'custom',
-    //   render: (row) => (
-    //     <ThreeDotMenu
-    //       value={[
-    //         {
-    //           label: 'View',
-    //           icon: cilHandPointRight,
-    //           onClick: () => {
-    //             handleView(row)
-    //           },
-    //         },
-    //         {
-    //           label: 'Edit',
-    //           icon: cilPencil,
-    //           onClick: () => {
-    //             handleEdit(row.id)
-    //           },
-    //         },
-    //         {
-    //           label: 'Delete',
-    //           icon: cilTrash,
-    //           onClick: () => {
-    //             handleDelete(row.id)
-    //           },
-    //         },
-    //       ]}
-    //     />
-    //   ),
-    // },
+
   ]
 
 

@@ -120,8 +120,8 @@ function ListOfSalesOrder() {
       const response = await salesOrderApi.getSalesOrderList({
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,
-        client: searchQuery,
-        sales_status: status
+        search: searchQuery,
+        //sales_status: status
       })
       setData(response?.data?.data)
       setApiResponse(response?.data)

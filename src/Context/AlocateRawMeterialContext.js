@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { productionApi } from "../api/production";
 
 const RawMaterialContext = createContext();
 
@@ -6,14 +7,94 @@ export const useRawMaterialContext = () => useContext(RawMaterialContext);
 
 export const RawMaterialProvider = ({ children }) => {
   const [groupOrders, setGroupOrders] = useState([]);
+  const [sfgData, setSfgData] = useState([]);
+  const [error, setError] = useState(null);
 
-  useEffect(()=>{
-    groupOrders
-  },[groupOrders])
+  
+  const [selectedFilters, setSelectedFilters] = useState({
+    gsm: '',
+    bf: '',
+    color: '',
+    deckle: '',
+    rawMeterial: '',
+  });
+
+  const fetchReels = async (params) => {
+    try {
+      const formattedParams = {
+        gsm: params?.gsm || '',
+        bf: params?.bf || '',
+        color: params?.color || '',
+        deckle: params?.deckle || ''
+      };
+      
+      const response = await productionApi.getReelsInRawMeterial(formattedParams);
+      if (response) {
+        setSfgData(response?.data?.data);
+      }
+    } catch (error) {
+      console.error('Error fetching reels:', error);
+      setError(error?.response?.data?.message || 'Failed to fetch reels data');
+    }
+  };
+
+  const fetchWorkOrders = async () => {
+    try {
+      const response = await productionApi.getProductionGroups();
+      setGroupOrders(response?.data?.data);
+    } catch (error) {
+      console.error("Error fetching work orders:", error);
+      setError(error?.response?.data?.message || 'Failed to fetch work orders');
+    }
+  };
+
+  const handleFilterChange = async (filterName, value) => {
+    const newFilters = {
+      ...selectedFilters,
+      [filterName]: value
+    };
+    
+    setSelectedFilters(newFilters);
+    await fetchReels(newFilters); // Pass the new filters directly
+  };
+
+
+  const getData = async () => {
+    // Force a fresh fetch with current filters
+    await fetchReels(selectedFilters);
+    await fetchWorkOrders();
+  }
+
+  const refreshData = async () => {
+    // Reset all filters to empty strings
+    const clearedFilters = {
+      gsm: '',
+      bf: '',
+      color: '',
+      deckle: '',
+      rawMeterial: '',
+    };
+    setSelectedFilters(clearedFilters);
+    
+    // Fetch fresh data with cleared filters
+    await fetchReels(clearedFilters);
+    await fetchWorkOrders();
+  };
+
+
+
 
   const value = {
     groupOrders,
+    sfgData,
+    error,
+    selectedFilters,
     setGroupOrders,
+    handleFilterChange,
+    fetchWorkOrders,
+    fetchReels,
+    getData,
+    refreshData
   };
 
   return (

@@ -83,6 +83,7 @@ const Login = React.lazy(() => import('./views/pages/login/Login'))
 const Register = React.lazy(() => import('./views/pages/register/Register'))
 const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
 const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
+const LandingPage = React.lazy(() => import('./views/landing/LandingPage'))
 
 // Protected route component to redirect authenticated users away from auth pages
 const PublicRoute = ({ element }) => {
@@ -121,14 +122,9 @@ const App = () => {
         <Routes>
           <Route
             path="/"
-            element={
-              isAuthenticated ? (
-                <Navigate to="/dashboard" replace />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
+            element={<LandingPage />}
           />
+          <Route path="/landing" name="Landing Page" element={<LandingPage />} />
           <Route path="/login" name="Login Page" element={<PublicRoute element={<Login />} />} />
           <Route
             path="/register"
@@ -138,8 +134,12 @@ const App = () => {
           <Route path="/404" name="Page 404" element={<Page404 />} />
           <Route path="/500" name="Page 500" element={<Page500 />} />
           <Route
-            path="*"
+            path="/dashboard/*"
             element={isAuthenticated ? <DefaultLayout /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="*"
+            element={<Navigate to="/" replace />}
           />
         </Routes>
       </Suspense>

@@ -4,7 +4,6 @@ import { FaAngleDown, FaAngleUp, FaHistory, FaUsers, FaTimes } from "react-icons
 import ProgressBar from '../ProgressBar' // Assuming you have this component
 
 function GroupData({ isVisible, onClose, data }) {
-    console.log(data,'fffff')
   const [visibleHistory, setVisibleHistory] = useState(false)
 
   // Close modal on Escape key
@@ -26,56 +25,6 @@ function GroupData({ isVisible, onClose, data }) {
     }
   }, [isVisible, onClose])
 
-  // Mock data for demonstration - replace with your actual data prop
-  const mockData = data || {
-    production_group: {
-      id: 1,
-      group_name: "Assembly Line A",
-      group_Qty: 50,
-      allocated_Qty: 20,
-      status: "active",
-      created_at: "2025-06-10T11:06:55.000Z",
-      updated_at: "2025-06-12T19:27:53.000Z"
-    },
-    allocation_status: {
-      required_qty: 50,
-      allocated_qty: 20,
-      remaining_to_allocate: 30,
-      allocation_percentage: 40
-    },
-    allocation_history: [
-      {
-        id: 4,
-        allocated_Qty: 10,
-        status: "active",
-        created_at: "2025-06-12T19:27:53.000Z",
-        Inventory: {
-          id: 23,
-          quantity_available: "80.00"
-        }
-      },
-      {
-        id: 1,
-        allocated_Qty: 10,
-        status: "active",
-        created_at: "2025-06-12T09:14:10.000Z",
-        Inventory: {
-          id: 23,
-          quantity_available: "80.00"
-        }
-      },
-      {
-        id: 2,
-        allocated_Qty: 20,
-        status: "active",
-        created_at: "2025-06-12T09:14:10.000Z",
-        Inventory: {
-          id: 23,
-          quantity_available: "80.00"
-        }
-      }
-    ]
-  }
 
   const { production_group, allocation_status, allocation_history } = mockData
 

@@ -41,12 +41,30 @@ export const RawMaterialProvider = ({ children }) => {
   const fetchWorkOrders = async () => {
     try {
       const response = await productionApi.getProductionGroups();
-      setGroupOrders(response?.data?.data);
+      const groupsWithHistory = response?.data?.data.map(group => ({
+        ...group,
+        history: {
+          inventory_id: group.id,
+          qty: group.allocated_Qty || 0
+        }
+      }));
+      setGroupOrders(groupsWithHistory);
     } catch (error) {
       console.error("Error fetching work orders:", error);
       setError(error?.response?.data?.message || 'Failed to fetch work orders');
     }
   };
+
+
+  // const fetchWorkOrders = async () => {
+  //   try {
+  //     const response = await productionApi.getProductionGroups();
+  //     setGroupOrders(response?.data?.data);
+  //   } catch (error) {
+  //     console.error("Error fetching work orders:", error);
+  //     setError(error?.response?.data?.message || 'Failed to fetch work orders');
+  //   }
+  // };
 
   const handleFilterChange = async (filterName, value) => {
     const newFilters = {

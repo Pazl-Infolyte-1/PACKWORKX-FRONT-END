@@ -258,13 +258,13 @@ export default function ReusableTable({
           className="overflow-x-auto custom-scrollbar w-full rounded-sm border border-gray-300 shadow-sm bg-white"
           style={tableContainerStyle}
         >
-          <CTable hover className="w-full border-collapse">
+          <CTable  className="w-full border-collapse">
             <CTableBody>
               {data.length > 0 ? (
                 data.map((row, rowIndex) => (
                   <React.Fragment key={rowIndex}>
                     <CTableRow
-                      className={`border-b text-sm text-gray-900 hover:bg-gray-50 transition-colors ${expandableConfig ? 'cursor-pointer' : ''} ${
+                      className={`border-b text-sm text-gray-900  transition-colors ${expandableConfig ? 'cursor-pointer' : ''} ${
                         miniScreenFields.length === 2 ? 'flex justify-between' : ''
                       }`}
                       onClick={(e) => handleRowClick1(row, e, rowIndex)}

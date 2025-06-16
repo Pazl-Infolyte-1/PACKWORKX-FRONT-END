@@ -53,11 +53,12 @@ const StockTableView = React.lazy(() => import('./Module/StockAdjustment/StockTa
 
 const Invoice = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceList.js'))
 const InvoiceView = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceView.js'))
-const InventoryForm =React.lazy(()=>import('./Module/Inventory/Items/AddItemProcess.js'))
-const DebitNote= React.lazy(() => import('./Module/DebitNote/DebitNote.js'))
-const DebitNoteForm= React.lazy(() => import('./Module/DebitNote/DebitNoteForm.js'))
-
-
+const InventoryForm = React.lazy(() => import('./Module/Inventory/Items/AddItemProcess.js'))
+const DebitNote = React.lazy(() => import('./Module/DebitNote/DebitNote.js'))
+const DebitNoteForm = React.lazy(() => import('./Module/DebitNote/DebitNoteForm.js'))
+const CreditNote = React.lazy(() => import('./Module/CreditNote/CreditNote.js'))
+const CreditNoteForm = React.lazy(() => import('./Module/CreditNote/CreditNoteForm.js'))
+const CreditNoteView = React.lazy(() => import('./Module/CreditNote/CreditNoteView.js'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
@@ -72,13 +73,13 @@ const routes = [
 
   { path: '/clients/clientForm', name: 'Add Client', element: ClientForm, key: '10-1' },
   //{ path: '/SKU', name: 'SKU', element: SKU, key: 23 },
-{
-  path: '/sku',
-  name: 'SKU',
-  element: SKU,
-  key: 23,
-  children: [{ path: ':id', element: SkuView, key: 'sku_view' }],
-},
+  {
+    path: '/sku',
+    name: 'SKU',
+    element: SKU,
+    key: 23,
+    children: [{ path: ':id', element: SkuView, key: 'sku_view' }],
+  },
   //{
   //  path: '/sku/add',
   //  name: 'Add SKU',
@@ -101,20 +102,19 @@ const routes = [
     key: 22,
   },
   { path: '/inventoryhandling', name: 'Inventory Handling', element: InventoryMain, key: 28 },
-    { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 230 },
-  { path: '/production',
-     name: 'Production',
-      element: Production,
-       key: 26,
-       children:[
-          { path: 'WorkOrders', name: 'WorkOrders', element: WorkOrderListProduction, key: '' },
-          { path: 'GroupLayers', name: 'GroupLayers', element: GroupLayerProduction, key: '' },
-          { path: 'AllocateRM', name: 'AllocateRM', element: RawMeterialProduction, key: '' },
-          // const tabs = ['Work Orders','Group Layers',  'Allocate RM', 'Returnables', 'Outsource & Preview']//'Allocate SFG'
-       ]
-
-
-   },
+  { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 230 },
+  {
+    path: '/production',
+    name: 'Production',
+    element: Production,
+    key: 26,
+    children: [
+      { path: 'WorkOrders', name: 'WorkOrders', element: WorkOrderListProduction, key: '' },
+      { path: 'GroupLayers', name: 'GroupLayers', element: GroupLayerProduction, key: '' },
+      { path: 'AllocateRM', name: 'AllocateRM', element: RawMeterialProduction, key: '' },
+      // const tabs = ['Work Orders','Group Layers',  'Allocate RM', 'Returnables', 'Outsource & Preview']//'Allocate SFG'
+    ],
+  },
   { path: '/packages', name: 'Packages', element: Packages, key: 5001 },
   { path: '/process', name: 'Process', element: Process, key: 5007 },
   { path: '/routeprocess', name: 'Route Process', element: RouteProcess, key: 5008 },
@@ -168,6 +168,15 @@ const routes = [
   { path: '/role', name: 'role', element: Role, key: '' },
   { path: '/debitnote', name: 'Debit Note', element: DebitNote, key: '' },
   { path: '/debitnote/add-form', name: 'Add Debit Note', element: DebitNoteForm, key: '' },
+  {
+    path: '/credit-note',
+    name: 'Credit Note',
+    element: CreditNote,
+    key: '',
+    children: [{ path: '/credit-note/:id', name: 'CreditNoteView', element: CreditNoteView, key: '' }],
+  },
+  { path: '/credit-note/form', name: 'Add Credit Note', element: CreditNoteForm, key: '' },
+  { path: '/credit-note/form/:id', name: 'Edit Credit Note', element: CreditNoteForm, key: '' },
 
   { path: '/users', name: 'user', element: DropDownController, key: 6000 },
   {
@@ -209,8 +218,12 @@ const routes = [
       },
     ],
   },
-          { path: '/inventoryhandling/inventory_form', name: 'Inventory', element: InventoryForm, key: 2232 },
-
+  {
+    path: '/inventoryhandling/inventory_form',
+    name: 'Inventory',
+    element: InventoryForm,
+    key: 2232,
+  },
 ]
 
 export default routes

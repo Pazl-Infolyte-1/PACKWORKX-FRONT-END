@@ -1,8 +1,8 @@
 /* Support Chatbot Styles */
 .chat-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
   width: 60px;
   height: 60px;
   background: linear-gradient(135deg, #e67e22, #d35400);
@@ -12,9 +12,11 @@
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(230, 126, 34, 0.4);
-  z-index: 9999;
+  z-index: 99999 !important;
   transition: all 0.3s ease;
   color: white;
+  transform: translateZ(0); /* Force hardware acceleration */
+  will-change: transform; /* Optimize for animations */
 }
 
 .chat-toggle:hover {
@@ -64,9 +66,9 @@
 
 /* Chat Window */
 .chat-window {
-  position: fixed;
-  bottom: 100px;
-  right: 20px;
+  position: fixed !important;
+  bottom: 100px !important;
+  right: 20px !important;
   width: 380px;
   max-width: calc(100vw - 40px);
   height: 600px;
@@ -74,11 +76,13 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  z-index: 9998;
+  z-index: 99998 !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: slideUp 0.3s ease;
+  transform: translateZ(0); /* Force hardware acceleration */
+  will-change: transform; /* Optimize for animations */
 }
 
 @keyframes slideUp {
@@ -370,23 +374,24 @@
 /* Mobile Responsive */
 @media (max-width: 480px) {
   .chat-window {
-    bottom: 90px;
-    right: 10px;
-    left: 10px;
+    bottom: 90px !important;
+    right: 10px !important;
+    left: 10px !important;
     width: auto;
     max-width: none;
     height: 500px;
   }
   
   .chat-toggle {
-    bottom: 15px;
-    right: 15px;
+    bottom: 15px !important;
+    right: 15px !important;
     width: 50px;
     height: 50px;
   }
   
   .chat-notification {
     bottom: 60px;
+    right: 0 !important;
     font-size: 12px;
   }
 }

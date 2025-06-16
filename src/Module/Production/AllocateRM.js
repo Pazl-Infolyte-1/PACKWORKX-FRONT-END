@@ -9,7 +9,7 @@ import {
   CCollapse,
   CFormSelect,
 } from '@coreui/react'
-import { FaAngleDown, FaAngleUp } from 'react-icons/fa'
+import { FaAngleDown, FaAngleUp, FaEye } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
 import { cilOptions, cilBriefcase, cilCut, cilClipboard, cilTrash } from '@coreui/icons'
 import { useDrag, useDrop } from 'react-dnd'
@@ -20,8 +20,9 @@ import AllcoateRMModal from './AllcoateRMModal'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext'
 import { productionApi } from '../../api/production'
+import GroupData from './RawmeterialComponents/GroupData'
 
-const ItemType = 'WORK_ORDER'
+const ItemType = 'RawMeterial'
 
 const CustomToggle = React.forwardRef(({ onClick }, ref) => (
   <span
@@ -40,17 +41,21 @@ const CustomToggle = React.forwardRef(({ onClick }, ref) => (
   </span>
 ))
 
-function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
-  console.log(sfg,'ffffffffffffff')
+function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
   const [, drag] = useDrag(() => ({
     type: ItemType,
-    item: { sfg },
-  }))
-  const toggleCollapse = (item_id) => {
-    setOpenSFG((prevId) => (prevId === item_id ? null : item_id)) // Toggle behavior
+    item: () => {
+      console.log('Dragging item:', { sfg });
+      return { sfg };
+    }
+  }), [sfg])
+
+
+  const toggleCollapse = (id) => {
+    setOpenSFG((prevId) => (prevId === id ? null : id)) // Toggle behavior
   }
   return (
-    <CCard className="mt-3" ref={drag} key={sfg.item_id}>
+    <CCard className="mt-3" ref={drag} key={sfg.id}>
       <CCardBody>
         <div
           style={{
@@ -61,7 +66,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
           }}
         >
           <span
-            onClick={() => toggleCollapse(sfg.item_id)}
+            onClick={() => toggleCollapse(sfg.id)}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -69,7 +74,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
               whiteSpace: 'nowrap', // Prevents text from wrapping
             }}
           >
-            Reel {sfg.item_id} {openSFG === sfg.item_id ? <FaAngleUp /> : <FaAngleDown />}
+            Reel {sfg.id} {openSFG === sfg.id ? <FaAngleUp /> : <FaAngleDown />}
           </span>
           <span
             style={{
@@ -102,66 +107,66 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
                     console.log('Remove from Plan')
                   },
                 },
-                {
-                  label: 'Split Work Order',
-                  icon: cilCut,
-                  onClick: () => {
-                    setVisibleSplit(true)
-                  },
-                },
+                // {
+                //   label: 'Split Work Order',
+                //   icon: cilCut,
+                //   onClick: () => {
+                //     setVisibleSplit(true)
+                //   },
+                // },
               ]}
             />
           </span>
         </div>
 
-        <CCollapse className="custom-collapse" visible={openSFG === sfg.item_id}>
+        <CCollapse className="custom-collapse" visible={openSFG === sfg.id}>
           <CRow className="align-items-center text-sm mt-3 mb-2">
-            <CCol md="2">
-              <span>GSM : {sfg?.item?.custom_fields?.gsm}</span>
+            <CCol md="2" className="text-nowrap">
+              <span>GSM: {sfg?.item?.default_custom_fields?.gsm}</span>
             </CCol>
-            <CCol md="2">
-              <span>BF : {sfg?.item?.custom_fields?.bf}</span>
+            <CCol md="2" className="text-nowrap">
+              <span>BF: {sfg?.item?.default_custom_fields?.bf}</span>
             </CCol>
-            <CCol md="2">
-              <span>Deckle : {sfg?.item?.custom_fields?.deckle_size}</span>
+            <CCol md="2" className="text-nowrap">
+              <span>Deckle: {sfg?.item?.default_custom_fields?.deckle_size}</span>
             </CCol>
-            <CCol md="3">
-              <span>Available Qty (KG) : {sfg.available_qty}</span>
+            <CCol md="3" className="text-nowrap">
+              <span>Available Qty: {sfg?.quantity_available} KG</span>
             </CCol>
-            <CCol md="3">
-              <span>Blocked Qty (KG) : {sfg.blocked_qty}</span>
+            <CCol md="3" className="text-nowrap">
+              <span>Blocked Qty: {sfg?.quantity_blocked} KG</span>
             </CCol>
           </CRow>
           <hr />
           <CRow className="mt-3">
-            <CCol xs={6}>
+            <CCol xs={12}>
               {sfg?.work_orders?.map((wo, index) => (
                 <CCard
                   key={index}
                   style={{
-                    height: '63px',
+                    height: '50px',
                     backgroundColor: '#ffffff',
                     borderRadius: '10px',
-                    boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.16)',
                     marginTop: '10px',
-                    padding: '8px', // Reduced padding to fit content
+                    padding: '4px',
                     display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center', // Centers content vertically
-                    alignItems: 'center', // Centers content horizontally
-                    overflow: 'hidden', // Prevents overflow
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    overflow: 'hidden',
+                    border: 'none'
                   }}
                 >
-                  <CRow className="w-100 text-center p-1">
-                    <CCol xs={6} className="flex flex-col items-center">
+                  <div className="d-flex justify-content-between w-100 px-3">
+                    <div className="text-center" style={{ width: '50%' }}>
                       <span className="font-semibold text-sm">Work Order</span>
-                      <div className="mt-1 text-xs">{wo.wo_id}</div>
-                    </CCol>
-                    <CCol xs={6} className="flex flex-col items-center">
+                      <div className="text-xs">{wo.wo_id}</div>
+                    </div>
+                    <div className="text-center" style={{ width: '50%' }}>
                       <span className="font-semibold text-sm">Quantity (KG)</span>
-                      <div className="mt-1 text-xs">{wo.quantity}</div>
-                    </CCol>
-                  </CRow>
+                      <div className="text-xs">{wo.quantity}</div>
+                    </div>
+                  </div>
                 </CCard>
               ))}
             </CCol>
@@ -174,23 +179,11 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG, setVisibleSplit }) {
 
 function GroupDropZone({
   i,
-  group,
   itemIndex,
-  groupIndex,
-  addQuantity,
   visibleItemIndex,
   setVisibleItemIndex,
   setVisibleSplit,
-  setVisibleAllocate,
 }) {
-  const [, drop] = useDrop(() => ({
-    accept: ItemType,
-    drop: (item) => {
-      setVisibleAllocate(true)
-      // addQuantity(i, groupIndex, item)
-    },
-  }))
-
   const toggleItemCollapse = (index) => {
     setVisibleItemIndex(visibleItemIndex === index ? null : index)
   }
@@ -198,46 +191,47 @@ function GroupDropZone({
   return (
     <CCard
       key={itemIndex}
-      ref={drop}
       className="mb-2"
       style={{
-        marginTop: '10px',
+        marginTop: '6px',
         backgroundColor: '#f5f4f7',
-        borderRadius: '10px',
+        borderRadius: '8px',
+        padding: '4px',
+        border: 'none'
       }}
     >
-      <CCardBody>
+      <CCardBody style={{ padding: '8px' }}>
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             cursor: 'pointer',
-            width: '100%', // Ensures proper space allocation
+            width: '100%',
           }}
         >
-          {/* Keep order_id and icon in the same row */}
           <span
             onClick={() => toggleItemCollapse(itemIndex)}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '6px', // Adds space between text and icon
-              whiteSpace: 'nowrap', // Prevents text wrapping
+              gap: '4px',
+              whiteSpace: 'nowrap',
+              fontSize: '0.9rem',
+              fontWeight: '500',
             }}
           >
-            {console.log()}
-            {`${i?.layer_detail?.layer}, ${i?.layer_detail?.layer}`}
-            {visibleItemIndex === itemIndex ? <FaAngleUp /> : <FaAngleDown />}
+            {`${i?.work_generate_id}`},
+            {`${i?.layer_detail?.layer}`} 
+            {/* {visibleItemIndex === itemIndex ? <FaAngleUp size={14} /> : <FaAngleDown size={14} />} */}
           </span>
 
-          {/* Ensure finished_goods / quantity stay aligned */}
           <span
             style={{
               display: 'flex',
               alignItems: 'center',
-              fontSize: '16px',
-              lineHeight: '21px',
+              fontSize: '0.85rem',
+              lineHeight: '1',
               whiteSpace: 'nowrap',
             }}
           >
@@ -245,7 +239,7 @@ function GroupDropZone({
               <>
                 {`${i.finished_goods} / ${i.quantity}`}
                 <div
-                  style={{ marginLeft: '10px', marginRight: '10px', width: '45px', height: '40px' }}
+                  style={{ marginLeft: '8px', marginRight: '8px', width: '35px', height: '30px' }}
                 >
                   <ProgressBar
                     value={Math.min(
@@ -257,11 +251,9 @@ function GroupDropZone({
               </>
             ) : (
               <>
-                {`80 / 100`}
                 <div
-                  style={{ marginLeft: '10px', marginRight: '10px', width: '45px', height: '40px' }}
+                  style={{ marginLeft: '8px', marginRight: '8px', width: '35px', height: '30px' }}
                 >
-                  <ProgressBar value={80} />
                 </div>
               </>
             )}
@@ -272,7 +264,7 @@ function GroupDropZone({
                   <CIcon
                     icon={cilBriefcase}
                     className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                    style={{ color: '#8167e5', fontSize: '1.2rem', fontWeight: 'bold' }}
                   />
                   View Work Order
                 </Dropdown.Item>
@@ -280,7 +272,7 @@ function GroupDropZone({
                   <CIcon
                     icon={cilClipboard}
                     className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                    style={{ color: '#8167e5', fontSize: '1.2rem', fontWeight: 'bold' }}
                   />
                   View Sales Order
                 </Dropdown.Item>
@@ -288,7 +280,7 @@ function GroupDropZone({
                   <CIcon
                     icon={cilTrash}
                     className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                    style={{ color: '#8167e5', fontSize: '1.2rem', fontWeight: 'bold' }}
                   />
                   Remove from Plan
                 </Dropdown.Item>
@@ -296,7 +288,7 @@ function GroupDropZone({
                   <CIcon
                     icon={cilCut}
                     className="me-2"
-                    style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                    style={{ color: '#8167e5', fontSize: '1.2rem', fontWeight: 'bold' }}
                   />
                   Split Work Order
                 </Dropdown.Item>
@@ -305,13 +297,14 @@ function GroupDropZone({
           </span>
         </div>
 
-        <CCollapse className="custom-collapse" visible={visibleItemIndex === itemIndex}>
+        {/* <CCollapse className="custom-collapse" visible={visibleItemIndex === itemIndex}> */}
           <div
             style={{
-              marginTop: '10px',
+              marginTop: '6px',
               display: 'flex',
               justifyContent: 'space-between',
-              gap: '8px',
+              gap: '6px',
+              fontSize: '0.85rem',
             }}
           >
             {i.sku_name ? (
@@ -335,22 +328,23 @@ function GroupDropZone({
           {i.layer_group
             ? i.layer_group.map((lg) => (
                 <CCard
-                  key={lg.layer_name} // Added a unique key
+                  key={lg.layer_name}
                   style={{
-                    padding: '10px',
-                    marginTop: '10px',
+                    padding: '6px',
+                    marginTop: '6px',
                     backgroundColor: '#f5f4f7',
-                    borderRadius: '10px',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
                   }}
                 >
                   {lg.layer_name}
                   <br />
                   <div
                     style={{
-                      marginTop: '10px',
+                      marginTop: '6px',
                       display: 'flex',
                       justifyContent: 'space-between',
-                      gap: '8px',
+                      gap: '6px',
                     }}
                   >
                     <span>Board Size (L x W) : {lg.dimensions}</span>
@@ -361,72 +355,183 @@ function GroupDropZone({
                 </CCard>
               ))
             : null}
-        </CCollapse>
+        {/* </CCollapse> */}
       </CCardBody>
     </CCard>
   )
 }
 
-const AllocateRM = ({
-  // workOrders,
-  // setWorkOrders,
-  // // setGroupOrders,
-  // autoSyncOrders,
-  // setVisibleSplit,
-}) => {
-  const [visibleGroupIndex, setVisibleGroupIndex] = useState(null)
+function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggleGroupCollapse }) {
   const [visibleItemIndex, setVisibleItemIndex] = useState(null)
-  const [advanced, setAdvanced] = useState(false)
   const [visibleAllocate, setVisibleAllocate] = useState(false)
-  const [visibleSplit, setVisibleSplit] = useState(false)
+  const [droppedItem, setDroppedItem] = useState(null)
+  const [groupDetailsModal, setGroupDetailsModal] = useState({visible:false, id:null, data:[]})
 
+  const addQuantity = (groupIndex, item) => {
+    console.log('Group Index:', groupIndex)
+    console.log('Item:', item)
+    setVisibleAllocate(true)
+  }
+
+  const handleViewGroupClick = async (id) => {
+    const response = await productionApi.getSingleGroupDetails(id)
+    setGroupDetailsModal({visible:true, id:id, data:response?.data?.data})
+  }
+
+  const [{ isOver, canDrop, draggedItem }, drop] = useDrop(() => ({
+    accept: ItemType,
+    drop: (item) => {
+      setDroppedItem(item)
+      setVisibleAllocate(true)
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  }))
+
+  return (
+    <CCard
+      ref={drop}
+      key={groupIndex}
+      className="mb-2"
+      style={{
+        backgroundColor: isOver ? '#e0e0e0' : '#f5f4f7',
+        borderRadius: '8px',
+        border: isOver ? '2px dashed #8167e5' : 'none',
+        transition: 'all 0.3s ease',
+        padding: '4px',
+      }}
+    >
+      <CCardBody style={{ padding: '8px' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            cursor: 'pointer',
+            width: '100%',
+          }}
+        >
+          <span
+            onClick={() => toggleGroupCollapse(groupIndex)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              whiteSpace: 'nowrap',
+              fontSize: '0.9rem',
+              fontWeight: '500',
+            }}
+          >
+            {group.group_name}{' '}
+            {visibleGroupIndex === groupIndex ? <FaAngleUp size={14} /> : <FaAngleDown size={14} />}
+          </span>
+
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              whiteSpace: 'nowrap',
+              fontSize: '0.85rem',
+            }}
+          >
+            {group.allocated_Qty}
+            /
+            {group.group_Qty}
+
+            <div style={{ marginLeft: '8px', width: '35px', height: '30px' }}>
+              <ProgressBar
+                value={Math.min(
+                  Math.max(
+                    (() => {
+                      if (group.group_Qty < 1) return 0;
+                      const percentage = (group.allocated_Qty / group.group_Qty) * 100;
+                      return parseFloat(percentage.toFixed(1));
+                    })(),
+                    0,
+                  ),
+                  100,
+                )}
+              />
+            </div>
+          </span>
+        </div>
+
+        <CCollapse className="custom-collapse" visible={visibleGroupIndex === groupIndex}>
+          {group?.layer_details?.map((i, itemIndex) => (
+            <GroupDropZone
+              key={itemIndex}
+              i={i}
+              itemIndex={itemIndex}
+              visibleItemIndex={visibleItemIndex}
+              setVisibleItemIndex={setVisibleItemIndex}
+            />
+          ))}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginTop: '6px',
+              marginBottom: '4px',
+              marginRight: '8px',
+            }}
+          >
+            <FaEye
+              size={14}
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                handleViewGroupClick(group.id)
+              }}
+            />
+          </div>
+        </CCollapse>
+      </CCardBody>
+      {visibleAllocate && (
+        <AllcoateRMModal
+          visibleAllocate={visibleAllocate}
+          setVisibleAllocate={() => {
+            setVisibleAllocate(false)
+          }}
+          group={group}
+          droppedItem={droppedItem}
+        />
+      )}
+      
+      {groupDetailsModal.visible && (
+        <GroupData
+        isVisible={groupDetailsModal.visible}
+        setVisible={setGroupDetailsModal}
+        groupID={groupDetailsModal.id}
+        data={groupDetailsModal.data}
+        onClose={() => setGroupDetailsModal(prev => ({ ...prev, visible: false , id:null}))}
+        />
+      )}
+    </CCard>
+  );
+}
+
+const AllocateRM = ({}) => {
+  // const [advanced, setAdvanced] = useState(false)
+  // const [visibleSplit, setVisibleSplit] = useState(false)
+  
+  const [visibleGroupIndex, setVisibleGroupIndex] = useState(null)
   const [deckleOptions, setDeckleOptions] = useState([]);
   const [colorOptions, setColorOptions] = useState([]);
   const [gsmOptions, setGsmOptions] = useState([]);
   const [bfOptions, setBfOptions] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [openSFG, setOpenSFG] = useState(null)
+  const {groupOrders,refreshData, sfgData ,handleFilterChange,selectedFilters} = useRawMaterialContext()
+  useEffect(()=>{
+    console.log(sfgData,'this is the data')
+  },[sfgData])
 
-  // Add state for selected filter values
-  const [selectedFilters, setSelectedFilters] = useState({
-    gsm: '',
-    bf: '',
-    color: '',
-    deckle: '',
-    rawMeterial:'',
-  });
 
-  const handleFilterChange = (filterName, value) => {
-    setSelectedFilters(prev => ({
-      ...prev,
-      [filterName]: value
-    }));
-  };
 
-  const fetchReels = async (params) => {
-    try {
-      // Format the parameters correctly
-      const formattedParams = {
-        gsm: params.gsm || '',
-        bf: params.bf || '',
-        color: params.color || '',
-        deckle: params.deckle || ''
-      };
 
-      const response = await productionApi.getReelsInRawMeterial(formattedParams);
-      if (response) {
-        setSfgData(response?.data.data.inventoryData)
-      }
-    } catch (error) {
-      console.error('Error fetching reels:', error);
-      setError(error?.response?.data?.message || 'Failed to fetch reels data');
-    }
-  };
-
-  // Update useEffect to watch selectedFilters
   useEffect(() => {
-    fetchReels(selectedFilters);
-  }, [selectedFilters]);
+    refreshData()
+    }, [])
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -437,9 +542,6 @@ const AllocateRM = ({
           productionApi.getGsmOptions(),
           productionApi.getBfOptions(),
         ]);
-
-        // console.log(deckleRes.value?.data?.data, colorRes, gsmRes, bfRes)
-        
 
         setDeckleOptions(deckleRes?.value?.data?.data);
         setColorOptions(colorRes?.value?.data?.data);
@@ -453,47 +555,12 @@ const AllocateRM = ({
     fetchOptions();
   }, []);
 
-
-
-
-  const [sfgData, setSfgData] = useState([
-    {
-      id: 'Reel 02',
-      gsm: 90,
-      bf: 10,
-      deckle: 150,
-      available_qty: 300,
-      blocked_qty: 150,
-      work_orders: [
-        {
-          wo_id: 'WO-1004',
-          quantity: 200,
-        },
-      ],
-    },
-    {
-      id: 'Reel 03',
-      gsm: 180,
-      bf: 20,
-      deckle: 120,
-      available_qty: 300,
-      blocked_qty: 150,
-      work_orders: [
-        {
-          wo_id: 'WO-1010',
-          quantity: 150,
-        },
-      ],
-    },
-  ])
-
   const selectStyles = {
     height: '21px',
     padding: '0px 8px',
     border: '0',
     boxSizing: 'border-box',
     borderRadius: '10px',
-    boxShadow: '0px 2px 8px rgba(0,0,0,0.16)',
     backgroundColor: '#ffffff',
     color: '#030303',
     fontSize: '14px',
@@ -502,222 +569,72 @@ const AllocateRM = ({
     outline: 'none',
   }
 
-  const [openSFG, setOpenSFG] = useState(null)
-  const {groupOrders,setGroupOrders} = useRawMaterialContext()
-
-
-  const fetchWorkOrders = async () => {
-    try {
-      const response = await productionApi.getProductionGroups();
-      setGroupOrders(response?.data?.data);
-    } catch (error) {
-      console.error("Error fetching work orders:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchWorkOrders();
-  }, []);
-
-
-  const addQuantity = (i, groupIndex, item) => {
-    console.log('Work Order:', i)
-    console.log('Group Index:', groupIndex)
-    console.log('Item:', item)
-
-    // setGroupOrders((prevOrders) =>
-    //   prevOrders.map((order) => {
-    //     if (order.order_id === i.wo_id) {
-    //       console.log('Inside the if condition')
-    //       console.log('Order:', order)
-
-    //       const updatedItems = order.items.map((orderItem) =>
-    //         orderItem.id === i.id
-    //           ? {
-    //               ...orderItem,
-    //               finished_goods: orderItem.finished_goods + item.sfg['available_qty'],
-    //             }
-    //           : orderItem,
-    //       )
-
-    //       return {
-    //         ...order,
-    //         items: updatedItems,
-    //       }
-    //     }
-    //     return order
-    //   }),
-    // )
-    setSfgData((prevSfgData) => prevSfgData.filter((sfg) => sfg.id !== item.sfg['id']))
-  }
-
   const toggleGroupCollapse = (index) => {
     setVisibleGroupIndex(visibleGroupIndex === index ? null : index)
   }
 
   return (
     <>
-      <CCol xs={5} className="mt-4">
+      <CCol xs={4} className="mt-4">
         <CRow>
           <CCol xs={12}>
-            <CCard
-              className="text-black bold"
-              style={{
-                cursor: 'pointer',
-                height: '56px',
-                padding: '0px 8px',
-                border: '0',
-                boxSizing: 'border-box',
-                borderRadius: '4px',
-                boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
-                backgroundColor: '#c7c7f1',
-                color: '#000000',
-                fontSize: '22px',
-                fontFamily: 'Roboto',
-                fontWeight: '500',
-                lineHeight: '31px',
-                outline: 'none',
-              }}
+            <div
+              className="text-black bold w-full bg-[#c7c7f1] text-md p-2 font-[Roboto]"
             >
               <CCardBody>
                 <div className="d-flex justify-content-between align-items-center">
-                  <CCardText className="mx-auto text-bold">Grouped Work Orders</CCardText>
+                  <CCardText className=" ">Grouped Work Orders</CCardText>
                 </div>
               </CCardBody>
-            </CCard>
+            </div>
           </CCol>
         </CRow>
-        <CRow className="mt-3">
+        <CRow className="mt-3 custom-srollbar" style={{ height: 'calc(95vh - 200px)', overflowY: 'auto' }}>
           <CCol xs={12}>
-            {/* {console.log(groupOrders)} */}
             {groupOrders?.map((group, groupIndex) => (
-              <CCard
+              <GroupRawMeterialDropZone
                 key={groupIndex}
-                className="mb-2"
-                style={{
-                  backgroundColor: '#f5f4f7',
-                  borderRadius: '10px',
-                }}
-              >
-                <CCardBody>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      cursor: 'pointer',
-                      width: '100%', // Ensures elements use available space
-                    }}
-                  >
-                    {/* Ensures group.name and the icon stay on the same line */}
-                    <span
-                      onClick={() => toggleGroupCollapse(groupIndex)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px', // Adds space between text and icon
-                        whiteSpace: 'nowrap', // Prevents text wrapping
-                      }}
-                    >
-                      {group.group_name}{' '}
-                      {visibleGroupIndex === groupIndex ? <FaAngleUp /> : <FaAngleDown />}
-                    </span>
-
-                    {/* Ensures numbers stay aligned */}
-                    <span
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {group?.items?.reduce(
-                        (sum, g) => (g.finished_goods ? sum + g.finished_goods : sum + 0),
-                        0,
-                      )}{' '}
-                      /
-                      {group?.items?.reduce((sum, g) => (g.quantity ? sum + g.quantity : sum + 0), 0)}
-                      <div style={{ marginLeft: '10px', width: '45px', height: '40px' }}>
-                        <ProgressBar
-                          value={Math.min(
-                            Math.max(
-                              (() => {
-                                const totalFinishedGoods = group?.items?.reduce(
-                                  (sum, g) => sum + (g.finished_goods || 0),
-                                  0,
-                                )
-                                const totalQuantity = group?.items?.reduce(
-                                  (sum, g) => sum + (g.quantity || 0),
-                                  0,
-                                )
-
-                                if (totalQuantity < 1) return 0
-
-                                const percentage = (totalFinishedGoods / totalQuantity) * 100
-
-                                return parseFloat(percentage.toFixed(1)) // Ensure only one decimal place
-                              })(),
-                              0,
-                            ),
-                            100,
-                          )}
-                        />
-                      </div>
-                    </span>
-                  </div>
-
-                  <CCollapse className="custom-collapse" visible={visibleGroupIndex === groupIndex}>
-                    {group?.layer_details?.map((i, itemIndex) => (
-                      <GroupDropZone
-                        key={itemIndex}
-                        group={group}
-                        i={i}
-                        itemIndex={itemIndex}
-                        groupIndex={groupIndex}
-                        addQuantity={addQuantity}
-                        visibleItemIndex={visibleItemIndex}
-                        setVisibleItemIndex={setVisibleItemIndex}
-                        setVisibleSplit={setVisibleSplit}
-                        setVisibleAllocate={setVisibleAllocate}
-                      />
-                    ))}
-                  </CCollapse>
-                </CCardBody>
-              </CCard>
+                group={group}
+                groupIndex={groupIndex}
+                visibleGroupIndex={visibleGroupIndex}
+                toggleGroupCollapse={toggleGroupCollapse}
+              />
             ))}
           </CCol>
         </CRow>
       </CCol>
 
-      <CCol xs={7} className="mt-1">
-        <CRow className="mt-2 px-3 py-3">
+      <CCol xs={8} className="mt-1">
+        <CRow className="mt-2 px-2 py-3">
           <CCard
             className="mb-2"
             style={{
               backgroundColor: '#f5f4f7',
               borderRadius: '10px',
+              height: 'calc(95vh - 200px)',
+              display: 'flex',
+              flexDirection: 'column',
+              border: 'none'
             }}
           >
-            <CCardBody>
+            <CCardBody style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div className="d-flex fw-bold justify-content-center align-items-center">
                 Raw Material
               </div>
               <div
                 style={{
-                  height: '6px',
-                  marginTop: '10px',
+                  height: '4px',
+                  marginTop: '8px',
                   backgroundColor: '#e5e7eb',
                   borderRadius: '2px',
                 }}
               ></div>
 
               <CRow className="align-items-center mt-3">
-              <CCol md="2">
+                <CCol md="2">
                   <label>Raw Meterial</label>
                   <CFormSelect 
                     style={selectStyles}
-                    // value={selectedFilters.gsm}
-                    // onChange={(e) => handleFilterChange('rawMeterial', e.target.value)}
                   >
                     <option value="Reel">Reel</option>
                   </CFormSelect>
@@ -726,7 +643,7 @@ const AllocateRM = ({
                   <label>GSM</label>
                   <CFormSelect 
                     style={selectStyles}
-                    value={selectedFilters.gsm}
+                    value={selectedFilters?.gsm}
                     onChange={(e) => handleFilterChange('gsm', e.target.value)}
                   >
                     <option value="">GSM</option>
@@ -741,7 +658,7 @@ const AllocateRM = ({
                   <label>BF</label>
                   <CFormSelect 
                     style={selectStyles}
-                    value={selectedFilters.bf}
+                    value={selectedFilters?.bf}
                     onChange={(e) => handleFilterChange('bf', e.target.value)}
                   >
                     <option value="">BF</option>
@@ -756,7 +673,7 @@ const AllocateRM = ({
                   <label>Color</label>
                   <CFormSelect 
                     style={selectStyles}
-                    value={selectedFilters.color}
+                    value={selectedFilters?.color}
                     onChange={(e) => handleFilterChange('color', e.target.value)}
                   >
                     <option value="">Color</option>
@@ -771,7 +688,7 @@ const AllocateRM = ({
                   <label>Deckle</label>
                   <CFormSelect 
                     style={selectStyles}
-                    value={selectedFilters.deckle}
+                    value={selectedFilters?.deckle}
                     onChange={(e) => handleFilterChange('deckle', e.target.value)}
                   >
                     <option value="">Deckle</option>
@@ -782,34 +699,8 @@ const AllocateRM = ({
                     ))}
                   </CFormSelect>
                 </CCol>
-{/* 
-                <CCol md="2" className="d-flex justify-content-end">
-                  <CButton
-                    color="light"
-                    onClick={() => setAdvanced(!advanced)}
-                    className="d-flex align-items-center"
-                  >
-                    Advanced {advanced ? <FaAngleUp /> : <FaAngleDown />}
-                  </CButton>
-                </CCol> */}
               </CRow>
-              {advanced && (
-                <CRow className="mt-3">
-                  <CCol md="3">
-                    <label>Board Length</label>
-                    <CFormSelect>
-                      <option>--</option>
-                    </CFormSelect>
-                  </CCol>
-                  <CCol md="3">
-                    <label>Board Width</label>
-                    <CFormSelect>
-                      <option>--</option>
-                    </CFormSelect>
-                  </CCol>
-                </CRow>
-              )}
-              <CRow className="align-items-center mt-3">
+              <CRow className="align-items-center mt-2">
                 <CCol md="2">
                   <label>Die</label>
                   <CFormSelect style={selectStyles}>
@@ -844,28 +735,27 @@ const AllocateRM = ({
 
               <div
                 style={{
-                  height: '6px',
-                  marginTop: '20px',
+                  height: '4px',
+                  marginTop: '8px',
                   backgroundColor: '#e5e7eb',
                   borderRadius: '2px',
                 }}
               ></div>
-              {sfgData?.map((sfg, index) => (
-                
-                <SFGDragableCard
-                  sfg={sfg}
-                  key={index}
-                  openSFG={openSFG}
-                  setOpenSFG={setOpenSFG}
-                  setVisibleSplit={setVisibleSplit}
-                />
-              ))}
+              <div style={{ flex: 1, overflowY: 'auto', marginTop: '8px' }}>
+                {sfgData?.map((sfg, index) => (
+                  <SFGDragableCard
+                    sfg={sfg}
+                    key={index}
+                    openSFG={openSFG}
+                    setOpenSFG={setOpenSFG}
+                  />
+                ))}
+              </div>
             </CCardBody>
           </CCard>
         </CRow>
       </CCol>
 
-      <AllcoateRMModal visibleAllocate={visibleAllocate} setVisibleAllocate={setVisibleAllocate} />
     </>
   )
 }

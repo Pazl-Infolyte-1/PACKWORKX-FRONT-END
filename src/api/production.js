@@ -41,8 +41,16 @@ export const productionApi = {
   },
   removeWorkOrderFromCreationStageInProduction:async(workorderId,params)=>{
     return await apiClient.patch(`/work-order/production/${workorderId}`,{...params})
+  },
+  getInventoryHistory:async(id)=>{
+    return await apiClient.get(`/production/allocation-history/inventory/${id}`)
+  },
+  allocateInventoryToGroup:async(body)=>{
+    return await apiClient.patch(`/production/production-group/allocate`,body)
+  },
+  getSingleGroupDetails:async(id)=>{
+    return await apiClient.get(`/production/production-group/${id}/allocations`)
   }
-
 }
 
 

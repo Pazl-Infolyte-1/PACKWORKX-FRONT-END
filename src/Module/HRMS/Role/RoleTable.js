@@ -27,7 +27,7 @@ function RoleTable({ roles, loading, onEdit, onDelete }) {
   }
 
   const columns = [
-    { key: 'id', header: 'ID', field: 'id' },
+    //{ key: 'id', header: 'ID', field: 'id' },
     { key: 'name', header: 'Role Name', field: 'name' },
     // { key: 'Parent_Role', header: 'Parent Role', field: 'Parent_Role', type: 'custom', render: (row) => <p className="text-start">{row?.parent_role?.role_name || 'None'}</p> },
     { key: 'created_at', header: 'Created Date', field: 'created_at', type: 'date' },

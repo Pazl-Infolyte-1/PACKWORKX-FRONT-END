@@ -131,10 +131,10 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
               <span>Deckle: {sfg?.item?.default_custom_fields?.deckle_size}</span>
             </CCol>
             <CCol md="3" className="text-nowrap">
-              <span>Available Qty: {sfg.quantity_available} KG</span>
+              <span>Available Qty: {sfg?.quantity_available} KG</span>
             </CCol>
             <CCol md="3" className="text-nowrap">
-              <span>Blocked Qty: {sfg.blocked_qty} KG</span>
+              <span>Blocked Qty: {sfg?.quantity_blocked} KG</span>
             </CCol>
           </CRow>
           <hr />
@@ -221,8 +221,9 @@ function GroupDropZone({
               fontWeight: '500',
             }}
           >
-            {`${i?.layer_detail?.layer}`}
-            {visibleItemIndex === itemIndex ? <FaAngleUp size={14} /> : <FaAngleDown size={14} />}
+            {`${i?.work_generate_id}`},
+            {`${i?.layer_detail?.layer}`} 
+            {/* {visibleItemIndex === itemIndex ? <FaAngleUp size={14} /> : <FaAngleDown size={14} />} */}
           </span>
 
           <span
@@ -296,7 +297,7 @@ function GroupDropZone({
           </span>
         </div>
 
-        <CCollapse className="custom-collapse" visible={visibleItemIndex === itemIndex}>
+        {/* <CCollapse className="custom-collapse" visible={visibleItemIndex === itemIndex}> */}
           <div
             style={{
               marginTop: '6px',
@@ -354,7 +355,7 @@ function GroupDropZone({
                 </CCard>
               ))
             : null}
-        </CCollapse>
+        {/* </CCollapse> */}
       </CCardBody>
     </CCard>
   )

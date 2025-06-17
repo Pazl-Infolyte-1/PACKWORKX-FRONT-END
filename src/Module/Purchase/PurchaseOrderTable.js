@@ -176,7 +176,7 @@ function PurchaseOrderTable({
       render: (row) => (
         <>
           <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold -ml-11
+            className={`px-2 py-1 rounded-full text-xs font-semibold -ml-11 w-28 text-center inline-block
           ${row.po_status === 'partialy-recieved' ? 'bg-blue-100 text-blue-800' : ''}
           ${row.po_status === 'created' ? 'bg-green-100 text-green-800' : ''}
           ${row.po_status === 'returned' ? 'bg-red-100 text-red-800' : ''}

@@ -169,7 +169,6 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
           cgst: parseFloat(itemData.cgst) || 0,
           sgst: parseFloat(itemData.sgst) || 0,
           manufacturer: itemData.manufacturer,
-          min_stock_level: parseFloat(itemData.min_stock_level) || 0,
           reorder_level: parseFloat(itemData.reorder_level) || 0,
           standard_cost: parseFloat(itemData.standard_cost) || 0,
           specifications: itemData.specifications,
@@ -337,7 +336,6 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
         ...data,
         custom_fields: customFields, // Directly use the object
         default_custom_fields: defaultFields, // Directly use the object
-        min_stock_level: parseFloat(data.min_stock_level) || 0,
         reorder_level: parseFloat(data.reorder_level) || 0,
         standard_cost: parseFloat(data.standard_cost) || 0,
         cgst: parseFloat(data.cgst) || 0,
@@ -403,7 +401,6 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
     { label: 'CGST %', name: 'cgst', type: 'number', min: 0, max: 100 },
     { label: 'SGST %', name: 'sgst', type: 'number', min: 0, max: 100 },
     { label: 'Manufacturer', name: 'manufacturer' },
-    { label: 'Min Stock Level', name: 'min_stock_level', type: 'number', min: 0 },
     { label: 'Reorder Level', name: 'reorder_level', type: 'number', min: 0 },
   ]
 
@@ -655,7 +652,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Category <span className="text-red-500"> *</span></label>
           <select
             style={getInputStyle(errors.category)}
             className="w-full rounded px-3 py-1"
@@ -692,7 +689,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
 
         {selectedItemType && subCategory.length > 0 && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">SubCategory</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">SubCategory <span className="text-red-500"> *</span></label>
             <select
               style={getInputStyle(errors.sub_category)}
               className="w-full rounded px-3 py-1"

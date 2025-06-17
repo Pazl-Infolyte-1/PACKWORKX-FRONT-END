@@ -24,11 +24,11 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
   }
 
   const openItemDetails = async (id) => {
-    const response = await itemApi.getItemList()
+    const response = await itemApi.getItemList({limit:1000})
     const items = response?.data?.data || []
-    console.log(items, 'item')
+    console.log(items, id, 'item')
     const item = items.find((i) => i.id === parseInt(id))
-    const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}
+    const customFields = item?.custom_fields
     console.log(customFields)
 
     setModalContent(
@@ -214,8 +214,10 @@ function PurchaseOrderDetails({ showPopUp, cell, editTag, setShowPopUp, handleSk
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                               {item.item_code}
                             </td>
+                            {console.log(item,"click item")
+                            }
                             <td
-                              onClick={() => openItemDetails(item.id)}
+                              onClick={() => openItemDetails(item.item_id)}
                               className="cursor-pointer text-blue-600"
                             >
                               ℹ️

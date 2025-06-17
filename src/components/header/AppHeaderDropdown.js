@@ -34,6 +34,7 @@ const AppHeaderDropdown = () => {
 
   const handleLogout = () => {
     dispatch(logout())
+    
   }
 
   const Navigater = (route) => {

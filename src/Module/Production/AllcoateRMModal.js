@@ -8,6 +8,7 @@ import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext';
     const [historyData,setHistoryData] = useState()
     const {getData} = useRawMaterialContext()
 
+
     useEffect(() => {
       async function fetchData() {
         console.log(droppedItem.sfg.id, 'jjjj')
@@ -58,28 +59,36 @@ import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext';
 
 
     return (
+      
       <div className="fixed inset-0 z-[2000] overflow-y-auto">
         <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={() => setVisibleAllocate(false)} />
 
-        <div className="flex min-h-full items-center justify-center p-4">
-          <div className="relative w-[600px] h-[690px] bg-white shadow-lg overflow-hidden rounded-xl">
-            <div className="p-4 pb-2 border-b border-gray-200">
-              <h1 className="text-lg font-semibold text-gray-800 mb-5">
+        <div className="flex  items-center justify-center p-1">
+          <div className="relative w-[600px] max-h-[730px] bg-white px-4 shadow-lg overflow-hidden rounded-xl">
+            <div className="p-2  border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">
                 Allocation - Reel 02
-              </h1>
+              </h2>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
+
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Total Quantity</span>
+                  <span className="text-sm text-gray-600">Available Quantity In Inventory</span>
+                  <div className="bg-gray-100 px-3 py-1.5 rounded-md text-sm text-gray-600 w-24 text-right pr-2">
+                    {droppedItem?.sfg?.quantity_available} KG
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Total Group Quantity</span>
                   <div className="bg-gray-100 px-3 py-1.5 rounded-md text-sm text-gray-600 w-24 text-right pr-2">
                     {group?.group_Qty} KG
                   </div>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Available Quantity</span>
+                  <span className="text-sm text-gray-600"> Balance To Allocate In group</span>
                   <div className="bg-gray-100 px-3 py-1.5 rounded-md text-sm text-gray-600 w-24 text-right pr-2">
-                    {droppedItem?.sfg?.quantity_available} KG
+                    {group?.group_Qty - group.balance_qty} KG
                   </div>
                 </div>
 
@@ -119,17 +128,17 @@ import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext';
                   </div>
 
                   <div className="bg-white h-[250px] custom-scrollbar overflow-y-auto">
-                    {historyData && historyData.length > 0 ? (
-                      historyData.map((order, index) => (
+                    {historyData && historyData.group_allocations.length > 0 ? (
+                      historyData.group_allocations.map((order, index) => (
                         <div key={index} className="flex">
                           <div className="flex-1 px-4 py-3">
                             <span className="text-sm text-blue-600 hover:underline cursor-pointer">
-                              GRP=#{order.group_id}
+                              GRP-#{order?.group_id}
                             </span>
                           </div>
                           <div className="w-px bg-gray-200"></div>
                           <div className="flex-1 px-4 py-3 flex items-center justify-end gap-2">
-                            <span className="text-sm text-gray-800">{order.allocated_Qty}</span>
+                            <span className="text-sm text-gray-800">{order.net_allocated_qty}</span>
                             <Lock className="w-4 h-4 text-gray-600" />
                           </div>
                         </div>

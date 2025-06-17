@@ -9,7 +9,7 @@ import {
   CCollapse,
   CFormSelect,
 } from '@coreui/react'
-import { FaAngleDown, FaAngleUp, FaEye } from 'react-icons/fa'
+import { FaAngleDown, FaAngleUp, FaEye, FaLock } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
 import { cilOptions, cilBriefcase, cilCut, cilClipboard, cilTrash } from '@coreui/icons'
 import { useDrag, useDrop } from 'react-dnd'
@@ -21,6 +21,7 @@ import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext'
 import { productionApi } from '../../api/production'
 import GroupData from './RawmeterialComponents/GroupData'
+import { ConstructionOutlined } from '@mui/icons-material'
 
 const ItemType = 'RawMeterial'
 
@@ -131,10 +132,10 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
               <span>Deckle: {sfg?.item?.default_custom_fields?.deckle_size}</span>
             </CCol>
             <CCol md="3" className="text-nowrap">
-              <span>Available Qty: {sfg.quantity_available} KG</span>
+              <span>Available Qty: {sfg?.quantity_available} KG</span>
             </CCol>
             <CCol md="3" className="text-nowrap">
-              <span>Blocked Qty: {sfg.blocked_qty} KG</span>
+              <span>Blocked Qty: {sfg?.quantity_blocked} KG</span>
             </CCol>
           </CRow>
           <hr />
@@ -210,35 +211,54 @@ function GroupDropZone({
             width: '100%',
           }}
         >
-          <span
-            onClick={() => toggleItemCollapse(itemIndex)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              whiteSpace: 'nowrap',
-              fontSize: '0.9rem',
-              fontWeight: '500',
-            }}
-          >
-            {`${i?.layer_detail?.layer}`}
-            {visibleItemIndex === itemIndex ? <FaAngleUp size={14} /> : <FaAngleDown size={14} />}
-          </span>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '4px',
+            flex: 1,
+            minWidth: 0 // This ensures text truncation works
+          }}>
+            <span
+              onClick={() => toggleItemCollapse(itemIndex)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '0.8rem',
+                fontWeight: '500',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                flex: 1
+              }}
+            >
+              {`${i?.work_generate_id}`},
+              {`${i?.layer_detail?.layer}`} 
+              {visibleItemIndex === itemIndex ? <FaAngleUp size={12} /> : <FaAngleDown size={12} />}
+            </span>
+          </div>
 
-          <span
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              fontSize: '0.85rem',
-              lineHeight: '1',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            flexShrink: 0
+          }}>
             {i.quantity ? (
               <>
-                {`${i.finished_goods} / ${i.quantity}`}
+                <span style={{ 
+                  fontSize: '0.75rem',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0
+                }}>
+                  {`${i.finished_goods} / ${i.quantity}`}
+                </span>
                 <div
-                  style={{ marginLeft: '8px', marginRight: '8px', width: '35px', height: '30px' }}
+                  style={{ 
+                    width: '30px', 
+                    height: '25px',
+                    flexShrink: 0
+                  }}
                 >
                   <ProgressBar
                     value={Math.min(
@@ -249,12 +269,13 @@ function GroupDropZone({
                 </div>
               </>
             ) : (
-              <>
-                <div
-                  style={{ marginLeft: '8px', marginRight: '8px', width: '35px', height: '30px' }}
-                >
-                </div>
-              </>
+              <div
+                style={{ 
+                  width: '30px', 
+                  height: '25px',
+                  flexShrink: 0
+                }}
+              />
             )}
             <Dropdown>
               <Dropdown.Toggle as={CustomToggle} />
@@ -293,7 +314,7 @@ function GroupDropZone({
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-          </span>
+          </div>
         </div>
 
         <CCollapse className="custom-collapse" visible={visibleItemIndex === itemIndex}>
@@ -365,11 +386,44 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
   const [visibleAllocate, setVisibleAllocate] = useState(false)
   const [droppedItem, setDroppedItem] = useState(null)
   const [groupDetailsModal, setGroupDetailsModal] = useState({visible:false, id:null, data:[]})
+  const [isDeallocating, setIsDeallocating] = useState(false);
+  const [deallocationError, setDeallocationError] = useState(null);
+  const {getData} = useRawMaterialContext()
 
   const addQuantity = (groupIndex, item) => {
     console.log('Group Index:', groupIndex)
     console.log('Item:', item)
     setVisibleAllocate(true)
+  }
+
+
+  const handleDeAllocateClick = async (inventory_id, total_qty, grpId) => {
+    try {
+      setIsDeallocating(true);
+      setDeallocationError(null);
+
+      const payload = {
+        deallocations: [
+          {
+            production_group_id: grpId,
+            inventory_id: inventory_id,
+            quantity_to_deallocate: total_qty,
+          }
+        ]
+      }
+
+      const response = await productionApi.deAllocateInventoryFromGroup({...payload});
+      
+
+      // Refresh data after successful deallocation
+      await getData();
+      
+    } catch (error) {
+      console.error('Deallocation error:', error);
+      setDeallocationError(error?.message || 'Failed to deallocate inventory. Please try again.');
+    } finally {
+      setIsDeallocating(false);
+    }
   }
 
   const handleViewGroupClick = async (id) => {
@@ -457,15 +511,78 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
         </div>
 
         <CCollapse className="custom-collapse" visible={visibleGroupIndex === groupIndex}>
-          {group?.layer_details?.map((i, itemIndex) => (
-            <GroupDropZone
-              key={itemIndex}
-              i={i}
-              itemIndex={itemIndex}
-              visibleItemIndex={visibleItemIndex}
-              setVisibleItemIndex={setVisibleItemIndex}
-            />
-          ))}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            {/* Left Column - Layer Details */}
+            <div className="custom-scrollbar" style={{ 
+              flex: 1.3,
+              maxHeight: '400px',
+              overflowY: 'auto',
+              overflowX: 'hidden'
+            }}>
+              {group?.layer_details?.map((i, itemIndex) => (
+                <GroupDropZone
+                  key={itemIndex}
+                  i={i}
+                  itemIndex={itemIndex}
+                  visibleItemIndex={visibleItemIndex}
+                  setVisibleItemIndex={setVisibleItemIndex}
+                />
+              ))}
+            </div>
+
+            {/* Right Column - History List */}
+            <div className="custom-scrollbar" style={{ 
+              flex: 1,
+              backgroundColor: '#f5f4f7',
+              marginTop: '5px',
+              borderLeft: '1px solid #e5e7eb',
+              padding: '12px',
+              maxHeight: '400px',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <div style={{ 
+                fontSize: '0.9rem',
+                fontWeight: '500',
+                marginBottom: '12px',
+                color: '#4b5563'
+              }}>
+                Allocation History
+              </div>
+
+              <div style={{ flex: 1, overflowY: 'auto' }}>
+                {group.allocation_history?.allocation_by_inventory?.map((allocation, index) => (
+                  <div key={index} style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '8px',
+                    backgroundColor: '#ffffff',
+                    borderRadius: '6px',
+                    fontSize: '0.85rem',
+                    marginBottom: '8px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span>Inventory ID: {allocation.inventory_id}</span>
+                      <span>Total Allocated: {allocation.total_allocated_qty}</span>
+                    </div>
+                    <FaLock 
+                      size={14}
+                      style={{ 
+                        cursor: isDeallocating ? 'not-allowed' : 'pointer',
+                        color: isDeallocating ? '#9ca3af' : '#8167e5',
+                        opacity: isDeallocating ? 0.7 : 1
+                      }}
+                      onClick={() => !isDeallocating && handleDeAllocateClick(allocation.inventory_id, allocation.total_allocated_qty, group.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div
             style={{
               display: 'flex',
@@ -562,7 +679,7 @@ const AllocateRM = ({}) => {
     borderRadius: '10px',
     backgroundColor: '#ffffff',
     color: '#030303',
-    fontSize: '14px',
+    fontSize: '12px',
     fontFamily: 'Roboto, sans-serif',
     lineHeight: '16px',
     outline: 'none',
@@ -573,189 +690,182 @@ const AllocateRM = ({}) => {
   }
 
   return (
-    <>
-      <CCol xs={4} className="mt-4">
-        <CRow>
-          <CCol xs={12}>
-            <div
-              className="text-black bold w-full bg-[#c7c7f1] text-md p-2 font-[Roboto]"
-            >
-              <CCardBody>
-                <div className="d-flex justify-content-between align-items-center">
-                  <CCardText className=" ">Grouped Work Orders</CCardText>
-                </div>
-              </CCardBody>
+    <CRow className="mt-4">
+      {/* Groups Column */}
+      <CCol xs={6}>
+        <div
+          className="text-black bold w-full bg-[#c7c7f1] text-md p-2 font-[Roboto]"
+        >
+          <CCardBody>
+            <div className="d-flex justify-content-between align-items-center">
+              <CCardText className=" ">Grouped Work Orders</CCardText>
             </div>
-          </CCol>
-        </CRow>
-        <CRow className="mt-3 custom-srollbar" style={{ height: 'calc(95vh - 200px)', overflowY: 'auto' }}>
-          <CCol xs={12}>
-            {groupOrders?.map((group, groupIndex) => (
-              <GroupRawMeterialDropZone
-                key={groupIndex}
-                group={group}
-                groupIndex={groupIndex}
-                visibleGroupIndex={visibleGroupIndex}
-                toggleGroupCollapse={toggleGroupCollapse}
-              />
-            ))}
-          </CCol>
-        </CRow>
+          </CCardBody>
+        </div>
+        <div className="mt-3 custom-srollbar" style={{ height: 'calc(95vh - 200px)', overflowY: 'auto' }}>
+          {groupOrders?.map((group, groupIndex) => (
+            <GroupRawMeterialDropZone
+              key={groupIndex}
+              group={group}
+              groupIndex={groupIndex}
+              visibleGroupIndex={visibleGroupIndex}
+              toggleGroupCollapse={toggleGroupCollapse}
+            />
+          ))}
+        </div>
       </CCol>
 
-      <CCol xs={8} className="mt-1">
-        <CRow className="mt-2 px-2 py-3">
-          <CCard
-            className="mb-2"
-            style={{
-              backgroundColor: '#f5f4f7',
-              borderRadius: '10px',
-              height: 'calc(95vh - 200px)',
-              display: 'flex',
-              flexDirection: 'column',
-              border: 'none'
-            }}
-          >
-            <CCardBody style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <div className="d-flex fw-bold justify-content-center align-items-center">
-                Raw Material
-              </div>
-              <div
-                style={{
-                  height: '4px',
-                  marginTop: '8px',
-                  backgroundColor: '#e5e7eb',
-                  borderRadius: '2px',
-                }}
-              ></div>
+      {/* Raw Material Column */}
+      <CCol xs={6}>
+        <CCard
+          className="mb-2"
+          style={{
+            backgroundColor: '#f5f4f7',
+            borderRadius: '10px',
+            height: 'calc(95vh - 200px)',
+            display: 'flex',
+            flexDirection: 'column',
+            border: 'none'
+          }}
+        >
+          <CCardBody style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div className="d-flex fw-bold justify-content-center align-items-center" style={{ fontSize: '14px' }}>
+              Raw Material
+            </div>
+            <div
+              style={{
+                height: '4px',
+                marginTop: '8px',
+                backgroundColor: '#e5e7eb',
+                borderRadius: '2px',
+              }}
+            ></div>
 
-              <CRow className="align-items-center mt-3">
-                <CCol md="2">
-                  <label>Raw Meterial</label>
-                  <CFormSelect 
-                    style={selectStyles}
-                  >
-                    <option value="Reel">Reel</option>
-                  </CFormSelect>
-                </CCol>
-                <CCol md="2">
-                  <label>GSM</label>
-                  <CFormSelect 
-                    style={selectStyles}
-                    value={selectedFilters?.gsm}
-                    onChange={(e) => handleFilterChange('gsm', e.target.value)}
-                  >
-                    <option value="">GSM</option>
-                    {gsmOptions?.map((option, index) => (
-                      <option key={index} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </CFormSelect>
-                </CCol>
-                <CCol md="2">
-                  <label>BF</label>
-                  <CFormSelect 
-                    style={selectStyles}
-                    value={selectedFilters?.bf}
-                    onChange={(e) => handleFilterChange('bf', e.target.value)}
-                  >
-                    <option value="">BF</option>
-                    {bfOptions?.map((option, index) => (
-                      <option key={index} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </CFormSelect>
-                </CCol>
-                <CCol md="2">
-                  <label>Color</label>
-                  <CFormSelect 
-                    style={selectStyles}
-                    value={selectedFilters?.color}
-                    onChange={(e) => handleFilterChange('color', e.target.value)}
-                  >
-                    <option value="">Color</option>
-                    {colorOptions?.map((option, index) => (
-                      <option key={index} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </CFormSelect>
-                </CCol>
-                <CCol md="2">
-                  <label>Deckle</label>
-                  <CFormSelect 
-                    style={selectStyles}
-                    value={selectedFilters?.deckle}
-                    onChange={(e) => handleFilterChange('deckle', e.target.value)}
-                  >
-                    <option value="">Deckle</option>
-                    {deckleOptions?.map((option, index) => (
-                      <option key={index} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </CFormSelect>
-                </CCol>
-              </CRow>
-              <CRow className="align-items-center mt-2">
-                <CCol md="2">
-                  <label>Die</label>
-                  <CFormSelect style={selectStyles}>
-                    <option>180</option>
-                  </CFormSelect>
-                </CCol>
-                <CCol md="2">
-                  <label>Ink</label>
-                  <CFormSelect style={selectStyles}>
-                    <option>25</option>
-                  </CFormSelect>
-                </CCol>
-                <CCol md="2">
-                  <label>Stero</label>
-                  <CFormSelect style={selectStyles}>
-                    <option>90</option>
-                  </CFormSelect>
-                </CCol>
-                <CCol md="2">
-                  <label>Glue</label>
-                  <CFormSelect style={selectStyles}>
-                    <option>25</option>
-                  </CFormSelect>
-                </CCol>
-                <CCol md="4">
-                  <label>Stiching Wires</label>
-                  <CFormSelect className="w-50" style={selectStyles}>
-                    <option>25</option>
-                  </CFormSelect>
-                </CCol>
-              </CRow>
+            <CRow className="align-items-center mt-3">
+              <CCol md="2">
+                <label style={{ fontSize: '12px' }}>Raw Meterial</label>
+                <CFormSelect 
+                  style={selectStyles}
+                >
+                  <option value="Reel">Reel</option>
+                </CFormSelect>
+              </CCol>
+              <CCol md="2">
+                <label style={{ fontSize: '12px' }}>GSM</label>
+                <CFormSelect 
+                  style={selectStyles}
+                  value={selectedFilters?.gsm}
+                  onChange={(e) => handleFilterChange('gsm', e.target.value)}
+                >
+                  <option value="">GSM</option>
+                  {gsmOptions?.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+              <CCol md="2">
+                <label style={{ fontSize: '12px' }}>BF</label>
+                <CFormSelect 
+                  style={selectStyles}
+                  value={selectedFilters?.bf}
+                  onChange={(e) => handleFilterChange('bf', e.target.value)}
+                >
+                  <option value="">BF</option>
+                  {bfOptions?.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+              <CCol md="2">
+                <label style={{ fontSize: '12px' }}>Color</label>
+                <CFormSelect 
+                  style={selectStyles}
+                  value={selectedFilters?.color}
+                  onChange={(e) => handleFilterChange('color', e.target.value)}
+                >
+                  <option value="">Color</option>
+                  {colorOptions?.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+              <CCol md="2">
+                <label style={{ fontSize: '12px' }}>Deckle</label>
+                <CFormSelect 
+                  style={selectStyles}
+                  value={selectedFilters?.deckle}
+                  onChange={(e) => handleFilterChange('deckle', e.target.value)}
+                >
+                  <option value="">Deckle</option>
+                  {deckleOptions?.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+            </CRow>
+            <CRow className="align-items-center mt-2">
+              <CCol md="2">
+                <label style={{ fontSize: '12px' }}>Die</label>
+                <CFormSelect style={selectStyles}>
+                  <option>180</option>
+                </CFormSelect>
+              </CCol>
+              <CCol md="2">
+                <label style={{ fontSize: '12px' }}>Ink</label>
+                <CFormSelect style={selectStyles}>
+                  <option>25</option>
+                </CFormSelect>
+              </CCol>
+              <CCol md="2">
+                <label style={{ fontSize: '12px' }}>Stero</label>
+                <CFormSelect style={selectStyles}>
+                  <option>90</option>
+                </CFormSelect>
+              </CCol>
+              <CCol md="2">
+                <label style={{ fontSize: '12px' }}>Glue</label>
+                <CFormSelect style={selectStyles}>
+                  <option>25</option>
+                </CFormSelect>
+              </CCol>
+              <CCol md="4">
+                <label style={{ fontSize: '12px' }}>Stiching Wires</label>
+                <CFormSelect className="w-50" style={selectStyles}>
+                  <option>25</option>
+                </CFormSelect>
+              </CCol>
+            </CRow>
 
-              <div
-                style={{
-                  height: '4px',
-                  marginTop: '8px',
-                  backgroundColor: '#e5e7eb',
-                  borderRadius: '2px',
-                }}
-              ></div>
-              <div style={{ flex: 1, overflowY: 'auto', marginTop: '8px' }}>
-                {sfgData?.map((sfg, index) => (
-                  <SFGDragableCard
-                    sfg={sfg}
-                    key={index}
-                    openSFG={openSFG}
-                    setOpenSFG={setOpenSFG}
-                  />
-                ))}
-              </div>
-            </CCardBody>
-          </CCard>
-        </CRow>
+            <div
+              style={{
+                height: '4px',
+                marginTop: '8px',
+                backgroundColor: '#e5e7eb',
+                borderRadius: '2px',
+              }}
+            ></div>
+            <div style={{ flex: 1, overflowY: 'auto', marginTop: '8px' }} className="custom-scrollbar">
+              {sfgData?.map((sfg, index) => (
+                <SFGDragableCard
+                  sfg={sfg}
+                  key={index}
+                  openSFG={openSFG}
+                  setOpenSFG={setOpenSFG}
+                />
+              ))}
+            </div>
+          </CCardBody>
+        </CCard>
       </CCol>
-
-    </>
+    </CRow>
   )
 }
 

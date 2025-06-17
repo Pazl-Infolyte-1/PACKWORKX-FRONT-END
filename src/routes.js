@@ -61,6 +61,10 @@ const CreditNote = React.lazy(() => import('./Module/CreditNote/CreditNote.js'))
 const CreditNoteForm = React.lazy(() => import('./Module/CreditNote/CreditNoteForm.js'))
 const CreditNoteView = React.lazy(() => import('./Module/CreditNote/CreditNoteView.js'))
 
+const ProductionPlanning = React.lazy(
+  () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
+)
+
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },
@@ -174,7 +178,9 @@ const routes = [
     name: 'Credit Note',
     element: CreditNote,
     key: '',
-    children: [{ path: '/credit-note/:id', name: 'CreditNoteView', element: CreditNoteView, key: '' }],
+    children: [
+      { path: '/credit-note/:id', name: 'CreditNoteView', element: CreditNoteView, key: '' },
+    ],
   },
   { path: '/credit-note/form', name: 'Add Credit Note', element: CreditNoteForm, key: '' },
   { path: '/credit-note/form/:id', name: 'Edit Credit Note', element: CreditNoteForm, key: '' },
@@ -232,6 +238,12 @@ const routes = [
     name: 'Inventory',
     element: InventoryForm,
     key: 2232,
+  },
+  {
+    path: '/productionplanning',
+    name: 'Production Planning',
+    element: ProductionPlanning,
+    key: '',
   },
 ]
 

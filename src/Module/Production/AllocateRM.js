@@ -246,39 +246,19 @@ function GroupDropZone({
             gap: '8px',
             flexShrink: 0
           }}>
-            {i.quantity ? (
-              <>
-                <span style={{ 
-                  fontSize: '0.75rem',
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0
-                }}>
-                  {`${i.finished_goods} / ${i.quantity}`}
-                </span>
-                <div
-                  style={{ 
-                    width: '30px', 
-                    height: '25px',
-                    flexShrink: 0
-                  }}
-                >
-                  <ProgressBar
-                    value={Math.min(
-                      Math.max(parseFloat(((i.finished_goods / i.quantity) * 100).toFixed(1)), 0),
-                      100,
-                    )}
-                  />
-                </div>
-              </>
-            ) : (
-              <div
-                style={{ 
-                  width: '30px', 
-                  height: '25px',
-                  flexShrink: 0
-                }}
-              />
-            )}
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              backgroundColor: '#e8e6f3',
+              color: '#8167e5',
+              padding: '2px 8px',
+              borderRadius: '12px',
+              fontSize: '0.75rem',
+              fontWeight: '600',
+            }}>
+              {i?.layer_detail?.weight?.toString().substring(0, 5)} KG
+            </span>
+
             <Dropdown>
               <Dropdown.Toggle as={CustomToggle} />
               <Dropdown.Menu>
@@ -329,54 +309,11 @@ function GroupDropZone({
               fontSize: '0.85rem',
             }}
           >
-            {i.sku_name ? (
-              <>
-                <span>{i.sku_name}</span>
-                <span>{i.dimension}</span>
-                <span>{i.layers} PLY</span>
-                <span>{i.print}</span>
-                <span>Quantity :{i.quantity}</span>
-                <span>{i.route}</span>
-              </>
-            ) : (
-              <>
-                <span>GSM - {i?.layer_detail?.gsm}</span>
-                <span>BF - {i?.layer_detail?.bf}</span>
-                <span>{i.weight} kg</span>
-                <span>{i?.layer_detail?.color}</span>
-              </>
-            )}
+            <span>GSM - {i?.layer_detail?.gsm}</span>
+            <span>BF - {i?.layer_detail?.bf}</span>
+
+            <span>{i?.layer_detail?.color}</span>
           </div>
-          {i.layer_group
-            ? i.layer_group.map((lg) => (
-                <CCard
-                  key={lg.layer_name}
-                  style={{
-                    padding: '6px',
-                    marginTop: '6px',
-                    backgroundColor: '#f5f4f7',
-                    borderRadius: '8px',
-                    fontSize: '0.85rem',
-                  }}
-                >
-                  {lg.layer_name}
-                  <br />
-                  <div
-                    style={{
-                      marginTop: '6px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      gap: '6px',
-                    }}
-                  >
-                    <span>Board Size (L x W) : {lg.dimensions}</span>
-                    <span>{lg.color}</span>
-                    <span>{lg.gsm} GSM</span>
-                    <span>{lg.bf} BF</span>
-                  </div>
-                </CCard>
-              ))
-            : null}
         </CCollapse>
       </CCardBody>
     </CCard>

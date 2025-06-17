@@ -1,0 +1,475 @@
+/* Landing Page Styles */
+.landing-page {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+/* Header Styles */
+.landing-header {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+  padding: 1rem 0;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.landing-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.landing-logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #e67e22;
+  flex-shrink: 0;
+}
+
+.landing-nav-links {
+  display: flex;
+  list-style: none;
+  gap: 1.2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.landing-nav-links a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s;
+  cursor: pointer;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.landing-nav-links a:hover {
+  color: #e67e22;
+}
+
+.landing-auth-buttons {
+  display: flex;
+  gap: 0.8rem;
+  flex-shrink: 0;
+}
+
+.landing-btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s;
+  font-weight: 500;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  background: transparent;
+}
+
+.landing-btn-primary {
+  background: #e67e22;
+  color: white;
+}
+
+.landing-btn-secondary {
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+.landing-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.landing-mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Content Styles */
+.landing-content {
+  margin-top: 80px;
+  min-height: calc(100vh - 80px);
+}
+
+.landing-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Hero Section */
+.landing-hero {
+  background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+  color: white;
+  padding: 6rem 0;
+  text-align: center;
+}
+
+.landing-hero h1 {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  animation: fadeInUp 1s ease;
+}
+
+.landing-hero p {
+  font-size: 1.3rem;
+  margin-bottom: 2rem;
+  animation: fadeInUp 1s ease 0.2s both;
+}
+
+.landing-cta-button {
+  background: #e67e22;
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  animation: fadeInUp 1s ease 0.4s both;
+}
+
+/* Features Section */
+.landing-features {
+  padding: 4rem 0;
+  background: white;
+}
+
+.landing-features h2 {
+  text-align: center;
+  margin-bottom: 3rem;
+  color: #2c3e50;
+  font-size: 2.5rem;
+}
+
+.landing-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.landing-feature-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.landing-feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.landing-feature-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  background: #e67e22;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+}
+
+/* Page Header */
+.landing-page-header {
+  background: #34495e;
+  color: white;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+/* Pricing Grid */
+.landing-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 4rem 0;
+}
+
+.landing-pricing-card {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.landing-pricing-card:hover {
+  transform: translateY(-5px);
+}
+
+.landing-pricing-card.featured {
+  border: 3px solid #e67e22;
+  transform: scale(1.05);
+}
+
+.landing-price {
+  font-size: 3rem;
+  color: #e67e22;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+.landing-features-list {
+  list-style: none;
+  margin: 2rem 0;
+  padding: 0;
+}
+
+.landing-features-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.landing-features-list li:before {
+  content: '✓';
+  color: #27ae60;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+/* Clients Grid */
+.landing-clients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  padding: 4rem 0;
+}
+
+.landing-client-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.landing-client-logo {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  background: #e67e22;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Auth Container */
+.landing-auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+  padding: 2rem 0;
+}
+
+.landing-auth-form {
+  background: white;
+  padding: 3rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.landing-auth-form h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+}
+
+.landing-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.landing-form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.landing-form-group input, 
+.landing-form-group textarea, 
+.landing-form-group select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.landing-form-group input:focus, 
+.landing-form-group textarea:focus, 
+.landing-form-group select:focus {
+  outline: none;
+  border-color: #e67e22;
+}
+
+/* Contact Content */
+.landing-contact-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  padding: 4rem 0;
+}
+
+.landing-contact-info {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.landing-contact-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.landing-contact-icon {
+  width: 40px;
+  height: 40px;
+  background: #e67e22;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-right: 1rem;
+}
+
+/* Footer */
+.landing-footer {
+  background: #2c3e50;
+  color: white;
+  text-align: center;
+  padding: 2rem 0;
+  margin-top: 4rem;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .landing-nav-links {
+    gap: 1rem;
+  }
+  
+  .landing-nav-links a {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .landing-nav-links {
+    gap: 0.8rem;
+  }
+  
+  .landing-auth-buttons .landing-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #2c3e50;
+    flex-direction: column;
+    padding: 1rem 0;
+    gap: 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .landing-nav-links.active {
+    display: flex;
+  }
+  
+  .landing-nav-links li {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #34495e;
+  }
+  
+  .landing-nav-links li:last-child {
+    border-bottom: none;
+  }
+  
+  .landing-nav-links a {
+    font-size: 1rem;
+  }
+  
+  .landing-auth-buttons {
+    display: none;
+  }
+  
+  .landing-mobile-menu-toggle {
+    display: block;
+  }
+  
+  .landing-hero h1 {
+    font-size: 2.5rem;
+  }
+  
+  .landing-contact-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Additional utility classes */
+.text-center {
+  text-align: center;
+}
+
+.mb-2 {
+  margin-bottom: 2rem;
+}
+
+.mt-1 {
+  margin-top: 1rem;
+}
+
+.width-100 {
+  width: 100%;
+}

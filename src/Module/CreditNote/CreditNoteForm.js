@@ -652,6 +652,7 @@ const CreditNoteForm = () => {
                         ? 'ring-1 ring-red-600'
                         : 'border-gray-300'
                     }`}
+                    placeholder='Enter Credit Reference ID'
                   />
                 </div>
               </div>
@@ -665,6 +666,7 @@ const CreditNoteForm = () => {
                   value={formData.subject || ''}
                   onChange={handleInputChange}
                   className="h-7 w-80 rounded border border-gray-300 px-3 text-sm"
+                  placeholder="Enter subject"
                 />
               </div>
 
@@ -676,8 +678,7 @@ const CreditNoteForm = () => {
                   name="credit_total_amount"
                   value={formData.credit_total_amount || ''}
                   onChange={handleInputChange}
-                  min="0"
-                  step="0.01"
+                  onWheel={(e) => e.target.blur()}
                   className={`h-7 w-80 rounded border px-3 text-sm ${
                     attemptedSubmit && errors.credit_reference_id
                       ? 'ring-1 ring-red-600'

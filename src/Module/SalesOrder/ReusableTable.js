@@ -112,7 +112,7 @@ export default function ReusableTable({
                   return (
                     <CTableHeaderCell
                       key={col.key}
-  className="px-3 py-2.5 text-xs !bg-gray-50 !text-gray-800 font-bold uppercase tracking-wider text-left border-b border-gray-200 whitespace-nowrap"
+                      className="px-3 py-2.5 text-xs !bg-gray-50 !text-gray-800 font-bold uppercase tracking-wider text-left border-b border-gray-200 whitespace-nowrap"
                     >
                       {isCheckbox ? (
                         <input
@@ -125,13 +125,10 @@ export default function ReusableTable({
                           className="form-checkbox h-4 w-4 text-blue-600 cursor-pointer transition-all"
                         />
                       ) : (
-                      <div className="flex items-center gap-[10px]">
-  <span>{col.header}</span>
-  {col.searchIcon && (
-    <span className="text-gray-500">⌕</span>
-  )}
-</div>
-
+                        <div className="flex items-center gap-[10px]">
+                          <span>{col.header}</span>
+                          {col.searchIcon && <span className="text-gray-500">⌕</span>}
+                        </div>
                       )}
                     </CTableHeaderCell>
                   )
@@ -255,16 +252,16 @@ export default function ReusableTable({
         </div>
       ) : (
         <div
-          className="overflow-x-auto custom-scrollbar w-full rounded-sm border border-gray-300 shadow-sm bg-white"
+          className="overflow-x-auto custom-scrollbar w-full border rounded-sm  border-gray-300 shadow-sm bg-white"
           style={tableContainerStyle}
         >
-          <CTable  className="w-full border-collapse">
+          <CTable className="w-full border-collapse">
             <CTableBody>
               {data.length > 0 ? (
                 data.map((row, rowIndex) => (
                   <React.Fragment key={rowIndex}>
                     <CTableRow
-                      className={`border-b text-sm text-gray-900  transition-colors ${expandableConfig ? 'cursor-pointer' : ''} ${
+                      className={` text-sm text-gray-900  transition-colors ${expandableConfig ? 'cursor-pointer' : ''} ${
                         miniScreenFields.length === 2 ? 'flex justify-between' : ''
                       }`}
                       onClick={(e) => handleRowClick1(row, e, rowIndex)}
@@ -344,7 +341,7 @@ export default function ReusableTable({
                           return (
                             <CTableDataCell
                               key={col.key}
-                              className={`px-3 py-3  text-left ${col.cellClass || ''}`}
+                              className={`px-3 py-3  text-left w-full `}
                             >
                               {col.type === 'date'
                                 ? formatDate(cellValue)

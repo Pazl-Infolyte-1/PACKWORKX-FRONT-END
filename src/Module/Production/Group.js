@@ -86,7 +86,7 @@ function GroupOrderDropZone({
 }) {
 
   const navigate = useNavigate()
-  const {removeWorkOrderFromGroup, updateGroup,alerts,setAlertsApp} = useGroupLayers()
+  const {removeWorkOrderFromGroup, updateGroup,alerts,setAlertsApp, deleteGroup} = useGroupLayers()
   const [isEditing, setIsEditing] = useState(false)
   const [editedName, setEditedName] = useState(groupOrder.group_name)
 
@@ -109,6 +109,17 @@ function GroupOrderDropZone({
     } else if (e.key === 'Escape') {
       setIsEditing(false)
       setEditedName(groupOrder.group_name)
+    }
+  }
+
+  const handleDeleteGroup = () => {
+    if (groupOrder.group_value && groupOrder.group_value.length > 0) {
+      if (window.confirm('This group contains Layers. Do you want to move all layers back to their work orders and delete the group?')) {
+        deleteGroup(groupOrder.id);
+      }
+    } else {
+        deleteGroup(groupOrder.id);
+      
     }
   }
 
@@ -179,17 +190,28 @@ function GroupOrderDropZone({
               ) : (
                 <>
                   <CCardText className="text-white bold mb-0">{groupOrder.group_name}</CCardText>
-                  <CIcon
-                    icon={cilPencil}
-                    className="hover-pointer"
-                    style={{ 
-                      fontSize: '1rem',
-                      color: 'white',
-                      opacity: 0.8,
-                      marginLeft: '8px'
-                    }}
-                    onClick={handleNameEdit}
-                  />
+                  <div className="d-flex align-items-center">
+                    <CIcon
+                      icon={cilPencil}
+                      className="hover-pointer me-2"
+                      style={{ 
+                        fontSize: '1rem',
+                        color: 'white',
+                        opacity: 0.8
+                      }}
+                      onClick={handleNameEdit}
+                    />
+                    <CIcon
+                      icon={cilTrash}
+                      className="hover-pointer"
+                      style={{ 
+                        fontSize: '1rem',
+                        color: 'white',
+                        opacity: 0.8
+                      }}
+                      onClick={handleDeleteGroup}
+                    />
+                  </div>
                 </>
               )}
             </div>

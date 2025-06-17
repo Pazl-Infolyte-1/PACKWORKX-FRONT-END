@@ -48,6 +48,87 @@ export const GroupLayersProvider = ({ children }) => {
     );
   };
 
+  const deleteGroup = (groupId) => {
+    // First, get the group to be deleted
+    const groupToDelete = groups.find(group => group.id === groupId);
+    
+    if (groupToDelete && groupToDelete.group_value.length > 0) {
+      // Move all items back to work orders
+      setWorkOrders((prevWorkOrders) => {
+        return prevWorkOrders.map((workOrder) => {
+          // Find all items in this group that belong to this work order
+          const itemsToRestore = groupToDelete.group_value.filter(item => 
+            item.workOrderId === workOrder.id
+          );
+
+          if (itemsToRestore.length > 0) {
+            const layersToAdd = [];
+            
+            itemsToRestore.forEach(item => {
+              if (item.isGroup && item.layers) {
+                // Handle paired layers
+                item.layers.forEach(layer => {
+                  const layerExists = workOrder.work_order_sku_values.some(
+                    (existingLayer) => existingLayer.layer_id === layer.layer_id
+                  );
+                  
+                  if (!layerExists) {
+                    layersToAdd.push({
+                      layer_id: layer.layer_id,
+                      layer: layer.layer,
+                      gsm: layer.gsm,
+                      bf: layer.bf,
+                      material: layer.material,
+                      color: layer.color,
+                      weight: layer.weight,
+                      bursting_strength: layer.bursting_strength,
+                      layer_status: "ungrouped",
+                      flute_type: layer.flute_type
+                    });
+                  }
+                });
+              } else {
+                // Handle single layer
+                const layerExists = workOrder.work_order_sku_values.some(
+                  (layer) => layer.layer_id === item.layer_id
+                );
+                
+                if (!layerExists) {
+                  layersToAdd.push({
+                    layer_id: item.layer_id,
+                    layer: item.layer,
+                    gsm: item.gsm,
+                    bf: item.bf,
+                    material: item.material,
+                    color: item.color,
+                    weight: item.weight,
+                    bursting_strength: item.bursting_strength,
+                    layer_status: "ungrouped",
+                    flute_type: item.flute_type
+                  });
+                }
+              }
+            });
+            
+            if (layersToAdd.length > 0) {
+              return {
+                ...workOrder,
+                work_order_sku_values: [
+                  ...workOrder.work_order_sku_values,
+                  ...layersToAdd
+                ]
+              };
+            }
+          }
+          return workOrder;
+        });
+      });
+    }
+
+    // Finally, remove the group
+    setGroups((prevGroups) => prevGroups.filter(group => group.id !== groupId));
+  };
+
   const addWorkOrderToGroup = (order, groupIndex) => {
     let Rejected = false
     setGroups((prevGroups) => {
@@ -329,7 +410,8 @@ export const GroupLayersProvider = ({ children }) => {
     removeWorkOrderFromGroup,
     refreshData,
     handleClose,
-    setAlertsApp
+    setAlertsApp,
+    deleteGroup
   };
 
   return (

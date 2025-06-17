@@ -48,6 +48,9 @@ export const productionApi = {
   allocateInventoryToGroup:async(body)=>{
     return await apiClient.patch(`/production/production-group/allocate`,body)
   },
+  deAllocateInventoryFromGroup:async(body)=>{
+    return await apiClient.patch(`/production/production-group/deallocate`,body)
+  },
   getSingleGroupDetails:async(id)=>{
     return await apiClient.get(`/production/production-group/${id}/allocations`)
   }

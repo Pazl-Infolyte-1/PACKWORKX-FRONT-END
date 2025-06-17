@@ -22,6 +22,7 @@ import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext'
 import { productionApi } from '../../api/production'
 import GroupData from './RawmeterialComponents/GroupData'
 import { ConstructionOutlined } from '@mui/icons-material'
+import CustomAlert from '../../components/New/CustomAlert'
 
 const ItemType = 'RawMeterial'
 
@@ -56,8 +57,8 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
     setOpenSFG((prevId) => (prevId === id ? null : id)) // Toggle behavior
   }
   return (
-    <CCard className="mt-3" ref={drag} key={sfg.id}>
-      <CCardBody>
+    <CCard className="mt-2" ref={drag} key={sfg.id} style={{ border: 'none' }}>
+      <CCardBody style={{ padding: '14px' }}>
         <div
           style={{
             display: 'flex',
@@ -71,17 +72,18 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '6px', // Creates space between the text and icon
-              whiteSpace: 'nowrap', // Prevents text from wrapping
+              gap: '4px',
+              whiteSpace: 'nowrap',
+              fontSize: '0.85rem',
+              fontWeight: '500',
             }}
           >
-            Reel {sfg.id} {openSFG === sfg.id ? <FaAngleUp /> : <FaAngleDown />}
+            Reel {sfg.id} {openSFG === sfg.id ? <FaAngleUp size={12} /> : <FaAngleDown size={12} />}
           </span>
           <span
             style={{
-              fontSize: '16px',
-              lineHeight: '21px',
-              display: 'flex', // Ensures CIcon stays aligned properly
+              fontSize: '0.85rem',
+              display: 'flex',
               alignItems: 'center',
             }}
           >
@@ -121,7 +123,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
         </div>
 
         <CCollapse className="custom-collapse" visible={openSFG === sfg.id}>
-          <CRow className="align-items-center text-sm mt-3 mb-2">
+          <CRow className="align-items-center text-xs mt-2 mb-1">
             <CCol md="2" className="text-nowrap">
               <span>GSM: {sfg?.item?.default_custom_fields?.gsm}</span>
             </CCol>
@@ -132,24 +134,24 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
               <span>Deckle: {sfg?.item?.default_custom_fields?.deckle_size}</span>
             </CCol>
             <CCol md="3" className="text-nowrap">
-              <span>Available Qty: {sfg?.quantity_available} KG</span>
+              <span>Available: {sfg?.quantity_available} KG</span>
             </CCol>
             <CCol md="3" className="text-nowrap">
-              <span>Blocked Qty: {sfg?.quantity_blocked} KG</span>
+              <span>Blocked: {sfg?.quantity_blocked} KG</span>
             </CCol>
           </CRow>
-          <hr />
-          <CRow className="mt-3">
+          <hr style={{ margin: '4px 0' }} />
+          <CRow className="mt-2">
             <CCol xs={12}>
               {sfg?.work_orders?.map((wo, index) => (
                 <CCard
                   key={index}
                   style={{
-                    height: '50px',
+                    height: '40px',
                     backgroundColor: '#ffffff',
-                    borderRadius: '10px',
-                    marginTop: '10px',
-                    padding: '4px',
+                    borderRadius: '6px',
+                    marginTop: '6px',
+                    padding: '2px',
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'space-between',
@@ -158,13 +160,13 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
                     border: 'none'
                   }}
                 >
-                  <div className="d-flex justify-content-between w-100 px-3">
+                  <div className="d-flex justify-content-between w-100 px-2">
                     <div className="text-center" style={{ width: '50%' }}>
-                      <span className="font-semibold text-sm">Work Order</span>
+                      <span className="font-semibold text-xs">Work Order</span>
                       <div className="text-xs">{wo.wo_id}</div>
                     </div>
                     <div className="text-center" style={{ width: '50%' }}>
-                      <span className="font-semibold text-sm">Quantity (KG)</span>
+                      <span className="font-semibold text-xs">Quantity (KG)</span>
                       <div className="text-xs">{wo.quantity}</div>
                     </div>
                   </div>
@@ -388,7 +390,7 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
   const [groupDetailsModal, setGroupDetailsModal] = useState({visible:false, id:null, data:[]})
   const [isDeallocating, setIsDeallocating] = useState(false);
   const [deallocationError, setDeallocationError] = useState(null);
-  const {getData} = useRawMaterialContext()
+  const {getData,setAlertsApp} = useRawMaterialContext()
 
   const addQuantity = (groupIndex, item) => {
     console.log('Group Index:', groupIndex)
@@ -419,8 +421,8 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
       await getData();
       
     } catch (error) {
-      console.error('Deallocation error:', error);
-      setDeallocationError(error?.message || 'Failed to deallocate inventory. Please try again.');
+      console.error('Deallocation error:', error.response.data.message);
+      setAlertsApp([{severity:"error",message:error.response.data.message}])
     } finally {
       setIsDeallocating(false);
     }
@@ -635,12 +637,11 @@ const AllocateRM = ({}) => {
   const [colorOptions, setColorOptions] = useState([]);
   const [gsmOptions, setGsmOptions] = useState([]);
   const [bfOptions, setBfOptions] = useState([]);
-  const [error, setError] = useState(null);
   const [openSFG, setOpenSFG] = useState(null)
-  const {groupOrders,refreshData, sfgData ,handleFilterChange,selectedFilters} = useRawMaterialContext()
-  useEffect(()=>{
-    console.log(sfgData,'this is the data')
-  },[sfgData])
+  const {groupOrders,refreshData, sfgData ,handleFilterChange,selectedFilters,alerts,setAlertsApp,handleClose} = useRawMaterialContext()
+
+
+
 
 
 
@@ -691,6 +692,10 @@ const AllocateRM = ({}) => {
 
   return (
     <CRow className="mt-4">
+        <CustomAlert
+        alerts={alerts}
+        handleClose={handleClose}
+        />
       {/* Groups Column */}
       <CCol xs={6}>
         <div

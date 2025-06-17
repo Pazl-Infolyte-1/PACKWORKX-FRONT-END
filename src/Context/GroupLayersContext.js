@@ -7,7 +7,17 @@ export const useGroupLayers = () => useContext(GroupLayersContext);
 export const GroupLayersProvider = ({ children }) => {
   const [groups, setGroups] = useState([]);
   const [workOrders, setWorkOrders] = useState([]);
-  // const [alert]
+  const [alerts,setAlerts] = useState([])
+
+
+
+  const handleClose = ()=>{
+    setAlerts([])
+  }
+
+  const setAlertsApp = (severity, message) => {
+    setAlerts([{ severity, message }]);
+  };
 
   const addGroup = () => {
     const random = Math.floor(100 + Math.random() * 900);
@@ -80,14 +90,14 @@ export const GroupLayersProvider = ({ children }) => {
 
           // Rule 1: Can't add layer1 to a group that has other layers
           if (hasLayer1 && targetHasOtherLayers) {
-            alert("Unable to move: Layer 1 cannot be added to a group with other layers");
+            setAlerts([{ severity:'warning', message:"Unable to move: Top Layer cannot be added to a group with other layers"}]);
             Rejected = true
             return prevGroups;
           }
           
           // Rule 2: Can't add other layers to a group that has layer1
           if (hasOtherLayers && targetHasLayer1) {
-            alert("Unable to move: Only Layer 1 can be added to this group");
+            setAlerts([{ severity:'warning', message:"Unable to move: Only Top Layer can be added to this group"}]);
             Rejected = true
             return prevGroups;
           }
@@ -141,14 +151,14 @@ export const GroupLayersProvider = ({ children }) => {
 
         // Rule 1: Can't add layer1 to a group that has other layers
         if (isAddingLayer1 && targetHasOtherLayers) {
-          alert("Unable to move: Layer 1 cannot be added to a group with other layers");
+          setAlerts([{ severity:'warning', message:"Unable to move: Top Layer cannot be added to a group with other layers"}]);
           Rejected = true
           return prevGroups;
         }
         
         // Rule 2: Can't add other layers to a group that has layer1
         if (!isAddingLayer1 && targetHasLayer1) {
-          alert("Unable to move: Only Layer 1 can be added to this group");
+          setAlerts([{ severity:'warning', message:"Unable to move: Only Top Layer can be added to this group"}]);
           Rejected = true
           return prevGroups;
         }
@@ -307,16 +317,19 @@ export const GroupLayersProvider = ({ children }) => {
   const refreshData = async () => {
       setGroups([]);
   };
-
+  
   const value = {
     workOrders,
     groups,
+    alerts,
     setWorkOrders,
     addGroup,
     updateGroup,
     addWorkOrderToGroup,
     removeWorkOrderFromGroup,
-    refreshData
+    refreshData,
+    handleClose,
+    setAlertsApp
   };
 
   return (

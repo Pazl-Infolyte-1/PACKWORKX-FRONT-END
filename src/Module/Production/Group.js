@@ -50,6 +50,7 @@ import { useNextHandler } from '../../Context/ProductionNextHandlerContext'
 import { useNavigate } from 'react-router-dom'
 import { productionApi } from '../../api/production'
 import WorkOrderCard from './GroupComponents/WorkOrderCard'
+import CustomAlert from '../../components/New/CustomAlert'
 
 const ItemType = 'WORK_ORDER'
 
@@ -85,10 +86,9 @@ function GroupOrderDropZone({
 }) {
 
   const navigate = useNavigate()
-  const {removeWorkOrderFromGroup, updateGroup} = useGroupLayers()
+  const {removeWorkOrderFromGroup, updateGroup,alerts,setAlertsApp} = useGroupLayers()
   const [isEditing, setIsEditing] = useState(false)
   const [editedName, setEditedName] = useState(groupOrder.group_name)
-  const [alerts,setAlerts] = useState([])
 
   const handleNameEdit = () => {
     setIsEditing(true)
@@ -525,7 +525,7 @@ const Group = ({
   const navigate = useNavigate()
   // const [workOrders1,setWorkOrders] = useState([])
   const [groups1,setGroupOrders] = useState()
-  const { groups,addWorkOrderToGroup,workOrders,setWorkOrders,refreshData } = useGroupLayers();
+  const { groups,addWorkOrderToGroup,workOrders,setWorkOrders,refreshData,handleClose,alerts } = useGroupLayers();
   const {registerNextHandler} = useNextHandler()
 
   const {searchQuery,setGlobalPlaceholder} = useSearch()
@@ -593,7 +593,7 @@ const Group = ({
 
     } catch (err) {
       console.error('Error while submitting groups:', err);
-      setError('Something went wrong while submitting');
+      // setAlertsApp("error","error while moving to production")
     }
   };
   
@@ -713,6 +713,10 @@ const Group = ({
   return (
     <>
       <CCol xs={3} className="mt-2">
+        <CustomAlert
+        alerts={alerts}
+        handleClose={handleClose}
+        />
         <CRow className=''>
           <CCol>
             <CCard

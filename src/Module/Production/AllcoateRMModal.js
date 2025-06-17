@@ -128,7 +128,7 @@ import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext';
                   </div>
 
                   <div className="bg-white h-[250px] custom-scrollbar overflow-y-auto">
-                    {historyData && historyData.group_allocations.length > 0 ? (
+                    { historyData?.group_allocations.length > 0 ? (
                       historyData.group_allocations.map((order, index) => (
                         <div key={index} className="flex">
                           <div className="flex-1 px-4 py-3">

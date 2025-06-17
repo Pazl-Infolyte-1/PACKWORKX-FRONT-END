@@ -1,0 +1,143 @@
+/* Chatbot Position Override - Ensures right-side positioning always */
+
+/* Force chatbot to always stay on the right side with highest z-index */
+.chat-toggle,
+.advanced-chat-toggle {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  left: auto !important;
+  top: auto !important;
+  z-index: 999999 !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+}
+
+.chat-window,
+.advanced-chat-window {
+  position: fixed !important;
+  bottom: 100px !important;
+  right: 20px !important;
+  left: auto !important;
+  top: auto !important;
+  z-index: 999998 !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+}
+
+/* Override any potential conflicts from other CSS */
+.chat-toggle:not(.mobile),
+.advanced-chat-toggle:not(.mobile) {
+  right: 20px !important;
+  left: auto !important;
+}
+
+.chat-window:not(.mobile),
+.advanced-chat-window:not(.mobile) {
+  right: 20px !important;
+  left: auto !important;
+}
+
+/* Mobile specific positioning */
+@media (max-width: 768px) {
+  .chat-toggle,
+  .advanced-chat-toggle {
+    bottom: 15px !important;
+    right: 15px !important;
+    left: auto !important;
+  }
+  
+  .chat-window,
+  .advanced-chat-window {
+    bottom: 90px !important;
+    right: 10px !important;
+    left: 10px !important;
+    width: auto !important;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 400px) {
+  .chat-toggle,
+  .advanced-chat-toggle {
+    bottom: 10px !important;
+    right: 10px !important;
+    left: auto !important;
+  }
+  
+  .chat-window,
+  .advanced-chat-window {
+    bottom: 80px !important;
+    right: 5px !important;
+    left: 5px !important;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .chat-toggle,
+  .advanced-chat-toggle {
+    bottom: 10px !important;
+    right: 15px !important;
+    left: auto !important;
+  }
+  
+  .chat-window,
+  .advanced-chat-window {
+    bottom: 70px !important;
+    right: 10px !important;
+    left: 10px !important;
+    height: 400px !important;
+  }
+}
+
+/* Ensure no other elements can override */
+body .chat-toggle,
+body .advanced-chat-toggle,
+html .chat-toggle,
+html .advanced-chat-toggle {
+  position: fixed !important;
+  right: 20px !important;
+  bottom: 20px !important;
+  z-index: 999999 !important;
+}
+
+body .chat-window,
+body .advanced-chat-window,
+html .chat-window,
+html .advanced-chat-window {
+  position: fixed !important;
+  right: 20px !important;
+  bottom: 100px !important;
+  z-index: 999998 !important;
+}
+
+/* Prevent any transform or translate that could move the chatbot */
+.chat-toggle,
+.advanced-chat-toggle {
+  transform: translateZ(0) !important;
+}
+
+.chat-toggle:hover,
+.advanced-chat-toggle:hover {
+  transform: translateZ(0) scale(1.1) !important;
+}
+
+/* Handle potential conflicts with other positioning classes */
+.fixed,
+.absolute,
+.relative {
+  .chat-toggle,
+  .advanced-chat-toggle {
+    position: fixed !important;
+    right: 20px !important;
+    bottom: 20px !important;
+  }
+  
+  .chat-window,
+  .advanced-chat-window {
+    position: fixed !important;
+    right: 20px !important;
+    bottom: 100px !important;
+  }
+}

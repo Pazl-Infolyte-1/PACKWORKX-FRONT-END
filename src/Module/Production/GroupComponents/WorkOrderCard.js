@@ -25,12 +25,12 @@ function LayerDragble({ lg, workOrderId,order }) {
     return (
       <CCard
         ref={drag}
-        className="p-2.5 mt-2.5  rounded-lg flex bg-transparent"
+        className="p-2 mt-1.5 rounded-lg flex bg-transparent"
       >
         <div className='flex justify-between'>
           <div className='flex flex-col items-start'>
-            <div className="text-sm font-medium">{lg.layer}</div>
-            <div className="flex gap-3 mt-3 text-xs">
+            <div className="text-xs font-medium">{lg.layer}</div>
+            <div className="flex gap-2 mt-2 text-[10px]">
               <span>{lg?.color}</span>
               <span>{lg?.gsm} GSM</span>
               <span>{lg?.bf} BF</span>
@@ -66,14 +66,14 @@ function LayerDragble({ lg, workOrderId,order }) {
     return (
       <CCard 
         ref={drag}
-        className=" mt-2.5 bg-transparent  rounded-lg border-2 border-dashed border-gray-300"
+        className="mt-1.5 bg-transparent rounded-lg border-2 border-dashed border-gray-300"
       >
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           {layers.map((lg) => (
-            <div key={`paired-layer-${lg.layer_id}`} className="flex justify-between  p-2 rounded">
+            <div key={`paired-layer-${lg.layer_id}`} className="flex justify-between p-1.5 rounded">
               <div className='flex flex-col items-start'>
-                <div className="text-sm font-medium">{lg.layer}</div>
-                <div className="flex gap-3 mt-2 text-xs">
+                <div className="text-xs font-medium">{lg.layer}</div>
+                <div className="flex gap-2 mt-1 text-[10px]">
                   <span>{lg?.color}</span>
                   <span>{lg?.gsm} GSM</span>
                   <span>{lg?.bf} BF</span>
@@ -173,23 +173,23 @@ export default function WorkOrderCard({
           borderRadius: '5px',
         }}
       >
-        <CCardBody>
+        <CCardBody className="p-2">
           <div className="cursor-pointer flex flex-col">
             <div className="flex justify-between items-center">
-              <div className=' flex flex-1 justify-between items-start'>
+              <div className='flex flex-1 justify-between items-start'>
                 <span
                   onClick={toggleCollapse}
-                  className="flex items-center gap-1.5 whitespace-nowrap font-bold text-sm"
+                  className="flex items-center gap-1 whitespace-nowrap font-bold text-xs"
                 >
                   {order.work_generate_id} {visibleIndex === index ? <FaAngleUp /> : <FaAngleDown />}
                 </span>
   
   
-                <div className="flex items-start gap-3 text-sm">
+                <div className="flex items-start gap-2 text-xs">
                   {/* Progress bar moved to the right side */}
   
                   <h6 className='text-primary'>0/{order.qty}</h6>
-                  <div className="w-10">
+                  <div className="w-8">
                     <ProgressBar
                       value={0 / order.qty}
                     />

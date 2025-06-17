@@ -368,7 +368,7 @@ const AddPurchaseOrderReturn = ({
 
   const getGRNData = async (poId) => {
     try {
-      const response = await grnApi.getGRNByPOId(poId)
+      const response = await purchaseOrderApi.getGrnByPoId(poId)
       const grn = response.data?.data.grns || []
 
       console.log('GRN Data Response:', grn)

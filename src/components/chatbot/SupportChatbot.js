@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import './SupportChatbot.css'
+import './ChatbotPositionOverride.css'
 
 const SupportChatbot = () => {
   const [isOpen, setIsOpen] = useState(false)

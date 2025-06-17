@@ -218,10 +218,12 @@ export default function ReusableTable({
                         return (
                           <CTableDataCell key={col.key} className="px-3 py-3 text-left">
                             {typeof col.render === 'function'
-                              ? col.render(row) // ✅ <- This will now work for your PO ID & Created By columns
+                              ? col.render(row)
                               : col.type === 'date'
                                 ? formatDate(cellValue)
-                                : cellValue || '—'}
+                                : col.field.includes('.')
+                                  ? col.field.split('.').reduce((obj, key) => obj?.[key], row) || '—'
+                                  : cellValue || '—'}
                           </CTableDataCell>
                         )
                       })}
@@ -346,8 +348,7 @@ export default function ReusableTable({
                               {col.type === 'date'
                                 ? formatDate(cellValue)
                                 : col.field.includes('.')
-                                  ? col.field.split('.').reduce((obj, key) => obj?.[key], row) ||
-                                    '—'
+                                  ? col.field.split('.').reduce((obj, key) => obj?.[key], row) || '—'
                                   : cellValue || '—'}
                             </CTableDataCell>
                           )

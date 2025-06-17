@@ -9,6 +9,20 @@ export const RawMaterialProvider = ({ children }) => {
   const [groupOrders, setGroupOrders] = useState([]);
   const [sfgData, setSfgData] = useState([]);
   const [error, setError] = useState(null);
+  const [alerts,setAlerts] = useState([])
+
+
+
+
+  
+  const handleClose = ()=>{
+    setAlerts([])
+  }
+
+  const setAlertsApp = (error) => {
+    setAlerts(error);
+  };
+
 
   
   const [selectedFilters, setSelectedFilters] = useState({
@@ -107,12 +121,15 @@ export const RawMaterialProvider = ({ children }) => {
     sfgData,
     error,
     selectedFilters,
+    alerts,
     setGroupOrders,
     handleFilterChange,
     fetchWorkOrders,
     fetchReels,
     getData,
-    refreshData
+    refreshData,
+    setAlertsApp,
+    handleClose,
   };
 
   return (

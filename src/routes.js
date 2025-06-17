@@ -52,6 +52,7 @@ const StockAdjustmentForm = React.lazy(
 const StockTableView = React.lazy(() => import('./Module/StockAdjustment/StockTableView.js'))
 
 const Invoice = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceList.js'))
+const InvoiceForm = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceAddForm.js'))
 const InvoiceView = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceView.js'))
 const InventoryForm = React.lazy(() => import('./Module/Inventory/Items/AddItemProcess.js'))
 const DebitNote = React.lazy(() => import('./Module/DebitNote/DebitNote.js'))
@@ -217,6 +218,14 @@ const routes = [
         key: '', // Assigned a proper unique key
       },
     ],
+  },
+
+  {
+    path: '/invoice/form',
+    name: 'invoiceForm',
+    element: InvoiceForm,
+    key: '',
+
   },
   {
     path: '/inventoryhandling/inventory_form',

@@ -26,7 +26,7 @@ function CreditNoteView() {
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
@@ -34,66 +34,65 @@ function CreditNoteView() {
   }
 
   const formatCurrency = (amount) => {
-    return `₹${parseFloat(amount || 0).toFixed(2)}`
-    
+    return `₹${parseFloat(amount).toFixed(2)}`
   }
 
   if (loading) {
     return (
-      <div className="w-full p-3 flex justify-center items-center">
-        <div className="text-gray-600">Loading credit note details...</div>
+      <div className="w-full p-4 flex justify-center items-center">
+        <div className="text-gray-500 text-sm">Loading credit note details...</div>
       </div>
     )
   }
 
   if (!creditData) {
     return (
-      <div className="w-full p-3 flex justify-center items-center">
-        <div className="text-red-600">Failed to load credit note details</div>
+      <div className="w-full p-4 flex justify-center items-center">
+        <div className="text-red-500 text-sm">Failed to load credit note details</div>
       </div>
     )
   }
 
   return (
-    <div className="w-full p-2  bg-white">
+    <div className="w-full">
       {/* Header */}
-      <div className="flex justify-between items-start mb-3  border-b-2 border-gray-200">
+      <div className="flex justify-between items-start mb-3 px-2 border-b border-l border-gray-200">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 m-0">Credit Note</h1>
-          <p className="text-gray-600 text-sm">View and manage credit note details</p>
+          <h1 className="text-lg font-semibold text-gray-900 m-0">Credit Note</h1>
+          <p className="text-xs text-gray-500 m-0">View and manage credit note details</p>
         </div>
         <button
           onClick={() => navigate('/credit-note')}
-          className="p-2 rounded-full transition-colors"
+          className="p-1 hover:bg-gray-100 rounded transition-colors"
         >
-          <CloseIcon className="text-gray-600" />
+          <CloseIcon className="text-gray-400 w-5 h-5" />
         </button>
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[calc(85vh-90px)] overflow-y-scroll">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-h-[calc(95vh-120px)] overflow-y-auto px-2">
+        
         {/* Credit Note Information */}
-        <div className="bg-gray-50 rounded-lg p-3 text-sm">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <div className="w-1 h-6 bg-blue-500 rounded mr-3"></div>
+        <div className="border border-gray-900 rounded p-3">
+          <h3 className="text-sm font-medium text-gray-900 mb-3 border-l-2 border-blue-500 pl-2">
             Credit Note Details
-          </h2>
-          <div className="space-y-1">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Credit Note ID:</span>
-              <span className="font-medium text-gray-800">{creditData.credit_generate_id}</span>
+          </h3>
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">Credit Note ID</span>
+              <span className="font-medium text-gray-900">{creditData.credit_generate_id}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Reference ID:</span>
-              <span className="font-medium text-gray-800">{creditData.credit_reference_id}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">Reference ID</span>
+              <span className="font-medium text-gray-900">{creditData.credit_reference_id}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Subject:</span>
-              <span className="font-medium text-gray-800">{creditData.subject}</span>
+            <div className="flex justify-between items-start">
+              <span className="text-gray-500">Subject</span>
+              <span className="font-medium text-gray-900 text-right max-w-[60%]">{creditData.subject}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Credit Amount:</span>
-              <span className="font-bold text-lg text-green-600">
+            <div className="flex justify-between items-center pt-1 border-t border-gray-100">
+              <span className="text-gray-500">Credit Amount</span>
+              <span className="font-semibold text-sm text-gray-900">
                 {formatCurrency(creditData.credit_total_amount)}
               </span>
             </div>
@@ -101,43 +100,41 @@ function CreditNoteView() {
         </div>
 
         {/* Client Information */}
-        <div className="bg-gray-50 rounded-lg p-3 text-sm">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <div className="w-1 h-6 bg-purple-500 rounded mr-3"></div>
+        <div className="border border-gray-200 rounded p-3">
+          <h3 className="text-sm font-medium text-gray-900 mb-3 border-l-2 border-purple-500 pl-2">
             Client Information
-          </h2>
-          <div className="space-y-1">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Client ID:</span>
-              <span className="font-medium text-gray-800">{creditData.client.client_id}</span>
+          </h3>
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">Client ID</span>
+              <span className="font-medium text-gray-900">{creditData.client.client_id}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Company Name:</span>
-              <span className="font-medium text-gray-800">{creditData.client.company_name}</span>
+            <div className="flex justify-between items-start">
+              <span className="text-gray-500">Company Name</span>
+              <span className="font-medium text-gray-900 text-right max-w-[60%]">{creditData.client.company_name}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Email:</span>
-              <span className="font-medium text-blue-600">{creditData.client.email}</span>
+            <div className="flex justify-between items-start">
+              <span className="text-gray-500">Email</span>
+              <span className="font-medium text-gray-700 text-right max-w-[60%] break-all">{creditData.client.email}</span>
             </div>
           </div>
         </div>
 
         {/* Related Invoice */}
-        <div className="bg-gray-50 rounded-lg p-3 text-sm">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <div className="w-1 h-6 bg-orange-500 rounded mr-3"></div>
+        <div className="border border-gray-200 rounded p-3">
+          <h3 className="text-sm font-medium text-gray-900 mb-3 border-l-2 border-orange-500 pl-2">
             Related Invoice
-          </h2>
-          <div className="space-y-1">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Invoice Number:</span>
-              <span className="font-medium text-gray-800">
+          </h3>
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">Invoice Number</span>
+              <span className="font-medium text-gray-900">
                 {creditData.workOrderInvoice.invoice_number}
               </span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Invoice Total:</span>
-              <span className="font-bold text-lg text-gray-800">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">Invoice Total</span>
+              <span className="font-semibold text-sm text-gray-900">
                 {formatCurrency(creditData.workOrderInvoice.total_amount)}
               </span>
             </div>
@@ -145,23 +142,22 @@ function CreditNoteView() {
         </div>
 
         {/* Activity Information */}
-        <div className="bg-gray-50 rounded-lg p-3 text-sm">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <div className="w-1 h-6 bg-teal-500 rounded mr-3"></div>
+        <div className="border border-gray-200 rounded p-3">
+          <h3 className="text-sm font-medium text-gray-900 mb-3 border-l-2 border-teal-500 pl-2">
             Activity Information
-          </h2>
-          <div className=" xl:flex justify-between">
-            <div className='sm:border-r w-1/2'>
-              <p className="text-sm text-gray-600 m-0">Created By:</p>
-              <p className="font-medium text-gray-800 m-0">{creditData.creator.name}</p>
-              <p className="text-sm text-gray-500 m-0">{creditData.creator.email}</p>
-              <p className="text-xs text-gray-400 m-0">{formatDate(creditData.created_at)}</p>
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="space-y-1">
+              <p className="text-gray-500 font-medium">Created By</p>
+              <p className="font-medium text-gray-900">{creditData.creator.name}</p>
+              <p className="text-gray-600">{creditData.creator.email}</p>
+              <p className="text-gray-400">{formatDate(creditData.created_at)}</p>
             </div>
-            <div className="">
-              <p className="text-sm text-gray-600 m-0">Last Updated By:</p>
-              <p className="font-medium text-gray-800 m-0">{creditData.updater.name}</p>
-              <p className="text-sm text-gray-500 m-0">{creditData.updater.email}</p>
-              <p className="text-xs text-gray-400 m-0">{formatDate(creditData.updated_at)}</p>
+            <div className="space-y-1 sm:border-l sm:border-gray-200 sm:pl-3">
+              <p className="text-gray-500 font-medium">Last Updated By</p>
+              <p className="font-medium text-gray-900">{creditData.updater.name}</p>
+              <p className="text-gray-600">{creditData.updater.email}</p>
+              <p className="text-gray-400">{formatDate(creditData.updated_at)}</p>
             </div>
           </div>
         </div>

@@ -27,71 +27,73 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
 
- const customFieldColumns = useMemo(() => {
-  // Extract unique custom field keys when subcategory filter is applied
-  if (!subCategoryId || !inventoryData || inventoryData.length === 0) {
-    return []
-  }
-
-  const customFieldsSet = new Set()
-
-  inventoryData.forEach((item) => {
-    if (item.item?.default_custom_fields) {
-      try {
-        // Check if default_custom_fields is already an object or needs parsing
-        const customFields = typeof item.item.default_custom_fields === 'string' 
-          ? JSON.parse(item.item.default_custom_fields) 
-          : item.item.default_custom_fields
-
-        Object.keys(customFields).forEach((key) => {
-          // Transform specific field names
-          let transformedKey = key
-          if (key.toLowerCase() === 'uom') {
-            transformedKey = 'Unit'
-          } else if (key.toLowerCase() === 'size') {
-            transformedKey = 'Deckle'
-          }
-          customFieldsSet.add(transformedKey)
-        })
-      } catch (error) {
-        console.error('Error parsing custom fields:', error)
-      }
+  const customFieldColumns = useMemo(() => {
+    // Extract unique custom field keys when subcategory filter is applied
+    if (!subCategoryId || !inventoryData || inventoryData.length === 0) {
+      return []
     }
-  })
 
-  return Array.from(customFieldsSet)
-}, [inventoryData, subCategoryId])
+    const customFieldsSet = new Set()
+
+    inventoryData.forEach((item) => {
+      if (item.item?.default_custom_fields) {
+        try {
+          // Check if default_custom_fields is already an object or needs parsing
+          const customFields =
+            typeof item.item.default_custom_fields === 'string'
+              ? JSON.parse(item.item.default_custom_fields)
+              : item.item.default_custom_fields
+
+          Object.keys(customFields).forEach((key) => {
+            // Transform specific field names
+            let transformedKey = key
+            if (key.toLowerCase() === 'uom') {
+              transformedKey = 'Unit'
+            } else if (key.toLowerCase() === 'size') {
+              transformedKey = 'Deckle'
+            }
+            customFieldsSet.add(transformedKey)
+          })
+        } catch (error) {
+          console.error('Error parsing custom fields:', error)
+        }
+      }
+    })
+
+    return Array.from(customFieldsSet)
+  }, [inventoryData, subCategoryId])
 
   // Function to get custom field value for an item
   const getCustomFieldValue = (item, fieldKey) => {
-  if (!item.item?.default_custom_fields) return '--'
+    if (!item.item?.default_custom_fields) return '--'
 
-  try {
-    // Check if default_custom_fields is already an object or needs parsing
-    const customFields = typeof item.item.default_custom_fields === 'string' 
-      ? JSON.parse(item.item.default_custom_fields) 
-      : item.item.default_custom_fields
+    try {
+      // Check if default_custom_fields is already an object or needs parsing
+      const customFields =
+        typeof item.item.default_custom_fields === 'string'
+          ? JSON.parse(item.item.default_custom_fields)
+          : item.item.default_custom_fields
 
-    // Handle the transformed field names (Unit and Deckle)
-    let originalKey = fieldKey
-    if (fieldKey === 'Unit') originalKey = 'uom'
-    if (fieldKey === 'Deckle') originalKey = 'size'
+      // Handle the transformed field names (Unit and Deckle)
+      let originalKey = fieldKey
+      if (fieldKey === 'Unit') originalKey = 'uom'
+      if (fieldKey === 'Deckle') originalKey = 'size'
 
-    const value = customFields[originalKey]
+      const value = customFields[originalKey]
 
-    if (!value) return '--'
-    
-    // Convert snake_case values to readable format
-    return value
-      .replace(/_/g, ' ')
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
-  } catch (error) {
-    console.error('Error parsing custom fields:', error)
-    return '--'
+      if (!value) return '--'
+
+      // Convert snake_case values to readable format
+      return value
+        .replace(/_/g, ' ')
+        .split(' ')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+    } catch (error) {
+      console.error('Error parsing custom fields:', error)
+      return '--'
+    }
   }
-}
   return (
     <>
       <div className="w-full overflow-x-auto overflow-y-scroll h-[calc(100vh-310px)] border rounded-md shadow-sm mt-1 mb-3">
@@ -156,8 +158,9 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
                       : '--'}
                   </CTableDataCell>
                   <CTableDataCell className="whitespace-nowrap">
-                    {item.total_quantity && (item.item.uom || item.item.net_weight)
-                      ? `${parseFloat(item.total_quantity)} ${item.item.uom || item.item.net_weight}`
+                    {item.quantity_available || item.total_quantity && (item.item.uom || item.item.net_weight)
+                      ? `${parseFloat(item.quantity_available || item.total_quantity)} ${item.item.uom || item.item.net_weight}` ||
+                        item.quantity_available
                       : '--'}
                   </CTableDataCell>
                   <CTableDataCell className="whitespace-nowrap">
@@ -178,7 +181,7 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
                     {(() => {
                       let stockStatus = '--'
                       // Convert strings to numbers
-                      const totalQuantity = parseFloat(item.total_quantity)
+                      const totalQuantity = parseFloat(item.quantity_available || item.total_quantity)
                       const minStockLevel = parseFloat(item.item.min_stock_level)
 
                       if (totalQuantity === 0.0) {
@@ -229,7 +232,7 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
                       <ThreeDotMenu
                         value={[
                           {
-                            label: 'Edit',
+                            label: 'Edit Product',
                             icon: cilPencil,
                             onClick: () => {
                               navigate('/inventoryhandling/inventory_form', {

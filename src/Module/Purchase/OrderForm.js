@@ -4,25 +4,16 @@ import ActionButton from '../../components/New/ActionButton'
 import ItemForm from './ItemForm'
 import 'core-js/stable'
 import { clientApi } from '../../api/client'
+import { useNavigate } from 'react-router-dom'
 
-const OrderForm = ({
-  orderData,
-  itemsData,
-  onSubmit,
-  isEdit,
-  isSubmitting,
-  setDrawer,
-  clientData,
-  selectedPoId,
-}) => {
-  const [formValues, setFormValues] = useState(orderData)
+const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id }) => {
   const [items, setItems] = useState(itemsData || [])
   const [supplierAddresses, setSupplierAddresses] = useState([])
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0)
   const [showAddressModal, setShowAddressModal] = useState(false)
   const [vendor, setVendor] = useState([])
   const [isSubmitted, setIsSubmitted] = useState(false)
-
+  const navigate = useNavigate()
   const [poTotals, setPoTotals] = useState({
     total_qty: 0,
     cgst_amount: 0,
@@ -114,6 +105,21 @@ const OrderForm = ({
     fetchData()
   }, [])
 
+  useEffect(() => {
+    if (isEdit && orderData?.supplier_id && vendor.length > 0) {
+      // Find the supplier and set the addresses
+
+      const selectedClient = vendor.find((client) => client.client_id == orderData.supplier_id)
+      if (selectedClient) {
+        const addresses = selectedClient.addresses || []
+
+        setSupplierAddresses(addresses)
+        setSelectedAddressIndex(0)
+        setValue('supplier_id', selectedClient.client_id)
+      }
+    }
+  }, [isEdit, orderData, vendor, setValue])
+
   // FIX 1: Update poTotals when received from ItemForm
   const handleTotalsUpdate = (newTotals) => {
     setPoTotals({
@@ -134,8 +140,10 @@ const OrderForm = ({
   }
 
   const handleSupplierChange = (e) => {
-    const selectedId = parseInt(e.target.value)
-    const selectedClient = vendor.find((client) => client.client_id === selectedId)
+    const selectedId = e.target.value
+    const selectedClient = vendor.find(
+      (client) => client.client_id === parseInt(selectedId) || client.client_id === selectedId,
+    )
 
     if (selectedClient) {
       setValue('supplier_name', selectedClient.display_name || '')
@@ -151,9 +159,8 @@ const OrderForm = ({
       const address_billing = addresses[0] || {}
       const billingString = [
         address_billing.attention,
-        address_billing.address_line,
-        address_billing.mobile,
-        address_billing.work_phone,
+        address_billing.street1,
+        address_billing.street2,
         address_billing.city,
         address_billing.state,
         address_billing.country,
@@ -165,12 +172,11 @@ const OrderForm = ({
 
       setValue('billing_address', billingString)
 
-      const addressObj = addresses[1] || {}
+      const addressObj = addresses[1] || addresses[0] || {}
       const addressString = [
         addressObj.attention,
-        addressObj.address_line,
-        addressObj.mobile,
-        addressObj.work_phone,
+        addressObj.street1,
+        addressObj.street2,
         addressObj.city,
         addressObj.state,
         addressObj.country,
@@ -289,276 +295,150 @@ const OrderForm = ({
   }
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <h2 className="text-lg font-semibold mb-4">Purchase Order Details</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Supplier Dropdown */}
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Supplier ID <span className="text-red-500"> *</span>
-            </label>
-            <select
-              {...register('supplier_id', { required: true })}
-              onChange={handleSupplierChange}
-              style={getInputStyle(errors.supplier_id)}
-              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-            >
-              <option value="">-- Select Supplier --</option>
-              {vendor?.map((item) => (
-                <option key={item.client_ui_id} value={item.client_id}>
-                  {item.client_ui_id} - {item.display_name}
-                </option>
-              ))}
-            </select>
-            {errors.supplier_id && isSubmitted && (
-              <p className="text-red-500 text-sm mt-1">{errors.supplier_id.message}</p>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Supplier Name <span className="text-red-500"> *</span>
-            </label>
-            <input
-              type="text"
-              {...register('supplier_name', { required: true })}
-              style={getInputStyle(errors.supplier_name)}
-              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-              readOnly
-            />
-            {errors.supplier_name && isSubmitted && (
-              <p className="text-red-500 text-sm mt-1">{errors.supplier_name.message}</p>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Supplier Contact <span className="text-red-500"> *</span>
-            </label>
-            <input
-              type="number"
-              {...register('supplier_contact', { required: true })}
-              style={getInputStyle(errors.supplier_contact)}
-              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-              readOnly
-            />
-            {errors.supplier_contact && isSubmitted && (
-              <p className="text-red-500 text-sm mt-1">{errors.supplier_contact.message}</p>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Supplier E-mail <span className="text-red-500"> *</span>
-            </label>
-            <input
-              type="email"
-              {...register('supplier_email', { required: true })}
-              style={getInputStyle(errors.supplier_email)}
-              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-              readOnly
-            />
-            {errors.supplier_email && isSubmitted && (
-              <p className="text-red-500 text-sm mt-1">{errors.supplier_email.message}</p>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Payment Terms <span className="text-red-500"> *</span>{' '}
-            </label>
-            <input
-              type="text"
-              {...register('payment_terms', { required: true })}
-              style={getInputStyle(errors.payment_terms)}
-              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-            />
-            {errors.payment_terms && isSubmitted && (
-              <p className="text-red-500 text-sm mt-1">{errors.payment_terms.message}</p>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">PO Date</label>
-            <input
-              type="date"
-              {...register('po_date')}
-              style={getInputStyle(errors.po_date)}
-              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-            />
-            {errors.po_date && isSubmitted && (
-              <p className="text-red-500 text-sm mt-1">{errors.po_date.message}</p>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Valid Till <span className="text-red-500"> *</span>{' '}
-            </label>
-            <input
-              type="date"
-              {...register('valid_till', { required: true })}
-              style={getInputStyle(errors.valid_till)}
-              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-            />
-            {errors.valid_till && isSubmitted && (
-              <p className="text-red-500 text-sm mt-1">{errors.valid_till.message}</p>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Freight Terms</label>
-            <input
-              type="text"
-              {...register('freight_terms')}
-              style={getInputStyle(errors.freight_terms)}
-              className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-            />
-            {errors.freight_terms && isSubmitted && (
-              <p className="text-red-500 text-sm mt-1">{errors.freight_terms.message}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Address sections remain the same */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Billing Address
-              <span
-                className="text-blue-600 cursor-pointer float-right text-sm"
-                onClick={() => setShowAddressModal(true)}
-                style={{ textDecoration: 'underline' }}
-              >
-                Change Address
-              </span>
-            </label>
-
-            <div className="border rounded p-3 bg-gray-50 mb-2">
-              {isEdit ? (
-                <textarea
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  {...register('billing_address')}
-                  rows={3}
-                />
-              ) : (
-                formatAddress(supplierAddresses[selectedAddressIndex])
-              )}
-            </div>
-            <input
-              type="hidden"
-              {...register('billing_address')}
-              value={[
-                supplierAddresses[selectedAddressIndex]?.attention,
-                supplierAddresses[selectedAddressIndex]?.address_line,
-                supplierAddresses?.[selectedAddressIndex]?.work_phones,
-                supplierAddresses[selectedAddressIndex]?.city,
-                supplierAddresses[selectedAddressIndex]?.state,
-                supplierAddresses[selectedAddressIndex]?.country,
-                supplierAddresses[selectedAddressIndex]?.pinCode,
-                supplierAddresses[selectedAddressIndex]?.phone,
-              ]
-                .filter(Boolean)
-                .join(', ')}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Destination to Deliver
-              <span
-                className="text-blue-600 cursor-pointer float-right text-sm"
-                onClick={() => setShowAddressModal(true)}
-                style={{ textDecoration: 'underline' }}
-              >
-                Change Address
-              </span>
-            </label>
-
-            <div className="border rounded p-3 bg-gray-50 mb-2">
-              {isEdit ? (
-                <textarea
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  {...register('shipping_address')}
-                  rows={3}
-                />
-              ) : (
-                formatAddress(supplierAddresses[selectedAddressIndex])
-              )}
-            </div>
-            <input
-              type="hidden"
-              {...register('shipping_address')}
-              value={[
-                supplierAddresses[selectedAddressIndex]?.attention,
-                supplierAddresses[selectedAddressIndex]?.address_line,
-                supplierAddresses?.[selectedAddressIndex]?.work_phones,
-                supplierAddresses[selectedAddressIndex]?.city,
-                supplierAddresses[selectedAddressIndex]?.state,
-                supplierAddresses[selectedAddressIndex]?.country,
-                supplierAddresses[selectedAddressIndex]?.pinCode,
-                supplierAddresses[selectedAddressIndex]?.phone,
-              ]
-                .filter(Boolean)
-                .join(', ')}
-            />
-          </div>
-
-          {/* Address Modal */}
-          {showAddressModal && (
-            <div
-              className="fixed inset-0  flex items-center justify-center z-50"
-              style={{ background: 'rgba(0, 0, 0, 0.5)' }}
-            >
-              <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg relative">
-                <h2 className="text-lg font-semibold mb-4">Addresses</h2>
-                <div className="space-y-3 max-h-72 overflow-y-auto">
-                  {supplierAddresses.map((address, idx) => (
-                    <div
-                      key={idx}
-                      className={`border rounded p-3 flex items-start gap-2 ${selectedAddressIndex === idx ? 'bg-blue-50 border-blue-400' : 'bg-gray-50'}`}
-                      onClick={() => setSelectedAddressIndex(idx)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <input
-                        type="radio"
-                        checked={selectedAddressIndex === idx}
-                        onChange={() => setSelectedAddressIndex(idx)}
-                        className="mt-1"
-                      />
-                      <div className="flex-1">
-                        <div>{formatAddress(address)}</div>
-                      </div>
-                    </div>
-                  ))}
+    <form onSubmit={handleSubmit(handleFormSubmit)}>
+      <div className="w-full ">
+        <div className="w-full">
+          <div className="w-full">
+            <div className="flex flex-col gap-3 px-2">
+              {/* Supplier Selection */}
+              <div className="flex items-center bg-gray-50 py-4 px-2 -mx-2">
+                <label className="text-xs text-red-600 w-40">Supplier Name*</label>
+                <div className="relative">
+                  <select
+                    {...register('supplier_id', { required: true })}
+                    onChange={handleSupplierChange}
+                    style={getInputStyle(errors.supplier_id)}
+                    className={`h-7 w-[25rem] rounded-l border px-3 text-sm ${errors.supplier_id && isSubmitted ? 'ring-1 ring-red-600' : 'border-gray-300'}`}
+                  >
+                    <option value="">-- Select Supplier --</option>
+                    {vendor?.map((item) => (
+                      <option key={item.client_ui_id} value={item.client_id}>
+                        {item.client_ui_id} - {item.display_name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div className="flex justify-end gap-2 mt-6">
-                  <button
-                    type="button"
-                    className="px-4 py-2 bg-blue-600 text-white rounded"
-                    onClick={handleAddressSelect}
+                <button
+                  type="button"
+                  className="h-7 w-9 flex items-center justify-center bg-blue-500 text-white rounded-r"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   >
-                    OK
-                  </button>
-                  <button
-                    type="button"
-                    className="px-4 py-2 border rounded"
-                    onClick={() => setShowAddressModal(false)}
-                  >
-                    Cancel
-                  </button>
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Supplier Name */}
+              <div className="flex items-center mt-1">
+                <label className="text-xs text-red-600 w-40">Supplier Name*</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    {...register('supplier_name', { required: true })}
+                    style={getInputStyle(errors.supplier_name)}
+                    className={`h-7 w-80 rounded border px-3 text-sm ${errors.supplier_name && isSubmitted ? 'ring-1 ring-red-600' : 'border-gray-300'}`}
+                    readOnly
+                  />
+                </div>
+              </div>
+
+              {/* Supplier Contact */}
+              <div className="flex items-center">
+                <label className="text-xs text-red-600 w-40">Supplier Contact*</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    {...register('supplier_contact', { required: true })}
+                    style={getInputStyle(errors.supplier_contact)}
+                    className={`h-7 w-80 rounded border px-3 text-sm ${errors.supplier_contact && isSubmitted ? 'ring-1 ring-red-600' : 'border-gray-300'}`}
+                    readOnly
+                  />
+                </div>
+              </div>
+
+              {/* Supplier Email */}
+              <div className="flex items-center">
+                <label className="text-xs text-red-600 w-40">Supplier Email*</label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    {...register('supplier_email', { required: true })}
+                    style={getInputStyle(errors.supplier_email)}
+                    className={`h-7 w-80 rounded border px-3 text-sm ${errors.supplier_email && isSubmitted ? 'ring-1 ring-red-600' : 'border-gray-300'}`}
+                    readOnly
+                  />
+                </div>
+              </div>
+
+              {/* Payment Terms */}
+              <div className="flex items-center">
+                <label className="text-xs text-red-600 w-40">Payment Terms*</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    {...register('payment_terms', { required: true })}
+                    style={getInputStyle(errors.payment_terms)}
+                    className={`h-7 w-80 rounded border px-3 text-sm ${errors.payment_terms && isSubmitted ? 'ring-1 ring-red-600' : 'border-gray-300'}`}
+                  />
+                </div>
+              </div>
+
+              {/* PO Date */}
+              <div className="flex items-center">
+                <label className="text-xs text-gray-700 w-40">PO Date</label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    {...register('po_date')}
+                    style={getInputStyle(errors.po_date)}
+                    className="h-7 w-80 rounded border border-gray-300 px-3 text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Valid Till */}
+              <div className="flex items-center">
+                <label className="text-xs text-red-600 w-40">Valid Till*</label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    {...register('valid_till', { required: true })}
+                    style={getInputStyle(errors.valid_till)}
+                    className={`h-7 w-80 rounded border px-3 text-sm ${errors.valid_till && isSubmitted ? 'ring-1 ring-red-600' : 'border-gray-300'}`}
+                  />
+                </div>
+              </div>
+
+              {/* Freight Terms */}
+              <div className="flex items-center">
+                <label className="text-xs text-gray-700 w-40">Freight Terms</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    {...register('freight_terms')}
+                    style={getInputStyle(errors.freight_terms)}
+                    className="h-7 w-80 rounded border border-gray-300 px-3 text-sm"
+                  />
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
 
-        <div className="mt-6">
-          {/* FIX 3: Pass the handleTotalsUpdate function to ItemForm */}
+        <div className="mt-8 mb-4">
           <ItemForm
-            key={selectedPoId || 'new'}
+            key={id || 'new'}
             items={items}
             setItems={setItems}
             formValues={poTotals}
@@ -566,29 +446,27 @@ const OrderForm = ({
           />
         </div>
 
-        {/* Hidden totals */}
-        <input type="hidden" {...register('total_qty')} value={poTotals.total_qty} />
-        <input type="hidden" {...register('cgst_amount')} value={poTotals.cgst_amount} />
-        <input type="hidden" {...register('sgst_amount')} value={poTotals.sgst_amount} />
-        <input type="hidden" {...register('tax_amount')} value={poTotals.tax_amount} />
-        <input type="hidden" {...register('total_amount')} value={poTotals.total_amount} />
+        {/* Submit Buttons Section */}
+        <div className="fixed bottom-0 bg-white border-t border-gray-200 z-10 flex p-1 py-2 w-full">
+          <div className="flex justify-end w-[83%]">
+            <div className="flex gap-2">
+              <ActionButton
+                type="button"
+                onClick={() => navigate('/purchaseorder')}
+                className="px-4 py-2 bg-gray-400 text-gray-700 rounded-md hover:bg-gray-500 transition-all"
+                label={'Cancel'}
+              />
 
-        <div className="mt-6 flex justify-end gap-3">
-          <button
-            onClick={() => setDrawer(false)}
-            type="button"
-            className=" border border-gray-300 rounded w-24 mr-2 hover:bg-gray-100 transition"
-          >
-            Cancel
-          </button>
-
-          <ActionButton
-            type="submit"
-            variant="primary"
-            label={isEdit ? 'Update' : 'Submit'}
-            isLoading={isSubmitting}
-            onClick={handleSubmitClick}
-          />
+              <ActionButton
+                type="submit"
+                variant="save"
+                className="bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
+                label={isEdit ? 'Update' : 'Submit Order'}
+                isLoading={isSubmitting}
+                onClick={handleSubmitClick}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </form>

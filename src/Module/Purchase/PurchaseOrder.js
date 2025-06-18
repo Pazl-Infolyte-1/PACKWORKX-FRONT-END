@@ -12,12 +12,11 @@ import { useSearch } from '../../components/New/SearchContext'
 import ContentHeader from '../../components/New/ContentHeader'
 import { debounce } from 'lodash'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 
 const PurchaseOrder = () => {
   const [data, setData] = useState([])
   const [isDrawerOpen, setDrawerOpen] = useState(false)
-  const [isReturnDrawerOpen, setReturnDrawerOpen] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [selectedPoId, setSelectedPoId] = useState(null)
   const [alert, setAlert] = useState({ show: false, message: '', type: '' })
@@ -28,6 +27,7 @@ const PurchaseOrder = () => {
   const [isMinimiseTable, setIsMinimiseTable] = useState(false)
   const [refresh, setRefresh] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const [paginationParams, setPaginationParams] = useState({
     currentPage: 1,
     pageSize: 50,
@@ -106,9 +106,7 @@ const PurchaseOrder = () => {
   }
 
   const handleAddNew = () => {
-    setIsEdit(false)
-    setSelectedPoId(null)
-    setDrawerOpen(true)
+    navigate('/purchaseorder/form')
   }
 
   const handleEdit = (id) => {
@@ -120,7 +118,6 @@ const PurchaseOrder = () => {
   const handlePurchaseDetails = (id) => {
     setSelectedPoId(id)
     setIsEdit(true)
-    setReturnDrawerOpen(true)
   }
 
   const handleSuccess = (updatedData) => {
@@ -139,7 +136,6 @@ const PurchaseOrder = () => {
     }
 
     setDrawerOpen(false)
-    setReturnDrawerOpen(false)
   }
 
   const closeAlert = () => {
@@ -219,20 +215,6 @@ const PurchaseOrder = () => {
               setRefresh={setRefresh}
             />
           )}
-        </Drawer>
-
-        <Drawer
-          isOpen={isReturnDrawerOpen}
-          onClose={() => setReturnDrawerOpen(false)}
-          maxWidth={'1350px'}
-          title={'Purchase Order Return'}
-        >
-          <AddPurchaseOrderReturn
-            selectedPoId={selectedPoId}
-            setDrawer={setReturnDrawerOpen}
-            onSuccess={handleSuccess}
-            poData={data}
-          />
         </Drawer>
       </div>
       

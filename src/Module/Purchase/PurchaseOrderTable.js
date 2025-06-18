@@ -237,7 +237,7 @@
 
               ...(row.po_status === 'created'
                 ? [
-                    { label: 'Edit', icon: cilPencil, onClick: () => handleEdit(row.id) },
+                    { label: 'Edit', icon: cilPencil, onClick: () => navigate(`/purchaseorder/form/${row.id}`)},
                     {
                       label: 'Delete',
                       icon: cilTrash,

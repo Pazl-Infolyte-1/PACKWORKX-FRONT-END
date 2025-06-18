@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { clientApi } from '../../api/client'
 import { creditApi } from '../../api/credit'
 import CustomAlert from '../../components/New/CustomAlert'
+import { workOrderApi } from '../../api/workOrder'
 
 const CreditNoteForm = () => {
   const [clients, setClients] = useState([])
@@ -102,48 +103,18 @@ const CreditNoteForm = () => {
     }
   }, [formData.client_id])
 
-  const sampleWorkOrderInvoices = [
-    {
-      id: 1,
-      company_id: 8,
-      client_id: 7,
-      sku_id: 4,
-      sku_version_id: null,
-      status: 'active',
-      invoice_number: 'INV-000001',
-      sale_id: 2,
-      work_id: 6,
-      created_by: 3,
-      updated_by: 3,
-      created_at: '2025-06-13T12:07:42.000Z',
-      updated_at: '2025-06-13T12:07:42.000Z',
-      due_date: '2025-06-13',
-      total: '94.00',
-      balance: '0.00',
-      payment_expected_date: '2025-06-13',
-      transaction_type: 'service',
-      discount_type: 'percentage',
-      discount: '64.00',
-      total_tax: '97.00',
-      total_amount: '67.00',
-      payment_status: 'paid',
-      workOrder: {
-        id: 6,
-        work_generate_id: '#WO-00006',
-        sku_name: 'CLOHEX 150',
-        qty: 10,
-        status: 'active',
-      },
-      salesOrder: {
-        id: 2,
-        sales_generate_id: 'SO-00002',
-        status: 'active',
-      },
-    },
-  ]
-
   useEffect(() => {
-    setInvoices(sampleWorkOrderInvoices)
+    const fetchInvoices = async () => {
+      try {
+        const response = await workOrderApi.getInvoice({
+          limit: 1000,
+        })
+        setInvoices(response.data.invoices)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    fetchInvoices()
   }, [])
 
   useEffect(() => {
@@ -652,7 +623,7 @@ const CreditNoteForm = () => {
                         ? 'ring-1 ring-red-600'
                         : 'border-gray-300'
                     }`}
-                    placeholder='Enter Credit Reference ID'
+                    placeholder="Enter Credit Reference ID"
                   />
                 </div>
               </div>

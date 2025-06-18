@@ -13,6 +13,7 @@ const SKU = React.lazy(() => import('./Module/SKU/SkuList.js'))
 const SkuAddEdit = React.lazy(() => import('./Module/SKU/SkuAddEdit.js'))
 const EmployeeList = React.lazy(() => import('./Module/HRMS/Employee/EmployeeList.js'))
 const PurchaseOrder = React.lazy(() => import('./Module/Purchase/PurchaseOrder.js'))
+const AddPurchaseOrder = React.lazy(() => import('./Module/Purchase/AddPurchaseOrder.js'))
 const PurchaseOrderDetails = React.lazy(() => import('./Module/Purchase/PurchaseOrderDetails.js'))
 const MachineDashboard = React.lazy(() => import('./Module/Machine/MachineDashboard.js'))
 const AddEditMachine = React.lazy(() => import('./Module/Machine/AddEditMachine.js'))
@@ -118,6 +119,7 @@ const routes = [
       },
     ],
   },
+  { path: '/purchaseorder/form/:id?', name: 'Purchase Order', element: AddPurchaseOrder, key: 654 },
   { path: '/machinedashboard', name: 'Machine Dashboard', element: MachineDashboard, key: 22 },
   {
     path: '/machinedashboard/form',

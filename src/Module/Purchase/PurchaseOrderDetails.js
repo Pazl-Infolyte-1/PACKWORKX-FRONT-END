@@ -1,4 +1,4 @@
-import { useState, useEffect   } from 'react'
+import { useState, useEffect } from 'react'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
 import { itemApi } from '../../api/item'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -15,7 +15,6 @@ function PurchaseOrderDetails() {
     const fetchData = async () => {
       try {
         const response = await purchaseOrderApi.getPurchaseOrderById(id)
-        console.log(response)
         setPurchaseOrder(response?.data)
       } catch (error) {
         console.error(error)
@@ -23,8 +22,6 @@ function PurchaseOrderDetails() {
     }
     fetchData()
   }, [id])
-
-  console.log('lksm', purchaseOrder)
 
   const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null
@@ -43,10 +40,8 @@ function PurchaseOrderDetails() {
   const openItemDetails = async (id) => {
     const response = await itemApi.getItemList({ limit: 1000 })
     const items = response?.data?.data || []
-    console.log(items, id, 'item')
     const item = items.find((i) => i.id === parseInt(id))
     const customFields = item?.custom_fields
-    console.log(customFields)
 
     setModalContent(
       <div className=" max-h-[200px] overflow-y-scroll">
@@ -98,9 +93,11 @@ function PurchaseOrderDetails() {
             >
               <span>📄</span> Download PDF
             </button>
-            <button onClick={() => navigate('/purchaseorder')}>
-              <CloseButton className="text-xs" />
-            </button>
+            <CloseButton
+              onClick={() => navigate('/purchaseorder')}
+              className="text-xs"
+              aria-label="Close"
+            />
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React from 'react'
 import settingsRoutes from './Module/Settings/SettingsRoutes.js'
+import { ratingClasses } from '@mui/material'
 const SettingsLayout = React.lazy(() => import('./Module/Settings/SettingsLayout.js'))
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
@@ -45,6 +46,8 @@ const wordOrderView = React.lazy(() => import('./Module/WorkOrder/ViewWorkOrder.
 
 const Items = React.lazy(() => import('./Module/Inventory/Items/items.js'))
 const GRN = React.lazy(() => import('./Module/GRN/Grn.js'))
+const GRNForm = React.lazy(() => import('./Module/GRN/GrnForm.js'))
+const GRNView = React.lazy(() => import('./Module/GRN/GrnView.js'))
 const Products = React.lazy(() => import('./Module/Products/Products.js'))
 const StockAdjustment = React.lazy(() => import('./Module/StockAdjustment/StockAdjustment.js'))
 const StockAdjustmentForm = React.lazy(
@@ -64,9 +67,9 @@ const CreditNoteView = React.lazy(() => import('./Module/CreditNote/CreditNoteVi
 const InventoryView = React.lazy(() => import('./Module/Inventory/ViewInventory.js'))
 
 
-const ProductionPlanning = React.lazy(
-  () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
-)
+// const ProductionPlanning = React.lazy(
+//   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
+// )
 
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
@@ -141,7 +144,15 @@ const routes = [
   { path: '/packages', name: 'Packages', element: Packages, key: 5001 },
   { path: '/process', name: 'Process', element: Process, key: 5007 },
   { path: '/routeprocess', name: 'Route Process', element: RouteProcess, key: 5008 },
-  { path: '/grn', name: 'GRN', element: GRN, key: 5009 },
+  {
+    path: '/grn',
+    name: 'GRN',
+    element: GRN,
+    key: 5009,
+    children: [{ path: 'view/:id', name: 'GRNView', element: GRNView, key: '' }],
+  },
+  { path: '/grn_form', name: 'GRNForm', element: GRNForm, key: '' },
+  { path: '/grn_form/:id', name: 'GRNEditForm', element: GRNForm, key: '' },
 
   { path: '/billing', name: 'Billing', element: Billing, key: 5003 },
   { path: '/companies', name: 'Companies', element: Companies, key: 5002 },
@@ -257,12 +268,12 @@ const routes = [
     element: InventoryForm,
     key: 2232,
   },
-  {
-    path: '/productionplanning',
-    name: 'Production Planning',
-    element: ProductionPlanning,
-    key: '',
-  },
+  // {
+  //   path: '/productionplanning',
+  //   name: 'Production Planning',
+  //   element: ProductionPlanning,
+  //   key: '',
+  // },
 ]
 
 export default routes

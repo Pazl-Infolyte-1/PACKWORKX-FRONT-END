@@ -8,16 +8,17 @@ const DefaultLayout = () => {
 
   return (
     <div className="w-full bg-white">
-      <AppSidebar />
+      {/* <AppSidebar /> */}
       <div
         className={`flex-column min-vh-100 ${
           sidebarShow ? (unfoldable ? 'pl-12' : 'pl-[183px]') : 'pl-0'
         }`}
       >
-        <AppHeader />
+        {/* <AppHeader /> */}
         <div className="body flex-grow-1 px-2">
-          <AppContent />
+          {/* <AppContent /> */}
         </div>
+        <div>Test the Content</div>
         {/*<AppFooter />*/}
       </div>
     </div>

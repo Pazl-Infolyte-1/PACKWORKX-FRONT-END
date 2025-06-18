@@ -8,6 +8,17 @@ export default defineConfig(() => {
     base: './',
     build: {
       outDir: 'build',
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom'],
+            coreui: ['@coreui/react', '@coreui/icons-react'],
+          },
+        },
+      },
+      target: 'es2015',
+      minify: 'terser',
+
     },
     css: {
       postcss: {
@@ -27,9 +38,19 @@ export default defineConfig(() => {
       loader: 'jsx',
       include: /src\/.*\.jsx?$/,
       exclude: [],
+      jsx: 'automatic',
     },
     optimizeDeps: {
-      force: true,
+      include: [
+        'react',
+        'react-dom',
+        '@coreui/react',
+        '@coreui/icons-react',
+        'react-router-dom',
+        'react-redux',
+        'redux',
+      ],
+      exclude: ['@syncfusion/ej2-base'],
       esbuildOptions: {
         loader: {
           '.js': 'jsx',

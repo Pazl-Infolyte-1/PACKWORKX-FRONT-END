@@ -8,7 +8,7 @@ import 'simplebar-react/dist/simplebar.min.css'
 import { cilUser } from '@coreui/icons'
 import './style.css'
 
-const AppSideBarNew = ({ giveAccess }) => {
+export const AppSideBarNew = ({ giveAccess }) => {
   const [expandedModules, setExpandedModules] = useState({})
   const [isOpen, setIsOpen] = useState(false)
 
@@ -498,5 +498,3 @@ const AppSideBarNew = ({ giveAccess }) => {
     </CSidebarNav>
   )
 }
-
-export default AppSideBarNew

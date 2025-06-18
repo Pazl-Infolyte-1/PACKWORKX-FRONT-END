@@ -10,16 +10,4 @@ export { default as DocsIcons } from './DocsIcons'
 export { default as DocsLink } from './DocsLink'
 export { default as DocsExample } from './DocsExample'
 
-
-export {
-  AppBreadcrumb,
-  AppContent,
-  AppFooter,
-  AppHeader,
-  AppHeaderDropdown,
-  AppSidebar,
-  DocsComponents,
-  DocsIcons,
-  DocsLink,
-  DocsExample,
-}
+// Remove the export { } block and default export entirely

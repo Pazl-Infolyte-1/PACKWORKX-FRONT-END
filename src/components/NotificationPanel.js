@@ -62,8 +62,9 @@ const NotificationPanel = () => {
   }
 
   return (
-    <CDropdown variant="nav-item">
-      <CDropdownToggle caret={false} className="position-relative">
+    // Changed from variant="nav-item" to remove the <li> wrapper
+    <CDropdown>
+      <CDropdownToggle caret={false} className="position-relative nav-link">
         <CIcon icon={cilBell} size="lg" className="text-white" />
         {notifications.length > 0 && (
           <span
@@ -98,11 +99,11 @@ const NotificationPanel = () => {
           <span>Notifications</span>
 
           <button
-            onClick={handleClearAll} // 👉 call your clear function here
+            onClick={handleClearAll}
             style={{
               backgroundColor: 'transparent',
               border: 'none',
-              color: '#dc3545', // Bootstrap danger color
+              color: '#dc3545',
               cursor: 'pointer',
               fontSize: '0.85rem',
               fontWeight: 'normal',
@@ -159,7 +160,7 @@ const NotificationPanel = () => {
                         return (
                           <span
                             style={{
-                              color: '#ffc107', // Yellow
+                              color: '#ffc107',
                               fontWeight: 'bold',
                               marginRight: '4px',
                             }}
@@ -172,7 +173,7 @@ const NotificationPanel = () => {
                         return (
                           <span
                             style={{
-                              color: '#c82333', // Dark red
+                              color: '#c82333',
                               fontWeight: 'bold',
                               marginRight: '4px',
                             }}

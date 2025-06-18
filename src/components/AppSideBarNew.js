@@ -1,16 +1,11 @@
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import {
-  CNavItem,
-  CNavLink,
-  CSidebarNav,
-  CNavTitle,
-} from '@coreui/react'
+import { CNavItem, CNavLink, CSidebarNav, CNavTitle } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import * as iconSet from '@coreui/icons'
 import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
-import {cilUser } from '@coreui/icons'
+import { cilUser } from '@coreui/icons'
 import './style.css'
 
 export const AppSideBarNew = ({ giveAccess }) => {
@@ -89,7 +84,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
   )
 
   return (
-    <CSidebarNav className='sidebar-menu' as={SimpleBar}>
+    <CSidebarNav className="sidebar-menu" as={SimpleBar}>
       {/*superAdmin*/}
       {/*accounts*/}
       {shouldDisplayAccounts && (
@@ -307,6 +302,16 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
+
+            if (module.modules_description === 'Invoice') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/invoice">
+                    {navLink('Invoice', 'cilList')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
             if (module.modules_description === 'Sku Details') {
               return (
                 <CNavItem key={index}>
@@ -382,16 +387,38 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
+            if (module.modules_description === 'Credit Note') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/credit-note">
+                    {navLink('Credit Note', 'cibCodepen')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
+            if (module.modules_description === 'Debit Note') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/debitnote">
+                    {navLink('Debit Note', 'cibFaceit')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
 
-            return null
-          })}
-        </>
-      )}
-      <CNavItem>
+            if (module.modules_description === 'Stock Adjustment') {
+              return (
+                <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/stockadjustment">
                     {navLink('Stock Adjustment', 'cibHighly')}
                   </CNavLink>
                 </CNavItem>
+              )
+            }
+            return null
+          })}
+        </>
+      )}
       {/*reports*/}
       {shouldDisplayReports && (
         <>

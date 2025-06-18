@@ -11,7 +11,7 @@ export const itemApi = {
 
           page: params.page || 1,
 
-          limit: params.limit || 10,
+          limit: params.limit || 1000,
         },
       })
     } catch (error) {

@@ -1,8 +1,8 @@
-// Updated InventoryMain component with click-outside functionality for dropdowns
+// Updated InventoryMain component with fixed Total Stock Value calculation
 
 import { useEffect, useState, useRef } from 'react'
 import InventoryTable from './InventoryTable'
-import { BiDollarCircle } from 'react-icons/bi'
+import { BiDollarCircle, BiRupee } from 'react-icons/bi'
 import { FaShieldAlt, FaStar, FaUsers, FaChevronDown, FaChevronUp, FaTimes } from 'react-icons/fa'
 import { CgWorkAlt } from 'react-icons/cg'
 import { MdCategory, MdOutlineStickyNote2, MdPushPin, MdRecycling } from 'react-icons/md'
@@ -16,6 +16,8 @@ import { FiDownload } from 'react-icons/fi'
 import { commonApi } from '../../api/common'
 import { inventoryApi } from '../../api/inventory'
 import { itemApi } from '../../api/item'
+import InventoryView from './InventoryView'
+import ViewInventory from './ViewInventory'
 
 const InventoryMain = () => {
   const [inventoryData, setInventoryData] = useState([])
@@ -35,6 +37,8 @@ const InventoryMain = () => {
   const { setGlobalPlaceholder, searchQuery } = useSearch()
   const [stockFilter, setStockFilter] = useState(null)
   const [isStockDropdownOpen, setIsStockDropdownOpen] = useState(false)
+const [isMinimised,setIsMinimised] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
 
   // Refs for click outside detection
   const stockDropdownRef = useRef(null)
@@ -70,7 +74,6 @@ const InventoryMain = () => {
 
     // Add event listener
     document.addEventListener('mousedown', handleClickOutside)
-    
     // Cleanup
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
@@ -103,12 +106,6 @@ const InventoryMain = () => {
     setFilteredInventoryData(filtered)
   }, [inventoryData, stockFilter])
 
-  const totalInventoryValue = inventoryData?.reduce((acc, item) => {
-    const quantity = item.total_quantity || 0
-    const cost = item.item?.standard_cost || 0
-    return acc + quantity * cost
-  }, 0)
-
   const backgroundColorsBox = ['#18a24d', '#5046e4', '#4c5564', '#9334ea']
 
   // Helper functions to get selected category and subcategory names
@@ -124,6 +121,39 @@ const InventoryMain = () => {
     return selectedSubCategory ? selectedSubCategory.sub_category_name.replace(/-/g, ' ') : null
   }
 
+  // Fixed function to get total stock value for selected subcategory
+  const getTotalStockValue = () => {
+    if (!subCategoryId || !subCategoryQuantities.length) return '0.00'
+
+    // Find the subcategory data that matches the selected subCategoryId
+    const selectedSubCategoryData = subCategoryQuantities.find(
+      (item) => item.sub_category === subCategoryId,
+    )
+
+    if (selectedSubCategoryData && selectedSubCategoryData.sub_category_info) {
+      const totalAmount = parseFloat(selectedSubCategoryData.sub_category_info.total_amount) || 0
+      return parseFloat(totalAmount) || '0'
+    }
+
+    return '0.00'
+  }
+
+  // // Function to get total quantity for selected subcategory
+  // const getTotalQuantity = () => {
+  //   if (!subCategoryId || !subCategoryQuantities.length) return '0'
+
+  //   const selectedSubCategoryData = subCategoryQuantities.find(
+  //     (item) => item.sub_category === subCategoryId
+  //   )
+
+  //   if (selectedSubCategoryData && selectedSubCategoryData.sub_category_info) {
+  //     const totalQuantity = parseFloat(selectedSubCategoryData.sub_category_info.total_quantity) || 0
+  //     return totalQuantity.toString()
+  //   }
+
+  //   return '0'
+  // }
+
   useEffect(() => {
     setGlobalPlaceholder('Search Inventory')
 
@@ -135,7 +165,7 @@ const InventoryMain = () => {
           currentPage,
           entriesPerPage,
           searchQuery,
-          subCategoryId , 
+          subCategoryId,
         )
 
         if (response?.data?.success) {
@@ -193,7 +223,7 @@ const InventoryMain = () => {
 
   const handleSubCategoryClick = async (e, categoryId) => {
     e.stopPropagation()
-    clearAllFilters()
+    // clearAllFilters()
 
     // Only proceed for categories that have subcategories
     if (categoryId !== 1 && categoryId !== 4) {
@@ -217,8 +247,6 @@ const InventoryMain = () => {
   }
 
   const handleSubCategorySelect = (subCategoryId) => {
-    console.log(subCategoryId);
-    
     setSubCategoryId(subCategoryId)
     setOpenCategoryId(null)
   }
@@ -243,22 +271,39 @@ const InventoryMain = () => {
     setStockFilter(null)
   }
 
-const handleInventoryExelExport = async () => {
-  const params = {
-    categoryId,
-    currentPage,
-    entriesPerPage,
-    searchQuery,
-    subCategoryId,
-  };
-  await inventoryApi.getInventoryExcelExport(params);
-}
+  const handleInventoryExelExport = async () => {
+    const params = {
+      categoryId,
+      currentPage,
+      entriesPerPage,
+      searchQuery,
+      subCategoryId,
+    }
+    await inventoryApi.getInventoryExcelExport(params)
+  }
+
+  const handleSummary = async () => {
+    try {
+      const response = await inventoryApi.getInventorySummary()
+      const data = response.data.data.inventoryData
+      const selectedSubcategory = data.filter((item) => item.item.sub_category === subCategoryId)
+      setInventoryData(selectedSubcategory)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   return (
     <>
+          <div className={isMinimised ? 'w-[387px] border-r' : 'w-full'}>
+
       <ContentHeader
+                  isMinimized={isMinimised}
         addLabel="New Product"
         heading="Inventory"
+        isNewButton={true}
+        newButtonLabel="Summary"
+        addNewButtonClick={handleSummary}
         onAddClick={() =>
           navigate('/inventoryhandling/inventory_form', {
             state: { fromInventory: true },
@@ -272,9 +317,10 @@ const handleInventoryExelExport = async () => {
           },
         ]}
       />
+      </div>
 
       {/*dashboard panel*/}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 w-full mt-2">
+    {!isMinimised && (    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 w-full mt-2">
         {category.map((item, index) => {
           const IconComponent = icons[index % icons.length]
           const hasSubCategories = item.id === 1 || item.id === 4
@@ -282,10 +328,10 @@ const handleInventoryExelExport = async () => {
           const isSelected = categoryId === item.id
 
           return (
-            <div 
-              key={item.id} 
+            <div
+              key={item.id}
               className="relative"
-              ref={(el) => {
+              ref={(el) => {  
                 if (el) {
                   subCategoryDropdownRefs.current[item.id] = el
                 }
@@ -305,7 +351,7 @@ const handleInventoryExelExport = async () => {
                   <span className="font-bold text-white">
                     {item.category_name.replace(/-/g, ' ')}
                   </span>
-                </div>  
+                </div>
                 <span
                   onClick={(e) => handleSubCategoryClick(e, item.id)}
                   className={`size-8 rounded flex items-center justify-center mr-2 border border-white shadow-lg ${
@@ -361,7 +407,11 @@ const handleInventoryExelExport = async () => {
                       const found = subCategoryQuantities.find(
                         (item) => item.sub_category === subCategoryId,
                       )
-                      return found?.total_quantity ? parseInt(found.total_quantity) : '0'
+                      console.log(found)
+
+                      return found?.sub_category_info.total_quantity
+                        ? parseInt(found.sub_category_info.total_quantity)
+                        : '0'
                     }
 
                     return (
@@ -406,15 +456,22 @@ const handleInventoryExelExport = async () => {
           )
         })}
 
-        {/* Total Stock Value Card */}
-        <div className="bg-blue-600 rounded-md m-0 shadow-md text-center font-bold capitalize w-full text-white">
-          <p className="m-0">Total Stock Value</p>
-          <p className="m-0">₹{totalInventoryValue}</p>
+        {/* Total Stock Value Card - Fixed Implementation */}
+
+        <div className="p-1 bg-gradient-to-r from-blue-600 to-blue-700 rounded-md shadow-md text-center text-white">
+          <div className="flex flex-col items-center justify-center">
+            <div className="flex">
+              <BiRupee className="text-xl opacity-80" />
+              <p className="text-xs font-medium opacity-90 m-0">Total Stock Value</p>
+            </div>
+            <p className="text-lg font-bold m-0">₹{getTotalStockValue()}</p>
+          </div>
         </div>
       </div>
+    )}
 
       {/* Stock Filter Buttons */}
-      <div className="flex w-full mt-2 gap-2">
+   {!isMinimised && (   <div className="flex w-full mt-2 gap-2">
         {/* Selected Filters Display */}
         {(categoryId || subCategoryId || stockFilter) && (
           <div className="flex flex-wrap gap-2 mt-1 mb-2 flex-1">
@@ -438,10 +495,10 @@ const handleInventoryExelExport = async () => {
                 <span className="mr-2">Subcategory: {getSelectedSubCategoryName()}</span>
                 {subCategoryId !== 1 && (
                   <FaTimes
-                  className="cursor-pointer hover:text-green-600"
-                  size={12}
-                  onClick={clearSubCategoryFilter}
-                />
+                    className="cursor-pointer hover:text-green-600"
+                    size={12}
+                    onClick={clearSubCategoryFilter}
+                  />
                 )}
               </div>
             )}
@@ -563,33 +620,64 @@ const handleInventoryExelExport = async () => {
             Clear All
           </button>
         </div>
-      </div>
+      </div>)}
 
       {/* Pass filtered data to table */}
-      <InventoryTable inventoryData={filteredInventoryData} subCategoryId={subCategoryId} totalInventoryValue={inventoryData} />
+  <div className={`${isMinimised ? 'grid grid-cols-10 gap-2' : ''}`}>
+  {/* Left Section - Inventory Table */}
+  <div
+    name="tableView"
+    className={`${isMinimised ? 'col-span-3' : ''}`}
+  >
+    <InventoryTable
+      isMinimised={isMinimised}
+      setIsMinimised={setIsMinimised}
+      inventoryData={filteredInventoryData}
+      subCategoryId={subCategoryId}
+      totalInventoryValue={inventoryData}
+        selectedItem={selectedItem}
+  setSelectedItem={setSelectedItem} 
+    />
 
-      <div className="fixed bottom-0 left-0 w-full bg-white shadow-md z-50 px-4 py-2">
-        <div className="flex justify-between items-center w-full">
-          <p className="text-sm font-medium text-gray-700 ml-[200px]">
-            Total Records: {stockFilter ? filteredInventoryData.length : totalRecords}
-            {stockFilter && (
-              <span className="ml-2 text-blue-600">
-                (Filtered by {stockFilter.replace('_', ' ')})
-              </span>
-            )}
-          </p>
-          <div className="mr-3 mb-3">
-            <CompactPagination
-              totalRecords={stockFilter ? filteredInventoryData.length : totalRecords}
-              count={totalPage}
-              page={currentPage}
-              onPageChange={handlePageChange}
-              entriesPerPage={entriesPerPage}
-              onEntriesChange={handleEntriesChange}
-            />
-          </div>
-        </div>
-      </div>
+    {/* Bottom Pagination Bar */}
+    <div className="fixed bottom-0 left-0 w-full bg-white shadow-md z-50 px-4 py-2">
+    <div
+  className={`flex justify-between items-center ${
+    isMinimised ? 'w-[300px]' : 'w-full'
+  }`}
+>
+ <p className="text-sm font-medium text-gray-700 ml-[200px] whitespace-nowrap">
+  Total Records: {stockFilter ? filteredInventoryData.length : totalRecords}
+  {stockFilter && (
+    <span className="ml-2 text-blue-600">
+      (Filtered by {stockFilter.replace('_', ' ')})
+    </span>
+  )}
+</p>
+
+ <div className={`mr-3 mb-3 ${isMinimised ? 'ml-[20px]' : ''}`}>
+  <CompactPagination
+    totalRecords={stockFilter ? filteredInventoryData.length : totalRecords}
+    count={totalPage}
+    page={currentPage}
+    onPageChange={handlePageChange}
+    entriesPerPage={entriesPerPage}
+    onEntriesChange={handleEntriesChange}
+  />
+</div>
+
+</div>
+
+    </div>
+  </div>
+
+  {/* Right Section - Inventory View */}
+ <div className={`${isMinimised ? 'col-span-7' : ''} -mt-10`}>
+    {/*<InventoryView />*/}
+    <ViewInventory item={selectedItem} totalInventoryValue={inventoryData} setIsMinimised={setIsMinimised}/>
+  </div>
+</div>
+
     </>
   )
 }

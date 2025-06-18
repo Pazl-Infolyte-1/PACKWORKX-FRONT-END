@@ -645,15 +645,39 @@ const AllocateRM = ({}) => {
           </CCardBody>
         </div>
         <div className="mt-3 custom-srollbar" style={{ height: 'calc(95vh - 200px)', overflowY: 'auto' }}>
-          {groupOrders?.map((group, groupIndex) => (
-            <GroupRawMeterialDropZone
-              key={groupIndex}
-              group={group}
-              groupIndex={groupIndex}
-              visibleGroupIndex={visibleGroupIndex}
-              toggleGroupCollapse={toggleGroupCollapse}
-            />
-          ))}
+          {groupOrders?.length === 0 ? (
+            <CCard
+              className="mb-2"
+              style={{
+                backgroundColor: '#f5f4f7',
+                borderRadius: '8px',
+                padding: '20px',
+                textAlign: 'center',
+                margin: '20px'
+              }}
+            >
+              <CCardBody>
+                <div className="flex flex-col items-center justify-center">
+                  <CIcon
+                    icon={cilBriefcase}
+                    style={{ fontSize: '2rem', color: '#8167e5', marginBottom: '10px' }}
+                  />
+                  <span className="text-gray-600 font-medium">No Groups Available</span>
+                  <span className="text-gray-500 text-sm mt-1">Create groups to begin allocation</span>
+                </div>
+              </CCardBody>
+            </CCard>
+          ) : (
+            groupOrders?.map((group, groupIndex) => (
+              <GroupRawMeterialDropZone
+                key={groupIndex}
+                group={group}
+                groupIndex={groupIndex}
+                visibleGroupIndex={visibleGroupIndex}
+                toggleGroupCollapse={toggleGroupCollapse}
+              />
+            ))
+          )}
         </div>
       </CCol>
 

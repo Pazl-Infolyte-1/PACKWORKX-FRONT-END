@@ -53,7 +53,6 @@ const PurchaseOrderReturn = () => {
         page: pagination.currentPage,
         limit: limit,
       })
-      console.log('podata', response?.data)
 
       setPoData(response?.data || [])
       setPagination(response.data.pagination || { currentPage: 1, totalPages: 1, total: 0 })
@@ -69,16 +68,12 @@ const PurchaseOrderReturn = () => {
   // Fetch details for editing
   const handlePurchaseDetails = async (id, setFormFields, setItems, setGrnId) => {
     try {
-      console.log('id', id)
 
       const response = await purchaseOrderApi.getPurchaseReturn({ id })
-      console.log('response', response)
 
       const approvedList = Array.isArray(response?.data?.approved) ? response.data.approved : []
-      console.log('approvedList', approvedList)
 
       const matchedPor = approvedList.find((item) => item.id === id)
-      console.log('matchedpor', matchedPor)
 
       if (matchedPor) {
         setGrnId(matchedPor.grn_id)
@@ -111,7 +106,6 @@ const PurchaseOrderReturn = () => {
 
   // Handle edit button
   const handleEdit = (po_return) => {
-    console.log('po_return', po_return)
     setSelectedPorId(po_return.id)
     setSelectedPoId(po_return.po_id)
     setIsPorEdit(true)

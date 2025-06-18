@@ -22,7 +22,7 @@ import {
 import { FaRupeeSign } from 'react-icons/fa'
 import { inventoryApi } from '../../api/inventory'
 
-const ViewInventory = ({ item, totalInventoryValue }) => {
+const ViewInventory = ({ item, totalInventoryValue ,setIsMinimised}) => {
   const [itemDetails, setItemDetails] = useState(null)
   const menus = ['Products', 'Purchase Order', 'GRN', 'Purchase Returns', 'Stock Adjustment']
 
@@ -41,6 +41,7 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
 
     fetchSingleItem()
   }, [item])
+console.log(item);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -48,14 +49,6 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
       month: 'short',
       day: 'numeric',
     })
-  }
-
-  const parseCustomFields = (customFieldsString) => {
-    try {
-      return JSON.parse(customFieldsString)
-    } catch {
-      return {}
-    }
   }
 
   const getStatusIcon = (status) => {
@@ -113,31 +106,49 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
     }).format(amount)
   }
 
-  const rawCustomFields = itemDetails?.products?.custom_fields
-  const parsed = rawCustomFields ? JSON.parse(rawCustomFields) : {}
-  const customData = parseCustomFields(parsed)
+  const rawCustomFields = itemDetails?.products?.default_custom_fields
+  
+  const customData = rawCustomFields ? JSON.parse(rawCustomFields) : {}
+  console.log('Raw Custom Fields:', customData);
 
+  const handleClose =()=>{
+setIsMinimised(false)
+  }
   return (
-    <div>
-      {/* Nav menu */}
-      <nav className="flex space-x-8 border-b mb-4">
-        {menus.map((menu) => (
-          <button
-            key={menu}
-            onClick={() => setActiveMenu(menu)}
-            className={`pb-2 font-semibold ${
-              activeMenu === menu
-                ? 'border-b-2 border-blue-600 text-blue-600'
-                : 'text-gray-600 hover:text-blue-500'
-            }`}
-          >
-            {menu}
-          </button>
-        ))}
-      </nav>
+  <div className='border-l h-[600px] flex flex-col'>
+  {/* Fixed Header Section */}
+  <div className="flex-shrink-0 bg-white border-b shadow-sm sticky top-0 z-10">
+    {/* Close button */}
+    <div className="flex justify-end p-2">
+      <button
+        onClick={handleClose} // define this function in your component
+        className="text-gray-500 hover:text-red-600 transition-colors"
+        aria-label="Close"
+      >
+        ✕
+      </button>
+    </div>
+
+    {/* Nav menu */}
+    <nav className="flex space-x-8 px-4 pb-2">
+      {menus.map((menu) => (
+        <button
+          key={menu}
+          onClick={() => setActiveMenu(menu)}
+          className={`pb-2 font-semibold transition-colors ${
+            activeMenu === menu
+              ? 'border-b-2 border-blue-600 text-blue-600'
+              : 'text-gray-600 hover:text-blue-500'
+          }`}
+        >
+          {menu}
+        </button>
+      ))}
+    </nav>
+  </div>
 
       {/* Content area */}
-      <div>
+      <div className="flex-1 overflow-y-auto">
         {activeMenu === 'Products' ? (
           <div className="p-3">
             <div className="flex justify-between">
@@ -147,7 +158,7 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
               </h2>
               <div>
                 <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                <p className="text-sm font-bold m-0">Qty:{totalInventoryValue[0].total_quantity}</p>
+                <p className="text-sm font-bold m-0">Available Qty: {parseFloat(item?.quantity_available)}</p>
               </div>
             </div>
 
@@ -261,7 +272,7 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                           {Object.entries(
-                            parseCustomFields(JSON.parse(itemDetails.products.custom_fields)),
+                            customData
                           ).map(([key, value]) => {
                             // Process the key: remove special characters and capitalize
                             const processedKey = key
@@ -275,6 +286,8 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
                                 key={key}
                                 className="flex gap-2 items-center py-2 px-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
                               >
+                                {console.log(processedKey)}
+                                
                                 <span className="text-sm font-medium text-gray-600">
                                   {processedKey}:
                                 </span>

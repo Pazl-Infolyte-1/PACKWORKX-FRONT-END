@@ -13,6 +13,7 @@ const SKU = React.lazy(() => import('./Module/SKU/SkuList.js'))
 const SkuAddEdit = React.lazy(() => import('./Module/SKU/SkuAddEdit.js'))
 const EmployeeList = React.lazy(() => import('./Module/HRMS/Employee/EmployeeList.js'))
 const PurchaseOrder = React.lazy(() => import('./Module/Purchase/PurchaseOrder.js'))
+const PurchaseOrderDetails = React.lazy(() => import('./Module/Purchase/PurchaseOrderDetails.js'))
 const MachineDashboard = React.lazy(() => import('./Module/Machine/MachineDashboard.js'))
 const AddEditMachine = React.lazy(() => import('./Module/Machine/AddEditMachine.js'))
 const InventoryHandling = React.lazy(() => import('./Module/Inventory/InventoryHandling.js'))
@@ -55,6 +56,7 @@ const StockAdjustmentForm = React.lazy(
 const StockTableView = React.lazy(() => import('./Module/StockAdjustment/StockTableView.js'))
 
 const Invoice = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceList.js'))
+const InvoiceForm = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceAddForm.js'))
 const InvoiceView = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceView.js'))
 const InventoryForm = React.lazy(() => import('./Module/Inventory/Items/AddItemProcess.js'))
 const DebitNote = React.lazy(() => import('./Module/DebitNote/DebitNote.js'))
@@ -62,6 +64,8 @@ const DebitNoteForm = React.lazy(() => import('./Module/DebitNote/DebitNoteForm.
 const CreditNote = React.lazy(() => import('./Module/CreditNote/CreditNote.js'))
 const CreditNoteForm = React.lazy(() => import('./Module/CreditNote/CreditNoteForm.js'))
 const CreditNoteView = React.lazy(() => import('./Module/CreditNote/CreditNoteView.js'))
+const InventoryView = React.lazy(() => import('./Module/Inventory/ViewInventory.js'))
+
 
 // const ProductionPlanning = React.lazy(
 //   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
@@ -100,7 +104,20 @@ const routes = [
   //  key: 'SKU_EDIT',
   //},
   { path: '/employeelist', name: 'Employee List', element: EmployeeList, key: 21 },
-  { path: '/purchaseorder', name: 'Purchase Order', element: PurchaseOrder, key: 29 },
+  {
+    path: '/purchaseorder',
+    name: 'Purchase Order',
+    element: PurchaseOrder,
+    key: 29,
+    children: [
+      {
+        path: '/purchaseorder/:id',
+        name: 'PurchaseOrderView',
+        element: PurchaseOrderDetails,
+        key: '',
+      },
+    ],
+  },
   { path: '/machinedashboard', name: 'Machine Dashboard', element: MachineDashboard, key: 22 },
   {
     path: '/machinedashboard/form',
@@ -108,7 +125,9 @@ const routes = [
     element: AddEditMachine,
     key: 22,
   },
-  { path: '/inventoryhandling', name: 'Inventory Handling', element: InventoryMain, key: 28 },
+  { path: '/inventoryhandling', name: 'Inventory Handling', element: InventoryMain, key: 28,
+        children: [{ path: ':id', element: InventoryView, key: 'inventory' }],
+   },
   { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 230 },
   {
     path: '/production',
@@ -234,6 +253,14 @@ const routes = [
         key: '', // Assigned a proper unique key
       },
     ],
+  },
+
+  {
+    path: '/invoice/form',
+    name: 'invoiceForm',
+    element: InvoiceForm,
+    key: '',
+
   },
   {
     path: '/inventoryhandling/inventory_form',

@@ -20,9 +20,12 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
     if (!isOpen) return null
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded p-6 max-w-5xl w-full">
-          <button onClick={onClose} className="float-right">
-            &times;
+        <div className="bg-white rounded p-6 max-w-5xl w-full relative">
+          <button 
+            onClick={onClose} 
+            className="absolute top-1 right-2 text-2xl text-red-500 hover:text-red-700 w-8 h-8 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 transition-colors"
+          >
+            ×
           </button>
           <div>{children}</div>
         </div>
@@ -39,7 +42,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
       if (!item) {
         setModalContent(
           <div className="text-center py-4">
-            <p className="text-red-500">Item not found.</p>
+            <p className="text-red-500">Please select a Item. </p>
           </div>,
         )
         setIsModalOpen(true)
@@ -429,7 +432,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
                             <option value="">{isLoading ? 'Loading...' : 'Select'}</option>
                             {itemList.map((item) => (
                               <option key={item.id} value={item.id}>
-                                {item.item_generate_id}
+                                {item.item_generate_id} - {item.item_name}
                               </option>
                             ))}
                           </select>

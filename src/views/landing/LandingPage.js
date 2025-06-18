@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import './LandingPage.css'
 import { AdvancedSupportChatbot } from '../../components/chatbot'
 
@@ -21,6 +21,10 @@ import Footer from './components/Footer'
 import { useDispatch } from 'react-redux'
 import { authApi } from '../../api/auth'
 import CustomAlert from '../../components/New/CustomAlert'
+import { apiClient } from '../../api/config'
+import { landingApi } from '../../api/landingPage'
+import ForgotPassword from './pages/ForgotPassword'
+import ConfirmPassword from './pages/confirmPassword'
 
 const LandingPage = () => {
   const [activePage, setActivePage] = useState('home')
@@ -30,7 +34,8 @@ const LandingPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
     const [alerts, setAlerts] = useState([])
-  
+  const [packagename,setPackageName]=useState("Free")
+   const location = useLocation()
    
   const dispatch = useDispatch();
   const showPage = (pageId) => {
@@ -43,9 +48,67 @@ const LandingPage = () => {
     setMobileMenuOpen(!mobileMenuOpen)
   }
 
-  const handleFormSubmit = (e, message = 'Thank you! Your submission has been received. We will contact you soon.') => {
-    e.preventDefault()
-    alert(message)
+  const handleTrailFormSubmit = async (e, message = 'Thank you! Your submission has been received. We will contact you soon.') => {
+   e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const company = formData.get('company');
+    const fullname = formData.get('fullname');
+    const email = formData.get('email');
+    const phone = formData.get('phone');
+    const password = formData.get('password');
+
+    const submissionData = {
+      name: company,
+      email: email,
+      phone: phone,
+      website: "https://premiumboxmfg.com",
+      address: "chennai",
+      currency: "4",
+      timezone: "America/Chicago",
+      language: "en",
+      company_state_id: "1",
+      logo: "https://premiumboxmfg.com/assets/logo.png",
+  package_name: packagename === "Free" ? "Trial" : (packagename || "Trial"),
+      password: password,
+      companyAccountDetails: [
+        {
+          accountName: fullname,
+          accountEmail: email,
+        }
+      ]
+    };
+
+    console.log("submitted data",submissionData);
+
+   try {
+  const response = await landingApi.addTrail(submissionData);
+  console.log("resss",response)
+  if (response?.data?.message) {
+    //alert(message);
+     setAlerts([
+        {
+          severity: 'success',
+          message: response?.data?.message || 'Sign Up Success',
+        },
+      ])
+       e.target.reset();
+      showPage('home')
+  } else {
+    alert("Something went wrong. Please try again.");
+  }
+} catch (error) {
+  console.error("API Error:", error);
+   setAlerts([
+        {
+          severity: 'error',
+          message: error?.response?.data?.message || 'Sign Up Failed',
+        },
+      ])
+  //alert(error.message || "Error submitting form. Please try again.");
+}
+
+    //alert('Thank you! Your submission has been received. We will contact you soon.');
   }
 
   //const handleSignIn = (e) => {
@@ -89,15 +152,209 @@ const LandingPage = () => {
           message: error?.response?.data?.message || 'Login Failed',
         },
       ])
-      setError(error.response?.data?.message || 'Login failed. Please try again.');
+      //setError(error.response?.data?.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+const createDemo = async (e) => {
+    e.preventDefault();
+
+    const form = e.target;
+
+    const demoData = {
+      company_name: form.company.value,
+      full_name: form.name.value,
+      email: form.email.value,
+      phone: form.phone.value,
+      role: form.role.value,
+      preferred_demo_time: form.time.value,
+      needs_description: form.message.value,
+    };
+
+    console.log("Demo Submitted:", demoData);
+
+    try {
+      const response = await landingApi.addDemo(demoData);
+      console.log("Demo created successfully:", response.data);
+       setAlerts([
+        {
+          severity: 'success',
+          message: response?.data?.message || 'Demo request Success!',
+        },
+      ])
+      //alert("Thank you! We’ll get back to you soon.");
+      form.reset(); // Reset form after successful submission
+            showPage('home')
+
+    } catch (error) {
+      console.error("Failed to submit demo request:", error);
+       setAlerts([
+        {
+          severity: 'error',
+          message: error?.response?.data?.message || 'Demo request Failed!',
+        },
+      ])
+      //alert("Oops! Something went wrong. Please try again.");
+    } 
+  };
+
+const setEmailForForgotPassword = async (e) => {
+  e.preventDefault();
+
+  const dataval = {
+    email: formData.email
+  };
+
+  console.log("Email clicked:", formData.email);
+  console.log("dataval:", dataval);
+
+  try {
+    const response = await landingApi.setPasswordForEmail(dataval);
+    console.log("API Success:", response.data);
+           e.target.reset();
+        setAlerts([
+        {
+          severity: 'success',
+          message:response?.data?.message || 'Check Your Mail',
+        },
+      ])
+            showPage("signin")
+    //alert("Password reset link sent to your email.");
+    // Optionally clear email field
+    // setFormData({ email: "" });
+  } catch (error) {
+    console.error("API Error:", error.response.data.message);
+      setAlerts([
+        {
+          severity: 'error',
+          message:error.response.data.message || 'Email Error',
+        },
+      ])
+    //alert("Something went wrong. Please try again.");
+  }
+};
+useEffect(() => {
+  const { pathname, search } = window.location;
+
+  if (pathname === "/reset-password") {
+    const queryParams = new URLSearchParams(search);
+    const token = queryParams.get("token");
+    const email = queryParams.get("email");
+
+    setFormData(prev => ({
+      ...prev,
+      token,
+      email,
+    }));
+
+    setActivePage("confirmPassword");
+  }
+}, []);
+
+useEffect(() => {
+  const { pathname, search } = window.location;
+
+  if (pathname === "/login") {
+         showPage("signin")
+  }
+}, []);
+
+const setNewPassword = async (e) => {
+  e.preventDefault();
+
+  if (formData.newPassword !== formData.confirmPassword) {
+    setAlerts([
+      {
+        severity: 'error',
+        message: "Passwords Do Not Match",
+      },
+    ]);
+    return;
+  }
+
+  const { email, token, newPassword, confirmPassword } = formData;
+
+  const payload = {
+    email,
+    token,
+    newPassword,
+    confirmPassword,
+  };
+
+  console.log("Password Reset Payload:", payload);
+
+  try {
+    const response = await landingApi.resetPassword(payload);
+console.log("success",response)
+    if (response?.data?.message) {
+      setAlerts([
+        {
+          severity: 'success',
+          message: response?.data?.message,
+        },
+      ]);
+      // Optionally redirect or update UI here
+      showPage("signin")
+    } 
+  } catch (error) {
+    console.log("error",error)
+    setAlerts([
+      {
+        severity: 'error',
+        message: error.response.data.message
+      },
+    ]);
+  }
+};
+
+const submitContacts = async (e) => {
+  e.preventDefault();
+
+  const form = e.target;
+
+  const contactData = {
+    name: form.name.value,
+    email: form.email.value,
+    company: form.company.value,
+    subject: form.subject.value,
+    message: form.message.value,
+  };
+
+  console.log("Submitted Contact:", contactData);
+
+  try {
+    const response = await landingApi.createContacts(contactData);
+    console.log("API Success:", response?.data);
+  setAlerts([
+      {
+        severity: 'success',
+        message: response?.data?.message
+      },
+    ]);
+    // Optionally show success message to user
+    //alert("Message sent successfully!");
+
+    // Reset the form
+    form.reset();
+  } catch (error) {
+    console.error("API Error:", error);
+       setAlerts([
+      {
+        severity: 'error',
+        message: error.response.data.message
+      },
+    ]);
+    //alert("Something went wrong. Please try again.");
+  }
+};
+
 
   const renderActivePage = () => {
-    const pageProps = { showPage, handleFormSubmit, handleSignIn ,  setFormData,formData}
+    const pageProps = { showPage, handleTrailFormSubmit, handleSignIn ,  setFormData,formData,createDemo,setEmailForForgotPassword,
+      setNewPassword,submitContacts,packagename,setPackageName
+    }
     
     switch (activePage) {
       case 'home':
@@ -123,7 +380,11 @@ const LandingPage = () => {
       case 'signin':
         return <SignInPage {...pageProps} />
       case 'signup':
-        return <SignUpPage {...pageProps} />
+        return <SignUpPage {...pageProps} packageName={packagename} />
+        case 'forgotPassword':
+        return <ForgotPassword {...pageProps} />
+        case 'confirmPassword':
+        return <ConfirmPassword {...pageProps} />
       default:
         return <HomePage {...pageProps} />
     }
@@ -139,6 +400,7 @@ const LandingPage = () => {
         showPage={showPage} 
         mobileMenuOpen={mobileMenuOpen} 
         toggleMobileMenu={toggleMobileMenu} 
+        setPackageName={setPackageName}
       />
       
       <main className="landing-content">

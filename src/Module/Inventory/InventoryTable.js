@@ -14,9 +14,8 @@ import { useNavigate } from 'react-router-dom'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { capitalize } from 'lodash'
 
-const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) => {
+const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue,setIsMinimised,isMinimised,setSelectedItem,selectedItem }) => {
   const [viewItem, setViewItem] = useState(false)
-  const [selectedItem, setSelectedItem] = useState(null)
   const navigate = useNavigate()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState({ open: false, id: null })
 
@@ -94,9 +93,19 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
 }
   return (
     <>
-      <div className="w-full overflow-x-auto overflow-y-scroll h-[calc(100vh-310px)] border rounded-md shadow-sm mt-1 mb-3">
-        <CTable className="min-w-[900px] overflow-x-scroll border-separate border-spacing-0">
-          <CTableHead className="!bg-gray-100">
+<div
+  className={`w-full overflow-y-scroll h-[calc(120vh-310px)] border rounded-md shadow-sm mt-1 mb-3 ${
+    isMinimised ? '' : 'overflow-x-auto'
+  }`}
+>
+<CTable
+  className={`border-separate border-spacing-0 ${
+    isMinimised
+      ? 'h-[1000px]' // or min-h-[500px] if needed
+      : 'min-w-[900px] overflow-x-scroll'
+  }`}
+>
+       {!isMinimised && (   <CTableHead className="!bg-gray-100">
             <CTableRow>
               <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                 Product ID <span className="text-gray-500">⌕</span>
@@ -134,135 +143,104 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
                 Actions
               </CTableHeaderCell>
             </CTableRow>
-          </CTableHead>
+          </CTableHead>)}
 
-          <CTableBody>
-            {inventoryData && inventoryData.length > 0 ? (
-              inventoryData.map((item, index) => (
-                <CTableRow
-                  key={index}
-                  className="text-sm text-center cursor-pointer hover:bg-gray-100"
-                  onClick={() => {
-                    setSelectedItem(item) // Save item to view
-                    setViewItem(true) // Show popup
-                  }}
-                >
-                  <CTableDataCell className="whitespace-nowrap max-w-[200px] truncate">
-                    {item?.item?.item_generate_id || '--'}
-                  </CTableDataCell>
-                  <CTableDataCell className="whitespace-nowrap">
-                    {item.item.min_stock_level && (item.item.uom || item.item.net_weight)
-                      ? `${parseFloat(item.item.min_stock_level)} ${item.item.uom || item.item.net_weight}`
-                      : '--'}
-                  </CTableDataCell>
-                  <CTableDataCell className="whitespace-nowrap">
-                    {item.total_quantity && (item.item.uom || item.item.net_weight)
-                      ? `${parseFloat(item.total_quantity)} ${item.item.uom || item.item.net_weight}`
-                      : '--'}
-                  </CTableDataCell>
-                  <CTableDataCell className="whitespace-nowrap">
-                    ₹{item.item.standard_cost || '--'}
-                  </CTableDataCell>
-                  {customFieldColumns.map((fieldKey, fieldIndex) => (
-                    <CTableDataCell
-                      key={`custom-value-${fieldIndex}`}
-                      className="whitespace-nowrap bg-blue-25 text-center"
-                    >
-                      <span className="inline-block px-2 py-1 text-sm rounded-full">
-                        {getCustomFieldValue(item, fieldKey)}
-                      </span>
-                    </CTableDataCell>
-                  ))}
+       <CTableBody>
+  {inventoryData && inventoryData.length > 0 ? (
+    inventoryData.map((item, index) => (
+      <CTableRow
+        key={index}
+        className="text-sm text-center cursor-pointer hover:bg-gray-100"
+        onClick={() => {
+          setSelectedItem(item)
+          //setViewItem(true)
+          setIsMinimised(true)
+        }}
+      >
+      <CTableDataCell
+  className={`whitespace-nowrap truncate ${
+    isMinimised
+      ? 'px-4 py-3 flex items-center gap-2 w-full'
+      : 'max-w-[200px]'
+  }`}
+>
+  {item?.item?.item_generate_id || '--'}
+</CTableDataCell>
 
-                  <CTableDataCell className="whitespace-nowrap text-center">
-                    {(() => {
-                      let stockStatus = '--'
-                      // Convert strings to numbers
-                      const totalQuantity = parseFloat(item.total_quantity)
-                      const minStockLevel = parseFloat(item.item.min_stock_level)
 
-                      if (totalQuantity === 0.0) {
-                        stockStatus = 'Out of Stock'
-                      } else if (totalQuantity >= minStockLevel) {
-                        stockStatus = 'In Stock'
-                      } else if (totalQuantity < minStockLevel) {
-                        stockStatus = 'Low Stock'
-                      }
+        {!isMinimised && (
+          <>
+            <CTableDataCell className="whitespace-nowrap">
+              {item.item.min_stock_level && (item.item.uom || item.item.net_weight)
+                ? `${parseFloat(item.item.min_stock_level)} ${item.item.uom || item.item.net_weight}`
+                : '--'}
+            </CTableDataCell>
+            <CTableDataCell className="whitespace-nowrap">
+              {item.total_quantity && (item.item.uom || item.item.net_weight)
+                ? `${parseFloat(item.total_quantity)} ${item.item.uom || item.item.net_weight}`
+                : '--'}
+            </CTableDataCell>
+            <CTableDataCell className="whitespace-nowrap">
+              ₹{item.item.standard_cost || '--'}
+            </CTableDataCell>
 
-                      const statusStyles = {
-                        'In Stock': {
-                          backgroundColor: '#D1FAE5',
-                          color: '#065F46',
-                        },
-                        'Out of Stock': {
-                          backgroundColor: '#FECACA',
-                          color: '#B91C1C',
-                        },
-                        'Low Stock': {
-                          backgroundColor: '#FEF3C7',
-                          color: '#92400E',
-                        },
-                        '--': {
-                          backgroundColor: '#F3F4F6',
-                          color: '#6B7280',
-                        },
-                      }
+            {customFieldColumns.map((fieldKey, fieldIndex) => (
+              <CTableDataCell
+                key={`custom-value-${fieldIndex}`}
+                className="whitespace-nowrap bg-blue-25 text-center"
+              >
+                <span className="inline-block px-2 py-1 text-sm rounded-full">
+                  {getCustomFieldValue(item, fieldKey)}
+                </span>
+              </CTableDataCell>
+            ))}
 
-                      return (
-                        <span
-                          style={{
-                            ...statusStyles[stockStatus],
-                            borderRadius: '4px',
-                            padding: '2px 8px',
-                            fontSize: '0.75rem',
-                            display: 'inline-block',
-                          }}
-                        >
-                          {stockStatus}
-                        </span>
-                      )
-                    })()}
-                  </CTableDataCell>
+            <CTableDataCell className="whitespace-nowrap text-center">
+              {/* Status logic here */}
+            </CTableDataCell>
 
-                  <CTableDataCell className="py-3">
-                    <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                      <ThreeDotMenu
-                        value={[
-                          {
-                            label: 'Edit',
-                            icon: cilPencil,
-                            onClick: () => {
-                              navigate('/inventoryhandling/inventory_form', {
-                                state: {
-                                  item,
-                                  fromInventory: true,
-                                  isInventoryEditing: true,
-                                  isEdit: true,
-                                },
-                              })
-                            },
+            <CTableDataCell className="py-3" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-center">
+                <ThreeDotMenu
+                  value={[
+                    {
+                      label: 'Edit',
+                      icon: cilPencil,
+                      onClick: () => {
+                        navigate('/inventoryhandling/inventory_form', {
+                          state: {
+                            item,
+                            fromInventory: true,
+                            isInventoryEditing: true,
+                            isEdit: true,
                           },
-                        ]}
-                      />
-                    </div>
-                  </CTableDataCell>
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow>
-                <CTableDataCell
-                  colSpan={11 + customFieldColumns.length}
-                  className="text-center text-gray-500 py-4"
-                >
-                  No inventory data available.
-                </CTableDataCell>
-              </CTableRow>
-            )}
-          </CTableBody>
+                        })
+                      },
+                    },
+                  ]}
+                />
+              </div>
+            </CTableDataCell>
+          </>
+        )}
+      </CTableRow>
+    ))
+  ) : (
+    <CTableRow>
+      <CTableDataCell
+        colSpan={isMinimised ? 1 : 11 + customFieldColumns.length}
+        className="text-center text-gray-500 py-4"
+      >
+        No inventory data available.
+      </CTableDataCell>
+    </CTableRow>
+  )}
+</CTableBody>
+
         </CTable>
       </div>
 
-      <PopUp
+      {/*<PopUp
         visible={viewItem}
         showCloseButton={true}
         setVisible={() => setViewItem(false)}
@@ -270,7 +248,7 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue }) =
         width={'70vw'}
       >
         <ViewInventory item={selectedItem} totalInventoryValue={totalInventoryValue} />
-      </PopUp>
+      </PopUp>*/}
     </>
   )
 }

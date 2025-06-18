@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Header = ({ showPage, mobileMenuOpen, toggleMobileMenu }) => {
+const Header = ({ showPage, mobileMenuOpen, toggleMobileMenu ,setPackageName}) => {
   return (
     <header className="landing-header">
       <nav className="landing-nav">
@@ -19,7 +19,9 @@ const Header = ({ showPage, mobileMenuOpen, toggleMobileMenu }) => {
         <div className="landing-auth-buttons">
           <a href="#" className="landing-btn landing-btn-secondary" onClick={() => showPage('demo')}>Free Demo</a>
           <a href="#" className="landing-btn landing-btn-secondary" onClick={() => showPage('signin')}>Sign In</a>
-          <a href="#" className="landing-btn landing-btn-primary" onClick={() => showPage('signup')}>Start Free Trial</a>
+          <a href="#" className="landing-btn landing-btn-primary" onClick={() => {showPage('signup')
+            setPackageName("Free")
+          }}>Start Free Trial</a>
         </div>
         <button className="landing-mobile-menu-toggle" onClick={toggleMobileMenu}>☰</button>
       </nav>

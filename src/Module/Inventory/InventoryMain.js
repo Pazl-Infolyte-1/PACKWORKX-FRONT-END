@@ -16,6 +16,8 @@ import { FiDownload } from 'react-icons/fi'
 import { commonApi } from '../../api/common'
 import { inventoryApi } from '../../api/inventory'
 import { itemApi } from '../../api/item'
+import InventoryView from './InventoryView'
+import ViewInventory from './ViewInventory'
 
 const InventoryMain = () => {
   const [inventoryData, setInventoryData] = useState([])
@@ -35,6 +37,8 @@ const InventoryMain = () => {
   const { setGlobalPlaceholder, searchQuery } = useSearch()
   const [stockFilter, setStockFilter] = useState(null)
   const [isStockDropdownOpen, setIsStockDropdownOpen] = useState(false)
+const [isMinimised,setIsMinimised] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
 
   // Refs for click outside detection
   const stockDropdownRef = useRef(null)
@@ -256,7 +260,10 @@ const handleInventoryExelExport = async () => {
 
   return (
     <>
+          <div className={isMinimised ? 'w-[387px] border-r' : 'w-full'}>
+
       <ContentHeader
+                  isMinimized={isMinimised}
         addLabel="New Product"
         heading="Inventory"
         onAddClick={() =>
@@ -272,9 +279,10 @@ const handleInventoryExelExport = async () => {
           },
         ]}
       />
+      </div>
 
       {/*dashboard panel*/}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 w-full mt-2">
+    {!isMinimised && (    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 w-full mt-2">
         {category.map((item, index) => {
           const IconComponent = icons[index % icons.length]
           const hasSubCategories = item.id === 1 || item.id === 4
@@ -412,9 +420,10 @@ const handleInventoryExelExport = async () => {
           <p className="m-0">₹{totalInventoryValue}</p>
         </div>
       </div>
+    )}
 
       {/* Stock Filter Buttons */}
-      <div className="flex w-full mt-2 gap-2">
+   {!isMinimised && (   <div className="flex w-full mt-2 gap-2">
         {/* Selected Filters Display */}
         {(categoryId || subCategoryId || stockFilter) && (
           <div className="flex flex-wrap gap-2 mt-1 mb-2 flex-1">
@@ -563,33 +572,64 @@ const handleInventoryExelExport = async () => {
             Clear All
           </button>
         </div>
-      </div>
+      </div>)}
 
       {/* Pass filtered data to table */}
-      <InventoryTable inventoryData={filteredInventoryData} subCategoryId={subCategoryId} totalInventoryValue={inventoryData} />
+  <div className={`${isMinimised ? 'grid grid-cols-10 gap-2' : ''}`}>
+  {/* Left Section - Inventory Table */}
+  <div
+    name="tableView"
+    className={`${isMinimised ? 'col-span-3' : ''}`}
+  >
+    <InventoryTable
+      isMinimised={isMinimised}
+      setIsMinimised={setIsMinimised}
+      inventoryData={filteredInventoryData}
+      subCategoryId={subCategoryId}
+      totalInventoryValue={inventoryData}
+        selectedItem={selectedItem}
+  setSelectedItem={setSelectedItem} 
+    />
 
-      <div className="fixed bottom-0 left-0 w-full bg-white shadow-md z-50 px-4 py-2">
-        <div className="flex justify-between items-center w-full">
-          <p className="text-sm font-medium text-gray-700 ml-[200px]">
-            Total Records: {stockFilter ? filteredInventoryData.length : totalRecords}
-            {stockFilter && (
-              <span className="ml-2 text-blue-600">
-                (Filtered by {stockFilter.replace('_', ' ')})
-              </span>
-            )}
-          </p>
-          <div className="mr-3 mb-3">
-            <CompactPagination
-              totalRecords={stockFilter ? filteredInventoryData.length : totalRecords}
-              count={totalPage}
-              page={currentPage}
-              onPageChange={handlePageChange}
-              entriesPerPage={entriesPerPage}
-              onEntriesChange={handleEntriesChange}
-            />
-          </div>
-        </div>
-      </div>
+    {/* Bottom Pagination Bar */}
+    <div className="fixed bottom-0 left-0 w-full bg-white shadow-md z-50 px-4 py-2">
+    <div
+  className={`flex justify-between items-center ${
+    isMinimised ? 'w-[300px]' : 'w-full'
+  }`}
+>
+ <p className="text-sm font-medium text-gray-700 ml-[200px] whitespace-nowrap">
+  Total Records: {stockFilter ? filteredInventoryData.length : totalRecords}
+  {stockFilter && (
+    <span className="ml-2 text-blue-600">
+      (Filtered by {stockFilter.replace('_', ' ')})
+    </span>
+  )}
+</p>
+
+ <div className={`mr-3 mb-3 ${isMinimised ? 'ml-[20px]' : ''}`}>
+  <CompactPagination
+    totalRecords={stockFilter ? filteredInventoryData.length : totalRecords}
+    count={totalPage}
+    page={currentPage}
+    onPageChange={handlePageChange}
+    entriesPerPage={entriesPerPage}
+    onEntriesChange={handleEntriesChange}
+  />
+</div>
+
+</div>
+
+    </div>
+  </div>
+
+  {/* Right Section - Inventory View */}
+ <div className={`${isMinimised ? 'col-span-7' : ''} -mt-10`}>
+    {/*<InventoryView />*/}
+    <ViewInventory item={selectedItem} totalInventoryValue={totalInventoryValue} setIsMinimised={setIsMinimised}/>
+  </div>
+</div>
+
     </>
   )
 }

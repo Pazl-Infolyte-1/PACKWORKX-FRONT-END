@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { clientApi } from '../../api/client';
 import { skuApi } from '../../api/sku';
 import ActionButton from '../../components/New/ActionButton';
+import { invoiceApi } from '../../api/Invoice';
 
 const InvoiceAddForm = forwardRef((props, ref) => {
   const navigate = useNavigate();
@@ -26,22 +27,17 @@ const InvoiceAddForm = forwardRef((props, ref) => {
     sgst: 0,
     igst: 0
   });
+  const [workOrders, setWorkOrders] = useState([]);
+  const [selectedWorkOrder, setSelectedWorkOrder] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [alerts, setAlerts] = useState([]);
 
   const dropdownRef = useRef(null);
-
-  // fetchWorkOrders()=>{
-
-  // }
-
-
-  useEffect(()=>{
-
-  },[])
 
   // Initialize form with React Hook Form
   const { register, control, watch, setValue, getValues, handleSubmit } = useForm({
     defaultValues: {
-      client: '',
+      client_name: '',
       client_id: '',
       invoice_reference: '',
       invoice_date: '',
@@ -55,26 +51,26 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       discount_type: '',
       discount: '',
       payment_status: '',
-      skus: [{
+      sku_details: [{
+        sku_id: null,
         sku: '',
-        quantity: '',
-        rate: '',
-        acceptableUnits: '',
-        totalAmount: '',
-        totalGst: '',
-        total: ''
+        quantity_required: '',
+        rate_per_sku: '',
+        total_amount: '',
+        gst: '',
+        total_incl__gst: ''
       }]
     }
   });
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'skus'
+    name: 'sku_details'
   });
 
   // Watch form values
   const formValues = watch();
-  const skusData = watch('skus');
+  const skuDetailsData = watch('sku_details');
 
   // Handle click outside dropdown
   useEffect(() => {
@@ -131,26 +127,39 @@ const InvoiceAddForm = forwardRef((props, ref) => {
   // Handle client selection
   const selectClient = (clientName, client_id, client_state_id) => {
     const stateID = localStorage.getItem('company_state_id');
+  
     const selectedClient = clients.find(
       (client) => client.company_name === clientName
     );
 
+
     if (selectedClient) {
-      const isSameState = selectedClient?.addresses[0]?.state === stateID;
+      const isSameState = selectedClient?.addresses[0]?.state == stateID;
       setIsIgstApplicable(!isSameState);
     }
 
     setSelectedClient(client_id);
-    setValue('client', clientName);
+    setValue('client_name', clientName);
     setValue('client_id', client_id);
     setIsOpen(false);
+
+    const fetchWorkOrders = async () => {
+      try {
+        const response = await invoiceApi.getWorkOrdersListByClientId(client_id);
+        setWorkOrders(response.data.workOrders || []);
+      } catch (error) {
+        console.error("Error fetching work orders:", error);
+      }
+    };
+    
+    fetchWorkOrders();
   };
 
   // Calculate row values
   const calculateRowValues = (index) => {
-    const values = getValues(`skus[${index}]`);
-    const quantity = parseFloat(values.quantity) || 0;
-    const rate = parseFloat(values.rate) || 0;
+    const values = getValues(`sku_details[${index}]`);
+    const quantity = parseFloat(values.quantity_required) || 0;
+    const rate = parseFloat(values.rate_per_sku) || 0;
     const totalAmount = quantity * rate;
 
     const selectedSku = skuList.find(sku => sku.sku_name === values.sku);
@@ -158,62 +167,89 @@ const InvoiceAddForm = forwardRef((props, ref) => {
 
     if (isIgstApplicable) {
       const igstAmount = totalAmount * (gstPercentage / 100);
-      setValue(`skus[${index}].igst`, gstPercentage);
-      setValue(`skus[${index}].igstAmount`, igstAmount.toFixed(2));
-      setValue(`skus[${index}].totalGst`, igstAmount.toFixed(2));
-      setValue(`skus[${index}].total`, (totalAmount + igstAmount).toFixed(2));
+      setValue(`sku_details[${index}].gst`, igstAmount.toFixed(2));
+      setValue(`sku_details[${index}].total_amount`, totalAmount.toFixed(2));
+      setValue(`sku_details[${index}].total_incl__gst`, (totalAmount + igstAmount).toFixed(2));
     } else {
       const halfGst = gstPercentage / 2;
       const sgstAmount = totalAmount * (halfGst / 100);
       const cgstAmount = totalAmount * (halfGst / 100);
-      setValue(`skus[${index}].sgst`, halfGst);
-      setValue(`skus[${index}].cgst`, halfGst);
-      setValue(`skus[${index}].sgstAmount`, sgstAmount.toFixed(2));
-      setValue(`skus[${index}].cgstAmount`, cgstAmount.toFixed(2));
-      setValue(`skus[${index}].totalGst`, (sgstAmount + cgstAmount).toFixed(2));
-      setValue(`skus[${index}].total`, (totalAmount + sgstAmount + cgstAmount).toFixed(2));
+      setValue(`sku_details[${index}].gst`, (sgstAmount + cgstAmount).toFixed(2));
+      setValue(`sku_details[${index}].total_amount`, totalAmount.toFixed(2));
+      setValue(`sku_details[${index}].total_incl__gst`, (totalAmount + sgstAmount + cgstAmount).toFixed(2));
     }
 
-    setValue(`skus[${index}].totalAmount`, totalAmount.toFixed(2));
     recalculateAllTotals();
   };
 
   // Recalculate all totals
   const recalculateAllTotals = () => {
-    const currentData = getValues('skus') || [];
+    const currentData = getValues('sku_details') || [];
     if (!currentData || currentData.length === 0) return;
 
-    const qty = currentData.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
-    const amount = currentData.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0);
-    const withGST = currentData.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
-    const totalGst = currentData.reduce((sum, item) => sum + (parseFloat(item.totalGst) || 0), 0);
-
-    let sgst = 0, cgst = 0, igst = 0;
-
-    if (isIgstApplicable) {
-      igst = currentData.reduce((sum, item) => sum + (parseFloat(item.igstAmount) || 0), 0);
-    } else {
-      sgst = currentData.reduce((sum, item) => sum + (parseFloat(item.sgstAmount) || 0), 0);
-      cgst = currentData.reduce((sum, item) => sum + (parseFloat(item.cgstAmount) || 0), 0);
-    }
+    const qty = currentData.reduce((sum, item) => sum + (parseFloat(item.quantity_required) || 0), 0);
+    const amount = currentData.reduce((sum, item) => sum + (parseFloat(item.total_amount) || 0), 0);
+    const withGST = currentData.reduce((sum, item) => sum + (parseFloat(item.total_incl__gst) || 0), 0);
+    
+    // Calculate total GST amount (difference between withGST and amount)
+    const totalGstAmount = withGST - amount;
 
     setTotals({
       total_qty: qty,
       total_amount: amount,
-      totalGst: totalGst,
+      totalGst: totalGstAmount,
       total_incl_gst: withGST,
-      cgst: cgst,
-      sgst: sgst,
-      igst: igst
+            // For CGST and SGST, split the GST amount in half
+            cgst: isIgstApplicable ? 0 : totalGstAmount / 2,
+            sgst: isIgstApplicable ? 0 : totalGstAmount / 2,
+            // For IGST, use the full GST amount
+            igst: isIgstApplicable ? totalGstAmount : 0
     });
   };
 
   // Form submission handler
-  const onSubmit = (data) => {
-    console.log('Form Data:', {
-      ...data,
-      totals
-    });
+  const onSubmit = async (data) => {
+    try {
+      setAttemptedSubmit(true);
+      setIsSubmitting(true);
+
+      // Check if any mandatory field is empty
+      if (!data.client_name || !data.invoice_reference || !data.invoice_date || 
+          !data.due_date || !data.total || !data.payment_expected_date || 
+          !data.payment_status || !data.transaction_type || 
+          !data.sku_details?.length || 
+          data.sku_details.some(sku => !sku.sku || !sku.quantity_required || !sku.rate_per_sku)) {
+        setIsSubmitting(false);
+        return;
+      }
+
+      const body = {
+        ...data,
+        totals
+      };
+
+      const response = await invoiceApi.createInvoice(body);
+      
+      // Show success message
+      setAlerts([{
+        severity: "success",
+        message: "Invoice created successfully"
+      }]);
+
+      // Navigate to the invoice view page
+      navigate(`/invoice/view/${response.data.data.id}`);
+
+    } catch (error) {
+      console.error("Error creating invoice:", error);
+      
+      // Show error message to user
+      setAlerts([{
+        severity: "error",
+        message: error?.response?.data?.message || "Failed to create invoice. Please try again."
+      }]);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Expose methods to parent component
@@ -228,6 +264,13 @@ const InvoiceAddForm = forwardRef((props, ref) => {
     }
   }));
 
+  // Add this function near the top of your component, after the state declarations
+  const preventScroll = (e) => {
+    e.target.blur();
+    // Prevent the default scroll behavior
+    e.preventDefault();
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="pl-2">
       <div className="relative">
@@ -239,12 +282,12 @@ const InvoiceAddForm = forwardRef((props, ref) => {
               <div className="relative" ref={dropdownRef}>
                 <div
                   className={`flex h-7 w-[25rem] items-center justify-between rounded-l border px-3 text-sm cursor-pointer bg-white ${
-                    attemptedSubmit && errors.client ? "ring-1 ring-red-600" : "border-gray-300"
+                    attemptedSubmit && !formValues.client_name ? "ring-1 ring-red-600" : "border-gray-300"
                   }`}
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   <span className="truncate text-sm text-gray-500">
-                    {formValues.client || "Select or add a client"}
+                    {formValues.client_name || "Select or add a client"}
                   </span>
                   <span className="text-gray-500">
                     {isOpen ? "▲" : "▼"}
@@ -288,25 +331,59 @@ const InvoiceAddForm = forwardRef((props, ref) => {
             <div className="flex items-center">
               <label className="text-xs text-red-600 w-40">Invoice Reference*</label>
               <input
-                {...register('invoice_reference', { required: true })}
+                {...register('invoice_reference')}
                 className={`h-7 w-80 rounded border px-3 text-sm ${
-                  attemptedSubmit && errors.invoice_reference ? "ring-1 ring-red-600" : "border-gray-300"
+                  attemptedSubmit && !formValues.invoice_reference ? "ring-1 ring-red-600" : "border-gray-300"
                 }`}
               />
             </div>
 
             {/* Work Order */}
             <div className="flex items-center">
-              <label className="text-xs text-red-600 w-40">Work Order*</label>
+              <label className="text-xs w-40">Work Order</label>
               <select
-                {...register('work_id', { required: true })}
+                {...register('work_id', { 
+                  onChange: (e) => {
+                    const selectedWorkOrderId = e.target.value;
+                    const workOrder = workOrders.find(wo => wo.id === parseInt(selectedWorkOrderId));
+                    setSelectedWorkOrder(workOrder);
+                    
+                    // Set the sale_id from the work order's sales order
+                    setValue('sale_id', workOrder?.sales_order_id || '');
+                    
+                    // Find the SKU from skuList to get its ID
+                    const selectedSku = skuList.find(sku => sku.sku_name === workOrder?.sku_name);
+                    
+                    // Clear existing SKUs and add the new one
+                    remove(0);
+                    append({
+                      sku_id: selectedSku?.id || null,
+                      sku: workOrder?.sku_name || '',
+                      quantity_required: workOrder?.qty || '',
+                      rate_per_sku: '',
+                      total_amount: '',
+                      gst: '',
+                      total_incl__gst: ''
+                    });
+                    
+                    // Calculate values for the new SKU
+                    setTimeout(() => {
+                      calculateRowValues(0);
+                      recalculateAllTotals();
+                    }, 0);
+                  }
+                })}
+                disabled={!selectedClient}
                 className={`h-7 w-80 rounded border px-3 text-sm ${
                   attemptedSubmit && errors.work_id ? "ring-1 ring-red-600" : "border-gray-300"
-                }`}
+                } ${!selectedClient ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               >
-                <option value="">Select Work Order</option>
-                <option value="w1">W1</option>
-                <option value="w2">W2</option>
+                <option value="">{workOrders?.length === 0 ? "No Work Orders Available" : "Select Work Order"}</option>
+                {workOrders?.map((workOrder) => (
+                  <option key={workOrder.id} value={workOrder.id}>
+                    {workOrder.work_generate_id || workOrder.id}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -315,9 +392,9 @@ const InvoiceAddForm = forwardRef((props, ref) => {
               <label className="text-xs text-red-600 w-40">Invoice Date*</label>
               <input
                 type="date"
-                {...register('invoice_date', { required: true })}
+                {...register('invoice_date')}
                 className={`h-7 w-80 rounded border px-3 text-sm ${
-                  attemptedSubmit && errors.invoice_date ? "ring-1 ring-red-600" : "border-gray-300"
+                  attemptedSubmit && !formValues.invoice_date ? "ring-1 ring-red-600" : "border-gray-300"
                 }`}
               />
             </div>
@@ -327,9 +404,9 @@ const InvoiceAddForm = forwardRef((props, ref) => {
               <label className="text-xs text-red-600 w-40">Due Date*</label>
               <input
                 type="date"
-                {...register('due_date', { required: true })}
+                {...register('due_date')}
                 className={`h-7 w-80 rounded border px-3 text-sm ${
-                  attemptedSubmit && errors.due_date ? "ring-1 ring-red-600" : "border-gray-300"
+                  attemptedSubmit && !formValues.due_date ? "ring-1 ring-red-600" : "border-gray-300"
                 }`}
               />
             </div>
@@ -340,16 +417,18 @@ const InvoiceAddForm = forwardRef((props, ref) => {
               <div className="flex gap-4">
                 <input
                   type="number"
-                  {...register('total', { required: true })}
+                  {...register('total')}
+                  onWheel={preventScroll}
                   className={`h-7 w-80 rounded border px-3 text-sm ${
-                    attemptedSubmit && errors.total ? "ring-1 ring-red-600" : "border-gray-300"
+                    attemptedSubmit && !formValues.total ? "ring-1 ring-red-600" : "border-gray-300"
                   }`}
                 />
-                <div className="flex items-center ">
-                  <label className="text-xs text-red-600 w-28">Balance*</label>
+                <div className="flex items-center">
+                  <label className="text-xs w-28">Balance</label>
                   <input
                     type="number"
-                    {...register('balance', { required: true })}
+                    {...register('balance')}
+                    onWheel={preventScroll}
                     className={`h-7 w-80 rounded border px-3 text-sm ${
                       attemptedSubmit && errors.balance ? "ring-1 ring-red-600" : "border-gray-300"
                     }`}
@@ -364,17 +443,17 @@ const InvoiceAddForm = forwardRef((props, ref) => {
               <div className="flex gap-4">
                 <input
                   type="date"
-                  {...register('payment_expected_date', { required: true })}
+                  {...register('payment_expected_date')}
                   className={`h-7 w-80 rounded border px-3 text-sm ${
-                    attemptedSubmit && errors.payment_expected_date ? "ring-1 ring-red-600" : "border-gray-300"
+                    attemptedSubmit && !formValues.payment_expected_date ? "ring-1 ring-red-600" : "border-gray-300"
                   }`}
                 />
                 <div className="flex items-center">
                   <label className="text-xs text-red-600 w-28">Payment Status*</label>
                   <select
-                    {...register('payment_status', { required: true })}
+                    {...register('payment_status')}
                     className={`h-7 w-80 rounded border px-3 text-sm ${
-                      attemptedSubmit && errors.payment_status ? "ring-1 ring-red-600" : "border-gray-300"
+                      attemptedSubmit && !formValues.payment_status ? "ring-1 ring-red-600" : "border-gray-300"
                     }`}
                   >
                     <option value="">Select Payment Status</option>
@@ -391,9 +470,9 @@ const InvoiceAddForm = forwardRef((props, ref) => {
               <label className="text-xs text-red-600 w-40">Transaction Type*</label>
               <div className="flex gap-4">
                 <select
-                  {...register('transaction_type', { required: true })}
+                  {...register('transaction_type')}
                   className={`h-7 w-80 rounded border px-3 text-sm ${
-                    attemptedSubmit && errors.transaction_type ? "ring-1 ring-red-600" : "border-gray-300"
+                    attemptedSubmit && !formValues.transaction_type ? "ring-1 ring-red-600" : "border-gray-300"
                   }`}
                 >
                   <option value="">Select Type</option>
@@ -401,10 +480,10 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                   <option value="service">Service</option>
                 </select>
                 <div className="flex items-center">
-                  <label className="text-xs text-red-600 w-28">Discount*</label>
+                  <label className="text-xs w-28">Discount</label>
                   <div className="flex">
                     <select
-                      {...register('discount_type', { required: true })}
+                      {...register('discount_type')}
                       className={`h-7 w-32 rounded-l border px-3 text-sm ${
                         attemptedSubmit && errors.discount_type ? "ring-1 ring-red-600" : "border-gray-300"
                       }`}
@@ -415,7 +494,8 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                     </select>
                     <input
                       type="number"
-                      {...register('discount', { required: true })}
+                      {...register('discount')}
+                      onWheel={preventScroll}
                       placeholder="Enter discount amount"
                       className={`h-7 w-48 rounded-r border px-3 text-sm ${
                         attemptedSubmit && errors.discount ? "ring-1 ring-red-600" : "border-gray-300"
@@ -458,31 +538,40 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                               <td className="border-b text-left w-[350px]">
                                 <Controller
                                   control={control}
-                                  name={`skus[${index}].sku`}
+                                  name={`sku_details[${index}].sku`}
                                   render={({ field }) => {
-                                    // Find the currently selected SKU
                                     const selectedSku = skuList.find(sku => sku.sku_name === field.value);
                                     
-                                    // Format the value for the Select component
                                     const selectedValue = selectedSku ? {
                                       label: `${selectedSku.sku_name} (GST: ${selectedSku.gst_percentage}%)`,
                                       value: selectedSku.sku_name
                                     } : null;
 
+                                    // Get all currently selected SKUs except the current one
+                                    const otherSelectedSkus = skuDetailsData
+                                      .filter((_, i) => i !== index)
+                                      .map(item => item.sku)
+                                      .filter(Boolean);
+
                                     return (
                                       <Select
                                         {...field}
-                                        value={selectedValue}  // Use the formatted value
-                                        options={skuList.map(sku => ({
+                                        value={selectedValue}
+                                        options={!selectedClient ? [] : skuList.map(sku => ({
                                           label: `${sku.sku_name} (GST: ${sku.gst_percentage}%)`,
-                                          value: sku.sku_name
+                                          value: sku.sku_name,
+                                          isDisabled: otherSelectedSkus.includes(sku.sku_name)
                                         }))}
                                         onChange={selected => {
-                                          field.onChange(selected?.value || '');  // Store just the SKU name
+                                          const selectedSku = skuList.find(sku => sku.sku_name === selected?.value);
+                                          field.onChange(selected?.value || '');
+                                          setValue(`sku_details[${index}].sku_id`, selectedSku?.id || null);
                                           calculateRowValues(index);
                                           recalculateAllTotals();
                                         }}
-                                        className="w-full"
+                                        isDisabled={!!selectedWorkOrder || !selectedClient}
+                                        placeholder={!selectedClient ? "Select a Client First" : "Select SKU"}
+                                        className={`w-full ${attemptedSubmit && !field.value ? 'ring-1 ring-red-600' : ''}`}
                                       />
                                     );
                                   }}
@@ -491,20 +580,24 @@ const InvoiceAddForm = forwardRef((props, ref) => {
 
                               <td className="p-1 border items-start">
                                 <input
-                                  {...register(`skus[${index}].quantity`)}
+                                  {...register(`sku_details[${index}].quantity_required`)}
                                   type="number"
+                                  onWheel={preventScroll}
                                   onChange={e => {
-                                    register(`skus[${index}].quantity`).onChange(e);
+                                    register(`sku_details[${index}].quantity_required`).onChange(e);
                                     calculateRowValues(index);
                                     recalculateAllTotals();
                                   }}
-                                  className="w-full h-[40px] text-right border-none focus:outline-none"
+                                  className={`w-full h-[40px] text-right border-none focus:outline-none ${
+                                    attemptedSubmit && (!formValues.sku_details[index]?.quantity_required || 
+                                    formValues.sku_details[index]?.quantity_required <= 0) ? 'ring-1 ring-red-600' : ''
+                                  }`}
                                 />
                               </td>
 
                               <td className="p-1 border items-start">
                                 <input
-                                  {...register(`skus[${index}].acceptableUnits`)}
+                                  {...register(`sku_details[${index}].acceptableUnits`)}
                                   type="number"
                                   className="w-full h-[40px] text-right border-none focus:outline-none"
                                 />
@@ -512,10 +605,11 @@ const InvoiceAddForm = forwardRef((props, ref) => {
 
                               <td className="p-0 border">
                                 <input
-                                  {...register(`skus[${index}].rate`)}
+                                  {...register(`sku_details[${index}].rate_per_sku`)}
                                   type="number"
+                                  onWheel={preventScroll}
                                   onChange={e => {
-                                    register(`skus[${index}].rate`).onChange(e);
+                                    register(`sku_details[${index}].rate_per_sku`).onChange(e);
                                     calculateRowValues(index);
                                     recalculateAllTotals();
                                   }}
@@ -525,7 +619,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
 
                               <td className="pr-2 border-b text-right">
                                 <input
-                                  {...register(`skus[${index}].total`)}
+                                  {...register(`sku_details[${index}].total_incl__gst`)}
                                   readOnly
                                   className="w-full h-[40px] text-right border-none focus:outline-none"
                                 />
@@ -535,7 +629,8 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 <button
                                   type="button"
                                   onClick={() => remove(index)}
-                                  className="text-red-500 hover:text-red-700"
+                                  disabled={!!selectedWorkOrder}
+                                  className={`text-red-500 hover:text-red-700 ${selectedWorkOrder ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -546,27 +641,27 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                             </tr>
 
                             {/* GST Info Row */}
-                            {skusData[index]?.sku && (
+                            {skuDetailsData[index]?.sku && (
                               <tr className="bg-gray-50 text-xs w-full">
                                 <td colSpan={2} className="border-b pl-4 py-1 italic text-gray-500">
-                                  GST Details ({skusData[index]?.sku})
+                                  GST Details ({skuDetailsData[index]?.sku})
                                 </td>
                                 <td colSpan={3} className="border-b pr-2 py-1">
                                   <div className="flex justify-end gap-4">
                                     {isIgstApplicable ? (
                                       <span>
-                                        IGST: {skusData[index]?.igst}% 
-                                        (₹{skusData[index]?.igstAmount || '0.00'})
+                                        IGST: {skuDetailsData[index]?.gst}% 
+                                        (₹{(parseFloat(skuDetailsData[index]?.total_incl__gst) - parseFloat(skuDetailsData[index]?.total_amount)).toFixed(2) || '0.00'})
                                       </span>
                                     ) : (
                                       <>
                                         <span>
-                                          CGST: {skusData[index]?.cgst}% 
-                                          (₹{skusData[index]?.cgstAmount || '0.00'})
+                                          CGST: {skuDetailsData[index]?.gst}% 
+                                          (₹{((parseFloat(skuDetailsData[index]?.total_incl__gst) - parseFloat(skuDetailsData[index]?.total_amount)) / 2).toFixed(2) || '0.00'})
                                         </span>
                                         <span>
-                                          SGST: {skusData[index]?.sgst}% 
-                                          (₹{skusData[index]?.sgstAmount || '0.00'})
+                                          SGST: {skuDetailsData[index]?.gst}% 
+                                          (₹{((parseFloat(skuDetailsData[index]?.total_incl__gst) - parseFloat(skuDetailsData[index]?.total_amount)) / 2).toFixed(2) || '0.00'})
                                         </span>
                                       </>
                                     )}
@@ -584,20 +679,23 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                       <button
                         type="button"
                         onClick={() => append({
+                          sku_id: null,
                           sku: '',
-                          quantity: '',
-                          rate: '',
-                          acceptableUnits: '',
-                          totalAmount: '',
-                          totalGst: '',
-                          total: ''
+                          quantity_required: '',
+                          rate_per_sku: '',
+                          total_amount: '',
+                          gst: '',
+                          total_incl__gst: ''
                         })}
-                        className="flex items-center h-8 w-28 text-xs bg-gray-100 hover:bg-gray-200 text-blue-600 py-2 px-3 rounded mr-2"
+                        disabled={!!selectedWorkOrder}
+                        className={`flex items-center h-8 w-28 text-xs bg-gray-100 hover:bg-gray-200 text-blue-600 py-2 px-3 rounded mr-2 ${
+                          selectedWorkOrder ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
                       >
                         <span className="mr-1">+</span>
                         Add Sku
                       </button>
-                      <div className="pr-9">
+                      <div className="pr-9 pb-16">
                         <table className="bg-gray-100 rounded w-full border-collapse">
                           <tbody className="gap-4">
                             <tr className="border-b border-gray-200">
@@ -641,7 +739,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       </div>
 
       {/* Fixed Submit Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
+      {/* <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
         <div className="max-w-7xl mx-auto flex justify-end">
           <button
             type="submit"
@@ -650,7 +748,30 @@ const InvoiceAddForm = forwardRef((props, ref) => {
             Submit Invoice
           </button>
         </div>
-      </div>
+      </div> */}
+
+
+      {/* Submit Buttons Section */}
+      <div className="fixed bottom-0 bg-white border-t border-gray-200 z-10 flex p-1 py-2 w-full">
+          <div className="flex justify-end w-[83%]">
+            <div className="flex gap-2">
+              <ActionButton
+                type="button"
+                onClick={() => navigate('/invoice')}
+                className="px-4 py-2 bg-gray-400 text-gray-700 rounded-md hover:bg-gray-500 transition-all"
+                label={'Cancel'}
+              />
+ 
+              <ActionButton
+                type="submit"
+                variant="save"
+                className="bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
+                label={ 'Submit'}
+                // onClick={handleSubmitClick}
+              />
+            </div>
+          </div>
+        </div>
     </form>
   );
 });

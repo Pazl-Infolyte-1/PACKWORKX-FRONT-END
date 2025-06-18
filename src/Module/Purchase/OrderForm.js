@@ -106,7 +106,7 @@ const OrderForm = ({
       try {
         const params = { limit: 5000, page: 1, entity_type: 'vendor' }
         const response = await clientApi.getVendor(params)
-        console.log('response', response.data.data);
+        console.log('response', response.data.data)
         setVendor(response?.data.data)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -117,7 +117,7 @@ const OrderForm = ({
 
   // FIX 1: Update poTotals when received from ItemForm
   const handleTotalsUpdate = (newTotals) => {
-    console.log('Updating totals:', newTotals);
+    console.log('Updating totals:', newTotals)
     setPoTotals({
       total_qty: newTotals.total_qty || 0,
       cgst_amount: newTotals.cgst_amount || 0,
@@ -126,7 +126,7 @@ const OrderForm = ({
       total_amount: newTotals.total_amount || 0,
       amount: newTotals.amount || 0,
     })
-    
+
     // Also update the form values for hidden inputs
     setValue('total_qty', newTotals.total_qty || 0)
     setValue('cgst_amount', newTotals.cgst_amount || 0)
@@ -136,8 +136,8 @@ const OrderForm = ({
   }
 
   const handleSupplierChange = (e) => {
-    console.log(typeof e.target.value);
-    
+    console.log(typeof e.target.value)
+
     const selectedId = parseInt(e.target.value)
     const selectedClient = vendor.find((client) => client.client_id === selectedId)
 
@@ -343,7 +343,7 @@ const OrderForm = ({
             </label>
             <input
               type="number"
-              {...register('supplier_contact', { required: true})}
+              {...register('supplier_contact', { required: true })}
               style={getInputStyle(errors.supplier_contact)}
               className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               readOnly
@@ -403,7 +403,7 @@ const OrderForm = ({
             </label>
             <input
               type="date"
-              {...register('valid_till', { required: true})}
+              {...register('valid_till', { required: true })}
               style={getInputStyle(errors.valid_till)}
               className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             />

@@ -27,41 +27,6 @@ function CreditNote() {
     }
   }, [])
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const params = {
-          page: pagination.current_page,
-          limit: pagination.per_page,
-          status: '',
-          client_id: '',
-          search: searchQuery,
-        }
-        const response = await creditApi.getCreditNotes(params)
-        setCreditNote(response.data.data || [])
-        setPagination(prev => ({
-          ...prev,
-          current_page: response.data.pagination.current_page,
-          total_pages: response.data.pagination.total_pages,
-          total: response.data.pagination.total,
-          per_page: response.data.pagination.per_page,
-        }))
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-
-    fetchData()
-  }, [pagination.current_page, pagination.per_page, searchQuery])
-
-  useEffect(() => {
-    if (location.pathname === '/credit-note') {
-      setIsMinimiseTable(false)
-    } else {
-      setIsMinimiseTable(true)
-    }
-  }, [location.pathname])
-
   const fetchData = async () => {
     try {
       const params = {
@@ -73,7 +38,7 @@ function CreditNote() {
       }
       const response = await creditApi.getCreditNotes(params)
       setCreditNote(response.data.data || [])
-      setPagination(prev => ({
+      setPagination((prev) => ({
         ...prev,
         current_page: response.data.pagination.current_page,
         total_pages: response.data.pagination.total_pages,
@@ -84,6 +49,18 @@ function CreditNote() {
       console.error('Error fetching data:', error)
     }
   }
+
+  useEffect(() => {
+    fetchData()
+  }, [pagination.current_page, pagination.per_page, searchQuery])
+
+  useEffect(() => {
+    if (location.pathname === '/credit-note') {
+      setIsMinimiseTable(false)
+    } else {
+      setIsMinimiseTable(true)
+    }
+  }, [location.pathname])
 
   return (
     <>

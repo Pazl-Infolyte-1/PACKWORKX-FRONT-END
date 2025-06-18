@@ -12,6 +12,7 @@ import { useSearch } from '../../components/New/SearchContext'
 import ContentHeader from '../../components/New/ContentHeader'
 import { debounce } from 'lodash'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
+import { Outlet, useLocation } from 'react-router-dom'
 
 const PurchaseOrder = () => {
   const [data, setData] = useState([])
@@ -24,8 +25,9 @@ const PurchaseOrder = () => {
   const { searchQuery, setGlobalSearchQuery, setGlobalPlaceholder } = useSearch()
   const [totalPages, setTotalPages] = useState(0)
   const [count, setCount] = useState(null)
-
+  const [isMinimiseTable, setIsMinimiseTable] = useState(false)
   const [refresh, setRefresh] = useState(false)
+  const location = useLocation()
   const [paginationParams, setPaginationParams] = useState({
     currentPage: 1,
     pageSize: 50,
@@ -39,6 +41,14 @@ const PurchaseOrder = () => {
       setGlobalPlaceholder('Search...')
     }
   }, [setGlobalPlaceholder])
+
+  useEffect(() => {
+    if (location.pathname === '/purchaseorder') {
+      setIsMinimiseTable(false)
+    } else {
+      setIsMinimiseTable(true)
+    }
+  }, [location.pathname]) // Added dependency
 
   // Debounced fetch function
   const fetchData = useCallback(async (search, pageParams) => {
@@ -156,26 +166,34 @@ const PurchaseOrder = () => {
   }
 
   return (
-    <div className="p-1">
+    <div className="flex h-full">
       {alert.show && (
         <CustomAlert message={alert.message} severity={alert.type} onClose={closeAlert} />
       )}
-      <div className="h-full w-full flex flex-col">
+      
+      {/* Main table container */}
+      <div className={`${isMinimiseTable ? 'w-1/4 min-w-0' : 'w-full'} flex flex-col`}>
         <ContentHeader heading={'Purchase Order'} onAddClick={handleAddNew} />
 
         {loading ? (
           <Loader />
         ) : (
-          <>
-            <PurchaseOrderTable
-              data={data}
-              handleEdit={handleEdit}
-              handlePurchaseDetails={handlePurchaseDetails}
-              setRefresh={setRefresh}
-            />
+          <div className="flex-1 flex flex-col min-w-0">
+            {/* Table container with full width */}
+            <div className="flex-1 min-w-0">
+              <PurchaseOrderTable
+                data={data}
+                handleEdit={handleEdit}
+                handlePurchaseDetails={handlePurchaseDetails}
+                setRefresh={setRefresh}
+                isMinimiseTable={isMinimiseTable}
+                setIsMinimiseTable={setIsMinimiseTable}
+              />
+            </div>
 
-            <div className="flex justify-end items-center gap-4 mt-2 ml-4 mr-4">
-              <p className="w-40 text-sm">
+            {/* Pagination */}
+            <div className="flex justify-end items-center gap-4 mt-2 px-4 py-2 border-t bg-white">
+              <p className="text-sm whitespace-nowrap">
                 Total Count: <span className="font-semibold">{count}</span>
               </p>
               <CompactPagination
@@ -186,7 +204,7 @@ const PurchaseOrder = () => {
                 entriesPerPage={paginationParams.pageSize}
               />
             </div>
-          </>
+          </div>
         )}
 
         <Drawer
@@ -220,6 +238,13 @@ const PurchaseOrder = () => {
           />
         </Drawer>
       </div>
+      
+      {/* Outlet container */}
+      {isMinimiseTable && (
+        <div className="flex-1 min-w-0">
+          <Outlet />
+        </div>
+      )}
     </div>
   )
 }

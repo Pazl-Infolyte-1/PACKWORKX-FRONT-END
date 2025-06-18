@@ -41,6 +41,7 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
 
     fetchSingleItem()
   }, [item])
+console.log(item);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -48,14 +49,6 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
       month: 'short',
       day: 'numeric',
     })
-  }
-
-  const parseCustomFields = (customFieldsString) => {
-    try {
-      return JSON.parse(customFieldsString)
-    } catch {
-      return {}
-    }
   }
 
   const getStatusIcon = (status) => {
@@ -113,9 +106,10 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
     }).format(amount)
   }
 
-  const rawCustomFields = itemDetails?.products?.custom_fields
-  const parsed = rawCustomFields ? JSON.parse(rawCustomFields) : {}
-  const customData = parseCustomFields(parsed)
+  const rawCustomFields = itemDetails?.products?.default_custom_fields
+  
+  const customData = rawCustomFields ? JSON.parse(rawCustomFields) : {}
+  console.log('Raw Custom Fields:', customData);
 
   return (
     <div>
@@ -147,7 +141,7 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
               </h2>
               <div>
                 <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                <p className="text-sm font-bold m-0">Qty:{totalInventoryValue[0].total_quantity}</p>
+                <p className="text-sm font-bold m-0">Available Qty: {parseFloat(item.quantity_available)}</p>
               </div>
             </div>
 
@@ -261,7 +255,7 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                           {Object.entries(
-                            parseCustomFields(JSON.parse(itemDetails.products.custom_fields)),
+                            customData
                           ).map(([key, value]) => {
                             // Process the key: remove special characters and capitalize
                             const processedKey = key
@@ -275,6 +269,8 @@ const ViewInventory = ({ item, totalInventoryValue }) => {
                                 key={key}
                                 className="flex gap-2 items-center py-2 px-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
                               >
+                                {console.log(processedKey)}
+                                
                                 <span className="text-sm font-medium text-gray-600">
                                   {processedKey}:
                                 </span>

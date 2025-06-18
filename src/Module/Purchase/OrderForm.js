@@ -106,7 +106,7 @@ const OrderForm = ({
       try {
         const params = { limit: 5000, page: 1, entity_type: 'vendor' }
         const response = await clientApi.getVendor(params)
-        console.log('response', response.data.data);
+        console.log('response', response.data.data)
         setVendor(response?.data.data)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -115,9 +115,29 @@ const OrderForm = ({
     fetchData()
   }, [])
 
+  // FIX 1: Update poTotals when received from ItemForm
+  const handleTotalsUpdate = (newTotals) => {
+    console.log('Updating totals:', newTotals)
+    setPoTotals({
+      total_qty: newTotals.total_qty || 0,
+      cgst_amount: newTotals.cgst_amount || 0,
+      sgst_amount: newTotals.sgst_amount || 0,
+      tax_amount: newTotals.tax_amount || 0,
+      total_amount: newTotals.total_amount || 0,
+      amount: newTotals.amount || 0,
+    })
+
+    // Also update the form values for hidden inputs
+    setValue('total_qty', newTotals.total_qty || 0)
+    setValue('cgst_amount', newTotals.cgst_amount || 0)
+    setValue('sgst_amount', newTotals.sgst_amount || 0)
+    setValue('tax_amount', newTotals.tax_amount || 0)
+    setValue('total_amount', newTotals.total_amount || 0)
+  }
+
   const handleSupplierChange = (e) => {
-    console.log(typeof e.target.value);
-    
+    console.log(typeof e.target.value)
+
     const selectedId = parseInt(e.target.value)
     const selectedClient = vendor.find((client) => client.client_id === selectedId)
 
@@ -194,21 +214,20 @@ const OrderForm = ({
     setValue('shipping_address', addressString)
   }
 
-  // This function runs only when form is valid
+  // FIX 2: Updated handleFormSubmit to use current totals
   const handleFormSubmit = (data) => {
     const formData = {
       orderData: {
         ...data,
-        amount: poTotals.amount,
-        total_qty: poTotals.total_qty,
-        cgst_amount: poTotals.cgst_amount,
-        sgst_amount: poTotals.sgst_amount,
-        tax_amount: poTotals.tax_amount,
-        total_amount: poTotals.total_amount,
+        amount: poTotals.amount || 0,
+        total_qty: poTotals.total_qty || 0,
+        cgst_amount: poTotals.cgst_amount || 0,
+        sgst_amount: poTotals.sgst_amount || 0,
+        tax_amount: poTotals.tax_amount || 0,
+        total_amount: poTotals.total_amount || 0,
       },
       itemsData: items,
     }
-
     onSubmit(formData)
   }
 
@@ -324,7 +343,7 @@ const OrderForm = ({
             </label>
             <input
               type="number"
-              {...register('supplier_contact', { required: true})}
+              {...register('supplier_contact', { required: true })}
               style={getInputStyle(errors.supplier_contact)}
               className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               readOnly
@@ -384,7 +403,7 @@ const OrderForm = ({
             </label>
             <input
               type="date"
-              {...register('valid_till', { required: true})}
+              {...register('valid_till', { required: true })}
               style={getInputStyle(errors.valid_till)}
               className="w-full p-2 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             />
@@ -541,12 +560,13 @@ const OrderForm = ({
         </div>
 
         <div className="mt-6">
+          {/* FIX 3: Pass the handleTotalsUpdate function to ItemForm */}
           <ItemForm
             key={selectedPoId || 'new'}
             items={items}
             setItems={setItems}
             formValues={poTotals}
-            setFormValues={setFormValues}
+            setFormValues={handleTotalsUpdate}
           />
         </div>
 
@@ -561,7 +581,7 @@ const OrderForm = ({
           <button
             onClick={() => setDrawer(false)}
             type="button"
-            className="p-2 border border-gray-300 rounded w-24 mr-2 hover:bg-gray-100 transition"
+            className=" border border-gray-300 rounded w-24 mr-2 hover:bg-gray-100 transition"
           >
             Cancel
           </button>

@@ -265,7 +265,6 @@
       setIsMinimiseTable(true)
       navigate(`/purchaseorder/${row.id}`)
     }
-console.log(isMinimiseTable);
 
     return (
       <div>

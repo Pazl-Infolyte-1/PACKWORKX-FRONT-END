@@ -10,10 +10,8 @@ const GrnView = ({ id, setOpenPoReturnModal }) => {
         const poReturnList = Array.isArray(response?.data?.approved)
           ? response.data.approved
           : response.data.disapproved || []
-        console.log('poReturnList', poReturnList)
 
         const matchedpoReturnList = poReturnList.find((item) => item.id === id)
-        console.log('matchedpoReturnList', matchedpoReturnList)
 
         setPoDetails(matchedpoReturnList)
       } catch (error) {

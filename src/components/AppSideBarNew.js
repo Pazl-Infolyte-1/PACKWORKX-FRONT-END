@@ -8,7 +8,7 @@ import 'simplebar-react/dist/simplebar.min.css'
 import { cilUser } from '@coreui/icons'
 import './style.css'
 
-export const AppSideBarNew = ({ giveAccess }) => {
+const AppSideBarNew = ({ giveAccess }) => {
   const [expandedModules, setExpandedModules] = useState({})
   const [isOpen, setIsOpen] = useState(false)
 
@@ -405,15 +405,20 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
+
+            if (module.modules_description === 'Stock Adjustment') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/stockadjustment">
+                    {navLink('Stock Adjustment', 'cibHighly')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
             return null
           })}
         </>
       )}
-      <CNavItem>
-        <CNavLink as={NavLink} to="/stockadjustment">
-          {navLink('Stock Adjustment', 'cibHighly')}
-        </CNavLink>
-      </CNavItem>
       {/*reports*/}
       {shouldDisplayReports && (
         <>
@@ -493,3 +498,5 @@ export const AppSideBarNew = ({ giveAccess }) => {
     </CSidebarNav>
   )
 }
+
+export default AppSideBarNew

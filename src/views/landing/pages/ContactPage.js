@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ContactPage = ({ handleFormSubmit }) => {
+const ContactPage = ({ handleFormSubmit,submitContacts }) => {
   return (
     <div>
       <section className="landing-page-header">
@@ -46,7 +46,7 @@ const ContactPage = ({ handleFormSubmit }) => {
 
           <div className="landing-auth-form">
             <h3>Send Us a Message</h3>
-            <form onSubmit={handleFormSubmit}>
+            <form onSubmit={submitContacts}>
               <div className="landing-form-group">
                 <label htmlFor="contact-name">Name</label>
                 <input type="text" id="contact-name" name="name" required />

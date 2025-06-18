@@ -106,7 +106,6 @@ const OrderForm = ({
       try {
         const params = { limit: 5000, page: 1, entity_type: 'vendor' }
         const response = await clientApi.getVendor(params)
-        console.log('response', response.data.data)
         setVendor(response?.data.data)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -117,7 +116,6 @@ const OrderForm = ({
 
   // FIX 1: Update poTotals when received from ItemForm
   const handleTotalsUpdate = (newTotals) => {
-    console.log('Updating totals:', newTotals)
     setPoTotals({
       total_qty: newTotals.total_qty || 0,
       cgst_amount: newTotals.cgst_amount || 0,
@@ -136,8 +134,6 @@ const OrderForm = ({
   }
 
   const handleSupplierChange = (e) => {
-    console.log(typeof e.target.value)
-
     const selectedId = parseInt(e.target.value)
     const selectedClient = vendor.find((client) => client.client_id === selectedId)
 

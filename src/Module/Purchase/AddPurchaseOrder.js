@@ -71,7 +71,6 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefre
     setLoading(true)
     try {
       const response = await purchaseOrderApi.getPurchaseOrderById(selectedPoId)
-      console.log(response, 'singlepo')
       if (response.data) {
         const { items, ...orderDetails } = response.data
         setOrderData(orderDetails)
@@ -105,8 +104,6 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefre
       let response
       if (isEdit) {
         response = await purchaseOrderApi.updatePurchaseOrder(selectedPoId, payload)
-        console.log(response.data, 'updated')
-
         setAlerts([
           { severity: 'success', message: response?.data?.message || 'Successfully updated' },
         ])

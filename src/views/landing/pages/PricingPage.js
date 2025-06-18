@@ -1,6 +1,24 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { landingApi } from '../../../api/landingPage'
 
-const PricingPage = ({ showPage }) => {
+const PricingPage = ({ showPage,setPackageName }) => {
+  const [packages, setPackages] = useState([]);
+  const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' | 'annual'
+
+useEffect(() => {
+  const fetchPricing = async () => {
+    try {
+      const response = await landingApi.displayPricing();
+              setPackages(response?.data?.data || []);
+      console.log("Pricing Data:", response?.data);
+    } catch (error) {
+      console.error("Error fetching pricing:", error);
+    }
+  };
+
+  fetchPricing();
+}, []);
+
   return (
     <div>
       <section className="landing-page-header">
@@ -10,55 +28,65 @@ const PricingPage = ({ showPage }) => {
         </div>
       </section>
 
-      <section className="landing-container">
-        <div className="landing-pricing-grid">
-          <div className="landing-pricing-card">
-            <h3>Starter</h3>
-            <div className="landing-price">$99<span style={{fontSize: '1rem'}}>/month</span></div>
-            <ul className="landing-features-list">
-              <li>Customer Management</li>
-              <li>Basic Order Processing</li>
-              <li>Quote Generation</li>
-              <li>5 Users</li>
-              <li>Email Support</li>
-              <li>Basic Reports</li>
-            </ul>
-            <button className="landing-btn landing-btn-primary" onClick={() => showPage('signup')}>Get Started</button>
-          </div>
-
-          <div className="landing-pricing-card featured">
-            <h3>Professional</h3>
-            <div className="landing-price">$299<span style={{fontSize: '1rem'}}>/month</span></div>
-            <ul className="landing-features-list">
-              <li>All Starter Features</li>
-              <li>Production Planning</li>
-              <li>Inventory Management</li>
-              <li>Advanced Analytics</li>
-              <li>15 Users</li>
-              <li>Priority Support</li>
-              <li>API Access</li>
-              <li>Custom Workflows</li>
-            </ul>
-            <button className="landing-btn landing-btn-primary" onClick={() => showPage('signup')}>Most Popular</button>
-          </div>
-
-          <div className="landing-pricing-card">
-            <h3>Enterprise</h3>
-            <div className="landing-price">$699<span style={{fontSize: '1rem'}}>/month</span></div>
-            <ul className="landing-features-list">
-              <li>All Professional Features</li>
-              <li>Multi-Location Support</li>
-              <li>Advanced Integrations</li>
-              <li>Custom Reports</li>
-              <li>Unlimited Users</li>
-              <li>24/7 Phone Support</li>
-              <li>Dedicated Account Manager</li>
-              <li>Custom Development</li>
-            </ul>
-            <button className="landing-btn landing-btn-primary" onClick={() => showPage('contact')}>Contact Sales</button>
-          </div>
+     <section className="landing-container">
+      {/* Toggle Button */}
+      <div className="flex justify-center mb-6 mt-4">
+        <div className="flex gap-4">
+          <button
+            className={`landing-btn ${billingCycle === 'monthly' ? 'landing-btn-primary' : ''}`}
+            onClick={() => setBillingCycle('monthly')}
+          >
+            Monthly Billing
+          </button>
+          <button
+            className={`landing-btn ${billingCycle === 'annual' ? 'landing-btn-primary' : ''}`}
+            onClick={() => setBillingCycle('annual')}
+          >
+            Annual Billing
+          </button>
         </div>
-      </section>
+      </div>
+
+      {/* Pricing Cards */}
+      <div className="landing-pricing-grid">
+        {packages.map((pkg) => (
+          <div
+            key={pkg.id}
+            className={`landing-pricing-card ${pkg.is_recommended ? 'featured' : ''}`}
+          >
+            <h3>{pkg.name}</h3>
+            <div className="landing-price">
+              {pkg.currency?.currency_symbol}
+              {billingCycle === 'monthly' ? pkg.monthly_price : pkg.annual_price}
+              <span style={{ fontSize: '1rem' }}>
+                /{billingCycle === 'monthly' ? 'month' : 'year'}
+              </span>
+            </div>
+
+            <ul className="landing-features-list">
+              {pkg.module_in_package?.slice(0, 8).map((feature, index) => (
+                <li key={index}>
+                  {feature.charAt(0).toUpperCase() + feature.slice(1).replace(/_/g, ' ')}
+                </li>
+              ))}
+              {pkg.module_in_package.length > 8 && (
+                <li>+ {pkg.module_in_package.length - 8} more modules</li>
+              )}
+            </ul>
+
+            <button
+              className="landing-btn landing-btn-primary"
+  onClick={() => {
+    setPackageName(pkg.name);  // <-- set name like "Starter", "Medium", etc.
+    showPage('signup');        // then go to signup page
+  }}
+            >
+              Get Started
+            </button>
+          </div>
+        ))}
+      </div>
+    </section>
     </div>
   )
 }

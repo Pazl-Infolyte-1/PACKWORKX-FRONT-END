@@ -32,10 +32,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
     try {
       const response = await itemApi.getItemList()
       const items = response?.data?.data || []
-      console.log(item_id, 'id')
-      console.log(items, 'item')
       const item = items.find((i) => i.id == item_id)
-      console.log(item, 'item')
 
       if (!item) {
         setModalContent(
@@ -266,10 +263,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         total_incl_gst: 0,
       }
     }
-  }, [formData.items])
-
-  console.log(totals,"totals");
-  
+  }, [formData.items])  
 
   // Only update form values with totals when totals change
   useEffect(() => {
@@ -562,7 +556,6 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
                   onClick={() => openItemDetails(getValues(`items.${index}.item_id`))}
                   className="w-[100px] cursor-pointer text-blue-600 text-center"
                   >
-                    {console.log(getValues(`items.${index}.item_id`))   }
                     ℹ️
                   </td>
                   {/* <td className="px-2 py-2 w-[65px]">

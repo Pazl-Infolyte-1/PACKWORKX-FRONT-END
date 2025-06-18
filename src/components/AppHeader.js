@@ -25,8 +25,8 @@ import {
   cilSun,
 } from '@coreui/icons'
 
-import { AppBreadcrumb } from './index'
-import { AppHeaderDropdown } from './header/index'
+import AppBreadcrumb from './AppBreadcrumb'
+import AppHeaderDropdown from './header/AppHeaderDropdown'
 import SearchBar from './New/SearchBar'
 import { MdOutlineMenu } from 'react-icons/md'
 import NotificationPanel from './NotificationPanel'
@@ -127,4 +127,4 @@ const AppHeader = () => {
   )
 }
 
-export default AppHeader
+export default AppHeader;

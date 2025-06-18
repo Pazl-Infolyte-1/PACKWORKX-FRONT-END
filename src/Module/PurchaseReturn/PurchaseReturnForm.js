@@ -40,8 +40,6 @@ const PurchaseReturnForm = ({
 
   // Populate form fields and items when editing
   useEffect(() => {
-    console.log('isPorEdit', isPorEdit)
-    console.log('selectedPorId', selectedPorId)
 
     if (isPorEdit && selectedPorId) {
       handlePurchaseDetails(

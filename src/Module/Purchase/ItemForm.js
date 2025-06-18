@@ -32,8 +32,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
     try {
       const response = await itemApi.getItemList()
       const items = response?.data?.data || []
-      const item = items.find((i) => i.id === parseInt(item_id))
-      console.log(item, 'item')
+      const item = items.find((i) => i.id == item_id)
 
       if (!item) {
         setModalContent(
@@ -45,7 +44,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         return
       }
 
-      const customFields = item?.custom_fields ? JSON.parse(JSON.parse(item.custom_fields)) : {}
+      const customFields = item?.custom_fields 
 
       setModalContent(
         <div className="max-h-96 overflow-y-auto">
@@ -264,7 +263,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         total_incl_gst: 0,
       }
     }
-  }, [formData.items])
+  }, [formData.items])  
 
   // Only update form values with totals when totals change
   useEffect(() => {
@@ -553,8 +552,9 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
                     </select>
                   </td>
                   <td
-                    onClick={() => openItemDetails(getValues(`items.${index}.item_id`))}
-                    className="w-[100px] cursor-pointer text-blue-600 text-center"
+                  
+                  onClick={() => openItemDetails(getValues(`items.${index}.item_id`))}
+                  className="w-[100px] cursor-pointer text-blue-600 text-center"
                   >
                     ℹ️
                   </td>
@@ -569,8 +569,6 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
                     <input
                       {...register(`items.${index}.quantity`)}
                       type="number"
-                      min="0"
-                      step="0.01"
                       onChange={(e) => handleQuantityChange(index, e.target.value)}
                       onBlur={(e) => handleQuantityBlur(index, e.target.value)}
                       className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
@@ -580,8 +578,6 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
                     <input
                       {...register(`items.${index}.standard_cost`)}
                       type="number"
-                      min="0"
-                      step="0.01"
                       onChange={(e) => handleRateChange(index, e.target.value)}
                       onBlur={(e) => handleRateBlur(index, e.target.value)}
                       className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"

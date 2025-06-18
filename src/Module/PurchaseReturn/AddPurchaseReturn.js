@@ -153,20 +153,14 @@ const AddPurchaseOrderReturn = ({
   useEffect(() => {
     const handleCheck = async () => {
       const response = await purchaseOrderApi.getPOForReturn()
-      console.log('Response from getPOForReturn:', response?.data?.data || [])
       setFilteredPoData(response?.data?.data || [])
     }
     if (poData?.length) handleCheck()
   }, [poData])
 
-  useEffect(() => {
-    console.log('Filtered PO Data use effecttttttttttttttttttttt :', filteredPoData)
-  }, [filteredPoData])
-
   // const handlePurchaseDetails = async (poId) => {
   //   try {
   //     const response = await inventoryApi.getinventory()
-  //     console.log('Response from getinventory:', response.data.data.inventoryData)
   //     const inventoryList = Array.isArray(response?.data?.data?.inventoryData)
   //       ? response.data.data?.inventoryData
   //       : []
@@ -194,7 +188,6 @@ const AddPurchaseOrderReturn = ({
   //       const fields = ['po_id', 'grn_id', 'payment_terms', 'reason', 'notes']
   //       fields.forEach((field) => setValue(field, purchaseOrder[field] || ''))
 
-  //       console.log('purchaseOrder', fields)
   //     }
 
   //     // if (Array.isArray(purchaseOrderItemDetails)) {
@@ -216,42 +209,7 @@ const AddPurchaseOrderReturn = ({
       // Extract GRN items array
       const grnItems = grnDetails?.GRNItems || []
 
-      console.log('GRN Details:', grnDetails)
-      console.log('GRN Items:', grnItems)
-
-      // Process each GRN item to get their details
-      if (grnItems.length > 0) {
-        grnItems.forEach((item, index) => {
-          console.log(`GRN Item #${index + 1} Details:`, item)
-
-          // Access specific properties of each GRN item
-          const {
-            id,
-            grn_id,
-            item_id,
-            item_code,
-            item_name,
-            quantity,
-            rate,
-            amount,
-            // Add any other properties you need to access
-          } = item
-
-          console.log(`
-            Item ID: ${item_id}
-            Item Code: ${item_code}
-            Item Name: ${item_name}
-            Quantity: ${quantity}
-            Rate: ${rate}
-            Amount: ${amount}
-          `)
-        })
-
-        return grnItems // Return the array of GRN items
-      } else {
-        console.log('No GRN items found for this GRN ID')
-        return []
-      }
+      return grnItems
     } catch (error) {
       console.error('Failed to fetch GRN data:', error)
       return []
@@ -277,9 +235,6 @@ const AddPurchaseOrderReturn = ({
         checkedItemCodes.length > 0
           ? grnItems.filter((item) => checkedItemCodes.includes(item.item_code))
           : grnItems
-
-      console.log('Filtered GRN Items:', filteredGrnItems)
-
       return filteredGrnItems
     } catch (error) {
       console.error('Failed to process GRN data:', error)
@@ -290,7 +245,6 @@ const AddPurchaseOrderReturn = ({
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
   // const handlePoChange = (e) => {
   //   const selectedId = parseInt(e.target.value);
-  //   console.log("selectedId",selectedId);
 
   //       // if(selectedId) {
   //         // selectedPoId = selectedId;
@@ -298,7 +252,6 @@ const AddPurchaseOrderReturn = ({
   //           setValue('po_id', e.target.value);
   //       // }else{
   //       //   selectedPoId
-  //       //   console.log("selectedPoId else",selectedPoId);
   //       // }
   //   };
 
@@ -315,7 +268,6 @@ const AddPurchaseOrderReturn = ({
 
   const handlePoChange = (e) => {
     const selectedId = parseInt(e.target.value) || null
-    console.log('Selected PO ID:', selectedId)
 
     setItems([])
     setValue('items', [])
@@ -331,31 +283,21 @@ const AddPurchaseOrderReturn = ({
     }
   }
 
-  useEffect(() => {
-    console.log('Selected PO ID State use effect value:', selectedPoIdState)
-  }, [selectedPoIdState])
-
   const handleGrnChange = (e) => {
     const selectedGrnIdValue = parseInt(e.target.value)
-    console.log('selected grn ', selectedGrnIdValue)
     setGrnId(selectedGrnIdValue)
     setValue('grn_id', selectedGrnIdValue)
     getGRNItemsForReturn(selectedPoIdState, selectedGrnIdValue)
     setSelectedGrnID(selectedGrnIdValue)
   }
   const getGRNItemsForReturn = async (poId, grnId) => {
-    console.log('Fetching GRN items for return with GRN ID:', grnId)
-    console.log('selectedPoIdState PO ID State grn get items function value:', selectedPoIdState)
-    console.log('selectedPoId PO ID State grn get items function value:', selectedPoId)
     try {
       const response = await purchaseOrderApi.getPurchaseOrderDetails({
         po_id: poId || selectedPoId,
         grn_id: grnId,
       })
       const grnItems = response?.data.purchaseOrderItemDetails || []
-      console.log('GRN Items for Return:', grnItems)
       const filteredGRNItems = grnItems.filter((grn) => grn.grn_item_id != null)
-      console.log('Filtered GRN Items:', filteredGRNItems)
       reset({ items: filteredGRNItems })
 
       // Optional: if you're managing separate local state for any reason
@@ -368,11 +310,8 @@ const AddPurchaseOrderReturn = ({
 
   const getGRNData = async (poId) => {
     try {
-      const response = await grnApi.getGRNByPOId(poId)
+      const response = await purchaseOrderApi.getGrnByPoId(poId)
       const grn = response.data?.data.grns || []
-
-      console.log('GRN Data Response:', grn)
-
       // const matchedGrn = allGrns.find((grn) => grn.po_id === poId)
 
       if (grn) {
@@ -401,14 +340,8 @@ const AddPurchaseOrderReturn = ({
   const getPOItemsById = async (poId) => {
     try {
       const response = await purchaseOrderApi.getPurchaseOrderById(poId)
-      console.log('PO Items Response:', response.data)
-      console.log('Selected PO ID state grn items     =====     ', selectedPoIdState)
-      console.log('poIDForReturn  PO ID grn items:', poIDForReturn)
-
       const POData = response?.data || []
       const poItems = POData?.PurchaseOrderItems || []
-
-      console.log('PO Items:', poItems)
 
       // setValue('grn_id', POData?.grn_id || null)
       getGRNData(poId, poItems)
@@ -436,7 +369,6 @@ const AddPurchaseOrderReturn = ({
       )
 
       const all_notofications = await commonApi.getNotifications()
-      console.log('All Notifications:', all_notofications.data.data)
       dispatch(setAllNotifications(all_notofications?.data?.data || []))
     } catch (error) {
       console.error('Error in handleThrowAlerts:', error)
@@ -452,8 +384,6 @@ const AddPurchaseOrderReturn = ({
   }
 
   const handleFormSubmit = async (data) => {
-    console.log('Form submit data:', data)
-
     const checkedItems = items.filter((item) => item.selected)
     const checkedItemCodes = checkedItems.map((item) => item.item_code)
 
@@ -474,7 +404,6 @@ const AddPurchaseOrderReturn = ({
     //   ? "Purchase return created successfully"
     //   : "Some item quantities are zero or unavailable, so return not possible";
     // alert(message);
-    // console.log(message);
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
     // if (checkedItems.length === 0) {
@@ -516,12 +445,10 @@ const AddPurchaseOrderReturn = ({
       })),
     }
 
-    console.log('Final Payload:', payload)
 
     try {
       // ✅ Submit PO return first
       const response = await purchaseOrderApi.submitPurchaseOrderReturn(payload)
-      console.log('PO Return Response:', response)
 
       // ✅ Throw alerts for each item AFTER successful PO return
       await handleThrowAlerts(payload.items)

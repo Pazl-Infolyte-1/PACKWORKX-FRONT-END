@@ -183,4 +183,12 @@ export const purchaseOrderApi = {
       throw error
     }
   },
+  getGrnByPoId: async (po_id) => {
+    try {
+      return await apiClient.get(`/purchase-order/grn/${po_id}`)
+    } catch (error) {
+      console.error('Error fetching GRN by PO ID:', error.response?.data || error.message)
+      throw error
+    }
+  },
 }

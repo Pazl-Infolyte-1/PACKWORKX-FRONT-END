@@ -128,4 +128,8 @@ export const inventoryApi = {
       throw error
     }
   },
+
+  getInventorySummary: async () => {
+    return await apiClient.get('/inventory/product')
+  }
 }

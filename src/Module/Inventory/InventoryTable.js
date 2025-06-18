@@ -26,71 +26,73 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue,setI
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
 
- const customFieldColumns = useMemo(() => {
-  // Extract unique custom field keys when subcategory filter is applied
-  if (!subCategoryId || !inventoryData || inventoryData.length === 0) {
-    return []
-  }
-
-  const customFieldsSet = new Set()
-
-  inventoryData.forEach((item) => {
-    if (item.item?.default_custom_fields) {
-      try {
-        // Check if default_custom_fields is already an object or needs parsing
-        const customFields = typeof item.item.default_custom_fields === 'string' 
-          ? JSON.parse(item.item.default_custom_fields) 
-          : item.item.default_custom_fields
-
-        Object.keys(customFields).forEach((key) => {
-          // Transform specific field names
-          let transformedKey = key
-          if (key.toLowerCase() === 'uom') {
-            transformedKey = 'Unit'
-          } else if (key.toLowerCase() === 'size') {
-            transformedKey = 'Deckle'
-          }
-          customFieldsSet.add(transformedKey)
-        })
-      } catch (error) {
-        console.error('Error parsing custom fields:', error)
-      }
+  const customFieldColumns = useMemo(() => {
+    // Extract unique custom field keys when subcategory filter is applied
+    if (!subCategoryId || !inventoryData || inventoryData.length === 0) {
+      return []
     }
-  })
 
-  return Array.from(customFieldsSet)
-}, [inventoryData, subCategoryId])
+    const customFieldsSet = new Set()
+
+    inventoryData.forEach((item) => {
+      if (item.item?.default_custom_fields) {
+        try {
+          // Check if default_custom_fields is already an object or needs parsing
+          const customFields =
+            typeof item.item.default_custom_fields === 'string'
+              ? JSON.parse(item.item.default_custom_fields)
+              : item.item.default_custom_fields
+
+          Object.keys(customFields).forEach((key) => {
+            // Transform specific field names
+            let transformedKey = key
+            if (key.toLowerCase() === 'uom') {
+              transformedKey = 'Unit'
+            } else if (key.toLowerCase() === 'size') {
+              transformedKey = 'Deckle'
+            }
+            customFieldsSet.add(transformedKey)
+          })
+        } catch (error) {
+          console.error('Error parsing custom fields:', error)
+        }
+      }
+    })
+
+    return Array.from(customFieldsSet)
+  }, [inventoryData, subCategoryId])
 
   // Function to get custom field value for an item
   const getCustomFieldValue = (item, fieldKey) => {
-  if (!item.item?.default_custom_fields) return '--'
+    if (!item.item?.default_custom_fields) return '--'
 
-  try {
-    // Check if default_custom_fields is already an object or needs parsing
-    const customFields = typeof item.item.default_custom_fields === 'string' 
-      ? JSON.parse(item.item.default_custom_fields) 
-      : item.item.default_custom_fields
+    try {
+      // Check if default_custom_fields is already an object or needs parsing
+      const customFields =
+        typeof item.item.default_custom_fields === 'string'
+          ? JSON.parse(item.item.default_custom_fields)
+          : item.item.default_custom_fields
 
-    // Handle the transformed field names (Unit and Deckle)
-    let originalKey = fieldKey
-    if (fieldKey === 'Unit') originalKey = 'uom'
-    if (fieldKey === 'Deckle') originalKey = 'size'
+      // Handle the transformed field names (Unit and Deckle)
+      let originalKey = fieldKey
+      if (fieldKey === 'Unit') originalKey = 'uom'
+      if (fieldKey === 'Deckle') originalKey = 'size'
 
-    const value = customFields[originalKey]
+      const value = customFields[originalKey]
 
-    if (!value) return '--'
-    
-    // Convert snake_case values to readable format
-    return value
-      .replace(/_/g, ' ')
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
-  } catch (error) {
-    console.error('Error parsing custom fields:', error)
-    return '--'
+      if (!value) return '--'
+
+      // Convert snake_case values to readable format
+      return value
+        .replace(/_/g, ' ')
+        .split(' ')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+    } catch (error) {
+      console.error('Error parsing custom fields:', error)
+      return '--'
+    }
   }
-}
   return (
     <>
 <div
@@ -195,9 +197,55 @@ const InventoryTable = ({ inventoryData, subCategoryId, totalInventoryValue,setI
               </CTableDataCell>
             ))}
 
-            <CTableDataCell className="whitespace-nowrap text-center">
-              {/* Status logic here */}
-            </CTableDataCell>
+                  <CTableDataCell className="whitespace-nowrap text-center">
+                    {(() => {
+                      let stockStatus = '--'
+                      // Convert strings to numbers
+                      const totalQuantity = parseFloat(item.quantity_available || item.total_quantity)
+                      const minStockLevel = parseFloat(item.item.min_stock_level)
+
+                      if (totalQuantity === 0.0) {
+                        stockStatus = 'Out of Stock'
+                      } else if (totalQuantity >= minStockLevel) {
+                        stockStatus = 'In Stock'
+                      } else if (totalQuantity < minStockLevel) {
+                        stockStatus = 'Low Stock'
+                      }
+
+                      const statusStyles = {
+                        'In Stock': {
+                          backgroundColor: '#D1FAE5',
+                          color: '#065F46',
+                        },
+                        'Out of Stock': {
+                          backgroundColor: '#FECACA',
+                          color: '#B91C1C',
+                        },
+                        'Low Stock': {
+                          backgroundColor: '#FEF3C7',
+                          color: '#92400E',
+                        },
+                        '--': {
+                          backgroundColor: '#F3F4F6',
+                          color: '#6B7280',
+                        },
+                      }
+
+                      return (
+                        <span
+                          style={{
+                            ...statusStyles[stockStatus],
+                            borderRadius: '4px',
+                            padding: '2px 8px',
+                            fontSize: '0.75rem',
+                            display: 'inline-block',
+                          }}
+                        >
+                          {stockStatus}
+                        </span>
+                      )
+                    })()}
+                  </CTableDataCell>
 
             <CTableDataCell className="py-3" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-center">

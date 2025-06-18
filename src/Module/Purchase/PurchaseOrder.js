@@ -61,7 +61,6 @@ const PurchaseOrder = () => {
         status: 'active',
       })
       setData(res.data || [])
-      console.log('ddd', res)
       setCount(res.totalCount)
       setTotalPages(Math.ceil(res.totalCount / pageParams.pageSize))
     } catch (err) {
@@ -125,8 +124,6 @@ const PurchaseOrder = () => {
   }
 
   const handleSuccess = (updatedData) => {
-    console.log('Updated Data:', updatedData)
-
     setRefresh((prev) => !prev) // Trigger refresh
     setAlert({
       show: true,

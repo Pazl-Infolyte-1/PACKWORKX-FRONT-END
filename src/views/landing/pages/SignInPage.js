@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SignInPage = ({ showPage, handleSignIn, formData, setFormData  }) => {
+const SignInPage = ({ showPage, handleSignIn, formData, setFormData,setPackageName  }) => {
     const handleInputChange = (e) => {
     setFormData(prev => ({
       ...prev,
@@ -53,12 +53,14 @@ const SignInPage = ({ showPage, handleSignIn, formData, setFormData  }) => {
           <div style={{ textAlign: 'center', marginTop: '1rem' }}>
             <p>
               Don't have an account?{' '}
-              <a href="#" onClick={() => showPage('signup')} style={{ color: '#e67e22' }}>
+              <a href="#" onClick={() =>{ showPage('signup')
+                setPackageName("Free")
+              }} style={{ color: '#e67e22' }}>
                 Sign up here
               </a>
             </p>
             <p>
-              <a href="#" style={{ color: '#e67e22' }}>
+              <a href="#" onClick={() => showPage('forgotPassword')} style={{ color: '#e67e22' }}>
                 Forgot your password?
               </a>
             </p>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
+import { AppContent, AppHeader, AppSidebar } from '../components'
 import { useSelector } from 'react-redux'
 
 const DefaultLayout = () => {
@@ -18,10 +18,10 @@ const DefaultLayout = () => {
         <div className="body flex-grow-1 px-2">
           <AppContent />
         </div>
-        {/*<AppFooter />*/}
+        {/* <AppFooter /> */}
       </div>
     </div>
   )
 }
- 
+
 export default DefaultLayout

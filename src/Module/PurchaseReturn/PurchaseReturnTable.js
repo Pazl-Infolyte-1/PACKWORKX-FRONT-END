@@ -52,8 +52,6 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
       grn_id: currentPor.grn_id || [], // send existing items back
     }
 
-    console.log('Payload for status change:', payload)
-
     try {
       const response = await purchaseOrderApi.updatePoRetrun(id, payload)
       setAlerts([{ severity: 'success', message: response.data.message }])
@@ -65,7 +63,6 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
       ])
     }
   }
-  console.log('Purchase Return Data:', porData) // 👈 Logs the porData prop to check its structure
   const columns = [
     { key: 'purchase_return_generate_id', header: 'ID', field: 'purchase_return_generate_id' },
     {

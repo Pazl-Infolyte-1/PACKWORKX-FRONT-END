@@ -4,7 +4,6 @@ import { inventoryApi } from '../../api/inventory'
 import { itemApi } from '../../api/item'
 
 const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
-  console.log('Item in return items form', items)
   const { register, control, reset, getValues, setValue } = useForm({
     defaultValues: {
       items: [],
@@ -109,8 +108,6 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
         available_quantity: parseFloat(item.available_quantity ?? 0),
       }))
 
-      console.log('Formatted items:', formatted)
-
       // Only reset on initial load
       if (!isInitialized.current) {
         reset({ items: formatted })
@@ -124,8 +121,6 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
   // Handle calculations without resetting form
   useEffect(() => {
     if (!watchedItems || !isInitialized.current) return
-
-    console.log('watchedItems', watchedItems)
 
     const hash = JSON.stringify(watchedItems)
     if (hash === lastHash.current) return
@@ -195,8 +190,6 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
       }
     })
 
-    console.log('updatedItems', updatedItems)
-
     // Update parent state only if there are significant changes
     const currentItemsString = JSON.stringify(items)
     const updatedItemsString = JSON.stringify(updatedItems)
@@ -223,7 +216,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
           <thead className="bg-gray-100">
             <tr className="text-center">
               <th className="w-12">Select</th>
-              <th className="w-8"></th> {/* Info icon column */}
+              {/* <th className="w-8"></th> */}
               <th className="w-24">Code</th>
               <th className="w-20">Qty</th>
               <th className="w-24">Return Qty</th>

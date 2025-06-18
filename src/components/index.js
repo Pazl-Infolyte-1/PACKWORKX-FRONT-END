@@ -9,7 +9,7 @@ import DocsIcons from './DocsIcons'
 import DocsLink from './DocsLink'
 import DocsExample from './DocsExample'
 
-export {
+export default {
   AppBreadcrumb,
   AppContent,
   AppFooter,

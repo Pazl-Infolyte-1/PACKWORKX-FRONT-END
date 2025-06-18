@@ -674,7 +674,7 @@ const [isMinimised,setIsMinimised] = useState(false)
   {/* Right Section - Inventory View */}
  <div className={`${isMinimised ? 'col-span-7' : ''} -mt-10`}>
     {/*<InventoryView />*/}
-    <ViewInventory item={selectedItem} totalInventoryValue={totalInventoryValue} setIsMinimised={setIsMinimised}/>
+    <ViewInventory item={selectedItem} totalInventoryValue={inventoryData} setIsMinimised={setIsMinimised}/>
   </div>
 </div>
 

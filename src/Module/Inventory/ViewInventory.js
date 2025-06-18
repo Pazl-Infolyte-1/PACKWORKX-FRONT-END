@@ -158,7 +158,7 @@ setIsMinimised(false)
               </h2>
               <div>
                 <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                <p className="text-sm font-bold m-0">Available Qty: {parseFloat(item.quantity_available)}</p>
+                <p className="text-sm font-bold m-0">Available Qty: {parseFloat(item?.quantity_available)}</p>
               </div>
             </div>
 

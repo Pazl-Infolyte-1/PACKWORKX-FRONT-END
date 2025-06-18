@@ -32,22 +32,12 @@ if %errorlevel% equ 0 (
     echo.
     echo 📝 If you still encounter issues, check BUILD_FIX_GUIDE.md
 ) else (
-    echo ❌ Build failed. Trying emergency fix...
-    echo.
-    echo 🚨 Running emergency build fix...
-    call node emergency-fix.js
-    call npm run build
-    
-    if %errorlevel% equ 0 (
-        echo ✅ Emergency build succeeded!
-    ) else (
-        echo ❌ Emergency build also failed.
-        echo 📝 Manual solutions:
-        echo 1. Check BUILD_FIX_GUIDE.md
-        echo 2. Try: npx vite build --config vite.config.emergency.mjs
-        echo 3. Check browser console for specific error details
-        exit /b 1
-    )
+    echo ❌ Build failed. Check the error messages above.
+    echo 📝 Common solutions:
+    echo 1. Check BUILD_FIX_GUIDE.md
+    echo 2. Verify all imports/exports are correct
+    echo 3. Ensure all dependencies are compatible
+    exit /b 1
 )
 
 pause

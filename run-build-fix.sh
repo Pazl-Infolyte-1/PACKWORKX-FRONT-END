@@ -31,20 +31,10 @@ if [ $? -eq 0 ]; then
     echo ""
     echo "📝 If you still encounter issues, check BUILD_FIX_GUIDE.md"
 else
-    echo "❌ Build failed. Trying emergency fix..."
-    echo ""
-    echo "🚨 Running emergency build fix..."
-    node emergency-fix.js
-    npm run build
-    
-    if [ $? -eq 0 ]; then
-        echo "✅ Emergency build succeeded!"
-    else
-        echo "❌ Emergency build also failed."
-        echo "📝 Manual solutions:"
-        echo "1. Check BUILD_FIX_GUIDE.md"
-        echo "2. Try: npx vite build --config vite.config.emergency.mjs"
-        echo "3. Check browser console for specific error details"
-        exit 1
-    fi
+    echo "❌ Build failed. Check the error messages above."
+    echo "📝 Common solutions:"
+    echo "1. Check BUILD_FIX_GUIDE.md"
+    echo "2. Verify all imports/exports are correct"
+    echo "3. Ensure all dependencies are compatible"
+    exit 1
 fi

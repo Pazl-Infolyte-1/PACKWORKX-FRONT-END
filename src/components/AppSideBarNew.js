@@ -405,15 +405,20 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
+
+            if (module.modules_description === 'Stock Adjustment') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/stockadjustment">
+                    {navLink('Stock Adjustment', 'cibHighly')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
             return null
           })}
         </>
       )}
-      <CNavItem>
-        <CNavLink as={NavLink} to="/stockadjustment">
-          {navLink('Stock Adjustment', 'cibHighly')}
-        </CNavLink>
-      </CNavItem>
       {/*reports*/}
       {shouldDisplayReports && (
         <>

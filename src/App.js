@@ -88,6 +88,8 @@ const Register = React.lazy(() => import('./views/pages/register/Register'))
 const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
 const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
 const LandingPage = React.lazy(() => import('./views/landing/LandingPage'))
+//const ConfirmPassword = React.lazy(() => import('./views/landing/pages/ConfirmPassword'))
+
 
 // Protected route component to redirect authenticated users away from auth pages
 const PublicRoute = ({ element }) => {
@@ -123,36 +125,27 @@ const App = () => {
           </div>
         }
       >
-        <Routes>
-          {/*<Route
-            path="/"
-            element={<LandingPage />}
-          />*/}
-          <Route
-  path="/"
-  element={
-    isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />
-  }
-/>
+      <Routes>
+  <Route
+    path="/"
+    element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />}
+  />
+  <Route path="/landing" name="Landing Page" element={<LandingPage />} />
+  <Route
+    path="/reset-password"
+    element={<PublicRoute element={<LandingPage />} />}
+  />
+  <Route path="/login" element={<PublicRoute element={<LandingPage />} />} />
+  <Route path="/register" element={<PublicRoute element={<Register />} />} />
+  <Route path="/404" element={<Page404 />} />
+  <Route path="/500" element={<Page500 />} />
+  <Route
+    path="/*"
+    element={isAuthenticated ? <DefaultLayout /> : <Navigate to="/login" replace />}
+  />
+  <Route path="*" element={<Navigate to="/" replace />} />
+</Routes>
 
-          <Route path="/landing" name="Landing Page" element={<LandingPage />} />
-          <Route path="/login" name="Login Page" element={<PublicRoute element={<LandingPage />} />} />
-          <Route
-            path="/register"
-            name="Register Page"
-            element={<PublicRoute element={<Register />} />}
-          />
-          <Route path="/404" name="Page 404" element={<Page404 />} />
-          <Route path="/500" name="Page 500" element={<Page500 />} />
-          <Route
-            path="/*"
-            element={isAuthenticated ? <DefaultLayout /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="*"
-            element={<Navigate to="/" replace />}
-          />
-        </Routes>
       </Suspense>
     </BrowserRouter>
   )

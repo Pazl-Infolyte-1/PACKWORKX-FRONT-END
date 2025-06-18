@@ -5,6 +5,9 @@ import autoprefixer from 'autoprefixer'
 import tailwind from 'tailwindcss'
 export default defineConfig(() => {
   return {
+    server: {
+      allowedHosts: 'all'
+    },
     base: './',
     build: {
       outDir: 'build',

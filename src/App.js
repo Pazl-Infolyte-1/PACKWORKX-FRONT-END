@@ -146,7 +146,7 @@ const App = () => {
           <Route path="/500" name="Page 500" element={<Page500 />} />
           <Route
             path="/*"
-            element={isAuthenticated ? <DefaultLayout /> : <Navigate to="/login" replace />}
+            element={isAuthenticated ? DefaultLayout : <Navigate to="/login" replace />}
           />
           <Route
             path="*"

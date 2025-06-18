@@ -1,5 +1,7 @@
 import React from 'react'
-import { AppContent, AppHeader, AppSidebar } from '../components'
+import AppContent from '../components/AppContent'
+import AppHeader from '../components/AppHeader'
+import AppSidebar from '../components/AppSidebar'
 import { useSelector } from 'react-redux'
 
 const DefaultLayout = () => {

@@ -13,13 +13,17 @@
   "license": "MIT",
   "author": "The CoreUI Team (https://github.com/orgs/coreui/people)",
   "scripts": {
-    "build": "vite build",
-    "build:clean": "rm -rf build && vite build",
-    "build:fix": "node fix-build.js && npm run build:clean",
-    "lint": "eslint",
-    "serve": "vite preview",
     "start": "vite",
-    "analyze": "npx vite-bundle-analyzer"
+    "build": "vite build",
+    "build:clean": "rm -rf build dist node_modules/.vite && vite build",
+    "build:debug": "node debug-build.js",
+    "build:fix": "node fix-build.js && npm install && npm run build:clean",
+    "serve": "vite preview",
+    "lint": "eslint",
+    "check-deps": "node check-deps.js",
+    "analyze": "npx vite-bundle-analyzer",
+    "clean": "rm -rf build dist node_modules/.vite",
+    "reinstall": "rm -rf node_modules package-lock.json && npm install"
   },
   "dependencies": {
     "@coreui/chartjs": "^4.0.0",

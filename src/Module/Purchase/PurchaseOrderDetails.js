@@ -3,6 +3,7 @@ import { purchaseOrderApi } from '../../api/purchaseOrder'
 import { itemApi } from '../../api/item'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CloseButton } from 'react-bootstrap'
+import { capitalize } from 'lodash'
 
 function PurchaseOrderDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -123,11 +124,11 @@ function PurchaseOrderDetails() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Purchase Status:</span>
-                  <span className="text-sm text-orange-600 font-medium">
-                    {purchaseOrder.status === 'active' ? 'Pending' : 'Rejected'}
+                  <span className="text-sm  font-medium">
+                    {capitalize(purchaseOrder.status)}
                   </span>
                 </div>
-                <div className="flex justify-between">
+                {/* <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Confirmation:</span>
                   <span className="text-sm text-blue-600 font-medium">Email</span>
                 </div>
@@ -136,7 +137,7 @@ function PurchaseOrderDetails() {
                   <span className="text-sm text-orange-600 font-medium">
                     {purchaseOrder.payment_terms}
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -153,7 +154,7 @@ function PurchaseOrderDetails() {
                 <span className="text-sm text-gray-900">{purchaseOrder.payment_terms}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">FREIGHT PAID</span>
+                <span className="text-sm text-gray-600">FREIGHT TERMS</span>
                 <span className="text-sm text-gray-900">₹1.00</span>
               </div>
             </div>

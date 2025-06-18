@@ -4,11 +4,16 @@ import { clientApi } from '../../api/client'
 import Loader from '../../components/New/Loader'
 import CustomAlert from '../../components/New/CustomAlert'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
+import { useNavigate, useParams } from 'react-router-dom'
 
-const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefresh }) => {
+const AddPurchaseOrder = () => {
   const [loading, setLoading] = useState(false)
   const [alerts, setAlerts] = useState([])
   const [clientData, setClientData] = useState([])
+  const [itemsData, setItemsData] = useState([])
+  const [isEdit, setIsEdit] = useState(false)
+  const {id} = useParams()
+  const navigate = useNavigate()
   const [orderData, setOrderData] = useState({
     po_date: new Date().toISOString().split('T')[0],
     valid_till: '',
@@ -21,8 +26,15 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefre
     payment_terms: '',
     freight_terms: '',
   })
-  const [itemsData, setItemsData] = useState([])
-
+  
+  useEffect(() =>{
+    if(id){
+      setIsEdit(true)
+    }else{
+      setIsEdit(false)
+    }
+  },[id])
+  
   useEffect(() => {
     const fetchVendors = async () => {
       try {
@@ -62,15 +74,15 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefre
   }, [isEdit])
 
   useEffect(() => {
-    if (isEdit && selectedPoId) {
+    if (isEdit && id) {
       fetchPoDetails()
     }
-  }, [isEdit, selectedPoId])
+  }, [isEdit, id])
 
   const fetchPoDetails = async () => {
     setLoading(true)
     try {
-      const response = await purchaseOrderApi.getPurchaseOrderById(selectedPoId)
+      const response = await purchaseOrderApi.getPurchaseOrderById(id)
       if (response.data) {
         const { items, ...orderDetails } = response.data
         setOrderData(orderDetails)
@@ -103,23 +115,21 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefre
 
       let response
       if (isEdit) {
-        response = await purchaseOrderApi.updatePurchaseOrder(selectedPoId, payload)
+        response = await purchaseOrderApi.updatePurchaseOrder(id, payload)
         setAlerts([
           { severity: 'success', message: response?.data?.message || 'Successfully updated' },
         ])
         setTimeout(() => {
-          setDrawer(false)
+          navigate('/purchaseorder')
         }, 1000)
-        setRefresh((prev) => !prev)
       } else {
         response = await purchaseOrderApi.createPurchaseOrder(payload)
         setAlerts([
           { severity: 'success', message: response?.data?.message || 'Successfully created' },
         ])
         setTimeout(() => {
-          setDrawer(false)
+           navigate('/purchaseorder')
         }, 1000)
-        setRefresh((prev) => !prev)
       }
     } catch (error) {
       console.error('API Error:', error)
@@ -141,7 +151,7 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefre
   }
 
   return (
-    <div className="p-4 relative">
+    <div className="relative">
       {alerts.length > 0 && (
         <div className="mb-4">
           {alerts.map((alert, index) => (
@@ -158,12 +168,11 @@ const AddPurchaseOrder = ({ isEdit, selectedPoId, setDrawer, onSuccess, setRefre
         <OrderForm
           orderData={orderData}
           itemsData={itemsData}
-          setDrawer={setDrawer}
           onSubmit={handleFormSubmit}
           isEdit={isEdit}
           isSubmitting={loading}
           clientData={clientData}
-          selectedPoId={selectedPoId}
+          id={id}
         />
       )}
     </div>

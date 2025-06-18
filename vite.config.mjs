@@ -5,7 +5,6 @@ import autoprefixer from 'autoprefixer'
 import tailwind from 'tailwindcss'
 export default defineConfig(() => {
   return {
-    
     base: './',
     build: {
       outDir: 'build',
@@ -48,8 +47,7 @@ export default defineConfig(() => {
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.scss'],
     },
     server: {
-      port: 8001,
-      allowedHosts: 'all',
+      port: 3000,
       proxy: {
         // https://vitejs.dev/config/server-options.html
       },

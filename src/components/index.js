@@ -9,5 +9,3 @@ export { default as DocsComponents } from './DocsComponents'
 export { default as DocsIcons } from './DocsIcons'
 export { default as DocsLink } from './DocsLink'
 export { default as DocsExample } from './DocsExample'
-
-// Remove the export { } block and default export entirely

@@ -151,7 +151,7 @@ const AddPurchaseOrder = () => {
   }
 
   return (
-    <div className="p-4 relative">
+    <div className="relative">
       {alerts.length > 0 && (
         <div className="mb-4">
           {alerts.map((alert, index) => (

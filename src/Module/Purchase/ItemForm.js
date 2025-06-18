@@ -3,6 +3,8 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { TrashIcon } from '@heroicons/react/solid'
 import ActionButton from '../../components/New/ActionButton'
 import { itemApi } from '../../api/item'
+import { Package } from 'lucide-react'
+import ItemDetails from './ItemDetails'
 
 const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -18,7 +20,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
     if (!isOpen) return null
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded p-6 max-w-2xl w-full">
+        <div className="bg-white rounded p-6 max-w-5xl w-full">
           <button onClick={onClose} className="float-right">
             &times;
           </button>
@@ -44,143 +46,10 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         return
       }
 
-      const customFields = item?.custom_fields 
+      const customFields = item?.custom_fields
 
       setModalContent(
-        <div className="max-h-96 overflow-y-auto">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Item Details</h3>
-
-          {/* Basic Information */}
-          <div className="mb-6">
-            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">
-              Basic Information
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-              <p>
-                <strong>Item ID:</strong> {item.id}
-              </p>
-              <p>
-                <strong>Item Code:</strong> {item.item_code}
-              </p>
-              <p>
-                <strong>Generated ID:</strong> {item.item_generate_id}
-              </p>
-              <p>
-                <strong>Item Name:</strong> {item.item_name}
-              </p>
-              <p>
-                <strong>Status:</strong>
-                <span
-                  className={`ml-1 px-2 py-1 rounded text-xs ${
-                    item.status === 'active'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
-                  }`}
-                >
-                  {item.status}
-                </span>
-              </p>
-              <p>
-                <strong>UOM:</strong> {item.uom}
-              </p>
-            </div>
-          </div>
-
-          {/* Description */}
-          {item.description && (
-            <div className="mb-6">
-              <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Description</h4>
-              <p className="text-sm">{item.description}</p>
-            </div>
-          )}
-
-          {/* Financial Information */}
-          <div className="mb-6">
-            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">
-              Financial Information
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-              <p>
-                <strong>Standard Cost:</strong> ₹{item.standard_cost}
-              </p>
-              <p>
-                <strong>CGST:</strong> {item.cgst}%
-              </p>
-              <p>
-                <strong>SGST:</strong> {item.sgst}%
-              </p>
-              <p>
-                <strong>HSN Code:</strong> {item.hsn_code}
-              </p>
-            </div>
-          </div>
-
-          {/* Stock Information */}
-          <div className="mb-6">
-            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">
-              Stock Information
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-              <p>
-                <strong>Min Stock Level:</strong> {item.min_stock_level}
-              </p>
-              <p>
-                <strong>Reorder Level:</strong> {item.reorder_level}
-              </p>
-            </div>
-          </div>
-
-          {/* Category Information */}
-          <div className="mb-6">
-            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">
-              Category Information
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-              <p>
-                <strong>Category ID:</strong> {item.category}
-              </p>
-              <p>
-                <strong>Sub Category ID:</strong> {item.sub_category}
-              </p>
-              <p>
-                <strong>Company ID:</strong> {item.company_id}
-              </p>
-            </div>
-          </div>
-
-          {/* Manufacturing Information */}
-          <div className="mb-6">
-            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">
-              Manufacturing Information
-            </h4>
-            <div className="text-sm">
-              <p>
-                <strong>Manufacturer:</strong> {item.manufacturer}
-              </p>
-              {item.specifications && (
-                <p>
-                  <strong>Specifications:</strong> {item.specifications}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Custom Fields */}
-          <div className="mb-6">
-            <h4 className="text-lg font-medium mb-2 text-gray-700 border-b pb-1">Custom Fields</h4>
-            {Object.entries(customFields).length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                {Object.entries(customFields).map(([key, value], idx) => (
-                  <p key={idx}>
-                    <strong>{key}:</strong> {value}
-                  </p>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500">No custom fields available.</p>
-            )}
-          </div>
-        </div>,
+       <ItemDetails item={item} customFields={customFields}/>
       )
       setIsModalOpen(true)
     } catch (error) {
@@ -263,7 +132,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         total_incl_gst: 0,
       }
     }
-  }, [formData.items])  
+  }, [formData.items])
 
   // Only update form values with totals when totals change
   useEffect(() => {
@@ -509,168 +378,202 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
   }
 
   return (
-    <div className="mt-2 p-4 bg-white rounded-lg border border-[#c2c2c2] w-full max-h-[600px]">
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Item Details</h2>
-        <ActionButton onClick={addNewItem} variant="add" label="+ Add Item" />
-      </div>
+    <div>
+      <div className="mt-2 bg-white rounded-md w-full">
+        <div className="w-[100%] mt-4">
+          <div className="overflow-x-auto w-[75%]">
+            <div className="custom-scrollbar rounded-sm">
+              <table className="w-full bg-white border-l rounded-lg">
+                {/* Table Head */}
+                <thead className="bg-white z-10">
+                  <tr className="bg-gray-100 p-2">
+                    <th className="py-2 px-2 text-sm font-bold text-left rounded-tl-xl">
+                      Item Table
+                    </th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th className="rounded-tr-xl"></th>
+                  </tr>
 
-      <div className="w-[100%] max-h-[350px] mt-4 rounded-[10px] border border-[#c2c2c2]">
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white rounded-lg">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-2 py-2 w-[115px]">Product</th>
-                <th className="w-[30px]"></th>
-                {/* <th className="px-2 py-2 w-[65px]">Item Code</th> */}
-                <th className="px-2 py-2 w-[65px]">Quantity</th>
-                <th className="px-2 py-2 w-[65px]">Rate</th>
-                <th className="px-2 py-2 w-[65px]">S-GST %</th>
-                <th className="px-2 py-2 w-[65px]">C-GST %</th>
-                <th className="px-2 py-2 w-[65px]">Amount</th>
-                <th className="px-2 py-2 w-[65px]">Tax</th>
-                <th className="px-2 py-2 w-[65px]">Total</th>
-                <th className="px-2 py-2 w-[65px]">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fields.map((field, index) => (
-                <tr key={field.id}>
-                  <td className="px-2 py-2 w-[115px]">
-                    <select
-                      {...register(`items.${index}.item_id`)}
-                      onChange={(e) => handleItemChange(index, e.target.value)}
-                      className="w-[115px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
-                      value={getValues(`items.${index}.item_id`)}
-                    >
-                      <option value="">{isLoading ? 'Loading...' : 'Select'}</option>
-                      {itemList.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.item_generate_id}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td
-                  
-                  onClick={() => openItemDetails(getValues(`items.${index}.item_id`))}
-                  className="w-[100px] cursor-pointer text-blue-600 text-center"
-                  >
-                    ℹ️
-                  </td>
-                  {/* <td className="px-2 py-2 w-[65px]">
-                    <input
-                      {...register(`items.${index}.item_code`)}
-                      readOnly
-                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
-                    />
-                  </td> */}
-                  <td className="px-2 py-2 w-[65px]">
-                    <input
-                      {...register(`items.${index}.quantity`)}
-                      type="number"
-                      onChange={(e) => handleQuantityChange(index, e.target.value)}
-                      onBlur={(e) => handleQuantityBlur(index, e.target.value)}
-                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
-                    />
-                  </td>
-                  <td className="px-2 py-2 w-[65px]">
-                    <input
-                      {...register(`items.${index}.standard_cost`)}
-                      type="number"
-                      onChange={(e) => handleRateChange(index, e.target.value)}
-                      onBlur={(e) => handleRateBlur(index, e.target.value)}
-                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
-                    />
-                  </td>
-                  <td className="px-2 py-2 w-[65px]">
-                    <input
-                      {...register(`items.${index}.sgst`)}
-                      readOnly
-                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-gray-50"
-                    />
-                  </td>
-                  <td className="px-2 py-2 w-[65px]">
-                    <input
-                      {...register(`items.${index}.cgst`)}
-                      readOnly
-                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md bg-gray-50"
-                    />
-                  </td>
-                  <td className="px-2 py-2 w-[65px]">
-                    <input
-                      {...register(`items.${index}.amount`)}
-                      readOnly
-                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
-                    />
-                  </td>
-                  <td className="px-2 py-2 w-[65px]">
-                    <input
-                      {...register(`items.${index}.tax_amount`)}
-                      readOnly
-                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
-                    />
-                  </td>
-                  <td className="px-2 py-2 w-[65px]">
-                    <input
-                      {...register(`items.${index}.total_amount`)}
-                      readOnly
-                      className="w-[100px] h-[40px] text-center border border-[#c2c2c2] rounded-md"
-                    />
-                  </td>
-                  <td className="px-2 py-2 w-[65px]">
-                    <button type="button" onClick={() => remove(index)}>
-                      <TrashIcon className="text-[#ff2d55] w-5 h-5 cursor-pointer" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  <tr>
+                    <th className="py-2 pl-2 border-r border-b text-xs font-medium text-left">
+                      ITEM DETAILS
+                    </th>
+                    <th className="p-2 border-r text-xs font-medium text-right">QUANTITY</th>
+                    <th className="p-2 border-r text-xs font-medium text-right">RATE</th>
+                    <th className="p-2 border-r text-xs font-medium text-right">S-GST %</th>
+                    <th className="p-2 border-r text-xs font-medium text-right">C-GST %</th>
+                    <th className="p-2 border-r text-xs font-medium text-right">AMOUNT</th>
+                    <th className="p-2 border-r text-xs font-medium text-right">TAX</th>
+                    <th className="p-2 border-r text-xs font-medium text-right">TOTAL</th>
+                    <th className="py-2 w-10"></th>
+                  </tr>
+                </thead>
 
-          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-            {modalContent}
-          </Modal>
+                {/* Table Body */}
+                <tbody>
+                  {fields.map((field, index) => (
+                    <tr key={field.id} className="h-[70px]">
+                      <td className="border-b w-[350px]">
+                        <div className="flex items-center gap-2">
+                          <select
+                            {...register(`items.${index}.item_id`)}
+                            onChange={(e) => handleItemChange(index, e.target.value)}
+                            className="flex-1 h-[35px] text-left border-none border rounded-md px-2 bg-gray-50 focus:outline-none hover:outline-none outline-none focus-visible:outline-none"
+                            value={getValues(`items.${index}.item_id`)}
+                          >
+                            <option value="">{isLoading ? 'Loading...' : 'Select'}</option>
+                            {itemList.map((item) => (
+                              <option key={item.id} value={item.id}>
+                                {item.item_generate_id}
+                              </option>
+                            ))}
+                          </select>
+                          <div
+                            onClick={() => openItemDetails(getValues(`items.${index}.item_id`))}
+                            className="cursor-pointer text-blue-600 text-center min-w-[24px] h-[35px] flex items-center justify-center"
+                          >
+                           ℹ️
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-1 border items-start">
+                        <input
+                          {...register(`items.${index}.quantity`)}
+                          type="number"
+                          onChange={(e) => handleQuantityChange(index, e.target.value)}
+                          onBlur={(e) => handleQuantityBlur(index, e.target.value)}
+                          className="w-full h-[35px] text-right border rounded-md no-spinner bg-gray-50"
+                          onWheel={(e) => e.target.blur()}
+                        />
+                      </td>
+                      <td className="p-1 border items-start">
+                        <input
+                          {...register(`items.${index}.standard_cost`)}
+                          type="number"
+                          onChange={(e) => handleRateChange(index, e.target.value)}
+                          onBlur={(e) => handleRateBlur(index, e.target.value)}
+                          className="w-full h-[35px] text-right border rounded-md no-spinner bg-gray-50"
+                          onWheel={(e) => e.target.blur()}
+                        />
+                      </td>
+                      <td className="p-1 border items-start">
+                        <input
+                          {...register(`items.${index}.sgst`)}
+                          readOnly
+                          className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none"
+                        />
+                      </td>
+                      <td className="p-1 border items-start">
+                        <input
+                          {...register(`items.${index}.cgst`)}
+                          readOnly
+                          className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none"
+                        />
+                      </td>
+                      <td className="p-1 border items-start">
+                        <input
+                          {...register(`items.${index}.amount`)}
+                          readOnly
+                          className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none"
+                        />
+                      </td>
+                      <td className="p-1 border items-start">
+                        <input
+                          {...register(`items.${index}.tax_amount`)}
+                          readOnly
+                          className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none"
+                        />
+                      </td>
+                      <td className="p-1 border items-start">
+                        <input
+                          {...register(`items.${index}.total_amount`)}
+                          readOnly
+                          className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none"
+                        />
+                      </td>
+                      <td className="py-2 text-center">
+                        <button
+                          type="button"
+                          onClick={() => remove(index)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Footer with Add Row and Totals */}
+              <div className="mt-3 grid grid-cols-2 pb-4">
+                <button
+                  type="button"
+                  onClick={addNewItem}
+                  className="flex items-center h-8 w-28 text-xs bg-gray-100 hover:bg-gray-200 text-blue-600 py-2 px-3 rounded mr-2"
+                >
+                  <span className="mr-1">+</span>
+                  Add Item
+                </button>
+                <div className="pr-9">
+                  <table className="bg-gray-100 rounded w-full border-collapse">
+                    <tbody className="gap-4">
+                      <tr className="border-b border-gray-200">
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          Total Qty:
+                        </td>
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          {totals.total_qty}
+                        </td>
+                      </tr>
+
+                      <tr className="border-b border-gray-200">
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          Total GST:
+                        </td>
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          {(totals.cgst + totals.sgst).toFixed(2)}
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
+                          Total Incl GST:
+                        </td>
+                        <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
+                          {totals.total_incl_gst.toFixed(2)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="flex mt-4">
-        <table className="flex-1">
-          <tbody className="gap-4">
-            <tr>
-              <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                Total Qty: {totals.total_qty}
-                <input type="hidden" {...register('total_qty')} />
-              </td>
-              <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                C-GST: {totals.cgst.toFixed(2)}
-                <input type="hidden" {...register('cgst_amount')} />
-              </td>
-              <td className="px-4 py-2"></td>
-              <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                S-GST: {totals.sgst.toFixed(2)}
-                <input type="hidden" {...register('sgst_amount')} />
-              </td>
-            </tr>
-            <tr>
-              <td className="px-4 py-2"></td>
-              <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                Total: {totals.total_amount.toFixed(2)}
-              </td>
-              <td className="px-4 py-2"></td>
-              <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                Total Incl of GST: {totals.total_incl_gst.toFixed(2)}
-                <input type="hidden" {...register('total_amount')} />
-                <input
-                  type="hidden"
-                  {...register('tax_amount')}
-                  value={totals.cgst + totals.sgst}
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        {modalContent}
+      </Modal>
     </div>
   )
 }

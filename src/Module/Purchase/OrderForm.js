@@ -4,25 +4,16 @@ import ActionButton from '../../components/New/ActionButton'
 import ItemForm from './ItemForm'
 import 'core-js/stable'
 import { clientApi } from '../../api/client'
+import { useNavigate } from 'react-router-dom'
 
-const OrderForm = ({
-  orderData,
-  itemsData,
-  onSubmit,
-  isEdit,
-  isSubmitting,
-  setDrawer,
-  clientData,
-  selectedPoId,
-}) => {
-  const [formValues, setFormValues] = useState(orderData)
+const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id }) => {
   const [items, setItems] = useState(itemsData || [])
   const [supplierAddresses, setSupplierAddresses] = useState([])
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0)
   const [showAddressModal, setShowAddressModal] = useState(false)
   const [vendor, setVendor] = useState([])
   const [isSubmitted, setIsSubmitted] = useState(false)
-
+  const navigate = useNavigate()
   const [poTotals, setPoTotals] = useState({
     total_qty: 0,
     cgst_amount: 0,
@@ -114,6 +105,24 @@ const OrderForm = ({
     fetchData()
   }, [])
 
+  useEffect(() => {
+    if (isEdit && orderData?.supplier_id && vendor.length > 0) {
+      // Find the supplier and set the addresses
+      
+      const selectedClient = vendor.find(
+        (client) =>
+          client.client_id == orderData.supplier_id,
+      )
+      if (selectedClient) {
+        const addresses = selectedClient.addresses || []
+        
+        setSupplierAddresses(addresses)
+        setSelectedAddressIndex(0)
+        setValue('supplier_id', selectedClient.client_id)
+      }
+    }
+  }, [isEdit, orderData, vendor, setValue])
+
   // FIX 1: Update poTotals when received from ItemForm
   const handleTotalsUpdate = (newTotals) => {
     setPoTotals({
@@ -133,60 +142,61 @@ const OrderForm = ({
     setValue('total_amount', newTotals.total_amount || 0)
   }
 
-  const handleSupplierChange = (e) => {
-    const selectedId = parseInt(e.target.value)
-    const selectedClient = vendor.find((client) => client.client_id === selectedId)
+ const handleSupplierChange = (e) => {
+  const selectedId = e.target.value
+  const selectedClient = vendor.find((client) => 
+    client.client_id === parseInt(selectedId) || 
+    client.client_id === selectedId
+  )
 
-    if (selectedClient) {
-      setValue('supplier_name', selectedClient.display_name || '')
-      setValue('supplier_email', selectedClient.email || '')
-      setValue('supplier_contact', selectedClient.mobile || selectedClient.work_phone || '')
-      setValue('payment_terms', selectedClient.payment_terms || '')
-      clearErrors('supplier_id')
+  if (selectedClient) {
+    setValue('supplier_name', selectedClient.display_name || '')
+    setValue('supplier_email', selectedClient.email || '')
+    setValue('supplier_contact', selectedClient.mobile || selectedClient.work_phone || '')
+    setValue('payment_terms', selectedClient.payment_terms || '')
+    clearErrors('supplier_id')
 
-      const addresses = selectedClient.addresses || []
-      setSupplierAddresses(addresses)
-      setSelectedAddressIndex(0)
+    const addresses = selectedClient.addresses || []
+    setSupplierAddresses(addresses)
+    setSelectedAddressIndex(0)
 
-      const address_billing = addresses[0] || {}
-      const billingString = [
-        address_billing.attention,
-        address_billing.address_line,
-        address_billing.mobile,
-        address_billing.work_phone,
-        address_billing.city,
-        address_billing.state,
-        address_billing.country,
-        address_billing.pinCode,
-        address_billing.phone,
-      ]
-        .filter(Boolean)
-        .join(', ')
+    const address_billing = addresses[0] || {}
+    const billingString = [
+      address_billing.attention,
+      address_billing.street1,
+      address_billing.street2,
+      address_billing.city,
+      address_billing.state,
+      address_billing.country,
+      address_billing.pinCode,
+      address_billing.phone,
+    ]
+      .filter(Boolean)
+      .join(', ')
 
-      setValue('billing_address', billingString)
+    setValue('billing_address', billingString)
 
-      const addressObj = addresses[1] || {}
-      const addressString = [
-        addressObj.attention,
-        addressObj.address_line,
-        addressObj.mobile,
-        addressObj.work_phone,
-        addressObj.city,
-        addressObj.state,
-        addressObj.country,
-        addressObj.pinCode,
-        addressObj.phone,
-      ]
-        .filter(Boolean)
-        .join(', ')
+    const addressObj = addresses[1] || addresses[0] || {}
+    const addressString = [
+      addressObj.attention,
+      addressObj.street1,
+      addressObj.street2,
+      addressObj.city,
+      addressObj.state,
+      addressObj.country,
+      addressObj.pinCode,
+      addressObj.phone,
+    ]
+      .filter(Boolean)
+      .join(', ')
 
-      setValue('shipping_address', addressString)
-    } else {
-      setSupplierAddresses([])
-      setSelectedAddressIndex(0)
-      setValue('shipping_address', '')
-    }
+    setValue('shipping_address', addressString)
+  } else {
+    setSupplierAddresses([])
+    setSelectedAddressIndex(0)
+    setValue('shipping_address', '')
   }
+}
 
   const handleAddressChange = (e) => {
     const idx = parseInt(e.target.value, 10)
@@ -558,7 +568,7 @@ const OrderForm = ({
         <div className="mt-6">
           {/* FIX 3: Pass the handleTotalsUpdate function to ItemForm */}
           <ItemForm
-            key={selectedPoId || 'new'}
+            key={id || 'new'}
             items={items}
             setItems={setItems}
             formValues={poTotals}
@@ -575,7 +585,7 @@ const OrderForm = ({
 
         <div className="mt-6 flex justify-end gap-3">
           <button
-            onClick={() => setDrawer(false)}
+            onClick={() => navigate('/purchaseorder')}
             type="button"
             className=" border border-gray-300 rounded w-24 mr-2 hover:bg-gray-100 transition"
           >

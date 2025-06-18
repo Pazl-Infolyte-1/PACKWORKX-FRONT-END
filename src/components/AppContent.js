@@ -13,23 +13,39 @@ const AppContent = () => {
           {routes.map((route, idx) => {
             return (
               route.element && (
+                // <Route
+                //   key={idx}
+                //   path={route.path}
+                //   exact={route.exact}
+                //   name={route.name}
+                //   element={<route.element />}
+                // >
+                //   {/* Handle nested routes/children */}
+                //   {route.children &&
+                //     route.children.map((childRoute, childIdx) => (
+                //       <Route
+                //         key={`child-${childIdx}`}
+                //         path={childRoute.path}
+                //         element={<childRoute.element />}
+                //       />
+                //     ))
+                //   }
+                // </Route>
                 <Route
                   key={idx}
                   path={route.path}
                   exact={route.exact}
                   name={route.name}
-                  element={<route.element />}
+                  element={React.createElement(route.element)} // <- fix
                 >
-                  {/* Handle nested routes/children */}
-                  {route.children && 
+                  {route.children &&
                     route.children.map((childRoute, childIdx) => (
                       <Route
                         key={`child-${childIdx}`}
                         path={childRoute.path}
-                        element={<childRoute.element />}
+                        element={React.createElement(childRoute.element)} // <- fix
                       />
-                    ))
-                  }
+                    ))}
                 </Route>
               )
             )

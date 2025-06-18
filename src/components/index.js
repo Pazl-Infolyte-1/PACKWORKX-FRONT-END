@@ -11,7 +11,7 @@ export { default as DocsLink } from './DocsLink'
 export { default as DocsExample } from './DocsExample'
 
 
-export default {
+export {
   AppBreadcrumb,
   AppContent,
   AppFooter,

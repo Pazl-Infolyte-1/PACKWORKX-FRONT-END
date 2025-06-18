@@ -4,6 +4,7 @@ import { FaAngleDown, FaAngleUp, FaHistory, FaUsers, FaTimes } from "react-icons
 import ProgressBar from '../ProgressBar' // Assuming you have this component
 
 function GroupData({ isVisible, onClose, data }) {
+    console.log(data,'fffff')
   const [visibleHistory, setVisibleHistory] = useState(false)
 
   // Close modal on Escape key
@@ -26,7 +27,7 @@ function GroupData({ isVisible, onClose, data }) {
   }, [isVisible, onClose])
 
 
-  const { production_group, allocation_status, allocation_history } = mockData
+  const { production_group, allocation_status, allocation_history } = data
 
   const toggleHistoryCollapse = () => {
     setVisibleHistory(!visibleHistory)

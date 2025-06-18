@@ -283,12 +283,14 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
  
       // await fetchData()
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
-      console.log(location.state)
- 
       if (location?.state?.fromsalesorder && location?.state?.id) {
-        navigate(`/salesorder/view/${location?.state?.id}`);
+        setTimeout(() => {
+          navigate(`/salesorder/view/${location?.state?.id}`);
+        }, 500);
       } else {
-        navigate('/workorderlist');
+        setTimeout(() => {
+          navigate('/workorderlist');
+        }, 500);
       }
  
     } catch (error) {
@@ -336,14 +338,14 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
         response = await salesOrderApi.editSalesOrder(selectedSalesOrderID, finalSalesOrder);
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
         setTimeout(() => {
-          // setDrawer(false)
-        }, 1000);
+          navigate('/salesorder')
+        }, 500);
       } else {
          response = await salesOrderApi.addSalesOrder(finalSalesOrder);
          setAlerts([{ severity: "success", message: response?.data?.message || "Successfull updated" }]);
          setTimeout(() => {
-          //  setDrawer(false)
-         }, 1000);        
+          navigate('/salesorder')
+        }, 500);        
        }
     } catch (error) {
       console.error("Error submitting sales order:", error);

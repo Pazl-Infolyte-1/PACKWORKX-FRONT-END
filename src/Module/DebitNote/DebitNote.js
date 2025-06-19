@@ -3,9 +3,8 @@ import CustomAlert from '../../components/New/CustomAlert'
 import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
 import DebitNoteTable from './DebitNoteTable'
-// import apiMethods from '../../api/config'
 import { useSearch } from '../../components/New/SearchContext'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { debitApi } from '../../api/debit'
 
 const DebitNote = () => {
@@ -16,19 +15,26 @@ const DebitNote = () => {
   const [count, setCount] = useState(null)
   const { searchQuery, setGlobalPlaceholder } = useSearch()
   const navigate = useNavigate()
+  const location = useLocation()
+  const [isMinimiseTable, setIsMinimiseTable] = useState(false)
 
   useEffect(() => {
     setGlobalPlaceholder('Search Debit Notes...')
     return () => setGlobalPlaceholder('Search...')
   }, [])
 
+    useEffect(() => {
+    if (location.pathname === '/debitnote') {
+      setIsMinimiseTable(false)
+    } else {
+      setIsMinimiseTable(true)
+    }
+  }, [location.pathname])
+
   const fetchData = async () => {
     try {
-      const response = await debitApi.getDebitNotes({
-        search: searchQuery,
-        page: pagination.currentPage,
-        limit: limit,
-      })
+      const params = { limit: limit, page: pagination.currentPage, search: searchQuery }
+      const response = await debitApi.getDebitNotes(params)
       setDebitNoteData(response?.data?.data || [])
       setPagination(response.data.pagination)
       setCount(response.data.totalCount)
@@ -103,42 +109,51 @@ const DebitNote = () => {
         handleCloseDrawer()
       } catch (error) {
         console.error(error)
-        setAlerts([{ severity: 'error', message: error?.response?.data?.message || 'Error occurred' }])
+        setAlerts([
+          { severity: 'error', message: error?.response?.data?.message || 'Error occurred' },
+        ])
       }
     }
   }
 
   return (
-    <>
-      <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
-      <ContentHeader
-        heading={'Debit Notes'}
-        onAddClick={() => {
-          navigate('/debitnote/add-form')
-        }}
-      />
-      <div className="">
-        <DebitNoteTable
-          debitNoteData={debitNoteData}
-          setAlerts={setAlerts}
+    <div className="flex">
+      <div className={`${isMinimiseTable ? 'w-1/4' : 'w-full'}`}>
+        <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
+        <ContentHeader
+          heading={'Debit Notes'}
+          onAddClick={() => {
+            navigate('/debitnote/add-form')
+          }}
         />
-        <div className="flex justify-end items-center gap-4 mt-2 ml-4 mr-4">
-          <p className="w-40 text-sm">
-            Total Count: <span className="font-semibold">{count}</span>
-          </p>
-          <CompactPagination
-            count={pagination.totalPages || 1}
-            page={pagination.currentPage || 1}
-            onPageChange={(e, value) => setPagination((prev) => ({ ...prev, currentPage: value }))}
-            onEntriesChange={(newLimit) => {
-              setLimit(newLimit)
-              setPagination((prev) => ({ ...prev, page: 1 }))
-            }}
-            entriesPerPage={limit}
+        <div className="">
+          <DebitNoteTable
+            debitNoteData={debitNoteData}
+            setAlerts={setAlerts}
+            isMinimiseTable={isMinimiseTable}
+            setIsMinimiseTable={setIsMinimiseTable}
           />
+          <div className="flex justify-end items-center gap-4 mt-2 ml-4 mr-4">
+            <p className="w-40 text-sm">
+              Total Count: <span className="font-semibold">{count}</span>
+            </p>
+            <CompactPagination
+              count={pagination?.totalPages || 1}
+              page={pagination?.currentPage || 1}
+              onPageChange={(e, value) =>
+                setPagination((prev) => ({ ...prev, currentPage: value }))
+              }
+              onEntriesChange={(newLimit) => {
+                setLimit(newLimit)
+                setPagination((prev) => ({ ...prev, page: 1 }))
+              }}
+              entriesPerPage={limit}
+            />
+          </div>
         </div>
       </div>
-    </>
+      <Outlet />
+    </div>
   )
 }
 

@@ -232,7 +232,7 @@
               {
                 label: 'View',
                 icon: cilHandPointRight,
-                onClick: () => setShowPopUp(row.id),
+                onClick: () => navigate(`/purchaseorder/${row.id}`),
               },
 
               ...(row.po_status === 'created'
@@ -246,7 +246,7 @@
                   ]
                 : []),
 
-              ...(row.po_status === 'received'
+              ...(row.po_status === 'received' || row.po_status === 'partialy-recieved'
                 ? [
                     {
                       label: 'Purchase Return',

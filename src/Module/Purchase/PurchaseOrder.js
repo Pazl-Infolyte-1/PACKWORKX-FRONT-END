@@ -185,7 +185,7 @@ const PurchaseOrder = () => {
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-end items-center gap-4 mt-2 px-4 py-2 border-t bg-white">
+            <div className="flex justify-end items-center gap-4 mt-2 py-2 border-t bg-white">
               <p className="text-sm whitespace-nowrap">
                 Total Count: <span className="font-semibold">{count}</span>
               </p>

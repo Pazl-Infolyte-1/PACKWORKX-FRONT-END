@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import { capitalize } from 'lodash'
 
-const ItemDetails = ({ item, customFields }) => {
+const ItemDetails = ({ item, customFields = {} }) => {
   const InfoCard = ({ title, icon: Icon, children, className = '' }) => (
     <div
       className={`bg-white rounded-lg shadow-sm border border-gray-100 p-3 hover:shadow-md transition-shadow duration-200 ${className}`}
@@ -30,7 +30,7 @@ const ItemDetails = ({ item, customFields }) => {
     <div className="flex justify-between items-center py-1 border-b border-gray-50 last:border-b-0">
       <span className="text-xs font-medium text-gray-600">{label}</span>
       <span className={`text-xs font-semibold ${highlight ? 'text-blue-600' : 'text-gray-800'}`}>
-        {value}
+        {value || 'N/A'}
       </span>
     </div>
   )
@@ -48,26 +48,37 @@ const ItemDetails = ({ item, customFields }) => {
           status === 'active' ? 'bg-emerald-500' : 'bg-red-500'
         }`}
       ></div>
-      {status.charAt(0).toUpperCase() + status.slice(1)}
+      {status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown'}
     </span>
   )
 
+  if (!item) {
+    return (
+      <div className="bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 p-6">
+        <div className="text-center py-8">
+          <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500">Item not found</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="h-[500px] max-w-[2000px] overflow-y-scroll bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 p-3">
-      <div className=" mx-auto">
+    <div className="bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 p-4 max-h-[400px] overflow-y-scroll">
+      <div className="mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-4 mb-4">
           <div className="flex items-start justify-between">
             <div className="flex items-center">
               <div className="bg-gradient-to-br from-blue-600 to-purple-700 p-1.5 rounded-lg mr-3">
-                <Package className="w-3 h-3 text-white" />
+                <Package className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-gray-900 mb-1">{item.item_name}</h1>
+                <h1 className="text-lg font-bold text-gray-900 mb-1">{item.item_name || 'Unnamed Item'}</h1>
                 <div className="flex items-center space-x-3">
                   <span className="text-xs text-gray-500">ID: {item.id}</span>
                   <span className="text-xs text-gray-500">•</span>
-                  <span className="text-xs text-gray-500">Code: {item.item_code}</span>
+                  <span className="text-xs text-gray-500">Code: {item.item_code || 'N/A'}</span>
                 </div>
               </div>
             </div>
@@ -143,14 +154,14 @@ const ItemDetails = ({ item, customFields }) => {
               <div className="space-y-3">
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-3 rounded-lg border border-green-100">
                   <div className="text-xs text-green-600 font-medium mb-0.5">Standard Cost</div>
-                  <div className="text-lg font-bold text-green-700">₹{item.standard_cost}</div>
+                  <div className="text-lg font-bold text-green-700">₹{item.standard_cost || '0'}</div>
                 </div>
                 <div className="space-y-0.5">
-                  <InfoRow label="CGST" value={`${item.cgst}%`} />
-                  <InfoRow label="SGST" value={`${item.sgst}%`} />
+                  <InfoRow label="CGST" value={item.cgst ? `${item.cgst}%` : 'N/A'} />
+                  <InfoRow label="SGST" value={item.sgst ? `${item.sgst}%` : 'N/A'} />
                   <InfoRow
                     label="Total GST"
-                    value={`${parseInt(item.cgst) + parseInt(item.sgst)}%`}
+                    value={item.cgst && item.sgst ? `${parseInt(item.cgst) + parseInt(item.sgst)}%` : 'N/A'}
                     highlight
                   />
                 </div>
@@ -174,16 +185,15 @@ const ItemDetails = ({ item, customFields }) => {
               <div className="space-y-2">
                 <div className="bg-gradient-to-br from-orange-50 to-red-50 p-3 rounded-lg border border-orange-100">
                   <div className="text-xs text-orange-600 font-medium mb-0.5">Min Stock Level</div>
-                  <div className="text-base font-bold text-orange-700">{item.min_stock_level}</div>
+                  <div className="text-base font-bold text-orange-700">{item.min_stock_level || '0'}</div>
                 </div>
                 <div className="bg-gradient-to-br from-yellow-50 to-orange-50 p-3 rounded-lg border border-yellow-100">
                   <div className="text-xs text-yellow-600 font-medium mb-0.5">Reorder Level</div>
-                  <div className="text-base font-bold text-yellow-700">{item.reorder_level}</div>
+                  <div className="text-base font-bold text-yellow-700">{item.reorder_level || '0'}</div>
                 </div>
               </div>
             </InfoCard>
           </div>
-
         </div>
       </div>
     </div>

@@ -254,7 +254,7 @@ export default function ReusableTable({
         </div>
       ) : (
         <div
-          className="overflow-x-auto custom-scrollbar w-full border rounded-sm  border-gray-300 shadow-sm bg-white"
+          className="overflow-x-auto custom-scrollbar cursor-pointer w-full border rounded-sm  border-gray-300 shadow-sm bg-white"
           style={tableContainerStyle}
         >
           <CTable className="w-full border-collapse">

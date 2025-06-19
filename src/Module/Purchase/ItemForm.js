@@ -23,7 +23,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         <div className="bg-white rounded p-6 max-w-5xl w-full relative">
           <button 
             onClick={onClose} 
-            className="absolute top-1 right-2 text-2xl text-red-500 hover:text-red-700 w-8 h-8 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 transition-colors"
+            className="absolute top-0 right-0 text-3xl text-gray-500 w-8 h-8 flex items-center justify-center rounded-full  transition-colors"
           >
             ×
           </button>

@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io'
 import { debitApi } from '../../api/debit'
 import CustomAlert from '../../components/New/CustomAlert'
+import { set } from 'lodash'
 
 const DebitNoteForm = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -21,6 +22,7 @@ const DebitNoteForm = () => {
     debit_note_date: '',
     reason: '',
     remark: '',
+    purchase_generate_id: '',
   })
 
   useEffect(()=>{
@@ -28,43 +30,47 @@ const DebitNoteForm = () => {
       try {
         const response = await debitApi.getAllPurchaseReturnIds()
         setPurchaseReturnIds(response.data.data)
+        
       } catch (error) {
         console.error(error)
       }
     }
     fetchReturnIds()
-  })
-
+  },[])
+  
   useEffect(() => {
     if(!id) return;
     const fetchReturnData = async () => {
       try {
         const response = await debitApi.getDebitNoteById(id)
         setDebitNoteFormData(response.data.data)
+        // setAlerts([{ severity: 'success', message: response.data.message }])
       } catch (error) {
         console.error(error)
       }
     }
     fetchReturnData()
   }, [id])
-
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setDebitNoteFormData((prev) => ({ ...prev, [name]: value }))
   }
-
-  const handleSelectReturn = async (id) => {
+  
+  const handleSelectReturn = async (id, purchase_generate_id) => {
     const event = { target: { name: 'po_return_id', value: id } }
     try {
-      const response = await debitApi.getPurchaseReturnById(id)
-      const prData = response.data.data
-
+      // const response = await debitApi.getPurchaseReturnById(id)
+      // const prData = response.data.data
+      
       setDebitNoteFormData((prevData) => ({
         ...prevData,
         po_return_id: id,
+        purchase_generate_id: purchase_generate_id
       }))
     } catch (error) {
       console.error('Error loading return data:', error)
+      // setAlerts([{ severity: 'warning', message: error?.response?.data?.message || 'Error occurred' }])
     }
 
     handleInputChange(event)
@@ -135,9 +141,11 @@ const DebitNoteForm = () => {
                     className={`flex h-7 w-[25rem] items-center justify-between rounded-l border px-3 text-sm cursor-pointer bg-white ${errors.po_return_id ? 'ring-1 ring-red-600' : 'border-gray-300'}`}
                     onClick={() => setIsOpen(!isOpen)}
                   >
+                    {console.log(debitNoteFormData)
+                    }
                     <span className="truncate text-sm text-gray-500">
                       {debitNoteFormData.po_return_id
-                        ? `Purchase Return ID: ${debitNoteFormData.po_return_id}`
+                        ? `Purchase Return ID: ${debitNoteFormData.purchase_generate_id}`
                         : 'Select Return'}
                     </span>
                     <span className="text-gray-500">
@@ -206,9 +214,9 @@ const DebitNoteForm = () => {
                           <div
                             key={r.id}
                             className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
-                            onClick={() => handleSelectReturn(r.id)}
+                            onClick={() => handleSelectReturn(r.id, r.purchase_generate_id)}
                           >
-                            Purchase Return ID: {r.id}
+                            Purchase Return ID: {r.purchase_generate_id}
                           </div>
                         ))
                       ) : (

@@ -33,11 +33,12 @@ const AppSidebar = () => {
   }, [combinedNavigation])
   const sidebarRef = useRef(null)
 
-  useEffect(() => {
-    if (sidebarRef.current) {
-      console.log('Sidebar width:', sidebarRef.current.offsetWidth, 'px')
-    }
-  }, []) // empty dependency array -> logs once when mounted
+  // Optional: Log sidebar width for debugging
+  // useEffect(() => {
+  //   if (sidebarRef.current) {
+  //     console.log('Sidebar width:', sidebarRef.current.offsetWidth, 'px')
+  //   }
+  // }, [])
 
   useEffect(() => {
     const fetchData = async () => {

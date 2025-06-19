@@ -13,9 +13,9 @@ function CreditNoteTable({ creditNote, isMinimiseTable, setIsMinimiseTable, fetc
   const navigate = useNavigate()
   const columns = [
     {
-      key: 'id',
-      header: 'Credit Note No.',
-      field: 'id',
+      key: 'credit_generate_id',
+      header: 'Credit Note ID.',
+      field: 'credit_generate_id',
     },
     {
       key: 'client_name',
@@ -167,7 +167,7 @@ function CreditNoteTable({ creditNote, isMinimiseTable, setIsMinimiseTable, fetc
         columns={columns}
         data={creditNote}
         isMinimiseTable={isMinimiseTable}
-        miniScreenFields={['id', 'credit_reference_id']}
+        miniScreenFields={['credit_generate_id', 'credit_reference_id']}
         handleRowClick={(row) => handleView(row)}
       />
 

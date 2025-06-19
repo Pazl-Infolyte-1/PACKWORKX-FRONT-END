@@ -31,17 +31,15 @@ function PurchaseOrderDetails() {
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
           <div className="flex justify-between items-center p-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Item Details</h2>
-            <button 
-              onClick={onClose} 
+            <h2 className="text-lg font-semibold text-gray-900">Product Details</h2>
+            <button
+              onClick={onClose}
               className="text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
             >
               &times;
             </button>
           </div>
-          <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
-            {children}
-          </div>
+          <div className="overflow-y-auto max-h-[calc(90vh-80px)]">{children}</div>
         </div>
       </div>
     )
@@ -53,9 +51,7 @@ function PurchaseOrderDetails() {
     const item = items.find((i) => i.id === parseInt(id))
     const customFields = item?.custom_fields || {}
 
-    setModalContent(
-      <ItemDetails item={item} customFields={customFields} />
-    )
+    setModalContent(<ItemDetails item={item} customFields={customFields} />)
     setIsModalOpen(true)
   }
 
@@ -83,7 +79,6 @@ function PurchaseOrderDetails() {
             <h1 className="text-2xl font-semibold text-gray-900 m-0 ">
               Purchase Order # {purchaseOrder.purchase_generate_id}
             </h1>
-            <p className="text-sm text-gray-500 m-0">Reference: {purchaseOrder.id}</p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -107,19 +102,29 @@ function PurchaseOrderDetails() {
           {/* Purchase Order Info - Half Width */}
           <div className="w-1/2">
             <div className="bg-white rounded-lg border border-gray-200">
-                {/* Status in Purchase Order Column */}
-                <div className="mt-2">
-                  <div className="flex justify-end px-3">
-                    <span className={`text-sm font-medium ${purchaseOrder.status === 'active' ? 'text-white px-3 rounded-full bg-green-500' : 'bg-red-500 text-white px-3 rounded-full'}`}>{capitalize(purchaseOrder.status)}</span>
-                  </div>
+              {/* Status in Purchase Order Column */}
+              <div className="mt-2">
+                <div className="flex justify-end px-3">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold -ml-11 w-28 text-center inline-block
+                     ${purchaseOrder.po_status === 'partialy-recieved' ? 'bg-blue-100 text-blue-800' : ''}
+                     ${purchaseOrder.po_status === 'created' ? 'bg-green-100 text-green-800 !w-20' : ''}
+                     ${purchaseOrder.po_status === 'returned' ? 'bg-red-100 text-red-800' : ''}
+                     ${purchaseOrder.po_status === 'received' ? 'bg-teal-500 text-white' : ''}
+                     ${purchaseOrder.po_status === 'amended' ? 'bg-orange-600 text-white' : ''}
+                     `}
+                  >
+                    {purchaseOrder.po_status === 'partialy-recieved'
+                      ? 'Partialy Recieved'
+                      : capitalize(purchaseOrder.po_status)}
+                  </span>{' '}
                 </div>
+              </div>
               <div className="p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-1">PURCHASE ORDER</h2>
                 <p className="text-sm text-gray-500 mb-2">
                   Purchase Order# {purchaseOrder.purchase_generate_id}
                 </p>
-                <p className="text-sm text-gray-500 mb-4">Reference: {purchaseOrder.id}</p>
-
               </div>
             </div>
           </div>

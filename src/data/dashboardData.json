@@ -1,0 +1,467 @@
+{
+  "dashboardConfig": {
+    "title": "PACKWORKX ERP Dashboard",
+    "subtitle": "Complete overview of your manufacturing operations and business processes",
+    "dateRange": {
+      "startDate": "2024-05-20",
+      "endDate": "2024-06-19"
+    }
+  },
+  "themeColors": {
+    "production": "#e74c3c",
+    "inventory": "#3498db",
+    "sales": "#2ecc71",
+    "purchase": "#f39c12",
+    "quality": "#9b59b6",
+    "maintenance": "#e67e22",
+    "finance": "#34495e",
+    "hr": "#1abc9c"
+  },
+  "alerts": [
+    {
+      "id": 1,
+      "type": "danger",
+      "message": "Critical: Machine M-001 requires immediate maintenance",
+      "time": "30 minutes ago",
+      "icon": "cilWarning",
+      "module": "Maintenance"
+    },
+    {
+      "id": 2,
+      "type": "warning",
+      "message": "Low stock alert: SKU-12345 inventory below minimum level",
+      "time": "2 hours ago",
+      "icon": "cilList",
+      "module": "Inventory"
+    },
+    {
+      "id": 3,
+      "type": "success",
+      "message": "Production target achieved: 105% of daily goal completed",
+      "time": "4 hours ago",
+      "icon": "cilCheckCircle",
+      "module": "Production"
+    },
+    {
+      "id": 4,
+      "type": "info",
+      "message": "New purchase order PO-2024-001 awaiting approval",
+      "time": "1 day ago",
+      "icon": "cilInfo",
+      "module": "Procurement"
+    }
+  ],
+  "erpWidgets": [
+    {
+      "title": "Sales Orders",
+      "value": "847",
+      "change": "+12.4%",
+      "trend": "up",
+      "description": "Active orders",
+      "color": "#2ecc71",
+      "icon": "cilCart",
+      "target": "1000",
+      "urgentCount": 23,
+      "bgGradient": "linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)"
+    },
+    {
+      "title": "Work Orders",
+      "value": "156",
+      "change": "+8.7%",
+      "trend": "up",
+      "description": "In production",
+      "color": "#e74c3c",
+      "icon": "cilPencil",
+      "target": "200",
+      "urgentCount": 12,
+      "bgGradient": "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)"
+    },
+    {
+      "title": "SKU Inventory",
+      "value": "12,450",
+      "change": "-3.2%",
+      "trend": "down",
+      "description": "Total items",
+      "color": "#3498db",
+      "icon": "cilList",
+      "target": "15000",
+      "urgentCount": 45,
+      "bgGradient": "linear-gradient(135deg, #3498db 0%, #2980b9 100%)"
+    },
+    {
+      "title": "Active Machines",
+      "value": "89/95",
+      "change": "+2.1%",
+      "trend": "up",
+      "description": "Operational status",
+      "color": "#e67e22",
+      "icon": "cilCalculator",
+      "target": "95",
+      "urgentCount": 6,
+      "bgGradient": "linear-gradient(135deg, #e67e22 0%, #d35400 100%)"
+    },
+    {
+      "title": "Employees",
+      "value": "324",
+      "change": "+1.8%",
+      "trend": "up",
+      "description": "Active workforce",
+      "color": "#1abc9c",
+      "icon": "cilUser",
+      "target": "350",
+      "urgentCount": 8,
+      "bgGradient": "linear-gradient(135deg, #1abc9c 0%, #16a085 100%)"
+    },
+    {
+      "title": "Clients/Vendors",
+      "value": "1,234",
+      "change": "+5.4%",
+      "trend": "up",
+      "description": "Active partners",
+      "color": "#34495e",
+      "icon": "cilUserPlus",
+      "target": "1500",
+      "urgentCount": 15,
+      "bgGradient": "linear-gradient(135deg, #34495e 0%, #2c3e50 100%)"
+    },
+    {
+      "title": "Purchase Orders",
+      "value": "89",
+      "change": "+15.2%",
+      "trend": "up",
+      "description": "Pending orders",
+      "color": "#f39c12",
+      "icon": "cilTruck",
+      "target": "120",
+      "urgentCount": 7,
+      "bgGradient": "linear-gradient(135deg, #f39c12 0%, #e67e22 100%)"
+    },
+    {
+      "title": "Routes",
+      "value": "45",
+      "change": "+3.8%",
+      "trend": "up",
+      "description": "Active routes",
+      "color": "#9b59b6",
+      "icon": "cilExternalLink",
+      "target": "60",
+      "urgentCount": 2,
+      "bgGradient": "linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)"
+    }
+  ],
+  "financialWidgets": [
+    {
+      "title": "GRN Processed",
+      "value": "456",
+      "change": "+7.8%",
+      "description": "Goods received",
+      "color": "#3498db",
+      "icon": "cilHome",
+      "amount": "$1.2M"
+    },
+    {
+      "title": "Purchase Returns",
+      "value": "23",
+      "change": "-12.5%",
+      "description": "Returns this month",
+      "color": "#e74c3c",
+      "icon": "cilArrowBottom",
+      "amount": "$45K"
+    },
+    {
+      "title": "Sale Returns",
+      "value": "34",
+      "change": "-8.9%",
+      "description": "Customer returns",
+      "color": "#2ecc71",
+      "icon": "cilArrowTop",
+      "amount": "$67K"
+    },
+    {
+      "title": "Stock Adjustments",
+      "value": "89",
+      "change": "+4.2%",
+      "description": "Inventory corrections",
+      "color": "#e67e22",
+      "icon": "cilSettings",
+      "amount": "$23K"
+    },
+    {
+      "title": "Credit Notes",
+      "value": "67",
+      "change": "-6.7%",
+      "description": "Issued credits",
+      "color": "#34495e",
+      "icon": "cilCreditCard",
+      "amount": "$156K"
+    },
+    {
+      "title": "Debit Notes",
+      "value": "45",
+      "change": "+11.3%",
+      "description": "Issued debits",
+      "color": "#9b59b6",
+      "icon": "cilFile",
+      "amount": "$89K"
+    }
+  ],
+  "productionMetrics": [
+    {
+      "label": "Daily Production Target",
+      "current": 1247,
+      "target": 1200,
+      "color": "#e74c3c",
+      "unit": "units",
+      "efficiency": 104
+    },
+    {
+      "label": "Quality Pass Rate",
+      "current": 96.8,
+      "target": 95,
+      "color": "#9b59b6",
+      "unit": "%",
+      "efficiency": 102
+    },
+    {
+      "label": "Machine Utilization",
+      "current": 87.5,
+      "target": 85,
+      "color": "#e67e22",
+      "unit": "%",
+      "efficiency": 103
+    },
+    {
+      "label": "On-time Delivery",
+      "current": 92.3,
+      "target": 95,
+      "color": "#2ecc71",
+      "unit": "%",
+      "efficiency": 97
+    }
+  ],
+  "recentTransactions": [
+    {
+      "id": 1,
+      "type": "Sales Order",
+      "reference": "SO-2024-001",
+      "client": "TechCorp Industries",
+      "amount": "$125,000",
+      "status": "Confirmed",
+      "date": "2024-06-18",
+      "priority": "High",
+      "icon": "cilCart",
+      "color": "#2ecc71"
+    },
+    {
+      "id": 2,
+      "type": "Purchase Order",
+      "reference": "PO-2024-156",
+      "client": "Raw Materials Ltd",
+      "amount": "$45,000",
+      "status": "Pending",
+      "date": "2024-06-17",
+      "priority": "Medium",
+      "icon": "cilTruck",
+      "color": "#f39c12"
+    },
+    {
+      "id": 3,
+      "type": "Work Order",
+      "reference": "WO-2024-089",
+      "client": "Internal Production",
+      "amount": "$23,000",
+      "status": "In Progress",
+      "date": "2024-06-16",
+      "priority": "High",
+      "icon": "cilPencil",
+      "color": "#e74c3c"
+    },
+    {
+      "id": 4,
+      "type": "GRN",
+      "reference": "GRN-2024-234",
+      "client": "Steel Suppliers Inc",
+      "amount": "$67,000",
+      "status": "Received",
+      "date": "2024-06-15",
+      "priority": "Low",
+      "icon": "cilHome",
+      "color": "#3498db"
+    },
+    {
+      "id": 5,
+      "type": "Credit Note",
+      "reference": "CN-2024-012",
+      "client": "Quality Electronics",
+      "amount": "$12,000",
+      "status": "Issued",
+      "date": "2024-06-14",
+      "priority": "Medium",
+      "icon": "cilCreditCard",
+      "color": "#34495e"
+    },
+    {
+      "id": 6,
+      "type": "Stock Adjustment",
+      "reference": "SA-2024-078",
+      "client": "Internal Audit",
+      "amount": "$8,500",
+      "status": "Completed",
+      "date": "2024-06-13",
+      "priority": "Low",
+      "icon": "cilSettings",
+      "color": "#e67e22"
+    }
+  ],
+  "chartData": {
+    "salesTrend": {
+      "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+      "datasets": [
+        {
+          "label": "Sales Orders",
+          "data": [650, 590, 800, 810, 756, 847],
+          "borderColor": "#2ecc71",
+          "backgroundColor": "#2ecc7120",
+          "fill": true,
+          "tension": 0.4
+        },
+        {
+          "label": "Purchase Orders",
+          "data": [280, 250, 320, 340, 298, 365],
+          "borderColor": "#f39c12",
+          "backgroundColor": "#f39c1220",
+          "fill": true,
+          "tension": 0.4
+        }
+      ]
+    },
+    "inventoryDistribution": {
+      "labels": ["Raw Materials", "Work in Progress", "Finished Goods", "Packaging", "Consumables"],
+      "datasets": [
+        {
+          "data": [35, 25, 20, 15, 5],
+          "backgroundColor": ["#3498db", "#e74c3c", "#2ecc71", "#e67e22", "#9b59b6"],
+          "borderWidth": 2,
+          "borderColor": "#fff"
+        }
+      ]
+    },
+    "machineEfficiency": {
+      "labels": ["M-001", "M-002", "M-003", "M-004", "M-005", "M-006"],
+      "datasets": [
+        {
+          "label": "Efficiency %",
+          "data": [95, 88, 92, 78, 96, 89],
+          "backgroundColor": ["#e67e22", "#e74c3c", "#e67e22", "#e74c3c", "#e67e22", "#e74c3c"],
+          "borderRadius": 8
+        }
+      ]
+    },
+    "employeePerformance": {
+      "labels": ["Production", "Quality", "Maintenance", "Logistics", "Admin"],
+      "datasets": [
+        {
+          "label": "Performance",
+          "data": [324, 67, 45, 89, 156],
+          "backgroundColor": ["#e74c3c", "#9b59b6", "#e67e22", "#f39c12", "#1abc9c"]
+        }
+      ]
+    }
+  },
+  "quickActions": [
+    {
+      "label": "New Sales Order",
+      "icon": "cilCart",
+      "color": "#2ecc71",
+      "action": "createSalesOrder"
+    },
+    {
+      "label": "Create Work Order",
+      "icon": "cilPencil",
+      "color": "#e74c3c",
+      "action": "createWorkOrder"
+    },
+    {
+      "label": "Add SKU",
+      "icon": "cilList",
+      "color": "#3498db",
+      "action": "addSKU"
+    },
+    {
+      "label": "Purchase Order",
+      "icon": "cilTruck",
+      "color": "#f39c12",
+      "action": "createPurchaseOrder"
+    },
+    {
+      "label": "Process GRN",
+      "icon": "cilHome",
+      "color": "#3498db",
+      "action": "processGRN"
+    },
+    {
+      "label": "Add Employee",
+      "icon": "cilUser",
+      "color": "#1abc9c",
+      "action": "addEmployee"
+    },
+    {
+      "label": "Create Route",
+      "icon": "cilExternalLink",
+      "color": "#9b59b6",
+      "action": "createRoute"
+    },
+    {
+      "label": "Credit Note",
+      "icon": "cilCreditCard",
+      "color": "#34495e",
+      "action": "createCreditNote"
+    },
+    {
+      "label": "Stock Adjustment",
+      "icon": "cilSettings",
+      "color": "#e67e22",
+      "action": "stockAdjustment"
+    },
+    {
+      "label": "Machine Setup",
+      "icon": "cilCalculator",
+      "color": "#e67e22",
+      "action": "machineSetup"
+    },
+    {
+      "label": "Client/Vendor",
+      "icon": "cilUserPlus",
+      "color": "#34495e",
+      "action": "addClientVendor"
+    },
+    {
+      "label": "Debit Note",
+      "icon": "cilFile",
+      "color": "#9b59b6",
+      "action": "createDebitNote"
+    }
+  ],
+  "statusConfig": {
+    "statusStyles": {
+      "Confirmed": "success",
+      "Pending": "warning",
+      "In Progress": "info",
+      "Received": "primary",
+      "Issued": "secondary",
+      "Completed": "success",
+      "Cancelled": "danger"
+    },
+    "priorityColors": {
+      "High": "danger",
+      "Medium": "warning",
+      "Low": "success"
+    }
+  },
+  "metadata": {
+    "lastUpdated": "2024-06-19T10:30:00Z",
+    "version": "1.0.0",
+    "dataSource": "PACKWORKX ERP System",
+    "refreshInterval": 300000
+  }
+}

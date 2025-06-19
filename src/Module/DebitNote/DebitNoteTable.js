@@ -8,7 +8,7 @@ import {
 } from '@coreui/react'
 import React, { useState } from 'react'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilPencil, cilTrash } from '@coreui/icons'
+import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import PopUp from '../../components/New/PopUp'
 import DebitNoteView from './DebitNoteView'
@@ -48,14 +48,14 @@ const DebitNoteTable = ({ debitNoteData, setAlerts, isMinimiseTable, setIsMinimi
 
   const columns = [
     {
-      key: 'debit_note_number',
-      header: 'Debit Note No.',
-      field: 'debit_note_number',
+      key: 'debit_note_generate_id',
+      header: 'Debit Note ID.',
+      field: 'debit_note_generate_id',
     },
     {
       key: 'po_return_id',
       header: 'PO Return ID',
-      field: 'po_return_id',
+      field: 'PurchaseOrderReturn.purchase_return_generate_id',
     },
     {
       key: 'reference_id',
@@ -87,15 +87,20 @@ const DebitNoteTable = ({ debitNoteData, setAlerts, isMinimiseTable, setIsMinimi
         <ThreeDotMenu
           value={[
             {
-              label: 'Edit Debit Note',
-              icon: cilPencil,
-              onClick: () => navigate(`/debitnote/add-form/${row.id}`),
+              label: 'View Debit Note',
+              icon: cilHandPointRight,
+              onClick: () => navigate(`/debitnote/${row.id}`),
             },
-            {
-              label: 'Delete',
-              icon: cilTrash,
-              onClick: () => openDeleteModal(row.id),
-            },
+            // {
+            //   label: 'Edit Debit Note',
+            //   icon: cilPencil,
+            //   onClick: () => navigate(`/debitnote/add-form/${row.id}`),
+            // },
+            // {
+            //   label: 'Delete',
+            //   icon: cilTrash,
+            //   onClick: () => openDeleteModal(row.id),
+            // },
           ]}
         />
       ),
@@ -110,7 +115,7 @@ const DebitNoteTable = ({ debitNoteData, setAlerts, isMinimiseTable, setIsMinimi
           columns={columns}
           isMinimiseTable={isMinimiseTable}
           handleRowClick={(row) => navigate(`/debitnote/${row.id}`)}
-          miniScreenFields={['debit_note_number', 'reference_id']}
+          miniScreenFields={['debit_note_generate_id', 'reference_id']}
         />
         <ConfirmationModale
           isOpen={confirmModal}

@@ -448,7 +448,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id })
 
         {/* Submit Buttons Section */}
         <div className="fixed bottom-0 bg-white border-t border-gray-200 z-10 flex p-1 py-2 w-full">
-          <div className="flex justify-end w-[83%]">
+          <div className="flex justify-end w-[86%]">
             <div className="flex gap-2">
               <ActionButton
                 type="button"

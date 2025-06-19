@@ -2,8 +2,10 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useForm, useFieldArray, useWatch } from 'react-hook-form'
 import { inventoryApi } from '../../api/inventory'
 import { itemApi } from '../../api/item'
+import ItemDetails from '../Purchase/ItemDetails'
 
 const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
+
   const { register, control, reset, getValues, setValue } = useForm({
     defaultValues: {
       items: [],
@@ -24,12 +26,20 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
   const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded p-6 max-w-md w-full">
-          <button onClick={onClose} className="float-right">
-            &times;
-          </button>
-          <div>{children}</div>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+          <div className="flex justify-between items-center p-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Item Details</h2>
+            <button 
+              onClick={onClose} 
+              className="text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+            >
+              &times;
+            </button>
+          </div>
+          <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+            {children}
+          </div>
         </div>
       </div>
     )
@@ -39,32 +49,46 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
     return () => reset()
   }, [])
 
-  const openItemDetails = async (item_id) => {
-    try {
-      const response = await itemApi.getItemList()
-      const items = response?.data?.data || []
-      const item = items.find((i) => i.id === parseInt(item_id))
-      const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}
+  //const openItemDetails = async (item_id) => {
+  //  try {
+  //    const response = await itemApi.getItemList()
+  //    const items = response?.data?.data || []
+  //    const item = items.find((i) => i.id === parseInt(item_id))
+  //    const customFields = item?.custom_fields ? JSON.parse(item.custom_fields) : {}
 
+  //    setModalContent(
+  //      <>
+  //        <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
+  //        {Object.entries(customFields).length > 0 ? (
+  //          Object.entries(customFields).map(([key, value], idx) => (
+  //            <p key={idx}>
+  //              <strong>{key}:</strong> {value}
+  //            </p>
+  //          ))
+  //        ) : (
+  //          <p>No custom fields available.</p>
+  //        )}
+  //      </>,
+  //    )
+  //    setIsModalOpen(true)
+  //  } catch (error) {
+  //    console.error('Error fetching item details:', error)
+  //  }
+  //}
+  const openItemDetails = async (item_id) => {
+  try {
+    const response = await itemApi.getItemData(item_id)
+    console.log("Item Details Response:", response?.data)
       setModalContent(
-        <>
-          <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
-          {Object.entries(customFields).length > 0 ? (
-            Object.entries(customFields).map(([key, value], idx) => (
-              <p key={idx}>
-                <strong>{key}:</strong> {value}
-              </p>
-            ))
-          ) : (
-            <p>No custom fields available.</p>
-          )}
-        </>,
-      )
-      setIsModalOpen(true)
-    } catch (error) {
-      console.error('Error fetching item details:', error)
-    }
+      <ItemDetails item={response?.data?.data} customFields={response?.data?.custom_fields} />
+    )
+        setIsModalOpen(true)
+
+  } catch (error) {
+    console.error("Error fetching item details:", error.response?.data || error.message)
   }
+}
+
 
   const lastItemsHash = useRef('')
 
@@ -401,10 +425,11 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
           </table>
         </div>
 
+      </div>
+      
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
           {modalContent}
         </Modal>
-      </div>
     </div>
   )
 }

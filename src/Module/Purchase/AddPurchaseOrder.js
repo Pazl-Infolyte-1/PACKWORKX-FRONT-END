@@ -105,12 +105,17 @@ const AddPurchaseOrder = () => {
     try {
       const payload = {
         ...formData.orderData,
-        items: formData.itemsData.map((item) => ({
-          ...item,
-          price: parseFloat(item.price),
-          quantity: parseInt(item.quantity),
-          total: parseFloat(item.price) * parseInt(item.quantity),
-        })),
+        items: formData.itemsData.map((item) => {
+          // Remove status and other unnecessary fields from items
+          const { status, created_at, updated_at, ...cleanItem } = item
+          
+          return {
+            ...cleanItem,
+            price: parseFloat(item.unit_price || item.price || 0),
+            quantity: parseInt(item.quantity || 0),
+            total: parseFloat(item.total_amount || item.total || 0),
+          }
+        }),
       }
 
       let response

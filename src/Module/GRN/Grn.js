@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useNavigate, Outlet, useLocation } from 'react-router-dom'
 import CustomAlert from '../../components/New/CustomAlert'
 import SearchBar from '../../components/New/SearchBar'
 import ActionButton from '../../components/New/ActionButton'
@@ -25,6 +26,19 @@ const Grn = () => {
   const { searchQuery, setGlobalPlaceholder } = useSearch()
   const [refresh, setRefresh] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  useEffect(() => {
+    if (location.pathname === '/grn') {
+      setIsMinimized(false)
+    } else {
+      setIsMinimized(true)
+    }
+  }, [location.pathname])
 
   useEffect(() => {
     setGlobalPlaceholder('Search GRN...')
@@ -55,6 +69,7 @@ const Grn = () => {
   }, [limit, searchQuery, pagination.currentPage, refresh])
 
   const [grnFormData, setGrnFormData] = useState({
+    po_bill_id: null,
     po_id: null,
     grn_date: '',
     delivery_note_no: '',
@@ -75,6 +90,7 @@ const Grn = () => {
     console.log('Edit item', item.GRNItems)
     setGrnFormData({
       id: item.id,
+      po_bill_id: item.po_bill_id,
       po_id: item.po_id,
       grn_date: item.grn_date,
       delivery_note_no: item.delivery_note_no,
@@ -91,7 +107,7 @@ const Grn = () => {
       items: item.GRNItems,
     })
     setIsEdit(true)
-    setDrawerOpen(true)
+    navigate('/grn_form/' + item.id)
   }
 
   const handleClose = () => {
@@ -101,6 +117,7 @@ const Grn = () => {
     setDrawerOpen(false)
     setIsSubmitted(false)
     setGrnFormData({
+      po_bill_id: null,
       po_id: null,
       grn_date: '',
       delivery_note_no: '',
@@ -163,6 +180,7 @@ const Grn = () => {
           ])
         }
         setGrnFormData({
+          po_bill_id: null,
           po_id: null,
           grn_date: '',
           delivery_note_no: '',
@@ -196,65 +214,59 @@ const Grn = () => {
 
   return (
     <>
-      <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <ContentHeader
-        heading={'GRN'}
-        onAddClick={() => {
-          setIsEdit(false)
-          setDrawerOpen(true)
-        }}
-      />
-      <div className="">
-        <div>
-          <GrnTable
-            grnData={grnData}
-            setGrnData={setGrnData}
-            setAlerts={setAlerts}
-            handleEdit={handleEdit}
-            setRefresh={setRefresh}
-          />
-        </div>
-        <div className="flex justify-end items-center gap-4 mt-2 ml-4 mr-4">
-          <p className="w-40 text-sm">
-            Total Count: <span className="font-semibold">{count}</span>
-          </p>
-          <CompactPagination
-            count={pagination?.totalPages || 1}
-            page={pagination?.currentPage || 1}
-            onPageChange={(event, value) => {
-              setPagination((prev) => ({
-                ...prev,
-                currentPage: value,
-              }))
+      <div className="flex w-full">
+        <div className={isMinimized ? 'w-[320px] border-r' : 'w-full'}>
+          <CustomAlert alerts={alerts} handleClose={handleClose} />
+          <ContentHeader
+            heading={'GRN'}
+            isMinimized={isMinimized}
+            onAddClick={() => {
+              setIsEdit(false)
+              // setDrawerOpen(true)
+              navigate('/grn_form')
             }}
-            onEntriesChange={(newLimit) => {
-              setLimit(newLimit)
-              setPagination((prev) => ({
-                ...prev,
-                page: 1,
-              }))
-            }}
-            entriesPerPage={limit}
           />
+
+          {/* <Loader isLoading={loading} /> */}
+          <div>
+            <GrnTable
+              grnData={grnData}
+              setGrnData={setGrnData}
+              setAlerts={setAlerts}
+              handleEdit={handleEdit}
+              setRefresh={setRefresh}
+              isMinimized={isMinimized}
+            />
+          </div>
+          <div
+            className={`${isMinimized ? 'flex-col ' : 'flex justify-end '} items-center gap-4 m-2 px-2`}
+          >
+            <p className="w-40 text-sm">
+              Total Count: <span className="font-semibold">{count}</span>
+            </p>
+            <CompactPagination
+              count={pagination?.totalPages || 1}
+              page={pagination?.currentPage || 1}
+              onPageChange={(event, value) => {
+                setPagination((prev) => ({
+                  ...prev,
+                  currentPage: value,
+                }))
+              }}
+              onEntriesChange={(newLimit) => {
+                setLimit(newLimit)
+                setPagination((prev) => ({
+                  ...prev,
+                  page: 1,
+                }))
+              }}
+              entriesPerPage={limit}
+            />
+          </div>
         </div>
-        <Drawer
-          isOpen={drawerOpen}
-          onClose={handleCloseDrawer}
-          maxWidth={'1350px'}
-          title={isEdit ? `Edit Grn` : `New Grn`}
-        >
-          <GrnForm
-            grnFormData={grnFormData}
-            setGrnFormData={setGrnFormData}
-            onSubmit={handleSubmit}
-            isEdit={isEdit}
-            handleCloseDrawer={handleCloseDrawer}
-            errors={errors}
-            setErrors={setErrors}
-            isSubmitted={isSubmitted}
-            setIsSubmitted={setIsSubmitted}
-          />
-        </Drawer>
+        <div className={isMinimized ? 'w-full' : ''}>
+          <Outlet />
+        </div>
       </div>
     </>
   )

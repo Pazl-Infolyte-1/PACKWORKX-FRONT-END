@@ -25,6 +25,8 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
       total_amount: workOrder?.sales_sku_details?.[0]?.total_incl__gst || '',
       payment_status: workOrder?.payment_status || '',
       sales_sku_details:workOrder?.sales_sku_details || [],
+      client_name: workOrder?.salesOrder?.client || '',
+
     }
   });
 
@@ -70,6 +72,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
         sales_sku_details: workOrder?.sales_sku_details || [],
         sku_version_id:workOrder.sku_version || '',
         sku_details:workOrder?.sales_sku_details || [],
+        client_name: workOrder?.salesOrder?.client || '',
       });
     }
   }, [workOrder, reset]);

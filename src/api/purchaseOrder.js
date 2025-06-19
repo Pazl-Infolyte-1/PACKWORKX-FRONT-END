@@ -154,6 +154,14 @@ export const purchaseOrderApi = {
       console.error(error)
     }
   },
+getPurchaseReturnById: async (id) => {
+  try {
+    return await apiClient.get(`/purchase-order-return/${id}`)
+  } catch (error) {
+    console.error(error)
+  }
+},
+
 
   deletePoReturn: async (id) => {
     try {

@@ -19,15 +19,18 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
   const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded p-6 max-w-5xl w-full relative">
-          <button 
-            onClick={onClose} 
-            className="absolute top-1 right-2 text-2xl text-red-500 hover:text-red-700 w-8 h-8 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 transition-colors"
-          >
-            ×
-          </button>
-          <div>{children}</div>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+          <div className="flex justify-between items-center p-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Product Details</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+            >
+              &times;
+            </button>
+          </div>
+          <div className="overflow-y-auto max-h-[calc(90vh-80px)]">{children}</div>
         </div>
       </div>
     )

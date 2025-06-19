@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 
 const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
 
+
+
   const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
     defaultValues: {
       client_id: workOrder?.client_id,
@@ -11,16 +13,19 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
       work_id: workOrder?.id,
       sale_id: workOrder?.sales_order_id,
       due_date: workOrder?.planned_end_date || '',
-      total: workOrder?.total || '',
+      total: workOrder?.sales_sku_details?.[0].total_amount || '',
       balance: workOrder?.balance || '',
       payment_expected_date: workOrder?.edd || '',
       transaction_type: workOrder?.transaction_type || '',
+      quantity: workOrder?.qty || '',
       discount_type: workOrder?.discount_type || '',
       discount: workOrder?.discount || '',
       total_tax: workOrder?.total_tax || '',
-      total_amount: workOrder?.total_amount || '',
+      total_amount: workOrder?.sales_sku_details?.[0]?.total_incl__gst || '',
       payment_status: workOrder?.payment_status || '',
-      sku_details:  workOrder?.sku_details || [],
+      sales_sku_details:workOrder?.sales_sku_details || [],
+      client_name: workOrder?.salesOrder?.client || '',
+
     }
   });
 
@@ -42,6 +47,35 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
     }
   }, [isOpen, reset]);
 
+  // Update form values when workOrder changes
+  useEffect(() => {
+    if (workOrder) {
+      reset({
+        sku_version_id:workOrder.sales_order_i,
+        sku_details:workOrder?.sales_sku_details || [],
+        client_id: workOrder?.client_id,
+        sku_id: workOrder?.sku_id,
+        work_id: workOrder?.id,
+        sale_id: workOrder?.sales_order_id,
+        due_date: workOrder?.planned_end_date || '',
+        total: workOrder?.sales_sku_details?.[0].total_amount || '',
+        balance: workOrder?.balance || '',
+        payment_expected_date: workOrder?.edd || '',
+        transaction_type: workOrder?.transaction_type || '',
+        quantity: workOrder?.qty || '',
+        discount_type: workOrder?.discount_type || '',
+        discount: workOrder?.discount || '',
+        total_tax: workOrder?.sales_sku_details?.[0]?.total_tax || workOrder?.sales_sku_details?.[0]?.total_incl__gst - workOrder?.sales_sku_details?.[0].total_amount,
+        total_amount: workOrder?.sales_sku_details?.[0]?.total_incl__gst || '',
+        payment_status: workOrder?.payment_status || '',
+        sales_sku_details: workOrder?.sales_sku_details || [],
+        sku_version_id:workOrder.sku_version || '',
+        sku_details:workOrder?.sales_sku_details || [],
+        client_name: workOrder?.salesOrder?.client || '',
+      });
+    }
+  }, [workOrder, reset]);
+
   const getTodayDate = () => {
     const today = new Date();
     return today.toISOString().split('T')[0];
@@ -51,19 +85,8 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
     setIsSubmitting(true);
     
     try {
-      const invoiceData = {
-        ...data,
-        client_id: workOrder.client_id,
-        sku_id: workOrder.sku_id,
-        work_id: workOrder.id,
-        sale_id: workOrder.sales_order_id,
-        sku_version_id:workOrder.sales_order_i
-      };
       
-
-      console.log(invoiceData)
-      
-      await onSubmit(invoiceData);
+      await onSubmit(data);
       handleClose();
     } catch (error) {
       console.error('Failed to create invoice:', error);
@@ -141,6 +164,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
             </div>
 
             {/* Total Amount */}
+            {/*
             <div>
               <label className={labelClass}>
                 <DollarSign size={12} className="inline mr-1" />
@@ -155,8 +179,10 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
                 placeholder="0.00"
               />
             </div>
+            */}
 
             {/* Tax Amount */}
+            {/*
             <div>
               <label className={labelClass}>
                 <Hash size={12} className="inline mr-1" />
@@ -171,8 +197,10 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
                 placeholder="0.00"
               />
             </div>
+            */}
 
             {/* Final Total Amount */}
+            {/*
             <div>
               <label className={labelClass}>
                 <DollarSign size={12} className="inline mr-1" />
@@ -187,8 +215,10 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
                 placeholder="0.00"
               />
             </div>
+            */}
 
             {/* Discount Type */}
+            {/*
             <div>
               <label className={labelClass}>
                 Discount Type *
@@ -202,8 +232,10 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
                 <option value="fixed">Fixed Amount ($)</option>
               </select>
             </div>
+            */}
 
             {/* Discount Value */}
+            {/*
             <div>
               <label className={labelClass}>
                 <Percent size={12} className="inline mr-1" />
@@ -218,6 +250,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
                 placeholder="0"
               />
             </div>
+            */}
 
             {/* Payment Status */}
             <div>

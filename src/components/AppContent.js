@@ -1,15 +1,17 @@
 import React, { Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { CContainer, CSpinner } from '@coreui/react'
+import ErrorBoundary from './ErrorBoundary'
 
 // routes config
 import routes from '../routes'
 
 const AppContent = () => {
   return (
-    <CContainer className="bg-white" fluid>
-      <Suspense fallback={<CSpinner color="primary" />}>
-        <Routes>
+    <ErrorBoundary>
+      <CContainer className="bg-white" fluid>
+        <Suspense fallback={<CSpinner color="primary" />}>
+          <Routes>
           {routes.map((route, idx) => {
             return (
               route.element && (
@@ -34,10 +36,11 @@ const AppContent = () => {
               )
             )
           })}
-          <Route path="/" element={<Navigate to="dashboard" replace />} />
-        </Routes>
-      </Suspense>
-    </CContainer>
+            <Route path="/" element={<Navigate to="dashboard" replace />} />
+          </Routes>
+        </Suspense>
+      </CContainer>
+    </ErrorBoundary>
   )
 }
 

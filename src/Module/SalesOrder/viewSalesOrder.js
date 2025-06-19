@@ -133,7 +133,7 @@ export default function SalesOrderView({ }) {
           {/* </div> */}
 
 {/* Invoices section */}
-<div className="bg-white border border-gray-200 rounded mb-3 hover:shadow-sm text-xs">
+{/* <div className="bg-white border border-gray-200 rounded mb-3 hover:shadow-sm text-xs">
   <div
     className="p-2 flex items-center justify-between cursor-pointer hover:bg-gray-50"
     onClick={() => {
@@ -169,7 +169,7 @@ export default function SalesOrderView({ }) {
       </svg>
     </div>
   </div>
-</div>
+</div> */}
 
 
           {/* Work Orders section */}

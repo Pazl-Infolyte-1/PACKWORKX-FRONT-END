@@ -29,7 +29,7 @@ const DebitNoteView = () => {
           <h2 className="text-xl font-bold">Debit Note Details</h2>
           <div className="flex gap-2 items-center">
             <span className="text-sm font-semibold bg-orange-100 px-3 py-1 rounded-full text-orange-800">
-              ID: #{debitNoteDetails?.debit_note_number}
+              ID: {debitNoteDetails?.debit_note_generate_id}
             </span>
             {/* Close Button */}
             <div className="flex justify-end mb-2">
@@ -92,29 +92,18 @@ const DebitNoteView = () => {
                 <div>
                   <p className="text-xs text-gray-700">
                     PO Return ID:{' '}
-                    <span className="font-medium">{debitNoteDetails?.po_return_id}</span>
+                    <span className="font-medium">{debitNoteDetails?.PurchaseOrderReturn?.purchase_return_generate_id}</span>
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-700">
-                    Company ID: <span className="font-medium">{debitNoteDetails?.company_id}</span>
+                    Tax Amount: <span className="font-medium">₹{debitNoteDetails?.tax_amount}</span>
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-700">
                     Reference ID:{' '}
                     <span className="font-medium">{debitNoteDetails?.reference_id || '-'}</span>
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-700">
-                    Supplier ID:{' '}
-                    <span className="font-medium">{debitNoteDetails?.supplier_id}</span>
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-700">
-                    Tax Amount: <span className="font-medium">₹{debitNoteDetails?.tax_amount}</span>
                   </p>
                 </div>
                 <div>
@@ -291,105 +280,6 @@ const DebitNoteView = () => {
           </div>
         )}
 
-        {/* Return Items */}
-        {debitNoteDetails?.PurchaseOrderReturn?.items?.length > 0 && (
-          <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center">
-              <svg
-                className="w-4 h-4 mr-2 text-indigo-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                />
-              </svg>
-              Return Items ({debitNoteDetails.PurchaseOrderReturn.items.length})
-            </h3>
-
-            <div className="space-y-2">
-              {debitNoteDetails.PurchaseOrderReturn.items.map((item, index) => (
-                <div key={item.id} className="p-2 rounded-lg border border-gray-200">
-                  <div className="flex justify-between items-start mb-1">
-                    <h4 className="text-sm font-semibold text-gray-900">Item #{item.item_id}</h4>
-                    <span className="text-xs bg-gray-200 text-gray-800 px-2 py-1 rounded-full">
-                      #{index + 1}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-4 gap-2 text-sm">
-                    <div>
-                      <p className="text-xs text-gray-700">
-                        Return Quantity: <span className="font-medium">{item.return_qty}</span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-700">
-                        Unit Price: <span className="font-medium">₹{item.unit_price}</span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-700">
-                        CGST (%): <span className="font-medium">{item.cgst}%</span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-700">
-                        SGST (%): <span className="font-medium">{item.sgst}%</span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-700">
-                        CGST Amount: <span className="font-medium">₹{item.cgst_amount}</span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-700">
-                        SGST Amount: <span className="font-medium">₹{item.sgst_amount}</span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-700">
-                        Item Amount: <span className="font-medium">₹{item.amount}</span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-700">
-                        Total Amount:{' '}
-                        <span className="font-bold text-green-700">₹{item.total_amount}</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {(item.reason || item.notes) && (
-                    <div className="mt-1 pt-1 border-t border-gray-200 space-y-1 text-sm">
-                      <div className="grid grid-cols-2 gap-4">
-                        {item.reason && (
-                          <div>
-                            <p className="text-xs text-gray-700">
-                              Reason: <span className="font-medium">{item.reason}</span>
-                            </p>
-                          </div>
-                        )}
-                        {item.notes && (
-                          <div>
-                            <p className="text-xs text-gray-700">
-                              Notes: <span className="font-medium">{item.notes}</span>
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Supplier Information */}
         {debitNoteDetails?.PurchaseOrderReturn?.PurchaseOrder && (
@@ -423,7 +313,7 @@ const DebitNoteView = () => {
                   <p className="text-xs text-gray-700">
                     PO ID:{' '}
                     <span className="font-medium">
-                      #{debitNoteDetails.PurchaseOrderReturn.PurchaseOrder.id}
+                      #{debitNoteDetails.PurchaseOrderReturn.PurchaseOrder.purchase_generate_id}
                     </span>
                   </p>
                 </div>
@@ -431,7 +321,7 @@ const DebitNoteView = () => {
                   <p className="text-xs text-gray-700">
                     PO Status:{' '}
                     <span className="font-medium text-green-700 capitalize">
-                      {debitNoteDetails.PurchaseOrderReturn.PurchaseOrder.status}
+                      {debitNoteDetails.PurchaseOrderReturn.status}
                     </span>
                   </p>
                 </div>
@@ -464,22 +354,22 @@ const DebitNoteView = () => {
                       </span>
                     </p>
                   </div>
-                    <div>
-                      <p className="text-xs text-gray-700 m-0">
-                        Contact:{' '}
-                        <span className="font-medium">
-                          {debitNoteDetails.PurchaseOrderReturn.PurchaseOrder.supplier_contact}
-                        </span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-700 m-0">
-                        Email:{' '}
-                        <span className="font-medium">
-                          {debitNoteDetails.PurchaseOrderReturn.PurchaseOrder.supplier_email}
-                        </span>
-                      </p>
-                    </div>
+                  <div>
+                    <p className="text-xs text-gray-700 m-0">
+                      Contact:{' '}
+                      <span className="font-medium">
+                        {debitNoteDetails.PurchaseOrderReturn.PurchaseOrder.supplier_contact}
+                      </span>
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-700 m-0">
+                      Email:{' '}
+                      <span className="font-medium">
+                        {debitNoteDetails.PurchaseOrderReturn.PurchaseOrder.supplier_email}
+                      </span>
+                    </p>
+                  </div>
                   <div>
                     <p className="text-xs text-gray-700 m-0">
                       Shipping Address:{' '}

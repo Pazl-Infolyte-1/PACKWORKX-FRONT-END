@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import Select from 'react-select';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { clientApi } from '../../api/client';
 import { skuApi } from '../../api/sku';
 import ActionButton from '../../components/New/ActionButton';
@@ -9,6 +9,7 @@ import { invoiceApi } from '../../api/Invoice';
 
 const InvoiceAddForm = forwardRef((props, ref) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [clients, setClients] = useState([]);
   const [skuList, setSkuList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -72,6 +73,9 @@ const InvoiceAddForm = forwardRef((props, ref) => {
   const formValues = watch();
   const skuDetailsData = watch('sku_details');
 
+  // Determine if form is opened from a work order
+  const isFromWorkOrder = Boolean(location.state && location.state.workOrder);
+
   // Handle click outside dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -124,6 +128,50 @@ const InvoiceAddForm = forwardRef((props, ref) => {
     fetchSkuList();
   }, [selectedClient]);
 
+  useEffect(() => {
+    if (location.state && location.state.client) {
+      selectClient(location.state.client.client_name, location.state.client.client_id);
+    }
+    // eslint-disable-next-line
+  }, [location.state]);
+
+  useEffect(() => {
+    if (
+      location.state &&
+      location.state.workOrder &&
+      skuList.length > 0 &&
+      workOrders.length > 0
+    ) {
+      const wo = workOrders.find(
+        (wo) => wo.id === location.state.workOrder.id
+      );
+      if (wo) {
+        setValue('work_id', wo.id);
+        setSelectedWorkOrder(wo);
+
+        const selectedSku = skuList.find(
+          (sku) => sku.sku_name === location.state.workOrder.sku_name
+        );
+        setValue('sku_details', [
+          {
+            sku_id: selectedSku?.id || null,
+            sku: selectedSku?.sku_name || '',
+            quantity_required: location.state.workOrder.qty || '',
+            rate_per_sku: '',
+            total_amount: '',
+            gst: '',
+            total_incl__gst: ''
+          }
+        ]);
+        setTimeout(() => {
+          calculateRowValues(0);
+          recalculateAllTotals();
+        }, 0);
+      }
+    }
+    // eslint-disable-next-line
+  }, [location.state, skuList, workOrders]);
+
   // Handle client selection
   const selectClient = (clientName, client_id, client_state_id) => {
     const stateID = localStorage.getItem('company_state_id');
@@ -142,6 +190,28 @@ const InvoiceAddForm = forwardRef((props, ref) => {
     setValue('client_name', clientName);
     setValue('client_id', client_id);
     setIsOpen(false);
+
+    // Clear SKU details and work order selection when client changes
+    setValue('sku_details', [{
+      sku_id: null,
+      sku: '',
+      quantity_required: '',
+      rate_per_sku: '',
+      total_amount: '',
+      gst: '',
+      total_incl__gst: ''
+    }]);
+    setValue('work_id', '');
+    setSelectedWorkOrder(null);
+    setTotals({
+      total_qty: 0,
+      total_amount: 0,
+      totalGst: 0,
+      total_incl_gst: 0,
+      cgst: 0,
+      sgst: 0,
+      igst: 0
+    });
 
     const fetchWorkOrders = async () => {
       try {
@@ -193,6 +263,12 @@ const InvoiceAddForm = forwardRef((props, ref) => {
     
     // Calculate total GST amount (difference between withGST and amount)
     const totalGstAmount = withGST - amount;
+
+
+    setValue('total',amount)
+    setValue('total_tax',totalGstAmount)
+    setValue('total_amount',withGST)
+    setValue('quantity',qty)
 
     setTotals({
       total_qty: qty,
@@ -268,7 +344,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
   const preventScroll = (e) => {
     e.target.blur();
     // Prevent the default scroll behavior
-    e.preventDefault();
+    // e.preventDefault();
   };
 
   return (
@@ -283,8 +359,10 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                 <div
                   className={`flex h-7 w-[25rem] items-center justify-between rounded-l border px-3 text-sm cursor-pointer bg-white ${
                     attemptedSubmit && !formValues.client_name ? "ring-1 ring-red-600" : "border-gray-300"
-                  }`}
-                  onClick={() => setIsOpen(!isOpen)}
+                  } ${isFromWorkOrder ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  onClick={() => { if (!isFromWorkOrder) setIsOpen(!isOpen); }}
+                  tabIndex={isFromWorkOrder ? -1 : 0}
+                  aria-disabled={isFromWorkOrder}
                 >
                   <span className="truncate text-sm text-gray-500">
                     {formValues.client_name || "Select or add a client"}
@@ -294,7 +372,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                   </span>
                 </div>
 
-                {isOpen && (
+                {isOpen && !isFromWorkOrder && (
                   <div className="absolute z-50 mt-1 max-h-60 w-80 overflow-y-auto rounded border border-gray-200 bg-white shadow-md">
                     <div className="sticky top-0 bg-white p-2 border-b border-gray-200">
                       <input
@@ -303,6 +381,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="h-9 w-full rounded border border-gray-300 bg-gray-50 pl-8 pr-2 text-sm"
+                        disabled={isFromWorkOrder}
                       />
                     </div>
                     {clients
@@ -319,13 +398,71 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                   </div>
                 )}
               </div>
-              <button type='button' className="h-7 w-9 flex items-center justify-center bg-blue-500 text-white rounded-r">
+              <button type='button' className="h-7 w-9 flex items-center justify-center bg-blue-500 text-white rounded-r" disabled={isFromWorkOrder}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.3-4.3" />
                 </svg>
               </button>
             </div>
+
+            
+
+            {/* Work Order */}
+            <div className="flex items-center">
+              <label className="text-xs w-40">Work Order</label>
+              <select
+                {...register('work_id', { 
+                  onChange: (e) => {
+                    const selectedWorkOrderId = e.target.value;
+                    const workOrder = workOrders.find(wo => wo.id === parseInt(selectedWorkOrderId));
+                    setSelectedWorkOrder(workOrder);
+                    // Set the sale_id from the work order's sales order
+                    setValue('sale_id', workOrder?.sales_order_id || '');
+                    // Find the SKU from skuList to get its ID
+                    const selectedSku = skuList.find(sku => sku.sku_name === workOrder?.sku_name);
+                    // Clear existing SKUs and add the new one
+                    remove(0);
+                    append({
+                      sku_id: selectedSku?.id || null,
+                      sku: workOrder?.sku_name || '',
+                      quantity_required: workOrder?.qty || '',
+                      rate_per_sku: '',
+                      total_amount: '',
+                      gst: '',
+                      total_incl__gst: ''
+                    });
+                    // Calculate values for the new SKU
+                    setTimeout(() => {
+                      calculateRowValues(0);
+                      recalculateAllTotals();
+                    }, 0);
+                    setTotals({
+                      total_qty: 0,
+                      total_amount: 0,
+                      totalGst: 0,
+                      total_incl_gst: 0,
+                      cgst: 0,
+                      sgst: 0,
+                      igst: 0
+                    });
+                  }
+                })}
+                disabled={!selectedClient || isFromWorkOrder}
+                className={`h-7 w-80 rounded border px-3 text-sm ${
+                  attemptedSubmit && errors.work_id ? "ring-1 ring-red-600" : "border-gray-300"
+                } ${!selectedClient || isFromWorkOrder ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+              >
+                <option value="">{workOrders?.length === 0 ? "No Work Orders Available" : "Select Work Order"}</option>
+                {workOrders?.map((workOrder) => (
+                  <option key={workOrder.id} value={workOrder.id}>
+                    {workOrder.work_generate_id || workOrder.id}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+
 
             {/* Invoice Reference */}
             <div className="flex items-center">
@@ -338,54 +475,9 @@ const InvoiceAddForm = forwardRef((props, ref) => {
               />
             </div>
 
-            {/* Work Order */}
-            <div className="flex items-center">
-              <label className="text-xs w-40">Work Order</label>
-              <select
-                {...register('work_id', { 
-                  onChange: (e) => {
-                    const selectedWorkOrderId = e.target.value;
-                    const workOrder = workOrders.find(wo => wo.id === parseInt(selectedWorkOrderId));
-                    setSelectedWorkOrder(workOrder);
-                    
-                    // Set the sale_id from the work order's sales order
-                    setValue('sale_id', workOrder?.sales_order_id || '');
-                    
-                    // Find the SKU from skuList to get its ID
-                    const selectedSku = skuList.find(sku => sku.sku_name === workOrder?.sku_name);
-                    
-                    // Clear existing SKUs and add the new one
-                    remove(0);
-                    append({
-                      sku_id: selectedSku?.id || null,
-                      sku: workOrder?.sku_name || '',
-                      quantity_required: workOrder?.qty || '',
-                      rate_per_sku: '',
-                      total_amount: '',
-                      gst: '',
-                      total_incl__gst: ''
-                    });
-                    
-                    // Calculate values for the new SKU
-                    setTimeout(() => {
-                      calculateRowValues(0);
-                      recalculateAllTotals();
-                    }, 0);
-                  }
-                })}
-                disabled={!selectedClient}
-                className={`h-7 w-80 rounded border px-3 text-sm ${
-                  attemptedSubmit && errors.work_id ? "ring-1 ring-red-600" : "border-gray-300"
-                } ${!selectedClient ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-              >
-                <option value="">{workOrders?.length === 0 ? "No Work Orders Available" : "Select Work Order"}</option>
-                {workOrders?.map((workOrder) => (
-                  <option key={workOrder.id} value={workOrder.id}>
-                    {workOrder.work_generate_id || workOrder.id}
-                  </option>
-                ))}
-              </select>
-            </div>
+            
+            {/* Balance to Manufacture Info */}
+
 
             {/* Invoice Date */}
             <div className="flex items-center">
@@ -412,7 +504,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
             </div>
 
             {/* Total and Balance in One Row */}
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <label className="text-xs text-red-600 w-40">Total*</label>
               <div className="flex gap-4">
                 <input
@@ -435,35 +527,9 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
 
-            {/* Payment Expected Date and Payment Status in One Row */}
-            <div className="flex items-center">
-              <label className="text-xs text-red-600 w-40">Payment Expected Date*</label>
-              <div className="flex gap-4">
-                <input
-                  type="date"
-                  {...register('payment_expected_date')}
-                  className={`h-7 w-80 rounded border px-3 text-sm ${
-                    attemptedSubmit && !formValues.payment_expected_date ? "ring-1 ring-red-600" : "border-gray-300"
-                  }`}
-                />
-                <div className="flex items-center">
-                  <label className="text-xs text-red-600 w-28">Payment Status*</label>
-                  <select
-                    {...register('payment_status')}
-                    className={`h-7 w-80 rounded border px-3 text-sm ${
-                      attemptedSubmit && !formValues.payment_status ? "ring-1 ring-red-600" : "border-gray-300"
-                    }`}
-                  >
-                    <option value="">Select Payment Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="paid">Paid</option>
-                    <option value="partial">Partial</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+
 
             {/* Discount Related Fields in One Row */}
             <div className="flex items-center">
@@ -479,7 +545,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                   <option value="product_sale">Product Sale</option>
                   <option value="service">Service</option>
                 </select>
-                <div className="flex items-center">
+                {/* <div className="flex items-center">
                   <label className="text-xs w-28">Discount</label>
                   <div className="flex">
                     <select
@@ -502,6 +568,34 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                       }`}
                     />
                   </div>
+                </div> */}
+              </div>
+            </div>
+
+                        {/* Payment Expected Date and Payment Status in One Row */}
+                        <div className="flex items-center">
+              <label className="text-xs text-red-600 w-40">Payment Expected Date*</label>
+              <div className="flex gap-4">
+                <input
+                  type="date"
+                  {...register('payment_expected_date')}
+                  className={`h-7 w-80 rounded border px-3 text-sm ${
+                    attemptedSubmit && !formValues.payment_expected_date ? "ring-1 ring-red-600" : "border-gray-300"
+                  }`}
+                />
+                <div className="flex items-center">
+                  <label className="text-xs text-red-600 w-28">Payment Status*</label>
+                  <select
+                    {...register('payment_status')}
+                    className={`h-7 w-80 rounded border px-3 text-sm ${
+                      attemptedSubmit && !formValues.payment_status ? "ring-1 ring-red-600" : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Select Payment Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="paid">Paid</option>
+                    <option value="partial">Partial</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -643,24 +737,29 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                             {/* GST Info Row */}
                             {skuDetailsData[index]?.sku && (
                               <tr className="bg-gray-50 text-xs w-full">
-                                <td colSpan={2} className="border-b pl-4 py-1 italic text-gray-500">
+                                <td colSpan={1} className="border-b pl-4 py-1 italic text-gray-500">
                                   GST Details ({skuDetailsData[index]?.sku})
+                                </td>
+                                <td colSpan={2} className="border-b pl-4 py-1 italic text-gray-500">
+                                  {selectedWorkOrder ? (
+                                    <>Pending Quantity : {selectedWorkOrder?.pending_qty}</>
+                                  ) : null}
                                 </td>
                                 <td colSpan={3} className="border-b pr-2 py-1">
                                   <div className="flex justify-end gap-4">
                                     {isIgstApplicable ? (
                                       <span>
-                                        IGST: {skuDetailsData[index]?.gst}% 
+                                        IGST: 
                                         (₹{(parseFloat(skuDetailsData[index]?.total_incl__gst) - parseFloat(skuDetailsData[index]?.total_amount)).toFixed(2) || '0.00'})
                                       </span>
                                     ) : (
                                       <>
                                         <span>
-                                          CGST: {skuDetailsData[index]?.gst}% 
+                                          CGST:
                                           (₹{((parseFloat(skuDetailsData[index]?.total_incl__gst) - parseFloat(skuDetailsData[index]?.total_amount)) / 2).toFixed(2) || '0.00'})
                                         </span>
                                         <span>
-                                          SGST: {skuDetailsData[index]?.gst}% 
+                                          SGST:
                                           (₹{((parseFloat(skuDetailsData[index]?.total_incl__gst) - parseFloat(skuDetailsData[index]?.total_amount)) / 2).toFixed(2) || '0.00'})
                                         </span>
                                       </>
@@ -700,10 +799,10 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                           <tbody className="gap-4">
                             <tr className="border-b border-gray-200">
                               <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                                Total Qty:
+                                Total Amount:
                               </td>
                               <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                                {totals.total_qty}
+                                {String(totals.total_amount || 0).slice(0, 20)}
                               </td>
                             </tr>
 
@@ -713,8 +812,8 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                               </td>
                               <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                                 {isIgstApplicable 
-                                  ? totals.igst?.toFixed(2) 
-                                  : ((totals.cgst || 0) + (totals.sgst || 0)).toFixed(2)}
+                                  ? String(totals.igst ?? 0).slice(0, 6)
+                                  : String((totals.cgst || 0) + (totals.sgst || 0)).slice(0, 20)}
                               </td>
                             </tr>
 
@@ -723,7 +822,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 Total Incl GST:
                               </td>
                               <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
-                                {(totals.total_incl_gst || 0).toFixed(2)}
+                                {String(totals.total_incl_gst || 0).slice(0, 20)}
                               </td>
                             </tr>
                           </tbody>

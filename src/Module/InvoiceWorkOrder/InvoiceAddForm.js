@@ -155,6 +155,15 @@ const InvoiceAddForm = forwardRef((props, ref) => {
     }]);
     setValue('work_id', '');
     setSelectedWorkOrder(null);
+    setTotals({
+      total_qty: 0,
+      total_amount: 0,
+      totalGst: 0,
+      total_incl_gst: 0,
+      cgst: 0,
+      sgst: 0,
+      igst: 0
+    });
 
     const fetchWorkOrders = async () => {
       try {
@@ -206,6 +215,12 @@ const InvoiceAddForm = forwardRef((props, ref) => {
     
     // Calculate total GST amount (difference between withGST and amount)
     const totalGstAmount = withGST - amount;
+
+
+    setValue('total',amount)
+    setValue('total_tax',totalGstAmount)
+    setValue('total_amount',withGST)
+    setValue('quantity',qty)
 
     setTotals({
       total_qty: qty,
@@ -281,7 +296,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
   const preventScroll = (e) => {
     e.target.blur();
     // Prevent the default scroll behavior
-    e.preventDefault();
+    // e.preventDefault();
   };
 
   return (
@@ -384,6 +399,15 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                       calculateRowValues(0);
                       recalculateAllTotals();
                     }, 0);
+                    setTotals({
+                      total_qty: 0,
+                      total_amount: 0,
+                      totalGst: 0,
+                      total_incl_gst: 0,
+                      cgst: 0,
+                      sgst: 0,
+                      igst: 0
+                    });
                   }
                 })}
                 disabled={!selectedClient}
@@ -450,33 +474,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
               </div>
             </div> */}
 
-            {/* Payment Expected Date and Payment Status in One Row */}
-            <div className="flex items-center">
-              <label className="text-xs text-red-600 w-40">Payment Expected Date*</label>
-              <div className="flex gap-4">
-                <input
-                  type="date"
-                  {...register('payment_expected_date')}
-                  className={`h-7 w-80 rounded border px-3 text-sm ${
-                    attemptedSubmit && !formValues.payment_expected_date ? "ring-1 ring-red-600" : "border-gray-300"
-                  }`}
-                />
-                <div className="flex items-center">
-                  <label className="text-xs text-red-600 w-28">Payment Status*</label>
-                  <select
-                    {...register('payment_status')}
-                    className={`h-7 w-80 rounded border px-3 text-sm ${
-                      attemptedSubmit && !formValues.payment_status ? "ring-1 ring-red-600" : "border-gray-300"
-                    }`}
-                  >
-                    <option value="">Select Payment Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="paid">Paid</option>
-                    <option value="partial">Partial</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+
 
             {/* Discount Related Fields in One Row */}
             <div className="flex items-center">
@@ -492,7 +490,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                   <option value="product_sale">Product Sale</option>
                   <option value="service">Service</option>
                 </select>
-                <div className="flex items-center">
+                {/* <div className="flex items-center">
                   <label className="text-xs w-28">Discount</label>
                   <div className="flex">
                     <select
@@ -515,6 +513,34 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                       }`}
                     />
                   </div>
+                </div> */}
+              </div>
+            </div>
+
+                        {/* Payment Expected Date and Payment Status in One Row */}
+                        <div className="flex items-center">
+              <label className="text-xs text-red-600 w-40">Payment Expected Date*</label>
+              <div className="flex gap-4">
+                <input
+                  type="date"
+                  {...register('payment_expected_date')}
+                  className={`h-7 w-80 rounded border px-3 text-sm ${
+                    attemptedSubmit && !formValues.payment_expected_date ? "ring-1 ring-red-600" : "border-gray-300"
+                  }`}
+                />
+                <div className="flex items-center">
+                  <label className="text-xs text-red-600 w-28">Payment Status*</label>
+                  <select
+                    {...register('payment_status')}
+                    className={`h-7 w-80 rounded border px-3 text-sm ${
+                      attemptedSubmit && !formValues.payment_status ? "ring-1 ring-red-600" : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Select Payment Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="paid">Paid</option>
+                    <option value="partial">Partial</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -663,17 +689,17 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                   <div className="flex justify-end gap-4">
                                     {isIgstApplicable ? (
                                       <span>
-                                        IGST: {skuDetailsData[index]?.gst}% 
+                                        IGST: 
                                         (₹{(parseFloat(skuDetailsData[index]?.total_incl__gst) - parseFloat(skuDetailsData[index]?.total_amount)).toFixed(2) || '0.00'})
                                       </span>
                                     ) : (
                                       <>
                                         <span>
-                                          CGST: {skuDetailsData[index]?.gst}% 
+                                          CGST:
                                           (₹{((parseFloat(skuDetailsData[index]?.total_incl__gst) - parseFloat(skuDetailsData[index]?.total_amount)) / 2).toFixed(2) || '0.00'})
                                         </span>
                                         <span>
-                                          SGST: {skuDetailsData[index]?.gst}% 
+                                          SGST:
                                           (₹{((parseFloat(skuDetailsData[index]?.total_incl__gst) - parseFloat(skuDetailsData[index]?.total_amount)) / 2).toFixed(2) || '0.00'})
                                         </span>
                                       </>
@@ -713,10 +739,10 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                           <tbody className="gap-4">
                             <tr className="border-b border-gray-200">
                               <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                                Total Qty:
+                                Total Amount:
                               </td>
                               <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                                {totals.total_qty}
+                                {String(totals.total_amount || 0).slice(0, 20)}
                               </td>
                             </tr>
 
@@ -726,8 +752,8 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                               </td>
                               <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                                 {isIgstApplicable 
-                                  ? totals.igst?.toFixed(2) 
-                                  : ((totals.cgst || 0) + (totals.sgst || 0)).toFixed(2)}
+                                  ? String(totals.igst ?? 0).slice(0, 6)
+                                  : String((totals.cgst || 0) + (totals.sgst || 0)).slice(0, 20)}
                               </td>
                             </tr>
 
@@ -736,7 +762,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 Total Incl GST:
                               </td>
                               <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
-                                {(totals.total_incl_gst || 0).toFixed(2)}
+                                {String(totals.total_incl_gst || 0).slice(0, 20)}
                               </td>
                             </tr>
                           </tbody>

@@ -406,16 +406,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
               </button>
             </div>
 
-            {/* Invoice Reference */}
-            <div className="flex items-center">
-              <label className="text-xs text-red-600 w-40">Invoice Reference*</label>
-              <input
-                {...register('invoice_reference')}
-                className={`h-7 w-80 rounded border px-3 text-sm ${
-                  attemptedSubmit && !formValues.invoice_reference ? "ring-1 ring-red-600" : "border-gray-300"
-                }`}
-              />
-            </div>
+            
 
             {/* Work Order */}
             <div className="flex items-center">
@@ -470,6 +461,21 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                 ))}
               </select>
             </div>
+
+
+
+            {/* Invoice Reference */}
+            <div className="flex items-center">
+              <label className="text-xs text-red-600 w-40">Invoice Reference*</label>
+              <input
+                {...register('invoice_reference')}
+                className={`h-7 w-80 rounded border px-3 text-sm ${
+                  attemptedSubmit && !formValues.invoice_reference ? "ring-1 ring-red-600" : "border-gray-300"
+                }`}
+              />
+            </div>
+
+            
             {/* Balance to Manufacture Info */}
 
 

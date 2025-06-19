@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 
 const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
 
-  console.log(workOrder)
 
 
   const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({

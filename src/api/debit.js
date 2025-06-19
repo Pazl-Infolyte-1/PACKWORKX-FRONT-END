@@ -1,30 +1,26 @@
 import { apiClient } from './config'
 
 export const debitApi = {
-  getDebitNotes: async (search, page, limits) => {
+  getDebitNotes: async (params) => {
     try {
-      return 'success'
+      return await apiClient.get('/debit-note', { params })
     } catch (error) {
       console.error(error)
     }
   },
-  editDebitNote: async (id) => {
+  editDebitNote: async (payload,id) => {
     try {
-      return 'success'
+      return await apiClient.put(`/debit-note/${id}`, payload)
     } catch (error) {
       console.error(error)
     }
   },
-  postDebitNote: async (id) => {
-    try {
-      return 'success'
-    } catch (error) {
-      console.error(error)
-    }
+  postDebitNote: async (debitNoteFormData) => {
+      return await apiClient.post('/debit-note', debitNoteFormData)
   },
-  getAllPurchaseReturnIds: async (search, page, limits) => {
+  getAllPurchaseReturnIds: async () => {
     try {
-      return 'success'
+      return await apiClient.get('/purchase-order/get/id')
     } catch (error) {
       console.error(error)
     }
@@ -39,14 +35,14 @@ export const debitApi = {
 
   deleteDebitNote: async (id) => {
     try {
-      return 'success'
+      return await apiClient.delete(`/debit-note/${id}`)
     } catch (error) {
       console.error(error)
     }
   },
   getDebitNoteById: async (id) => {
     try {
-      return 'success'
+      return await apiClient.get(`/debit-note/${id}`)
     } catch (error) {
       console.error(error)
     }

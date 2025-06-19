@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { SettingsApi } from '../../api/Settings'
 import CustomAlert from '../../components/New/CustomAlert'
+import { set } from 'lodash'
 
-function PurchaseTemplate() {
+function InvoiceTemplate() {
   const [templates, setTemplates] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -13,7 +14,7 @@ function PurchaseTemplate() {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const response = await SettingsApi.getTemplates()
+        const response = await SettingsApi.getInvoiceTemplates()
         console.log(response)
 
         if (response?.data) {
@@ -60,7 +61,7 @@ function PurchaseTemplate() {
 
   const handleUseTemplate = async (template) => {
     try {
-      const response = await SettingsApi.useTemplate(template.id)
+      const response = await SettingsApi.applyInvoiceTemplate(template.id)
       setAlerts([{ severity: 'success', message: response?.data?.message || 'Success' }])
       console.log(response)
     } catch (error) {
@@ -90,18 +91,18 @@ function PurchaseTemplate() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-x-hidden">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       <div className="p-3 w-full">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Purchase Order Templates</h1>
+        {/* <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Invoice Templates</h1>
           <p className="text-gray-600">
             Choose from our collection of professional purchase order templates
           </p>
-        </div>
+        </div> */}
 
         {/* Templates Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {templates.map((template) => (
             <div
               key={template.id}
@@ -110,7 +111,7 @@ function PurchaseTemplate() {
             >
               <div className="p-4 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">Template {template.id}</h3>
-                <p className="text-sm text-gray-600">Professional purchase order layout</p>
+                <p className="text-sm text-gray-600">Professional Invoice layout</p>
               </div>
 
               {/* Template Preview - Fixed scaling and overflow */}
@@ -184,9 +185,9 @@ function PurchaseTemplate() {
               </button>
             </div>
 
-            <div className="p-4 overflow-auto max-h-[calc(90vh-100px)] w-full">
+            <div className="p-4 w-full">
               <div
-                className="bg-white rounded-lg w-full overflow-x-auto"
+                className="bg-white rounded-lg w-full"
                 style={{ minWidth: 'fit-content' }}
                 dangerouslySetInnerHTML={{ __html: selectedTemplate.content }}
               />
@@ -210,4 +211,4 @@ function PurchaseTemplate() {
   )
 }
 
-export default PurchaseTemplate
+export default InvoiceTemplate

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import CIcon from '@coreui/icons-react';
 import { cilEnvelopeOpen, cilPencil, cilPrint } from '@coreui/icons';
 import html2pdf from 'html2pdf.js';
-import { workOrderApi } from '../../api/workOrder';
+import { invoiceApi } from '../../api/Invoice';
 
 
 function InvoiceView() {
@@ -14,7 +14,8 @@ function InvoiceView() {
     useEffect(() => {
         const fetchSalesOrderData = async () => {
             try {
-                const response = await workOrderApi.getInvoiceById(id)
+                const response = await invoiceApi.getInvoiceById(id)
+                console.log(response.data)
                 setInvoice(response?.data);
             } catch (error) {
                 console.error("Error viewing sales order:", error);
@@ -37,17 +38,35 @@ function InvoiceView() {
         return date.toLocaleDateString("en-GB"); // DD/MM/YYYY format
     };
 
-    const handlePrint = () => {
-        const element = document.getElementById('invoice-content');
-        const opt = {
-            margin:       0.5,
-            filename:     `Invoice_${invoice?.invoice_number || 'download'}.pdf`,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
+    const handlePrint = async () => {
+        // const element = document.getElementById('invoice-content');
+        // const opt = {
+        //     margin:       0.5,
+        //     filename:     `Invoice_${invoice?.invoice_number || 'download'}.pdf`,
+        //     image:        { type: 'jpeg', quality: 0.98 },
+        //     html2canvas:  { scale: 2 },
+        //     jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        // };
+        // html2pdf().set(opt).from(element).save();
+            try {
+              const response = await invoiceApi.downloadInvoice(id)
+              console.log(response)
+              const blob = new Blob([response.data], { type: 'application/pdf' })
+              const url = URL.createObjectURL(blob)
+              const link = document.createElement('a')
+              link.href = url
+              link.download = `INV-00${id}.pdf`
+              link.click()
+              URL.revokeObjectURL(url)
+            } catch (error) {
+              console.error('Error downloading PDF:', error)
+            }
+          
+
     };
+
+
+
     
 
 
@@ -93,8 +112,13 @@ function InvoiceView() {
             <div className="flex-1 overflow-y-auto"  id="invoice-content">
 
 
+{/* pdfinvoice */}
+{invoice && (
+  <div dangerouslySetInnerHTML={{ __html: invoice }} />
+)}
+
                 {/* Main form content */}
-                <div className="flex flex-col mx-auto font-sans px-4 md:px-44 pt-4 pb-8">
+                {/* <div className="flex flex-col mx-auto font-sans px-4 md:px-44 pt-4 pb-8">
                     <div className="flex flex-col md:flex-row justify-between">
                         <div className="flex flex-col gap-0 mb-4 md:mb-0">
                             <span className="text-xl">Invoice</span>
@@ -162,8 +186,7 @@ function InvoiceView() {
                     <div className="border rounded overflow-hidden">
                         <div className="bg-gray-100 grid grid-cols-8 text-xs font-semibold text-gray-600 px-4 py-2">
                             <div className="col-span-2">ITEMS & DESCRIPTION</div>
-                            {/* <div>QUANTITY</div> */}
-                            {/* <div>ACCEPTABLE UNITS</div> */}
+                     
                             <div>RATE</div>
                             <div>Discount</div>
                             <div>Tax</div>
@@ -198,8 +221,7 @@ function InvoiceView() {
                 <p className="text-gray-600 text-xs">SKU: {invoice.sku_id}</p>
             </div>
         </div>
-        {/* <div>{invoice.quantity_required}</div>
-        <div>{invoice.acceptable_sku_units}</div> */}
+ 
         <div>₹{parseFloat(invoice.total)?.toFixed(2)}</div>
         <div>₹{parseFloat(invoice.discount)?.toFixed(2) || 22}</div>
         <div>₹{parseFloat(invoice.total_tax)?.toFixed(2) || 22}</div>
@@ -256,12 +278,9 @@ function InvoiceView() {
                         </div>
                     </div>
 
-                    {/* Created/Updated by information
-                    <div className="text-xs text-gray-500 mt-8">
-                        <p>Created by: {invoice?.creator_sales?.name || 'Unknown'} on {formatDate(invoice?.created_at)}</p>
-                        <p>Last updated by: {invoice?.updater_sales?.name || 'Unknown'} on {formatDate(invoice?.updated_at)}</p>
-                    </div> */}
-                </div>
+           
+                </div> */}
+
             </div>
         </div>
     );

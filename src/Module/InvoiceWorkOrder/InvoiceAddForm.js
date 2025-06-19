@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import Select from 'react-select';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { clientApi } from '../../api/client';
 import { skuApi } from '../../api/sku';
 import ActionButton from '../../components/New/ActionButton';
@@ -9,6 +9,7 @@ import { invoiceApi } from '../../api/Invoice';
 
 const InvoiceAddForm = forwardRef((props, ref) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [clients, setClients] = useState([]);
   const [skuList, setSkuList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

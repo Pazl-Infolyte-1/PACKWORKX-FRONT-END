@@ -138,6 +138,58 @@ const getProgressInfo = (progress) => {
   }
 };
 
+const InvoiceTypeSelectionModal = ({ isOpen, onClose, onFull, onPartial }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Subtle background layer for modal separation */}
+      <div className="absolute inset-0 bg-white/70 backdrop-blur-sm" />
+      <div className="relative bg-white border border-gray-200 rounded-lg shadow-lg w-full max-w-md p-6">
+        <button
+          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors"
+          onClick={onClose}
+        >
+          <X size={18} />
+        </button>
+        {/* Header */}
+        <div className="mb-5">
+          <h3 className="text-base font-semibold text-gray-900 mb-1">Invoice Type</h3>
+          <p className="text-xs text-gray-500">Choose how you want to invoice this work order</p>
+        </div>
+        {/* 2-column Options with icons */}
+        <div className="grid grid-cols-2 gap-4 mb-2">
+          <button
+            className="flex flex-col items-center justify-center p-4 bg-blue-50 border border-blue-100 rounded hover:bg-blue-100 transition-colors group min-h-[120px]"
+            onClick={onFull}
+          >
+            <Download size={32} className="text-blue-600 mb-2" />
+            <div className="font-medium text-gray-900 text-sm mb-0.5">Full Invoice</div>
+            <div className="text-xs text-gray-500 text-center">Invoice for the complete work order</div>
+          </button>
+          <button
+            className="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded hover:bg-gray-100 transition-colors group min-h-[120px]"
+            onClick={onPartial}
+          >
+            <Clipboard size={32} className="text-gray-500 mb-2" />
+            <div className="font-medium text-gray-900 text-sm mb-0.5">Partial Invoice</div>
+            <div className="text-xs text-gray-500 text-center">Invoice for specific items or quantities</div>
+          </button>
+        </div>
+        {/* Footer */}
+        <div className="mt-2 pt-3 border-t border-gray-100">
+          <button
+            className="w-full px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ViewWorkOrder = () => {
   const { id } = useParams();
   const [workOrder, setWorkOrder] = useState([]);
@@ -156,6 +208,7 @@ const ViewWorkOrder = () => {
   const [isProductionPlannedModalOpen, setIsProductionPlannedModalOpen] = useState(false);
   const [invoice,setInvoice] = useState()
   const [selectedInvoiceID,setSelectedInvoiceID] = useState()
+  const [isInvoiceTypeModalOpen, setIsInvoiceTypeModalOpen] = useState(false);
 
 
 
@@ -498,7 +551,7 @@ const ViewWorkOrder = () => {
                     </div>
                     <button
                       className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
-                      onClick={() => setIsInvoiceModalOpen(true)}
+                      onClick={() => setIsInvoiceTypeModalOpen(true)}
                     >
                       Convert Into Invoice
                     </button>
@@ -843,6 +896,33 @@ const ViewWorkOrder = () => {
 
 
             {/* Modals */}
+            <InvoiceTypeSelectionModal
+              isOpen={isInvoiceTypeModalOpen}
+              onClose={() => setIsInvoiceTypeModalOpen(false)}
+              onFull={() => {
+                setIsInvoiceTypeModalOpen(false);
+                setIsInvoiceModalOpen(true);
+              }}
+              onPartial={() => {
+                setIsInvoiceTypeModalOpen(false);
+                navigate('/invoice/form', {
+                  state: {
+                    client: {
+                      client_id: workOrder.client_id,
+                      client_name: workOrder.salesOrder?.client, // Adjust if your client name field is different
+                      addresses: workOrder.salesOrder?.client_addresses || [], // Adjust if needed
+                    },
+                    workOrder: {
+                      id: workOrder.id,
+                      work_generate_id: workOrder.work_generate_id,
+                      sku_name: workOrder.sku_name,
+                      qty: workOrder.qty,
+                      sales_order_id: workOrder.sales_order_id,
+                    }
+                  }
+                });
+              }}
+            />
             <InvoiceCreationModal
               isOpen={isInvoiceModalOpen}
               onClose={() => setIsInvoiceModalOpen(false)}

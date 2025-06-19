@@ -557,9 +557,11 @@ const Dashboard = () => {
                   /> */}
                   <CProgress
                     value={Math.round(calculateProgressValue(widget))}
-                    color="success"
-                    // className="custom-progress"
-                    // style={{ height: '6px', backgroundColor: 'rgba(255,255,255,0.2)' }}
+                    // color="success"
+                    color={Math.round(calculateProgressValue(widget)) >= 100 ? 'success' : Math.round(calculateProgressValue(widget)) >= 50 ? 'warning' : 'danger'}
+
+                  // className="custom-progress"
+                  // style={{ height: '6px', backgroundColor: 'rgba(255,255,255,0.2)' }}
                   />
                 </div>
               </CCardBody>
@@ -775,7 +777,7 @@ const Dashboard = () => {
                       <CProgress
                         value={(metric.current / metric.target) * 100}
                         color={metric.efficiency >= 100 ? 'success' : metric.efficiency >= 90 ? 'warning' : 'danger'}
-                        style={{ height: '8px' }}
+                      // style={{ height: '8px' }}
                       />
                     </div>
                   ))}

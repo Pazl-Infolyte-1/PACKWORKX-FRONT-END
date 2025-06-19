@@ -724,8 +724,8 @@ const calculateRowValues = (index) => {
                   type="button" 
                   onClick={() => {
                     append(isIgstApplicable 
-                      ? { sku: '', quantity: 1, rate: 0, acceptableUnits: 0, igst: 0, igstAmount: 0, totalAmount: 0, totalGst: 0, total: 0 }
-                      : { sku: '', quantity: 1, rate: 0, acceptableUnits: 0, sgst: 0, cgst: 0, sgstAmount: 0, cgstAmount: 0, totalAmount: 0, totalGst: 0, total: 0 }
+                      ? { sku: '', quantity: 0, rate: 0, acceptableUnits: 0, igst: 0, igstAmount: 0, totalAmount: 0, totalGst: 0, total: 0 }
+                      : { sku: '', quantity:0 , rate: 0, acceptableUnits: 0, sgst: 0, cgst: 0, sgstAmount: 0, cgstAmount: 0, totalAmount: 0, totalGst: 0, total: 0 }
                     );
                     // Force recalculation after adding new row
                     setTimeout(() => {

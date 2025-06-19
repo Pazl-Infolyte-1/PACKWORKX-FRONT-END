@@ -21,10 +21,10 @@ import Footer from './components/Footer'
 import { useDispatch } from 'react-redux'
 import { authApi } from '../../api/auth'
 import CustomAlert from '../../components/New/CustomAlert'
-import { apiClient } from '../../api/config'
+// import { apiClient } from '../../api/config'
 import { landingApi } from '../../api/landingPage'
 import ForgotPassword from './pages/ForgotPassword'
-import ConfirmPassword from './pages/confirmPassword'
+import ConfirmPassword from './pages/ConfirmPassword'
 
 const LandingPage = () => {
   const [activePage, setActivePage] = useState('home')

@@ -76,10 +76,6 @@ import { useSelector } from 'react-redux'
 import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
 import './scss/examples.scss'
-import { registerLicense } from '@syncfusion/ej2-base'
-import { SyncfusionLicense } from './api/constant'
-
-registerLicense(SyncfusionLicense)
 
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
 const Signin = React.lazy(() => import('./views/landing/pages/SignInPage'))
@@ -147,7 +143,7 @@ const App = () => {
   />
   <Route path="*" element={<Navigate to="/" replace />} />
 </Routes>
-
+s
       </Suspense>
     </BrowserRouter>
   )

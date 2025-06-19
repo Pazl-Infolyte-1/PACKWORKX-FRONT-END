@@ -1,6 +1,18 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 const Header = ({ showPage, mobileMenuOpen, toggleMobileMenu ,setPackageName}) => {
+    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
+  const navigate = useNavigate()
+    const handleClick = () => {
+    if (isAuthenticated) {
+      navigate('/dashboard')
+    } else {
+      showPage('signin')
+    }
+  }
+
   return (
     <header className="landing-header">
       <nav className="landing-nav">
@@ -18,7 +30,9 @@ const Header = ({ showPage, mobileMenuOpen, toggleMobileMenu ,setPackageName}) =
         </ul>
         <div className="landing-auth-buttons">
           <a href="#" className="landing-btn landing-btn-secondary" onClick={() => showPage('demo')}>Free Demo</a>
-          <a href="#" className="landing-btn landing-btn-secondary" onClick={() => showPage('signin')}>Sign In</a>
+          <a href="#" className="landing-btn landing-btn-secondary" onClick={handleClick}>
+      {isAuthenticated ? 'Dashboard' : 'Sign In'}
+    </a>
           <a href="#" className="landing-btn landing-btn-primary" onClick={() => {showPage('signup')
             setPackageName("Free")
           }}>Start Free Trial</a>

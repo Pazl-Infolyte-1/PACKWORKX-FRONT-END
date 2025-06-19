@@ -94,7 +94,9 @@ const LandingPage = React.lazy(() => import('./views/landing/LandingPage'))
 // Protected route component to redirect authenticated users away from auth pages
 const PublicRoute = ({ element }) => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : element
+  //return isAuthenticated ? <Navigate to="/dashboard" replace /> : element
+    return isAuthenticated ? <Navigate to="/landing" replace /> : element
+
 }
 
 const App = () => {

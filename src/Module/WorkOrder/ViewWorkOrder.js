@@ -21,6 +21,8 @@ import InvoiceModal from "./InvoiceModal";
 import CustomAlert from "../../components/New/CustomAlert";
 import ProgressCompletedModal from "./ProgressCompletedModale";
 import { workOrderApi } from "../../api/workOrder";
+import { invoiceApi } from "../../api/Invoice";
+import { orderBy } from "lodash";
 
 // Format dates
 const formatDate = (dateString) => {
@@ -152,12 +154,22 @@ const ViewWorkOrder = () => {
   const [isOpenProgressModale, setIsOpenProgressModale] = useState(false)
   const [isRawMaterialModalOpen, setIsRawMaterialModalOpen] = useState(false);
   const [isProductionPlannedModalOpen, setIsProductionPlannedModalOpen] = useState(false);
+  const [invoice,setInvoice] = useState()
+  const [selectedInvoiceID,setSelectedInvoiceID] = useState()
 
 
 
   const handleClose = () => {
     setAlerts([])
   }
+
+
+ const HandleInvoiceDownload = async(id)=>{
+  const response = await invoiceApi.getInvoiceById(id)
+  setSelectedInvoiceID(id)
+  setInvoice(response?.data);
+  setInvoiceOpen(true)
+ }
 
   const handleCreateInvoice = async (invoiceData) => {
     try {
@@ -493,27 +505,28 @@ const ViewWorkOrder = () => {
                   </div>
                 </div>
               ) : (
-                <div className="bg-green-50 border border-green-100 rounded p-2 mx-4 my-2 text-xs">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <div className="bg-green-100 p-0.5 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-green-600" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-green-800 text-xs">INVOICE AVAILABLE</h3>
-                        <p className="text-green-700 text-xs">This work order has already been invoiced.</p>
-                      </div>
-                    </div>
-                    <button
-                      className="bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
-                      onClick={() => { setInvoiceOpen(true) }}
-                    >
-                      Show Invoice
-                    </button>
-                  </div>
-                </div>
+                null
+                // <div className="bg-green-50 border border-green-100 rounded p-2 mx-4 my-2 text-xs">
+                //   <div className="flex items-center justify-between">
+                //     <div className="flex items-center gap-1">
+                //       <div className="bg-green-100 p-0.5 rounded-full">
+                //         <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                //           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                //         </svg>
+                //       </div>
+                //       <div>
+                //         <h3 className="font-semibold text-green-800 text-xs">INVOICE AVAILABLE</h3>
+                //         <p className="text-green-700 text-xs">This work order has already been invoiced.</p>
+                //       </div>
+                //     </div>
+                //     <button
+                //       className="bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
+                //       onClick={() => { setInvoiceOpen(true) }}
+                //     >
+                //       Show Invoice
+                //     </button>
+                //   </div>
+                // </div>
               )}
 
 
@@ -566,6 +579,35 @@ const ViewWorkOrder = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Invoice History List */}
+              {invoiceHistory.length > 0 && (
+                <div className="p-4 border-t border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Invoice History</h3>
+                  <div className="grid gap-3">
+                    {invoiceHistory.map((invoice, idx) => (
+                      <div
+                        key={invoice.id}
+                        className={`flex items-center justify-between px-2 py-1 text-sm ${idx !== invoiceHistory.length - 1 ? 'border-b border-gray-200' : ''}`}
+                        style={{ background: 'none', borderRadius: 0 }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-semibold text-green-800">{invoice.invoice_number || `Invoice #${invoice.id}`}</span>
+                          <span className="text-xs text-gray-500">{formatDate(invoice.created_at)}</span>
+                          <span className="text-xs text-gray-700">₹{invoice.amount || 'N/A'}</span>
+                        </div>
+                        <button
+                          className="flex items-center p-1 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
+                          title="Download Invoice"
+                          onClick={()=>{HandleInvoiceDownload(invoice.id)}}
+                        >
+                          <Download size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Production Stages - Dynamic based on progress */}
@@ -834,8 +876,9 @@ const ViewWorkOrder = () => {
             />
             <InvoiceModal
               isOpen={isInvoiceOpen}
-              invoices={invoiceHistory}
+              invoice={invoice}
               setIsOpen={setInvoiceOpen}
+              invoiceID={selectedInvoiceID}
             />
             <CustomAlert
               alerts={alerts}

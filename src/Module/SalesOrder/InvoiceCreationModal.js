@@ -3,6 +3,7 @@ import { X, Calendar, DollarSign, Percent, Hash } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
+
   const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
     defaultValues: {
       client_id: workOrder?.client_id,
@@ -18,7 +19,8 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
       discount: workOrder?.discount || '',
       total_tax: workOrder?.total_tax || '',
       total_amount: workOrder?.total_amount || '',
-      payment_status: workOrder?.payment_status || ''
+      payment_status: workOrder?.payment_status || '',
+      sku_details:  workOrder?.sku_details || [],
     }
   });
 

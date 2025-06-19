@@ -7,8 +7,7 @@ const LanguageSetting = React.lazy(() => import('./LanguageSetting'))
 const SuperAdmin = React.lazy(() => import('./SuperAdmin'))
 const NotificationSetting = React.lazy(() => import('./NotificationSetting'))
 const DropdownSetting = React.lazy(() => import('./DropdownSetting'))
-const Template = React.lazy(() => import('./Template')) 
-
+const TemplatesPage = React.lazy(() => import('./TemplatesPage'))
 
 const settingsRoutes = [
   { path: 'language', name: 'Language Settings', element: LanguageSetting },
@@ -16,8 +15,7 @@ const settingsRoutes = [
   { path: 'superAdmin', name: 'Super Admin', element: SuperAdmin },
   { path: 'notification', name: 'Notification', element: NotificationSetting },
   { path: 'dropdown', name: 'Dropdown Settings', element: DropdownSetting },
-  { path: 'template', name: 'Template', element: Template },
-
+  { path: 'template', name: 'Template', element: TemplatesPage },
 ]
 
 export default settingsRoutes

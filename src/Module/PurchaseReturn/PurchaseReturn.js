@@ -11,12 +11,14 @@ import AddPurchaseOrderReturn from './AddPurchaseReturn'
 import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 
 const PurchaseOrderReturn = () => {
   const [isPorEdit, setIsPorEdit] = useState(false)
   const [selectedPorId, setSelectedPorId] = useState(null)
   const [alerts, setAlerts] = useState([])
   const [porData, setPorData] = useState([])
+    const [count, setCount] = useState(null)
   const [poData, setPoData] = useState([])
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 })
@@ -25,6 +27,9 @@ const PurchaseOrderReturn = () => {
   const { searchQuery } = useSearch()
   const [selectedPoId, setSelectedPoId] = useState(null)
   const [resetTrigger, setResetTrigger] = useState(false)
+  const [isMinimiseTable, setIsMinimiseTable] = useState(false)
+    const location = useLocation()
+const navigate = useNavigate()
 
   // Fetch data
   const fetchData = async () => {
@@ -35,6 +40,7 @@ const PurchaseOrderReturn = () => {
         limit: limit,
       })
       setPorData(response?.data?.approved || [])
+      setCount(response?.data?.totalCount ||0)
       setPagination(response.data.pagination || { currentPage: 1, totalPages: 1, total: 0 })
     } catch (error) {
       console.error(error)
@@ -44,6 +50,13 @@ const PurchaseOrderReturn = () => {
   useEffect(() => {
     fetchData()
   }, [limit, searchQuery, pagination.currentPage])
+  useEffect(() => {
+    if (location.pathname === '/purchase-return') {
+      setIsMinimiseTable(false)
+    } else {
+      setIsMinimiseTable(true)
+    }
+  }, [location.pathname]) // Added dependency
 
   //po data
   const poFetchData = async () => {
@@ -114,7 +127,10 @@ const PurchaseOrderReturn = () => {
 
   const handleAddNew = () => {
     setIsPorEdit(false)
-    setDrawerOpen(true)
+    //setDrawerOpen(true)
+   navigate("/purchase-return/form", {
+    state: { selectedPoId,poData }
+  })
     setIsPorEdit(false)
   }
 
@@ -132,8 +148,10 @@ const PurchaseOrderReturn = () => {
   }
 
   return (
-    <>
+    <div className="flex h-full">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
+              <div className={`${isMinimiseTable ? 'w-1/4 min-w-0' : 'w-full'} flex flex-col`}>
+
       <ContentHeader heading={'Purchase Return'} onAddClick={handleAddNew} />
 
       <div>
@@ -143,28 +161,36 @@ const PurchaseOrderReturn = () => {
             setPorData={setPorData}
             setAlerts={setAlerts}
             handleEdit={handleEdit}
+                      isMinimiseTable={isMinimiseTable}
+                setIsMinimiseTable={setIsMinimiseTable}
+
           />
         </div>
-        <div className="mt-2">
-          <CompactPagination
-            count={pagination?.totalPages || 1}
-            page={pagination?.currentPage || 1}
-            onPageChange={(event, value) => {
-              setPagination((prev) => ({
-                ...prev,
-                currentPage: value,
-              }))
-            }}
-            onEntriesChange={(newLimit) => {
-              setLimit(newLimit)
-              setPagination((prev) => ({
-                ...prev,
-                currentPage: 1,
-              }))
-            }}
-            entriesPerPage={limit}
-          />
-        </div>
+      <div className="mt-2 flex items-center justify-between">
+  {/* Left: Total Count */}
+  <p className="text-sm text-gray-700 w-[200px]">Total Count: {count}</p>
+
+  {/* Right: Pagination */}
+  <CompactPagination
+    count={pagination?.totalPages || 1}
+    page={pagination?.currentPage || 1}
+    onPageChange={(event, value) => {
+      setPagination((prev) => ({
+        ...prev,
+        currentPage: value,
+      }))
+    }}
+    onEntriesChange={(newLimit) => {
+      setLimit(newLimit)
+      setPagination((prev) => ({
+        ...prev,
+        currentPage: 1,
+      }))
+    }}
+    entriesPerPage={limit}
+  />
+</div>
+
         <Drawer
           isOpen={drawerOpen}
           onClose={handleCloseDrawer}
@@ -185,8 +211,15 @@ const PurchaseOrderReturn = () => {
             resetTrigger={resetTrigger}
           />
         </Drawer>
-      </div>
-    </>
+              </div>
+
+</div>
+           {isMinimiseTable && (
+        <div className="flex-1 min-w-0">
+          <Outlet />
+        </div>
+      )}
+    </div>
   )
 }
 

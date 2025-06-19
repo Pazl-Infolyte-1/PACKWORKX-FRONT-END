@@ -21,37 +21,42 @@ import {
 } from 'lucide-react'
 import { FaRupeeSign } from 'react-icons/fa'
 import { inventoryApi } from '../../api/inventory'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 const ViewInventory = ({setIsMinimised}) => {
   const [itemDetails, setItemDetails] = useState(null)
   const menus = ['Products', 'Purchase Order', 'GRN', 'Purchase Returns', 'Stock Adjustment']
  const { state } = useLocation();
+// const {item_id}=useParams()
+// console.log("item id",state.item.item_id)
+  //console.log("item id///",item_id)
+
   const { item, totalInventoryValue } = state || {};
   const [activeMenu, setActiveMenu] = useState('Products')
   const navigate = useNavigate()
+   useEffect(() => {
+    if (state?.item?.item_id) {
+      setIsMinimised(true);
+    } else {
+      setIsMinimised(false); // Reset to false if ID is not '10'
+    }
+  }, [state?.item?.item_id]);
   useEffect(() => {
     const fetchSingleItem = async () => {
-      if (!item?.item_id) return
+      if (!state?.item?.item_id) return
 
       try {
-        const response = await inventoryApi.singleInventoryView(item.item_id)
-        setItemDetails(response.data)
+        const response = await inventoryApi.singleInventoryView(state?.item?.item_id)
+        setItemDetails(response?.data)
       } catch (error) {
         console.error('Error fetching single inventory view:', error)
       }
     }
 
     fetchSingleItem()
-  }, [item])
+  }, [state?.item?.item_id])
 console.log(item);
- useEffect(() => {
-    if (item?.id) {
-      setIsMinimised(true);
-    } else {
-      setIsMinimised(false); // Reset to false if ID is not '10'
-    }
-  }, [item?.id]);
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',

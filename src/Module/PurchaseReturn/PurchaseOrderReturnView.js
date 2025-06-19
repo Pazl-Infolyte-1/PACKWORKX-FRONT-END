@@ -1,28 +1,47 @@
 import React, { useEffect, useState } from 'react'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
+import { useNavigate, useParams } from 'react-router-dom'
 
-const GrnView = ({ id, setOpenPoReturnModal }) => {
+const GrnView = ({  setOpenPoReturnModal }) => {
   const [poDetails, setPoDetails] = useState(null)
+  const navigate = useNavigate()
+  //useEffect(() => {
+  //  const fetchData = async () => {
+  //    try {
+  //      const response = await purchaseOrderApi.getPurchaseReturn()
+  //      const poReturnList = Array.isArray(response?.data?.approved)
+  //        ? response.data.approved
+  //        : response.data.disapproved || []
+
+  //      const matchedpoReturnList = poReturnList.find((item) => item.id === id)
+
+  //      setPoDetails(matchedpoReturnList)
+  //    } catch (error) {
+  //      console.error('Error fetching data:', error)
+  //    }
+  //  }
+  //  fetchData()
+  //}, [id])
+    const {id} = useParams()
+console.log("iddd",id)
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await purchaseOrderApi.getPurchaseReturn()
-        const poReturnList = Array.isArray(response?.data?.approved)
-          ? response.data.approved
-          : response.data.disapproved || []
-
-        const matchedpoReturnList = poReturnList.find((item) => item.id === id)
-
-        setPoDetails(matchedpoReturnList)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
+      const response = await purchaseOrderApi.getPurchaseReturnById(id)
+      console.log('Purchase Return Response:', response?.data)
+      setPoDetails(response?.data?.data)
     }
-    fetchData()
+
+    if (id) {
+      fetchData()
+    }
   }, [id])
+
+  const handleClose =()=>{
+navigate("/purchase-return")
+  }
   return (
     <div>
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg shadow-md h-full overflow-y-auto">
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg shadow-md h-[650px] overflow-y-auto">
         {/* Header */}
         <div className="border-b border-gray-200 pb-4 mb-6">
           <div className="flex justify-between items-center">
@@ -32,6 +51,20 @@ const GrnView = ({ id, setOpenPoReturnModal }) => {
                 Purchase Order Return ID: #{poDetails?.id}
               </span>
             </div>
+           <div>
+  <button onClick={handleClose} aria-label="Close">
+    <svg
+      className="h-5 w-5 text-indigo-800 hover:text-red-500"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+</div>
+
           </div>
           <div className="mt-2 flex items-center">
             <span

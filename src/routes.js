@@ -14,7 +14,10 @@ const SkuAddEdit = React.lazy(() => import('./Module/SKU/SkuAddEdit.js'))
 const EmployeeList = React.lazy(() => import('./Module/HRMS/Employee/EmployeeList.js'))
 const PurchaseOrder = React.lazy(() => import('./Module/Purchase/PurchaseOrder.js'))
 const AddPurchaseOrder = React.lazy(() => import('./Module/Purchase/AddPurchaseOrder.js'))
+const AddPurchaseReturn = React.lazy(() => import('./Module/PurchaseReturn/AddPurchaseReturn.js'))
 const PurchaseOrderDetails = React.lazy(() => import('./Module/Purchase/PurchaseOrderDetails.js'))
+const PurchaseOrderReturnView = React.lazy(() => import('./Module/PurchaseReturn/PurchaseOrderReturnView.js'))
+
 const MachineDashboard = React.lazy(() => import('./Module/Machine/MachineDashboard.js'))
 const AddEditMachine = React.lazy(() => import('./Module/Machine/AddEditMachine.js'))
 const InventoryHandling = React.lazy(() => import('./Module/Inventory/InventoryHandling.js'))
@@ -120,6 +123,17 @@ const routes = [
     ],
   },
   { path: '/purchaseorder/form/:id?', name: 'Purchase Order', element: AddPurchaseOrder, key: 654 },
+    { path: '/purchase-return', name: 'Purchase Return', element: PurchaseReturn, key: 'purchase return',
+          children: [
+      {
+        path: '/purchase-return/:id',
+        name: 'PurchaseOrderReturn',
+        element: PurchaseOrderReturnView,
+        key: '',
+      },
+    ],
+     },
+       { path: '/purchase-return/form/:id?', name: 'Purchase Order', element: AddPurchaseReturn, key: "return form" },
   { path: '/machinedashboard', name: 'Machine Dashboard', element: MachineDashboard, key: 22 },
   {
     path: '/machinedashboard/form',
@@ -195,7 +209,6 @@ const routes = [
 
   { path: '/attendance', name: 'Attendance', element: Attendance, key: '' },
   { path: '/salesReturn', name: 'Sales Return', element: SalesReturn, key: '' },
-  { path: '/purchase-return', name: 'Purchase Return', element: PurchaseReturn, key: '' },
   { path: '/reports', name: 'Reports', element: Reports, key: '' },
   { path: '/offlineRequest', name: 'Offline Request', element: OfflineRequest, key: '' },
   { path: '/adminFaq', name: 'Admin Faq', element: AdminFaq, key: '' },

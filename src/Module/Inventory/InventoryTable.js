@@ -154,14 +154,14 @@ const InventoryTable = ({ inventoryData,subCategoryId,totalInventoryValue,setIsM
                   onClick={() => {
                     setSelectedItem(item)
                     //setViewItem(true)
-                    setIsMinimised(true)
-                                             navigate(`/inventoryhandling/${item?.id}`, {
+                                             navigate(`/inventoryhandling/${item?.item_id}`, {
     state: {
       item,
       totalInventoryValue,
     },
   });
 
+                    setIsMinimised(true)
 
                   }}
                 >

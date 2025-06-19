@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 
 const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
 
+  console.log(workOrder.sales_sku_details)
+
   const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
     defaultValues: {
       client_id: workOrder?.client_id,
@@ -20,7 +22,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
       total_tax: workOrder?.total_tax || '',
       total_amount: workOrder?.total_amount || '',
       payment_status: workOrder?.payment_status || '',
-      sku_details:  workOrder?.sku_details || [],
+      sales_sku_details:workOrder?.sales_sku_details || [],
     }
   });
 
@@ -57,7 +59,8 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
         sku_id: workOrder.sku_id,
         work_id: workOrder.id,
         sale_id: workOrder.sales_order_id,
-        sku_version_id:workOrder.sales_order_i
+        sku_version_id:workOrder.sales_order_i,
+        sku_details:workOrder?.sales_sku_details || [],
       };
       
 

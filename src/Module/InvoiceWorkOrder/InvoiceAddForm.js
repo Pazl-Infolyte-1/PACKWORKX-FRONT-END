@@ -143,6 +143,19 @@ const InvoiceAddForm = forwardRef((props, ref) => {
     setValue('client_id', client_id);
     setIsOpen(false);
 
+    // Clear SKU details and work order selection when client changes
+    setValue('sku_details', [{
+      sku_id: null,
+      sku: '',
+      quantity_required: '',
+      rate_per_sku: '',
+      total_amount: '',
+      gst: '',
+      total_incl__gst: ''
+    }]);
+    setValue('work_id', '');
+    setSelectedWorkOrder(null);
+
     const fetchWorkOrders = async () => {
       try {
         const response = await invoiceApi.getWorkOrdersListByClientId(client_id);
@@ -412,7 +425,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
             </div>
 
             {/* Total and Balance in One Row */}
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <label className="text-xs text-red-600 w-40">Total*</label>
               <div className="flex gap-4">
                 <input
@@ -435,7 +448,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Payment Expected Date and Payment Status in One Row */}
             <div className="flex items-center">

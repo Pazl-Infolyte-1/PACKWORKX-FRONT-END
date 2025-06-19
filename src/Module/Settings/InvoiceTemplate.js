@@ -94,12 +94,12 @@ function InvoiceTemplate() {
     <div className="w-full overflow-x-hidden">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       <div className="p-3 w-full">
-        {/* <div className="mb-8">
+        <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Invoice Templates</h1>
           <p className="text-gray-600">
             Choose from our collection of professional purchase order templates
           </p>
-        </div> */}
+        </div>
 
         {/* Templates Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
@@ -120,10 +120,10 @@ function InvoiceTemplate() {
                   <div
                     className="absolute top-0 left-0 pointer-events-none"
                     style={{
-                      transform: 'scale(0.2)',
+                      transform: 'scale(0.35)',
                       transformOrigin: 'top left',
-                      width: '500%',
-                      height: '500%',
+                      width: '300%',
+                      height: '300%',
                     }}
                   >
                     <div

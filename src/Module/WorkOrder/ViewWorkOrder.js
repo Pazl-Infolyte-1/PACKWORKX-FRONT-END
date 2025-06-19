@@ -612,8 +612,32 @@ const ViewWorkOrder = () => {
 
             {/* Production Stages - Dynamic based on progress */}
             <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-              <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">Production Stages</h3>
+                <div className="relative">
+                  <button
+                    className="px-3 py-1.5 text-xs text-white min-w-[12rem] bg-blue-600 rounded hover:bg-blue-700 flex items-center"
+                    onClick={() => setIsProgressDropdownOpen(!isProgressDropdownOpen)}
+                  >
+                    Update Progress
+                    <ChevronDown size={14} className="ml-1" />
+                  </button>
+                  {isProgressDropdownOpen && (
+                    <div className="absolute right-0 z-50 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto min-w-[12rem] transition-all duration-200">
+                      {progressOptions.map((option) => (
+                        <button
+                          key={option}
+                          className={`w-full px-3 py-1.5 text-xs text-left hover:bg-gray-50 ${
+                            workOrder.progress === option ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                          }`}
+                          onClick={() => handleProgressChange(option)}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="p-4">
                 <div className="relative">
@@ -722,55 +746,6 @@ const ViewWorkOrder = () => {
     )}
   </div>
 </div>
-            {/* Actions */}
-            <div className="overflow-visible mt-2 bg-white border border-gray-200 rounded-lg shadow-sm">
-              <div className="p-3 border-b border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700">Actions</h3>
-              </div>
-              <div className="p-4">
-                <div className="space-y-2">
-                  <div className="relative">
-                    <button
-                      className="w-full px-3 py-1.5 text-xs text-white bg-blue-600 rounded hover:bg-blue-700 flex items-center justify-between"
-                      onClick={() => setIsProgressDropdownOpen(!isProgressDropdownOpen)}
-                    >
-                      Update Progress
-                      <ChevronDown size={14} className="ml-1" />
-                    </button>
-                    {isProgressDropdownOpen && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                        {progressOptions.map((option) => (
-                          <button
-                            key={option}
-                            className={`w-full px-3 py-1.5 text-xs text-left hover:bg-gray-50 ${
-                              workOrder.progress === option ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-                            }`}
-                            onClick={() => handleProgressChange(option)}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  
-                </div>
-                
-              </div>
-            </div>
-
-            {/* Description Section */}
-            {/* {workOrder?.description && (
-              <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-                <div className="p-2 border-b border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-700">Description</h3>
-                </div>
-                <div className="p-3">
-                  <p className="text-sm text-gray-600">{workOrder.description}</p>
-                </div>
-              </div>
-            )} */}
-
             {/* Related Info */}
             <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="p-2 border-b border-gray-200">

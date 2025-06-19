@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ContentHeader from '../../components/New/ContentHeader'
 import InvoiceTable from './InvoiceTable'
-import { Outlet, useLocation, useParams } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import CompactPagination from '../../components/New/CompactPagination'
 import { useSearch } from '../../components/New/SearchContext'
 import { workOrderApi } from '../../api/workOrder'
@@ -9,6 +9,7 @@ import { workOrderApi } from '../../api/workOrder'
 function InvoiceList() {
   const [isMiniMised, setIsMinimised] = useState()
   const [invoices, setInvoices] = useState([])
+  const Navigate = useNavigate()
   const [pagination, setPagination] = useState({
     page: 1,
     totalPages: 1,
@@ -60,6 +61,7 @@ function InvoiceList() {
         <ContentHeader
           heading={"invoice"}
           isMinimized={isMiniMised}
+          onAddClick={()=>{Navigate('form')}}
         />
         <InvoiceTable
           isMiniMised={isMiniMised}

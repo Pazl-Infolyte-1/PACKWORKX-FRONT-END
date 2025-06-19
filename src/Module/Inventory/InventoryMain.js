@@ -9,7 +9,7 @@ import { MdCategory, MdOutlineStickyNote2, MdPushPin, MdRecycling } from 'react-
 import { cilArrowTop, cilSave } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import ContentHeader from '../../components/New/ContentHeader'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import CompactPagination from '../../components/New/CompactPagination'
 import { useSearch } from '../../components/New/SearchContext'
 import { FiDownload } from 'react-icons/fi'
@@ -672,10 +672,11 @@ const [isMinimised,setIsMinimised] = useState(false)
   </div>
 
   {/* Right Section - Inventory View */}
- <div className={`${isMinimised ? 'col-span-7' : ''} -mt-10`}>
+{isMinimised&&( <div className={`${isMinimised ? 'col-span-7' : ''} -mt-10`}>
     {/*<InventoryView />*/}
     <ViewInventory item={selectedItem} totalInventoryValue={inventoryData} setIsMinimised={setIsMinimised}/>
-  </div>
+    {/*<Outlet/>*/}
+  </div>)}
 </div>
 
     </>

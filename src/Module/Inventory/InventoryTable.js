@@ -101,7 +101,7 @@ const InventoryTable = ({ inventoryData,subCategoryId,totalInventoryValue,setIsM
       >
         <CTable
           className={`border-separate border-spacing-0 ${isMinimised
-              ? 'h-[1000px]' // or min-h-[500px] if needed
+              ? 'h-[400px]' // or min-h-[500px] if needed
               : 'min-w-[900px] overflow-x-scroll'
             }`}
         >
@@ -155,6 +155,14 @@ const InventoryTable = ({ inventoryData,subCategoryId,totalInventoryValue,setIsM
                     setSelectedItem(item)
                     //setViewItem(true)
                     setIsMinimised(true)
+                                             navigate(`/inventoryhandling/${item?.id}`, {
+    state: {
+      item,
+      totalInventoryValue,
+    },
+  });
+
+
                   }}
                 >
                   <CTableDataCell
@@ -250,7 +258,7 @@ const InventoryTable = ({ inventoryData,subCategoryId,totalInventoryValue,setIsM
                           <ThreeDotMenu
                             value={[
                               {
-                                label: 'Edit',
+                                label: 'Edit Product',
                                 icon: cilPencil,
                                 onClick: () => {
                                   navigate('/inventoryhandling/inventory_form',{

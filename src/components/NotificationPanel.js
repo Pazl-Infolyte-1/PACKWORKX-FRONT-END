@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { CDropdown, CDropdownToggle, CDropdownMenu, CDropdownItem } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilBell, cilX } from '@coreui/icons'
@@ -9,7 +9,11 @@ import { setAllNotifications, clearNotification, clearAllNotifications } from '.
 const NotificationPanel = () => {
   const dispatch = useDispatch()
 
-  const notifications = useSelector((state) => state?.auth?.all_notification || [])
+  // Memoized selector to prevent unnecessary rerenders
+  const allNotificationState = useSelector((state) => state?.auth?.all_notification)
+  const notifications = useMemo(() => {
+    return allNotificationState || []
+  }, [allNotificationState])
 
   const fetchNotifications = async () => {
     try {

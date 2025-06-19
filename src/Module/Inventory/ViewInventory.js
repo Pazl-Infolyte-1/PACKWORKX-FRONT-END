@@ -21,12 +21,15 @@ import {
 } from 'lucide-react'
 import { FaRupeeSign } from 'react-icons/fa'
 import { inventoryApi } from '../../api/inventory'
+import { useLocation, useNavigate } from 'react-router-dom'
 
-const ViewInventory = ({ item, totalInventoryValue ,setIsMinimised}) => {
+const ViewInventory = ({setIsMinimised}) => {
   const [itemDetails, setItemDetails] = useState(null)
   const menus = ['Products', 'Purchase Order', 'GRN', 'Purchase Returns', 'Stock Adjustment']
-
+ const { state } = useLocation();
+  const { item, totalInventoryValue } = state || {};
   const [activeMenu, setActiveMenu] = useState('Products')
+  const navigate = useNavigate()
   useEffect(() => {
     const fetchSingleItem = async () => {
       if (!item?.item_id) return
@@ -42,7 +45,13 @@ const ViewInventory = ({ item, totalInventoryValue ,setIsMinimised}) => {
     fetchSingleItem()
   }, [item])
 console.log(item);
-
+ useEffect(() => {
+    if (item?.id) {
+      setIsMinimised(true);
+    } else {
+      setIsMinimised(false); // Reset to false if ID is not '10'
+    }
+  }, [item?.id]);
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -114,19 +123,37 @@ console.log(item);
   const handleClose =()=>{
 setIsMinimised(false)
   }
+
+const handleEdit=()=>{
+        navigate('/inventoryhandling/inventory_form',{
+                                    state: {
+                                      item,
+                                      fromInventory: true,
+                                      isInventoryEditing: true,
+                                      isEdit: true,
+                                    },
+                                  })
+}
   return (
   <div className='border-l h-[600px] flex flex-col'>
   {/* Fixed Header Section */}
-  <div className="flex-shrink-0 bg-white border-b shadow-sm sticky top-0 z-10">
-    {/* Close button */}
-    <div className="flex justify-end p-2">
-      <button
-        onClick={handleClose} // define this function in your component
-        className="text-gray-500 hover:text-red-600 transition-colors"
-        aria-label="Close"
-      >
-        ✕
-      </button>
+<div className="flex-shrink-0 bg-white border-b shadow-sm sticky top-0 z-10">
+  {/* Header buttons */}
+  <div className="flex justify-end items-center p-2 space-x-2">
+    {/*<button
+      onClick={handleEdit} // define this function in your component
+      className="text-gray-500 hover:text-blue-600 transition-colors"
+      aria-label="Edit"
+    >
+      ✎ Edit
+    </button>*/}
+    <button
+      onClick={handleClose}
+      className="text-gray-500 hover:text-red-600 transition-colors"
+      aria-label="Close"
+    >
+      ✕
+    </button>
     </div>
 
     {/* Nav menu */}
@@ -151,16 +178,27 @@ setIsMinimised(false)
       <div className="flex-1 overflow-y-auto">
         {activeMenu === 'Products' ? (
           <div className="p-3">
-            <div className="flex justify-between">
-              <h2 className="text-xl font-bold mb-2   text-gray-800 flex items-center gap-2">
-                <Package className="w-6 h-6 text-blue-600" />
-                Product Details
-              </h2>
-              <div>
-                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                <p className="text-sm font-bold m-0">Available Qty: {parseFloat(item?.quantity_available)}</p>
-              </div>
-            </div>
+          <div className="flex justify-between">
+  <h2 className="text-xl font-bold mb-2 text-gray-800 flex items-center gap-2">
+    <Package className="w-6 h-6 text-blue-600" />
+    Product Details
+  </h2>
+  <div className="text-right">
+    <div className="flex items-center justify-end gap-2">
+      <button
+        onClick={handleEdit} // define this function
+        className="text-sm text-blue-600 hover:underline"
+      >
+        ✎ Edit
+      </button>
+      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+    </div>
+    <p className="text-sm font-bold m-0">
+      Available Qty: {parseFloat(item?.quantity_available)}
+    </p>
+  </div>
+</div>
+
 
             {itemDetails?.products ? (
               <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden mt-1">

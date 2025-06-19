@@ -145,7 +145,7 @@ const DebitNoteForm = () => {
                     }
                     <span className="truncate text-sm text-gray-500">
                       {debitNoteFormData.po_return_id
-                        ? `Purchase Return ID: ${debitNoteFormData.purchase_generate_id}`
+                        ? ` ${debitNoteFormData.purchase_generate_id}`
                         : 'Select Return'}
                     </span>
                     <span className="text-gray-500">
@@ -216,7 +216,7 @@ const DebitNoteForm = () => {
                             className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
                             onClick={() => handleSelectReturn(r.id, r.purchase_generate_id)}
                           >
-                            Purchase Return ID: {r.purchase_generate_id}
+                             {r.purchase_generate_id}
                           </div>
                         ))
                       ) : (

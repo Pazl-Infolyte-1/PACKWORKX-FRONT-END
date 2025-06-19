@@ -15,12 +15,13 @@ import PopUp from '../../components/New/PopUp'
 import PurchaseOrderReturnView from './PurchaseOrderReturnView'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
+import { useNavigate } from 'react-router-dom'
 
-const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
+const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit ,isMinimiseTable ,setIsMinimiseTable}) => {
   const [confirmModal, setConfirmModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [openPOModal, setOpenPoReturnModal] = useState(false)
-
+const navigate = useNavigate()
   const closeDeleteModal = () => {
     setConfirmModal(false)
   }
@@ -105,7 +106,11 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
             {
               label: 'View',
               icon: cilHandPointRight,
-              onClick: () => setOpenPoReturnModal({ open: true, id: row.id }),
+              onClick: () => {
+                //setOpenPoReturnModal({ open: true, id: row.id })
+                  setIsMinimiseTable(true)
+      navigate(`/purchase-return/${row.id}`)
+            },
             },
             // {
             //   label: 'Edit',
@@ -122,6 +127,10 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
       ),
     },
   ]
+    const handleView = (row) => {
+      setIsMinimiseTable(true)
+      navigate(`/purchase-return/${row.id}`)
+    }
 
   return (
     <>
@@ -129,7 +138,12 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
         <ReusableTable
           data={porData}
           columns={columns}
-          handleRowClick={(row) => setOpenPoReturnModal({ open: true, id: row.id })}
+          //handleRowClick={(row) => setOpenPoReturnModal({ open: true, id: row.id })}
+                    handleRowClick={(row) => handleView(row)}
+
+                    isMinimiseTable={isMinimiseTable}
+          miniScreenFields={['purchase_return_generate_id']}
+
         />
       </div>
       <ConfirmationModale
@@ -137,7 +151,7 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
         onClose={closeDeleteModal}
         onConfirm={handleDelete}
       />
-      <PopUp
+      {/*<PopUp
         visible={openPOModal.open}
         setVisible={(isVisible) => {
           if (!isVisible) setOpenPoReturnModal({ open: false, id: null })
@@ -147,7 +161,7 @@ const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit }) => {
         height="660px"
       >
         <PurchaseOrderReturnView id={openPOModal.id} setOpenPoReturnModal={setOpenPoReturnModal} />
-      </PopUp>
+      </PopUp>*/}
     </>
   )
 }

@@ -11,13 +11,14 @@ import { purchaseOrderApi } from '../../api/purchaseOrder'
 import { setAllNotifications } from '../../action'
 import { useDispatch } from 'react-redux'
 import { CornerDownLeft } from 'lucide-react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const AddPurchaseOrderReturn = ({
   isEdit,
-  selectedPoId,
+  //selectedPoId,
   setDrawer,
   selectedPorId,
-  poData,
+  //poData,
   isOpen,
   resetTrigger,
 }) => {
@@ -33,7 +34,9 @@ const AddPurchaseOrderReturn = ({
   const [grnData, setGrnData] = useState([])
   const [selectedGrnID, setSelectedGrnID] = useState(0)
   const [poIDForReturn, setPoIDForReturn] = useState(0)
-
+const location = useLocation()
+  const selectedPoId = location.state?.selectedPoId
+  const poData =location.state?.poData
   const [poTotals, setPoTotals] = useState({
     total_qty: 0,
     cgst_amount: 0,
@@ -44,7 +47,7 @@ const AddPurchaseOrderReturn = ({
   })
 
   const dispatch = useDispatch()
-
+const navigate=useNavigate()
   const {
     register,
     control,
@@ -138,7 +141,8 @@ const AddPurchaseOrderReturn = ({
       total_amount: 0,
       return_qty: 0,
     })
-    setDrawer(false)
+    //setDrawer(false)
+   navigate("/purchase-return") 
     setItems([])
     setPoTotals({
       total_qty: 0,
@@ -308,34 +312,36 @@ const AddPurchaseOrderReturn = ({
     }
   }
 
-  const getGRNData = async (poId) => {
-    try {
-      const response = await purchaseOrderApi.getGrnByPoId(poId)
-      const grn = response.data?.data.grns || []
-      // const matchedGrn = allGrns.find((grn) => grn.po_id === poId)
+ const getGRNData = async (poId) => {
+  try {
+    const response = await purchaseOrderApi.getGrnByPoId(poId)
+    const grn = response.data?.data || [] // correct extraction
 
-      if (grn) {
-        setGrnData(grn)
+    console.log("GRNs:", grn)
 
-        if (grn.length === 1) {
-          const id = grn[0].id
-          setGrnId(id)
-          setSelectedGrnID(id)
-          setValue('grn_id', id)
-          getGRNItemsForReturn(poId, id)
-        }
-      } else {
-        console.warn('No GRN found matching the PO ID:', poId)
-        // setAlerts('No matching GRN found.')
+    if (grn.length > 0) {
+      setGrnData(grn)
+
+      if (grn.length === 1) {
+        const id = grn[0].id
+        setGrnId(id)
+        setSelectedGrnID(id)
+        setValue('grn_id', id)
+        getGRNItemsForReturn(poId, id)
       }
-    } catch (error) {
-      setAlerts({
-        severity: 'error',
-        message: 'Something went wrong',
-      })
-      console.error(error.response?.data || error.message)
+    } else {
+      console.warn('No GRNs found for PO ID:', poId)
+      // Optionally show a warning alert
     }
+  } catch (error) {
+    setAlerts({
+      severity: 'error',
+      message: 'Something went wrong',
+    })
+    console.error(error.response?.data || error.message)
   }
+}
+
 
   const getPOItemsById = async (poId) => {
     try {
@@ -386,49 +392,6 @@ const AddPurchaseOrderReturn = ({
   const handleFormSubmit = async (data) => {
     const checkedItems = items.filter((item) => item.selected)
     const checkedItemCodes = checkedItems.map((item) => item.item_code)
-
-    ////////////////////////////////////////////////////////////////////////////////////////
-    // const response = await workOrderApi.getinventory();
-    // const inventoryList = Array.isArray(response?.data?.data) ? response.data.data : [];
-    // let allAvailable = true;
-    // for (const checkedItem of checkedItems) {
-    //   const matchedInventory = inventoryList.find(inv => inv.item_id === checkedItem.item_id);
-
-    //   if (!matchedInventory || matchedInventory.quantity_available === 0) {
-    //     allAvailable = false;
-    //     console.warn(`Item ID ${checkedItem.item_id} is not available in inventory.`);
-    //     break;
-    //   }
-    // }
-    // const message = allAvailable
-    //   ? "Purchase return created successfully"
-    //   : "Some item quantities are zero or unavailable, so return not possible";
-    // alert(message);
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // if (checkedItems.length === 0) {
-    //   alert('Please select at least one item to return.')
-    //   return
-    // }
-    // const grnDetails = await handleGrndata(grnId, checkedItemCodes)
-
-    // Fetch GRN details first to enrich or validate data
-
-    // const payload = {
-    //   ...data,
-    //   items: checkedItems.map(item => ({
-    //     grn_item_id: item.grn_item_id || null,
-    //     item_id: item.item_id,
-    //     return_qty: item.quantity,
-    //     unit_price: item.unit_price,
-    //     reason: data.reason || 'Quality issues',
-    //     notes: data.notes || ''
-    //   })),
-    //   ...poTotals,
-    //   po_id: selectedPoId,
-    //   grn_id: grnId
-    // }
-
     const payload = {
       po_id: data.po_id || selectedPoId,
       grn_id: grnId || selectedGrnID,
@@ -460,7 +423,8 @@ const AddPurchaseOrderReturn = ({
         },
       ])
       handleFormReset()
-      setDrawer(false)
+      //setDrawer(false)
+         navigate("/purchase-return") 
     } catch (error) {
       console.error('Submission error:', error)
       setAlerts([
@@ -639,26 +603,26 @@ const AddPurchaseOrderReturn = ({
                 ))}
               </select>
             </div>
+<div className="form-group">
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    GRN ID <span className="text-red-500"> *</span>
+  </label>
+  <select
+    {...register('grn_id', { required: 'required' })}
+    onChange={handleGrnChange}
+    style={getInputStyle(errors?.grn_id)}
+    className="w-full p-2 border-gray-300 rounded-md"
+    value={selectedGrnID || ''}
+  >
+    <option value="">-- Select GRN --</option>
+    {grnData?.map((grn) => (
+      <option key={grn.id} value={grn.id}>
+        {grn.grn_generate_id}
+      </option>
+    ))}
+  </select>
+</div>
 
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                GRN ID <span className="text-red-500"> *</span>
-              </label>
-              <select
-                {...register('grn_id', { required: 'required' })}
-                onChange={handleGrnChange}
-                style={getInputStyle(errors?.grn_id)}
-                className="w-full p-2 border-gray-300 rounded-md"
-                value={selectedGrnID || ''}
-              >
-                <option value="">-- Select GRN --</option>
-                {grnData?.map((grn) => (
-                  <option key={grn.id} value={grn.id}>
-                    {grn.grn_generate_id}
-                  </option>
-                ))}
-              </select>
-            </div>
 
             {/* <div className="form-group">
               <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Name </label>

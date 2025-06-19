@@ -9,7 +9,7 @@ import { MdCategory, MdOutlineStickyNote2, MdPushPin, MdRecycling } from 'react-
 import { cilArrowTop, cilSave } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import ContentHeader from '../../components/New/ContentHeader'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useParams } from 'react-router-dom'
 import CompactPagination from '../../components/New/CompactPagination'
 import { useSearch } from '../../components/New/SearchContext'
 import { FiDownload } from 'react-icons/fi'
@@ -39,6 +39,8 @@ const InventoryMain = () => {
   const [isStockDropdownOpen, setIsStockDropdownOpen] = useState(false)
 const [isMinimised,setIsMinimised] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
+  const {id}=useParams()
+
 
   // Refs for click outside detection
   const stockDropdownRef = useRef(null)
@@ -292,6 +294,11 @@ const [isMinimised,setIsMinimised] = useState(false)
       console.error(error)
     }
   }
+  useEffect(()=>{
+if(id){
+  setIsMinimised(true)
+}
+  },[id])
 
   return (
     <>

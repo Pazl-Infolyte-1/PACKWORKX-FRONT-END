@@ -391,7 +391,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
                 <thead className="bg-white z-10">
                   <tr className="bg-gray-100 p-2">
                     <th className="py-2 px-2 text-sm font-bold text-left rounded-tl-xl">
-                      Item Table
+                      Product Table
                     </th>
                     <th></th>
                     <th></th>
@@ -404,7 +404,7 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
 
                   <tr>
                     <th className="py-2 pl-2 border-r border-b text-xs font-medium text-left">
-                      ITEM DETAILS
+                      PRODUCT DETAILS
                     </th>
                     <th className="p-2 border-r text-xs font-medium text-right">QUANTITY</th>
                     <th className="p-2 border-r text-xs font-medium text-right">RATE</th>

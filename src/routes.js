@@ -62,11 +62,11 @@ const InvoiceView = React.lazy(() => import('./Module/InvoiceWorkOrder/InvoiceVi
 const InventoryForm = React.lazy(() => import('./Module/Inventory/Items/AddItemProcess.js'))
 const DebitNote = React.lazy(() => import('./Module/DebitNote/DebitNote.js'))
 const DebitNoteForm = React.lazy(() => import('./Module/DebitNote/DebitNoteForm.js'))
+const DebitNoteView = React.lazy(() => import('./Module/DebitNote/DebitNoteView.js'))
 const CreditNote = React.lazy(() => import('./Module/CreditNote/CreditNote.js'))
 const CreditNoteForm = React.lazy(() => import('./Module/CreditNote/CreditNoteForm.js'))
 const CreditNoteView = React.lazy(() => import('./Module/CreditNote/CreditNoteView.js'))
 const InventoryView = React.lazy(() => import('./Module/Inventory/ViewInventory.js'))
-
 
 // const ProductionPlanning = React.lazy(
 //   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
@@ -127,9 +127,13 @@ const routes = [
     element: AddEditMachine,
     key: 22,
   },
-  { path: '/inventoryhandling', name: 'Inventory Handling', element: InventoryMain, key: 28,
-        children: [{ path: ':id', element: InventoryView, key: 'inventory' }],
-   },
+  {
+    path: '/inventoryhandling',
+    name: 'Inventory Handling',
+    element: InventoryMain,
+    key: 28,
+    children: [{ path: ':id', element: InventoryView, key: 'inventory' }],
+  },
   { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 230 },
   {
     path: '/production',
@@ -202,8 +206,14 @@ const routes = [
   { path: '/designation', name: 'Designation', element: Designation, key: '' },
   { path: '/department', name: 'Department', element: Department, key: '' },
   { path: '/role', name: 'role', element: Role, key: '' },
-  { path: '/debitnote', name: 'Debit Note', element: DebitNote, key: '' },
-  { path: '/debitnote/add-form', name: 'Add Debit Note', element: DebitNoteForm, key: '' },
+  {
+    path: '/debitnote',
+    name: 'Debit Note',
+    element: DebitNote,
+    key: '',
+    children: [{ path: '/debitnote/:id', name: 'DebitNoteView', element: DebitNoteView, key: '' }],
+  },
+  { path: '/debitnote/add-form/:id?', name: 'Add Debit Note', element: DebitNoteForm, key: '' },
   {
     path: '/credit-note',
     name: 'Credit Note',
@@ -262,7 +272,6 @@ const routes = [
     name: 'invoiceForm',
     element: InvoiceForm,
     key: '',
-
   },
   {
     path: '/inventoryhandling/inventory_form',

@@ -14,12 +14,13 @@ import PopUp from '../../components/New/PopUp'
 import DebitNoteView from './DebitNoteView'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import { debitApi } from '../../api/debit'
+import { useNavigate } from 'react-router-dom'
 
-const DebitNoteTable = ({ debitNoteData, setDebitNoteData, setAlerts, handleEdit }) => {
+const DebitNoteTable = ({ debitNoteData, setAlerts, isMinimiseTable, setIsMinimiseTable }) => {
   const [confirmModal, setConfirmModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [openDebitNoteModal, setOpenDebitNoteModal] = useState(false)
-
+  const navigate = useNavigate()
   const closeDeleteModal = () => setConfirmModal(false)
 
   const openDeleteModal = (id) => {
@@ -32,8 +33,7 @@ const DebitNoteTable = ({ debitNoteData, setDebitNoteData, setAlerts, handleEdit
       const response = await debitApi.deleteDebitNote(deleteId)
       if (response.status === 200) {
         setConfirmModal(false)
-        setDebitNoteData((prev) => prev.filter((item) => item.id !== deleteId))
-        setAlerts([{ severity: 'error', message: 'Debit Note deleted successfully!' }])
+        setAlerts([{ severity: 'success', message: response.data.message || 'Debit Note deleted successfully!' }])
       }
     } catch (error) {
       console.error(error)
@@ -58,14 +58,15 @@ const DebitNoteTable = ({ debitNoteData, setDebitNoteData, setAlerts, handleEdit
       field: 'po_return_id',
     },
     {
-      key: 'invoice_number',
-      header: 'Invoice No.',
-      field: 'invoice_number',
+      key: 'reference_id',
+      header: 'Reference Id.',
+      field: 'reference_id',
     },
     {
-      key: 'invoice_date',
-      header: 'Invoice Date',
-      field: 'invoice_date',
+      key: 'debit_note_date',
+      header: 'Debit Note Date',
+      field: 'debit_note_date',
+      type: 'date',
     },
     {
       key: 'amount',
@@ -85,11 +86,11 @@ const DebitNoteTable = ({ debitNoteData, setDebitNoteData, setAlerts, handleEdit
       render: (row) => (
         <ThreeDotMenu
           value={[
-            // {
-            //   label: 'Edit Debit Note',
-            //   icon: cilPencil,
-            //   onClick: () => handleEdit(row),
-            // },
+            {
+              label: 'Edit Debit Note',
+              icon: cilPencil,
+              onClick: () => navigate(`/debitnote/add-form/${row.id}`),
+            },
             {
               label: 'Delete',
               icon: cilTrash,
@@ -107,7 +108,9 @@ const DebitNoteTable = ({ debitNoteData, setDebitNoteData, setAlerts, handleEdit
         <ReusableTable
           data={debitNoteData}
           columns={columns}
-          handleRowClick={(row) => setOpenDebitNoteModal({ open: true, id: row.id })}
+          isMinimiseTable={isMinimiseTable}
+          handleRowClick={(row) => navigate(`/debitnote/${row.id}`)}
+          miniScreenFields={['debit_note_number', 'reference_id']}
         />
         <ConfirmationModale
           isOpen={confirmModal}
@@ -125,7 +128,6 @@ const DebitNoteTable = ({ debitNoteData, setDebitNoteData, setAlerts, handleEdit
         >
           <DebitNoteView
             id={openDebitNoteModal.id}
-            handleEdit={handleEdit}
             setOpenDebitNoteModal={setOpenDebitNoteModal}
           />
         </PopUp>

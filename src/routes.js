@@ -6,9 +6,11 @@ const SettingsLayout = React.lazy(() => import('./Module/Settings/SettingsLayout
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Client = React.lazy(() => import('./Module/Client/ClientList.js'))
 const TableView = React.lazy(() => import('./Module/Client/TableView.js'))
+const BillingView = React.lazy(() => import('./Module/Billing/BillingView.js'))
 const SkuView = React.lazy(() => import('./Module/SKU/SkuView.js'))
 const OverviewComponent = React.lazy(() => import('./Module/Client/OverviewComponent'))
 const ClientForm = React.lazy(() => import('./Module/Client/ClientForm.js'))
+const BillingForm = React.lazy(() => import('./Module/Billing/BillingForm.js'))
 const SKU = React.lazy(() => import('./Module/SKU/SkuList.js'))
 const SkuAddEdit = React.lazy(() => import('./Module/SKU/SkuAddEdit.js'))
 const EmployeeList = React.lazy(() => import('./Module/HRMS/Employee/EmployeeList.js'))
@@ -70,6 +72,8 @@ const CreditNote = React.lazy(() => import('./Module/CreditNote/CreditNote.js'))
 const CreditNoteForm = React.lazy(() => import('./Module/CreditNote/CreditNoteForm.js'))
 const CreditNoteView = React.lazy(() => import('./Module/CreditNote/CreditNoteView.js'))
 const InventoryView = React.lazy(() => import('./Module/Inventory/ViewInventory.js'))
+const BillingMain = React.lazy(() => import('./Module/Billing/BillingMain.js'))
+
 
 // const ProductionPlanning = React.lazy(
 //   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
@@ -292,6 +296,14 @@ const routes = [
     element: InventoryForm,
     key: 2232,
   },
+    {
+    path: '/billingmain',
+    name: 'BillingMain',
+    element: BillingMain,
+    key: "billingMain",
+       children: [{ path: ':id', element: BillingView, key: 'Billing_view' }],
+  },
+  { path: '/billingmain/billingmainForm', name: 'Add Billing', element: BillingForm, key: 'billingmain form' }
   // {
   //   path: '/productionplanning',
   //   name: 'Production Planning',

@@ -517,14 +517,14 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                           <th className="py-2 px-2 text-sm font-bold text-left rounded-tl-xl">Item Table</th>
                           <th className=""></th>
                           <th className=""></th>
-                          <th className=""></th>
+                          {/* <th className=""></th> */}
                           <th className="rounded-tr-xl"></th>
                         </tr>
 
                         <tr>
                           <th className="py-2 pl-2 border-r border-b text-xs font-medium text-left">ITEM DETAILS</th>
                           <th className="p-2 border-r text-xs font-medium text-right">QUANTITY</th>
-                          <th className="p-2 border-r text-xs font-medium text-right uppercase">Acceptable</th>
+                          {/* <th className="p-2 border-r text-xs font-medium text-right uppercase">Acceptable</th> */}
                           <th className="p-2 border-r text-xs font-medium text-right">RATE</th>
                           <th className="p-2 border-b text-xs font-medium text-right">AMOUNT</th>
                           <th className="py-2 w-10"></th>
@@ -595,13 +595,13 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 />
                               </td>
 
-                              <td className="p-1 border items-start">
+                              {/* <td className="p-1 border items-start">
                                 <input
                                   {...register(`sku_details[${index}].acceptableUnits`)}
                                   type="number"
                                   className="w-full h-[40px] text-right border-none focus:outline-none"
                                 />
-                              </td>
+                              </td> */}
 
                               <td className="p-0 border">
                                 <input

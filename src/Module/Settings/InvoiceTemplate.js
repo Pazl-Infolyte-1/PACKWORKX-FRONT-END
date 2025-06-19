@@ -10,8 +10,7 @@ function InvoiceTemplate() {
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [alerts, setAlerts] = useState([])
 
-  useEffect(() => {
-    const fetchData = async () => {
+   const fetchData = async () => {
       try {
         setLoading(true)
         const response = await SettingsApi.getInvoiceTemplates()
@@ -28,10 +27,25 @@ function InvoiceTemplate() {
             const templateId = templateInfo
               ? templateInfo.textContent.match(/Template ID:\s*(\d+)/)?.[1]
               : index + 1
+            let templateStatus = ''
+            if (templateInfo) {
+              const templateInfoElements = block.querySelectorAll('.template-info')
+              templateInfoElements.forEach((element) => {
+                const text = element.textContent.trim()
+                if (text.includes('Template Status:')) {
+                  const statusMatch = text.match(/Template Status:\s*(.+)/s)
+                  if (statusMatch) {
+                    const cleanStatus = statusMatch[1].replace(/<[^>]*>/g, '').trim()
+                    templateStatus = cleanStatus
+                  }
+                }
+              })
+            }
             const htmlContent = block.innerHTML.replace(templateInfo?.outerHTML || '', '')
 
             return {
               id: templateId,
+              templateStatus: templateStatus,
               content: htmlContent,
             }
           })
@@ -46,12 +60,11 @@ function InvoiceTemplate() {
       }
     }
 
+  useEffect(() => {
     fetchData()
   }, [])
 
   const handleTemplateSelect = (template) => {
-    console.log(template);
-    
     setSelectedTemplate(template)
   }
 
@@ -63,7 +76,7 @@ function InvoiceTemplate() {
     try {
       const response = await SettingsApi.applyInvoiceTemplate(template.id)
       setAlerts([{ severity: 'success', message: response?.data?.message || 'Success' }])
-      console.log(response)
+      fetchData()
     } catch (error) {
       setAlerts([
         { severity: 'error', message: error?.response?.data?.message || 'Error occurred' },
@@ -94,12 +107,12 @@ function InvoiceTemplate() {
     <div className="w-full overflow-x-hidden">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       <div className="p-3 w-full">
-        {/* <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Invoice Templates</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 text-start">Invoice Templates</h1>
           <p className="text-gray-600">
             Choose from our collection of professional purchase order templates
           </p>
-        </div> */}
+        </div>
 
         {/* Templates Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
@@ -109,9 +122,14 @@ function InvoiceTemplate() {
               onClick={() => handleTemplateSelect(template)}
               className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 w-full"
             >
-              <div className="p-4 border-b border-gray-200">
+              <div className="flex justify-between items-center !p-2">
                 <h3 className="text-lg font-semibold text-gray-900">Template {template.id}</h3>
-                <p className="text-sm text-gray-600">Professional Invoice layout</p>
+                {template.templateStatus === 'Active' && (
+                  <div className="flex items-center gap-1.5 bg-emerald-100 text-emerald-800 rounded-full px-3 py-1 text-xs font-semibold border border-emerald-200 shadow-sm">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    Active
+                  </div>
+                )}
               </div>
 
               {/* Template Preview - Fixed scaling and overflow */}

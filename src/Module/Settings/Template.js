@@ -9,48 +9,61 @@ function PurchaseTemplate() {
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [alerts, setAlerts] = useState([])
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        const response = await SettingsApi.getTemplates()
-        console.log(response)
+  const fetchData = async () => {
+    try {
+      setLoading(true)
+      const response = await SettingsApi.getTemplates()
+      console.log(response)
 
-        if (response?.data) {
-          // Parse the HTML content to extract templates
-          const parser = new DOMParser()
-          const doc = parser.parseFromString(response.data, 'text/html')
-          const templateBlocks = doc.querySelectorAll('.template-block')
+      if (response?.data) {
+        // Parse the HTML content to extract templates
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(response.data, 'text/html')
+        const templateBlocks = doc.querySelectorAll('.template-block')
 
-          const templatesData = Array.from(templateBlocks).map((block, index) => {
-            const templateInfo = block.querySelector('.template-info')
-            const templateId = templateInfo
-              ? templateInfo.textContent.match(/Template ID:\s*(\d+)/)?.[1]
-              : index + 1
-            const htmlContent = block.innerHTML.replace(templateInfo?.outerHTML || '', '')
+        const templatesData = Array.from(templateBlocks).map((block, index) => {
+          const templateInfo = block.querySelector('.template-info')
+          const templateId = templateInfo
+            ? templateInfo.textContent.match(/Template ID:\s*(\d+)/)?.[1]
+            : index + 1
+          let templateStatus = ''
+          if (templateInfo) {
+            const templateInfoElements = block.querySelectorAll('.template-info')
+            templateInfoElements.forEach((element) => {
+              const text = element.textContent.trim()
+              if (text.includes('Template Status:')) {
+                const statusMatch = text.match(/Template Status:\s*(.+)/s)
+                if (statusMatch) {
+                  const cleanStatus = statusMatch[1].replace(/<[^>]*>/g, '').trim()
+                  templateStatus = cleanStatus
+                }
+              }
+            })
+          }
+          const htmlContent = block.innerHTML.replace(templateInfo?.outerHTML || '', '')
 
-            return {
-              id: templateId,
-              content: htmlContent,
-            }
-          })
+          return {
+            id: templateId,
+            templateStatus: templateStatus,
+            content: htmlContent,
+          }
+        })
 
-          setTemplates(templatesData)
-        }
-      } catch (error) {
-        console.error('Error fetching templates:', error)
-        setError('Failed to load templates')
-      } finally {
-        setLoading(false)
+        setTemplates(templatesData)
       }
+    } catch (error) {
+      console.error('Error fetching templates:', error)
+      setError('Failed to load templates')
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchData()
   }, [])
 
   const handleTemplateSelect = (template) => {
-    console.log(template);
-    
     setSelectedTemplate(template)
   }
 
@@ -62,7 +75,7 @@ function PurchaseTemplate() {
     try {
       const response = await SettingsApi.useTemplate(template.id)
       setAlerts([{ severity: 'success', message: response?.data?.message || 'Success' }])
-      console.log(response)
+      fetchData()
     } catch (error) {
       setAlerts([
         { severity: 'error', message: error?.response?.data?.message || 'Error occurred' },
@@ -108,9 +121,14 @@ function PurchaseTemplate() {
               onClick={() => handleTemplateSelect(template)}
               className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 w-full"
             >
-              <div className="p-4 border-b border-gray-200">
+              <div className="flex justify-between items-center !p-2">
                 <h3 className="text-lg font-semibold text-gray-900">Template {template.id}</h3>
-                <p className="text-sm text-gray-600">Professional purchase order layout</p>
+                {template.templateStatus === 'Active' && (
+                  <div className="flex items-center gap-1.5 bg-emerald-100 text-emerald-800 rounded-full px-3 py-1 text-xs font-semibold border border-emerald-200 shadow-sm">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    Active
+                  </div>
+                )}
               </div>
 
               {/* Template Preview - Fixed scaling and overflow */}

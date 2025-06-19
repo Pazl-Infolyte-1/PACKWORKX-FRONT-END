@@ -8,7 +8,7 @@ export const debitApi = {
       console.error(error)
     }
   },
-  editDebitNote: async (payload,id) => {
+  editDebitNote: async (payload, id) => {
     try {
       return await apiClient.put(`/debit-note/${id}`, payload)
     } catch (error) {
@@ -16,7 +16,7 @@ export const debitApi = {
     }
   },
   postDebitNote: async (debitNoteFormData) => {
-      return await apiClient.post('/debit-note', debitNoteFormData)
+    return await apiClient.post('/debit-note', debitNoteFormData)
   },
   getAllPurchaseReturnIds: async () => {
     try {
@@ -26,11 +26,7 @@ export const debitApi = {
     }
   },
   getPurchaseReturnById: async (id) => {
-    try {
-      return await apiClient.get(`/purchase-order-return/${id}`)
-    } catch (error) {
-      console.error(error)
-    }
+    return await apiClient.get(`/purchase-order-return/${id}`)
   },
 
   deleteDebitNote: async (id) => {

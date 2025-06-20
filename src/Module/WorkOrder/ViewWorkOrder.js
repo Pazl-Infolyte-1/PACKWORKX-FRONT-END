@@ -140,7 +140,7 @@ const getProgressInfo = (progress) => {
   }
 };
 
-const InvoiceTypeSelectionModal = ({ isOpen, onClose, onFull, onPartial }) => {
+const InvoiceTypeSelectionModal = ({ isOpen, onClose, onFull, onPartial, disableFullInvoice }) => {
   if (!isOpen) return null;
   
   return (
@@ -162,8 +162,9 @@ const InvoiceTypeSelectionModal = ({ isOpen, onClose, onFull, onPartial }) => {
         {/* 2-column Options with icons */}
         <div className="grid grid-cols-2 gap-4 mb-2">
           <button
-            className="flex flex-col items-center justify-center p-4 bg-blue-50 border border-blue-100 rounded hover:bg-blue-100 transition-colors group min-h-[120px]"
+            className="flex flex-col items-center justify-center p-4 bg-blue-50 border border-blue-100 rounded hover:bg-blue-100 transition-colors group min-h-[120px] disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={onFull}
+            disabled={disableFullInvoice}
           >
             <Download size={32} className="text-blue-600 mb-2" />
             <div className="font-medium text-gray-900 text-sm mb-0.5">Full Invoice</div>
@@ -230,10 +231,16 @@ const ViewWorkOrder = () => {
     try {
       console.log(invoiceData)
       const response = await workOrderApi.createInvoiceWorkOrder(invoiceData);
+      
       console.log('Invoice created successfully:', response);
 
+
+      const downloadResponse = await invoiceApi.downloadInvoice(response.data.data.id)
+      console.log(downloadResponse)
+      
+
       // Optionally refresh work order data or navigate to invoice
-      navigate(`/invoice/view/${response.data.data.id}`);
+      // navigate(`/invoice/view/${response.data.data.id}`);
 
 
     } catch (err) {
@@ -537,6 +544,7 @@ const ViewWorkOrder = () => {
               </div>
 
               {/* What's Next Section */}
+              {workOrder.pending_invoice_qty !== 0 && (
                 <div className="bg-blue-50 border-t border-blue-100 rounded p-2 mx-4 my-2 text-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
@@ -558,15 +566,27 @@ const ViewWorkOrder = () => {
                     </button>
                   </div>
                 </div>
-
-
-                              {/* Invoice History List */}
-              {invoiceHistory.length > 0 && (
-                <div className="p-4 border-t border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Invoice History</h3>
-                  <InvoiceHistoryCollapsible invoices={invoiceHistory} />
-                </div>
               )}
+
+
+<div className="p-4 border-t border-gray-200">
+  <div className="flex justify-between items-center mb-2">
+    <h3 className="text-sm font-medium text-gray-700">Invoice History</h3>
+    <h3 className="text-sm font-medium text-gray-700">
+      Pending Quantity: {workOrder.pending_invoice_qty}
+    </h3>
+  </div>
+
+  {invoiceHistory.length > 0 ? (
+    <InvoiceHistoryCollapsible invoices={invoiceHistory} />
+  ) : (
+    <div className="text-xs text-gray-500 py-4 text-center">
+      No invoice history available
+    </div>
+  )}
+</div>
+
+
                
 
 
@@ -882,6 +902,7 @@ const ViewWorkOrder = () => {
                   }
                 });
               }}
+              disableFullInvoice={workOrder.qty !== workOrder.pending_invoice_qty}
             />
             <InvoiceCreationModal
               isOpen={isInvoiceModalOpen}
@@ -1125,7 +1146,7 @@ const InvoiceHistoryCollapsible = ({ invoices }) => {
           </div>
 
           {/* Invoice Details - Collapsible with fixed height */}
-          <div className={`bg-white border-t border-gray-200 transition-all duration-200 ease-in-out ${expandedInvoice === invoice?.id ? 'h-[280px] opacity-100' : 'h-0 opacity-0 overflow-hidden'}`}>
+          <div className={`bg-white border-t border-gray-200 transition-all border duration-200 ease-in-out ${expandedInvoice === invoice?.id ? 'h-[280px] opacity-100' : 'h-0 opacity-0 overflow-hidden'}`}>
             <div className="p-2 h-full">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
                 {/* Financial Information */}
@@ -1144,10 +1165,10 @@ const InvoiceHistoryCollapsible = ({ invoices }) => {
                       <span className="text-gray-500">Tax:</span>
                       <span className="ml-2 font-medium">₹{invoice?.total_tax}</span>
                     </div>
-                    {/* <div>
+                    <div>
                       <span className="text-gray-500">Discount:</span>
-                      <span className="ml-2 font-medium">₹{invoice?.discount} ({invoice?.discount_type})</span>
-                    </div> */}
+                      <span className="ml-2 font-medium">₹{invoice?.discount}</span>
+                    </div>
                     <div className="col-span-2 pt-2 border-t">
                       <span className="text-gray-700 font-medium">Total Amount:</span>
                       <span className="ml-2 font-bold text-sm">₹{invoice?.total_amount}</span>

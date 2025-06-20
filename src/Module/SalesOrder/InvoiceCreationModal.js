@@ -229,240 +229,241 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
         </div>
 
         {/* Content */}
-        <div className="relative">
-          <form onSubmit={handleSubmit(onSubmitForm)} className="p-6 pb-32 max-h-[60vh] overflow-y-auto">
-            {/* Compact grid layout similar to Zoho */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {/* Due Date */}
-              <div>
-                <label className={labelClass}>
-                  <Calendar size={12} className="inline mr-1" />
-                  Due Date *
-                </label>
-                <input
-                  type="date"
-                  {...register('due_date', { required: true })}
-                  min={getTodayDate()}
-                  className={`${inputClass} ${errors.due_date ? errorClass : ''}`}
-                />
-              </div>
+        <form onSubmit={handleSubmit(onSubmitForm)} className="p-6">
+          {/* Compact grid layout similar to Zoho */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {/* Due Date */}
+            <div>
+              <label className={labelClass}>
+                <Calendar size={12} className="inline mr-1" />
+                Due Date *
+              </label>
+              <input
+                type="date"
+                {...register('due_date', { required: true })}
+                min={getTodayDate()}
+                className={`${inputClass} ${errors.due_date ? errorClass : ''}`}
+              />
+            </div>
 
-              {/* Payment Expected Date */}
-              <div>
-                <label className={labelClass}>
-                  <Calendar size={12} className="inline mr-1" />
-                  Payment Expected *
-                </label>
-                <input
-                  type="date"
-                  {...register('payment_expected_date', { required: true })}
-                  min={getTodayDate()}
-                  className={`${inputClass} ${errors.payment_expected_date ? errorClass : ''}`}
-                />
-              </div>
+            {/* Payment Expected Date */}
+            <div>
+              <label className={labelClass}>
+                <Calendar size={12} className="inline mr-1" />
+                Payment Expected *
+              </label>
+              <input
+                type="date"
+                {...register('payment_expected_date', { required: true })}
+                min={getTodayDate()}
+                className={`${inputClass} ${errors.payment_expected_date ? errorClass : ''}`}
+              />
+            </div>
 
                        {/* Payment Status */}
                        <div>
-                <label className={labelClass}>
-                  Payment Status *
-                </label>
-                <select
-                  {...register('payment_status', { required: true })}
-                  className={`${selectClass} ${errors.payment_status ? errorClass : ''}`}
-                >
-                  <option value="">Select status</option>
-                  <option value="pending">Pending</option>
-                  <option value="partial">Partial</option>
-                  <option value="paid">Paid</option>
-                </select>
-              </div>
-
-              {/* Received Amount input for Partial status */}
-              {paymentStatus === 'partial' && (
-                <div>
-                  <label className={labelClass}>
-                    Received Amount *
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    {...register('received_amount', { required: paymentStatus === 'partial' })}
-                    className={`${inputClass} ${errors.received_amount ? errorClass : ''}`}
-                    placeholder="Enter received amount"
-                  />
-                </div>
-              )}
-
-              {/* Total Amount */}
-              {/*
-              <div>
-                <label className={labelClass}>
-                  <DollarSign size={12} className="inline mr-1" />
-                  Total Amount *
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  {...register('total', { required: true })}
-                  className={`${inputClass} ${errors.total ? errorClass : ''}`}
-                  placeholder="0.00"
-                />
-              </div>
-              */}
-
-              {/* Tax Amount */}
-              {/*
-              <div>
-                <label className={labelClass}>
-                  <Hash size={12} className="inline mr-1" />
-                  Tax Amount *
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  {...register('total_tax', { required: true })}
-                  className={`${inputClass} ${errors.total_tax ? errorClass : ''}`}
-                  placeholder="0.00"
-                />
-              </div>
-              */}
-
-              {/* Final Total Amount */}
-              {/*
-              <div>
-                <label className={labelClass}>
-                  <DollarSign size={12} className="inline mr-1" />
-                  Final Total *
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  {...register('total_amount', { required: true })}
-                  className={`${inputClass} ${errors.total_amount ? errorClass : ''}`}
-                  placeholder="0.00"
-                />
-              </div>
-              */}
-
-              {/* Discount Type */}
-              <div>
-                <label className={labelClass}>
-                  {/* <Percent size={12} className="inline mr-1" /> */}
-                  Rate Per Sku
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  {...register('rate_per_qty')}
-                  className={inputClass}
-                  placeholder="0"
-                />
-
-
-              </div>
-
-              <div>
-                <label className={labelClass}>
-                  Transaction Type *
-                </label>
-                <select
-                  {...register('transaction_type', { required: true })}
-                  className={`${selectClass} ${errors.transaction_type ? errorClass : ''}`}
-                >
-                  <option value="">Select type</option>
-                  <option value="product_sale">Product Sale</option>
-                  <option value="service">Service</option>
-                  <option value="subscription">Subscription</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className={labelClass}>
-                  Discount Type *
-                </label>
-                <select
-                  {...register('discount_type', { required: true })}
-                  className={`${selectClass} ${errors.discount_type ? errorClass : ''}`}
-                >
-                  <option value="">Select type</option>
-                  <option value="percentage">Percentage (%)</option>
-                  <option value="fixed">Fixed Amount ($)</option>
-                </select>
-              </div>
-             
-
-              {/* Discount Value */}
-              
-              <div>
-                <label className={labelClass}>
-                  {/* <Percent size={12} className="inline mr-1" /> */}
-                  Discount
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  {...register('discount')}
-                  className={inputClass}
-                  placeholder="0"
-                />
-              </div>
-             
-
-
-
-              {/* Transaction Type */}
-
-            </div>
-
-            {/* Send via Email/WhatsApp Checkbox */}
-            <div className="mt-4 flex items-center space-x-3">
-              <input
-                type="checkbox"
-                id="sendViaEmail"
-                checked={sendViaEmail}
-                onChange={e => setSendViaEmail(e.target.checked)}
-                className="accent-blue-600"
-              />
-              <label htmlFor="sendViaEmail" className="text-sm text-gray-700 font-medium">
-                Send Invoice via Email/WhatsApp?
+              <label className={labelClass}>
+                Payment Status *
               </label>
+              <select
+                {...register('payment_status', { required: true })}
+                className={`${selectClass} ${errors.payment_status ? errorClass : ''}`}
+              >
+                <option value="">Select status</option>
+                <option value="pending">Pending</option>
+                <option value="partial">Partial</option>
+                <option value="paid">Paid</option>
+              </select>
             </div>
 
-            {/* Conditional Email and WhatsApp fields */}
-            {sendViaEmail && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                <div>
-                  <label className={labelClass}>Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    className={inputClass}
-                    placeholder="Enter email address"
-                    required={sendViaEmail}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>WhatsApp Number</label>
-                  <input
-                    type="tel"
-                    value={whatsapp}
-                    onChange={e => setWhatsapp(e.target.value)}
-                    className={inputClass}
-                    placeholder="Enter WhatsApp number"
-                    required={sendViaEmail}
-                  />
-                </div>
+            {/* Received Amount input for Partial status */}
+            {paymentStatus === 'partial' && (
+              <div>
+                <label className={labelClass}>
+                  Received Amount *
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  {...register('received_amount', { required: paymentStatus === 'partial' })}
+                  className={`${inputClass} ${errors.received_amount ? errorClass : ''}`}
+                  placeholder="Enter received amount"
+                />
               </div>
             )}
 
+            {/* Total Amount */}
+            {/*
+            <div>
+              <label className={labelClass}>
+                <DollarSign size={12} className="inline mr-1" />
+                Total Amount *
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                {...register('total', { required: true })}
+                className={`${inputClass} ${errors.total ? errorClass : ''}`}
+                placeholder="0.00"
+              />
+            </div>
+            */}
+
+            {/* Tax Amount */}
+            {/*
+            <div>
+              <label className={labelClass}>
+                <Hash size={12} className="inline mr-1" />
+                Tax Amount *
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                {...register('total_tax', { required: true })}
+                className={`${inputClass} ${errors.total_tax ? errorClass : ''}`}
+                placeholder="0.00"
+              />
+            </div>
+            */}
+
+            {/* Final Total Amount */}
+            {/*
+            <div>
+              <label className={labelClass}>
+                <DollarSign size={12} className="inline mr-1" />
+                Final Total *
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                {...register('total_amount', { required: true })}
+                className={`${inputClass} ${errors.total_amount ? errorClass : ''}`}
+                placeholder="0.00"
+              />
+            </div>
+            */}
+
+            {/* Discount Type */}
+            <div>
+              <label className={labelClass}>
+                {/* <Percent size={12} className="inline mr-1" /> */}
+                Rate Per Sku
+              </label>
+              <input
+                type="number"
+                min="0"
+                {...register('rate_per_qty')}
+                className={inputClass}
+                placeholder="0"
+              />
+
+
+            </div>
+
+            <div>
+              <label className={labelClass}>
+                Transaction Type *
+              </label>
+              <select
+                {...register('transaction_type', { required: true })}
+                className={`${selectClass} ${errors.transaction_type ? errorClass : ''}`}
+              >
+                <option value="">Select type</option>
+                <option value="product_sale">Product Sale</option>
+                <option value="service">Service</option>
+                <option value="subscription">Subscription</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className={labelClass}>
+                Discount Type *
+              </label>
+              <select
+                {...register('discount_type', { required: true })}
+                className={`${selectClass} ${errors.discount_type ? errorClass : ''}`}
+              >
+                <option value="">Select type</option>
+                <option value="percentage">Percentage (%)</option>
+                <option value="fixed">Fixed Amount ($)</option>
+              </select>
+            </div>
+           
+
+            {/* Discount Value */}
+            
+            <div>
+              <label className={labelClass}>
+                {/* <Percent size={12} className="inline mr-1" /> */}
+                Discount
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                {...register('discount')}
+                className={inputClass}
+                placeholder="0"
+              />
+            </div>
+           
+
+ 
+
+            {/* Transaction Type */}
+
+          </div>
+
+          {/* Send via Email/WhatsApp Checkbox */}
+          <div className="mt-4 flex items-center space-x-3">
+            <input
+              type="checkbox"
+              id="sendViaEmail"
+              checked={sendViaEmail}
+              onChange={e => setSendViaEmail(e.target.checked)}
+              className="accent-blue-600"
+            />
+            <label htmlFor="sendViaEmail" className="text-sm text-gray-700 font-medium">
+              Send Invoice via Email/WhatsApp?
+            </label>
+          </div>
+
+          {/* Conditional Email and WhatsApp fields */}
+          {sendViaEmail && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              <div>
+                <label className={labelClass}>Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  className={inputClass}
+                  placeholder="Enter email address"
+                  required={sendViaEmail}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>WhatsApp Number</label>
+                <input
+                  type="tel"
+                  value={whatsapp}
+                  onChange={e => setWhatsapp(e.target.value)}
+                  className={inputClass}
+                  placeholder="Enter WhatsApp number"
+                  required={sendViaEmail}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Actions - Compact button styling */}
+          <div className="flex flex-row justify-between items-center mt-6 pt-4 border-t border-gray-200 w-full">
             {/* Amount summary - vertical stack, left side */}
-            <div className="flex flex-col space-y-2 mt-6">
+            <div className="flex flex-col space-y-2">
               <div className="text-xs text-gray-700 font-medium flex items-center">
                 Qty: <span className="ml-1 text-base font-semibold">{parseFloat(quantity).toFixed(2)}</span>
               </div>
@@ -470,6 +471,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
                 Total: <span className="ml-1 text-base font-semibold">₹{parseFloat(total).toFixed(2)}</span>
                 <span className="ml-2 text-xs text-gray-500">({parseFloat(quantity)} × {parseFloat(ratePerSku)})</span>
               </div>
+
               <div className="text-xs text-gray-700 font-medium flex items-center">
                 Discount: <span className="ml-1 text-base font-semibold">₹{!isNaN(discountAmount) ? discountAmount.toFixed(2) : '0.00'}</span>
               </div>
@@ -479,8 +481,8 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
               <div className="text-xs text-gray-700 font-medium flex items-center">
                 Invoice Amount: <span className="ml-1 text-base font-semibold">₹{!isNaN(invoiceWithGst) ? invoiceWithGst.toFixed(2) : '0.00'}</span>
               </div>
-              {/* Credit Amount with checkbox */}
-              <div className="text-xs text-gray-700 font-medium flex items-center">
+                            {/* Credit Amount with checkbox */}
+                            <div className="text-xs text-gray-700 font-medium flex items-center">
                 Credit Amount: <span className="ml-1 text-base font-semibold">₹{parseFloat(workOrder.credit_balance)}</span>
                 <label className="ml-2 flex items-center cursor-pointer">
                   <input
@@ -491,38 +493,45 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
                   />
                   <span className="text-xs">Use Credit</span>
                 </label>
+
+                {/* <span className="ml-4 text-xs font-medium text-gray-700">
+                  Balance to Pay: <span className="text-base font-semibold">
+                    ₹{invoiceWithGst - credit_balance}
+                  </span>
+                </span> */}
               </div>
-              {useCredit && (
-                <div className="text-xs text-blue-700 font-medium flex items-center">
-                  (Invoice Amount ₹{invoiceWithGst.toFixed(2)} - Credit ₹{credit_balance})
-                </div>
-              )}
+                              {useCredit && (
+                  <div className="text-xs text-blue-700 font-medium flex items-center">
+                    (Invoice Amount ₹{invoiceWithGst.toFixed(2)} - Credit ₹{credit_balance})
+                  </div>
+                )}
+
               {/* Final Amount to Pay */}
               <div className="mt-2 text-sm font-bold text-green-700 border-t border-gray-200 pt-2">
                 Final Amount to Pay: ₹{useCredit ? balanceToPay.toFixed(2) : invoiceWithGst.toFixed(2)}
               </div>
             </div>
-          </form>
 
-          {/* Sticky Action buttons - always at the bottom of modal */}
-          <div className="fixed left-0 right-0 bottom-0 z-50 bg-white border-t border-gray-200 px-6 py-4 flex justify-end space-x-2 max-w-4xl mx-auto rounded-b-lg">
-            <button
-              type="button"
-              onClick={handleClose}
-              className="px-4 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              form="invoice-creation-form"
-              disabled={isSubmitting}
-              className="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isSubmitting ? 'Creating...' : 'Create Invoice'}
-            </button>
+            
+            {/* Action buttons - right side */}
+            <div className="flex flex-row space-x-2">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="px-4 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isSubmitting ? 'Creating...' : 'Create Invoice'}
+              </button>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

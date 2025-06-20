@@ -123,6 +123,15 @@ export const purchaseOrderApi = {
     }
   },
 
+    getPurchaseOrderDropdown: async () => {
+    try {
+      const response = await apiClient.get('/purchase-order?limit=10000')
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
   getPurchaseOrderDetails: async ({ po_id, grn_id }) => {
     console.log('Fetching purchase order details for PO ID:', po_id, 'and GRN ID:', grn_id)
     try {
@@ -199,4 +208,6 @@ getPurchaseReturnById: async (id) => {
       throw error
     }
   },
+
+
 }

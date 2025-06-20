@@ -59,7 +59,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
         rate_per_sku: '',
         total_amount: '',
         gst: '',
-        total_incl__gst: ''
+        total_incl__gst: '',
       }]
     }
   });
@@ -475,7 +475,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
               />
             </div>
 
-            
+
             {/* Balance to Manufacture Info */}
 
 
@@ -545,7 +545,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                   <option value="product_sale">Product Sale</option>
                   <option value="service">Service</option>
                 </select>
-                {/* <div className="flex items-center">
+                <div className="flex items-center">
                   <label className="text-xs w-28">Discount</label>
                   <div className="flex">
                     <select
@@ -568,7 +568,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                       }`}
                     />
                   </div>
-                </div> */}
+                </div>
               </div>
             </div>
 
@@ -676,6 +676,8 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 <input
                                   {...register(`sku_details[${index}].quantity_required`)}
                                   type="number"
+                            min="0"
+
                                   onWheel={preventScroll}
                                   onChange={e => {
                                     register(`sku_details[${index}].quantity_required`).onChange(e);
@@ -689,13 +691,13 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 />
                               </td>
 
-                              {/* <td className="p-1 border items-start">
+                              <td className="p-1 border items-start">
                                 <input
-                                  {...register(`sku_details[${index}].acceptableUnits`)}
+                                  {...register(`sku_details[${index}].discount`)}
                                   type="number"
                                   className="w-full h-[40px] text-right border-none focus:outline-none"
                                 />
-                              </td> */}
+                              </td>
 
                               <td className="p-0 border">
                                 <input
@@ -742,7 +744,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 </td>
                                 <td colSpan={2} className="border-b pl-4 py-1 italic text-gray-500">
                                   {selectedWorkOrder ? (
-                                    <>Pending Quantity : {selectedWorkOrder?.pending_qty}</>
+                                    <>Pending Invoice Quantity : {selectedWorkOrder?.pending_invoice}</>
                                   ) : null}
                                 </td>
                                 <td colSpan={3} className="border-b pr-2 py-1">

@@ -52,17 +52,22 @@ const deleteBilling = async () => {
               <CTableHead className="!bg-gray-300 sticky top-0 z-10">
                 <CTableRow>
                   <CTableHeaderCell className="w-48 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                    Bill Generate Id<span className="text-gray-500 ml-1">⌕</span>
+                    Bill  Id<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
+                  <CTableHeaderCell className="w-48 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    PO ID<span className="text-gray-500 ml-1">⌕</span>
+                  </CTableHeaderCell>
+                  <CTableHeaderCell className="w-40 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+                Supplier<span className="text-gray-500 ml-1">⌕</span>
+                  </CTableHeaderCell>
+                  
                   <CTableHeaderCell className="w-32 px-4 x-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                  Bill Reference Number<span className="text-gray-500 ml-1">⌕</span>
+                   Reference Number<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-40 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
                 Bill Date<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
-				   <CTableHeaderCell className="w-40 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                Supplier<span className="text-gray-500 ml-1">⌕</span>
-                  </CTableHeaderCell>
+
                   <CTableHeaderCell className="w-52 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
                   Remarks<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
@@ -89,7 +94,7 @@ const deleteBilling = async () => {
                     {/* When minimized: Only render checkbox and display name */}
                     {isMinimized ? (
                       <>
-                        <CTableDataCell className="px-4 py-3 flex items-center gap-2">
+                        <CTableDataCell className="px-4 border-none py-3 flex items-center gap-2">
                           <div
                             onClick={(e) => {
                             //  openViewCard(client)
@@ -100,6 +105,9 @@ const deleteBilling = async () => {
                               {bill.bill_generate_id || 'N/A'}
                             </span>
                           </div>
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
+                          {bill.purchaseOrder.purchase_generate_id || 'N/A'}
                         </CTableDataCell>
                       </>
                     ) : (
@@ -112,14 +120,17 @@ const deleteBilling = async () => {
                         >
                           {bill.bill_generate_id || 'N/A'}
                         </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
+                          {bill.purchaseOrder.purchase_generate_id || 'N/A'}
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
+                          {bill.purchaseOrder.supplier_name || 'N/A'}
+                        </CTableDataCell>
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                           {bill.bill_reference_number || 'N/A'}
                         </CTableDataCell>
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
                           {bill.bill_date || 'N/A'}
-                        </CTableDataCell>
-						    <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
-                          {bill.purchaseOrder.supplier_name || 'N/A'}
                         </CTableDataCell>
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
                           {bill.remarks || 'N/A'}

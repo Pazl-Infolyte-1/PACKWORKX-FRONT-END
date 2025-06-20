@@ -20,6 +20,7 @@ const [invoiceAmount, setInvoiceAmount] = useState(0);
   const location = useLocation()
   const PoID = location.state?.po_id
 
+  const Item_id = location?.state?.item_id || null
   // Debounce refs for quantity and rate
   const quantityTimeoutRefs = useRef({})
   const rateTimeoutRefs = useRef({})
@@ -109,7 +110,7 @@ const [invoiceAmount, setInvoiceAmount] = useState(0);
 
     // Check if PoID exists in itemList
     const selectedItem = itemList.find((item) => item.id === parseInt(PoID))
-    
+
     if (selectedItem && fields.length > 0) {
       // Set the item_id in the form
       setValue(`items.0.item_id`, PoID)
@@ -117,6 +118,9 @@ const [invoiceAmount, setInvoiceAmount] = useState(0);
       handleItemChange(0, PoID)
     }
   }, [PoID, itemList, fields.length, setValue])
+  useEffect(() => {
+    handleItemChange(0, Item_id)
+  }, [Item_id, itemList])
 
   // Calculate totals from items without setting values
 
@@ -315,7 +319,6 @@ setoveralltotal(result.total_incl_gst)
 
   const handleItemChange = (index, selectedItemId) => {
     const selectedItem = itemList.find((item) => item.id === parseInt(selectedItemId))
-
     if (selectedItem) {
       setValue(`items.${index}`, {
         item_id: selectedItem.id,
@@ -530,7 +533,7 @@ useEffect(() => {
                             className="flex-1 h-[35px] text-left border-none border rounded-md px-2 bg-gray-50 focus:outline-none hover:outline-none outline-none focus-visible:outline-none"
                             disabled={PoID && index === 0} // Disable if PoID is set for first item
                             value={PoID && index === 0 ? PoID : getValues(`items.${index}.item_id`)}
-                            >
+                          >
                             {console.log(getValues(`items.${index}.item_id`), "getvalue ")}
                             <option value="">{isLoading ? 'Loading...' : 'Select'}</option>
                             {itemList.map((item) => (

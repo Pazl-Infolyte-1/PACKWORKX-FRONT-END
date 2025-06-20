@@ -14,11 +14,15 @@ import PopUp from '../../components/New/PopUp'
 import GrnView from './GrnView'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import { grnApi } from '../../api/grn'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { render } from 'sass'
 
-const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh }) => {
+const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh, isMinimized }) => {
   const [confirmModal, setConfirmModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [openGrnModal, setOpenGrnModal] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
 
   const closeDeleteModal = () => {
     setConfirmModal(false)
@@ -83,8 +87,12 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh }) =>
     { key: 'grn_generate_id', header: 'ID', field: 'grn_generate_id' },
     {
       key: 'po_id',
-      header: 'PO ID',
+      header: 'Purchase Order',
       field: 'po_id',
+      type: 'custom',
+      render: (row) => (
+        <p className="text-start">{row?.purchase_order?.purchase_generate_id || 'None'}</p>
+      ),
     },
     {
       key: 'grn_date',
@@ -119,26 +127,31 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh }) =>
       header: 'Invoice Date',
       field: 'invoice_date',
     },
-    // {
-    //   key: 'status',
-    //   header: 'Status',
-    //   field: 'status',
-    //   type: 'dropdown',
-    //   options: ['active', 'inactive'],
-    //   getOptionClass: (val) => {
-    //     switch (val) {
-    //       case 'active':
-    //         return 'bg-green-100 text-green-800 border-green-300'
-    //       case 'inactive':
-    //         return 'bg-red-100 text-red-800 border-red-300'
-    //       default:
-    //         return 'bg-gray-100 text-gray-800 border-gray-300'
-    //     }
-    //   },
-    //   onChange: (row, newValue) => {
-    //     handleStatusChange(row.id, newValue)
-    //   },
-    // },
+    {
+      key: 'status',
+      header: 'Status',
+      field: 'grn_status',
+      type: 'custom',
+      render: (row) => {
+        const formattedStatus = row.grn_status
+          ? row.grn_status.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
+          : ''
+
+        return (
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-semibold -ml-11 w-28 text-center inline-block
+          ${row.grn_status === 'partially_received' ? 'bg-blue-100 text-blue-800' : ''}
+          ${row.grn_status === 'fully_received' ? 'bg-green-100 text-green-800' : ''}
+          ${row.grn_status === 'returned' ? 'bg-red-100 text-red-800' : ''}
+          ${row.grn_status === 'received' ? 'bg-teal-500 text-white' : ''}
+          ${row.grn_status === 'amended' ? 'bg-orange-600 text-white' : ''}
+        `}
+          >
+            {formattedStatus}
+          </span>
+        )
+      },
+    },
     {
       key: 'actions',
       header: 'Action',
@@ -154,13 +167,13 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh }) =>
                 handleEdit(row)
               },
             },
-            {
-              label: 'Delete',
-              icon: cilTrash,
-              onClick: () => {
-                openDeleteModal(row.id)
-              },
-            },
+            // {
+            //   label: 'Delete',
+            //   icon: cilTrash,
+            //   onClick: () => {
+            //     openDeleteModal(row.id)
+            //   },
+            // },
           ]}
         />
       ),
@@ -173,14 +186,16 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh }) =>
         <ReusableTable
           data={grnData}
           columns={columns}
-          handleRowClick={(row) => setOpenGrnModal({ open: true, id: row.id })}
+          handleRowClick={(row) => navigate(`/grn/view/${row.id}`)}
+          miniScreenFields={['id', 'grn_generate_id']}
+          isMinimiseTable={isMinimized}
         />
         <ConfirmationModale
           isOpen={confirmModal}
           onClose={closeDeleteModal}
           onConfirm={handleDelete}
         />
-        <PopUp
+        {/* <PopUp
           visible={openGrnModal.open}
           setVisible={(isVisible) => {
             if (!isVisible) setOpenGrnModal({ open: false, id: null })
@@ -190,7 +205,7 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh }) =>
           height="660px"
         >
           <GrnView id={openGrnModal.id} handleEdit={handleEdit} setOpenGrnModal={setOpenGrnModal} />
-        </PopUp>
+        </PopUp> */}
       </div>
     </>
   )

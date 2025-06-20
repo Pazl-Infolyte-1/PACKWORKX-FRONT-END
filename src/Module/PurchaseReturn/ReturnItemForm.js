@@ -4,7 +4,8 @@ import { inventoryApi } from '../../api/inventory'
 import { itemApi } from '../../api/item'
 import ItemDetails from '../Purchase/ItemDetails'
 
-const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
+const ReturnItemForm = ({ items, setItems, formValues, setFormValues, poIDForReturn }) => {
+  console.log('items  :', items)
 
   const { register, control, reset, getValues, setValue } = useForm({
     defaultValues: {
@@ -12,7 +13,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
     },
   })
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: 'items',
   })
@@ -30,24 +31,18 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
         <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
           <div className="flex justify-between items-center p-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Item Details</h2>
-            <button 
-              onClick={onClose} 
+            <button
+              onClick={onClose}
               className="text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
             >
               &times;
             </button>
           </div>
-          <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
-            {children}
-          </div>
+          <div className="overflow-y-auto max-h-[calc(90vh-80px)]">{children}</div>
         </div>
       </div>
     )
   }
-
-  useEffect(() => {
-    return () => reset()
-  }, [])
 
   //const openItemDetails = async (item_id) => {
   //  try {
@@ -76,29 +71,26 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
   //  }
   //}
   const openItemDetails = async (item_id) => {
-  try {
-    const response = await itemApi.getItemData(item_id)
-    console.log("Item Details Response:", response?.data)
+    try {
+      const response = await itemApi.getItemData(item_id)
+      console.log('Item Details Response:', response?.data)
       setModalContent(
-      <ItemDetails item={response?.data?.data} customFields={response?.data?.custom_fields} />
-    )
-        setIsModalOpen(true)
-
-  } catch (error) {
-    console.error("Error fetching item details:", error.response?.data || error.message)
+        <ItemDetails item={response?.data?.data} customFields={response?.data?.custom_fields} />,
+      )
+      setIsModalOpen(true)
+    } catch (error) {
+      console.error('Error fetching item details:', error.response?.data || error.message)
+    }
   }
-}
-
 
   const lastItemsHash = useRef('')
 
   // Initial data fetch and setup
   useEffect(() => {
-    if (!Array.isArray(items) || items.length === 0) return
-
-    const currentHash = JSON.stringify(items)
-    if (lastItemsHash.current === currentHash) return
-    lastItemsHash.current = currentHash
+    if (!Array.isArray(items) || items.length === 0) {
+      replace([]) // Clear fields when empty
+      return
+    }
 
     const fetchAndFormat = async () => {
       const response = await inventoryApi.getinventory()
@@ -117,7 +109,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
         grn_item_id: item.grn_item_id ?? 0,
         item_code: item.item_code ?? '',
         quantity: parseFloat(item.quantity ?? 0),
-        return_qty: item.return_qty || item.quantity || 0, // Use original return_qty or default to quantity
+        return_qty: item.return_qty || item.quantity || 0,
         uom: item.uom ?? '',
         unit_price: parseFloat(item.unit_price ?? 0),
         cgst: parseFloat(item.cgst ?? 0),
@@ -132,11 +124,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
         available_quantity: parseFloat(item.available_quantity ?? 0),
       }))
 
-      // Only reset on initial load
-      if (!isInitialized.current) {
-        reset({ items: formatted })
-        isInitialized.current = true
-      }
+      replace(formatted) // ✅ Properly updates UI via useFieldArray
     }
 
     fetchAndFormat()
@@ -144,6 +132,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
 
   // Handle calculations without resetting form
   useEffect(() => {
+    console.log('watchedItems:', watchedItems)
     if (!watchedItems || !isInitialized.current) return
 
     const hash = JSON.stringify(watchedItems)
@@ -240,7 +229,7 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
           <thead className="bg-gray-100">
             <tr className="text-center">
               <th className="w-12">Select</th>
-              {/* <th className="w-8"></th> */}
+              <th className="w-8"></th>
               <th className="w-24">Code</th>
               <th className="w-20">Qty</th>
               <th className="w-24">Return Qty</th>
@@ -424,12 +413,11 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues }) => {
             </tbody>
           </table>
         </div>
-
       </div>
-      
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          {modalContent}
-        </Modal>
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        {modalContent}
+      </Modal>
     </div>
   )
 }

@@ -331,8 +331,8 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
           customFields[finalLabel] = String(field.value)
         }
       })
-      console.log(data,"data");
-      
+      console.log(data, "data");
+
       const formattedData = {
         ...data,
         custom_fields: customFields, // Directly use the object
@@ -346,7 +346,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       }
 
       let response
-      
+
       if (isEditing) {
         formattedData.id = currentItemId
         response = await itemApi.updateItem(currentItemId, formattedData)
@@ -404,11 +404,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
   ]
 
   const handleCancel = () => {
-    if (fromInventory) {
-      navigate('/inventoryhandling')
-    } else {
-      setDrawer(false)
-    }
+    navigate('/inventoryhandling')
   }
 
   // Predefined tags for different subcategories
@@ -630,10 +626,10 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
               }}
               {...register('net_weight')}
             >
-              {(!selectedSubCategory || ['1', '5', '6', '7','8', '9', '4'].includes(selectedSubCategory)) && (
+              {(!selectedSubCategory || ['1', '5', '6', '7', '8', '9', '4'].includes(selectedSubCategory)) && (
                 <option value="kg">Kg</option>
               )}
-              {(!selectedSubCategory || ['2', '5', '6', '7','8', '3', '4'].includes(selectedSubCategory)) && (
+              {(!selectedSubCategory || ['2', '5', '6', '7', '8', '3', '4'].includes(selectedSubCategory)) && (
                 <option value="litre">Litre</option>
               )}
             </select>

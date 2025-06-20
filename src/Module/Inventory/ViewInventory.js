@@ -23,24 +23,25 @@ import { FaRupeeSign } from 'react-icons/fa'
 import { inventoryApi } from '../../api/inventory'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
-const ViewInventory = ({setIsMinimised}) => {
+const ViewInventory = ({ setIsMinimised }) => {
   const [itemDetails, setItemDetails] = useState(null)
+  const [grnBillDetails, setGrnBillDetails] = useState({}) // Store GRN bill details by po_id
+  const [loadingGrnBills, setLoadingGrnBills] = useState(false)
   const menus = ['Products', 'Purchase Order', 'GRN', 'Purchase Returns', 'Stock Adjustment']
- const { state } = useLocation();
-// const {item_id}=useParams()
-// console.log("item id",state.item.item_id)
-  //console.log("item id///",item_id)
+  const { state } = useLocation()
 
-  const { item, totalInventoryValue } = state || {};
+  const { item, totalInventoryValue } = state || {}
   const [activeMenu, setActiveMenu] = useState('Products')
   const navigate = useNavigate()
-   useEffect(() => {
+
+  useEffect(() => {
     if (state?.item?.item_id) {
-      setIsMinimised(true);
+      setIsMinimised(true)
     } else {
-      setIsMinimised(false); // Reset to false if ID is not '10'
+      setIsMinimised(false)
     }
-  }, [state?.item?.item_id]);
+  }, [state?.item?.item_id])
+
   useEffect(() => {
     const fetchSingleItem = async () => {
       if (!state?.item?.item_id) return
@@ -55,7 +56,44 @@ const ViewInventory = ({setIsMinimised}) => {
 
     fetchSingleItem()
   }, [state?.item?.item_id])
-console.log(item);
+
+  // Fetch GRN bill details when GRN data is available
+  useEffect(() => {
+    const fetchGrnBillDetails = async () => {
+      if (!itemDetails?.grns || itemDetails.grns.length === 0) return
+
+      setLoadingGrnBills(true)
+      const billDetailsMap = {}
+
+      try {
+        // Get unique po_ids from GRNs
+        const uniquePoIds = [...new Set(itemDetails.grns.map(grn => grn.grn.po_id))]
+
+        // Fetch bill details for each unique po_id
+        const promises = uniquePoIds.map(async (po_id) => {
+          try {
+            const response = await inventoryApi.getGrnBillID(po_id)
+            console.log(response.data.data);
+
+            billDetailsMap[po_id] = response?.data || null
+          } catch (error) {
+            console.error(`Error fetching GRN bill for po_id ${po_id}:`, error)
+            billDetailsMap[po_id] = null
+          }
+        })
+
+        await Promise.all(promises)
+
+        setGrnBillDetails(billDetailsMap)
+      } catch (error) {
+        console.error('Error fetching GRN bill details:', error)
+      } finally {
+        setLoadingGrnBills(false)
+      }
+    }
+
+    fetchGrnBillDetails()
+  }, [itemDetails?.grns])
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -121,89 +159,132 @@ console.log(item);
   }
 
   const rawCustomFields = itemDetails?.products?.default_custom_fields
-  
   const customData = rawCustomFields ? JSON.parse(rawCustomFields) : {}
-  console.log('Raw Custom Fields:', customData);
 
-  const handleClose =()=>{
-setIsMinimised(false)
+  const handleClose = () => {
+    setIsMinimised(false)
+    navigate('/inventoryhandling')
   }
 
-const handleEdit=()=>{
-        navigate('/inventoryhandling/inventory_form',{
-                                    state: {
-                                      item,
-                                      fromInventory: true,
-                                      isInventoryEditing: true,
-                                      isEdit: true,
-                                    },
-                                  })
-}
-  return (
-  <div className='border-l h-[600px] flex flex-col'>
-  {/* Fixed Header Section */}
-<div className="flex-shrink-0 bg-white border-b shadow-sm sticky top-0 z-10">
-  {/* Header buttons */}
-  <div className="flex justify-end items-center p-2 space-x-2">
-    {/*<button
-      onClick={handleEdit} // define this function in your component
-      className="text-gray-500 hover:text-blue-600 transition-colors"
-      aria-label="Edit"
-    >
-      ✎ Edit
-    </button>*/}
-    <button
-      onClick={handleClose}
-      className="text-gray-500 hover:text-red-600 transition-colors"
-      aria-label="Close"
-    >
-      ✕
-    </button>
-    </div>
+  const handleEdit = () => {
+    navigate('/inventoryhandling/inventory_form', {
+      state: {
+        item,
+        fromInventory: true,
+        isInventoryEditing: true,
+        isEdit: true,
+      },
+    })
+  }
+  console.log(grnBillDetails);
 
-    {/* Nav menu */}
-    <nav className="flex space-x-8 px-4 pb-2">
-      {menus.map((menu) => (
-        <button
-          key={menu}
-          onClick={() => setActiveMenu(menu)}
-          className={`pb-2 font-semibold transition-colors ${
-            activeMenu === menu
-              ? 'border-b-2 border-blue-600 text-blue-600'
-              : 'text-gray-600 hover:text-blue-500'
-          }`}
-        >
-          {menu}
-        </button>
-      ))}
-    </nav>
-  </div>
+  // Function to render GRN bill information
+  const renderGrnBillInfo = (po_id) => {
+    const billData = grnBillDetails[po_id]
+
+    if (loadingGrnBills) {
+      return (
+        <div className="bg-blue-50 rounded-lg p-2 mb-3">
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-blue-500 animate-spin" />
+            <span className="text-sm text-blue-600">Loading bill details...</span>
+          </div>
+        </div>
+      )
+    }
+
+    if (!billData || !billData.data || billData.data.length === 0) {
+      return (
+        <div className="bg-gray-50 rounded-lg p-2 mb-3">
+          <div className="flex items-center gap-2">
+            <Info className="w-4 h-4 text-gray-500" />
+            <span className="text-sm text-gray-600">No bill details available</span>
+          </div>
+        </div>
+      )
+    }
+
+    // Get the first bill data from the array
+    const firstBill = billData.data[0]
+
+    return (
+      <div onClick={() => navigate(`/billingmain/${firstBill.id}`)} className="bg-green-50 rounded-lg cursor-pointer p-2 mb-3 border-l-4 border-green-400">
+        <div className="text-sm text-green-700 font-medium mb-2">Bill Information:</div>
+        <div className="space-y-1">
+          {firstBill && firstBill.bill_generate_id && (
+            <div className="flex items-center gap-2 text-sm">
+              <Receipt className="w-3 h-3 text-green-600" />
+              <span className="text-gray-600">Bill No:</span>
+              <span className="font-medium text-gray-900">{firstBill.bill_generate_id}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="border-l h-[600px] flex flex-col">
+      {/* Fixed Header Section */}
+      <div className="flex-shrink-0 bg-white border-b shadow-sm sticky top-0 z-10">
+        {/* Header buttons */}
+        <div className="flex justify-end items-center p-2 space-x-2">
+          <button
+            onClick={handleClose}
+            className="text-gray-500 hover:text-red-600 transition-colors"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Nav menu */}
+        <nav className="flex space-x-8 px-4 pb-2">
+          {menus.map((menu) => (
+            <button
+              key={menu}
+              onClick={() => setActiveMenu(menu)}
+              className={`pb-2 font-semibold transition-colors ${activeMenu === menu
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-gray-600 hover:text-blue-500'
+                }`}
+            >
+              {menu}
+            </button>
+          ))}
+        </nav>
+      </div>
 
       {/* Content area */}
       <div className="flex-1 overflow-y-auto">
         {activeMenu === 'Products' ? (
           <div className="p-3">
-          <div className="flex justify-between">
-  <h2 className="text-xl font-bold mb-2 text-gray-800 flex items-center gap-2">
-    <Package className="w-6 h-6 text-blue-600" />
-    Product Details
-  </h2>
-  <div className="text-right">
-    <div className="flex items-center justify-end gap-2">
-      <button
-        onClick={handleEdit} // define this function
-        className="text-sm text-blue-600 hover:underline"
-      >
-        ✎ Edit
-      </button>
-      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-    </div>
-    <p className="text-sm font-bold m-0">
-      Available Qty: {parseFloat(item?.quantity_available)}
-    </p>
-  </div>
-</div>
-
+            <div className="flex justify-between">
+              <h2 className="text-xl font-bold mb-2 text-gray-800 flex items-center gap-2">
+                <Package className="w-6 h-6 text-blue-600" />
+                Product Details
+              </h2>
+              <div className="text-right">
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    onClick={() => navigate('/inventoryhandling/inventory_form')}
+                    className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-bold px-2 rounded"
+                  >
+                    + Product
+                  </button>
+                  <button
+                    onClick={handleEdit}
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    ✎ Edit
+                  </button>
+                  <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                </div>
+                <p className="text-sm font-bold m-0">
+                  Available Qty: {parseFloat(item?.quantity_available)}
+                </p>
+              </div>
+            </div>
 
             {itemDetails?.products ? (
               <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden mt-1">
@@ -314,12 +395,9 @@ const handleEdit=()=>{
                           </h4>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
-                          {Object.entries(
-                            customData
-                          ).map(([key, value]) => {
-                            // Process the key: remove special characters and capitalize
+                          {Object.entries(customData).map(([key, value]) => {
                             const processedKey = key
-                              .replace(/[^a-zA-Z0-9 ]/g, ' ') 
+                              .replace(/[^a-zA-Z0-9 ]/g, ' ')
                               .replace(/\s+/g, ' ')
                               .replace(/\b\w/g, (char) => char.toUpperCase())
                               .trim()
@@ -329,8 +407,6 @@ const handleEdit=()=>{
                                 key={key}
                                 className="flex gap-2 items-center py-2 px-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
                               >
-                                {console.log(processedKey)}
-                                
                                 <span className="text-sm font-medium text-gray-600">
                                   {processedKey}:
                                 </span>
@@ -375,13 +451,43 @@ const handleEdit=()=>{
                       <FileText className="w-6 h-6 text-white" />
                     </div>
                     <h1 className="text-xl font-bold text-gray-900">Purchase Orders</h1>
+                    <div className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+
+
+                      </div>
+
+
+                    </div>
                   </div>
 
                   {/* Right side ID and Item Name */}
-                  <div className="text-right">
-                    <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                    <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                  <div className="flex items-center justify-between w-47">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() =>
+                          navigate("/purchaseorder/form", {
+                            state: {
+                              item_id: itemDetails?.products?.id,
+                            },
+                          })
+                        }
+                        className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-bold px-2 rounded"
+                      >
+                        + Purchase
+                      </button>
+                    </div>
+
+                    <div className="text-right ml-2">
+                      <p className="text-xl font-bold m-0">
+                        {item?.item?.item_generate_id}
+                      </p>
+                      <h3 className="text-xs text-gray-800">
+                        {itemDetails?.products?.item_name}
+                      </h3>
+                    </div>
                   </div>
+
                 </div>
               </div>
 
@@ -556,8 +662,27 @@ const handleEdit=()=>{
 
                   {/* Right section: ID and name */}
                   <div className="text-right">
-                    <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                    <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                    <div className="flex items-center justify-between w-47">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() =>
+                            navigate("/stockadjustment/stock_form", {
+                              state: {
+                                item_id: itemDetails?.products?.id,
+                              },
+                            })
+                          }
+                          className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-bold px-2 rounded"
+                        >
+                          + Stock Adjustment
+                        </button>
+                      </div>
+                      <div className="text-right ml-2">
+                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                      <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               </div>
@@ -711,7 +836,6 @@ const handleEdit=()=>{
               {/* Header */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-2">
-                  {/* Left section: Icon + Heading */}
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                       <Truck className="w-6 h-6 text-white" />
@@ -719,10 +843,17 @@ const handleEdit=()=>{
                     <h1 className="text-xl font-bold text-gray-900">Goods Receipt Notes (GRN)</h1>
                   </div>
 
-                  {/* Right section: Item ID and Name */}
-                  <div className="text-right">
-                    <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                    <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                  <div className="flex gap-3 items-center">
+                    <button
+                      onClick={() => navigate('/grn_form')}
+                      className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-semibold px-2 rounded"
+                    >
+                      + GRN
+                    </button>
+                    <div className="text-right">
+                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                      <h3 className="text-xs text-gray-800">{itemDetails?.products?.item_name}</h3>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -754,6 +885,9 @@ const handleEdit=()=>{
 
                       {/* Card Content */}
                       <div className="p-3 space-y-2">
+                        {/* GRN Bill Information - NEW SECTION */}
+                        {renderGrnBillInfo(grn.grn.po_id)}
+
                         {/* Date and Invoice Info */}
                         <div className="space-y-3">
                           <div className="flex items-center gap-3 text-sm">
@@ -950,9 +1084,17 @@ const handleEdit=()=>{
                 <RotateCcw className="w-6 h-6 text-blue-600" />
                 Purchase Returns
               </h2>
-              <div className="">
-                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+              <div className="flex gap-3 items-center">
+                <button
+                  onClick={() => navigate('/purchase-return/form')}
+                  className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-semibold px-2 rounded"
+                >
+                  + Purchase Returns
+                </button>
+                <div className="">
+                  <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                  <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                </div>
               </div>
             </div>
             {itemDetails?.purchaseReturns.length > 0 ? (
@@ -980,7 +1122,7 @@ const handleEdit=()=>{
           </div>
         )}
       </div>
-    </div>
+    </div >
   )
 }
 

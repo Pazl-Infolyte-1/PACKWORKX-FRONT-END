@@ -28,6 +28,7 @@ const AddEditStockAdjustment = () => {
   const [GRNItems, setGRNItems] = useState({})
   const [InventoryItems, setInventoryItems] = useState({})
   const selectedGRNIds = useSelector((state) => state?.auth?.stockAdjustmentGRNArray || [])
+  const PoID = location.state?.PoID
   const adjustmentMode = {
     // 'value Adjustment': 'Value Adjustment',
     'Quantity Adjustment': 'Quantity Adjustment',
@@ -61,7 +62,7 @@ const AddEditStockAdjustment = () => {
       description: '',
       items: [
         {
-          item_id: null,
+          item_id: PoID || null,
           inventory_id: null,
           quantity_available: null,
           type: 'increase',
@@ -177,6 +178,25 @@ const AddEditStockAdjustment = () => {
       setValue('mode_of_adjustment', firstKey)
     }
   }, [adjustmentMode, setValue])
+
+  // Setting product while navigating from inverntry view page
+  useEffect(() => {
+    if (PoID && product.length > 0 && !stock?.id) {
+      const defaultProduct = product.find((p) => p.id === parseInt(PoID))
+
+      if (defaultProduct) {
+        setValue('items.0.item_id', defaultProduct.id)
+
+        if (PoID) {
+          getPurchaseOrderItem(defaultProduct.id, 0)
+        } else {
+          handleProductSelect(defaultProduct.id, 0)
+        }
+      } else {
+        console.error('Product not found for PoID:', PoID)
+      }
+    }
+  }, [product, PoID, setValue, stock?.id])
 
   const handleThrowAlert = async (id) => {
     try {
@@ -374,9 +394,6 @@ const AddEditStockAdjustment = () => {
     // }
   }
 
-  console.log('redux id', selectedProductIds)
-  // React Hook Form's watch
-
   return (
     <div className="p-2 mt-2  rounded-lg  w-full">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
@@ -475,7 +492,13 @@ const AddEditStockAdjustment = () => {
                   <select
                     {...register(`items.${index}.item_id`, {
                       required: true,
-                      onChange: (e) => handleProductSelect(e.target.value, index),
+                      onChange: (e) => {
+                        if (PoID) {
+                          getPurchaseOrderItem(e.target.value, index)
+                        } else {
+                          handleProductSelect(e.target.value, index)
+                        }
+                      },
                     })}
                     className={`w-full h-[36px] rounded-md px-1 text-sm text-left ${
                       errors.items?.[index]?.item_id

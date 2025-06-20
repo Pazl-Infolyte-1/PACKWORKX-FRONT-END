@@ -3,7 +3,7 @@ import CustomAlert from '../../components/New/CustomAlert'
 import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
 import { Outlet, useNavigate } from 'react-router-dom'
-import SalesReturnTable from './SalesReturnTable'
+// import SalesReturnTable from './SalesReturnTable'
 import { workOrderApi } from '../../api/workOrder'
 
 const SalesReturn = () => {
@@ -55,13 +55,13 @@ const SalesReturn = () => {
             }}
           />
           <div>
-            <SalesReturnTable
+            {/* <SalesReturnTable
               isMinimized={isMinimized}
               setRefresh={setRefresh}
               setAlerts={setAlerts}
               handleEdit={handleEdit}
               salesReturnData={salesReturnData}
-            />
+            /> */}
           </div>
           <div className="flex justify-end items-center gap-4 mt-2 py-2 border-t bg-white">
             <p className="w-40 text-sm">

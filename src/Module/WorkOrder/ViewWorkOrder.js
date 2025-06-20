@@ -535,7 +535,6 @@ const ViewWorkOrder = () => {
               </div>
 
               {/* What's Next Section */}
-              {invoiceHistory.length === 0 ? (
                 <div className="bg-blue-50 border border-blue-100 rounded p-2 mx-4 my-2 text-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
@@ -557,30 +556,7 @@ const ViewWorkOrder = () => {
                     </button>
                   </div>
                 </div>
-              ) : (
-                null
-                // <div className="bg-green-50 border border-green-100 rounded p-2 mx-4 my-2 text-xs">
-                //   <div className="flex items-center justify-between">
-                //     <div className="flex items-center gap-1">
-                //       <div className="bg-green-100 p-0.5 rounded-full">
-                //         <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-green-600" viewBox="0 0 20 20" fill="currentColor">
-                //           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                //         </svg>
-                //       </div>
-                //       <div>
-                //         <h3 className="font-semibold text-green-800 text-xs">INVOICE AVAILABLE</h3>
-                //         <p className="text-green-700 text-xs">This work order has already been invoiced.</p>
-                //       </div>
-                //     </div>
-                //     <button
-                //       className="bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
-                //       onClick={() => { setInvoiceOpen(true) }}
-                //     >
-                //       Show Invoice
-                //     </button>
-                //   </div>
-                // </div>
-              )}
+              
 
 
               {/* Product Details */}

@@ -27,46 +27,42 @@ function StockAdjustment() {
   const [isEdit, setIsEdit] = useState(false)
   const [alerts, setAlerts] = useState([])
   const [refresh, setRefresh] = useState(false)
-    const [data, setData] = useState([])
+  const [data, setData] = useState([])
   const location = useLocation()
-   const [totalPage, setTotalPage] = useState(1)
-    const [isMinimized, setIsMinimized] = useState(false)
-const navigate=useNavigate()
+  const [totalPage, setTotalPage] = useState(1)
+  const [isMinimized, setIsMinimized] = useState(false)
+  const navigate = useNavigate()
   const { setGlobalPlaceholder, searchQuery } = useSearch()
   const [reloadData, setReloadData] = useState(false)
-  
-  
+
   useEffect(() => {
-    setGlobalPlaceholder("Search stock adjustments...")
-    return () => setGlobalPlaceholder("Search...")
+    setGlobalPlaceholder('Search stock adjustments...')
+    return () => setGlobalPlaceholder('Search...')
   }, [setGlobalPlaceholder])
-
-
 
   const handleAdd = () => {
     navigate('/stockadjustment/stock_form') // Navigate to the add page
-    
+
     // setDrawerOpen(true)
     // setIsEdit(false)
     // setSelectedData(null)
   }
 
-
-useEffect(() => {
-  const fetchStockAdjustments = async () => {
-    try {
- const response = await inventoryApi.getStockAdjustments(currentPage, entriesPerPage);
-      console.log('Stock Adjustments:', response.data);
-            setTotalPages(response?.data?.pagination?.totalPages);
-      setTotalRecords(response?.data?.pagination?.totalRecords);
-      setData(response?.data?.data)
-    } catch (error) {
-      console.error('Error fetching stock adjustments:', error);
+  useEffect(() => {
+    const fetchStockAdjustments = async () => {
+      try {
+        const response = await inventoryApi.getStockAdjustments(currentPage, entriesPerPage)
+        console.log('Stock Adjustments:', response.data)
+        setTotalPages(response?.data?.pagination?.totalPages)
+        setTotalRecords(response?.data?.pagination?.totalRecords)
+        setData(response?.data?.data)
+      } catch (error) {
+        console.error('Error fetching stock adjustments:', error)
+      }
     }
-  };
 
-  fetchStockAdjustments();
-}, [reloadData, currentPage, entriesPerPage]);
+    fetchStockAdjustments()
+  }, [reloadData, currentPage, entriesPerPage])
   const handleEdit = (id) => {
     const found = stockadjustments.find((item) => item.id === id)
     if (found) {
@@ -92,18 +88,20 @@ useEffect(() => {
     setAlerts([{ severity: 'success', message: isEdit ? 'Updated' : 'Created successfully' }])
   }
 
-const handlePageChange = (e, newPage) => {
-  setCurrentPage(newPage);
-};
+  const handlePageChange = (e, newPage) => {
+    setCurrentPage(newPage)
+  }
 
-const handleEntriesChange = (newEntries) => {
-  setEntriesPerPage(newEntries);
-  setCurrentPage(1); // Reset to page 1 on page size change
-};
+  const handleEntriesChange = (newEntries) => {
+    setEntriesPerPage(newEntries)
+    setCurrentPage(1) // Reset to page 1 on page size change
+  }
 
   const downloadExcelSheet = async () => {
     try {
-      const response = await stockAdjustmentApi.downloadStockAdjustmentExcel({ search: searchQuery })
+      const response = await stockAdjustmentApi.downloadStockAdjustmentExcel({
+        search: searchQuery,
+      })
       const blob = new Blob([response], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       })
@@ -120,12 +118,11 @@ const handleEntriesChange = (newEntries) => {
     }
   }
 
-
-    const refreshClients = () => {
+  const refreshClients = () => {
     setReloadData((prev) => !prev)
   }
 
-    useEffect(() => {
+  useEffect(() => {
     if (location.pathname === '/stockadjustment') {
       setIsMinimized(false)
     } else {
@@ -133,25 +130,25 @@ const handleEntriesChange = (newEntries) => {
     }
   }, [location.pathname])
   return (
-     <div className="flex ">
+    <div className="flex ">
       <div className={isMinimized ? 'w-[320px] border-r' : 'w-full'}>
         <div className="relative">
           <ContentHeader
             isMinimized={isMinimized}
             heading="Stock Adjustment"
             onAddClick={handleAdd}
-            menuOptions={[
-              {
-                icon: <FiUpload className="mr-2 text-blue-500" />,
-                label: 'Import',
-                onClick: () => console.log('Import clicked'),
-              },
-              {
-                icon: <FiDownload className="mr-2 text-blue-500" />,
-                label: 'Export',
-                  onClick: () => console.log('Export clicked'),
-              },
-            ]}
+            // menuOptions={[
+            //   {
+            //     icon: <FiUpload className="mr-2 text-blue-500" />,
+            //     label: 'Import',
+            //     onClick: () => console.log('Import clicked'),
+            //   },
+            //   {
+            //     icon: <FiDownload className="mr-2 text-blue-500" />,
+            //     label: 'Export',
+            //       onClick: () => console.log('Export clicked'),
+            //   },
+            // ]}
             //headingOptions={[
             //  {
             //    label: 'All Stocks',
@@ -170,14 +167,13 @@ const handleEntriesChange = (newEntries) => {
             //  },
             //]}
           />
-
         </div>
 
         <Loader isLoading={loading} />
 
         <div className="mt-3 overflow-x-auto">
           <StockAdjustmentTable
-          //setSingleStatusUpdate={setSingleStatusUpdate}
+            //setSingleStatusUpdate={setSingleStatusUpdate}
             isMinimized={isMinimized}
             refreshClients={refreshClients}
             stockAdjustmentData={data}
@@ -190,17 +186,15 @@ const handleEntriesChange = (newEntries) => {
             <span>Total Count:</span>
             <span className="font-medium">{totalRecords}</span>
           </div>
-<CompactPagination
-  totalRecords={totalRecords}
-  count={totalPages}
-  page={currentPage}
-  onPageChange={handlePageChange}
-  entriesPerPage={entriesPerPage}
-  onEntriesChange={handleEntriesChange}
-/>
-
+          <CompactPagination
+            totalRecords={totalRecords}
+            count={totalPages}
+            page={currentPage}
+            onPageChange={handlePageChange}
+            entriesPerPage={entriesPerPage}
+            onEntriesChange={handleEntriesChange}
+          />
         </div>
-       
       </div>
 
       <div className="flex-1 transition-all duration-300">

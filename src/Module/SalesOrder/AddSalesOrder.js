@@ -252,6 +252,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
         response = await salesOrderApi.editSalesOrder(selectedSalesOrderID, payload);
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfully updated" }]);
       } else {
+        
         response = await salesOrderApi.addSalesOrder(payload);
         setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
       }

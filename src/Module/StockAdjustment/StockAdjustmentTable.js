@@ -81,11 +81,14 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized, refreshClients
                   <CTableHeaderCell className="w-32 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
                     Adjustment Date<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
+                  <CTableHeaderCell className="w-32 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
+                    Mode of Adjustment<span className="text-gray-500 ml-1">⌕</span>
+                  </CTableHeaderCell>
                   {/* <CTableHeaderCell className="w-40 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
                     Reason<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell> */}
                   <CTableHeaderCell className="w-52 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
-                    Remarks<span className="text-gray-500 ml-1">⌕</span>
+                    Reason<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
                   {/* <CTableHeaderCell className="w-36 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-start whitespace-nowrap">
                     Status<span className="text-gray-500 ml-1">⌕</span>
@@ -154,6 +157,9 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized, refreshClients
                           className="px-4 py-3 text-sm !text-blue-600 font-semibold  whitespace-nowrap"
                         >
                           {stock.stock_adjustment_generate_id || 'N/A'}
+                        </CTableDataCell>
+                        <CTableDataCell className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                          {stock.mode_of_adjustment || 'Quantity Adjustment'}
                         </CTableDataCell>
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                           {stock.adjustment_date || 'N/A'}

@@ -10,7 +10,7 @@ const ActionButton = ({
   customColor = '',
   borderRadius = 'md',
   icon: Icon,
-  type = 'button' // ✅ Add type with a default value
+  type = 'button' // ✅ Add type with a default value,
 }) => {
     const getButtonStyle = () => {
         if (customColor) {

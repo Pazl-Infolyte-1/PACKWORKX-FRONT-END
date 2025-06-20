@@ -14,6 +14,13 @@ const AddPurchaseOrder = () => {
   const [isEdit, setIsEdit] = useState(false)
   const {id} = useParams()
   const navigate = useNavigate()
+    const [useDebitBalance, setUseDebitBalance] = useState(false);
+          const [balanceAmount, setBalanceAmount] = useState(0)
+  const [debitBalanceAmount, setDebitBalanceAmount] = useState(0)
+    const [debitUsedAmount, setDebitUsedAmount] = useState(0)
+
+
+  
   const [orderData, setOrderData] = useState({
     po_date: new Date().toISOString().split('T')[0],
     valid_till: '',
@@ -101,22 +108,33 @@ const AddPurchaseOrder = () => {
   }
 
   const handleFormSubmit = async (formData) => {
+    console.log("return clicked")
+    console.log("debit bal",useDebitBalance)
+        console.log("bal amount",balanceAmount)
+        console.log("////////debit bal",debitBalanceAmount)
+console.log("////////debit usedd",debitUsedAmount)
     setLoading(true)
+
     try {
-      const payload = {
-        ...formData.orderData,
-        items: formData.itemsData.map((item) => {
-          // Remove status and other unnecessary fields from items
-          const { status, created_at, updated_at, ...cleanItem } = item
-          
-          return {
-            ...cleanItem,
-            price: parseFloat(item.unit_price || item.price || 0),
-            quantity: parseInt(item.quantity || 0),
-            total: parseFloat(item.total_amount || item.total || 0),
-          }
-        }),
-      }
+         const payload = {
+  ...formData.orderData,
+  items: formData.itemsData.map((item) => {
+    const { status, created_at, updated_at, ...cleanItem } = item;
+
+    return {
+      ...cleanItem,
+      price: parseFloat(item.unit_price || item.price || 0),
+      quantity: parseInt(item.quantity || 0),
+      total: parseFloat(item.total_amount || item.total || 0),
+    };
+  }),
+  //these are the extra keys
+  use_this: useDebitBalance,
+  debit_balance_amount:debitBalanceAmount,
+  debit_used_amount:debitUsedAmount
+};
+payload.total_amount = Math.max(0, parseFloat(payload.total_amount || 0));
+      console.log("payload",payload)
 
       let response
       if (isEdit) {
@@ -178,6 +196,14 @@ const AddPurchaseOrder = () => {
           isSubmitting={loading}
           clientData={clientData}
           id={id}
+          setUseDebitBalance={setUseDebitBalance}
+          useDebitBalance={useDebitBalance}
+          setBalanceAmount={setBalanceAmount}
+          balanceAmount={balanceAmount}
+          debitBalanceAmount={debitBalanceAmount}
+          setDebitBalanceAmount={setDebitBalanceAmount}
+          debitUsedAmount={debitUsedAmount}
+          setDebitUsedAmount={setDebitUsedAmount}
         />
       )}
     </div>

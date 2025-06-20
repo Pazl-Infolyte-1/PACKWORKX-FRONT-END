@@ -203,9 +203,9 @@ function InvoiceTemplate() {
               </button>
             </div>
 
-            <div className="p-4 w-full">
+            <div className="p-4 overflow-auto max-h-[calc(90vh-100px)] w-full">
               <div
-                className="bg-white rounded-lg w-full"
+                className="bg-white rounded-lg w-full overflow-x-auto"
                 style={{ minWidth: 'fit-content' }}
                 dangerouslySetInnerHTML={{ __html: selectedTemplate.content }}
               />

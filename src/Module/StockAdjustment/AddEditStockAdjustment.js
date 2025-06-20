@@ -390,7 +390,7 @@ const AddEditStockAdjustment = () => {
 
           <div className="flex flex-col gap-2">
             {Object.keys(adjustmentMode).map((key, index) => (
-              <label key={key} className={`flex items-center gap-2 text-sm text-gray-800 }`}>
+              <label key={key} className={`flex items-center gap-2 text-xs text-gray-800 }`}>
                 <input
                   {...register('mode_of_adjustment', { required: true })}
                   type="radio"
@@ -408,7 +408,7 @@ const AddEditStockAdjustment = () => {
           <input
             {...register('refernce_number')}
             placeholder="Reference Number"
-            className="w-80 h-7 px-2 border border-[#c2c2c2] rounded-md bg-white placeholder:text-sm"
+            className="w-80 h-7 px-2 border border-[#c2c2c2] rounded-md text-xs bg-white placeholder:text-xs"
           />
         </div>
         <div className="flex items-center gap-4">
@@ -418,22 +418,24 @@ const AddEditStockAdjustment = () => {
           <input
             type="date"
             {...register('date', { required: true })}
-            className={`w-80 h-7 px-2 rounded-md bg-white text-sm ${
-              errors.date ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'
-            }`}
+            className={`w-80 h-7 px-2 rounded-md bg-white text-xs text-gray-800
+      ${errors.date ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'}`}
           />
         </div>
+
         <div className="flex items-center gap-4">
           <label className="text-xs text-black-600 text-left ml-4 w-40">
             Reason <span className="text-red-500">*</span>
           </label>
           <select
             {...register('remarks', { required: true })}
-            className={`w-80 h-7 px-2 rounded-md bg-white placeholder:text-sm ${
+            className={`w-80 h-7 px-2 rounded-md bg-white text-xs placeholder:text-xs ${
               errors.remarks ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'
             }`}
           >
-            <option value="">Select Reason</option>
+            <option className="text-xs" value="">
+              Select Reason
+            </option>
             {reasons.map((item, index) => (
               <option key={index} value={item}>
                 {item}
@@ -442,15 +444,17 @@ const AddEditStockAdjustment = () => {
           </select>
         </div>
         <div className="flex items-center gap-4">
-          <label className="text-xs text-black-600 text-left ml-4 w-40">Description</label>
+          <label className="text-xs text-black-600 text-left text-xs placeholder:text-xs ml-4 w-40">
+            Description
+          </label>
           <input
             {...register('description')}
             placeholder="Description"
-            className="w-80 h-7 px-2 border border-[#c2c2c2] rounded-md bg-white placeholder:text-sm"
+            className="w-80 h-7 px-2 border border-[#c2c2c2] text-xs rounded-md bg-white placeholder:text-xs"
           />
         </div>
         <table className="w-full mt-4 bg-white border-collapse rounded-xl overflow-hidden">
-          <thead className="bg-gray-100 text-xs font-medium text-gray-700">
+          <thead className="bg-gray-100 text-sm font-medium text-gray-700">
             <tr>
               <th className="py-2 px-2 text-center">Product</th>
               <th className="py-2 px-2 text-center">Inventory</th>
@@ -473,7 +477,7 @@ const AddEditStockAdjustment = () => {
                       required: true,
                       onChange: (e) => handleProductSelect(e.target.value, index),
                     })}
-                    className={`w-full h-[36px] rounded-md px-1 text-sm text-center ${
+                    className={`w-full h-[36px] rounded-md px-1 text-sm text-left ${
                       errors.items?.[index]?.item_id
                         ? 'border-2 border-red-500'
                         : 'border border-[#c2c2c2]'
@@ -488,7 +492,7 @@ const AddEditStockAdjustment = () => {
 
                       return (
                         <option key={prod?.id} value={prod.id} disabled={isDisabledGlobally}>
-                          {prod?.item_name}
+                          {prod?.item_generate_id} - {prod?.item_name}
                         </option>
                       )
                     })}

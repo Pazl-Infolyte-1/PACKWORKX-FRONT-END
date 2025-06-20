@@ -14,7 +14,9 @@ import {
   Tag,
   Truck,
   ChevronDown,
-  X
+  X,
+  FileText,
+  ChevronUp
 } from 'lucide-react';
 import InvoiceCreationModal from "../SalesOrder/InvoiceCreationModal";
 import InvoiceModal from "./InvoiceModal";
@@ -138,7 +140,7 @@ const getProgressInfo = (progress) => {
   }
 };
 
-const InvoiceTypeSelectionModal = ({ isOpen, onClose, onFull, onPartial }) => {
+const InvoiceTypeSelectionModal = ({ isOpen, onClose, onFull, onPartial, disableFullInvoice }) => {
   if (!isOpen) return null;
   
   return (
@@ -160,8 +162,9 @@ const InvoiceTypeSelectionModal = ({ isOpen, onClose, onFull, onPartial }) => {
         {/* 2-column Options with icons */}
         <div className="grid grid-cols-2 gap-4 mb-2">
           <button
-            className="flex flex-col items-center justify-center p-4 bg-blue-50 border border-blue-100 rounded hover:bg-blue-100 transition-colors group min-h-[120px]"
+            className="flex flex-col items-center justify-center p-4 bg-blue-50 border border-blue-100 rounded hover:bg-blue-100 transition-colors group min-h-[120px] disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={onFull}
+            disabled={disableFullInvoice}
           >
             <Download size={32} className="text-blue-600 mb-2" />
             <div className="font-medium text-gray-900 text-sm mb-0.5">Full Invoice</div>
@@ -228,10 +231,16 @@ const ViewWorkOrder = () => {
     try {
       console.log(invoiceData)
       const response = await workOrderApi.createInvoiceWorkOrder(invoiceData);
+      
       console.log('Invoice created successfully:', response);
 
+
+      const downloadResponse = await invoiceApi.downloadInvoice(response.data.data.id)
+      console.log(downloadResponse)
+      
+
       // Optionally refresh work order data or navigate to invoice
-      navigate(`/invoice/view/${response.data.data.id}`);
+      // navigate(`/invoice/view/${response.data.data.id}`);
 
 
     } catch (err) {
@@ -510,7 +519,7 @@ const ViewWorkOrder = () => {
           <div className="col-span-2">
             <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
               {/* Work Order Header */}
-              <div className="flex items-start justify-between p-4 border-b border-gray-200">
+              <div className="flex items-start justify-between p-2 px-4 border-b border-gray-200">
                 <div>
                   <div className="flex items-center">
                     <h2 className="text-lg font-medium text-gray-900">{workOrder.work_generate_id}</h2>
@@ -535,8 +544,8 @@ const ViewWorkOrder = () => {
               </div>
 
               {/* What's Next Section */}
-              {invoiceHistory.length === 0 ? (
-                <div className="bg-blue-50 border border-blue-100 rounded p-2 mx-4 my-2 text-xs">
+              {workOrder.pending_invoice_qty !== 0 && (
+                <div className="bg-blue-50 border-t border-blue-100 rounded p-2 mx-4 my-2 text-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
                       <div className="bg-blue-100 p-0.5 rounded-full">
@@ -557,30 +566,28 @@ const ViewWorkOrder = () => {
                     </button>
                   </div>
                 </div>
-              ) : (
-                null
-                // <div className="bg-green-50 border border-green-100 rounded p-2 mx-4 my-2 text-xs">
-                //   <div className="flex items-center justify-between">
-                //     <div className="flex items-center gap-1">
-                //       <div className="bg-green-100 p-0.5 rounded-full">
-                //         <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-green-600" viewBox="0 0 20 20" fill="currentColor">
-                //           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                //         </svg>
-                //       </div>
-                //       <div>
-                //         <h3 className="font-semibold text-green-800 text-xs">INVOICE AVAILABLE</h3>
-                //         <p className="text-green-700 text-xs">This work order has already been invoiced.</p>
-                //       </div>
-                //     </div>
-                //     <button
-                //       className="bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 rounded shadow-sm text-xs"
-                //       onClick={() => { setInvoiceOpen(true) }}
-                //     >
-                //       Show Invoice
-                //     </button>
-                //   </div>
-                // </div>
               )}
+
+
+<div className="p-4 border-t border-gray-200">
+  <div className="flex justify-between items-center mb-2">
+    <h3 className="text-sm font-medium text-gray-700">Invoice History</h3>
+    <h3 className="text-sm font-medium text-gray-700">
+      Pending Quantity: {workOrder.pending_invoice_qty}
+    </h3>
+  </div>
+
+  {invoiceHistory.length > 0 ? (
+    <InvoiceHistoryCollapsible invoices={invoiceHistory} />
+  ) : (
+    <div className="text-xs text-gray-500 py-4 text-center">
+      No invoice history available
+    </div>
+  )}
+</div>
+
+
+               
 
 
               {/* Product Details */}
@@ -633,34 +640,7 @@ const ViewWorkOrder = () => {
                 </div>
               </div>
 
-              {/* Invoice History List */}
-              {invoiceHistory.length > 0 && (
-                <div className="p-4 border-t border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Invoice History</h3>
-                  <div className="grid gap-3">
-                    {invoiceHistory.map((invoice, idx) => (
-                      <div
-                        key={invoice.id}
-                        className={`flex items-center justify-between px-2 py-1 text-sm ${idx !== invoiceHistory.length - 1 ? 'border-b border-gray-200' : ''}`}
-                        style={{ background: 'none', borderRadius: 0 }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs font-semibold text-green-800">{invoice.invoice_number || `Invoice #${invoice.id}`}</span>
-                          <span className="text-xs text-gray-500">{formatDate(invoice.created_at)}</span>
-                          <span className="text-xs text-gray-700">₹{invoice.amount || 'N/A'}</span>
-                        </div>
-                        <button
-                          className="flex items-center p-1 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
-                          title="Download Invoice"
-                          onClick={()=>{HandleInvoiceDownload(invoice.id)}}
-                        >
-                          <Download size={16} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+
             </div>
 
             {/* Production Stages - Dynamic based on progress */}
@@ -922,6 +902,7 @@ const ViewWorkOrder = () => {
                   }
                 });
               }}
+              disableFullInvoice={workOrder.qty !== workOrder.pending_invoice_qty}
             />
             <InvoiceCreationModal
               isOpen={isInvoiceModalOpen}
@@ -1073,6 +1054,195 @@ const ViewWorkOrder = () => {
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+const InvoiceHistoryCollapsible = ({ invoices }) => {
+  const [expandedInvoice, setExpandedInvoice] = useState(null);
+  const [downloading, setDownloading] = useState({}); // Track loading state per invoice
+
+  const handleDownload = async (id) => {
+    setDownloading((prev) => ({ ...prev, [id]: true }));
+    try {
+      const response = await invoiceApi.downloadInvoice(id)
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `INV-00${id}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error downloading PDF:', error)
+    } finally {
+      setDownloading((prev) => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const toggleInvoice = (invoiceId) => {
+    setExpandedInvoice(expandedInvoice === invoiceId ? null : invoiceId);
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'paid': return 'bg-green-100 text-green-800';
+      case 'partial': return 'bg-yellow-100 text-yellow-800';
+      case 'pending': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  return (
+    <div className="space-y-1">
+      {invoices?.map((invoice) => (
+        <div key={invoice?.id} className="overflow-hidden">
+          {/* Invoice Header - Always Visible */}
+          <div
+            className="bg-gray-50 p-3 cursor-pointer hover:bg-gray-100 transition-colors flex justify-between items-center h-[52px]"
+            onClick={() => toggleInvoice(invoice?.id)}
+          >
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <FileText size={16} className="text-gray-500" />
+                <span className="text-sm font-medium">{invoice?.invoice_number}</span>
+              </div>
+              <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(invoice?.payment_status)}`}>
+                {invoice?.payment_status?.charAt(0)?.toUpperCase() + invoice?.payment_status?.slice(1)}
+              </span>
+              <div className="flex items-center space-x-1 text-gray-600">
+                <span className="text-sm font-medium">₹{invoice?.total_amount}</span>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-gray-500">Due: {formatDate(invoice?.due_date)}</span>
+ 
+              {expandedInvoice === invoice?.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              <button
+                className="ml-2 p-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
+                onClick={(e)=>{e.stopPropagation() ,handleDownload(invoice.id)}}
+                title="Download Invoice"
+                disabled={!!downloading[invoice.id]}
+              >
+                {downloading[invoice.id] ? (
+                  // Simple spinner SVG
+                  <svg className="animate-spin mr-1" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                  </svg>
+                ) : (
+                  <Download size={16} />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Invoice Details - Collapsible with fixed height */}
+          <div className={`bg-white border-t border-gray-200 transition-all border duration-200 ease-in-out ${expandedInvoice === invoice?.id ? 'h-[280px] opacity-100' : 'h-0 opacity-0 overflow-hidden'}`}>
+            <div className="p-2 h-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+                {/* Financial Information */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-medium text-gray-700 border-b pb-2">Financial Details</h4>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                      <span className="text-gray-500">Total:</span>
+                      <span className="ml-2 font-medium">₹{invoice?.total}</span>
+                    </div>
+                    {/* <div>
+                      <span className="text-gray-500">Balance:</span>
+                      <span className="ml-2 font-medium">₹{invoice?.balance}</span>
+                    </div> */}
+                    <div>
+                      <span className="text-gray-500">Tax:</span>
+                      <span className="ml-2 font-medium">₹{invoice?.total_tax}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Discount:</span>
+                      <span className="ml-2 font-medium">₹{invoice?.discount}</span>
+                    </div>
+                    <div className="col-span-2 pt-2 border-t">
+                      <span className="text-gray-700 font-medium">Total Amount:</span>
+                      <span className="ml-2 font-bold text-sm">₹{invoice?.total_amount}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Date Information */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-medium text-gray-700 border-b pb-2">Timeline</h4>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center space-x-2">
+                      <Calendar size={14} className="text-gray-500" />
+                      <span className="text-gray-500">Created:</span>
+                      <span className="font-medium">{formatDate(invoice?.created_at)}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Calendar size={14} className="text-gray-500" />
+                      <span className="text-gray-500">Due Date:</span>
+                      <span className="font-medium">{formatDate(invoice?.due_date)}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Calendar size={14} className="text-gray-500" />
+                      <span className="text-gray-500">Expected Payment:</span>
+                      <span className="font-medium">{formatDate(invoice?.payment_expected_date)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Work Order & Sales Order */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-medium text-gray-700 border-b pb-2">Order Information</h4>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center space-x-2">
+                      <Package size={14} className="text-gray-500" />
+                      <span className="text-gray-500">Work Order:</span>
+                      <span className="font-medium">{invoice?.workOrder?.work_generate_id}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <FileText size={14} className="text-gray-500" />
+                      <span className="text-gray-500">Sales Order:</span>
+                      <span className="font-medium">{invoice?.salesOrder?.sales_generate_id}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">SKU:</span>
+                      <span className="ml-2 font-medium">{invoice?.workOrder?.sku_name}</span>
+                    </div>
+      
+                  </div>
+                </div>
+
+                {/* Additional Details */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-medium text-gray-700 border-b pb-2">Additional Details</h4>
+                  <div className="space-y-2 text-xs">
+                    <div>
+                      <span className="text-gray-500">Transaction Type:</span>
+                      <span className="ml-2 font-medium capitalize">{invoice?.transaction_type?.replace('_', ' ')}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Status:</span>
+                      <span className="ml-2 font-medium capitalize">{invoice?.status}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Quantity:</span>
+                      <span className="ml-2 font-medium">{invoice?.workOrder?.qty}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

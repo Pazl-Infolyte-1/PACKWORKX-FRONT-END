@@ -169,7 +169,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
           cgst: parseFloat(itemData.cgst) || 0,
           sgst: parseFloat(itemData.sgst) || 0,
           manufacturer: itemData.manufacturer,
-          reorder_level: parseFloat(itemData.reorder_level) || 0,
+          min_stock_level: parseFloat(itemData.min_stock_level) || 0,
           standard_cost: parseFloat(itemData.standard_cost) || 0,
           specifications: itemData.specifications,
           description: itemData.description,
@@ -331,12 +331,13 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
           customFields[finalLabel] = String(field.value)
         }
       })
-
+      console.log(data,"data");
+      
       const formattedData = {
         ...data,
         custom_fields: customFields, // Directly use the object
         default_custom_fields: defaultFields, // Directly use the object
-        reorder_level: parseFloat(data.reorder_level) || 0,
+        min_stock_level: parseFloat(data.min_stock_level) || 0,
         standard_cost: parseFloat(data.standard_cost) || 0,
         cgst: parseFloat(data.cgst) || 0,
         sgst: parseFloat(data.sgst) || 0,
@@ -345,7 +346,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       }
 
       let response
-
+      
       if (isEditing) {
         formattedData.id = currentItemId
         response = await itemApi.updateItem(currentItemId, formattedData)
@@ -367,7 +368,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
         } else {
           setDrawer(false)
         }
-        fetchData()
+        // fetchData()
       }, 1500)
     } catch (error) {
       console.error(error)
@@ -382,8 +383,6 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       setIsSubmitting(false)
     }
   }
-
-  console.log(typeof selectedSubCategory)
 
   function cleanAndUppercase(text) {
     return text
@@ -401,7 +400,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
     { label: 'CGST %', name: 'cgst', type: 'number', min: 0, max: 100 },
     { label: 'SGST %', name: 'sgst', type: 'number', min: 0, max: 100 },
     { label: 'Manufacturer', name: 'manufacturer' },
-    { label: 'Reorder Level', name: 'reorder_level', type: 'number', min: 0 },
+    { label: 'Min Stock Level', name: 'min_stock_level', type: 'number', min: 0 },
   ]
 
   const handleCancel = () => {
@@ -631,10 +630,10 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
               }}
               {...register('net_weight')}
             >
-              {(!selectedSubCategory || ['1', '5', '9', '4'].includes(selectedSubCategory)) && (
+              {(!selectedSubCategory || ['1', '5', '6', '7','8', '9', '4'].includes(selectedSubCategory)) && (
                 <option value="kg">Kg</option>
               )}
-              {(!selectedSubCategory || ['2', '5', '3', '4'].includes(selectedSubCategory)) && (
+              {(!selectedSubCategory || ['2', '5', '6', '7','8', '3', '4'].includes(selectedSubCategory)) && (
                 <option value="litre">Litre</option>
               )}
             </select>

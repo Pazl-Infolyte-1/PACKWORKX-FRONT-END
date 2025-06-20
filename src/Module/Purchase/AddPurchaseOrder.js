@@ -4,7 +4,7 @@ import { clientApi } from '../../api/client'
 import Loader from '../../components/New/Loader'
 import CustomAlert from '../../components/New/CustomAlert'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 const AddPurchaseOrder = () => {
   const [loading, setLoading] = useState(false)
@@ -26,6 +26,11 @@ const AddPurchaseOrder = () => {
     payment_terms: '',
     freight_terms: '',
   })
+  
+  const location = useLocation()
+  const PoID = location.state?.po_id
+  console.log('PoID:', PoID);
+  
   
   useEffect(() =>{
     if(id){

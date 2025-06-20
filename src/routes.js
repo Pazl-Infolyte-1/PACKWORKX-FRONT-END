@@ -18,7 +18,9 @@ const PurchaseOrder = React.lazy(() => import('./Module/Purchase/PurchaseOrder.j
 const AddPurchaseOrder = React.lazy(() => import('./Module/Purchase/AddPurchaseOrder.js'))
 const AddPurchaseReturn = React.lazy(() => import('./Module/PurchaseReturn/AddPurchaseReturn.js'))
 const PurchaseOrderDetails = React.lazy(() => import('./Module/Purchase/PurchaseOrderDetails.js'))
-const PurchaseOrderReturnView = React.lazy(() => import('./Module/PurchaseReturn/PurchaseOrderReturnView.js'))
+const PurchaseOrderReturnView = React.lazy(
+  () => import('./Module/PurchaseReturn/PurchaseOrderReturnView.js'),
+)
 
 const MachineDashboard = React.lazy(() => import('./Module/Machine/MachineDashboard.js'))
 const AddEditMachine = React.lazy(() => import('./Module/Machine/AddEditMachine.js'))
@@ -74,7 +76,6 @@ const CreditNoteView = React.lazy(() => import('./Module/CreditNote/CreditNoteVi
 const InventoryView = React.lazy(() => import('./Module/Inventory/ViewInventory.js'))
 const BillingMain = React.lazy(() => import('./Module/Billing/BillingMain.js'))
 
-
 // const ProductionPlanning = React.lazy(
 //   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
 // )
@@ -127,8 +128,12 @@ const routes = [
     ],
   },
   { path: '/purchaseorder/form/:id?', name: 'Purchase Order', element: AddPurchaseOrder, key: 654 },
-    { path: '/purchase-return', name: 'Purchase Return', element: PurchaseReturn, key: 'purchase return',
-          children: [
+  {
+    path: '/purchase-return',
+    name: 'Purchase Return',
+    element: PurchaseReturn,
+    key: 'purchase return',
+    children: [
       {
         path: '/purchase-return/:id',
         name: 'PurchaseOrderReturn',
@@ -136,8 +141,13 @@ const routes = [
         key: '',
       },
     ],
-     },
-       { path: '/purchase-return/form/:id?', name: 'Purchase Order', element: AddPurchaseReturn, key: "return form" },
+  },
+  {
+    path: '/purchase-return/form/:id?',
+    name: 'Purchase Order',
+    element: AddPurchaseReturn,
+    key: 'return form',
+  },
   { path: '/machinedashboard', name: 'Machine Dashboard', element: MachineDashboard, key: 22 },
   {
     path: '/machinedashboard/form',
@@ -296,14 +306,19 @@ const routes = [
     element: InventoryForm,
     key: 2232,
   },
-    {
+  {
     path: '/billingmain',
     name: 'BillingMain',
     element: BillingMain,
-    key: "billingMain",
-       children: [{ path: ':id', element: BillingView, key: 'Billing_view' }],
+    key: 'billingMain',
+    children: [{ path: ':id', element: BillingView, key: 'Billing_view' }],
   },
-  { path: '/billingmain/billingmainForm', name: 'Add Billing', element: BillingForm, key: 'billingmain form' }
+  {
+    path: '/billingmain/billingmainForm',
+    name: 'Add Billing',
+    element: BillingForm,
+    key: 'billingmain form',
+  },
   // {
   //   path: '/productionplanning',
   //   name: 'Production Planning',

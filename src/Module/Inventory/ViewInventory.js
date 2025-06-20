@@ -23,24 +23,22 @@ import { FaRupeeSign } from 'react-icons/fa'
 import { inventoryApi } from '../../api/inventory'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
-const ViewInventory = ({setIsMinimised}) => {
+const ViewInventory = ({ setIsMinimised }) => {
   const [itemDetails, setItemDetails] = useState(null)
   const menus = ['Products', 'Purchase Order', 'GRN', 'Purchase Returns', 'Stock Adjustment']
- const { state } = useLocation();
-// const {item_id}=useParams()
-// console.log("item id",state.item.item_id)
-  //console.log("item id///",item_id)
+  const { state } = useLocation()
+  // const {item_id}=useParams()
 
-  const { item, totalInventoryValue } = state || {};
+  const { item, totalInventoryValue } = state || {}
   const [activeMenu, setActiveMenu] = useState('Products')
   const navigate = useNavigate()
-   useEffect(() => {
+  useEffect(() => {
     if (state?.item?.item_id) {
-      setIsMinimised(true);
+      setIsMinimised(true)
     } else {
-      setIsMinimised(false); // Reset to false if ID is not '10'
+      setIsMinimised(false) // Reset to false if ID is not '10'
     }
-  }, [state?.item?.item_id]);
+  }, [state?.item?.item_id])
   useEffect(() => {
     const fetchSingleItem = async () => {
       if (!state?.item?.item_id) return
@@ -55,7 +53,6 @@ const ViewInventory = ({setIsMinimised}) => {
 
     fetchSingleItem()
   }, [state?.item?.item_id])
-console.log(item);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -121,89 +118,93 @@ console.log(item);
   }
 
   const rawCustomFields = itemDetails?.products?.default_custom_fields
-  
-  const customData = rawCustomFields ? JSON.parse(rawCustomFields) : {}
-  console.log('Raw Custom Fields:', customData);
 
-  const handleClose =()=>{
-setIsMinimised(false)
+  const customData = rawCustomFields ? JSON.parse(rawCustomFields) : {}
+
+  const handleClose = () => {
+    setIsMinimised(false)
   }
 
-const handleEdit=()=>{
-        navigate('/inventoryhandling/inventory_form',{
-                                    state: {
-                                      item,
-                                      fromInventory: true,
-                                      isInventoryEditing: true,
-                                      isEdit: true,
-                                    },
-                                  })
-}
+  const handleEdit = () => {
+    navigate('/inventoryhandling/inventory_form', {
+      state: {
+        item,
+        fromInventory: true,
+        isInventoryEditing: true,
+        isEdit: true,
+      },
+    })
+  }
   return (
-  <div className='border-l h-[600px] flex flex-col'>
-  {/* Fixed Header Section */}
-<div className="flex-shrink-0 bg-white border-b shadow-sm sticky top-0 z-10">
-  {/* Header buttons */}
-  <div className="flex justify-end items-center p-2 space-x-2">
-    {/*<button
+    <div className="border-l h-[600px] flex flex-col">
+      {/* Fixed Header Section */}
+      <div className="flex-shrink-0 bg-white border-b shadow-sm sticky top-0 z-10">
+        {/* Header buttons */}
+        <div className="flex justify-end items-center p-2 space-x-2">
+          {/*<button
       onClick={handleEdit} // define this function in your component
       className="text-gray-500 hover:text-blue-600 transition-colors"
       aria-label="Edit"
     >
       ✎ Edit
     </button>*/}
-    <button
-      onClick={handleClose}
-      className="text-gray-500 hover:text-red-600 transition-colors"
-      aria-label="Close"
-    >
-      ✕
-    </button>
-    </div>
+          <button
+            onClick={handleClose}
+            className="text-gray-500 hover:text-red-600 transition-colors"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
 
-    {/* Nav menu */}
-    <nav className="flex space-x-8 px-4 pb-2">
-      {menus.map((menu) => (
-        <button
-          key={menu}
-          onClick={() => setActiveMenu(menu)}
-          className={`pb-2 font-semibold transition-colors ${
-            activeMenu === menu
-              ? 'border-b-2 border-blue-600 text-blue-600'
-              : 'text-gray-600 hover:text-blue-500'
-          }`}
-        >
-          {menu}
-        </button>
-      ))}
-    </nav>
-  </div>
+        {/* Nav menu */}
+        <nav className="flex space-x-8 px-4 pb-2">
+          {menus.map((menu) => (
+            <button
+              key={menu}
+              onClick={() => setActiveMenu(menu)}
+              className={`pb-2 font-semibold transition-colors ${
+                activeMenu === menu
+                  ? 'border-b-2 border-blue-600 text-blue-600'
+                  : 'text-gray-600 hover:text-blue-500'
+              }`}
+            >
+              {menu}
+            </button>
+          ))}
+        </nav>
+      </div>
 
       {/* Content area */}
       <div className="flex-1 overflow-y-auto">
         {activeMenu === 'Products' ? (
           <div className="p-3">
-          <div className="flex justify-between">
-  <h2 className="text-xl font-bold mb-2 text-gray-800 flex items-center gap-2">
-    <Package className="w-6 h-6 text-blue-600" />
-    Product Details
-  </h2>
-  <div className="text-right">
-    <div className="flex items-center justify-end gap-2">
-      <button
-        onClick={handleEdit} // define this function
-        className="text-sm text-blue-600 hover:underline"
-      >
-        ✎ Edit
-      </button>
-      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-    </div>
-    <p className="text-sm font-bold m-0">
-      Available Qty: {parseFloat(item?.quantity_available)}
-    </p>
-  </div>
-</div>
-
+            <div className="flex justify-between">
+              <h2 className="text-xl font-bold mb-2 text-gray-800 flex items-center gap-2">
+                <Package className="w-6 h-6 text-blue-600" />
+                Product Details
+              </h2>
+              <div className="text-right">
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    onClick={() =>
+                      navigate('/products/productsForm')
+                    }
+                    className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-bold px-2 rounded"
+                  >+ Product</button>
+                  <button
+                    onClick={handleEdit} // define this function
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    ✎ Edit
+                  </button>
+                  <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                </div>
+                <p className="text-sm font-bold m-0">
+                  Available Qty: {parseFloat(item?.quantity_available)}
+                </p>
+              </div>
+            </div>
 
             {itemDetails?.products ? (
               <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden mt-1">
@@ -314,12 +315,10 @@ const handleEdit=()=>{
                           </h4>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
-                          {Object.entries(
-                            customData
-                          ).map(([key, value]) => {
+                          {Object.entries(customData).map(([key, value]) => {
                             // Process the key: remove special characters and capitalize
                             const processedKey = key
-                              .replace(/[^a-zA-Z0-9 ]/g, ' ') 
+                              .replace(/[^a-zA-Z0-9 ]/g, ' ')
                               .replace(/\s+/g, ' ')
                               .replace(/\b\w/g, (char) => char.toUpperCase())
                               .trim()
@@ -329,8 +328,6 @@ const handleEdit=()=>{
                                 key={key}
                                 className="flex gap-2 items-center py-2 px-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
                               >
-                                {console.log(processedKey)}
-                                
                                 <span className="text-sm font-medium text-gray-600">
                                   {processedKey}:
                                 </span>
@@ -378,9 +375,19 @@ const handleEdit=()=>{
                   </div>
 
                   {/* Right side ID and Item Name */}
-                  <div className="text-right">
-                    <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                    <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                  <div className="flex gap-3 items-center">
+                    <button
+                      onClick={() =>
+                        navigate('/purchaseorder/form', { state: { po_id: item?.item_id } })
+                      }
+                      className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-bold px-2 rounded"
+                    >
+                      + Purchase Order
+                    </button>
+                    <div className="text-right">
+                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                      <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -511,7 +518,6 @@ const handleEdit=()=>{
                         </div>
                         {/* Footer */}
                         <div className="flex justify-between items-center pt-3 border-t text-xs text-gray-500">
-                          {console.log(po)}
                           <div className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             <span>Created: {formatDate(po.created_at)}</span>
@@ -553,11 +559,20 @@ const handleEdit=()=>{
                     </div>
                     <h1 className="text-xl font-bold text-gray-900">Stock Adjustment</h1>
                   </div>
-
-                  {/* Right section: ID and name */}
-                  <div className="text-right">
-                    <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                    <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                  <div className="flex gap-3 items-center">
+                    <button
+                      onClick={() =>
+                        navigate('/stockadjustment/stock_form', { state: { PoID: item.item_id } })
+                      }
+                      className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-bold px-2 rounded"
+                    >
+                      + Stock
+                    </button>
+                    {/* Right section: ID and name */}
+                    <div className="text-right">
+                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                      <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -720,9 +735,17 @@ const handleEdit=()=>{
                   </div>
 
                   {/* Right section: Item ID and Name */}
-                  <div className="text-right">
-                    <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                    <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                  <div className="flex gap-3 items-center">
+                    <button
+                      onClick={() => navigate('/grn_form')}
+                      className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-semibold px-2 rounded"
+                    >
+                      + GRN
+                    </button>
+                    <div className="text-right">
+                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                      <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -950,9 +973,17 @@ const handleEdit=()=>{
                 <RotateCcw className="w-6 h-6 text-blue-600" />
                 Purchase Returns
               </h2>
-              <div className="">
-                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+              <div className="flex gap-3 items-center">
+                <button
+                  onClick={() => navigate('/purchase-return/form')}
+                  className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-semibold px-2 rounded"
+                >
+                  + Purchase Returns
+                </button>
+                <div className="">
+                  <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                  <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                </div>
               </div>
             </div>
             {itemDetails?.purchaseReturns.length > 0 ? (

@@ -39,6 +39,7 @@ const InventoryMain = () => {
   const [isStockDropdownOpen, setIsStockDropdownOpen] = useState(false)
   const [isMinimised, setIsMinimised] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
+  const [activateSummary, setActivateSummary] = useState(false)
   const { id } = useParams()
 
   // Refs for click outside detection
@@ -164,22 +165,30 @@ const InventoryMain = () => {
     // In the fetchInventory function, modify the API call parameters:
     const fetchInventory = async () => {
       try {
-        const response = await inventoryApi.getinventoryWithParams(
-          categoryId,
-          currentPage,
-          entriesPerPage,
-          searchQuery,
-          subCategoryId,
-        )
-
-        if (response?.data?.success) {
-          setInventoryData(response.data.data.inventoryData)
-          setSubCategoryQuantities(response.data.data.subCategoryQuantities)
-          const pagination = response.data.pagination
-          setCurrentPage(pagination.currentPage)
-          setTotalPage(pagination.totalPages)
-          setTotalRecords(pagination.totalCount)
-          setEntriesPerPage(pagination.perPage)
+        if (activateSummary) {
+          const response = await inventoryApi.getInventorySummary()
+          const data = response.data.data.inventoryData
+          const selectedSubcategory = data.filter(
+            (item) => item.item.sub_category === subCategoryId,
+          )
+          setInventoryData(selectedSubcategory)
+        } else {
+          const response = await inventoryApi.getinventoryWithParams(
+            categoryId,
+            currentPage,
+            entriesPerPage,
+            searchQuery,
+            subCategoryId,
+          )
+          if (response?.data?.success) {
+            setInventoryData(response.data.data.inventoryData)
+            setSubCategoryQuantities(response.data.data.subCategoryQuantities)
+            const pagination = response.data.pagination
+            setCurrentPage(pagination.currentPage)
+            setTotalPage(pagination.totalPages)
+            setTotalRecords(pagination.totalCount)
+            setEntriesPerPage(pagination.perPage)
+          }
         }
       } catch (error) {
         console.error('Failed to fetch inventory:', error)
@@ -187,7 +196,7 @@ const InventoryMain = () => {
     }
 
     fetchInventory()
-  }, [categoryId, subCategoryId, currentPage, entriesPerPage, searchQuery])
+  }, [categoryId, subCategoryId, currentPage, entriesPerPage, searchQuery, activateSummary])
 
   const handlePageChange = (_, newPage) => {
     setCurrentPage(newPage)
@@ -288,10 +297,11 @@ const InventoryMain = () => {
 
   const handleSummary = async () => {
     try {
-      const response = await inventoryApi.getInventorySummary()
-      const data = response.data.data.inventoryData
-      const selectedSubcategory = data.filter((item) => item.item.sub_category === subCategoryId)
-      setInventoryData(selectedSubcategory)
+      // const response = await inventoryApi.getInventorySummary()
+      // const data = response.data.data.inventoryData
+      // const selectedSubcategory = data.filter((item) => item.item.sub_category === subCategoryId)
+      // setInventoryData(selectedSubcategory)
+      setActivateSummary((prev)=> !prev)
     } catch (error) {
       console.error(error)
     }
@@ -311,6 +321,7 @@ const InventoryMain = () => {
           heading="Inventory"
           isNewButton={true}
           newButtonLabel="Summary"
+          activateSummary={activateSummary}
           addNewButtonClick={handleSummary}
           onAddClick={() =>
             navigate('/inventoryhandling/inventory_form', {

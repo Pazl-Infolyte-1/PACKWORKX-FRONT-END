@@ -128,7 +128,7 @@ const InventoryTable = ({
                   Qty
                 </CTableHeaderCell>
                 <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                  Rate/Kg
+                  Rate
                 </CTableHeaderCell>
                 {/* Dynamic Custom Field Columns */}
                 {customFieldColumns.map((fieldKey, index) => (

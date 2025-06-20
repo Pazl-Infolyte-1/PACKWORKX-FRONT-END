@@ -88,24 +88,24 @@ const Grn = () => {
 
   const handleEdit = (item) => {
     console.log('Edit item', item.GRNItems)
-    setGrnFormData({
-      id: item.id,
-      po_bill_id: item.po_bill_id,
-      po_id: item.po_id,
-      grn_date: item.grn_date,
-      delivery_note_no: item.delivery_note_no,
-      invoice_no: item.invoice_no,
-      invoice_date: item.invoice_date,
-      amount: item.amount,
-      cgst_amount: item.cgst_amount,
-      sgst_amount: item.sgst_amount,
-      tax_amount: item.tax_amount,
-      total_amount: item.total_amount,
-      total_qty: item.total_qty,
-      received_by: item.received_by,
-      notes: item.notes,
-      items: item.GRNItems,
-    })
+    // setGrnFormData({
+    //   id: item.id,
+    //   po_bill_id: item.po_bill_id,
+    //   po_id: item.po_id,
+    //   grn_date: item.grn_date,
+    //   delivery_note_no: item.delivery_note_no,
+    //   invoice_no: item.invoice_no,
+    //   invoice_date: item.invoice_date,
+    //   amount: item.amount,
+    //   cgst_amount: item.cgst_amount,
+    //   sgst_amount: item.sgst_amount,
+    //   tax_amount: item.tax_amount,
+    //   total_amount: item.total_amount,
+    //   total_qty: item.total_qty,
+    //   received_by: item.received_by,
+    //   notes: item.notes,
+    //   items: item.GRNItems,
+    // })
     setIsEdit(true)
     navigate('/grn_form/' + item.id)
   }
@@ -214,20 +214,18 @@ const Grn = () => {
 
   return (
     <>
-      <div className="flex w-full">
-        <div className={isMinimized ? 'w-[320px] border-r' : 'w-full'}>
+      <div className="flex w-full h-[calc(100vh-<HEADER_HEIGHT>px)] overflow-hidden">
+        {/* Left Side (Table/List) */}
+        <div className={isMinimized ? 'w-[320px] border-r flex-shrink-0' : 'w-full'}>
           <CustomAlert alerts={alerts} handleClose={handleClose} />
           <ContentHeader
             heading={'GRN'}
             isMinimized={isMinimized}
             onAddClick={() => {
               setIsEdit(false)
-              // setDrawerOpen(true)
               navigate('/grn_form')
             }}
           />
-
-          {/* <Loader isLoading={loading} /> */}
           <div>
             <GrnTable
               grnData={grnData}
@@ -238,9 +236,7 @@ const Grn = () => {
               isMinimized={isMinimized}
             />
           </div>
-          <div
-            className={`${isMinimized ? 'flex-col ' : 'flex justify-end '} items-center gap-4 m-2 px-2`}
-          >
+          <div className="flex justify-end items-center gap-4 mt-2 py-2 border-t bg-white">
             <p className="w-40 text-sm">
               Total Count: <span className="font-semibold">{count}</span>
             </p>
@@ -264,7 +260,12 @@ const Grn = () => {
             />
           </div>
         </div>
-        <div className={isMinimized ? 'w-full' : ''}>
+
+        {/* Right Side (Outlet for Detail View) */}
+        <div
+          className={isMinimized ? 'flex-1' : 'w-0'}
+          style={{ overflowX: 'auto', overflowY: 'auto' }}
+        >
           <Outlet />
         </div>
       </div>

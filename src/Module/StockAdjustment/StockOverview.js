@@ -55,12 +55,20 @@ const StockOverview = ({ tableData }) => {
                   <span className="font-medium">{tableData?.adjustment_date || '-'}</span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span className="text-gray-600">Reason</span>
-                  <span className="font-medium">{tableData?.reason || '-'}</span>
+                  <span className="text-gray-600">Mode of Adjustment</span>
+                  <span className="font-medium">{tableData?.mode_of_adjustment || '-'}</span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span className="text-gray-600">Remarks</span>
+                  <span className="text-gray-600">Reference Number</span>
+                  <span className="font-medium">{tableData?.reference_number || '-'}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-gray-600">Reason</span>
                   <span className="font-medium">{tableData?.remarks || '-'}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-gray-600">Description</span>
+                  <span className="font-medium">{tableData?.description || '-'}</span>
                 </div>
                 <div className="flex justify-between py-1">
                   <span className="text-gray-600">Created By</span>

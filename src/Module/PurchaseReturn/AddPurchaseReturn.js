@@ -88,7 +88,7 @@ const AddPurchaseOrderReturn = ({
     if (!isOpen) {
       reset()
     }
-  }, [isOpen, reset])
+  }, [isOpen])
 
   useEffect(() => {
     if (resetTrigger) {
@@ -262,6 +262,7 @@ const AddPurchaseOrderReturn = ({
     setSelectedPoIdState(selectedId)
     setValue('po_id', selectedId)
     setPoIDForReturn(selectedId)
+    setSelectedGrnID('')
 
     if (selectedId) {
       // getPOItemsById(selectedId)
@@ -285,7 +286,7 @@ const AddPurchaseOrderReturn = ({
       })
       const grnItems = response?.data.purchaseOrderItemDetails || []
       const filteredGRNItems = grnItems.filter((grn) => grn.grn_item_id != null)
-      console.log('Filtered GRN Items:', filteredGRNItems)
+      console.log('Filtered GRN Items    ====   ', filteredGRNItems)
       reset({ items: filteredGRNItems })
 
       // Optional: if you're managing separate local state for any reason
@@ -315,6 +316,7 @@ const AddPurchaseOrderReturn = ({
         }
       } else {
         console.warn('No GRNs found for PO ID:', poId)
+        setGrnData([])
         // Optionally show a warning alert
       }
     } catch (error) {
@@ -373,8 +375,21 @@ const AddPurchaseOrderReturn = ({
   }
 
   const handleFormSubmit = async (data) => {
+    console.log('data', data)
+    console.log('items', items)
     const checkedItems = items.filter((item) => item.selected)
-    const checkedItemCodes = checkedItems.map((item) => item.item_code)
+    console.log('checkedItems', checkedItems)
+
+    if (checkedItems.length === 0) {
+      setAlerts([
+        {
+          severity: 'error',
+          message: 'Please select at least one item to perform Purchase Return.',
+        },
+      ])
+      return
+    }
+
     const payload = {
       po_id: data.po_id || selectedPoId,
       grn_id: grnId || selectedGrnID,
@@ -391,11 +406,10 @@ const AddPurchaseOrderReturn = ({
       })),
     }
 
-    try {
-      // ✅ Submit PO return first
-      const response = await purchaseOrderApi.submitPurchaseOrderReturn(payload)
+    console.log('payload', payload)
 
-      // ✅ Throw alerts for each item AFTER successful PO return
+    try {
+      const response = await purchaseOrderApi.submitPurchaseOrderReturn(payload)
       await handleThrowAlerts(payload.items)
 
       setAlerts([
@@ -405,7 +419,6 @@ const AddPurchaseOrderReturn = ({
         },
       ])
       handleFormReset()
-      //setDrawer(false)
       navigate('/purchase-return')
     } catch (error) {
       console.error('Submission error:', error)
@@ -539,277 +552,98 @@ const AddPurchaseOrderReturn = ({
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <h2 className="text-lg font-semibold mb-4">Purchase Order Details</h2>
+      <form className="space-y-4">
+        <div className="relative">
+          <div className="w-full">
+            <div className="w-full">
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-4 py-3 px-4 border-gray-200">
+                  {/* Purchase Order ID */}
+                  <div className="flex items-center gap-4">
+                    <label className="text-xs text-black-600 w-40">
+                      Purchase Order ID <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      {...register('po_id', { required: 'required' })}
+                      value={selectedPoId || selectedPoIdState || ''}
+                      onChange={handlePoChange}
+                      style={getInputStyle(errors?.po_id)}
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-sm"
+                    >
+                      <option value="">-- Select Purchase Order --</option>
+                      {filteredPoData?.map((po) => (
+                        <option key={po.id} value={po.id}>
+                          {po.purchase_generate_id}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Supplier Dropdown */}
-            {/* <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Supplier ID </label>
-            <select
-              {...register('supplier_id')}
-              onChange={handleSupplierChange}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            >
-              <option value="">-- Select Supplier --</option>
-              {clientData?.map((client) => (
-                <option key={client.client_id} value={client.client_id}>
-                  {client.client_ui_id} - {client.display_name}
-                </option>
-              ))}
-            </select>
-            {errors.supplier_id && (
-              <p className="text-red-500 text-sm mt-1">{errors.supplier_id.message}</p>
-            )}
-          </div> */}
+                  {/* GRN ID */}
+                  <div className="flex items-center gap-4">
+                    <label className="text-xs text-black-600 w-40">
+                      GRN ID <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      {...register('grn_id', { required: 'required' })}
+                      onChange={handleGrnChange}
+                      style={getInputStyle(errors?.grn_id)}
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-sm"
+                      value={selectedGrnID || ''}
+                    >
+                      <option value="">-- Select GRN --</option>
+                      {grnData?.map((grn) => (
+                        <option key={grn.id} value={grn.id}>
+                          {grn.grn_generate_id}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-            {/* purchase order id */}
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Purchase Order ID <span className="text-red-500"> *</span>
-              </label>
-              <select
-                {...register('po_id', { required: 'required' })}
-                value={selectedPoId || selectedPoIdState || ''} // ✅ Controlled by state
-                onChange={handlePoChange}
-                style={getInputStyle(errors?.po_id)}
-                className="w-full p-2 border-gray-300 rounded-md"
-              >
-                <option value="">-- Select Purchase Order --</option>
-
-                {filteredPoData?.map((po) => (
-                  <option key={po.id} value={po.id}>
-                    {po.purchase_generate_id}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                GRN ID <span className="text-red-500"> *</span>
-              </label>
-              <select
-                {...register('grn_id', { required: 'required' })}
-                onChange={handleGrnChange}
-                style={getInputStyle(errors?.grn_id)}
-                className="w-full p-2 border-gray-300 rounded-md"
-                value={selectedGrnID || ''}
-              >
-                <option value="">-- Select GRN --</option>
-                {grnData?.map((grn) => (
-                  <option key={grn.id} value={grn.id}>
-                    {grn.grn_generate_id}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Supplier Name </label>
-              <input
-                type="text"
-                {...register('supplier_name')}
-                className="w-full p-2 border border-gray-300 rounded-md"
-                readOnly
-              />
-              {errors.supplier_name && (
-                <p className="text-red-500 text-sm mt-1">{errors.supplier_name.message}</p>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Supplier Contact{' '}
-              </label>
-              <input
-                type="number"
-                {...register('supplier_contact')}
-                className="w-full p-2 border border-gray-300 rounded-md"
-                readOnly
-              />
-              {errors.supplier_contact && (
-                <p className="text-red-500 text-sm mt-1">{errors.supplier_contact.message}</p>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Supplier E-mail
-              </label>
-              <input
-                type="email"
-                {...register('supplier_email')}
-                className="w-full p-2 border border-gray-300 rounded-md"
-                readOnly
-              />
-              {errors.supplier_email && (
-                <p className="text-red-500 text-sm mt-1">{errors.supplier_email.message}</p>
-              )}
-            </div> */}
-
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Payment Terms</label>
-              <input
-                type="text"
-                {...register('payment_terms', { required: 'required' })}
-                style={getInputStyle(errors?.payment_terms)}
-                className="w-full p-2 border-gray-300 rounded-md"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
-              <input
-                type="text"
-                {...register('reason', { required: 'required' })}
-                style={getInputStyle(errors?.reason)}
-                className="w-full p-2 border-gray-300 rounded-md"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-              <input
-                type="text"
-                {...register('notes', { required: 'required' })}
-                style={getInputStyle(errors?.notes)}
-                className="w-full p-2 border-gray-300 rounded-md"
-              />
-            </div>
-
-            {/* <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-1">PO Date</label>
-            <input
-              type="date"
-              {...register('po_date')}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            />
-          </div> */}
-
-            {/* <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Valid Till <span className="text-red-500"> *</span>{' '}
-              </label>
-              <input
-                type="date"
-                {...register('valid_till', { required: 'required' })}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-              {errors.valid_till && (
-                <p className="text-red-500 text-sm mt-1">{errors.valid_till.message}</p>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Freight Terms</label>
-              <input
-                type="text"
-                {...register('freight_terms')}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Decision</label>
-              <select
-                disabled
-                {...register('decision')}
-                defaultValue="approve"
-                className="w-full p-2 border border-gray-300 rounded-md"
-              >
-                <option value="approve">Approve</option>
-                <option value="disapprove">Disapprove</option>
-              </select>
-            </div> */}
-          </div>
-
-          {/* Address */}
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
-          <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Billing Address
-                <span
-                  className="text-blue-600 cursor-pointer float-right text-sm"
-                  onClick={() => setShowAddressModal(true)}
-                  style={{ textDecoration: 'underline' }}
-                >
-                  Change Address
-                </span>
-              </label>
-
-              <div className="border rounded p-3 bg-gray-50 mb-2">
-                  {isEdit ? (
-                    <textarea
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                      {...register('billing_address')}
-                      rows={3}
+                  {/* Payment Terms */}
+                  <div className="flex items-center gap-4">
+                    <label className="text-xs text-black-600 w-40">
+                      Payment Terms <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      {...register('payment_terms', { required: 'required' })}
+                      style={getInputStyle(errors?.payment_terms)}
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
                     />
-                  ) : (
-                    formatAddress(supplierAddresses[selectedAddressIndex])
-                  )}      
-              </div>
-                  <input
-                    type="hidden"
-                    {...register('billing_address')}
-                    value={
-                      [
-                        supplierAddresses[selectedAddressIndex]?.attention,
-                        supplierAddresses[selectedAddressIndex]?.address_line,
-                        supplierAddresses?.[selectedAddressIndex]?.work_phones,
-                        supplierAddresses[selectedAddressIndex]?.city,
-                        supplierAddresses[selectedAddressIndex]?.state,
-                        supplierAddresses[selectedAddressIndex]?.country,
-                        supplierAddresses[selectedAddressIndex]?.pinCode,
-                        supplierAddresses[selectedAddressIndex]?.phone
-                      ].filter(Boolean).join(', ')
-                    }
-                />
-          </div>
+                  </div>
 
-
-          <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Destination to Deliver
-                <span
-                  className="text-blue-600 cursor-pointer float-right text-sm"
-                  onClick={() => setShowAddressModal(true)}
-                  style={{ textDecoration: 'underline' }}
-                >
-                  Change Address
-                </span>
-              </label>
-
-              <div className="border rounded p-3 bg-gray-50 mb-2">
-                  {isEdit ? (
-                    <textarea
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                      {...register('shipping_address')}
-                      rows={3}
+                  {/* Reason */}
+                  <div className="flex items-center gap-4">
+                    <label className="text-xs text-black-600 w-40">
+                      Reason <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      {...register('reason', { required: 'required' })}
+                      style={getInputStyle(errors?.reason)}
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
                     />
-                  ) : (
-                    formatAddress(supplierAddresses[selectedAddressIndex])
-                  )}      
-              </div>
-                  <input
-                    type="hidden"
-                    {...register('shipping_address')}
-                    value={
-                      [
-                        supplierAddresses[selectedAddressIndex]?.attention,
-                        supplierAddresses[selectedAddressIndex]?.address_line,
-                        supplierAddresses?.[selectedAddressIndex]?.work_phones,
-                        supplierAddresses[selectedAddressIndex]?.city,
-                        supplierAddresses[selectedAddressIndex]?.state,
-                        supplierAddresses[selectedAddressIndex]?.country,
-                        supplierAddresses[selectedAddressIndex]?.pinCode,
-                        supplierAddresses[selectedAddressIndex]?.phone
-                      ].filter(Boolean).join(', ')
-                    }
-                />
-          </div>
-        </div> */}
+                  </div>
 
+                  {/* Notes */}
+                  <div className="flex items-center gap-4">
+                    <label className="text-xs text-black-600 w-40">
+                      Notes <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      {...register('notes', { required: 'required' })}
+                      style={getInputStyle(errors?.notes)}
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Item Form */}
           <div className="mt-6">
             <ReturnItemForm
               items={items}
@@ -826,23 +660,28 @@ const AddPurchaseOrderReturn = ({
             <input type="hidden" key={key} {...register(key)} value={value} />
           ))}
 
-          <div className="mt-6 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                handleCancel()
-                handleFormReset()
-              }}
-              className="p-1 border border-gray-300 rounded w-24 hover:bg-gray-100 transition"
-            >
-              Cancel
-            </button>
-            <ActionButton
-              type="submit"
-              variant="primary"
-              label={isEdit ? 'Update' : 'Submit'}
-              isLoading={isSubmitting}
-            />
+          {/* Buttons */}
+          <div className="fixed bottom-0 bg-white border-t border-gray-200 z-10 flex p-1 py-2 w-full">
+            <div className="flex-1 justify-start">
+              <div className="flex gap-2">
+                <ActionButton
+                  onClick={handleSubmit(handleFormSubmit)}
+                  variant="save"
+                  className="bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
+                  label={'Submit'}
+                />
+                <ActionButton
+                  type="button"
+                  onClick={() => {
+                    navigate('/purchase-return')
+                    handleCancel()
+                    handleFormReset()
+                  }}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-all"
+                  label={'Cancel'}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </form>

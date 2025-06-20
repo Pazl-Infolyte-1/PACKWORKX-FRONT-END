@@ -6,11 +6,16 @@ import { itemApi } from '../../api/item'
 import { Package } from 'lucide-react'
 import ItemDetails from './ItemDetails'
 
-const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
+const ItemForm = ({ items = [], setItems, formValues, setFormValues,fixedDebitBalance ,setBalanceAmount,balanceAmount,
+  debitBalanceAmount,setDebitBalanceAmount,debitUsedAmount,setDebitUsedAmount,useDebitBalance
+}) => {
   const [isLoading, setIsLoading] = useState(true)
   const [itemList, setItemList] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState(null)
+  console.log("fixed debit",fixedDebitBalance)
+const [overallTotal,setoveralltotal]=useState(0)
+const [invoiceAmount, setInvoiceAmount] = useState(0);
 
   // Debounce refs for quantity and rate
   const quantityTimeoutRefs = useRef({})
@@ -98,38 +103,70 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
   }, [append, fields.length])
 
   // Calculate totals from items without setting values
-  const totals = useMemo(() => {
-    try {
-      return (getValues('items') || []).reduce(
-        (acc, item) => {
-          const qty = parseFloat(item.quantity) || 0
-          const amt = parseFloat(item.amount) || 0
-          const sgst = parseFloat(item.sgst) || 0
-          const cgst = parseFloat(item.cgst) || 0
-          const sgstAmt = parseFloat(item.sgst_amount) || 0
-          const cgstAmt = parseFloat(item.cgst_amount) || 0
 
-          return {
-            total_qty: acc.total_qty + qty,
-            amount: parseFloat((acc.amount + amt).toFixed(2)),
-            total_amount: parseFloat((acc.total_amount + amt).toFixed(2)),
-            sgst: parseFloat((acc.sgst + sgstAmt).toFixed(2)),
-            cgst: parseFloat((acc.cgst + cgstAmt).toFixed(2)),
-            total_incl_gst: parseFloat((acc.total_incl_gst + amt + sgstAmt + cgstAmt).toFixed(2)),
-          }
-        },
-        {
-          total_qty: 0,
-          total_amount: 0,
-          amount: 0,
-          sgst: 0,
-          cgst: 0,
-          total_incl_gst: 0,
-        },
-      )
-    } catch (error) {
-      console.error('Totals calculation error:', error)
-      return {
+  //const totals = useMemo(() => {
+  //  try {
+  //    return (getValues('items') || []).reduce(
+  //      (acc, item) => {
+  //        const qty = parseFloat(item.quantity) || 0
+  //        const amt = parseFloat(item.amount) || 0
+  //        const sgst = parseFloat(item.sgst) || 0
+  //        const cgst = parseFloat(item.cgst) || 0
+  //        const sgstAmt = parseFloat(item.sgst_amount) || 0
+  //        const cgstAmt = parseFloat(item.cgst_amount) || 0
+
+  //        return {
+  //          total_qty: acc.total_qty + qty,
+  //          amount: parseFloat((acc.amount + amt).toFixed(2)),
+  //          total_amount: parseFloat((acc.total_amount + amt).toFixed(2)),
+  //          sgst: parseFloat((acc.sgst + sgstAmt).toFixed(2)),
+  //          cgst: parseFloat((acc.cgst + cgstAmt).toFixed(2)),
+  //          total_incl_gst: parseFloat((acc.total_incl_gst + amt + sgstAmt + cgstAmt).toFixed(2)),
+  //        }
+  //      },
+  //      {
+  //        total_qty: 0,
+  //        total_amount: 0,
+  //        amount: 0,
+  //        sgst: 0,
+  //        cgst: 0,
+  //        total_incl_gst: 0,
+  //      },
+  //    )
+  //  } catch (error) {
+  //    console.error('Totals calculation error:', error)
+  //    return {
+  //      total_qty: 0,
+  //      total_amount: 0,
+  //      amount: 0,
+  //      sgst: 0,
+  //      cgst: 0,
+  //      total_incl_gst: 0,
+  //    }
+  //  }
+  //}, [formData.items])
+
+  const totals = useMemo(() => {
+  try {
+    const result = (getValues('items') || []).reduce(
+      (acc, item) => {
+        const qty = parseFloat(item.quantity) || 0;
+        const amt = parseFloat(item.amount) || 0;
+        const sgst = parseFloat(item.sgst) || 0;
+        const cgst = parseFloat(item.cgst) || 0;
+        const sgstAmt = parseFloat(item.sgst_amount) || 0;
+        const cgstAmt = parseFloat(item.cgst_amount) || 0;
+
+        return {
+          total_qty: acc.total_qty + qty,
+          amount: parseFloat((acc.amount + amt).toFixed(2)),
+          total_amount: parseFloat((acc.total_amount + amt).toFixed(2)),
+          sgst: parseFloat((acc.sgst + sgstAmt).toFixed(2)),
+          cgst: parseFloat((acc.cgst + cgstAmt).toFixed(2)),
+          total_incl_gst: parseFloat((acc.total_incl_gst + amt + sgstAmt + cgstAmt).toFixed(2)),
+        };
+      },
+      {
         total_qty: 0,
         total_amount: 0,
         amount: 0,
@@ -137,8 +174,32 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
         cgst: 0,
         total_incl_gst: 0,
       }
-    }
-  }, [formData.items])
+    );
+setoveralltotal(result.total_incl_gst)
+    // Subtract fixedDebitBalance once here
+   const finalTotalInclGst = parseFloat(
+      (result.total_incl_gst - fixedDebitBalance).toFixed(2)
+    );
+
+    // Set balanceAmount: if negative use it, else 0
+    setBalanceAmount(finalTotalInclGst < 0 ? finalTotalInclGst : 0);
+
+    // Optionally update total_incl_gst if you still want to keep the reduced value
+    result.total_incl_gst = finalTotalInclGst;
+    //setallTotalAmount(result.total_incl_gst)
+    return result;
+  } catch (error) {
+    console.error('Totals calculation error:', error);
+    return {
+      total_qty: 0,
+      total_amount: 0,
+      amount: 0,
+      sgst: 0,
+      cgst: 0,
+      total_incl_gst: 0,
+    };
+  }
+}, [formData.items, fixedDebitBalance]);
 
   // Only update form values with totals when totals change
   useEffect(() => {
@@ -383,6 +444,26 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
     })
   }
 
+useEffect(() => {
+  if (fixedDebitBalance > overallTotal) {
+    setDebitBalanceAmount(fixedDebitBalance-overallTotal)
+    setDebitUsedAmount(overallTotal)
+    setInvoiceAmount(0);
+  } else {
+        setDebitBalanceAmount(0)
+        setDebitUsedAmount(fixedDebitBalance)
+    setInvoiceAmount(overallTotal - fixedDebitBalance);
+  }
+}, [fixedDebitBalance, overallTotal]);
+
+useEffect(() => {
+  if (!useDebitBalance) {
+    setDebitBalanceAmount(0);
+    setDebitUsedAmount(0);
+  }
+}, [useDebitBalance]);
+
+
   return (
     <div>
       <div className="mt-2 bg-white rounded-md w-full">
@@ -502,28 +583,45 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
                           className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none"
                         />
                       </td>
-                      <td className="py-2 text-center">
-                        <button
-                          type="button"
-                          onClick={() => remove(index)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                          </svg>
-                        </button>
-                      </td>
+                     <td className="py-2 text-center">
+  <button
+    type="button"
+    onClick={() => {
+      const currentItems = getValues('items');
+      if (currentItems.length === 1 && index === 0) {
+        // If only one item remains and it's index 0, reset the form
+        reset({
+          items: [],
+          total_qty: 0,
+          cgst_amount: 0,
+          sgst_amount: 0,
+          amount: 0,
+          tax_amount: 0,
+          total_amount: 0,
+        });
+      } else {
+        remove(index);
+      }
+    }}
+    className="text-red-500 hover:text-red-700"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  </button>
+</td>
+
                     </tr>
                   ))}
                 </tbody>
@@ -550,24 +648,47 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues }) => {
                           {totals.total_qty}
                         </td>
                       </tr>
-
+  <tr className="border-b border-gray-200">
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          Total Amount:
+                        </td>
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                           ₹{totals.total_amount}
+                        </td>
+                      </tr>
                       <tr className="border-b border-gray-200">
                         <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           Total GST:
                         </td>
                         <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                          {(totals.cgst + totals.sgst).toFixed(2)}
+                           ₹{(totals.cgst + totals.sgst).toFixed(2)}
                         </td>
                       </tr>
+    <tr className="border-b border-gray-200">
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                         Total Incl GST:
+                        </td>
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                     ₹{overallTotal}
+                        </td>
+                      </tr>
+                       <tr className="border-b border-gray-200">
+                        <td className="px-4 py-3 text-[#3c3c3c] font-semibold  text-[15px] font-lato leading-[22px]">
+                     Used Debit Balance :
+                        </td>
+                        <td className="px-4 py-3 text-[#3c3c3c] font-semibold  text-[15px] font-lato leading-[22px]">
+                    -₹{Math.abs(fixedDebitBalance).toFixed(2)}
+                        </td>
+                      </tr>              
+  <tr className="border-b border-gray-200">
+  <td className="px-4 py-3 text-red-600 text-[15px] font-lato leading-[22px]">
+    Invoice Amount:
+  </td>
+  <td className="px-4 py-3 text-red-600 text-[15px] font-lato leading-[22px]">
+    ₹{invoiceAmount.toFixed(2)}
+  </td>
+</tr>
 
-                      <tr>
-                        <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
-                          Total Incl GST:
-                        </td>
-                        <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
-                          {totals.total_incl_gst.toFixed(2)}
-                        </td>
-                      </tr>
                     </tbody>
                   </table>
                 </div>

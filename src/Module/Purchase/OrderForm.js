@@ -6,13 +6,18 @@ import 'core-js/stable'
 import { clientApi } from '../../api/client'
 import { useNavigate } from 'react-router-dom'
 
-const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id }) => {
+const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id,setUseDebitBalance,useDebitBalance,setBalanceAmount,balanceAmount,
+  debitBalanceAmount,setDebitBalanceAmount,debitUsedAmount,setDebitUsedAmount
+ }) => {
   const [items, setItems] = useState(itemsData || [])
   const [supplierAddresses, setSupplierAddresses] = useState([])
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0)
   const [showAddressModal, setShowAddressModal] = useState(false)
   const [vendor, setVendor] = useState([])
   const [isSubmitted, setIsSubmitted] = useState(false)
+      const [debitBalanceObject, setDebitBalanceObject] = useState(null)
+  const [fixedDebitBalance, setFixedDebitBalance] = useState(0);
+
   const navigate = useNavigate()
   const [poTotals, setPoTotals] = useState({
     total_qty: 0,
@@ -140,10 +145,13 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id })
   }
 
   const handleSupplierChange = (e) => {
+    setUseDebitBalance(false)
+    setFixedDebitBalance(0)
     const selectedId = e.target.value
     const selectedClient = vendor.find(
       (client) => client.client_id === parseInt(selectedId) || client.client_id === selectedId,
     )
+setDebitBalanceObject(selectedClient)
 
     if (selectedClient) {
       setValue('supplier_name', selectedClient.display_name || '')
@@ -294,6 +302,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id })
     setShowAddressModal(false)
   }
 
+  console.log("chkck box val",fixedDebitBalance)
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <div className="w-full ">
@@ -338,6 +347,49 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id })
                   </svg>
                 </button>
               </div>
+  {debitBalanceObject && (
+  <div className="mt-2 flex items-center space-x-4 text-sm text-gray-700">
+    <p className="flex items-center space-x-2">
+      <span>
+        <strong>Debit Balance:</strong>{' '}
+        ₹{debitBalanceObject.debit_balance !== null ? debitBalanceObject.debit_balance : '0.00'}
+      </span>
+      {Number(debitBalanceObject.debit_balance) > 0 && (
+        <label className="flex items-center space-x-1">
+          <input
+            type="checkbox"
+            checked={useDebitBalance}
+            onChange={(e) => {
+              const isChecked = e.target.checked;
+              setUseDebitBalance(isChecked);
+              const fixedValue =
+                isChecked && debitBalanceObject.debit_balance !== null
+                  ? Number(debitBalanceObject.debit_balance)
+                  : 0;
+              setFixedDebitBalance(fixedValue);
+              console.log('Using debit balance:', fixedValue);
+            }}
+            className="h-4 w-4"
+          />
+          <span>Use</span>
+        </label>
+      )}
+    </p>
+    
+    {/* Helper text with info icon - Balance Amount From Debit */}
+    {useDebitBalance && (
+      <div className="flex items-center space-x-1 text-xs text-gray-500 italic mt-1">
+        <span className="inline-flex items-center justify-center w-3 h-3 bg-gray-400 text-white rounded-full text-[10px] font-bold">
+          i
+        </span>
+        <span>
+          <strong>Balance Amount From Debit:</strong>{' '}
+          ₹{Math.abs(balanceAmount).toFixed(2)}
+        </span>
+      </div>
+    )}
+  </div>
+)}
 
               {/* Supplier Name */}
               <div className="flex items-center mt-1">
@@ -443,6 +495,13 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id })
             setItems={setItems}
             formValues={poTotals}
             setFormValues={handleTotalsUpdate}
+            fixedDebitBalance={fixedDebitBalance}
+            setBalanceAmount={setBalanceAmount}
+            balanceAmount={balanceAmount}
+            debitBalanceAmount={debitBalanceAmount}
+            setDebitBalanceAmount={setDebitBalanceAmount}
+            setDebitUsedAmount={setDebitUsedAmount}
+            debitUsedAmount={debitUsedAmount}
           />
         </div>
 
@@ -464,6 +523,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id })
                 label={isEdit ? 'Update' : 'Submit Order'}
                 isLoading={isSubmitting}
                 onClick={handleSubmitClick}
+                setBalanceAmount={setBalanceAmount}
               />
             </div>
           </div>

@@ -40,7 +40,7 @@ export const purchaseOrderApi = {
   },
 
   getAllPurchaseOrderIds: async () => {
-    return await apiClient.get('/purchase-orders/ids')
+    return await apiClient.get('/purchase-order/ids')
   },
 
   getPurchaseOrderById: async (id) => {
@@ -163,14 +163,13 @@ export const purchaseOrderApi = {
       console.error(error)
     }
   },
-getPurchaseReturnById: async (id) => {
-  try {
-    return await apiClient.get(`/purchase-order-return/${id}`)
-  } catch (error) {
-    console.error(error)
-  }
-},
-
+  getPurchaseReturnById: async (id) => {
+    try {
+      return await apiClient.get(`/purchase-order-return/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
   deletePoReturn: async (id) => {
     try {
@@ -208,6 +207,12 @@ getPurchaseReturnById: async (id) => {
       throw error
     }
   },
-
-
+  getBillForPO: async () => {
+    try {
+      return await apiClient.get(`/purchase-order/bill-get`)
+    } catch (error) {
+      console.error('Error fetching bill for PO:', error.response?.data || error.message)
+      throw error
+    }
+  },
 }

@@ -5,6 +5,7 @@ import Select from 'react-select'
 import { ChevronDoubleLeftIcon, TrashIcon } from '@heroicons/react/solid'
 import PopUp from '../../../src/components/New/PopUp'
 import { itemApi } from '../../api/item'
+import ItemDetails from '../Purchase/ItemDetails'
 
 const GrnItemsFrom = ({
   grnFormData,
@@ -36,42 +37,60 @@ const GrnItemsFrom = ({
   }
 
   const openItemDetails = async (item_id) => {
+    console.log('item_id:', item_id)
     try {
       const response = await itemApi.getItemList()
+      console.log('response:', response)
       const items = response?.data?.data || []
-      const item = items.find((i) => i.item_generate_id === item_id)
+      const item = items.find((i) => i.id == item_id)
+
+      if (!item) {
+        setModalContent(
+          <div className="text-center py-4">
+            <p className="text-red-500">Please select a Item. </p>
+          </div>,
+        )
+        setIsModalOpen(true)
+        return
+      }
+
       const customFields = item?.custom_fields
 
-      setModalContent(
-        <>
-          <h3 className="text-xl font-semibold mb-3">Custom Fields</h3>
-          {Object.entries(customFields).length > 0 ? (
-            Object.entries(customFields).map(([key, value], idx) => (
-              <p key={idx}>
-                <strong>{key}:</strong> {value}
-              </p>
-            ))
-          ) : (
-            <p>No custom fields available.</p>
-          )}
-        </>,
-      )
+      setModalContent(<ItemDetails item={item} customFields={customFields} />)
       setIsModalOpen(true)
     } catch (error) {
       console.error('Error fetching item details:', error)
+      setModalContent(
+        <div className="text-center py-4">
+          <p className="text-red-500">Error loading item details. Please try again.</p>
+        </div>,
+      )
+      setIsModalOpen(true)
     }
   }
 
   useEffect(() => {
+    console.log('grnFormData in sync items:', grnFormData)
     function syncPurchaseOrderItems() {
       remove() // Clear existing items
+      console.log('grnFormData.items:', grnFormData.items)
 
       if (grnFormData.items && grnFormData.items.length > 0) {
-        // If items are already set in grnFormData (from selectClient), use those
-        append(grnFormData.items)
+        const updatedItems = grnFormData.items.map((item) => ({
+          ...item,
+          quantity_received: item.quantity,
+          item_generate_id: item?.item_generate_id
+            ? item?.item_generate_id
+            : item?.item_info?.item_generate_id,
+        }))
+
+        append(updatedItems)
       } else if (grnFormData.po_id) {
+        console.log('grnFormData.po_id else condidtion:', grnFormData.po_id)
         // Fallback: if items aren't set but po_id is, try to fetch them
         const selectedPo = purchaseOrderData.find((po) => po.id === grnFormData.po_id)
+
+        console.log('selectedPo:', selectedPo.PurchaseOrderItems)
 
         if (selectedPo?.PurchaseOrderItems?.length > 0) {
           const newItems = selectedPo.PurchaseOrderItems.map((item) => {
@@ -81,10 +100,11 @@ const GrnItemsFrom = ({
               item_id: item.item_id || 0,
               item_code: item.item_code || '',
               grn_item_name: item.po_item_name || '',
+              // item_generate_id: item.item_generate_id || '',
               description: item.description || '',
               quantity_ordered: orderedQuantity,
               quantity_received: orderedQuantity, // Initialize with ordered quantity
-              accepted_quantity: orderedQuantity, // Initialize with ordered quantity
+              accepted_quantity: 0, // Initialize with ordered quantity
               rejected_quantity: 0,
               unit_price: item.unit_price || 0,
               cgst: item.cgst || 0,
@@ -125,11 +145,12 @@ const GrnItemsFrom = ({
               item_id: item.item_id || 0,
               item_code: item.item_code || '',
               grn_item_name: item.grn_item_name || '',
+              // item_generate_id: item?.item_info?.item_generate_id || 0,
               description: item.description || '',
               quantity_ordered: item.quantity_ordered || 0,
               // If no received/accepted quantity exists, use ordered quantity as default
               quantity_received: item.quantity_received || item.quantity_ordered || 0,
-              accepted_quantity: item.accepted_quantity || item.quantity_ordered || 0,
+              accepted_quantity: item.accepted_quantity || 0,
               rejected_quantity: item.rejected_quantity || 0,
               unit_price: item.unit_price || 0,
               cgst_amount: item.cgst_amount || 0,
@@ -156,12 +177,13 @@ const GrnItemsFrom = ({
               po_item_id: item.po_item_id || 0,
               item_id: item.item_id || 0,
               item_code: item.item_code || '',
+              // item_generate_id: item?.item_info?.item_generate_id || 0,
               grn_item_name: item.grn_item_name || '',
               description: item.description || '',
               quantity_ordered: item.quantity_ordered || 0,
               // Initialize with ordered quantity if received/accepted quantities don't exist
               quantity_received: item.quantity_received || item.quantity_ordered || 0,
-              accepted_quantity: item.accepted_quantity || item.quantity_ordered || 0,
+              accepted_quantity: item.accepted_quantity || 0,
               rejected_quantity: item.rejected_quantity || 0,
               unit_price: item.unit_price || 0,
               cgst: item.cgst || 0,
@@ -210,7 +232,7 @@ const GrnItemsFrom = ({
       let grandTotal = 0
 
       const updatedItems = grnItemsData.map((item, index) => {
-        const quantity = parseFloat(item.quantity_received || 0)
+        const quantity = parseFloat(item.accepted_quantity || 0)
         const unit_price = parseFloat(item.unit_price)
         const cgst_percentage = parseFloat(item.cgst || 0)
         const sgst_percentage = parseFloat(item.sgst || 0)
@@ -218,11 +240,17 @@ const GrnItemsFrom = ({
 
         // Calculate tax amounts from unit price and percentage
         const cgst_per_unit = (unit_price * cgst_percentage) / 100
+        console.log('cgst_per_unit', cgst_per_unit)
         const sgst_per_unit = (unit_price * sgst_percentage) / 100
+        console.log('sgst_per_unit', sgst_per_unit)
 
         const cgst_total = cgst_per_unit * quantity
         const sgst_total = sgst_per_unit * quantity
         const tax_total = cgst_total + sgst_total
+
+        console.log('cgst_total', cgst_total)
+        console.log('sgst_total', sgst_total)
+        console.log('tax_total', tax_total)
 
         const amount_total = unit_price * quantity
         const total = amount_total + cgst_total + sgst_total
@@ -244,6 +272,18 @@ const GrnItemsFrom = ({
           amount: amount_total.toFixed(2), // total for the row *without* tax
         }
       })
+
+      console.log('updatedItems', updatedItems)
+      console.log(
+        'Taxes: CGST:',
+        totalCgst.toFixed(2),
+        'SGST:',
+        totalSgst.toFixed(2),
+        'Tax:',
+        totalTax.toFixed(2),
+        'totalQty:',
+        totalQty,
+      )
 
       setGrnFormData((prevData) => ({
         ...prevData,
@@ -357,278 +397,202 @@ const GrnItemsFrom = ({
         {/* <div className="flex justify-content-end mt-4 mb-4">
           <ActionButton onClick={addNewGRNItmes} variant="add" label={'+ Add GRN Items'} />
         </div> */}
-        <div className="p-2 mt-2 flex flex-1 rounded-lg border border-[#c2c2c2] w-full ">
-          <div className="overflow-x-auto p-2">
-            <div className=" min-h-[300px] max-h-[300px] overflow-y-auto custom-scrollbar rounded-lg">
-              <table className="min-w-full bg-white rounded-lg max-h-[1250px] border-collapse">
+        <div className="p-2 mt-2 flex flex-1 w-full">
+          <div className="p-2 w-full">
+            <div className="min-h-[300px] w-full rounded-lg">
+              <table className="w-100 border-collapse bg-white shadow-sm rounded-xl overflow-hidden">
                 {/* Table Head */}
-                <thead className="sticky top-0 bg-white z-10 text-center">
-                  <tr className="border-b-2 text-sm">
-                    {/* <th className="px-4 py-2 min-w-[100px] text-center">PO Item</th> */}
-                    <th className="px-2 py-1 min-w-[100px] text-center">Item Id</th>
-                    <td></td>
-                    {/* <th className="px-2 py-1 min-w-[180px] text-center">Item Code</th> */}
-                    <th className="px-2 py-1 min-w-[100px] text-center">Ordered Quantity</th>
-                    <th className="px-2 py-1 min-w-[100px] text-center">Received Quantity</th>
-                    <th className="px-2 py-1 min-w-[100px] text-center">Accepted Quantity</th>
-                    <th className="px-2 py-1 min-w-[100px] text-center">Rejected Quantity</th>
-                    <th className="px-2 py-1 min-w-[100px] text-center">Unit Price</th>
-                    {/* <th className="px-2 py-1 min-w-[110px] text-center">C-GST</th> */}
-                    {/* <th className="px-2 py-1 min-w-[110px] text-center">S-GST</th> */}
-                    <th className="px-2 py-1 min-w-[110px] text-center">Tax Amount</th>
-                    <th className="px-2 py-1 min-w-[110px] text-center">Total Amount</th>
-                    <th className="px-2 py-1 min-w-[180px] text-center">Description</th>
-                    {/* <th className="px-2 py-1 min-w-[180px] text-center">Batch No.</th> */}
-                    {/* <th className="px-2 py-1 min-w-[180px] text-center">Work Order No.</th> */}
-                    {/* <th className="px-2 py-1 min-w-[180px] text-center">Location</th> */}
-                    <th className="px-2 py-1 min-w-[180px] text-center">Notes</th>
-                    <th className="px-2 py-1 min-w-[50px] text-center">Action</th>
+                <thead className="bg-gray-100 sticky top-0 z-10 text-xs text-gray-700 uppercase">
+                  <tr>
+                    <th className="py-3 px-2 text-left font-semibold bg-gray-100 rounded-tl-xl">
+                      Product Table
+                    </th>
+                    <th className="bg-gray-100"></th>
+                    <th className="bg-gray-100"></th>
+                    <th className="bg-gray-100"></th>
+                    <th className="bg-gray-100"></th>
+                    <th className="bg-gray-100"></th>
+                    <th className="bg-gray-100"></th>
+                    <th className="bg-gray-100"></th>
+                    <th className="py-3 px-2 bg-gray-100 rounded-tr-xl"></th>
+                  </tr>
+                  <tr className="text-gray-600 text-xs font-semibold bg-gray-50 border-y">
+                    <th className="py-2 px-2 border-r text-center">Product</th>
+                    <th className="py-2 px-2 border-r text-center">Ordered Qty</th>
+                    <th className="py-2 px-2 border-r text-center">Received Qty</th>
+                    <th className="py-2 px-2 border-r text-center">Accepted Qty</th>
+                    <th className="py-2 px-2 border-r text-center">Rejected Qty</th>
+                    <th className="py-2 px-2 border-r text-center">Unit Price</th>
+                    <th className="py-2 px-2 border-r text-center">Tax Amount</th>
+                    <th className="py-2 px-2 border-r text-center">Total Amount</th>
+                    <th className="py-2 px-2 border-r text-center">Notes</th>
                   </tr>
                 </thead>
-                <tbody>
+
+                {/* Table Body */}
+                <tbody className="text-sm text-gray-800">
                   {fields.map((item, index) => (
-                    <tr key={item.id} className="hover:bg-gray-50 border-t">
-                      {/* <td className="px-4 py-2 w-40">
-                        <input
-                          type="text"
-                          name="po_item_id"
-                          disabled
-                          {...register(`grn_items[${index}].po_item_id`, {
-                            onChange: () => updateParentFormData(),
-                          })}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                        />
-                      </td> */}
-                      <td className="px-1 py-1">
-                        <input
-                          type="text"
-                          name="item_id"
-                          disabled
-                          value={grnFormData?.items?.[index]?.item_generate_id || ''}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                        />
+                    <tr
+                      key={item.id}
+                      className="even:bg-gray-50 hover:bg-gray-100 border-b transition"
+                    >
+                      <td className="py-2 px-2 text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <input
+                            type="text"
+                            disabled
+                            value={grnFormData?.items?.[index]?.item_generate_id || ''}
+                            {...register(`grn_items.${index}.item_generate_id`)}
+                            className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
+                          />
+                          <span
+                            className="cursor-pointer text-indigo-500 hover:text-indigo-700"
+                            onClick={() => openItemDetails(item.item_id)}
+                          >
+                            ℹ️
+                          </span>
+                        </div>
                       </td>
-                      {console.log(getValues(`grn_items.${index}`), 'item_id')}
-                      <td
-                        onClick={() =>
-                          openItemDetails(getValues(`grn_items.${index}.item_generate_id`))
-                        }
-                        className="cursor-pointer text-blue-600"
-                      >
-                        ℹ️
-                      </td>
-                      {/* <td className="px-1 py-1">
-                        <input
-                          type="text"
-                          name="item_code"
-                          disabled
-                          {...register(`grn_items[${index}].item_code`, {
-                            onChange: () => updateParentFormData(),
-                          })}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                        />
-                      </td> */}
-                      {/* Rate Per SKU Input */}
-                      {/* Acceptable SKU Units Input */}
-                      <td className="px-1 py-1">
+
+                      {/* Inputs */}
+                      <td className="py-2 px-2 text-center">
                         <input
                           type="number"
-                          name="quantity_ordered"
                           disabled
-                          {...register(`grn_items[${index}].quantity_ordered`, {
-                            onChange: () => updateParentFormData(),
-                          })}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                          {...register(`grn_items[${index}].quantity_ordered`)}
+                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
                         />
                       </td>
-                      {/* Total Amount */}
-                      <td className="px-1 py-1">
+                      <td className="py-2 px-2 text-center">
                         <input
                           type="number"
-                          name="quantity_received"
-                          {...register(`grn_items.${index}.quantity_received`, {
-                            onChange: () => {
-                              // Remove the line that automatically updates accepted quantity
-                              updateParentFormData()
-                            },
-                          })}
-                          // Add this line to show ordered quantity as value
+                          {...register(`grn_items.${index}.quantity_received`)}
                           value={
                             watch(`grn_items.${index}.quantity_received`) ||
                             watch(`grn_items.${index}.quantity_ordered`) ||
                             ''
                           }
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
                         />
                       </td>
-                      <td className="px-1 py-1">
+                      <td className="py-2 px-2 text-center">
                         <input
                           type="number"
-                          name="accepted_quantity"
-                          {...register(`grn_items.${index}.accepted_quantity`, {
-                            onChange: () => updateParentFormData(),
-                          })}
-                          // Add this line to show ordered quantity as value
-                          value={
-                            watch(`grn_items.${index}.accepted_quantity`) ||
-                            watch(`grn_items.${index}.quantity_ordered`) ||
-                            ''
-                          }
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                          {...register(`grn_items.${index}.accepted_quantity`)}
+                          value={watch(`grn_items.${index}.accepted_quantity`)}
+                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
                         />
                       </td>
-                      <td className="px-1 py-1">
+                      <td className="py-2 px-2 text-center">
                         <input
                           type="number"
-                          name="rejected_quantity"
-                          {...register(`grn_items[${index}].rejected_quantity`, {
-                            onChange: () => updateParentFormData(),
-                          })}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                          {...register(`grn_items[${index}].rejected_quantity`)}
+                          value={watch(`grn_items.${index}.rejected_quantity`)}
+                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
                         />
                       </td>
-                      <td className="px-1 py-1">
+                      <td className="py-2 px-2 text-center">
                         <input
                           type="number"
-                          name="unit_price"
-                          {...register(`grn_items[${index}].unit_price`, {
-                            onChange: () => updateParentFormData(),
-                          })}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                        />
-                      </td>
-                      {/* <td className="px-1 py-1">
-                        <input
-                          type="number"
-                          name="cgst"
-                          readOnly
-                          value={grnFormData?.items?.[index]?.cgst_amount || ''}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                        />
-                      </td>
-                      <td className="px-1 py-1">
-                        <input
-                          type="number"
-                          name="sgst"
                           disabled
-                          value={grnFormData?.items?.[index]?.sgst_amount || ''}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                          {...register(`grn_items[${index}].unit_price`)}
+                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
                         />
-                      </td> */}
-                      <td className="px-1 py-1">
+                      </td>
+                      <td className="py-2 px-2 text-center">
                         <input
                           type="number"
-                          name="tax_amount"
                           disabled
                           value={grnFormData?.items?.[index]?.tax_amount || ''}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
                         />
                       </td>
-                      <td className="px-1 py-1">
+                      <td className="py-2 px-2 text-center">
                         <input
                           type="number"
-                          name="total_amount"
                           disabled
                           value={grnFormData?.items?.[index]?.total_amount || ''}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
                         />
                       </td>
-                      <td className="px-1 py-1">
+                      <td className="py-2 px-2 text-center">
                         <input
                           type="text"
-                          name="description"
-                          {...register(`grn_items[${index}].description`, {
-                            onChange: () => updateParentFormData(),
-                          })}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                          placeholder="Notes..."
+                          {...register(`grn_items[${index}].notes`)}
+                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
                         />
-                      </td>
-                      {/* <td className="px-1 py-1">
-                        <input
-                          type="text"
-                          name="batch_no"
-                          {...register(`grn_items[${index}].batch_no`, {
-                            onChange: () => updateParentFormData(),
-                          })}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                        />
-                      </td>
-                      <td className="px-1 py-1">
-                        <input
-                          type="text"
-                          name="work_order_no"
-                          {...register(`grn_items[${index}].work_order_no`, {
-                            onChange: () => updateParentFormData(),
-                          })}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-self"
-                        />
-                      </td>
-                      <td className="px-1 py-1">
-                        <input
-                          type="text"
-                          name="location"
-                          {...register(`grn_items[${index}].location`, {
-                            onChange: () => updateParentFormData(),
-                          })}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                        />
-                      </td> */}
-                      <td className="px-1 py-1">
-                        <input
-                          type="text"
-                          name="notes"
-                          {...register(`grn_items[${index}].notes`, {
-                            onChange: () => updateParentFormData(),
-                          })}
-                          className="w-full h-[40px] px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
-                        />
-                      </td>
-                      <td className="px-1 py-1 flex justify-center items-center">
-                        <button type="button" onClick={() => removeGrnItem(index)}>
-                          <TrashIcon className="text-[#ff2d55] w-6 h-6 cursor-pointer" />
-                        </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
 
-              <div className="flex mt-4">
-                <table className="flex-1">
-                  <tbody className="gap-4">
-                    <tr>
-                      <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                        Total Qty: {grnFormData.total_qty}
-                      </td>
-                      <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                        C-GST: {grnFormData.cgst_amount}
-                      </td>
-                      <td className="px-4 py-2"></td>
-                      <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                        S-GST: {grnFormData.sgst_amount}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                        Total: {grnFormData.amount}
-                      </td>
-                      <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                        Tax Amount: {grnFormData.tax_amount}
-                      </td>
-                      <td className="px-4 py-2"></td>
-                      <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                        Total Incl of GST: {grnFormData.total_amount}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div className="mt-3 pb-4 mt-4 flex justify-end w-full">
+                <div className="w-full md:w-1/2 pr-4">
+                  <table className="bg-gray-100 rounded w-full border-collapse">
+                    <tbody className="gap-4">
+                      <tr className="border-b border-gray-200">
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          Total Qty:
+                        </td>
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          {grnFormData.total_qty}
+                        </td>
+                      </tr>
+                      {/* <tr className="border-b border-gray-200">
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          C-GST:
+                        </td>
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          {grnFormData.cgst_amount}
+                        </td>
+                      </tr>
+                      <tr className="border-b border-gray-200">
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          S-GST:
+                        </td>
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          {grnFormData.sgst_amount}
+                        </td>
+                      </tr>
+
+                      <tr className="border-b border-gray-200">
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          Total:
+                        </td>
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          {grnFormData.amount}
+                        </td>
+                      </tr> */}
+                      <tr className="border-b border-gray-200">
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          Tax GST:
+                        </td>
+                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          {grnFormData.tax_amount}
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
+                          Total Incl GST:
+                        </td>
+                        <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
+                          {grnFormData.total_amount}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
-              <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                {modalContent}
-              </Modal>
             </div>
           </div>
         </div>
+
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+          {modalContent}
+        </Modal>
 
         <PopUp
           visible={showModal}

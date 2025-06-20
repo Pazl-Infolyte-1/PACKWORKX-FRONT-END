@@ -10,7 +10,9 @@ import { inventoryApi } from '../../api/inventory'
 import { itemApi } from '../../api/item'
 import { commonApi } from '../../api/common'
 import { stockAdjustmentApi } from '../../api/stockAdjustment'
-import { Inventory } from '@mui/icons-material'
+import { Description, Inventory } from '@mui/icons-material'
+import ActionButton from '../../components/New/ActionButton'
+import { reference } from '@popperjs/core'
 const AddEditStockAdjustment = () => {
   const location = useLocation()
   const initialStock = location.state?.stock
@@ -26,6 +28,20 @@ const AddEditStockAdjustment = () => {
   const [GRNItems, setGRNItems] = useState({})
   const [InventoryItems, setInventoryItems] = useState({})
   const selectedGRNIds = useSelector((state) => state?.auth?.stockAdjustmentGRNArray || [])
+  const adjustmentMode = {
+    // 'value Adjustment': 'Value Adjustment',
+    'Quantity Adjustment': 'Quantity Adjustment',
+  }
+
+  const reasons = [
+    'Stock on Fire',
+    'Stolen goods',
+    'Daaged Goods',
+    'Stock Written Off',
+    'Stocktaking results',
+    'Inventory Revaluation',
+    'others',
+  ]
 
   const navigate = useNavigate()
   const {
@@ -38,7 +54,11 @@ const AddEditStockAdjustment = () => {
     formState: { errors, isSubmitted },
   } = useForm({
     defaultValues: {
+      mode_of_adjustment: '',
+      reference_number: '',
+      date: '',
       remarks: '',
+      description: '',
       items: [
         {
           item_id: null,
@@ -46,6 +66,7 @@ const AddEditStockAdjustment = () => {
           quantity_available: null,
           type: 'increase',
           reason: '',
+          new_quantity_available: null,
           adjustment_quantity: null,
         },
       ],
@@ -92,6 +113,7 @@ const AddEditStockAdjustment = () => {
               type: item.type || 'increase',
               inventory_id: item.inventory_id,
               reason: item.reason,
+              new_quantity_available: item.new_quantity_available,
               adjustment_quantity: item.adjustment_quantity || '',
               quantity_available: AvailableQuantity || null,
             }
@@ -104,6 +126,10 @@ const AddEditStockAdjustment = () => {
         // Reset form with fetched values
         reset({
           remarks: data.remarks || '',
+          mode_of_adjustment: data.mode_of_adjustment || '',
+          reference_number: data.reference_number || '',
+          date: data.date || '',
+          description: date.description || '',
           items:
             items?.length > 0
               ? items
@@ -114,6 +140,7 @@ const AddEditStockAdjustment = () => {
                     quantity_available: null,
                     type: 'increase',
                     reason: '',
+                    new_quantity_available: null,
                     adjustment_quantity: null,
                   },
                 ],
@@ -144,6 +171,13 @@ const AddEditStockAdjustment = () => {
     fetchProduct()
   }, [])
 
+  useEffect(() => {
+    const firstKey = Object.keys(adjustmentMode)[0]
+    if (firstKey) {
+      setValue('mode_of_adjustment', firstKey)
+    }
+  }, [adjustmentMode, setValue])
+
   const handleThrowAlert = async (id) => {
     try {
       const response = await commonApi.throwAlert(id)
@@ -162,12 +196,16 @@ const AddEditStockAdjustment = () => {
     const parsedData = {
       ...data,
       remarks: data.remarks,
+      mode_of_adjustment: data.mode_of_adjustment,
+      reference_number: data.reference_number,
+      date: data.date,
+      description: data.description,
       items: data.items.map((item) => ({
         item_id: item.item_id,
         inventory_id: item.inventory_id,
-        type: item.type,
+        type: item.new_quantity_available > item.quantity_available ? 'increase' : 'decrease',
         reason: item.reason,
-        adjustment_quantity: parseFloat(item.adjustment_quantity),
+        adjustment_quantity: Math.abs(parseFloat(item.adjustment_quantity)),
         quantity_available: item.quantity_available,
       })),
     }
@@ -222,6 +260,7 @@ const AddEditStockAdjustment = () => {
           navigate('/stockadjustment')
         }, 2000)
       }
+      navigate('/stockadjustment')
     } catch (error) {
       console.error('Error submitting stock adjustment:', error)
       setAlerts([
@@ -339,156 +378,237 @@ const AddEditStockAdjustment = () => {
   // React Hook Form's watch
 
   return (
-    <div className="p-2 mt-2  rounded-lg border border-[#c2c2c2] w-full">
+    <div className="p-2 mt-2  rounded-lg  w-full">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
-      <h2 className="text-lg font-semibold text-purple-700 mb-4">Add Stock Adjustment</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Items Section + Remarks */}
-        <div className="grid grid-cols-3 md:grid-cols-3 gap-2">
-          {/* Items List */}
-          <div className="p-3 rounded-lg flex flex-col col-span-3 md:col-span-3">
-            <h3 className="text-sm font-medium mt-1 mb-2">Items</h3>
+        <div className="flex items-start gap-4">
+          <label className="text-xs text-black-600 text-left ml-4 w-40 pt-2">
+            Mode of Adjustment
+          </label>
+
+          <div className="flex flex-col gap-2">
+            {Object.keys(adjustmentMode).map((key, index) => (
+              <label key={key} className={`flex items-center gap-2 text-sm text-gray-800 }`}>
+                <input
+                  {...register('mode_of_adjustment', { required: true })}
+                  type="radio"
+                  value={key}
+                  className="accent-indigo-600"
+                />
+                {adjustmentMode[key]}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <label className="text-xs text-black-600 text-left ml-4 w-40">Reference Number</label>
+          <input
+            {...register('refernce_number')}
+            placeholder="Reference Number"
+            className="w-80 h-7 px-2 border border-[#c2c2c2] rounded-md bg-white placeholder:text-sm"
+          />
+        </div>
+        <div className="flex items-center gap-4">
+          <label className="text-xs text-black-600 text-left ml-4 w-40">
+            Date <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="date"
+            {...register('date', { required: true })}
+            className={`w-80 h-7 px-2 rounded-md bg-white text-sm ${
+              errors.date ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'
+            }`}
+          />
+        </div>
+        <div className="flex items-center gap-4">
+          <label className="text-xs text-black-600 text-left ml-4 w-40">
+            Reason <span className="text-red-500">*</span>
+          </label>
+          <select
+            {...register('remarks', { required: true })}
+            className={`w-80 h-7 px-2 rounded-md bg-white placeholder:text-sm ${
+              errors.remarks ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'
+            }`}
+          >
+            <option value="">Select Reason</option>
+            {reasons.map((item, index) => (
+              <option key={index} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-center gap-4">
+          <label className="text-xs text-black-600 text-left ml-4 w-40">Description</label>
+          <input
+            {...register('description')}
+            placeholder="Description"
+            className="w-80 h-7 px-2 border border-[#c2c2c2] rounded-md bg-white placeholder:text-sm"
+          />
+        </div>
+        <table className="w-full mt-4 bg-white border-collapse rounded-xl overflow-hidden">
+          <thead className="bg-gray-100 text-xs font-medium text-gray-700">
+            <tr>
+              <th className="py-2 px-2 text-center">Product</th>
+              <th className="py-2 px-2 text-center">Inventory</th>
+              {/* <th className="py-2 px-2 text-center">TYPE</th> */}
+              <th className="py-2 px-2 text-center">Qty Available</th>
+              <th className="py-2 px-2 text-center">New Qty On Hand</th>
+              <th className="py-2 px-2 text-center">Adjusted QTY</th>
+              <th className="py-2 px-2 text-center">REASON</th>
+              <th className="py-2 px-2 text-center w-[40px]"></th> {/* For Delete button */}
+            </tr>
+          </thead>
+
+          <tbody>
             {fields.map((item, index) => (
-              <div key={item.id} className="flex space-x-2 items-center mb-2">
-                <select
-                  {...register(`items.${index}.item_id`, {
-                    required: true,
-                    onChange: (e) => handleProductSelect(e.target.value, index),
-                  })}
-                  className={`w-[220px] h-[40px] rounded-md px-2 
-  ${errors.items?.[index]?.item_id ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'}`}
-                >
-                  <option value="">Select Product</option>
-                  {product?.map((prod) => {
-                    const currentItemId = watchedItems?.[index]?.item_id?.toString() || ''
-                    const isSelectedHere = currentItemId === prod?.id?.toString()
-                    const isDisabledGlobally =
-                      selectedProductIds.includes(prod?.id.toString()) && !isSelectedHere
+              <tr key={item.id} className="border-b">
+                {/* Item Select */}
+                <td className="p-1 pr-2">
+                  <select
+                    {...register(`items.${index}.item_id`, {
+                      required: true,
+                      onChange: (e) => handleProductSelect(e.target.value, index),
+                    })}
+                    className={`w-full h-[36px] rounded-md px-1 text-sm text-center ${
+                      errors.items?.[index]?.item_id
+                        ? 'border-2 border-red-500'
+                        : 'border border-[#c2c2c2]'
+                    }`}
+                  >
+                    <option value="">Select Product</option>
+                    {product?.map((prod) => {
+                      const currentItemId = watchedItems?.[index]?.item_id?.toString() || ''
+                      const isSelectedHere = currentItemId === prod?.id?.toString()
+                      const isDisabledGlobally =
+                        selectedProductIds.includes(prod?.id.toString()) && !isSelectedHere
 
-                    return (
-                      <option key={prod?.id} value={prod.id} disabled={isDisabledGlobally}>
-                        {prod?.item_generate_id}
-                      </option>
-                    )
-                  })}
-                </select>
+                      return (
+                        <option key={prod?.id} value={prod.id} disabled={isDisabledGlobally}>
+                          {prod?.item_name}
+                        </option>
+                      )
+                    })}
+                  </select>
+                </td>
 
-                <select
-                  {...register(`items.${index}.inventory_id`, {
-                    onChange: (e) => handleINVSelect(e.target.value, index), // optional: if needed
-                  })}
-                  className={`w-[180px] h-[40px] rounded-md px-2`}
-                  style={getInputStyle(errors?.items?.[index]?.id)}
-                >
-                  <option value="">Select INV</option>
-
-                  {(InventoryItems?.[index] || []).map((inv) => {
-                    // const currentPOId = watchedItems?.[index]?.inventory_id?.toString() || ''
-                    // const isSelectedHere = currentPOId === inv?.id?.toString()
-                    // const isDisabledGlobally =
-                    //   selectedPOIds.includes(inv?.id.toString()) && !isSelectedHere
-
-                    return (
+                {/* Inventory Select */}
+                <td className="p-1 pr-2">
+                  <select
+                    {...register(`items.${index}.inventory_id`, {
+                      onChange: (e) => handleINVSelect(e.target.value, index),
+                    })}
+                    className="w-full h-[36px] rounded-md px-1 text-sm text-center border border-[#c2c2c2]"
+                  >
+                    <option value="">Select Inventory</option>
+                    {(InventoryItems?.[index] || []).map((inv) => (
                       <option key={inv?.id} value={inv.id}>
                         {inv?.inventory_generate_id}
                       </option>
-                    )
-                  })}
-                </select>
+                    ))}
+                  </select>
+                </td>
 
-                {/* <select
-                  {...register(`items.${index}.grn_id`, {
-                    onChange: (e) => handleGRNSelect(e.target.value, index),
-                  })}
-                  className={`w-[180px] h-[40px] rounded-md px-2`}
-                  style={getInputStyle(errors?.items?.[index]?.grn_id)}
-                >
-                  <option value="">Select GRN</option>
+                {/* Type */}
+                {/* <td className="p-1 pr-2">
+                  <select
+                    {...register(`items.${index}.type`)}
+                    className="w-full h-[36px] rounded-md px-1 text-sm text-center border border-[#c2c2c2]"
+                  >
+                    <option value="increase">Increase</option>
+                    <option value="decrease">Decrease</option>
+                  </select>
+                </td> */}
 
-                  {(GRNItems?.[index] || []).map((grn) => {
-                    // const currentPOId = watchedItems?.[index]?.grn_id?.toString() || ''
-                    // const isSelectedHere = currentPOId === grn?.id?.toString()
-                    // const isDisabledGlobally =
-                    //   selectedPOIds.includes(grn?.id.toString()) && !isSelectedHere
+                {/* Available Qty */}
+                <td className="p-1 pr-2 text-center">
+                  <input
+                    type="number"
+                    step="0.01"
+                    readOnly
+                    placeholder="0.00"
+                    {...register(`items.${index}.quantity_available`)}
+                    className="w-full h-[36px] rounded-md px-1 text-sm text-center border border-[#c2c2c2] bg-gray-50"
+                  />
+                </td>
 
-                    return (
-                      <option key={grn?.id} value={grn.id}>
-                        {grn?.grn_generate_id}
-                      </option>
-                    )
-                  })}
-                </select> */}
+                <td className="p-1 pr-2 text-center">
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    {...register(`items.${index}.new_quantity_available`)}
+                    onChange={(e) => {
+                      const newQty = parseFloat(e.target.value || '0')
+                      const availQty = parseFloat(watch(`items.${index}.quantity_available`) || '0')
+                      const adjustment = +(newQty - availQty).toFixed(2)
 
-                <select
-                  {...register(`items.${index}.type`)}
-                  className="border border-[#c2c2c2] rounded-md w-[100px] h-[40px]"
-                >
-                  <option value="increase">Increase</option>
-                  <option value="decrease">Decrease</option>
-                </select>
+                      setValue(`items.${index}.new_quantity_available`, newQty)
+                      setValue(`items.${index}.adjustment_quantity`, adjustment)
+                    }}
+                    className={`w-full h-[36px] rounded-md px-1 text-sm text-center${
+                      errors.items?.[index]?.new_quantity_available
+                        ? 'border-2 border-red-500'
+                        : 'border border-[#c2c2c2]'
+                    } `}
+                  />
+                </td>
 
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="Available Qty"
-                  readOnly
-                  {...register(`items.${index}.quantity_available`)}
-                  className={`w-[100px] h-[40px] px-2 rounded-md`}
-                  style={getInputStyle(errors?.items?.[index]?.available_quantity)}
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="Quantity"
-                  {...register(`items.${index}.adjustment_quantity`, { required: true })}
-                  className={`w-[100px] h-[40px] px-2 rounded-md`}
-                  style={getInputStyle(errors?.items?.[index]?.adjustment_quantity)}
-                />
+                <td className="p-1 pr-2 text-center">
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="Eg. +10 or -10"
+                    {...register(`items.${index}.adjustment_quantity`, { required: true })}
+                    className={`w-full h-[36px] rounded-md px-1 text-sm text-center `}
+                    readOnly
+                  />
+                </td>
 
-                <input
-                  type="text"
-                  {...register(`items.${index}.reason`, { required: true })}
-                  placeholder="Add any Reason"
-                  className={`w-[250px] h-[40px] px-2 rounded-md`}
-                  style={getInputStyle(errors?.items?.[index]?.reason)}
-                />
+                {/* Reason */}
+                <td className="p-1 pr-2">
+                  <input
+                    type="text"
+                    placeholder="Add reason"
+                    {...register(`items.${index}.reason`, { required: true })}
+                    className={`w-full h-[36px] rounded-md px-1 text-sm text-center ${
+                      errors.items?.[index]?.reason
+                        ? 'border-2 border-red-500'
+                        : 'border border-[#c2c2c2]'
+                    }`}
+                  />
+                </td>
 
-                <button
-                  type="button"
-                  onClick={() => handleRemoveItem(index)}
-                  className="text-red-600 hover:text-red-800 text-sm font-medium"
-                  title="Delete item"
-                >
-                  ✕
-                </button>
-              </div>
+                {/* Delete button */}
+                <td className="p-1 text-center">
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveItem(index)}
+                    className="text-red-500 hover:text-red-700"
+                    title="Remove"
+                  >
+                    ✕
+                  </button>
+                </td>
+              </tr>
             ))}
+          </tbody>
+        </table>
 
-            <button
-              type="button"
-              onClick={() => append({ type: 'increase', adjustment_quantity: '' })}
-              className="text-sm text-blue-600 hover:underline mt-2 w-fit"
-            >
-              + Add Item
-            </button>
-          </div>
-
-          {/* Remarks Section moved here */}
-          {/* <div className="p-3 rounded-lg flex flex-col col-span-3 md:col-span-1">
-            <label className="text-black font-normal mb-2">Remarks</label>
-            <textarea
-              {...register('remarks', { required: true })}
-              placeholder="Add any remarks"
-              className={`w-full px-2 rounded-md bg-white leading-[26px] outline-none placeholder:text-sm 
-    ${errors.remarks ? 'border-2 border-red-500' : 'border border-[#c2c2c2]'}`}
-              rows={3}
-            />
-          </div> */}
-        </div>
+        {/* + Add Item Button */}
+        <button
+          type="button"
+          onClick={() => append({ type: 'increase', adjustment_quantity: '' })}
+          className="flex items-center h-8 w-28 text-xs bg-gray-100 hover:bg-gray-200 text-blue-600 py-2 px-3 rounded mr-2"
+        >
+          + Add Item
+        </button>
 
         {/* Remarks Section */}
-        <div className="grid grid-cols-3 md:grid-cols-2 gap-2">
+        {/* <div className="grid grid-cols-3 md:grid-cols-2 gap-2">
           <div className="p-3 rounded-lg flex flex-col">
             <label className="text-black font-normal mb-2">Remarks</label>
             <input
@@ -498,10 +618,10 @@ const AddEditStockAdjustment = () => {
             />
             {errors.remarks && <span className="text-red-500 text-xs">Required</span>}
           </div>
-        </div>
+        </div> */}
 
         {/* Buttons */}
-        <div className="flex justify-end gap-x-4 mt-4">
+        {/* <div className="flex justify-start gap-x-4 mt-4">
           <button
             type="button"
             onClick={handleCancel}
@@ -516,6 +636,25 @@ const AddEditStockAdjustment = () => {
           >
             Submit Adjustment
           </CButton>
+        </div> */}
+        <div className="fixed bottom-0 bg-white border-t border-gray-200 z-10 flex p-1 py-2 w-full">
+          <div className="flex-1 justify-start">
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                color="primary"
+                className="h-8 w- rounded-md flex text-xs  items-center justify-center px-4 py-2 shadow-md border-none cursor-pointer text-white bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
+              >
+                Submit Adjustment
+              </button>
+              <ActionButton
+                type="button"
+                onClick={handleCancel}
+                className="px-4 py-2 bg-gray-200 text-black-700 rounded-md hover:bg-gray-300 transition-all"
+                label={'Cancel'}
+              />
+            </div>
+          </div>
         </div>
       </form>
     </div>

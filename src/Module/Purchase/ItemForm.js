@@ -5,6 +5,7 @@ import ActionButton from '../../components/New/ActionButton'
 import { itemApi } from '../../api/item'
 import { Package } from 'lucide-react'
 import ItemDetails from './ItemDetails'
+import { useLocation } from 'react-router-dom'
 
 const ItemForm = ({ items = [], setItems, formValues, setFormValues,fixedDebitBalance ,setBalanceAmount,balanceAmount,
   debitBalanceAmount,setDebitBalanceAmount,debitUsedAmount,setDebitUsedAmount,useDebitBalance
@@ -16,6 +17,8 @@ const ItemForm = ({ items = [], setItems, formValues, setFormValues,fixedDebitBa
   console.log("fixed debit",fixedDebitBalance)
 const [overallTotal,setoveralltotal]=useState(0)
 const [invoiceAmount, setInvoiceAmount] = useState(0);
+  const location = useLocation()
+  const PoID = location.state?.po_id
 
   // Debounce refs for quantity and rate
   const quantityTimeoutRefs = useRef({})
@@ -59,9 +62,7 @@ const [invoiceAmount, setInvoiceAmount] = useState(0);
 
       const customFields = item?.custom_fields
 
-      setModalContent(
-       <ItemDetails item={item} customFields={customFields}/>
-      )
+      setModalContent(<ItemDetails item={item} customFields={customFields} />)
       setIsModalOpen(true)
     } catch (error) {
       console.error('Error fetching item details:', error)
@@ -101,6 +102,21 @@ const [invoiceAmount, setInvoiceAmount] = useState(0);
       append({ item_id: '', quantity: 1 })
     }
   }, [append, fields.length])
+
+  // Updated useEffect to handle PoID selection
+  useEffect(() => {
+    if (!PoID || itemList.length === 0) return
+
+    // Check if PoID exists in itemList
+    const selectedItem = itemList.find((item) => item.id === parseInt(PoID))
+    
+    if (selectedItem && fields.length > 0) {
+      // Set the item_id in the form
+      setValue(`items.0.item_id`, PoID)
+      // Trigger the item change to populate all fields
+      handleItemChange(0, PoID)
+    }
+  }, [PoID, itemList, fields.length, setValue])
 
   // Calculate totals from items without setting values
 
@@ -507,12 +523,15 @@ useEffect(() => {
                     <tr key={field.id} className="h-[70px]">
                       <td className="border-b w-[350px]">
                         <div className="flex items-center gap-2">
+                          {console.log(PoID, "PoID ")}
                           <select
                             {...register(`items.${index}.item_id`)}
                             onChange={(e) => handleItemChange(index, e.target.value)}
                             className="flex-1 h-[35px] text-left border-none border rounded-md px-2 bg-gray-50 focus:outline-none hover:outline-none outline-none focus-visible:outline-none"
-                            value={getValues(`items.${index}.item_id`)}
-                          >
+                            disabled={PoID && index === 0} // Disable if PoID is set for first item
+                            value={PoID && index === 0 ? PoID : getValues(`items.${index}.item_id`)}
+                            >
+                            {console.log(getValues(`items.${index}.item_id`), "getvalue ")}
                             <option value="">{isLoading ? 'Loading...' : 'Select'}</option>
                             {itemList.map((item) => (
                               <option key={item.id} value={item.id}>
@@ -524,7 +543,7 @@ useEffect(() => {
                             onClick={() => openItemDetails(getValues(`items.${index}.item_id`))}
                             className="cursor-pointer text-blue-600 text-center min-w-[24px] h-[35px] flex items-center justify-center"
                           >
-                           ℹ️
+                            ℹ️
                           </div>
                         </div>
                       </td>

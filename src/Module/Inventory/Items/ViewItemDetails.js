@@ -95,7 +95,7 @@ function ItemView({ viewItem, setViewItem, selectedItemData }) {
                 <Detail label="Manufacturer" value={selectedItemData?.manufacturer} />
                 <Detail label="Standard Cost" value={`₹${selectedItemData?.standard_cost}`} />
                 <Detail label="Specifications" value={selectedItemData?.specifications} />
-                <Detail label="Reorder Level" value={selectedItemData?.reorder_level} />
+                <Detail label="Min Stock Level" value={selectedItemData?.min_stock_level} />
                 <Detail label="Status" value={selectedItemData?.status} />
                 <Detail label="Description" value={selectedItemData?.description} />
 

@@ -6,18 +6,26 @@ import {
   CTableBody,
   CTableDataCell,
 } from '@coreui/react'
-import React,{ useState,useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import PopUp from '../../../src/components/New/PopUp'
 import ViewInventory from './ViewInventory'
-import { cilPencil,cilTrash } from '@coreui/icons'
+import { cilPencil, cilTrash } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import { capitalize } from 'lodash'
 
-const InventoryTable = ({ inventoryData,subCategoryId,totalInventoryValue,setIsMinimised,isMinimised,setSelectedItem,selectedItem }) => {
-  const [viewItem,setViewItem] = useState(false)
+const InventoryTable = ({
+  inventoryData,
+  subCategoryId,
+  totalInventoryValue,
+  setIsMinimised,
+  isMinimised,
+  setSelectedItem,
+  selectedItem,
+}) => {
+  const [viewItem, setViewItem] = useState(false)
   const navigate = useNavigate()
-  const [isDeleteModalOpen,setIsDeleteModalOpen] = useState({ open: false,id: null })
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState({ open: false, id: null })
 
   const toTitleCase = (str) =>
     str
@@ -54,16 +62,16 @@ const InventoryTable = ({ inventoryData,subCategoryId,totalInventoryValue,setIsM
             customFieldsSet.add(transformedKey)
           })
         } catch (error) {
-          console.error('Error parsing custom fields:',error)
+          console.error('Error parsing custom fields:', error)
         }
       }
     })
 
     return Array.from(customFieldsSet)
-  },[inventoryData,subCategoryId])
+  }, [inventoryData, subCategoryId])
 
   // Function to get custom field value for an item
-  const getCustomFieldValue = (item,fieldKey) => {
+  const getCustomFieldValue = (item, fieldKey) => {
     if (!item.item?.default_custom_fields) return '--'
 
     try {
@@ -84,96 +92,97 @@ const InventoryTable = ({ inventoryData,subCategoryId,totalInventoryValue,setIsM
 
       // Convert snake_case values to readable format
       return value
-        .replace(/_/g,' ')
+        .replace(/_/g, ' ')
         .split(' ')
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
     } catch (error) {
-      console.error('Error parsing custom fields:',error)
+      console.error('Error parsing custom fields:', error)
       return '--'
     }
   }
   return (
     <>
       <div
-        className={`w-full overflow-y-scroll h-[calc(120vh-310px)] border rounded-md shadow-sm mt-1 mb-3 ${isMinimised ? '' : 'overflow-x-auto'
-          }`}
+        className={`w-full overflow-y-scroll h-[calc(120vh-310px)] border rounded-md shadow-sm mt-1 mb-3 ${
+          isMinimised ? '' : 'overflow-x-auto'
+        }`}
       >
         <CTable
-          className={`border-separate border-spacing-0 ${isMinimised
-              ? 'h-[400px]' // or min-h-[500px] if needed
+          className={`border-separate border-spacing-0 ${
+            isMinimised
+              ? 'max-h-[400px]' // or min-h-[500px] if needed
               : 'min-w-[900px] overflow-x-scroll'
-            }`}
+          }`}
         >
-          {!isMinimised && (<CTableHead className="!bg-gray-100">
-            <CTableRow>
-              <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Product ID <span className="text-gray-500">⌕</span>
-              </CTableHeaderCell>
-              <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Reorder Level (Kg)
-              </CTableHeaderCell>
-              <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Qty
-              </CTableHeaderCell>
-              <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Rate/Kg
-              </CTableHeaderCell>
-              {/* Dynamic Custom Field Columns */}
-              {customFieldColumns.map((fieldKey,index) => (
-                <CTableHeaderCell
-                  key={`custom-${index}`}
-                  className="sticky top-0 bg-blue-50 text-center z-10 border-b border-blue-200 whitespace-nowrap text-sm  text-blue-700"
-                >
-                  {fieldKey
-                    .replace(/_/g,' ')
-                    .replace(/[^a-zA-Z0-9 ]/g,' ')
-                    .replace(/\s+/g,' ')
-                    .split(' ')
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ')
-                    .trim()}
+          {!isMinimised && (
+            <CTableHead className="!bg-gray-100">
+              <CTableRow>
+                <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
+                  Product ID <span className="text-gray-500">⌕</span>
                 </CTableHeaderCell>
-              ))}
+                <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
+                  Reorder Level
+                </CTableHeaderCell>
+                <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
+                  Qty
+                </CTableHeaderCell>
+                <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
+                  Rate
+                </CTableHeaderCell>
+                {/* Dynamic Custom Field Columns */}
+                {customFieldColumns.map((fieldKey, index) => (
+                  <CTableHeaderCell
+                    key={`custom-${index}`}
+                    className="sticky top-0 bg-blue-50 text-center z-10 border-b border-blue-200 whitespace-nowrap text-sm  text-blue-700"
+                  >
+                    {fieldKey
+                      .replace(/_/g, ' ')
+                      .replace(/[^a-zA-Z0-9 ]/g, ' ')
+                      .replace(/\s+/g, ' ')
+                      .split(' ')
+                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                      .join(' ')
+                      .trim()}
+                  </CTableHeaderCell>
+                ))}
 
-              <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Status
-              </CTableHeaderCell>
-              <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                Actions
-              </CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>)}
+                <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
+                  Status
+                </CTableHeaderCell>
+                <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
+                  Actions
+                </CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+          )}
 
           <CTableBody>
             {inventoryData && inventoryData.length > 0 ? (
-              inventoryData.map((item,index) => (
+              inventoryData.map((item, index) => (
                 <CTableRow
                   key={index}
                   className="text-sm text-center cursor-pointer hover:bg-gray-100"
                   onClick={() => {
                     setSelectedItem(item)
                     //setViewItem(true)
-                                             navigate(`/inventoryhandling/${item?.item_id}`, {
-    state: {
-      item,
-      totalInventoryValue,
-    },
-  });
+                    navigate(`/inventoryhandling/${item?.item_id}`, {
+                      state: {
+                        item,
+                        totalInventoryValue,
+                      },
+                    })
 
                     setIsMinimised(true)
-
                   }}
                 >
                   <CTableDataCell
-                    className={`whitespace-nowrap truncate ${isMinimised
-                        ? 'px-4 py-3 flex items-center gap-2 w-full'
-                        : 'max-w-[200px]'
-                      }`}
+                    className={`whitespace-nowrap truncate ${
+                      isMinimised ? 'px-4 py-3 flex items-center gap-2 w-full' : 'max-w-[200px]'
+                    }`}
                   >
                     {item?.item?.item_generate_id || '--'}
                   </CTableDataCell>
-
 
                   {!isMinimised && (
                     <>
@@ -183,22 +192,23 @@ const InventoryTable = ({ inventoryData,subCategoryId,totalInventoryValue,setIsM
                           : '--'}
                       </CTableDataCell>
                       <CTableDataCell className="whitespace-nowrap">
-                        {item.quantity_available || item.total_quantity && (item.item.uom || item.item.net_weight)
+                        {item.quantity_available ||
+                        (item.total_quantity && (item.item.uom || item.item.net_weight))
                           ? `${parseFloat(item.quantity_available || item.total_quantity)} ${item.item.uom || item.item.net_weight}` ||
-                          item.quantity_available
+                            item.quantity_available
                           : '--'}
                       </CTableDataCell>
                       <CTableDataCell className="whitespace-nowrap">
                         ₹{item.item.standard_cost || '--'}
                       </CTableDataCell>
 
-                      {customFieldColumns.map((fieldKey,fieldIndex) => (
+                      {customFieldColumns.map((fieldKey, fieldIndex) => (
                         <CTableDataCell
                           key={`custom-value-${fieldIndex}`}
                           className="whitespace-nowrap bg-blue-25 text-center"
                         >
                           <span className="inline-block px-2 py-1 text-sm rounded-full">
-                            {getCustomFieldValue(item,fieldKey)}
+                            {getCustomFieldValue(item, fieldKey)}
                           </span>
                         </CTableDataCell>
                       ))}
@@ -207,7 +217,9 @@ const InventoryTable = ({ inventoryData,subCategoryId,totalInventoryValue,setIsM
                         {(() => {
                           let stockStatus = '--'
                           // Convert strings to numbers
-                          const totalQuantity = parseFloat(item.quantity_available || item.total_quantity)
+                          const totalQuantity = parseFloat(
+                            item.quantity_available || item.total_quantity,
+                          )
                           const minStockLevel = parseFloat(item.item.min_stock_level)
 
                           if (totalQuantity === 0.0) {
@@ -261,7 +273,7 @@ const InventoryTable = ({ inventoryData,subCategoryId,totalInventoryValue,setIsM
                                 label: 'Edit Product',
                                 icon: cilPencil,
                                 onClick: () => {
-                                  navigate('/inventoryhandling/inventory_form',{
+                                  navigate('/inventoryhandling/inventory_form', {
                                     state: {
                                       item,
                                       fromInventory: true,
@@ -290,7 +302,6 @@ const InventoryTable = ({ inventoryData,subCategoryId,totalInventoryValue,setIsM
               </CTableRow>
             )}
           </CTableBody>
-
         </CTable>
       </div>
 

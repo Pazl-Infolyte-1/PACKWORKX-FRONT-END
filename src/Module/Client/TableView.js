@@ -40,6 +40,16 @@ const TableView = () => {
           )}
 
           <div className="flex items-center gap-2">
+            {tableData && (
+              <div className="flex items-center gap-2 mr-2">
+                <span className="px-2 py-1 text-sm bg-blue-50 text-blue-700 rounded font-medium border border-blue-100">
+                  Debit: ₹ {tableData.debit_balance != null ? tableData.debit_balance : 0}
+                </span>
+                <span className="px-2 py-1 text-sm bg-green-50 text-green-700 rounded font-medium border border-green-100">
+                  Credit: ₹ {tableData.credit_balance != null ? tableData.credit_balance : 0}
+                </span>
+              </div>
+            )}
             <button
               className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
               onClick={() => navigate('/clients/clientForm', { state: { client } })}

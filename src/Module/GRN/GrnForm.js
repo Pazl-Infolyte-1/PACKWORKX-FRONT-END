@@ -38,38 +38,10 @@ const GrnForm = () => {
   }, [id])
 
   useEffect(() => {
-    console.log('Grn Form data == ', grnFormData)
-  }, [grnFormData])
-
-  useEffect(() => {
-    const fetchEditData = async () => {
-      const response = await grnApi.getGrnById(id)
-      const item = response.data.data
-
-      setGrnFormData({
-        id: item.id,
-        po_bill_id: item.po_bill_id,
-        po_id: item.po_id,
-        grn_date: item.grn_date,
-        delivery_note_no: item.delivery_note_no,
-        invoice_no: item.invoice_no,
-        invoice_date: item.invoice_date,
-        amount: item.amount,
-        cgst_amount: item.cgst_amount,
-        sgst_amount: item.sgst_amount,
-        tax_amount: item.tax_amount,
-        total_amount: item.total_amount,
-        total_qty: item.total_qty,
-        received_by: item.received_by,
-        notes: item.notes,
-        items: item.GRNItems,
-      })
-
-      handleBillChange(item.po_bill_id)
+    if (billings.length > 0 && isEdit) {
+      fetchEditData() // only after billings are loaded
     }
-
-    fetchEditData()
-  }, [isEdit, billings])
+  }, [billings, isEdit])
 
   const [isOpen, setIsOpen] = useState(false)
   const [purchaseOrderData, setPurchaseOrderData] = useState([])
@@ -191,7 +163,7 @@ const GrnForm = () => {
         item_id: item.item_id,
         item_code: item.item_code,
         item_generate_id: item.item_info?.item_generate_id,
-        grn_item_name: item.po_item_name || '',
+        grn_item_name: item?.item_info?.item_name || '',
         description: item.description || '',
         quantity_ordered: parseFloat(item.quantity) || 0,
         quantity_received: 0,
@@ -234,16 +206,23 @@ const GrnForm = () => {
 
   const handleBillChange = (bill_id) => {
     const selectedBill = billings.find((item) => item.id == bill_id)
+    console.log('Selected Bill ID:', selectedBill)
     if (selectedBill) {
+      console.log('Selected Bill:', selectedBill.purchaseOrder)
       // Ensure purchaseOrderData is always an array
       setPurchaseOrderData(
         Array.isArray(selectedBill.purchaseOrder)
           ? selectedBill.purchaseOrder
           : [selectedBill.purchaseOrder],
       )
+      setGrnFormData((prevData) => ({
+        ...prevData,
+        po_bill_id: bill_id,
+      }))
+      console.log('Updated purchaseOrderData:', purchaseOrderData)
     } else {
       console.warn('No matching bill found')
-      setPurchaseOrderData([]) // Empty array if not found
+      setPurchaseOrderData([])
     }
   }
 
@@ -275,6 +254,39 @@ const GrnForm = () => {
     fetchBillData()
   }, [])
 
+  const fetchEditData = async () => {
+    const response = await grnApi.getGrnById(id)
+    const item = response.data.data
+
+    setGrnFormData({
+      id: item.id,
+      po_bill_id: item.po_bill_id,
+      po_id: item.po_id,
+      grn_date: item.grn_date,
+      delivery_note_no: item.delivery_note_no,
+      invoice_no: item.invoice_no,
+      invoice_date: item.invoice_date,
+      amount: item.amount,
+      cgst_amount: item.cgst_amount,
+      sgst_amount: item.sgst_amount,
+      tax_amount: item.tax_amount,
+      total_amount: item.total_amount,
+      total_qty: item.total_qty,
+      received_by: item.received_by,
+      notes: item.notes,
+      items: item.GRNItems,
+    })
+
+    // After setting grnFormData, update purchaseOrderData
+    const selectedBill = billings.find((b) => b.id == item.po_bill_id)
+    if (selectedBill) {
+      const newPurchaseOrders = Array.isArray(selectedBill.purchaseOrder)
+        ? selectedBill.purchaseOrder
+        : [selectedBill.purchaseOrder]
+      setPurchaseOrderData(newPurchaseOrders)
+    }
+  }
+
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -293,14 +305,14 @@ const GrnForm = () => {
                       name="po_bill_id"
                       onChange={(e) => handleBillChange(e.target.value)}
                       style={getInputStyle('po_bill_id')}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-sm"
                       value={grnFormData.po_bill_id}
                     >
-                      <option className="text-sm" value="">
+                      <option className="text-xs" value="">
                         Select Bill
                       </option>
                       {billings.map((item, index) => (
-                        <option key={index} value={item.id}>
+                        <option key={item.id} value={item.id}>
                           {item.bill_generate_id}
                         </option>
                       ))}
@@ -415,7 +427,7 @@ const GrnForm = () => {
                       value={grnFormData.grn_date || ''}
                       onChange={handleInputChange}
                       style={getInputStyle('grn_date')}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
                     />
                   </div>
 
@@ -428,7 +440,7 @@ const GrnForm = () => {
                       value={grnFormData.delivery_note_no || ''}
                       onChange={handleInputChange}
                       style={getInputStyle('delivery_note_no')}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
                     />
                   </div>
 
@@ -441,7 +453,7 @@ const GrnForm = () => {
                       value={grnFormData.invoice_no || ''}
                       onChange={handleInputChange}
                       style={getInputStyle('invoice_no')}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
                     />
                   </div>
 
@@ -454,7 +466,7 @@ const GrnForm = () => {
                       value={grnFormData.invoice_date || ''}
                       onChange={handleInputChange}
                       style={getInputStyle('invoice_date')}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
                     />
                   </div>
 
@@ -467,7 +479,7 @@ const GrnForm = () => {
                       value={grnFormData.received_by || ''}
                       onChange={handleInputChange}
                       style={getInputStyle('received_by')}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
                     />
                   </div>
 
@@ -480,7 +492,7 @@ const GrnForm = () => {
                       value={grnFormData.notes || ''}
                       onChange={handleInputChange}
                       style={getInputStyle('notes')}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none placeholder:text-sm"
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
                     />
                   </div>
                 </div>

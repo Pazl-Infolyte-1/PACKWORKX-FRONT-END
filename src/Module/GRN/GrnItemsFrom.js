@@ -498,7 +498,9 @@ const GrnItemsFrom = ({
                         <td className="py-2 px-2 text-center w-[90px]">
                           <input
                             type="number"
-                            {...register(`grn_items.${index}.accepted_quantity`, required)}
+                            {...register(`grn_items.${index}.accepted_quantity`, {
+                              required: true,
+                            })}
                             value={watch(`grn_items.${index}.accepted_quantity`)}
                             className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
                           />

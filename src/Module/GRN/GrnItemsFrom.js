@@ -6,6 +6,8 @@ import { ChevronDoubleLeftIcon, TrashIcon } from '@heroicons/react/solid'
 import PopUp from '../../../src/components/New/PopUp'
 import { itemApi } from '../../api/item'
 import ItemDetails from '../Purchase/ItemDetails'
+import CIcon from '@coreui/icons-react'
+import { cilTrash } from '@coreui/icons'
 
 const GrnItemsFrom = ({
   grnFormData,
@@ -25,12 +27,18 @@ const GrnItemsFrom = ({
   const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded p-6 max-w-md w-full">
-          <button onClick={onClose} className="float-right">
-            &times;
-          </button>
-          <div>{children}</div>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+          <div className="flex justify-between items-center p-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Item Details</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+            >
+              &times;
+            </button>
+          </div>
+          <div className="overflow-y-auto max-h-[calc(90vh-80px)]">{children}</div>
         </div>
       </div>
     )
@@ -76,12 +84,15 @@ const GrnItemsFrom = ({
       console.log('grnFormData.items:', grnFormData.items)
 
       if (grnFormData.items && grnFormData.items.length > 0) {
+        const selectedPo = purchaseOrderData.find((po) => po.id === grnFormData.po_id)
+        console.log('selectedPo:', selectedPo)
         const updatedItems = grnFormData.items.map((item) => ({
           ...item,
           quantity_received: item.quantity,
           item_generate_id: item?.item_generate_id
             ? item?.item_generate_id
             : item?.item_info?.item_generate_id,
+          grn_item_name: item?.grn_item_name || '',
         }))
 
         append(updatedItems)
@@ -99,7 +110,7 @@ const GrnItemsFrom = ({
               po_item_id: item.id || 0,
               item_id: item.item_id || 0,
               item_code: item.item_code || '',
-              grn_item_name: item.po_item_name || '',
+              grn_item_name: item?.item_info?.item_name || '',
               // item_generate_id: item.item_generate_id || '',
               description: item.description || '',
               quantity_ordered: orderedQuantity,
@@ -400,133 +411,163 @@ const GrnItemsFrom = ({
         <div className="p-2 mt-2 flex flex-1 w-full">
           <div className="p-2 w-full">
             <div className="min-h-[300px] w-full rounded-lg">
-              <table className="w-100 border-collapse bg-white shadow-sm rounded-xl overflow-hidden">
-                {/* Table Head */}
-                <thead className="bg-gray-100 sticky top-0 z-10 text-xs text-gray-700 uppercase">
-                  <tr>
-                    <th className="py-3 px-2 text-left font-semibold bg-gray-100 rounded-tl-xl">
-                      Product Table
-                    </th>
-                    <th className="bg-gray-100"></th>
-                    <th className="bg-gray-100"></th>
-                    <th className="bg-gray-100"></th>
-                    <th className="bg-gray-100"></th>
-                    <th className="bg-gray-100"></th>
-                    <th className="bg-gray-100"></th>
-                    <th className="bg-gray-100"></th>
-                    <th className="py-3 px-2 bg-gray-100 rounded-tr-xl"></th>
-                  </tr>
-                  <tr className="text-gray-600 text-xs font-semibold bg-gray-50 border-y">
-                    <th className="py-2 px-2 border-r text-center">Product</th>
-                    <th className="py-2 px-2 border-r text-center">Ordered Qty</th>
-                    <th className="py-2 px-2 border-r text-center">Received Qty</th>
-                    <th className="py-2 px-2 border-r text-center">Accepted Qty</th>
-                    <th className="py-2 px-2 border-r text-center">Rejected Qty</th>
-                    <th className="py-2 px-2 border-r text-center">Unit Price</th>
-                    <th className="py-2 px-2 border-r text-center">Tax Amount</th>
-                    <th className="py-2 px-2 border-r text-center">Total Amount</th>
-                    <th className="py-2 px-2 border-r text-center">Notes</th>
-                  </tr>
-                </thead>
+              <div className="overflow-x-auto rounded-xl shadow-sm">
+                <table className="w-full table-fixed border-collapse bg-white">
+                  {/* Table Head */}
+                  <thead className="bg-gray-100 sticky top-0 z-10 text-[15px] text-gray-700 uppercase">
+                    <tr>
+                      <th
+                        className="py-3 px-2 text-left font-semibold bg-gray-100 rounded-tl-xl"
+                        colSpan="10"
+                      >
+                        Product Table
+                      </th>
+                    </tr>
+                    <tr className="text-gray-600 text-xs font-semibold bg-gray-50 border-y">
+                      <th className="py-2 px-2 border-r text-center w-[200px]">Product</th>
+                      <th className="py-2 px-2 border-r text-center w-[90px]">Ordered Qty</th>
+                      <th className="py-2 px-2 border-r text-center w-[90px]">Received Qty</th>
+                      <th className="py-2 px-2 border-r text-center w-[90px]">Accepted Qty</th>
+                      <th className="py-2 px-2 border-r text-center w-[90px]">Rejected Qty</th>
+                      <th className="py-2 px-2 border-r text-center w-[90px]">Unit Price</th>
+                      <th className="py-2 px-2 border-r text-center w-[90px]">Tax Amount</th>
+                      <th className="py-2 px-2 border-r text-center w-[90px]">Total Amount</th>
+                      <th className="py-2 px-2 border-r text-center w-[120px] rounded-tr-xl">
+                        Notes
+                      </th>
+                      <th className="py-2 px-2 border-r text-center w-[40px]">Action</th>
+                    </tr>
+                  </thead>
 
-                {/* Table Body */}
-                <tbody className="text-sm text-gray-800">
-                  {fields.map((item, index) => (
-                    <tr
-                      key={item.id}
-                      className="even:bg-gray-50 hover:bg-gray-100 border-b transition"
-                    >
-                      <td className="py-2 px-2 text-center">
-                        <div className="flex items-center justify-center gap-1">
+                  {/* Table Body */}
+                  <tbody className=" text-gray-800">
+                    {fields.map((item, index) => (
+                      <tr
+                        key={item.id}
+                        className="even:bg-gray-50 hover:bg-gray-100 border-b transition"
+                      >
+                        {/* Product */}
+                        <td className="py-2 px-2 text-center w-[200px]">
+                          <div className="flex items-center justify-center gap-1">
+                            <input
+                              type="text"
+                              disabled
+                              value={
+                                grnFormData?.items?.[index]
+                                  ? ` ${grnFormData.items[index].grn_item_name || ''} - ${grnFormData.items[index].item_generate_id || ''} -`
+                                  : ''
+                              }
+                              {...register(`grn_items.${index}.item_generate_id`)}
+                              className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
+                            />
+
+                            <span
+                              className="cursor-pointer text-indigo-500 hover:text-indigo-700"
+                              onClick={() => openItemDetails(item.item_id)}
+                            >
+                              ℹ️
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Ordered Qty */}
+                        <td className="py-2 px-2 text-center w-[90px]">
+                          <input
+                            type="number"
+                            disabled
+                            {...register(`grn_items[${index}].quantity_ordered`)}
+                            className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
+                          />
+                        </td>
+
+                        {/* Received Qty */}
+                        <td className="py-2 px-2 text-center w-[90px]">
+                          <input
+                            type="number"
+                            {...register(`grn_items.${index}.quantity_received`)}
+                            value={
+                              watch(`grn_items.${index}.quantity_received`) ||
+                              watch(`grn_items.${index}.quantity_ordered`) ||
+                              ''
+                            }
+                            className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
+                          />
+                        </td>
+
+                        {/* Accepted Qty */}
+                        <td className="py-2 px-2 text-center w-[90px]">
+                          <input
+                            type="number"
+                            {...register(`grn_items.${index}.accepted_quantity`, required)}
+                            value={watch(`grn_items.${index}.accepted_quantity`)}
+                            className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
+                          />
+                        </td>
+
+                        {/* Rejected Qty */}
+                        <td className="py-2 px-2 text-center w-[90px]">
+                          <input
+                            type="number"
+                            {...register(`grn_items[${index}].rejected_quantity`)}
+                            value={watch(`grn_items.${index}.rejected_quantity`)}
+                            className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
+                          />
+                        </td>
+
+                        {/* Unit Price */}
+                        <td className="py-2 px-2 text-center w-[90px]">
+                          <input
+                            type="number"
+                            disabled
+                            {...register(`grn_items[${index}].unit_price`)}
+                            className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
+                          />
+                        </td>
+
+                        {/* Tax Amount */}
+                        <td className="py-2 px-2 text-center w-[90px]">
+                          <input
+                            type="number"
+                            disabled
+                            value={grnFormData?.items?.[index]?.tax_amount || ''}
+                            className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
+                          />
+                        </td>
+
+                        {/* Total Amount */}
+                        <td className="py-2 px-2 text-center w-[90px]">
+                          <input
+                            type="number"
+                            disabled
+                            value={grnFormData?.items?.[index]?.total_amount || ''}
+                            className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
+                          />
+                        </td>
+
+                        {/* Notes */}
+                        <td className="py-2 px-2 text-center w-[120px]">
                           <input
                             type="text"
-                            disabled
-                            value={grnFormData?.items?.[index]?.item_generate_id || ''}
-                            {...register(`grn_items.${index}.item_generate_id`)}
-                            className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
+                            placeholder="Notes..."
+                            {...register(`grn_items[${index}].notes`)}
+                            className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
                           />
-                          <span
-                            className="cursor-pointer text-indigo-500 hover:text-indigo-700"
-                            onClick={() => openItemDetails(item.item_id)}
+                        </td>
+                        <td className="py-2 px-2 text-center w-[40px]">
+                          <button
+                            type="button"
+                            onClick={() => removeGrnItem(index)}
+                            className="text-red-500 hover:text-red-700"
+                            aria-label="Remove"
                           >
-                            ℹ️
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Inputs */}
-                      <td className="py-2 px-2 text-center">
-                        <input
-                          type="number"
-                          disabled
-                          {...register(`grn_items[${index}].quantity_ordered`)}
-                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
-                        />
-                      </td>
-                      <td className="py-2 px-2 text-center">
-                        <input
-                          type="number"
-                          {...register(`grn_items.${index}.quantity_received`)}
-                          value={
-                            watch(`grn_items.${index}.quantity_received`) ||
-                            watch(`grn_items.${index}.quantity_ordered`) ||
-                            ''
-                          }
-                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
-                        />
-                      </td>
-                      <td className="py-2 px-2 text-center">
-                        <input
-                          type="number"
-                          {...register(`grn_items.${index}.accepted_quantity`)}
-                          value={watch(`grn_items.${index}.accepted_quantity`)}
-                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
-                        />
-                      </td>
-                      <td className="py-2 px-2 text-center">
-                        <input
-                          type="number"
-                          {...register(`grn_items[${index}].rejected_quantity`)}
-                          value={watch(`grn_items.${index}.rejected_quantity`)}
-                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
-                        />
-                      </td>
-                      <td className="py-2 px-2 text-center">
-                        <input
-                          type="number"
-                          disabled
-                          {...register(`grn_items[${index}].unit_price`)}
-                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
-                        />
-                      </td>
-                      <td className="py-2 px-2 text-center">
-                        <input
-                          type="number"
-                          disabled
-                          value={grnFormData?.items?.[index]?.tax_amount || ''}
-                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
-                        />
-                      </td>
-                      <td className="py-2 px-2 text-center">
-                        <input
-                          type="number"
-                          disabled
-                          value={grnFormData?.items?.[index]?.total_amount || ''}
-                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
-                        />
-                      </td>
-                      <td className="py-2 px-2 text-center">
-                        <input
-                          type="text"
-                          placeholder="Notes..."
-                          {...register(`grn_items[${index}].notes`)}
-                          className="w-full h-10 text-center bg-transparent border-none focus:ring-0 focus:outline-none"
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                            <CIcon icon={cilTrash} className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
               <div className="mt-3 pb-4 mt-4 flex justify-end w-full">
                 <div className="w-full md:w-1/2 pr-4">

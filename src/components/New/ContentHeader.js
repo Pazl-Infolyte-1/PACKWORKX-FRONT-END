@@ -15,7 +15,8 @@ function ContentHeader({
   isAddNew = true,
   isNewButton = false,
   addNewButtonClick,
-  newButtonLabel
+  newButtonLabel,
+  activateSummary = false,
 }) {
   const [showMenu, setShowMenu] = useState(false)
   const [showHeadingDropdown, setShowHeadingDropdown] = useState(false)
@@ -118,9 +119,23 @@ function ContentHeader({
         {isNewButton && (
           <button
             onClick={addNewButtonClick}
-            className='border border-blue-600 text-blue-600 py-1.5 px-3 rounded-md transition-all duration-200 hover:bg-blue-500 hover:text-white'
+            className={`border transition-all duration-200 py-1.5 px-3 rounded-md font-medium relative overflow-hidden ${
+              activateSummary
+                ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200 ring-2 ring-blue-300 ring-opacity-50 transform scale-105'
+                : 'border-blue-600 text-blue-600 hover:bg-blue-50'
+            }`}
           >
-            {newButtonLabel}
+            {activateSummary && (
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 opacity-20 animate-pulse"></div>
+            )}
+            <span className="relative z-10 flex items-center gap-2">
+              {activateSummary && (
+                <svg className="w-4 h-4 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                  <circle cx="10" cy="10" r="3"></circle>
+                </svg>
+              )}
+              {newButtonLabel}
+            </span>
           </button>
         )}
         {isAddNew && (

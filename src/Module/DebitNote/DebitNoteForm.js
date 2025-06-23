@@ -23,12 +23,13 @@ const DebitNoteForm = () => {
     reason: '',
     remark: '',
     purchase_generate_id: '',
+    amount:''
   })
 
   useEffect(()=>{
     const fetchReturnIds = async () => {
       try {
-        const response = await debitApi.getAllPurchaseReturnIds()
+        const response = await debitApi.getAllPurchaseReturnIdsUpdated()
         setPurchaseReturnIds(response.data.data)
         
       } catch (error) {
@@ -57,25 +58,24 @@ const DebitNoteForm = () => {
     setDebitNoteFormData((prev) => ({ ...prev, [name]: value }))
   }
   
-  const handleSelectReturn = async (id, purchase_generate_id) => {
-    const event = { target: { name: 'po_return_id', value: id } }
-    try {
-      // const response = await debitApi.getPurchaseReturnById(id)
-      // const prData = response.data.data
-      
-      setDebitNoteFormData((prevData) => ({
-        ...prevData,
-        po_return_id: id,
-        purchase_generate_id: purchase_generate_id
-      }))
-    } catch (error) {
-      console.error('Error loading return data:', error)
-      // setAlerts([{ severity: 'warning', message: error?.response?.data?.message || 'Error occurred' }])
-    }
+ const handleSelectReturn = async (id, purchase_generate_id, total_amount) => {
+  const event = { target: { name: 'po_return_id', value: id } }
 
-    handleInputChange(event)
-    setIsOpen(false)
+  try {
+    setDebitNoteFormData((prevData) => ({
+      ...prevData,
+      po_return_id: id,
+      purchase_generate_id: purchase_generate_id,
+      amount: total_amount, // ✅ set amount here
+    }))
+  } catch (error) {
+    console.error('Error loading return data:', error)
   }
+
+  handleInputChange(event)
+  setIsOpen(false)
+}
+
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value)
 
@@ -101,6 +101,8 @@ const DebitNoteForm = () => {
           debit_note_date: debitNoteFormData.debit_note_date,
           reason: debitNoteFormData.reason,
           remark: debitNoteFormData.remark,
+                    amount: debitNoteFormData.amount,
+
         }
 
         let response
@@ -212,12 +214,14 @@ const DebitNoteForm = () => {
                       {purchaseReturnIds.length > 0 ? (
                         purchaseReturnIds.map((r) => (
                           <div
-                            key={r.id}
-                            className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
-                            onClick={() => handleSelectReturn(r.id, r.purchase_generate_id)}
-                          >
-                             {r.purchase_generate_id}
-                          </div>
+    key={r.id}
+    className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
+    onClick={() =>
+      handleSelectReturn(r.id, r.purchase_return_generate_id, r.total_amount)
+    }
+  >
+    {r.purchase_return_generate_id}
+  </div>
                         ))
                       ) : (
                         <div className="px-3 py-2 text-xs text-gray-500">No results found</div>
@@ -314,7 +318,18 @@ const DebitNoteForm = () => {
                     placeholder="Enter remark"
                   />
                 </div>
+                
               </div>
+                                   {debitNoteFormData.amount && (
+ <div className="flex items-center mt-1">
+                <label className="text-xs text-gray-700 w-40">   Total Amount:</label>
+                <div className="relative">
+  <span className=" text-sm text-gray-700">
+  ₹{Number(debitNoteFormData.amount).toFixed(2)}
+  </span>
+                </div>
+              </div>)}
+
             </div>
           </div>
         </div>

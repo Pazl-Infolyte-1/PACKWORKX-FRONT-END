@@ -73,6 +73,8 @@ const AddPurchaseOrderReturn = ({
       tax_amount: 0,
       total_amount: 0,
       return_qty: 0,
+      auto_Debit_Note:"No",
+      return_type:"wallet"
     },
   })
 
@@ -112,6 +114,8 @@ const AddPurchaseOrderReturn = ({
         tax_amount: 0,
         total_amount: 0,
         return_qty: 0,
+          auto_Debit_Note:"No",
+      return_type:"wallet"
       })
       setItems([])
       setPoTotals({
@@ -140,6 +144,8 @@ const AddPurchaseOrderReturn = ({
       tax_amount: 0,
       total_amount: 0,
       return_qty: 0,
+        auto_Debit_Note:"No",
+      return_type:"wallet"
     })
     //setDrawer(false)
     navigate('/purchase-return')
@@ -396,6 +402,8 @@ const AddPurchaseOrderReturn = ({
       reason: data.reason || 'Quality issues',
       payment_terms: data.payment_terms || '',
       notes: data.notes || '',
+        auto_Debit_Note:data.auto_Debit_Note,
+      return_type:data.return_type,
       items: checkedItems.map((item) => ({
         grn_item_id: item.grn_item_id || null,
         item_id: item.item_id,
@@ -407,7 +415,6 @@ const AddPurchaseOrderReturn = ({
     }
 
     console.log('payload', payload)
-
     try {
       const response = await purchaseOrderApi.submitPurchaseOrderReturn(payload)
       await handleThrowAlerts(payload.items)
@@ -638,6 +645,42 @@ const AddPurchaseOrderReturn = ({
                       className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
                     />
                   </div>
+
+                  {/* Auto Debit Note & Return Type */}
+<div className="flex items-center gap-4">
+  <label className="text-xs text-black-600 w-40">
+    Auto Debit Note
+  </label>
+
+  {/* Checkbox */}
+   <input
+    type="checkbox"
+    checked={watch('auto_Debit_Note') === 'Yes'}
+    onChange={(e) => {
+      const isChecked = e.target.checked
+      setValue('auto_Debit_Note', isChecked ? 'Yes' : 'No')
+      setValue('return_type', isChecked ? 'wallet' : null)
+    }}
+    className="h-4 w-4 border-[0.8px] border-[#c2c2c2] rounded"
+  />
+</div>
+  {watch('auto_Debit_Note') === 'Yes' && (
+<div className="flex items-center gap-4">
+  <label className="text-xs text-black-600 w-40">
+   Return Type
+  </label>
+  {/* Conditional Dropdown - Return Type */}
+
+    <select
+      {...register('return_type', { required: 'Required when Auto Debit Note is enabled' })}
+                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-sm"
+      defaultValue="wallet"
+    >
+      <option value="wallet">Wallet</option>
+      <option value="recieved">Cash Received</option>
+    </select>
+</div>  )}
+
                 </div>
               </div>
             </div>

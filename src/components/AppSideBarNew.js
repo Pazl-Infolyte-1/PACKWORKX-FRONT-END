@@ -418,7 +418,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === 'Bills') {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/BillingMain">
+                  <CNavLink as={NavLink} to="/billingmain">
                     {navLink('Bills', 'cilMoney')}
                   </CNavLink>
                 </CNavItem>

@@ -393,6 +393,13 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       }
       body.credit_amount = useCredit ? credit_amount : 0;
 
+      // Set total_amount as final amount after deducting used credit (if any)
+      if (useCredit) {
+        body.total_amount = Math.max((totals.total_incl_gst || 0) - credit_amount, 0);
+      } else {
+        body.total_amount = totals.total_incl_gst || 0;
+      }
+
       if (data.payment_status === 'partial') {
         body.received_amount = parseFloat(receivedAmount) || 0;
       } else if (data.payment_status === 'paid') {

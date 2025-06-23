@@ -6,6 +6,7 @@ import ItemDetails from '../Purchase/ItemDetails'
 
 const GrnView = ({}) => {
   const [poDetails, setPoDetails] = useState(null)
+  const [items, setItems] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState(null)
   const navigate = useNavigate()
@@ -29,12 +30,13 @@ const GrnView = ({}) => {
     )
   }
   const { id } = useParams()
-  console.log('iddd', id)
   useEffect(() => {
     const fetchData = async () => {
       const response = await purchaseOrderApi.getPurchaseReturnById(id)
       console.log('Purchase Return Response:', response?.data)
       setPoDetails(response?.data?.data)
+      setItems(response?.data?.item_data)
+      console.log(response.data)
     }
 
     if (id) {
@@ -118,7 +120,7 @@ const GrnView = ({}) => {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <p className="text-xs text-gray-500">Purchase Order</p>
-                <p className="font-medium">{poDetails?.po_id}</p>
+                <p className="font-medium">{poDetails?.PurchaseOrder?.purchase_generate_id}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Return Date</p>
@@ -172,6 +174,7 @@ const GrnView = ({}) => {
                 <div>Tax Amount</div>
                 <div>Total Amount</div>
               </div>
+              {console.log('poDetails:', poDetails)}
               {poDetails?.items?.length > 0 ? (
                 poDetails.items.map((item, idx) => (
                   <div
@@ -182,20 +185,20 @@ const GrnView = ({}) => {
                     }}
                   >
                     <div>
-                      {item.item_id}{' '}
+                      {items.find((i) => i.id === item.item_id)?.item_generate_id || 'N/A'}
                       <span
-                        className="cursor-pointer text-indigo-500 hover:text-indigo-700"
+                        className="cursor-pointer text-indigo-500 hover:text-indigo-700 ml-2"
                         onClick={() => openItemDetails(item.item_id)}
                       >
                         ℹ️
                       </span>
                     </div>
-                    <div>{item.return_qty}</div>
-                    <div>{item.reason}</div>
-                    <div>{item.unit_price}</div>
-                    <div>{item.amount}</div>
-                    <div>{item.tax_amount}</div>
-                    <div>{item.total_amount}</div>
+                    <div>{item.return_qty || 'N/A'}</div>
+                    <div>{item.reason || 'N/A'}</div>
+                    <div>{item.unit_price || 'N/A'}</div>
+                    <div>{item.amount || 'N/A'}</div>
+                    <div>{item.tax_amount || 'N/A'}</div>
+                    <div>{item.total_amount || 'N/A'}</div>
                   </div>
                 ))
               ) : (

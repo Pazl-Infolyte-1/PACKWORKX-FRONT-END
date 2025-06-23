@@ -1,3 +1,4 @@
+import ReturnItemForm from '../Module/PurchaseReturn/ReturnItemForm'
 import { apiClient } from './config'
 
 export const clientApi = {
@@ -169,5 +170,9 @@ export const clientApi = {
       console.error(error)
     }
   },
+
+  addWallet: async (formData) => {
+    return await apiClient.post('/clients/add/wallet-balance', formData)
+  }
 
 }

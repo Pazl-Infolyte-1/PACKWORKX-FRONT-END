@@ -129,10 +129,10 @@ export const inventoryApi = {
     }
   },
 
-  getInventorySummary: async () => {
-    return await apiClient.get('/inventory/product')
+  getInventorySummary: async (params) => {
+    return await apiClient.get('/inventory/product', { params })
   },
   getGrnBillID: async (id) => {
     return await apiClient.get(`/grn/bill/${id}`)
-  }
+  },
 }

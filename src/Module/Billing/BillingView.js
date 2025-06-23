@@ -109,7 +109,7 @@ const navigate=useNavigate()
   }
 
   return (
-<div className="h-screen overflow-y-auto bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 relative">
+<div className="h-[90vh] overflow-y-auto bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 relative">
      <div className="max-w-4xl mx-auto relative">
   {/* X Button */}
   <button

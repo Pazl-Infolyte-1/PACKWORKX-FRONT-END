@@ -116,6 +116,8 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id,se
 
       const selectedClient = vendor.find((client) => client.client_id == orderData.supplier_id)
       if (selectedClient) {
+        setDebitBalanceObject(selectedClient)
+
         const addresses = selectedClient.addresses || []
 
         setSupplierAddresses(addresses)
@@ -239,6 +241,8 @@ setDebitBalanceObject(selectedClient)
       itemsData: items,
     }
     onSubmit(formData)
+    setDebitBalanceObject(null)
+    setFixedDebitBalance
   }
 
   // This function runs when submit button is clicked (regardless of validation)
@@ -303,6 +307,25 @@ setDebitBalanceObject(selectedClient)
   }
 
   console.log("chkck box val",fixedDebitBalance)
+
+  console.log("is edit",isEdit)
+  console.log("order data",orderData)
+useEffect(() => {
+  if (isEdit) {
+    const balanceAmount = Number(orderData.debit_balance_amount);
+
+    if (!isNaN(balanceAmount) && balanceAmount > 0) {
+      setDebitBalanceObject(balanceAmount);
+    }
+
+    if (orderData.use_this) {
+      //setUseDebitBalance(orderData.use_this);
+      //setFixedDebitBalance(!isNaN(balanceAmount) ? balanceAmount : 0);
+      setFixedDebitBalance(0);
+    }
+  }
+}, [isEdit]);
+
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <div className="w-full ">

@@ -271,7 +271,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
               >
                 <option value="">Select status</option>
                 <option value="pending">Pending</option>
-                <option value="partial">Partial</option>
+                {/* <option value="partial">Partial</option> */}
                 <option value="paid">Paid</option>
               </select>
             </div>
@@ -510,11 +510,8 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
               <div className="mt-2 text-sm font-bold text-green-700 border-t border-gray-200 pt-2">
                 Final Amount to Pay: ₹{useCredit ? balanceToPay.toFixed(2) : invoiceWithGst.toFixed(2)}
               </div>
-            </div>
-
-            
-            {/* Action buttons - right side */}
-            <div className="flex flex-row space-x-2">
+              <div className="flex  mt-2 flex-1 flex-row space-x-2">
+                
               <button
                 type="button"
                 onClick={handleClose}
@@ -525,11 +522,16 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-1.5  text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isSubmitting ? 'Creating...' : 'Create Invoice'}
               </button>
             </div>
+            </div>
+
+            
+            {/* Action buttons - right side */}
+            
           </div>
         </form>
       </div>

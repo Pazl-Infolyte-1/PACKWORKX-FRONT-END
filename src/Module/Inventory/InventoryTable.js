@@ -187,19 +187,18 @@ const InventoryTable = ({
                   {!isMinimised && (
                     <>
                       <CTableDataCell className="whitespace-nowrap">
-                        {item.item.min_stock_level && (item.item.uom || item.item.net_weight)
+                        {item.item && item.item.min_stock_level && (item.item.uom || item.item.net_weight)
                           ? `${parseFloat(item.item.min_stock_level)} ${item.item.uom || item.item.net_weight}`
                           : '--'}
                       </CTableDataCell>
                       <CTableDataCell className="whitespace-nowrap">
-                        {item.quantity_available ||
-                        (item.total_quantity && (item.item.uom || item.item.net_weight))
+                        {item.item && (item.quantity_available || (item.total_quantity && (item.item.uom || item.item.net_weight)))
                           ? `${parseFloat(item.quantity_available || item.total_quantity)} ${item.item.uom || item.item.net_weight}` ||
                             item.quantity_available
                           : '--'}
                       </CTableDataCell>
                       <CTableDataCell className="whitespace-nowrap">
-                        ₹{item.item.standard_cost || '--'}
+                        ₹{item.item?.standard_cost !== undefined ? item.item?.standard_cost : '--'}
                       </CTableDataCell>
 
                       {customFieldColumns.map((fieldKey, fieldIndex) => (
@@ -220,7 +219,7 @@ const InventoryTable = ({
                           const totalQuantity = parseFloat(
                             item.quantity_available || item.total_quantity,
                           )
-                          const minStockLevel = parseFloat(item.item.min_stock_level)
+                          const minStockLevel = item.item ? parseFloat(item.item.min_stock_level) : 0
 
                           if (totalQuantity === 0.0) {
                             stockStatus = 'Out of Stock'

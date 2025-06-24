@@ -170,7 +170,8 @@ const WorkOrderTable = ({
       onChange: (row, newValue) => {
         handleProgressChange(newValue, row.id)
       },
-       searchIcon: true
+      searchIcon: true,
+      disabled: (row) => row.progress === 'Invoiced',
     },
 
     {

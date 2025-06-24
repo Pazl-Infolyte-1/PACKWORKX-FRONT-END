@@ -94,8 +94,9 @@ const ReturnItemForm = ({
         console.log('Inventory Item:', inventoryItem)
         return {
           ...item,
+          item_id: inventoryItem.item_id,
           available_quantity: inventoryItem ? parseFloat(inventoryItem.quantity_available) : 0,
-          grn_item_name: inventoryItem ? inventoryItem?.item?.item_name : '',
+          grn_item_name: inventoryItem ? inventoryItem?.item_info?.item_name : '',
         }
       })
 
@@ -201,6 +202,11 @@ const ReturnItemForm = ({
             <tbody>
               {fields.map((item, index) => (
                 <tr key={item.id} className="h-[60px]  text-gray-800 border-b hover:bg-gray-50">
+                  <input
+                    type="hidden"
+                    {...register(`items.${index}.item_id`)}
+                    value={item.item_id}
+                  />
                   <td className="pl-2 pr-1">
                     <Controller
                       control={control}
@@ -217,7 +223,7 @@ const ReturnItemForm = ({
                   </td>
                   <td
                     className="text-center text-blue-500 cursor-pointer"
-                    onClick={() => openItemDetails(getValues(`items.${index}.item_id`))}
+                    onClick={() => openItemDetails(item.item_id)}
                   >
                     ℹ️
                   </td>

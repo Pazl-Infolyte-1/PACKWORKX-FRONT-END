@@ -229,7 +229,6 @@ const ViewWorkOrder = () => {
 
   const handleCreateInvoice = async (invoiceData) => {
     try {
-      console.log(invoiceData)
       const response = await workOrderApi.createInvoiceWorkOrder(invoiceData);
       
       console.log('Invoice created successfully:', response);
@@ -242,9 +241,10 @@ const ViewWorkOrder = () => {
       // Optionally refresh work order data or navigate to invoice
       // navigate(`/invoice/view/${response.data.data.id}`);
 
-
+      return response; // success
     } catch (err) {
-      console.log(error)
+      // Throw the error so the modal knows it failed
+      throw err;
     }
   }
 

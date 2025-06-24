@@ -312,16 +312,16 @@ setDebitBalanceObject(selectedClient)
   console.log("order data",orderData)
 useEffect(() => {
   if (isEdit) {
-    const balanceAmount = Number(orderData.debit_balance_amount);
-
-    if (!isNaN(balanceAmount) && balanceAmount > 0) {
-      setDebitBalanceObject(balanceAmount);
+    const debitbalanceAmount = Number(orderData.debit_balance_amount);
+const usedAmount = Number(orderData.debit_used_amount)
+    if (!isNaN(debitbalanceAmount) && debitbalanceAmount > 0) {
+      setDebitBalanceObject(debitbalanceAmount);
     }
 
     if (orderData.use_this) {
-      //setUseDebitBalance(orderData.use_this);
-      //setFixedDebitBalance(!isNaN(balanceAmount) ? balanceAmount : 0);
-      setFixedDebitBalance(0);
+      setUseDebitBalance(orderData.use_this);
+      setFixedDebitBalance(!isNaN(debitbalanceAmount) ? debitbalanceAmount : 0);
+      setFixedDebitBalance(debitbalanceAmount+usedAmount);
     }
   }
 }, [isEdit]);

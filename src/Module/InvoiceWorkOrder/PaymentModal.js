@@ -370,18 +370,27 @@ function PaymentHistoryModal({ isOpen, onClose, onCreatePayment, invoiceId, invo
 
 // --- NEW MODAL: CreatePaymentLinkModal ---
 function CreatePaymentLinkModal({ isOpen, onClose, invoiceId, invoiceNumber, clientName, onSubmit, invoice }) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+  // Calculate amounts
+  const totalAmount = invoice && invoice.total_amount != null ? Number(invoice.total_amount) : null;
+  const receivedAmount = invoice && invoice.received_amount != null ? Number(invoice.received_amount) : 0;
+  const pendingAmount = totalAmount != null ? (totalAmount - receivedAmount) : null;
+
+  const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
     defaultValues: {
       emailOrMobileNumber: '',
-      amount: '',
+      amount: pendingAmount != null ? pendingAmount : '',
     },
   });
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (isOpen) setIsAnimating(true);
-  }, [isOpen]);
+    if (isOpen) {
+      setValue('amount', pendingAmount != null ? pendingAmount : '');
+      setIsAnimating(true);
+    }
+  }, [isOpen, pendingAmount, setValue]);
+
   useEffect(() => {
     if (!isOpen) reset();
   }, [isOpen, reset]);
@@ -415,11 +424,6 @@ function CreatePaymentLinkModal({ isOpen, onClose, invoiceId, invoiceNumber, cli
   const inputClass = `w-full h-8 px-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500`;
   const labelClass = `block text-xs font-medium text-gray-700 mb-1`;
   const errorClass = `border-red-500 ring-1 ring-red-500`;
-
-  // Calculate amounts
-  const totalAmount = invoice && invoice.total_amount != null ? Number(invoice.total_amount) : null;
-  const receivedAmount = invoice && invoice.received_amount != null ? Number(invoice.received_amount) : 0;
-  const pendingAmount = totalAmount != null ? (totalAmount - receivedAmount) : null;
 
   if (!isOpen) return null;
   return (

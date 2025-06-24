@@ -15,11 +15,11 @@ export const skuApi = {
     try {
       const response = await apiClient.get('/sku-details', {
         params: {
-          search: params.search || '',
-          client: params.client || '',
-          sku_type: params.sku_type || '',
-          page: params.page || 1,
-          limit: params.limit || 10,
+          search: params?.search || '',
+          client: params?.client || '',
+          sku_type: params?.sku_type || '',
+          page: params?.page || 1,
+          limit: params?.limit || 10,
         },
       })
       return response.data

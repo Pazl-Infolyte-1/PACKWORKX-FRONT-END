@@ -1,11 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useForm, useFieldArray, useWatch } from 'react-hook-form'
+import { useForm, useFieldArray, useWatch, Controller } from 'react-hook-form'
 import { inventoryApi } from '../../api/inventory'
 import { itemApi } from '../../api/item'
 import ItemDetails from '../Purchase/ItemDetails'
 
-const ReturnItemForm = ({ items, setItems, formValues, setFormValues, poIDForReturn }) => {
-  const { register, control, getValues, setValue } = useForm({
+const ReturnItemForm = ({
+  items,
+  setItems,
+  formValues,
+  setFormValues,
+  poIDForReturn,
+  control,
+  register,
+}) => {
+  const { getValues, setValue } = useForm({
     defaultValues: { items: [] },
   })
 
@@ -194,10 +202,17 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues, poIDForRet
               {fields.map((item, index) => (
                 <tr key={item.id} className="h-[60px]  text-gray-800 border-b hover:bg-gray-50">
                   <td className="pl-2 pr-1">
-                    <input
-                      type="checkbox"
-                      {...register(`items.${index}.selected`)}
-                      className="h-4 w-4"
+                    <Controller
+                      control={control}
+                      name={`items.${index}.selected`}
+                      render={({ field }) => (
+                        <input
+                          type="checkbox"
+                          {...field}
+                          checked={field.value || false}
+                          className="h-4 w-4"
+                        />
+                      )}
                     />
                   </td>
                   <td

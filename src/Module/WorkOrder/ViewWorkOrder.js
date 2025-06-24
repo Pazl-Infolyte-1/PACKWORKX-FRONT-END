@@ -235,7 +235,13 @@ const ViewWorkOrder = () => {
 
 
       const downloadResponse = await invoiceApi.downloadInvoice(response.data.data.id)
-      console.log(downloadResponse)
+      const blob = new Blob([downloadResponse.data], { type: 'application/pdf' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `INV-00${id}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
       
 
       // Optionally refresh work order data or navigate to invoice

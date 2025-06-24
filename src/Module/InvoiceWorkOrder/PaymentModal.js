@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { X, CheckCircle, Clock, XCircle, CreditCard, Hash, Mail, Phone } from 'lucide-react';
 import { invoiceApi } from '../../api/Invoice';
+import { clientApi } from '../../api/client';
 
 const paymentTypes = [
   { value: 'cash', label: 'Cash' },
@@ -9,6 +10,7 @@ const paymentTypes = [
   { value: 'upi', label: 'UPI' },
   { value: 'cheque', label: 'Cheque' },
   { value: 'other', label: 'Other' },
+  { value: 'wallet', label: 'Wallet' },
 ];
 
 const statusOptions = [
@@ -58,7 +60,23 @@ function paymentTypeIcon(type) {
 }
 
 function PaymentModal({ isOpen, onClose, invoiceId, invoiceNumber, clientName, invoice }) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+  const [creditBalance,setCreditBalance] = useState('')
+
+console.log(clientName)
+
+  useEffect(() => {
+    async function fetchClient() {
+      try {
+        const response = await clientApi.singleClients(invoice?.client_id);
+        setCreditBalance(response.data.credit_balance);
+      } catch (error) {
+        console.error('Error fetching client:', error);
+      }
+    }
+    fetchClient();
+  }, [invoice?.client_id]);
+
+  const { register, handleSubmit, reset, formState: { errors }, watch } = useForm({
     defaultValues: {
       payment_type: '',
       reference_number: '',
@@ -115,6 +133,8 @@ function PaymentModal({ isOpen, onClose, invoiceId, invoiceNumber, clientName, i
   const labelClass = `block text-xs font-medium text-gray-700 mb-1`;
   const errorClass = `border-red-500 ring-1 ring-red-500`;
 
+  const selectedPaymentType = watch('payment_type');
+
   if (!isOpen) return null;
 
   return (
@@ -144,12 +164,15 @@ function PaymentModal({ isOpen, onClose, invoiceId, invoiceNumber, clientName, i
               {clientName && (
                 <span><span className="font-semibold">Client:</span> {clientName}</span>
               )}
+              {selectedPaymentType === 'wallet' && creditBalance && invoice?.client_id && (
+                <span><span className="font-semibold">wallet Balance:</span> {creditBalance}</span>
+              )}
             </div>
             <div className="flex flex-col items-end min-w-[120px]">
               <span className="font-semibold">Balance to Pay:</span>
               <span className="text-base font-bold text-gray-900">
                 {invoice && invoice.total_amount != null && invoice.received_amount != null
-                  ? `₹${(Number(invoice.total_amount) - Number(invoice.received_amount)).toFixed(2)}`
+                  ? `₹${Math.max(0, (Number(invoice.total_amount) - Number(invoice.received_amount))).toFixed(2)}`
                   : '-'}
               </span>
             </div>
@@ -322,7 +345,7 @@ function PaymentHistoryModal({ isOpen, onClose, onCreatePayment, invoiceId, invo
               <span className="font-semibold">Balance to Pay:</span>
               <span className="text-base font-bold text-gray-900">
                 {invoice && invoice.total_amount != null && invoice.received_amount != null
-                  ? `₹${(Number(invoice.total_amount) - Number(invoice.received_amount)).toFixed(2)}`
+                  ? `₹${Math.max(0, (Number(invoice.total_amount) - Number(invoice.received_amount))).toFixed(2)}`
                   : '-'}
               </span>
             </div>

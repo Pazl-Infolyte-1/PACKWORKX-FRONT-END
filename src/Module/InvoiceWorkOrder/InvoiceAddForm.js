@@ -409,6 +409,14 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       }
 
       const response = await invoiceApi.createInvoice(body);
+            const downloadResponse = await invoiceApi.downloadInvoice(response.data.data.id)
+      const blob = new Blob([downloadResponse.data], { type: 'application/pdf' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `INV-00${response.data.data.id}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
       
       // Show success message
       setAlerts([{
@@ -464,7 +472,19 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       ? 'Enter discount (₹)'
       : 'Enter discount amount';
 
- 
+  // Auto-set payment status to 'paid' if credit covers the full amount
+  useEffect(() => {
+    if (useCredit) {
+      const total = totals.total_incl_gst || 0;
+      const credit = creditBalance || 0;
+      const finalAmount = total - credit;
+      if (finalAmount <= 0) {
+        setValue('payment_status', 'paid');
+        setReceivedAmount(credit > total ? total : credit); // received amount is total if credit exceeds total
+      }
+    }
+  }, [useCredit, totals.total_incl_gst, creditBalance, setValue]);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="pl-2 h-[90vh] overflow-scroll">
       <div className="relative">
@@ -870,11 +890,16 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 <input
                                   {...register(`sku_details[${index}].quantity_required`)}
                                   type="number"
-                            min="0"
-
+                                  min="0"
                                   onWheel={preventScroll}
                                   onChange={e => {
-                                    register(`sku_details[${index}].quantity_required`).onChange(e);
+                                    let value = parseFloat(e.target.value);
+                                    if (isNaN(value) || value < 0) value = 0;
+                                    setValue(`sku_details[${index}].quantity_required`, value);
+                                    register(`sku_details[${index}].quantity_required`).onChange({
+                                      ...e,
+                                      target: { ...e.target, value }
+                                    });
                                     calculateRowValues(index);
                                     recalculateAllTotals();
                                   }}
@@ -891,9 +916,16 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 <input
                                   {...register(`sku_details[${index}].rate_per_sku`)}
                                   type="number"
+                                  min="0"
                                   onWheel={preventScroll}
                                   onChange={e => {
-                                    register(`sku_details[${index}].rate_per_sku`).onChange(e);
+                                    let value = parseFloat(e.target.value);
+                                    if (isNaN(value) || value < 0) value = 0;
+                                    setValue(`sku_details[${index}].rate_per_sku`, value);
+                                    register(`sku_details[${index}].rate_per_sku`).onChange({
+                                      ...e,
+                                      target: { ...e.target, value }
+                                    });
                                     calculateRowValues(index);
                                     recalculateAllTotals();
                                   }}
@@ -905,11 +937,18 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 <input
                                   {...register(`sku_details[${index}].discount`)}
                                   type="number"
+                                  min="0"
                                   onChange={e => {
+                                    let value = parseFloat(e.target.value);
+                                    if (isNaN(value) || value < 0) value = 0;
+                                    setValue(`sku_details[${index}].discount`, value);
                                     // Clear overall discount and type when individual discount is changed
                                     setValue('discount', '');
                                     setValue('discount_type', '');
-                                    register(`sku_details[${index}].discount`).onChange(e);
+                                    register(`sku_details[${index}].discount`).onChange({
+                                      ...e,
+                                      target: { ...e.target, value }
+                                    });
                                     calculateRowValues(index);
                                     recalculateAllTotals();
                                   }}

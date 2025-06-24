@@ -226,7 +226,7 @@ function PurchaseOrderDetails() {
                             <div className="flex items-center justify-between gap-3">
                               <div>
                                 <div className="text-sm font-medium text-blue-600 cursor-pointer hover:underline">
-                                  {item.item_code}
+                                  {item.item_info.item_generate_id}- {item.item_info.item_name}
                                 </div>
                               </div>
                               <button

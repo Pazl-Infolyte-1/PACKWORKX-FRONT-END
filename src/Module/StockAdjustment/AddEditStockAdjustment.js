@@ -28,7 +28,7 @@ const AddEditStockAdjustment = () => {
   const [GRNItems, setGRNItems] = useState({})
   const [InventoryItems, setInventoryItems] = useState({})
   const selectedGRNIds = useSelector((state) => state?.auth?.stockAdjustmentGRNArray || [])
-  const PoID = location.state?.PoID
+  const PoID = location.state?.item_id
   const adjustmentMode = {
     // 'value Adjustment': 'Value Adjustment',
     'Quantity Adjustment': 'Quantity Adjustment',
@@ -162,7 +162,6 @@ const AddEditStockAdjustment = () => {
     const fetchProduct = async () => {
       try {
         const response = await grnApi.getProductsForStockAdjustment()
-        console.log('Product Data:', response.data)
         setProduct(response?.data)
       } catch (error) {
         console.error('Error fetching items:', error)
@@ -323,13 +322,13 @@ const AddEditStockAdjustment = () => {
     //   ...prev,
     //   [rowIndex]: [],
     // }))
-    getInventoryByItemId(selectedProductId, rowIndex)
+    // getInventoryByItemId(selectedProductId, rowIndex)
   }
 
   const getInventoryByItemId = async (selectedProductId, rowIndex) => {
     try {
       const response = await grnApi.getInventoryByItemId(selectedProductId)
-      console.log('Inventory Data:', response?.data?.data)
+      console.log('Inventory     Data:', response?.data?.data)
       setInventoryItems((prev) => ({
         ...prev,
         [rowIndex]: response?.data?.data || [],

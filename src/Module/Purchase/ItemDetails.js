@@ -74,8 +74,11 @@ const ItemDetails = ({ item, customFields = {} }) => {
                 <Package className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-gray-900 mb-1">
+                <h1 className="text-lg font-bold text-gray-900 m-0">
                   {item.item_name || 'Unnamed Item'}
+                </h1>
+                <h1 className="text-sm font-bold text-gray-900">
+                  {item.item_generate_id || 'Unnamed Item'}
                 </h1>
               </div>
             </div>
@@ -177,9 +180,8 @@ const ItemDetails = ({ item, customFields = {} }) => {
             {/* Category Information */}
             <InfoCard title="Category Information" icon={Layers}>
               <div className="space-y-0.5">
-                <InfoRow label="Category ID" value={item.category} />
-                <InfoRow label="Sub Category ID" value={item.sub_category} />
-                <InfoRow label="Company ID" value={item.company_id} highlight />
+                <InfoRow label="Category" value={item.category_info.category_name} />
+                <InfoRow label="Sub Category" value={item.sub_category_info.sub_category_name} />
               </div>
             </InfoCard>
 

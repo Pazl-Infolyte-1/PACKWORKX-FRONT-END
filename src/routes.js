@@ -40,6 +40,8 @@ const salesOrderForm = React.lazy(() => import('./Module/SalesOrder/AddSalesOrde
 const DropDownController = React.lazy(() => import('./Module/User/DropDownController.js'))
 const Attendance = React.lazy(() => import('./Module/Attendance/Attendance.js'))
 const SalesReturn = React.lazy(() => import('./Module/SalesReturn/SalesReturn.js'))
+const SalesReturnForm = React.lazy(() => import('./Module/SalesReturn/SalesReturnForm.js'))
+const SalesReturnView = React.lazy(() => import('./Module/SalesReturn/SalesReturnView.js'))
 const PurchaseReturn = React.lazy(() => import('./Module/PurchaseReturn/PurchaseReturn.js'))
 const Reports = React.lazy(() => import('./Module/Reports/Report.js'))
 const OfflineRequest = React.lazy(() => import('./Module/OfflineRequest/OfflineRequest.js'))
@@ -226,7 +228,15 @@ const routes = [
   { path: '/salesorder/form', name: 'salesorderform', element: salesOrderForm, key: '' },
 
   { path: '/attendance', name: 'Attendance', element: Attendance, key: '' },
-  { path: '/salesReturn', name: 'Sales Return', element: SalesReturn, key: '' },
+  {
+    path: '/sales-return',
+    name: 'Sales Return',
+    element: SalesReturn,
+    key: '',
+    children: [{ path: 'view/:id', name: 'SalesReturnView', element: SalesReturnView, key: '' }],
+  },
+  { path: '/sales-return/form', name: 'Sales Return', element: SalesReturnForm, key: '' },
+
   { path: '/reports', name: 'Reports', element: Reports, key: '' },
   { path: '/offlineRequest', name: 'Offline Request', element: OfflineRequest, key: '' },
   { path: '/adminFaq', name: 'Admin Faq', element: AdminFaq, key: '' },

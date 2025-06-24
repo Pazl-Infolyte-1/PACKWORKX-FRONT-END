@@ -171,6 +171,7 @@ payload.total_amount = Math.max(0, parseFloat(payload.total_amount || 0));
       ])
     } finally {
       setLoading(false)
+      setUseDebitBalance(false)
     }
   }
 

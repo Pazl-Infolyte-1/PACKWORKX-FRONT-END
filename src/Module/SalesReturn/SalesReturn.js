@@ -2,35 +2,64 @@ import React, { useState, useEffect } from 'react'
 import CustomAlert from '../../components/New/CustomAlert'
 import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
-import { Outlet, useNavigate } from 'react-router-dom'
-// import SalesReturnTable from './SalesReturnTable'
-import { workOrderApi } from '../../api/workOrder'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import SalesReturnTable from './SalesReturnTable'
+import { salesOrderApi } from '../../api/salesOrder'
+import { useSearch } from '../../components/New/SearchContext'
 
 const SalesReturn = () => {
-  const [isMinimized, setIsMinimized] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(true)
   const [salesReturnData, setSalesReturnData] = useState([])
-  const [count, setCount] = useState(0)
-  const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 })
+  const [count, setCount] = useState(null)
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    total_pages: 1,
+    total_records: 0,
+  })
   const [limit, setLimit] = useState(50)
   const [isEdit, setIsEdit] = useState(false)
   const [alerts, setAlerts] = useState([])
   const [refresh, setRefresh] = useState(false)
-  const [saleData, setSalesData] = useState([])
+  const { searchQuery, setGlobalPlaceholder } = useSearch()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const fetchInvoice = async () => {
-      try {
-        const response = await workOrderApi.getInvoice()
-        console.log('Invoice Data:', response.data)
-        setSalesData(response.data)
-      } catch (error) {
-        console.error(error)
-      }
-    }
+  const location = useLocation()
 
-    fetchInvoice()
+  useEffect(() => {
+    if (location.pathname === '/sales-return') {
+      setIsMinimized(false)
+    } else {
+      setIsMinimized(true)
+    }
+  }, [location.pathname])
+
+  useEffect(() => {
+    setGlobalPlaceholder('Search Sales Return...')
+
+    return () => {
+      setGlobalPlaceholder('Search...')
+    }
   }, [])
+
+  const fetchSalesReturn = async () => {
+    try {
+      const response = await salesOrderApi.getSalesReturn({
+        search: searchQuery,
+        page: pagination.current_page,
+        limit: limit,
+      })
+      console.log('Sales Return Data:', response?.data?.data?.sales_returns)
+      setSalesReturnData(response?.data?.data?.sales_returns)
+      setPagination(response?.data?.data?.pagination)
+      setCount(response?.data?.data?.pagination?.total_records)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    fetchSalesReturn()
+  }, [limit, searchQuery, pagination.current_page])
 
   const handleEdit = () => {
     setIsEdit(true)
@@ -55,25 +84,23 @@ const SalesReturn = () => {
             }}
           />
           <div>
-            {/* <SalesReturnTable
+            <SalesReturnTable
               isMinimized={isMinimized}
-              setRefresh={setRefresh}
-              setAlerts={setAlerts}
               handleEdit={handleEdit}
               salesReturnData={salesReturnData}
-            /> */}
+            />
           </div>
           <div className="flex justify-end items-center gap-4 mt-2 py-2 border-t bg-white">
             <p className="w-40 text-sm">
               Total Count: <span className="font-semibold">{count}</span>
             </p>
             <CompactPagination
-              count={pagination?.totalPages || 1}
-              page={pagination?.currentPage || 1}
+              count={pagination?.total_pages || 1}
+              page={pagination?.current_page || 1}
               onPageChange={(event, value) => {
                 setPagination((prev) => ({
                   ...prev,
-                  currentPage: value,
+                  current_page: value,
                 }))
               }}
               onEntriesChange={(newLimit) => {
@@ -93,7 +120,7 @@ const SalesReturn = () => {
           className={isMinimized ? 'flex-1' : 'w-0'}
           style={{ overflowX: 'auto', overflowY: 'auto' }}
         >
-          <Outlet />
+          {isMinimized && <Outlet />}
         </div>
       </div>
     </div>

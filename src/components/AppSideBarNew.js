@@ -418,8 +418,17 @@ export const AppSideBarNew = ({ giveAccess }) => {
             if (module.modules_description === 'Bills') {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/BillingMain">
+                  <CNavLink as={NavLink} to="/billingmain">
                     {navLink('Bills', 'cilMoney')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
+            if (module.modules_description === 'Sales Return') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/sales-return">
+                    {navLink('Sales Return', 'cilCart')}
                   </CNavLink>
                 </CNavItem>
               )

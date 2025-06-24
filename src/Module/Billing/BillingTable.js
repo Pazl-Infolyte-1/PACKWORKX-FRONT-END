@@ -135,9 +135,18 @@ const deleteBilling = async () => {
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
                           {bill.remarks || 'N/A'}
                         </CTableDataCell>
-                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
-                          {bill.status || 'N/A'}
-                        </CTableDataCell>
+                       <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
+  <span
+    className={`px-2 py-0.5 rounded-full text-xs font-medium 
+      ${bill.status?.toLowerCase() === 'active'
+        ? 'bg-green-100 text-green-700'
+        : 'bg-red-100 text-red-700'}
+    `}
+  >
+    {bill.status || 'N/A'}
+  </span>
+</CTableDataCell>
+
                         <CTableDataCell className="px-4 py-3">
                           <div onClick={(e) => e.stopPropagation()}>
                             <ThreeDotMenu

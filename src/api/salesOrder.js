@@ -54,9 +54,21 @@ export const salesOrderApi = {
       },
     })
   },
-    DeleteSalesOrder: async (id) => {
+  DeleteSalesOrder: async (id) => {
     const response = await apiClient.delete(`/sale-order/${id}`)
     return response
   },
 
+  addSalesReturn: async (body) => {
+    const response = await apiClient.post('/sales-return', body)
+    return response
+  },
+  getSalesReturn: async (params) => {
+    const response = await apiClient.get('/sales-return', { params })
+    return response
+  },
+  getSalesReturnById: async (id) => {
+    const response = await apiClient.get(`/sales-return/${id}`)
+    return response
+  },
 }

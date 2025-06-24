@@ -25,6 +25,13 @@ export const debitApi = {
       console.error(error)
     }
   },
+    getAllPurchaseReturnIdsUpdated: async () => {
+    try {
+      return await apiClient.get('/debit-note/get/po-return-id')
+    } catch (error) {
+      console.error(error)
+    }
+  },
   getPurchaseReturnById: async (id) => {
     return await apiClient.get(`/purchase-order-return/${id}`)
   },

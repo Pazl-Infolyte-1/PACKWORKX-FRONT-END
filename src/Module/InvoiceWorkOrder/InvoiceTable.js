@@ -148,21 +148,28 @@ function InvoiceTable({isMiniMised,invoices}) {
         handleRowClick={handleView}
         miniScreenFields={['invoice_number']}
         />
-        <PaymentHistoryModal
-          isOpen={isPaymentHistoryModalOpen}
-          onClose={handleClosePaymentHistoryModal}
-          onCreatePayment={handleCreatePayment}
-          invoiceId={selectedInvoice?.id}
-          invoiceNumber={selectedInvoice?.invoice_number}
-          clientName={selectedInvoice?.client_name}
-          invoicePaymentType = {selectedInvoice?.payment_status}
-        />
+
+        
+        {isPaymentHistoryModalOpen && (
+          <PaymentHistoryModal
+            isOpen={isPaymentHistoryModalOpen}
+            onClose={handleClosePaymentHistoryModal}
+            onCreatePayment={handleCreatePayment}
+            invoiceId={selectedInvoice?.id}
+            invoiceNumber={selectedInvoice?.invoice_number}
+            clientName={selectedInvoice?.client_name}
+            invoicePaymentType={selectedInvoice?.payment_status}
+            invoice={selectedInvoice}
+          />
+        )}
         <PaymentModal
           isOpen={isPaymentModalOpen}
           onClose={handleClosePaymentModal}
           invoiceId={selectedInvoice?.id}
           invoiceNumber={selectedInvoice?.invoice_number}
           clientName={selectedInvoice?.client_name}
+          invoice={selectedInvoice}
+
         />
         <CreatePaymentLinkModal
           isOpen={isCreatePaymentLinkModalOpen}
@@ -170,6 +177,7 @@ function InvoiceTable({isMiniMised,invoices}) {
           invoiceId={selectedInvoice?.id}
           invoiceNumber={selectedInvoice?.invoice_number}
           clientName={selectedInvoice?.client_name}
+          invoice={selectedInvoice}
           onSubmit={handleCreatePaymentLink}
         />
     </div>

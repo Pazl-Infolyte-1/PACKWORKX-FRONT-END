@@ -424,6 +424,15 @@ export const AppSideBarNew = ({ giveAccess }) => {
                 </CNavItem>
               )
             }
+            if (module.modules_description === 'Sales Return') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/sales-return">
+                    {navLink('Sales Return', 'cilCart')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
             return null
           })}
         </>

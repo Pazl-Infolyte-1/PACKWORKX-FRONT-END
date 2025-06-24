@@ -19,6 +19,13 @@ function getStatusStyle(status) {
   }
 }
 
+// Helper function to format date as 'date month year'
+function formatDateDMY(dateStr) {
+  if (!dateStr) return '-';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 function InvoiceTable({isMiniMised,invoices}) {
 
     const navigate = useNavigate()
@@ -75,7 +82,7 @@ function InvoiceTable({isMiniMised,invoices}) {
   const columns = [
     { header: 'Invoice ID', field: 'invoice_number',key:'invoice_number' },
     { header: 'Client', field: 'client_name', key:'client_name' },
-    { header: 'Due Date', field: 'due_date',key:'due_date' },
+    { header: 'Due Date', field: 'due_date', key:'due_date', render: (row) => formatDateDMY(row.due_date) },
 
     {
       key: 'payment_status',

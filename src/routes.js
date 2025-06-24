@@ -197,13 +197,13 @@ const routes = [
     path: '/workorderlist',
     name: 'Workorderlist',
     element: WorkOrderList, // Make sure to use JSX here if you're rendering a component
-    key: 25,
+    key: 'listofwork',
     children: [
       {
         path: 'view/:id',
         name: 'WorkOrdersView',
         element: wordOrderView,
-        key: 26, // Assigned a proper unique key
+        key: 'workorderview', // Assigned a proper unique key
       },
     ],
   },

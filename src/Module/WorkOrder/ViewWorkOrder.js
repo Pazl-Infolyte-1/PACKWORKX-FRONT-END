@@ -490,7 +490,9 @@ const ViewWorkOrder = () => {
         <div className="px-4 py-2 mx-auto sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center  space-x-3">
-              <button className="p-1 text-gray-500 rounded hover:bg-gray-100" onClick={() => { navigate('/workorderlist') }}>
+              <button className="p-1 text-gray-500 rounded hover:bg-gray-100" onClick={() => {
+                 navigate('/workorderlist')
+                  }}>
                 <ChevronLeft size={20} />
               </button>
               {/* <h1 className="text-sm   font-medium text-gray-900">Work Order Details</h1> */}

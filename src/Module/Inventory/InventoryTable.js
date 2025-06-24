@@ -187,12 +187,12 @@ const InventoryTable = ({
                   {!isMinimised && (
                     <>
                       <CTableDataCell className="whitespace-nowrap">
-                        {item.item && item?.item_info?.min_stock_level && (item.item_info.uom || item.item_info.net_weight)
+                        {item.item_info && item?.item_info?.min_stock_level && (item.item_info.uom || item.item_info.net_weight)
                           ? `${parseFloat(item?.item_info?.min_stock_level)} ${item.item_info.uom || item.item_info.net_weight}`
                           : '--'}
                       </CTableDataCell>
                       <CTableDataCell className="whitespace-nowrap">
-                        {item.item && (item.quantity_available || (item.total_quantity && (item.item_info.uom || item.item_info.net_weight)))
+                        {item.item_info && (item.quantity_available || (item.total_quantity && (item.item_info.uom || item.item_info.net_weight)))
                           ? `${parseFloat(item?.quantity_available || item?.total_quantity)} ${item?.item_info?.uom || item?.item_info?.net_weight}` ||
                             item?.quantity_available
                           : '--'}

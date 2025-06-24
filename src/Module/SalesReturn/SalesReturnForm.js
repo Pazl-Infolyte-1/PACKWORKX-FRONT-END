@@ -26,7 +26,6 @@ const SalesReturnForm = () => {
     cgst_amount: 0,
     sgst_amount: 0,
     igst_amount: 0,
-    amount: 0,
     tax_amount: 0,
     total_amount: 0,
   })

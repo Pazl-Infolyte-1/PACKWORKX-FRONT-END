@@ -73,8 +73,6 @@ const ViewInventory = ({ setIsMinimised }) => {
         const promises = uniquePoIds.map(async (po_id) => {
           try {
             const response = await inventoryApi.getGrnBillID(po_id)
-            console.log(response.data.data)
-
             billDetailsMap[po_id] = response?.data || null
           } catch (error) {
             console.error(`Error fetching GRN bill for po_id ${po_id}:`, error)
@@ -159,7 +157,7 @@ const ViewInventory = ({ setIsMinimised }) => {
   }
 
   const rawCustomFields = itemDetails?.products?.default_custom_fields
-  const customData = rawCustomFields ? JSON.parse(rawCustomFields) : {}
+  const customData = rawCustomFields 
 
   const handleClose = () => {
     setIsMinimised(false)
@@ -176,7 +174,6 @@ const ViewInventory = ({ setIsMinimised }) => {
       },
     })
   }
-  console.log(grnBillDetails)
 
   // Function to render GRN bill information
   const renderGrnBillInfo = (po_id) => {
@@ -473,9 +470,8 @@ const ViewInventory = ({ setIsMinimised }) => {
                         + Purchase
                       </button>
                     </div>
-
                     <div className="text-right ml-2">
-                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                      <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
                       <h3 className="text-xs text-gray-800">{itemDetails?.products?.item_name}</h3>
                     </div>
                   </div>
@@ -608,7 +604,6 @@ const ViewInventory = ({ setIsMinimised }) => {
                         </div>
                         {/* Footer */}
                         <div className="flex justify-between items-center pt-3 border-t text-xs text-gray-500">
-                          {console.log(po)}
                           <div className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             <span>Created: {formatDate(po.created_at)}</span>
@@ -669,7 +664,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                         </button>
                       </div>
                       <div className="text-right ml-2">
-                        <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                        <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
                         <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
                       </div>
                     </div>
@@ -841,7 +836,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                       + GRN
                     </button>
                     <div className="text-right">
-                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                      <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
                       <h3 className="text-xs text-gray-800">{itemDetails?.products?.item_name}</h3>
                     </div>
                   </div>
@@ -1027,7 +1022,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                 Debit Notes
               </h2>
               <div className="">
-                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
                 <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
               </div>
             </div>
@@ -1051,7 +1046,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                 Credit Notes
               </h2>
               <div className="">
-                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
                 <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
               </div>
             </div>
@@ -1088,7 +1083,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                       + Purchase Returns
                     </button>
                     <div className="text-right">
-                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                      <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
                       <h3 className="text-xs text-gray-800">{itemDetails?.products?.item_name}</h3>
                     </div>
                   </div>

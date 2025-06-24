@@ -460,7 +460,7 @@ const AddEditStockAdjustment = () => {
           </select>
         </div>
         <div className="flex items-center gap-4">
-          <label className="text-xs text-black-600 text-left text-xs placeholder:text-xs ml-4 w-40">
+          <label className="text-xs text-black-600 text-left placeholder:text-xs ml-4 w-40">
             Description
           </label>
           <input
@@ -669,7 +669,7 @@ const AddEditStockAdjustment = () => {
               <button
                 type="submit"
                 color="primary"
-                className="h-8 w- rounded-md flex text-xs  items-center justify-center px-4 py-2 shadow-md border-none cursor-pointer text-white bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
+                className="h-8 w- rounded-md flex text-xs  items-center justify-center px-4 py-2 shadow-md border-none cursor-pointer text-white bg-[#8167E5] hover:bg-opacity-90 transition-all"
               >
                 Submit Adjustment
               </button>

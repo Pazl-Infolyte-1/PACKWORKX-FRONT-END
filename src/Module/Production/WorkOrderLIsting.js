@@ -1,10 +1,17 @@
-import React, { useEffect, useState } from 'react'
-import { FaClipboardList, FaBox, FaCalendarAlt, FaPlus, FaMinus, FaSort } from 'react-icons/fa'
+import React, { useEffect, useState, useRef } from 'react'
+import { FaClipboardList, FaBox, FaCalendarAlt, FaPlus, FaMinus, FaSort, FaFilter } from 'react-icons/fa'
 import { useSearch } from '../../components/New/SearchContext';
 import { ArrowUpDown } from 'lucide-react';
 import { useNextHandler } from '../../Context/ProductionNextHandlerContext';
 import { useNavigate } from 'react-router-dom';
 import { productionApi } from '../../api/production';
+import { clientApi } from '../../api/client';
+import { skuApi } from '../../api/sku';
+import { workOrderApi } from '../../api/workOrder';
+import { DateRange } from 'react-date-range';
+import { format } from 'date-fns';
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file
 
 function WorkOrderListing() {
   const [selectedOrders, setSelectedOrders] = useState([])
@@ -15,6 +22,95 @@ function WorkOrderListing() {
   const [sortModalPosition, setSortModalPosition] = useState({ x: 0, y: 0, visible: false, column: null });
   const [sortParams, setSortParams] = useState({ sortBy: null, sortOrder: null });
   const navigate = useNavigate();
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [filterCustomer, setFilterCustomer] = useState('');
+  const [filterBoxType, setFilterBoxType] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const filterBtnRef = useRef(null);
+  const filterPopoverRef = useRef(null);
+  const datePickerRef = useRef(null);
+  const [filterPopoverPos, setFilterPopoverPos] = useState({ x: 0, y: 0 });
+
+  // Pending filter state (used in popover fields)
+  const [pendingFilterCustomer, setPendingFilterCustomer] = useState('');
+  const [pendingFilterBoxType, setPendingFilterBoxType] = useState('');
+  const [pendingFilterStatus, setPendingFilterStatus] = useState('');
+
+  const [clientOptions, setClientOptions] = useState([{ value: '', label: 'All Customers' }]);
+  const [skuOptions, setSkuOptions] = useState([{ value: '', label: 'All Types' }]);
+  const [proggressOption, setProgressOption] = useState([{ value: '', label: 'All' }]);
+
+  // Single date range state
+  const [dateRange, setDateRange] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: 'selection'
+    }
+  ]);
+  const [pendingDateRange, setPendingDateRange] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: 'selection'
+    }
+  ]);
+
+  const [showDateRangePicker, setShowDateRangePicker] = useState(false);
+
+  useEffect(() => {
+    const fetchClientsAndSkus = async () => {
+      try {
+        // Fetch clients
+        const clientResponse = await clientApi.getClients();
+        const clientData = clientResponse?.data || [];
+        setClientOptions([
+          { value: '', label: 'All Customers' },
+          ...clientData.map(client => ({ value: client.id, label: client.company_name }))
+        ]);
+
+        // Fetch SKUs
+        const skuResponse = await skuApi.getSkuList();
+        console.log(skuResponse)
+        const skuData = skuResponse?.data || [];
+        setSkuOptions([
+          { value: '', label: 'All Types' },
+          ...skuData.map(sku => ({ value: sku.sku_name, label: sku.sku_name }))
+        ]);
+
+        const progressOptionsResponse = await workOrderApi.getWorkOrderProgressDropDownOptions();
+        const progressOptions = progressOptionsResponse?.data?.data || [];
+        console.log(progressOptions)
+        setProgressOption([
+          { value: '', label: 'All Types' },
+          ...progressOptions.map(option => ({ value: option.work_order_status, label: option.work_order_status }))
+        ]);
+      } catch (err) {
+        console.error('Error fetching clients or SKUs:', err);
+      }
+    };
+    fetchClientsAndSkus();
+  }, []);
+
+  // Table style objects
+  const headerStyle = {
+    background: '#f8fafc',
+    padding: '12px 10px',
+    textAlign: 'left',
+    fontWeight: 600,
+    color: '#374151',
+    borderBottom: '1px solid #e5e7eb',
+    fontSize: '12px',
+  };
+  const headerStyleWithSort = {
+    ...headerStyle,
+    cursor: 'pointer',
+  };
+  const rowStyle = {
+    padding: '12px 10px',
+    borderBottom: '1px solid #f3f4f6',
+    fontSize: '12px',
+  };
 
   const openSortModal = (column, event) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -45,21 +141,23 @@ function WorkOrderListing() {
 
   useEffect(() => {
     setGlobalPlaceholder('Search Work Order...')
-
     return () => {
       setGlobalPlaceholder('Search...');
     }
   }, []);
 
-  
   useEffect(() => {
     const fetchWorkOrders = async () => {
       try {
         const params = {
-          sku_name: searchQuery,
-          ...(sortParams.sortBy && { sortBy: sortParams.sortBy }), //if condition is truth then only the object is spreaded into the object else it will not b spreaded
-          ...(sortParams.sortOrder && { sortOrder: sortParams.sortOrder })
-        }
+          skuName: filterBoxType || '',
+          clientName: filterCustomer || '',
+          startDate: dateRange[0].startDate ? format(dateRange[0].startDate, 'yyyy-MM-dd') : '',
+          endDate: dateRange[0].endDate ? format(dateRange[0].endDate, 'yyyy-MM-dd') : '',
+          progress: filterStatus || '',
+          sortBy: sortParams.sortBy,
+          sortOrder: sortParams.sortOrder
+        };
         const response = await productionApi.getWorkOrderInCreated(params);
         setWorkOrders(response?.data?.workOrders);
       } catch (error) {
@@ -69,11 +167,7 @@ function WorkOrderListing() {
     };
   
     fetchWorkOrders();
-  }, [searchQuery, sortParams]);
-
-
-  
-  
+  }, [searchQuery, sortParams, dateRange, filterCustomer, filterBoxType, filterStatus]);
 
   const handleNext = async () => {
     try {
@@ -96,13 +190,9 @@ function WorkOrderListing() {
     }
   };
 
-
   useEffect(() => {
     registerNextHandler(handleNext);
   }, [handleNext]);
-
-
- 
 
   const handleOrderToggle = (workOrderId) => {
     setSelectedOrders((prev) =>
@@ -121,160 +211,562 @@ function WorkOrderListing() {
     return order === 'asc' ? 'A → Z' : 'Z → A';
   };
 
+  // Format date range for display
+  const formatDateRange = (range) => {
+    if (!range || !range.startDate || !range.endDate) {
+      return 'Select date range';
+    }
+    
+    const start = format(range.startDate, 'MMM dd, yyyy');
+    const end = format(range.endDate, 'MMM dd, yyyy');
+    
+    if (start === end) {
+      return start;
+    }
+    
+    return `${start} - ${end}`;
+  };
+
+  // Modal handlers
+  const handleOpenFilterModal = () => {
+    if (filterBtnRef.current) {
+      const rect = filterBtnRef.current.getBoundingClientRect();
+      let left = rect.left;
+      let top = rect.bottom + window.scrollY;
+      const popoverWidth = 380; // px
+      const popoverHeight = 350; // px (estimate)
+      const margin = 8;
+      if (left + popoverWidth > window.innerWidth) {
+        left = window.innerWidth - popoverWidth - margin;
+        if (left < margin) left = margin;
+      }
+      if (top + popoverHeight > window.innerHeight + window.scrollY) {
+        top = window.innerHeight + window.scrollY - popoverHeight - margin;
+        if (top < margin + window.scrollY) top = margin + window.scrollY;
+      }
+      setFilterPopoverPos({ x: left, y: top });
+    }
+    // Initialize pending values from real filter state
+    setPendingFilterCustomer(filterCustomer);
+    setPendingFilterBoxType(filterBoxType);
+    setPendingFilterStatus(filterStatus);
+    setPendingDateRange([...dateRange]);
+    setFilterModalOpen(true);
+  };
+
+  const handleCloseFilterModal = () => {
+    setFilterModalOpen(false);
+    setShowDateRangePicker(false);
+  };
+
+  const handleApplyFilters = () => {
+    setDateRange([...pendingDateRange]);
+    setFilterCustomer(pendingFilterCustomer);
+    setFilterBoxType(pendingFilterBoxType);
+    setFilterStatus(pendingFilterStatus);
+    setFilterModalOpen(false);
+    setShowDateRangePicker(false);
+  };
+
+  const handleClearFilters = () => {
+    setPendingFilterCustomer('');
+    setPendingFilterBoxType('');
+    setPendingFilterStatus('');
+    setPendingDateRange([{
+      startDate: new Date(),
+      endDate: new Date(),
+      key: 'selection'
+    }]);
+  };
+
+  const handleDateRangeChange = (item) => {
+    setPendingDateRange([item.selection]);
+  };
+
+  const handleDateInputClick = () => {
+    setShowDateRangePicker(!showDateRangePicker);
+  };
+
+  // Add these style objects at the top of the component (after other style objects):
+  const modalLabelStyle = {
+    fontSize: 12,
+    fontWeight: 500,
+    color: '#374151',
+    marginBottom: 4,
+    display: 'block',
+  };
+  const modalInputStyle = {
+    width: '100%',
+    padding: '6px 10px',
+    border: '1px solid #d1d5db',
+    borderRadius: 5,
+    fontSize: 13,
+    marginBottom: 0,
+    marginTop: 2,
+    cursor: 'pointer',
+  };
+
+  // Click outside to close
+  useEffect(() => {
+    if (!filterModalOpen) return;
+    const handleClickOutside = (event) => {
+      if (
+        filterPopoverRef.current &&
+        !filterPopoverRef.current.contains(event.target) &&
+        filterBtnRef.current &&
+        !filterBtnRef.current.contains(event.target)
+      ) {
+        setFilterModalOpen(false);
+        setShowDateRangePicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [filterModalOpen]);
+
   return (
-    <div className="w-full min-h-[calc(86vh-200px)]">
-      <div className="bg-white rounded-lg shadow-sm h-full">
-        <div className="p-0">
-          {workOrders?.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="p-3 text-gray-600 text-center font-medium">Select</th>
-                    <th className="p-3 text-gray-600 font-medium text-left">Sales-ID</th>
-                    <th className="p-3 text-gray-600 font-medium text-left">SO-Reference</th>
-                    <th className="p-3 text-gray-600 font-medium text-left">Work Order ID</th>
-                    <th className="p-3 text-gray-600 font-medium text-left">Priority</th>
-                    <th className="p-3 text-gray-600 font-medium text-left relative">
-                      <div className="flex items-center">
-                        SKU
-                        <ArrowUpDown
-                          onClick={(e) => openSortModal('sku_name', e)}
-                          className="inline-block ml-2 text-gray-400 w-4 h-4 cursor-pointer hover:text-purple-500"
-                        />
-                      </div>
-                    </th>
-                    <th className="p-3 text-gray-600 font-medium text-left relative">
-                      <div className="flex items-center">
-                        Quantity
-                        <ArrowUpDown
-                          onClick={(e) => openSortModal('qty', e)}
-                          className="inline-block ml-2 text-gray-400 w-4 h-4 cursor-pointer hover:text-purple-500"
-                        />
-                      </div>
-                    </th>
-                    <th className="p-3 text-gray-600 font-medium text-left relative">
-                      <div className="flex items-center">
-                        Client
-                        <ArrowUpDown
-                          onClick={(e) => openSortModal('client', e)}
-                          className="inline-block ml-2 text-gray-400 w-4 h-4 cursor-pointer hover:text-purple-500"
-                        />
-                      </div>
-                    </th>
-                    <th className="p-3 text-gray-600 font-medium text-left">Expected Delivery</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {workOrders.map((order) => (
-                    <tr
-                      key={order?.id}
-                      className="transition-all duration-200 ease-in-out cursor-pointer hover:bg-gray-50"
-                    >
-                      <td className="p-3 text-center">
-                        <input
-                          type="checkbox"
-                          checked={selectedOrders.includes(order?.id)}
-                          onChange={() => handleOrderToggle(order?.id)}
-                          className="w-[18px] h-[18px] cursor-pointer"
-                          style={{
-                            accentColor: selectedOrders.includes(order?.id) ? '#dc3545' : '#8761e5',
-                          }}
-                        />
-                      </td>
-                      
-                      <td className="p-3">
-                        <span className="text-gray-800 font-medium text-[0.95rem]">
-                          {order?.salesOrder?.sales_generate_id || 'N/A'}
-                        </span>
-                      </td>
-
-                                    
-                      <td className="p-3">
-                        <span className="text-gray-800 font-medium text-[0.95rem]">
-                          {order?.salesOrder?.sales_ui_id || 'N/A'}
-                        </span>
-                      </td>
-
-                      <td className="p-3">
-                        <span className="text-gray-800 font-medium text-[0.95rem]">
-                          {order?.work_generate_id || 'N/A'}
-                        </span>
-                      </td>
-
-                      <td className="p-3">
-                        <span className="text-gray-800 font-medium text-[0.95rem]">
-                          {order?.priority || 'N/A'}
-                        </span>
-                      </td>
-
-
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <FaBox className="text-purple-500 text-[0.9rem]" />
-                          <span className="text-gray-800">{order?.sku_name || 'N/A'}</span>
-                        </div>
-                      </td>
-                      <td className="p-3">
-                        <span className="font-medium">
-                          {order?.qty || '-'}
-                        </span>
-                      </td>
-
-
-                      <td className="p-3">
-                        <span className="font-medium">
-                          {order?.client || 'N/A'}
-                        </span>
-                      </td>
-                      <td className="p-3">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <FaCalendarAlt className="text-[0.9rem] text-purple-500" />
-                          <span>{order?.edd ? formatDate(order.edd) : 'N/A'}</span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+    <div style={{ 
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      background: '#f5f7fa',
+      padding: '2px 5px'
+    }}>
+      <div style={{ margin: '0 auto' }}>
+        {/* Screen Container */}
+        <div style={{
+          background: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          marginBottom: '40px',
+          overflow: 'hidden'
+        }}>
+          {/* Screen Header */}
+          <div style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'white',
+            padding: '10px 30px',
+            borderBottom: '3px solid #5a67d8'
+          }}>
+            <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '5px' }}>
+              Step 1: Select Work Orders for RM Planning
             </div>
-          ) : (
-            <div className="text-center py-12 w-full flex-1">
-              <div className="text-gray-600">
-                <FaClipboardList className="mb-3 mx-auto text-4xl text-purple-500" />
-                <h6 className="mb-2 text-gray-800 font-medium">
-                  No Work Orders Found
-                </h6>
-                <p className="text-sm mb-0">There are no work orders to display at the moment.</p>
+            <div style={{ fontSize: '12px', opacity: 0.9 }}>
+              Choose work orders to include in your raw material planning batch
+            </div>
+          </div>
+  
+          {/* Screen Content */}
+          <div style={{ padding: '5px 10px' }}>
+            {/* Filter Button */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10, position: 'relative' }}>
+              <button
+                ref={filterBtnRef}
+                onClick={handleOpenFilterModal}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  background: '#667eea',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '7px 18px',
+                  fontWeight: 500,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(102,126,234,0.08)',
+                  transition: 'background 0.2s',
+                }}
+                onMouseEnter={e => e.target.style.background = '#5a67d8'}
+                onMouseLeave={e => e.target.style.background = '#667eea'}
+              >
+                <FaFilter style={{ fontSize: 15 }} />
+                Filter
+              </button>
+
+              {/* Filter Popover */}
+              {filterModalOpen && (
+                <div
+                  ref={filterPopoverRef}
+                  style={{
+                    position: 'fixed',
+                    left: filterPopoverPos.x,
+                    top: filterPopoverPos.y,
+                    background: 'white',
+                    borderRadius: 12,
+                    boxShadow: '0 8px 32px rgba(102,126,234,0.18)',
+                    padding: '24px 20px 16px 20px',
+                    minWidth: 380,
+                    zIndex: 100,
+                  }}
+                >
+                  <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 14, color: '#4c51bf' }}>
+                    Filter Work Orders
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ flex: 1, position: 'relative' }}>
+                        <label style={modalLabelStyle}>Date Range</label>
+                        <input
+                          type="text"
+                          readOnly
+                          value={formatDateRange(pendingDateRange[0])}
+                          onClick={handleDateInputClick}
+                          style={{
+                            ...modalInputStyle,
+                            cursor: 'pointer',
+                            background: '#f9fafb'
+                          }}
+                          placeholder="Click to select date range"
+                        />
+                        
+                        {/* Inline Date Range Picker */}
+                        {showDateRangePicker && (
+                          <div
+                            ref={datePickerRef}
+                            style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              zIndex: 1000,
+                              background: 'white',
+                              borderRadius: 8,
+                              boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                              border: '1px solid #e5e7eb',
+                              marginTop: 5,
+                            }}
+                          >
+                            <DateRange
+                              editableDateInputs={true}
+                              onChange={handleDateRangeChange}
+                              moveRangeOnFirstSelection={false}
+                              ranges={pendingDateRange}
+                              direction="horizontal"
+                              rangeColors={['#667eea']}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      
+                    <div style={{ display: 'flex', gap: 12 }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={modalLabelStyle}>Client</label>
+                        <select 
+                          value={pendingFilterCustomer} 
+                          onChange={e => setPendingFilterCustomer(e.target.value)} 
+                          style={modalInputStyle}
+                        >
+                          {clientOptions?.map(opt => 
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          )}
+                        </select>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={modalLabelStyle}>SKU</label>
+                        <select 
+                          value={pendingFilterBoxType} 
+                          onChange={e => setPendingFilterBoxType(e.target.value)} 
+                          style={modalInputStyle}
+                        >
+                          {skuOptions?.map(opt => 
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          )}
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div style={{ display: 'flex', gap: 12 }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={modalLabelStyle}>Progress</label>
+                        <select 
+                          value={pendingFilterStatus} 
+                          onChange={e => setPendingFilterStatus(e.target.value)} 
+                          style={modalInputStyle}
+                        >
+                          {proggressOption?.map(opt => 
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          )}
+                        </select>
+                      </div>
+
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 18 }}>
+                    <button 
+                      onClick={handleClearFilters} 
+                      style={{
+                        background: '#f3f4f6', 
+                        color: '#374151', 
+                        border: 'none', 
+                        borderRadius: 5, 
+                        padding: '7px 16px', 
+                        fontWeight: 500, 
+                        fontSize: 13, 
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Clear
+                    </button>
+                    <button 
+                      onClick={handleCloseFilterModal} 
+                      style={{
+                        background: '#e2e8f0', 
+                        color: '#4a5568', 
+                        border: 'none', 
+                        borderRadius: 5, 
+                        padding: '7px 16px', 
+                        fontWeight: 500, 
+                        fontSize: 13, 
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={handleApplyFilters} 
+                      style={{
+                        background: '#667eea', 
+                        color: 'white', 
+                        border: 'none', 
+                        borderRadius: 5, 
+                        padding: '7px 18px', 
+                        fontWeight: 500, 
+                        fontSize: 13, 
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Apply Filters
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+  
+            <div style={{ 
+              minHeight: '450px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between'
+            }}>
+              {/* Table or No Results Message */}
+              <div>
+                {workOrders?.length > 0 ? (
+                  <table style={{
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    background: 'white',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}>
+                    <thead>
+                      <tr>
+                        <th style={headerStyle}>
+                          <input
+                            type="checkbox"
+                            style={{
+                              width: '15px',
+                              height: '15px',
+                              accentColor: '#667eea'
+                            }}
+                            // TODO: Add select all logic if needed
+                          />
+                        </th>
+                        <th style={headerStyle}>Sales-ID</th>
+                        <th style={headerStyle}>SO-Reference</th>
+                        <th style={headerStyle}>Work Order ID</th>
+                        <th style={headerStyle}>Priority</th>
+                        <th style={headerStyleWithSort}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            SKU
+                            <ArrowUpDown
+                              onClick={(e) => openSortModal('sku_name', e)}
+                              style={{ marginLeft: 6, color: '#a0aec0', width: 16, height: 16, cursor: 'pointer' }}
+                            />
+                          </div>
+                        </th>
+                        <th style={headerStyleWithSort}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            Quantity
+                            <ArrowUpDown
+                              onClick={(e) => openSortModal('qty', e)}
+                              style={{ marginLeft: 6, color: '#a0aec0', width: 16, height: 16, cursor: 'pointer' }}
+                            />
+                          </div>
+                        </th>
+                        <th style={headerStyleWithSort}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            Client
+                            <ArrowUpDown
+                              onClick={(e) => openSortModal('client', e)}
+                              style={{ marginLeft: 6, color: '#a0aec0', width: 16, height: 16, cursor: 'pointer' }}
+                            />
+                          </div>
+                        </th>
+                        <th style={headerStyle}>Expected Delivery</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {workOrders.map((order) => (
+                        <tr
+                          key={order?.id}
+                          style={{
+                            borderBottom: '1px solid #f3f4f6',
+                            cursor: 'pointer'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                        >
+                          <td style={rowStyle}>
+                            <input
+                              type="checkbox"
+                              checked={selectedOrders.includes(order?.id)}
+                              onChange={() => handleOrderToggle(order?.id)}
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                accentColor: '#667eea'
+                              }}
+                            />
+                          </td>
+                          <td style={rowStyle}>{order?.salesOrder?.sales_generate_id || 'N/A'}</td>
+                          <td style={rowStyle}>{order?.salesOrder?.sales_ui_id || 'N/A'}</td>
+                          <td style={rowStyle}>{order?.work_generate_id || 'N/A'}</td>
+                          <td style={rowStyle}>{order?.priority || 'N/A'}</td>
+                          <td style={rowStyle}>{order?.sku_name || 'N/A'}</td>
+                          <td style={rowStyle}>{order?.qty || '-'}</td>
+                          <td style={rowStyle}>{order?.salesOrder.client || 'N/A'}</td>
+                          <td style={rowStyle}>{order?.edd ? formatDate(order.edd) : 'N/A'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div style={{
+                    textAlign: 'center',
+                    padding: '60px 20px',
+                    color: '#6b7280'
+                  }}>
+                    <h6 style={{ marginBottom: '8px', color: '#374151', fontWeight: 600 }}>
+                      No Work Orders Found
+                    </h6>
+                    <p style={{ fontSize: '14px', margin: 0 }}>
+                      {selectedOrders.length > 0 
+                        ? `No work orders match your current filters. You have ${selectedOrders.length} work order(s) selected.`
+                        : 'There are no work orders to display at the moment.'
+                      }
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons - Always show */}
+              <div style={{
+                display: 'flex',
+                gap: '15px',
+                justifyContent: 'center',
+                padding: '20px 0'
+              }}>
+                <button
+                  onClick={handleNext}
+                  disabled={selectedOrders.length === 0}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    fontWeight: 500,
+                    cursor: selectedOrders.length === 0 ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease',
+                    background: selectedOrders.length === 0 ? '#cbd5e0' : '#667eea',
+                    color: 'white',
+                    fontSize: '12px',
+                    opacity: selectedOrders.length === 0 ? 0.6 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedOrders.length > 0) {
+                      e.target.style.background = '#5a67d8';
+                      e.target.style.transform = 'translateY(-1px)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedOrders.length > 0) {
+                      e.target.style.background = '#667eea';
+                      e.target.style.transform = 'translateY(0)';
+                    }
+                  }}
+                >
+                  Continue to Layer Grouping ({selectedOrders.length})
+                </button>
               </div>
             </div>
-          )}
+          </div>
         </div>
+  
+        {/* Sort Modal */}
+        {sortModalPosition.visible && (
+          <div 
+            className="sort-modal"
+            style={{
+              position: 'fixed',
+              zIndex: 50,
+              background: 'white',
+              borderRadius: '8px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              border: '1px solid #e5e7eb',
+              padding: '4px 0',
+              minWidth: '90px',
+              left: `${sortModalPosition.x}px`,
+              top: `${sortModalPosition.y}px`
+            }}
+          >
+            <button
+              onClick={() => handleSortChoice('asc')}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                textAlign: 'left',
+                fontSize: '12px',
+                color: '#6b7280',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = '#f9fafb';
+                e.target.style.color = '#667eea';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'none';
+                e.target.style.color = '#6b7280';
+              }}
+            >
+              {getSortLabel(sortModalPosition.column, 'asc')}
+            </button>
+            <button
+              onClick={() => handleSortChoice('desc')}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                textAlign: 'left',
+                fontSize: '12px',
+                color: '#6b7280',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = '#f9fafb';
+                e.target.style.color = '#667eea';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'none';
+                e.target.style.color = '#6b7280';
+              }}
+            >
+              {getSortLabel(sortModalPosition.column, 'desc')}
+            </button>
+          </div>
+        )}
       </div>
-
-      {sortModalPosition.visible && (
-  <div 
-    className="sort-modal fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[90px]"
-    style={{
-      left: `${sortModalPosition.x}px`,
-      top: `${sortModalPosition.y}px`
-    }}
-  >
-    <button
-      onClick={() => handleSortChoice('asc')}
-      className="w-full px-3 py-1.5 text-left text-xs text-gray-600 hover:bg-gray-50 hover:text-purple-500"
-    >
-      {getSortLabel(sortModalPosition.column, 'asc')}
-    </button>
-    <button
-      onClick={() => handleSortChoice('desc')}
-      className="w-full px-3 py-1.5 text-left text-xs text-gray-600 hover:bg-gray-50 hover:text-purple-500"
-    >
-      {getSortLabel(sortModalPosition.column, 'desc')}
-    </button>
-  </div>
-)}
-
     </div>
   )
 }

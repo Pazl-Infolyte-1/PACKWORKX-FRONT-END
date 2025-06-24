@@ -127,50 +127,100 @@ const Index = () => {
         <RawMaterialProvider>
       <div className='overflow-hidden h-[90vh] flex flex-col'>
         {/* Fixed Header Section */}
-        <div className="sticky top-0 bg-white z-[900] flex-shrink-0">
-          <div className="d-flex justify-content-between align-items-center mb-3 pt-0.5">
-            <h5>Order Grouping</h5>
-            <div className="ms-auto flex flex-row gap-2">
-              {activeTab === 'Group Layers' && (
-                <AddGroupButton/>
-              )}
-              <SharedNextButton />
-            </div>
+        <div className="sticky top-0 bg-white z-[900] flex-shrink-0" style={{paddingTop: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.03)'}}>
+  
+
+{/* Step Indicator - Exact HTML Pattern */}
+<div style={{
+  display: 'flex',
+  justifyContent: 'space-between',
+  marginBottom: '18px',
+  padding: '0 10px',
+  minHeight: '54px',
+  alignItems: 'flex-start',
+}}>
+  {tabs.map((tab, index) => {
+    const isDisabled = '';
+    const isActive = activeTabIndex === index;
+    const isCompleted = activeTabIndex > index;
+    
+    return (
+      <React.Fragment key={tab.path}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          flex: 1,
+          position: 'relative',
+          minWidth: 0,
+        }}>
+          {/* Connecting Line */}
+          {index < tabs.length - 1 && (
+            <div style={{
+              position: 'absolute',
+              top: '13px',
+              right: '-50%',
+              width: '100%',
+              height: '2px',
+              background: isCompleted || isActive ? '#667eea' : '#e2e8f0',
+              zIndex: 1
+            }} />
+          )}
+          
+          {/* Step Number Circle */}
+          <button
+            disabled={isDisabled}
+            onClick={() => {
+              if (!isDisabled) {
+                handleTabChange(tab.path);
+              }
+            }}
+            style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              background: isCompleted ? '#10b981' : isActive ? '#667eea' : '#e2e8f0',
+              color: isCompleted || isActive ? 'white' : '#64748b',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 600,
+              marginBottom: '4px',
+              position: 'relative',
+              zIndex: 2,
+              border: 'none',
+              cursor: isDisabled ? 'not-allowed' : 'pointer',
+              fontSize: '13px',
+              opacity: isDisabled ? 0.6 : 1,
+              transition: 'background 0.2s, color 0.2s',
+              boxShadow: isActive ? '0 2px 8px rgba(102,126,234,0.08)' : 'none',
+            }}
+          >
+            {index + 1}
+          </button>
+          
+          {/* Step Label */}
+          <div style={{
+            fontSize: '11px',
+            textAlign: 'center',
+            color: isActive ? '#667eea' : '#64748b',
+            fontWeight: isActive ? 600 : 'normal',
+            maxWidth: 80,
+            lineHeight: 1.2,
+            whiteSpace: 'normal',
+            marginTop: 0,
+          }}>
+            {tab.label === 'Work Orders' ? 'Select Work Orders' : 
+             tab.label === 'Group Layers' ? 'Group Layers' : 
+             tab.label === 'Allocate RM' ? 'Calculate Requirements' : 
+             tab.label === 'Returnables' ? 'Allocate Inventory' : 
+             'Review & Plan'}
           </div>
-
-          <CCol xs={6} className=''>
-            <CNav variant="tabs">
-              {tabs.map((tab, index) => {
-                const isDisabled = '';
-                const isActive = activeTabIndex === index;
-                return (
-                  <CNavItem key={tab.path}>
-                    <CNavLink
-                      active={isActive}
-                      disabled={isDisabled}
-                      onClick={() => {
-                        if (!isDisabled) {
-                          handleTabChange(tab.path);
-                        }
-                      }}
-                      style={{
-                        backgroundColor: isActive ? '#8761e5' : 'transparent',
-                        color: isActive ? '#ffffff' : isDisabled ? '#9ca3af' : '#8761e5',
-                        cursor: isDisabled ? 'not-allowed' : 'pointer',
-                        opacity: isDisabled ? 0.6 : 1,
-                        //cursor: 'pointer',
-                        fontSize: '0.85rem',
-                        padding: '0.4rem 0.8rem',
-                      }}
-                    >
-                      {tab.label}
-                    </CNavLink>
-                  </CNavItem>
-                );
-              })}
-            </CNav>
-
-          </CCol>
+        </div>
+      </React.Fragment>
+    );
+  })}
+</div>
         </div>
 
         {/* Scrollable Content Section */}

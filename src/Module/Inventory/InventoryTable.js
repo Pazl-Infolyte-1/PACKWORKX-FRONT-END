@@ -43,13 +43,13 @@ const InventoryTable = ({
     const customFieldsSet = new Set()
 
     inventoryData.forEach((item) => {
-      if (item.item?.default_custom_fields) {
+      if (item.item_info?.default_custom_fields) {
         try {
           // Check if default_custom_fields is already an object or needs parsing
           const customFields =
-            typeof item.item.default_custom_fields === 'string'
-              ? JSON.parse(item.item.default_custom_fields)
-              : item.item.default_custom_fields
+            typeof item.item_info.default_custom_fields === 'string'
+              ? JSON.parse(item.item_info.default_custom_fields)
+              : item.item_info.default_custom_fields
 
           Object.keys(customFields).forEach((key) => {
             // Transform specific field names
@@ -72,14 +72,14 @@ const InventoryTable = ({
 
   // Function to get custom field value for an item
   const getCustomFieldValue = (item, fieldKey) => {
-    if (!item.item?.default_custom_fields) return '--'
+    if (!item.item_info?.default_custom_fields) return '--'
 
     try {
       // Check if default_custom_fields is already an object or needs parsing
       const customFields =
-        typeof item.item.default_custom_fields === 'string'
-          ? JSON.parse(item.item.default_custom_fields)
-          : item.item.default_custom_fields
+        typeof item.item_info.default_custom_fields === 'string'
+          ? JSON.parse(item.item_info.default_custom_fields)
+          : item.item_info.default_custom_fields
 
       // Handle the transformed field names (Unit and Deckle)
       let originalKey = fieldKey
@@ -181,24 +181,24 @@ const InventoryTable = ({
                       isMinimised ? 'px-4 py-3 flex items-center gap-2 w-full' : 'max-w-[200px]'
                     }`}
                   >
-                    {item?.item?.item_generate_id || '--'}
+                    {item?.item_info?.item_generate_id || '--'}
                   </CTableDataCell>
 
                   {!isMinimised && (
                     <>
                       <CTableDataCell className="whitespace-nowrap">
-                        {item.item && item.item.min_stock_level && (item.item.uom || item.item.net_weight)
-                          ? `${parseFloat(item.item.min_stock_level)} ${item.item.uom || item.item.net_weight}`
+                        {item.item_info && item?.item_info?.min_stock_level && (item.item_info.uom || item.item_info.net_weight)
+                          ? `${parseFloat(item?.item_info?.min_stock_level)} ${item.item_info.uom || item.item_info.net_weight}`
                           : '--'}
                       </CTableDataCell>
                       <CTableDataCell className="whitespace-nowrap">
-                        {item.item && (item.quantity_available || (item.total_quantity && (item.item.uom || item.item.net_weight)))
-                          ? `${parseFloat(item.quantity_available || item.total_quantity)} ${item.item.uom || item.item.net_weight}` ||
-                            item.quantity_available
+                        {item.item_info && (item.quantity_available || (item.total_quantity && (item.item_info.uom || item.item_info.net_weight)))
+                          ? `${parseFloat(item?.quantity_available || item?.total_quantity)} ${item?.item_info?.uom || item?.item_info?.net_weight}` ||
+                            item?.quantity_available
                           : '--'}
                       </CTableDataCell>
                       <CTableDataCell className="whitespace-nowrap">
-                        ₹{item.item?.standard_cost !== undefined ? item.item?.standard_cost : '--'}
+                        ₹{item.item_info?.standard_cost !== undefined ? item.item?.standard_cost : '--'}
                       </CTableDataCell>
 
                       {customFieldColumns.map((fieldKey, fieldIndex) => (
@@ -219,7 +219,7 @@ const InventoryTable = ({
                           const totalQuantity = parseFloat(
                             item.quantity_available || item.total_quantity,
                           )
-                          const minStockLevel = item.item ? parseFloat(item.item.min_stock_level) : 0
+                          const minStockLevel = parseFloat(item.item_info.min_stock_level)
 
                           if (totalQuantity === 0.0) {
                             stockStatus = 'Out of Stock'

@@ -24,17 +24,17 @@ const TableView = () => {
   })
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const fetchClient = async () => {
-      try {
-        const data = await clientApi.singleclients(id)
-        setTableData(data?.data)
-        setClient(data?.data)
-      } catch (error) {
-        console.error('Error fetching client:', error)
-      }
+  const fetchClient = async () => {
+    try {
+      const data = await clientApi.singleclients(id)
+      setTableData(data?.data)
+      setClient(data?.data)
+    } catch (error) {
+      console.error('Error fetching client:', error)
     }
+  }
 
+  useEffect(() => {
     if (id) {
       fetchClient()
     }
@@ -66,6 +66,7 @@ const TableView = () => {
       setAlerts([
         { severity: 'success', message: response?.data?.message || 'Amount added successfully!' },
       ])
+      fetchClient()
     } else {
       setAlerts([{ severity: 'error', message: 'Something went wrong' }])
     }
@@ -92,7 +93,7 @@ const TableView = () => {
                   <div className="flex items-center justify-center">
                     <p className="text-white mt-1">
                       {' '}
-                      <span className="text-green-600 mr-2">₹</span>Amount
+                      <span className="text-white mr-2">₹</span>Add Credit Amount
                     </p>
                   </div>
                 </button>
@@ -160,7 +161,10 @@ const TableView = () => {
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Amount</label>
-                <div className="relative" onClick={()=> setFormData({...formData, client_id: id})}>
+                <div
+                  className="relative"
+                  onClick={() => setFormData({ ...formData, client_id: id })}
+                >
                   <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
                     ₹
                   </span>

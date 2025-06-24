@@ -1,11 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useForm, useFieldArray, useWatch } from 'react-hook-form'
+import { useForm, useFieldArray, useWatch, Controller } from 'react-hook-form'
 import { inventoryApi } from '../../api/inventory'
 import { itemApi } from '../../api/item'
 import ItemDetails from '../Purchase/ItemDetails'
 
-const ReturnItemForm = ({ items, setItems, formValues, setFormValues, poIDForReturn }) => {
-  const { register, control, getValues, setValue } = useForm({
+const ReturnItemForm = ({
+  items,
+  setItems,
+  formValues,
+  setFormValues,
+  poIDForReturn,
+  control,
+  register,
+}) => {
+  const { getValues, setValue } = useForm({
     defaultValues: { items: [] },
   })
 
@@ -86,8 +94,9 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues, poIDForRet
         console.log('Inventory Item:', inventoryItem)
         return {
           ...item,
+          item_id: inventoryItem.item_id,
           available_quantity: inventoryItem ? parseFloat(inventoryItem.quantity_available) : 0,
-          grn_item_name: inventoryItem ? inventoryItem?.item?.item_name : '',
+          grn_item_name: inventoryItem ? inventoryItem?.item_info?.item_name : '',
         }
       })
 
@@ -193,16 +202,28 @@ const ReturnItemForm = ({ items, setItems, formValues, setFormValues, poIDForRet
             <tbody>
               {fields.map((item, index) => (
                 <tr key={item.id} className="h-[60px]  text-gray-800 border-b hover:bg-gray-50">
+                  <input
+                    type="hidden"
+                    {...register(`items.${index}.item_id`)}
+                    value={item.item_id}
+                  />
                   <td className="pl-2 pr-1">
-                    <input
-                      type="checkbox"
-                      {...register(`items.${index}.selected`)}
-                      className="h-4 w-4"
+                    <Controller
+                      control={control}
+                      name={`items.${index}.selected`}
+                      render={({ field }) => (
+                        <input
+                          type="checkbox"
+                          {...field}
+                          checked={field.value || false}
+                          className="h-4 w-4"
+                        />
+                      )}
                     />
                   </td>
                   <td
                     className="text-center text-blue-500 cursor-pointer"
-                    onClick={() => openItemDetails(getValues(`items.${index}.item_id`))}
+                    onClick={() => openItemDetails(item.item_id)}
                   >
                     ℹ️
                   </td>

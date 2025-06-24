@@ -19,6 +19,13 @@ function getStatusStyle(status) {
   }
 }
 
+// Helper function to format date as 'date month year'
+function formatDateDMY(dateStr) {
+  if (!dateStr) return '-';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 function InvoiceTable({isMiniMised,invoices}) {
 
     const navigate = useNavigate()
@@ -75,7 +82,7 @@ function InvoiceTable({isMiniMised,invoices}) {
   const columns = [
     { header: 'Invoice ID', field: 'invoice_number',key:'invoice_number' },
     { header: 'Client', field: 'client_name', key:'client_name' },
-    { header: 'Due Date', field: 'due_date',key:'due_date' },
+    { header: 'Due Date', field: 'due_date', key:'due_date', render: (row) => formatDateDMY(row.due_date) },
 
     {
       key: 'payment_status',
@@ -141,21 +148,28 @@ function InvoiceTable({isMiniMised,invoices}) {
         handleRowClick={handleView}
         miniScreenFields={['invoice_number']}
         />
-        <PaymentHistoryModal
-          isOpen={isPaymentHistoryModalOpen}
-          onClose={handleClosePaymentHistoryModal}
-          onCreatePayment={handleCreatePayment}
-          invoiceId={selectedInvoice?.id}
-          invoiceNumber={selectedInvoice?.invoice_number}
-          clientName={selectedInvoice?.client_name}
-          invoicePaymentType = {selectedInvoice?.payment_status}
-        />
+
+        
+        {isPaymentHistoryModalOpen && (
+          <PaymentHistoryModal
+            isOpen={isPaymentHistoryModalOpen}
+            onClose={handleClosePaymentHistoryModal}
+            onCreatePayment={handleCreatePayment}
+            invoiceId={selectedInvoice?.id}
+            invoiceNumber={selectedInvoice?.invoice_number}
+            clientName={selectedInvoice?.client_name}
+            invoicePaymentType={selectedInvoice?.payment_status}
+            invoice={selectedInvoice}
+          />
+        )}
         <PaymentModal
           isOpen={isPaymentModalOpen}
           onClose={handleClosePaymentModal}
           invoiceId={selectedInvoice?.id}
           invoiceNumber={selectedInvoice?.invoice_number}
           clientName={selectedInvoice?.client_name}
+          invoice={selectedInvoice}
+
         />
         <CreatePaymentLinkModal
           isOpen={isCreatePaymentLinkModalOpen}
@@ -163,6 +177,7 @@ function InvoiceTable({isMiniMised,invoices}) {
           invoiceId={selectedInvoice?.id}
           invoiceNumber={selectedInvoice?.invoice_number}
           clientName={selectedInvoice?.client_name}
+          invoice={selectedInvoice}
           onSubmit={handleCreatePaymentLink}
         />
     </div>

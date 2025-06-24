@@ -48,12 +48,13 @@ const WorkOrders = () => {
     if (location.pathname.includes('/workorderlist/view/')) {
       setIsminimiseTable(true);
     } else {
-      setIsminimiseTable(false);
+      const fetchAndSet = async () => {
+        await fetchData();
+        setIsminimiseTable(false);
+      };
+      fetchAndSet();
     }
   }, [location.pathname]);
-
-
-
 
 
   const  fetchData = async () => {

@@ -187,19 +187,18 @@ const InventoryTable = ({
                   {!isMinimised && (
                     <>
                       <CTableDataCell className="whitespace-nowrap">
-                        {item?.item_info?.min_stock_level && (item.item_info.uom || item.item_info.net_weight)
+                        {item.item && item?.item_info?.min_stock_level && (item.item_info.uom || item.item_info.net_weight)
                           ? `${parseFloat(item?.item_info?.min_stock_level)} ${item.item_info.uom || item.item_info.net_weight}`
                           : '--'}
                       </CTableDataCell>
                       <CTableDataCell className="whitespace-nowrap">
-                        {item.quantity_available ||
-                        (item.total_quantity && (item.item_info.uom || item.item_info.net_weight))
+                        {item.item && (item.quantity_available || (item.total_quantity && (item.item_info.uom || item.item_info.net_weight)))
                           ? `${parseFloat(item?.quantity_available || item?.total_quantity)} ${item?.item_info?.uom || item?.item_info?.net_weight}` ||
                             item?.quantity_available
                           : '--'}
                       </CTableDataCell>
                       <CTableDataCell className="whitespace-nowrap">
-                        ₹{item.item_info.standard_cost || '--'}
+                        ₹{item.item_info?.standard_cost !== undefined ? item.item?.standard_cost : '--'}
                       </CTableDataCell>
 
                       {customFieldColumns.map((fieldKey, fieldIndex) => (

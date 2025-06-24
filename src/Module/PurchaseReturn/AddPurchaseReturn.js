@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm } from 'react-hook-form'
 import ActionButton from '../../components/New/ActionButton'
 import ReturnItemForm from './ReturnItemForm'
 import CustomAlert from '../../components/New/CustomAlert'
@@ -55,10 +55,8 @@ const AddPurchaseOrderReturn = ({
     watch,
     handleSubmit,
     setValue,
-    errors,
-    isSubmitted,
     isSubmitting,
-    formState,
+    formState: { errors, isSubmitted },
   } = useForm({
     defaultValues: {
       po_id: '',
@@ -73,9 +71,14 @@ const AddPurchaseOrderReturn = ({
       tax_amount: 0,
       total_amount: 0,
       return_qty: 0,
-      auto_Debit_Note:"No",
-      return_type:"wallet"
+      auto_Debit_Note: 'No',
+      return_type: 'wallet',
     },
+  })
+
+  const { fields, append, replace } = useFieldArray({
+    control,
+    name: 'items',
   })
 
   const itemsData = watch('items')
@@ -114,8 +117,8 @@ const AddPurchaseOrderReturn = ({
         tax_amount: 0,
         total_amount: 0,
         return_qty: 0,
-          auto_Debit_Note:"No",
-      return_type:"wallet"
+        auto_Debit_Note: 'No',
+        return_type: 'wallet',
       })
       setItems([])
       setPoTotals({
@@ -144,8 +147,8 @@ const AddPurchaseOrderReturn = ({
       tax_amount: 0,
       total_amount: 0,
       return_qty: 0,
-        auto_Debit_Note:"No",
-      return_type:"wallet"
+      auto_Debit_Note: 'No',
+      return_type: 'wallet',
     })
     //setDrawer(false)
     navigate('/purchase-return')
@@ -230,11 +233,6 @@ const AddPurchaseOrderReturn = ({
     border: hasError && isSubmitted ? '1px solid #EF4444' : '1px solid #D1D5DB',
   })
 
-  // Example of how to use this function:
-  // Call this function with the GRN ID you want to get details for
-  // const grnItems = await getGrnItemDetails(6); // where 6 is your GRN ID
-
-  // You can also integrate this into your existing handleGrnData function:
   const handleGrndata = async (grnId, checkedItemCodes) => {
     try {
       // Get all GRN items first
@@ -290,14 +288,19 @@ const AddPurchaseOrderReturn = ({
         po_id: poId || selectedPoId,
         grn_id: grnId,
       })
-      const grnItems = response?.data.purchaseOrderItemDetails || []
-      const filteredGRNItems = grnItems.filter((grn) => grn.grn_item_id != null)
-      console.log('Filtered GRN Items    ====   ', filteredGRNItems)
-      reset({ items: filteredGRNItems })
 
-      // Optional: if you're managing separate local state for any reason
+      const grnItems = response?.data.purchaseOrderItemDetails || []
+      const filteredGRNItems = grnItems
+        .filter((grn) => grn.grn_item_id != null)
+        .map((item) => ({
+          ...item,
+          selected: false,
+        }))
+
+      console.log('Filtered GRN Items ==== ', filteredGRNItems)
+
+      reset({ items: filteredGRNItems })
       setItems(filteredGRNItems)
-      // setGrnItemsForReturn(grnItems)
     } catch (error) {
       console.error('Error fetching GRN items for return:', error)
     }
@@ -383,27 +386,60 @@ const AddPurchaseOrderReturn = ({
   const handleFormSubmit = async (data) => {
     console.log('data', data)
     console.log('items', items)
-    const checkedItems = items.filter((item) => item.selected)
+
+    const checkedItems = data.items.filter((item) => item.selected)
     console.log('checkedItems', checkedItems)
 
+    // ✅ 1️⃣ Check if NO items are selected
     if (checkedItems.length === 0) {
       setAlerts([
         {
           severity: 'error',
-          message: 'Please select at least one item to perform Purchase Return.',
+          message: 'Please select at least one item to return.',
         },
       ])
       return
     }
 
+    // ✅ 2️⃣ Check if any checkedItem has return_qty > available_quantity
+    const invalidQtyItem = checkedItems.find(
+      (item) => Number(item.return_qty) > Number(item.available_quantity),
+    )
+
+    if (invalidQtyItem) {
+      setAlerts([
+        {
+          severity: 'error',
+          message: `Return quantity for item "${invalidQtyItem.grn_item_name || invalidQtyItem.item_id}" exceeds available quantity.`,
+        },
+      ])
+      return
+    }
+
+    // ✅ 3️⃣ Check if any checkedItem has return_qty <= 0 or is invalid
+    const zeroQtyItem = checkedItems.find(
+      (item) => !item.return_qty || Number(item.return_qty) <= 0,
+    )
+
+    if (zeroQtyItem) {
+      setAlerts([
+        {
+          severity: 'error',
+          message: `Return quantity for item "${zeroQtyItem.grn_item_name || zeroQtyItem.item_id}" cannot be zero or empty.`,
+        },
+      ])
+      return
+    }
+
+    // ✅ 4️⃣ Proceed to create payload if all validations pass
     const payload = {
       po_id: data.po_id || selectedPoId,
       grn_id: grnId || selectedGrnID,
       reason: data.reason || 'Quality issues',
       payment_terms: data.payment_terms || '',
       notes: data.notes || '',
-        auto_Debit_Note:data.auto_Debit_Note,
-      return_type:data.return_type,
+      auto_Debit_Note: data.auto_Debit_Note,
+      return_type: data.return_type,
       items: checkedItems.map((item) => ({
         grn_item_id: item.grn_item_id || null,
         item_id: item.item_id,
@@ -415,6 +451,7 @@ const AddPurchaseOrderReturn = ({
     }
 
     console.log('payload', payload)
+
     try {
       const response = await purchaseOrderApi.submitPurchaseOrderReturn(payload)
       await handleThrowAlerts(payload.items)
@@ -559,171 +596,163 @@ const AddPurchaseOrderReturn = ({
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <form className="space-y-4">
-        <div className="relative">
-          <div className="w-full">
-            <div className="w-full">
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-col gap-4 py-3 px-4 border-gray-200">
-                  {/* Purchase Order ID */}
-                  <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">
-                      Purchase Order ID <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      {...register('po_id', { required: 'required' })}
-                      value={selectedPoId || selectedPoIdState || ''}
-                      onChange={handlePoChange}
-                      style={getInputStyle(errors?.po_id)}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-sm"
-                    >
-                      <option value="">-- Select Purchase Order --</option>
-                      {filteredPoData?.map((po) => (
-                        <option key={po.id} value={po.id}>
-                          {po.purchase_generate_id}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* GRN ID */}
-                  <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">
-                      GRN ID <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      {...register('grn_id', { required: 'required' })}
-                      onChange={handleGrnChange}
-                      style={getInputStyle(errors?.grn_id)}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-sm"
-                      value={selectedGrnID || ''}
-                    >
-                      <option value="">-- Select GRN --</option>
-                      {grnData?.map((grn) => (
-                        <option key={grn.id} value={grn.id}>
-                          {grn.grn_generate_id}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Payment Terms */}
-                  <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">
-                      Payment Terms <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      {...register('payment_terms', { required: 'required' })}
-                      style={getInputStyle(errors?.payment_terms)}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
-                    />
-                  </div>
-
-                  {/* Reason */}
-                  <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">
-                      Reason <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      {...register('reason', { required: 'required' })}
-                      style={getInputStyle(errors?.reason)}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
-                    />
-                  </div>
-
-                  {/* Notes */}
-                  <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">
-                      Notes <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      {...register('notes', { required: 'required' })}
-                      style={getInputStyle(errors?.notes)}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-xs"
-                    />
-                  </div>
-
-                  {/* Auto Debit Note & Return Type */}
-<div className="flex items-center gap-4">
-  <label className="text-xs text-black-600 w-40">
-    Auto Debit Note
-  </label>
-
-  {/* Checkbox */}
-   <input
-    type="checkbox"
-    checked={watch('auto_Debit_Note') === 'Yes'}
-    onChange={(e) => {
-      const isChecked = e.target.checked
-      setValue('auto_Debit_Note', isChecked ? 'Yes' : 'No')
-      setValue('return_type', isChecked ? 'wallet' : null)
-    }}
-    className="h-4 w-4 border-[0.8px] border-[#c2c2c2] rounded"
-  />
-</div>
-  {watch('auto_Debit_Note') === 'Yes' && (
-<div className="flex items-center gap-4">
-  <label className="text-xs text-black-600 w-40">
-   Return Type
-  </label>
-  {/* Conditional Dropdown - Return Type */}
-
-    <select
-      {...register('return_type', { required: 'Required when Auto Debit Note is enabled' })}
-                      className="h-7 w-80 px-2 border-[0.8px] border-[#c2c2c2] rounded-md bg-white leading-[26px] outline-none text-xs placeholder:text-sm"
-      defaultValue="wallet"
-    >
-      <option value="wallet">Wallet</option>
-      <option value="recieved">Cash Received</option>
-    </select>
-</div>  )}
-
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
+        <div className="relative h-[calc(100vh-60px)] flex flex-col">
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto pr-1 mb-10">
+            {' '}
+            {/* <-- Scrolls independently */}
+            {/* Form Section */}
+            <div className="w-full flex flex-col gap-3">
+              <div className="flex flex-col gap-4 py-3 px-4 border-gray-200">
+                {/* Purchase Order ID */}
+                <div className="flex items-center gap-4">
+                  <label className="text-xs text-black-600 w-40">
+                    Purchase Order ID <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    {...register('po_id', { required: true })}
+                    value={selectedPoId || selectedPoIdState || ''}
+                    onChange={handlePoChange}
+                    style={getInputStyle(errors?.po_id)}
+                    className="h-7 w-80 px-2 border-[0.8px] rounded-md bg-white text-xs"
+                  >
+                    <option value="">-- Select Purchase Order --</option>
+                    {filteredPoData?.map((po) => (
+                      <option key={po.id} value={po.id}>
+                        {po.purchase_generate_id}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+
+                {/* GRN ID */}
+                <div className="flex items-center gap-4">
+                  <label className="text-xs text-black-600 w-40">
+                    GRN ID <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    {...register('grn_id', { required: true })}
+                    onChange={handleGrnChange}
+                    style={getInputStyle(errors?.grn_id)}
+                    className="h-7 w-80 px-2 border-[0.8px] rounded-md bg-white text-xs"
+                    value={selectedGrnID || ''}
+                  >
+                    <option value="">-- Select GRN --</option>
+                    {grnData?.map((grn) => (
+                      <option key={grn.id} value={grn.id}>
+                        {grn.grn_generate_id}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Payment Terms */}
+                <div className="flex items-center gap-4">
+                  <label className="text-xs text-black-600 w-40">
+                    Payment Terms <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    {...register('payment_terms', { required: true })}
+                    style={getInputStyle(errors?.payment_terms)}
+                    className="h-7 w-80 px-2 border-[0.8px] rounded-md bg-white text-xs"
+                  />
+                </div>
+
+                {/* Reason */}
+                <div className="flex items-center gap-4">
+                  <label className="text-xs text-black-600 w-40">
+                    Reason <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    {...register('reason', { required: true })}
+                    style={getInputStyle(errors?.reason)}
+                    className="h-7 w-80 px-2 border-[0.8px] rounded-md bg-white text-xs"
+                  />
+                </div>
+
+                {/* Notes */}
+                <div className="flex items-center gap-4">
+                  <label className="text-xs text-black-600 w-40">
+                    Notes <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    {...register('notes', { required: true })}
+                    style={getInputStyle(errors?.notes)}
+                    className="h-7 w-80 px-2 border-[0.8px] rounded-md bg-white text-xs"
+                  />
+                </div>
+
+                {/* Auto Debit Note & Return Type */}
+                <div className="flex items-center gap-4">
+                  <label className="text-xs text-black-600 w-40">Auto Debit Note</label>
+                  <input
+                    type="checkbox"
+                    checked={watch('auto_Debit_Note') === 'Yes'}
+                    onChange={(e) => {
+                      const isChecked = e.target.checked
+                      setValue('auto_Debit_Note', isChecked ? 'Yes' : 'No')
+                      setValue('return_type', isChecked ? 'wallet' : null)
+                    }}
+                    className="h-4 w-4 border-[0.8px] rounded"
+                  />
+                </div>
+
+                {watch('auto_Debit_Note') === 'Yes' && (
+                  <div className="flex items-center gap-4">
+                    <label className="text-xs text-black-600 w-40">Return Type</label>
+                    <select
+                      {...register('return_type', {
+                        required: 'Required when Auto Debit Note is enabled',
+                      })}
+                      className="h-7 w-80 px-2 border-[0.8px] rounded-md bg-white text-xs"
+                      defaultValue="wallet"
+                    >
+                      <option value="wallet">Wallet</option>
+                      <option value="recieved">Cash Received</option>
+                    </select>
+                  </div>
+                )}
               </div>
+            </div>
+            {/* Scrollable - Item Form */}
+            <div className="mt-6">
+              <ReturnItemForm
+                items={items}
+                setItems={setItems}
+                formValues={poTotals}
+                setFormValues={setPoTotals}
+                isEdit={isEdit}
+                poIDForReturn={poIDForReturn}
+                control={control}
+                register={register}
+              />
             </div>
           </div>
 
-          {/* Item Form */}
-          <div className="mt-6">
-            <ReturnItemForm
-              items={items}
-              setItems={setItems}
-              formValues={poTotals}
-              setFormValues={setPoTotals}
-              isEdit={isEdit}
-              poIDForReturn={poIDForReturn}
-            />
-          </div>
-
-          {/* Hidden totals */}
-          {Object.entries(poTotals).map(([key, value]) => (
-            <input type="hidden" key={key} {...register(key)} value={value} />
-          ))}
-
-          {/* Buttons */}
+          {/* Fixed Button Section*/}
           <div className="fixed bottom-0 bg-white border-t border-gray-200 z-10 flex p-1 py-2 w-full">
-            <div className="flex-1 justify-start">
-              <div className="flex gap-2">
-                <ActionButton
-                  onClick={handleSubmit(handleFormSubmit)}
-                  variant="save"
-                  className="bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
-                  label={'Submit'}
-                />
-                <ActionButton
-                  type="button"
-                  onClick={() => {
-                    navigate('/purchase-return')
-                    handleCancel()
-                    handleFormReset()
-                  }}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-all"
-                  label={'Cancel'}
-                />
-              </div>
+            <div className="flex-1 flex gap-2">
+              <ActionButton
+                type="submit"
+                variant="save"
+                className="bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
+                label={'Submit'}
+              />
+
+              <ActionButton
+                type="button"
+                onClick={() => {
+                  navigate('/purchase-return')
+                  handleCancel()
+                  handleFormReset()
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-all"
+                label={'Cancel'}
+              />
             </div>
           </div>
         </div>

@@ -466,7 +466,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
 
  
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="pl-2">
+    <form onSubmit={handleSubmit(onSubmit)} className="pl-2 h-[90vh] overflow-scroll">
       <div className="relative">
         <div className="w-full">
           <div className="flex flex-col gap-3">

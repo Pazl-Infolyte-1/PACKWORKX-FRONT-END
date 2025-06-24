@@ -57,7 +57,7 @@ function paymentTypeIcon(type) {
   }
 }
 
-function PaymentModal({ isOpen, onClose, invoiceId, invoiceNumber, clientName }) {
+function PaymentModal({ isOpen, onClose, invoiceId, invoiceNumber, clientName, invoice }) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
       payment_type: '',
@@ -136,13 +136,23 @@ function PaymentModal({ isOpen, onClose, invoiceId, invoiceNumber, clientName })
         </div>
         {/* Invoice Info */}
         <div className="px-6 pt-2 pb-1 border-b border-gray-100 bg-white">
-          <div className="text-xs text-gray-600 flex flex-col gap-1">
-            {invoiceNumber && (
-              <span><span className="font-semibold">Invoice #:</span> {invoiceNumber}</span>
-            )}
-            {clientName && (
-              <span><span className="font-semibold">Client:</span> {clientName}</span>
-            )}
+          <div className="flex flex-row justify-between items-center text-xs text-gray-600 gap-2">
+            <div className="flex flex-col gap-1">
+              {invoiceNumber && (
+                <span><span className="font-semibold">Invoice #:</span> {invoiceNumber}</span>
+              )}
+              {clientName && (
+                <span><span className="font-semibold">Client:</span> {clientName}</span>
+              )}
+            </div>
+            <div className="flex flex-col items-end min-w-[120px]">
+              <span className="font-semibold">Balance to Pay:</span>
+              <span className="text-base font-bold text-gray-900">
+                {invoice && invoice.total != null && invoice.received_amount != null
+                  ? `₹${(Number(invoice.total) - Number(invoice.received_amount)).toFixed(2)}`
+                  : '-'}
+              </span>
+            </div>
           </div>
         </div>
         {/* Form */}
@@ -229,11 +239,12 @@ function PaymentModal({ isOpen, onClose, invoiceId, invoiceNumber, clientName })
   );
 }
 
-function PaymentHistoryModal({ isOpen, onClose, onCreatePayment, invoiceId, invoiceNumber, clientName,invoicePaymentType }) {
+function PaymentHistoryModal({ isOpen, onClose, onCreatePayment, invoiceId, invoiceNumber, clientName,invoicePaymentType,invoice }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  console.log(invoice)
 
   useEffect(() => {
     if (isOpen && invoiceId) {
@@ -298,13 +309,23 @@ function PaymentHistoryModal({ isOpen, onClose, onCreatePayment, invoiceId, invo
         </div>
         {/* Invoice Info */}
         <div className="px-6 pt-2 pb-1 border-b border-gray-50 bg-white">
-          <div className="text-xs text-gray-500 flex flex-col gap-1">
-            {invoiceNumber && (
-              <span><span className="font-semibold">Invoice #:</span> {invoiceNumber}</span>
-            )}
-            {clientName && (
-              <span><span className="font-semibold">Client:</span> {clientName}</span>
-            )}
+          <div className="flex flex-row justify-between items-center text-xs text-gray-500 gap-2">
+            <div className="flex flex-col gap-1">
+              {invoiceNumber && (
+                <span><span className="font-semibold">Invoice #:</span> {invoiceNumber}</span>
+              )}
+              {clientName && (
+                <span><span className="font-semibold">Client:</span> {clientName}</span>
+              )}
+            </div>
+            <div className="flex flex-col items-end min-w-[120px]">
+              <span className="font-semibold">Balance to Pay:</span>
+              <span className="text-base font-bold text-gray-900">
+                {invoice && invoice.total != null && invoice.received_amount != null
+                  ? `₹${(Number(invoice.total) - Number(invoice.received_amount)).toFixed(2)}`
+                  : '-'}
+              </span>
+            </div>
           </div>
         </div>
         {/* Payment History Minimal List */}

@@ -177,11 +177,9 @@ function PurchaseOrderTable({
         <>
           <span
             className={`px-2 py-1 rounded-full text-xs font-semibold w-24 text-center inline-block
-            ${row.payment_status === 'partialy-recieved' ? 'bg-blue-100 text-blue-800' : ''}
-            ${row.payment_status === 'created' ? 'bg-green-100 text-green-800' : ''}
+            ${row.payment_status === 'partial' ? 'bg-blue-100 text-blue-800' : ''}
             ${row.payment_status === 'pending' ? 'bg-red-100 text-red-800' : ''}
-            ${row.payment_status === 'received' ? 'bg-teal-500 text-white' : ''}
-            ${row.payment_status === 'amended' ? 'bg-orange-600 text-white' : ''}
+            ${row.payment_status === 'completed' ? 'bg-teal-500 text-white' : ''}
             `}
           >
             {row.payment_status.charAt(0).toUpperCase() + row.payment_status.slice(1)}

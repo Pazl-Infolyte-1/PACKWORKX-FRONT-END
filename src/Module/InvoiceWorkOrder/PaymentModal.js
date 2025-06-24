@@ -148,8 +148,8 @@ function PaymentModal({ isOpen, onClose, invoiceId, invoiceNumber, clientName, i
             <div className="flex flex-col items-end min-w-[120px]">
               <span className="font-semibold">Balance to Pay:</span>
               <span className="text-base font-bold text-gray-900">
-                {invoice && invoice.total != null && invoice.received_amount != null
-                  ? `₹${(Number(invoice.total) - Number(invoice.received_amount)).toFixed(2)}`
+                {invoice && invoice.total_amount != null && invoice.received_amount != null
+                  ? `₹${(Number(invoice.total_amount) - Number(invoice.received_amount)).toFixed(2)}`
                   : '-'}
               </span>
             </div>
@@ -321,8 +321,8 @@ function PaymentHistoryModal({ isOpen, onClose, onCreatePayment, invoiceId, invo
             <div className="flex flex-col items-end min-w-[120px]">
               <span className="font-semibold">Balance to Pay:</span>
               <span className="text-base font-bold text-gray-900">
-                {invoice && invoice.total != null && invoice.received_amount != null
-                  ? `₹${(Number(invoice.total) - Number(invoice.received_amount)).toFixed(2)}`
+                {invoice && invoice.total_amount != null && invoice.received_amount != null
+                  ? `₹${(Number(invoice.total_amount) - Number(invoice.received_amount)).toFixed(2)}`
                   : '-'}
               </span>
             </div>
@@ -369,11 +369,10 @@ function PaymentHistoryModal({ isOpen, onClose, onCreatePayment, invoiceId, invo
 }
 
 // --- NEW MODAL: CreatePaymentLinkModal ---
-function CreatePaymentLinkModal({ isOpen, onClose, invoiceId, invoiceNumber, clientName, onSubmit }) {
+function CreatePaymentLinkModal({ isOpen, onClose, invoiceId, invoiceNumber, clientName, onSubmit, invoice }) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
-      emailId: '',
-      mobileNumber: '',
+      emailOrMobileNumber: '',
       amount: '',
     },
   });
@@ -394,6 +393,12 @@ function CreatePaymentLinkModal({ isOpen, onClose, invoiceId, invoiceNumber, cli
     }, 200);
   };
 
+  // Accepts either a valid email or a valid phone number (10-15 digits)
+  const emailOrPhonePattern = {
+    value: /(^[\w-.]+@[\w-]+\.[a-zA-Z]{2,}$)|(^\d{10,15}$)/,
+    message: 'Enter a valid email or phone number',
+  };
+
   const onSubmitForm = async (data) => {
     setIsSubmitting(true);
     try {
@@ -410,6 +415,11 @@ function CreatePaymentLinkModal({ isOpen, onClose, invoiceId, invoiceNumber, cli
   const inputClass = `w-full h-8 px-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500`;
   const labelClass = `block text-xs font-medium text-gray-700 mb-1`;
   const errorClass = `border-red-500 ring-1 ring-red-500`;
+
+  // Calculate amounts
+  const totalAmount = invoice && invoice.total_amount != null ? Number(invoice.total_amount) : null;
+  const receivedAmount = invoice && invoice.received_amount != null ? Number(invoice.received_amount) : 0;
+  const pendingAmount = totalAmount != null ? (totalAmount - receivedAmount) : null;
 
   if (!isOpen) return null;
   return (
@@ -429,47 +439,45 @@ function CreatePaymentLinkModal({ isOpen, onClose, invoiceId, invoiceNumber, cli
             <X size={18} />
           </button>
         </div>
-        {/* Invoice & Client Info Row */}
-        <div className="px-6 pt-3 pb-2 bg-white">
-          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 text-xs text-gray-700">
-            {invoiceNumber && (
-              <span className="font-semibold">Invoice #: <span className="font-normal">{invoiceNumber}</span></span>
-            )}
-            {clientName && (
-              <span className="font-semibold">Client: <span className="font-normal">{clientName}</span></span>
-            )}
+        {/* Invoice & Client Info Row + Amounts */}
+        <div className="px-6 pt-3 pb-2 bg-white border-b border-gray-100">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 text-xs text-gray-700 justify-between">
+            <div className="flex flex-col gap-1">
+              {invoiceNumber && (
+                <span className="font-semibold">Invoice #: <span className="font-normal">{invoiceNumber}</span></span>
+              )}
+              {clientName && (
+                <span className="font-semibold">Client: <span className="font-normal">{clientName}</span></span>
+              )}
+            </div>
+            <div className="flex flex-col items-end min-w-[120px]">
+              <span className="font-semibold">Total Amount:</span>
+              <span className="text-base font-bold text-gray-900">
+                {totalAmount != null ? `₹${totalAmount.toFixed(2)}` : '-'}
+              </span>
+              <span className="font-semibold mt-1">Pending Amount:</span>
+              <span className="text-base font-bold text-gray-900">
+                {pendingAmount != null ? `₹${pendingAmount.toFixed(2)}` : '-'}
+              </span>
+            </div>
           </div>
         </div>
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmitForm)} className="p-6">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Email */}
+            {/* Email or Mobile Number */}
             <div className="flex-1 min-w-0">
-              <label className={labelClass}>Email *</label>
+              <label className={labelClass}>Email or Phone Number *</label>
               <div className="relative">
                 <input
-                  type="emailId"
-                  {...register('emailId', { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ })}
-                  className={`${inputClass} ${errors.emailId ? errorClass : ''} pl-12 py-2 text-base`}
-                  placeholder="Enter email address"
+                  type="text"
+                  {...register('emailOrMobileNumber', { required: 'This field is required', pattern: emailOrPhonePattern })}
+                  className={`${inputClass} ${errors.emailOrMobileNumber ? errorClass : ''} pl-4 py-2 text-base`}
+                  placeholder="Enter email or phone number"
                   style={{ minWidth: 0 }}
                 />
               </div>
-              {errors.emailId && <span className="text-xs text-red-500">Valid email required</span>}
-            </div>
-            {/* WhatsApp Number */}
-            <div className="flex-1 min-w-0">
-              <label className={labelClass}>Phone Number *</label>
-              <div className="relative">
-                <input
-                  type="tel"
-                  {...register('mobileNumber', { required: true, pattern: /^\d{10,15}$/ })}
-                  className={`${inputClass} ${errors.mobileNumber ? errorClass : ''} pl-12 py-2 text-base`}
-                  placeholder="Enter WhatsApp number"
-                  style={{ minWidth: 0 }}
-                />
-              </div>
-              {errors.mobileNumber && <span className="text-xs text-red-500">Valid Phone number required</span>}
+              {errors.emailOrMobileNumber && <span className="text-xs text-red-500">{errors.emailOrMobileNumber.message}</span>}
             </div>
             {/* Amount */}
             <div className="flex-1 min-w-0">
@@ -499,7 +507,7 @@ function CreatePaymentLinkModal({ isOpen, onClose, invoiceId, invoiceNumber, cli
               type="submit"
               className="px-4 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 text-sm font-semibold disabled:opacity-60"
               disabled={isSubmitting}
-            >{isSubmitting ? 'Creating...' : 'Create Link'}</button>
+            >{isSubmitting ? 'Sending...' : 'Send Payment Link'}</button>
           </div>
         </form>
       </div>

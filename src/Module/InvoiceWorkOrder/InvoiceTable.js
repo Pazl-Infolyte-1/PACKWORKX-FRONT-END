@@ -122,6 +122,7 @@ function InvoiceTable({isMiniMised,invoices}) {
               label: 'Create Payment Link',
               icon: cilCamera,
               onClick: () => handleCreatePaymentLinkClick(row),
+              disabled: row.payment_status === 'paid',
             },
             // {
             //   label: 'Delete',

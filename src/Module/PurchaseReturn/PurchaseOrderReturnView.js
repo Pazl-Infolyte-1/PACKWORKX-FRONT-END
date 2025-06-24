@@ -185,7 +185,7 @@ const GrnView = ({}) => {
                     }}
                   >
                     <div>
-                      {items.find((i) => i.id === item.item_id)?.item_generate_id || 'N/A'}
+                      {items.find((i) => i.id === item.item_id)?.item_name || 'N/A'}
                       <span
                         className="cursor-pointer text-indigo-500 hover:text-indigo-700 ml-2"
                         onClick={() => openItemDetails(item.item_id)}

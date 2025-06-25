@@ -7,6 +7,7 @@ const paymentTypes = [
   { value: 'cash', label: 'Cash' },
   { value: 'bank', label: 'Bank' },
   { value: 'upi', label: 'UPI' },
+  { value: 'wallet', label: 'Wallet' },
   { value: 'cheque', label: 'Cheque' },
   { value: 'other', label: 'Other' },
 ]
@@ -289,6 +290,9 @@ function PurchaseOrderPaymentHistoryModal({
 
   if (!isOpen) return null
 
+  const paidAmount = payments.reduce((acc, p) => acc + Number(p.amount), 0)
+  const pendingAmount = totalAmount - paidAmount
+
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center backdrop-blur-md bg-white/10">
       <div
@@ -300,12 +304,15 @@ function PurchaseOrderPaymentHistoryModal({
         <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-white">
           <h2 className="text-base font-semibold text-gray-900">Payment History</h2>
           <div className="flex items-center gap-2">
-            <button
-              className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors"
-              onClick={onCreatePayment}
-            >
-              Create Payment
-            </button>
+            {pendingAmount > 0 && (
+              <button
+                className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors"
+                onClick={onCreatePayment}
+              >
+                Create Payment
+              </button>
+            )}
+
             <button
               onClick={handleClose}
               className="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100 transition-colors"
@@ -316,7 +323,7 @@ function PurchaseOrderPaymentHistoryModal({
           </div>
         </div>
         {/* PO Info */}
-        <div className="flex justify-between px-6 pt-2 pb-1 border-b border-gray-50 bg-white">
+        <div className="flex justify-between px-6 pt-2 pb-1 border-b border-gray-100 bg-white">
           <div className="text-xs text-gray-500 flex flex-col gap-1">
             {purchaseOrderNumber && (
               <span>
@@ -328,12 +335,20 @@ function PurchaseOrderPaymentHistoryModal({
                 <span className="font-semibold">Supplier:</span> {supplierName}
               </span>
             )}
+            <span>
+              <span className="font-semibold">Total Amount:</span> ₹
+              {totalAmount?.charAt(0).toUpperCase() + totalAmount?.slice(1)}
+            </span>
+            <span>
+              <span className="font-semibold">Paid Amount: ₹{paidAmount} </span>
+            </span>
+            <span>
+              <span className="font-semibold">Pending Amount: ₹{pendingAmount}</span>
+            </span>
           </div>
           <div className="text-sm font-bold">
-            <p className='m-0 text-center'>Total</p>
-            <span className="text-green-500 ">
-              ₹{totalAmount?.charAt(0).toUpperCase() + totalAmount?.slice(1) || '-'}
-            </span>
+            <p className="m-0 text-center">Balence to Pay</p>
+            <span className="text-green-500 text-center ">₹{pendingAmount || 0}</span>
           </div>
         </div>
         {/* Payment History List */}

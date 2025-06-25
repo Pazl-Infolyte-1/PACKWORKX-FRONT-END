@@ -212,7 +212,7 @@ const Index = () => {
           }}>
             {tab.label === 'Work Orders' ? 'Select Work Orders' : 
              tab.label === 'Group Layers' ? 'Group Layers' : 
-             tab.label === 'Allocate RM' ? 'Calculate Requirements' : 
+             tab.label === 'Allocate RM' ? 'allocate rawmeterials' : 
              tab.label === 'Returnables' ? 'Allocate Inventory' : 
              'Review & Plan'}
           </div>

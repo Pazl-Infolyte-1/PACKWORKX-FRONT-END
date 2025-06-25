@@ -10,7 +10,7 @@ export const productionApi = {
     return await apiClient.get('/work-order/ungrouped-layers')
   },
   getWorkOrderInCreated: async (params) => {
-    return await apiClient.get('/work-order?production=created',{params})
+    return await apiClient.get('/work-order?production=created&&payment_status=except_invoiced',{params})
   },
   getWorkOrderCreatedInProduction:async (body) => {
     return await apiClient.patch('/work-order?production=created',body)

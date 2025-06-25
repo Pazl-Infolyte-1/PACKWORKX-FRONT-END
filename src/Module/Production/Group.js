@@ -51,6 +51,7 @@ import { useNavigate } from 'react-router-dom'
 import { productionApi } from '../../api/production'
 import WorkOrderCard from './GroupComponents/WorkOrderCard'
 import CustomAlert from '../../components/New/CustomAlert'
+import AddGroupButton from './AddGroupButton'
 
 const ItemType = 'WORK_ORDER'
 
@@ -146,378 +147,316 @@ function GroupOrderDropZone({
   }
 
   return (
-    <CCol xs={4} ref={drop} className="mt-3">
-      <CCard className="px-2 py-2" style={{ color: '#F3F2F5', borderRadius: '10px' }}>
-        <CCard
-          className="text-center mb-3 px-2 p"
-          style={{
-            cursor: 'pointer',
-            height: '37px',
-            padding: '0px 8px',
-            border: '0',
-            boxSizing: 'border-box',
-            borderRadius: '4px',
-            boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
-            backgroundColor: '#8167e5',
-            color: '#ffffff',
-            fontSize: '16px',
-            fontFamily: 'Roboto',
-            fontWeight: '500',
-            lineHeight: '23px',
-            outline: 'none',
-          }}
-        >
-          <CCardBody className="p-2 d-flex align-items-center justify-content-center">
-            <div className="d-flex align-items-center justify-content-between w-100">
-              {isEditing ? (
-                <input
-                  value={editedName}
-                  onChange={handleNameChange}
-                  onKeyDown={handleKeyPress}
-                  onBlur={handleNameSave}
-                  autoFocus
-                  style={{ 
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'white',
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    width: '100%',
-                    outline: 'none',
-                    textAlign: 'center'
-                  }}
-                />
-              ) : (
-                <>
-                  <CCardText className="text-white bold mb-0">{groupOrder.group_name}</CCardText>
-                  <div className="d-flex align-items-center">
-                    <CIcon
-                      icon={cilPencil}
-                      className="hover-pointer me-2"
-                      style={{ 
-                        fontSize: '1rem',
-                        color: 'white',
-                        opacity: 0.8
-                      }}
-                      onClick={handleNameEdit}
-                    />
-                    <CIcon
-                      icon={cilTrash}
-                      className="hover-pointer"
-                      style={{ 
-                        fontSize: '1rem',
-                        color: 'white',
-                        opacity: 0.8
-                      }}
-                      onClick={handleDeleteGroup}
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-          </CCardBody>
-        </CCard>
+    <div
+      ref={drop}
+      style={{
+        background: groupOrder?.group_value?.length > 0 ? '#f0f4ff' : 'white',
+        border: groupOrder?.group_value?.length > 0 ? '2px solid #667eea' : '2px dashed #d1d5db',
+        borderRadius: '8px',
+        padding: '20px',
+        marginBottom: '15px',
+        minHeight: '120px',
+        width: '100%'
+      }}
+    >
+      {/* Group Header */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '15px',
+        background: groupOrder?.group_value?.length > 0 ? '#667eea' : '#e2e8f0',
+        color: groupOrder?.group_value?.length > 0 ? 'white' : '#374151',
+        padding: '10px 15px',
+        borderRadius: '6px',
+        fontWeight: 600
+      }}>
+        {isEditing ? (
+          <input
+            value={editedName}
+            onChange={handleNameChange}
+            onKeyDown={handleKeyPress}
+            onBlur={handleNameSave}
+            autoFocus
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'inherit',
+              fontSize: '16px',
+              fontWeight: 600,
+              flex: 1,
+              outline: 'none'
+            }}
+          />
+        ) : (
+          <div style={{ flex: 1 }}>
+            {groupOrder.group_name}
+          </div>
+        )}
+        
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <CIcon
+            icon={cilPencil}
+            className="hover-pointer"
+            style={{ 
+              fontSize: '1rem',
+              color: 'inherit',
+              opacity: 0.8,
+              cursor: 'pointer'
+            }}
+            onClick={handleNameEdit}
+          />
+          <CIcon
+            icon={cilTrash}
+            className="hover-pointer"
+            style={{ 
+              fontSize: '1rem',
+              color: 'inherit',
+              opacity: 0.8,
+              cursor: 'pointer'
+            }}
+            onClick={handleDeleteGroup}
+          />
+        </div>
+      </div>
 
-        {
-        groupOrder?.group_value?.map((item, itemIndex) => {
-          const uniqueIndex = `${groupIndex}-${itemIndex}`
-          const isPairedGroup = item.isGroup && item.layers && item.layers.length > 1
-          
-          return (
-            <CCard
-              key={uniqueIndex}
-              className="mt-2"
-              style={{
-                backgroundColor: '#ffffff',
-                borderRadius: '10px',
-                boxShadow: '0px 2px 10px rgba(3,3,3,0.1)',
-            fontSize: '12px',
-
-              }}
-            >
-<CCardBody>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    cursor: 'pointer',
-                    width: '100%',
-                    minHeight: '10px',
-                  }}
-                >
-                  {/* Layer Names Section */}
-                  <div
-                    onClick={() => toggleCollapse(itemIndex)}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px',
-                      flex: 1,
-                      paddingRight: '20px',
-                    }}
-                  >
-                    { isPairedGroup 
-                      ? (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            {item.layers.map((layer, idx) => (
-                              <div key={idx} style={{ display: 'flex', flexDirection: 'column' }}>
-                                <div className='font-medium'>
-                                  {`${layer.layer}, ${item?.order?.work_generate_id}`}
-                                </div>
-                                
-                                {/* Show data under each layer when expanded */}
-                                {groupVisibleIndex === uniqueIndex && (
-                                  <div 
-                                  className='w-full'
-                                    style={{
-                                      padding: '5px',
-                                      borderRadius: '4px',
-                                      borderLeft: '3px solid #8167e5',
-                                      fontSize: '10px',
-                                      marginTop: '6px',
-                                      marginBottom: '8px'
-                                    }}
-                                  >
-                                    <div className=" text-xs">
-                                      <div className=" mb-2">
-                                        <strong>Layer:</strong> {layer.layer || 'N/A'}
-                                      </div>
-                                      <div className="mb-2">
-                                        <strong>Gsm:</strong> {layer.gsm || 'N/A'} mm
-                                      </div>
-                                      <div className="mb-2">
-                                        <strong>Bf:</strong> {layer.bf || 'N/A'}
-                                      </div>
-                                      <div className="mb-2">
-                                        <strong>material:</strong> {formatDate(layer.material) || 'N/A'}
-                                      </div>
-                                      <div className="mb-2">
-                                        <strong>weight:</strong> {formatDate(layer.weight) || 'N/A'}
-                                      </div>
-                                      <div className="mb-2">
-                                        <strong>bursting_strength:</strong> {layer.bursting_strength || 'N/A'}
-                                      </div>
-                                    </div>
-
-                                    {/* <div className="d-flex align-items-center text-xs gap-2 mt-2" style={{ fontSize: '14px' }}>
-                                      <label htmlFor={`finishedGoods-${idx}`} className="mb-0">
-                                        <strong>Finished Goods:</strong>
-                                      </label>
-                                      <input
-                                        id={`finishedGoods-${idx}`}
-                                        type="number"
-                                        defaultValue={138}
-                                        className="form-control form-control-sm"
-                                        // style={{ width: '80px' }}
-                                      />
-                                      <button 
-                                        className="btn btn-sm btn-success"
-                                        style={{ padding: '2px 8px' }}
-                                      >
-                                        ✔
-                                      </button>
-                                    </div> */}
-                                  </div>
-                                )}
-
-                                {/* Divider line between layers */}
-                                {idx < item.layers.length - 1 && (
-                                  <hr style={{ 
-                                    margin: '8px 0', 
-                                    border: 'none', 
-                                    borderTop: '1px solid #dee2e6',
-                                    width: '100%'
-                                  }} />
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )
-                      : (
-                          <div>
-
-                            <div className='font-medium'>
-                              {`${item.layer}, ${item.order?.order?.work_generate_id}`}
-                              
-
+      {/* Grouped Items */}
+      {groupOrder?.group_value?.map((item, itemIndex) => {
+        const uniqueIndex = `${groupIndex}-${itemIndex}`
+        const isPairedGroup = item.isGroup && item.layers && item.layers.length > 1
+        
+        return (
+          <div
+            key={uniqueIndex}
+            style={{
+              background: '#e0e7ff',
+              border: '1px solid #c7d2fe',
+              borderRadius: '4px',
+              padding: '8px 12px',
+              marginBottom: '8px',
+              fontSize: '14px'
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              cursor: 'pointer',
+              width: '100%',
+              minHeight: '10px',
+            }}>
+              {/* Layer Names Section */}
+              <div
+                onClick={() => toggleCollapse(itemIndex)}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  flex: 1,
+                  paddingRight: '20px',
+                }}
+              >
+                { isPairedGroup 
+                  ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {item.layers.map((layer, idx) => (
+                          <div key={idx} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <div style={{ fontWeight: 500 }}>
+                              {`${layer.layer}, ${item?.order?.work_generate_id}`}
                             </div>
-                            {/* Show data under single layer when expanded */}
+                            
+                            {/* Show data under each layer when expanded */}
                             {groupVisibleIndex === uniqueIndex && (
                               <div 
                                 style={{
-                                  
                                   padding: '5px',
                                   borderRadius: '4px',
-                                  
                                   borderLeft: '3px solid #8167e5',
                                   fontSize: '10px',
-                                  marginTop: '6px'
+                                  marginTop: '6px',
+                                  marginBottom: '8px',
+                                  background: 'rgba(255,255,255,0.5)'
                                 }}
                               >
-                                <div className="row text-xs">
-                                  <div className="col-12 mb-2">
-                                    <strong>layer:</strong> {item.layer || 'N/A'}
+                                <div style={{ fontSize: '10px' }}>
+                                  <div style={{ marginBottom: '2px' }}>
+                                    <strong>Layer:</strong> {layer.layer || 'N/A'}
                                   </div>
-                                  <div className=" mb-2">
-                                    <strong>Gsm:</strong> {item.gsm || 'N/A'}
+                                  <div style={{ marginBottom: '2px' }}>
+                                    <strong>Gsm:</strong> {layer.gsm || 'N/A'} mm
                                   </div>
-                                  <div className=" mb-2">
-                                    <strong>Bf:</strong> {item.bf || 'N/A'} mm
+                                  <div style={{ marginBottom: '2px' }}>
+                                    <strong>Bf:</strong> {layer.bf || 'N/A'}
                                   </div>
-                                  <div className=" mb-2">
-                                    <strong>material:</strong> {item.material || 'N/A'}
+                                  <div style={{ marginBottom: '2px' }}>
+                                    <strong>material:</strong> {formatDate(layer.material) || 'N/A'}
                                   </div>
-                                  <div className=" mb-2">
-                                    <strong>color:</strong>{item.color || 'N/A'}
+                                  <div style={{ marginBottom: '2px' }}>
+                                    <strong>weight:</strong> {formatDate(layer.weight) || 'N/A'}
                                   </div>
-                                  <div className=" mb-2">
-                                    <strong>weight:</strong> {item.weight || 'N/A'}
-                                  </div>
-                                  <div className=" mb-2">
-                                    <strong>bursting_strength:</strong> {item.bursting_strength || 'N/A'}
+                                  <div style={{ marginBottom: '2px' }}>
+                                    <strong>bursting_strength:</strong> {layer.bursting_strength || 'N/A'}
                                   </div>
                                 </div>
-
-                                {/* <div className="d-flex align-items-center gap-2 mt-2" style={{ fontSize: '14px' }}>
-                                  <label htmlFor="finishedGoods" className="mb-0">
-                                    <strong>Finished Goods:</strong>
-                                  </label>
-                                  <input
-                                    id="finishedGoods"
-                                    type="number"
-                                    defaultValue={138}
-                                    className="form-control form-control-sm"
-                                    // style={{ width: '80px' }}
-                                  />
-                                  <button 
-                                    className="btn btn-sm btn-success"
-                                    style={{ padding: '2px 8px' }}
-                                  >
-                                    ✔
-                                  </button>
-                                </div> */}
                               </div>
                             )}
+
+                            {/* Divider line between layers */}
+                            {idx < item.layers.length - 1 && (
+                              <hr style={{ 
+                                margin: '8px 0', 
+                                border: 'none', 
+                                borderTop: '1px solid #dee2e6',
+                                width: '100%'
+                              }} />
+                            )}
                           </div>
-                        )
-                    }
-                  </div>
+                        ))}
+                      </div>
+                    )
+                  : (
+                      <div>
+                        <div style={{ fontWeight: 500 }}>
+                          {`${item.layer}, ${item.order?.order?.work_generate_id}`}
+                        </div>
+                        {/* Show data under single layer when expanded */}
+                        {groupVisibleIndex === uniqueIndex && (
+                          <div 
+                            style={{
+                              padding: '5px',
+                              borderRadius: '4px',
+                              borderLeft: '3px solid #8167e5',
+                              fontSize: '10px',
+                              marginTop: '6px',
+                              background: 'rgba(255,255,255,0.5)'
+                            }}
+                          >
+                            <div style={{ fontSize: '10px' }}>
+                              <div style={{ marginBottom: '2px' }}>
+                                <strong>layer:</strong> {item.layer || 'N/A'}
+                              </div>
+                              <div style={{ marginBottom: '2px' }}>
+                                <strong>Gsm:</strong> {item.gsm || 'N/A'}
+                              </div>
+                              <div style={{ marginBottom: '2px' }}>
+                                <strong>Bf:</strong> {item.bf || 'N/A'} mm
+                              </div>
+                              <div style={{ marginBottom: '2px' }}>
+                                <strong>material:</strong> {item.material || 'N/A'}
+                              </div>
+                              <div style={{ marginBottom: '2px' }}>
+                                <strong>color:</strong>{item.color || 'N/A'}
+                              </div>
+                              <div style={{ marginBottom: '2px' }}>
+                                <strong>weight:</strong> {item.weight || 'N/A'}
+                              </div>
+                              <div style={{ marginBottom: '2px' }}>
+                                <strong>bursting_strength:</strong> {item.bursting_strength || 'N/A'}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                }
+              </div>
 
-                  {/* Right Side Controls */}
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '12px',
-                    flexShrink: 0
-                  }}>
-                    {/* Quantity Display */}
-                    <span
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        fontSize: '16px',
-                        lineHeight: '21px',
-                        gap: '4px',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {isPairedGroup 
-                        ? item.layers[0].qty ? `${item.layers[0].qty} / ${item.layers[0].qty}` : ''
-                        : item.qty ? `${item.qty} / ${item.qty}` : ''
-                      }
-                    </span>
+              {/* Right Side Controls */}
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '12px',
+                flexShrink: 0
+              }}>
+                {/* Quantity Display */}
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: '16px',
+                    lineHeight: '21px',
+                    gap: '4px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {isPairedGroup 
+                    ? item.layers[0].qty ? `${item.layers[0].qty} / ${item.layers[0].qty}` : ''
+                    : item.qty ? `${item.qty} / ${item.qty}` : ''
+                  }
+                </span>
 
-                    {/* Toggle Icon */}
-                    <div 
-                      onClick={() => toggleCollapse(itemIndex)}
-                      style={{ 
-                        cursor: 'pointer',
-                        padding: '4px',
-                        borderRadius: '4px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      {groupVisibleIndex === uniqueIndex ? <FaAngleUp /> : <FaAngleDown />}
-                    </div>
-
-                    {/* Dropdown Menu */}
-                    <Dropdown>
-                      <Dropdown.Toggle as={CustomToggle} />
-                      <Dropdown.Menu>
-                        <Dropdown.Item onClick={() =>navigate(`/workorderlist/view/${item.workOrderId}`)}>
-                          <CIcon
-                            icon={cilBriefcase}
-                            className="me-2"
-                            style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                          />
-                          View Work Order
-                        </Dropdown.Item>
-                        <Dropdown.Item onClick={() =>navigate(`/salesorder/view/${item?.order?.order?.sales_order_id || item?.order?.sales_order_id}`)}>
-                          <CIcon
-                            icon={cilClipboard}
-                            className="me-2"
-                            style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                          />
-                          View Sales Order
-                        </Dropdown.Item>
-                        <Dropdown.Item onClick={() => removeWorkOrderFromGroup(groupIndex,itemIndex)}>
-                          <CIcon
-                            icon={cilTrash}
-                            className="me-2"
-                            style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                          />
-                          Remove from Group
-                        </Dropdown.Item>
-                        {/* <Dropdown.Item onClick={() => removeWorkOrderFromPlan(item, groupIndex)}>
-                          <CIcon
-                            icon={cilMinus}
-                            className="me-2"
-                            style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                          />
-                          Remove from Plan
-                        </Dropdown.Item> */}
-                        <Dropdown.Item onClick={() => setVisibleSplit(true)}>
-                          <CIcon
-                            icon={cilCut}
-                            className="me-2"
-                            style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
-                          />
-                          Split Work Order
-                        </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
+                {/* Toggle Icon */}
+                <div 
+                  onClick={() => toggleCollapse(itemIndex)}
+                  style={{ 
+                    cursor: 'pointer',
+                    padding: '4px',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {groupVisibleIndex === uniqueIndex ? <FaAngleUp /> : <FaAngleDown />}
                 </div>
 
-                {/* Eye Icon */}
-                {/* {groupVisibleIndex === uniqueIndex && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'flex-end',
-                      marginTop: '15px',
-                      marginBottom: '10px',
-                      marginRight: '10px',
-                    }}
-                  >
-                    <FaEye
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => {
-                        setModalWorkOrder(item)
-                        setVisible(true)
-                      }}
-                    />
-                  </div>
-                )} */}
-              </CCardBody>
-            </CCard>
-          )
-        })}
-      </CCard>
-    </CCol>
+                {/* Dropdown Menu */}
+                <Dropdown>
+                  <Dropdown.Toggle as={CustomToggle} />
+                  <Dropdown.Menu>
+                    <Dropdown.Item onClick={() =>navigate(`/workorderlist/view/${item.workOrderId}`)}>
+                      <CIcon
+                        icon={cilBriefcase}
+                        className="me-2"
+                        style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                      />
+                      View Work Order
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() =>navigate(`/salesorder/view/${item?.order?.order?.sales_order_id || item?.order?.sales_order_id}`)}>
+                      <CIcon
+                        icon={cilClipboard}
+                        className="me-2"
+                        style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                      />
+                      View Sales Order
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => removeWorkOrderFromGroup(groupIndex,itemIndex)}>
+                      <CIcon
+                        icon={cilTrash}
+                        className="me-2"
+                        style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                      />
+                      Remove from Group
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => setVisibleSplit(true)}>
+                      <CIcon
+                        icon={cilCut}
+                        className="me-2"
+                        style={{ color: '#8167e5', fontSize: '1.4rem', fontWeight: 'bold' }}
+                      />
+                      Split Work Order
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
+            </div>
+          </div>
+        )
+      })}
+
+      {/* Empty State */}
+      {(!groupOrder?.group_value || groupOrder?.group_value?.length === 0) && (
+        <div style={{
+          textAlign: 'center',
+          color: '#9ca3af',
+          fontSize: '14px',
+          fontStyle: 'italic',
+          padding: '20px'
+        }}>
+          Drag layers here to group them
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -545,14 +484,12 @@ const Group = ({
   const [selectedType, setSelectedType] = useState('')
   const [splitVisible, setSplitVisible] = useState(false)
   const navigate = useNavigate()
-  // const [workOrders1,setWorkOrders] = useState([])
   const [groups1,setGroupOrders] = useState()
   const { groups,addWorkOrderToGroup,workOrders,setWorkOrders,refreshData,handleClose,alerts } = useGroupLayers();
   const {registerNextHandler} = useNextHandler()
 
   const {searchQuery,setGlobalPlaceholder} = useSearch()
   const [error,setError] = useState()
-
 
   const fetchWorkOrders = async () => {
     try {
@@ -567,7 +504,6 @@ const Group = ({
     refreshData(); 
     fetchWorkOrders();
   }, []);
-
 
   const SubmitGroups = async () => {
     try {
@@ -600,8 +536,6 @@ const Group = ({
             group_name: group?.group_name,
             group_value: groupItems,
             group_Qty: groupQty,
-            // allocated_quantity:0
-
           };
         });
     
@@ -615,12 +549,8 @@ const Group = ({
 
     } catch (err) {
       console.error('Error while submitting groups:', err);
-      // setAlertsApp("error","error while moving to production")
     }
   };
-  
-  
-
 
   useEffect(() => {
     registerNextHandler(SubmitGroups);
@@ -633,25 +563,6 @@ const Group = ({
       setGlobalPlaceholder('Search...');
     }
   }, []);
-
-
-  // const fetchWorkOrders = async () => {
-  //   try {
-  //     const params = {
-  //       sku_name: searchQuery,
-  //     }
-  //     const response = await apiMethods.getWorkOrderInGroup(params);
-  //     setWorkOrders(response?.data?.workOrders); // or response.data if using axios or similar
-  //   } catch (error) {
-  //     console.error('Error fetching work orders:', error);
-  //     setError(error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchWorkOrders();
-  // }, [searchQuery]);
-
 
   const removeWorkOrderFromGroup = (order, groupIndex) => {
     setGroupOrders((prevGroups) =>
@@ -685,32 +596,17 @@ const Group = ({
     };
   
     try {
-      // Optional: set loading state here if needed
-      // setLoading(true);
-  
       const response = await productionApi.removeWorkOrderFromCreationStageInProduction(id, params);
 
-  
       if (response?.data?.success) {
-        // Success - reload work orders
         fetchWorkOrders();
-  
-        // Optional: show success message
         console.log('Work Order removed successfully');
-        // showToast('Work Order removed successfully', 'success');
       } else {
-        // Handle API failure (but no exception)
         console.error('Failed to remove Work Order:', response?.message || 'Unknown error');
-        // showToast(response?.message || 'Failed to remove Work Order', 'error');
       }
   
     } catch (error) {
-      // Handle exception
       console.error('Error while removing Work Order:', error);
-      // showToast('An error occurred while removing Work Order', 'error');
-    } finally {
-      // Optional: clear loading state here
-      // setLoading(false);
     }
   };
   
@@ -733,351 +629,332 @@ const Group = ({
   }
 
   return (
-    <>
-      <CCol xs={3} className="mt-2">
-        <CustomAlert
-        alerts={alerts}
-        handleClose={handleClose}
-        />
-        <CRow className=''>
-          <CCol>
-            <CCard
-              style={{
-                cursor: 'pointer',
-                height: '40px',
-                // padding: '0px 8px',
-                border: '0',
-                boxSizing: 'border-box',
-                borderRadius: '4px',
-                boxShadow: '0px 0px 10px rgba(3,3,3,0.1)',
-                backgroundColor: '#c7c7f1',
-                color: '#000000',
-                fontSize: '16px',
-                fontFamily: 'Roboto',
-                fontWeight: '500',
-                // lineHeight: '31px',
-                outline: 'none',
-              }}
-            >
-              <CCardBody>
-                <div className="">
-                  <CCardText className=" text-bold ">Work Orders</CCardText>
-                  {/* <CIcon
-                    icon={cilReload}
-                    onClick={handleAutoSync}
-                    className="me-2 hover-pointer"
-                    style={{ fontSize: '1.4rem', fontWeight: 'bold', verticalAlign: 'middle' }}
-                  /> */}
+    <div className="h-[calc(98vh-150px)]  overflow-hidden flex flex-col bg-gray-50 ">
+      <div className="flex-1 flex flex-col h-full min-h-0">
+        <div className="bg-white rounded-xl shadow-lg  overflow-hidden flex-1 flex flex-col h-full min-h-0">
+          {/* Screen Header */}
+          <div
+          style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'white',
+            borderBottom: '3px solid #5a67d8'
+          }}
+           className=" text-white px-7 py-2.5 border-b-[3px] border-indigo-600">
+            <div className="text-base font-semibold mb-1">
+              Step 2: Group Similar Layers
+            </div>
+            <div className="text-xs opacity-90">
+              Drag similar layers into groups for efficient manufacturing
+            </div>
+          </div>
+  
+          {/* Screen Content */}
+          <div className="p-2.5 flex-1 flex flex-col justify-between min-h-0 h-full">
+            {/* Two Column Layout */}
+            <div className="grid grid-cols-[1.10fr_2fr] gap-2.5 flex-1 min-h-0 h-full">
+              {/* Available Layers Section */}
+              <div className="bg-slate-50 rounded-lg p-1 h-full overflow-y-auto min-h-0">
+                <div className="text-[15px] font-semibold mb-4 text-gray-700">
+                  Available Layers
                 </div>
-              </CCardBody>
-            </CCard>
-          </CCol>
-        </CRow>
-        <CRow className="mt-3">
-          <CCol>
-            {workOrders?.length === 0 ? (
-              <CCard
-                className="mb-2"
-                style={{
-                  backgroundColor: '#f5f4f7',
-                  borderRadius: '5px',
-                  padding: '20px',
-                  textAlign: 'center'
-                }}
-              >
-                <CCardBody>
-                  <div className="flex flex-col items-center justify-center">
-                    <CIcon
-                      icon={cilBriefcase}
-                      style={{ fontSize: '2rem', color: '#8167e5', marginBottom: '10px' }}
-                    />
-                    <span className="text-gray-600 font-medium">No Work Orders in Production</span>
-                    <span className="text-gray-500 text-sm mt-1">Add work orders to begin production planning</span>
-                  </div>
-                </CCardBody>
-              </CCard>
-            ) : 
-            (
-              workOrders
-                ?.filter((order) => order.work_order_sku_values && order.work_order_sku_values.length > 0)
-                ?.map((order) => {
-                  return (
-                    <WorkOrderCard
-                      key={order.id}
-                      order={order}
-                      index={order.id}
-                      visibleIndex={visibleIndex}
-                      setVisibleIndex={setVisibleIndex}
-                      removeWOFromPlan={removeWOFromPlan}
-                      setModalWorkOrder={setModalWorkOrder}
-                      modalWorkOrder={modalWorkOrder}
-                      setVisible={setVisible}
-                      setVisibleSplit={setVisibleSplit}
-                    />
-                  );
-                })
-            )}
-          </CCol>
-        </CRow>
-      </CCol>
-
-      <CCol  className="mt-1">
-        <CRow className="mt-2 px-3 py-3">
-          {groups?.length > 0 &&
-            groups?.map((groupOrder, groupIndex) => (
-              <GroupOrderDropZone
-                key={groupIndex}
-                groupOrder={groupOrder}
-                groupIndex={groupIndex}
-                addWorkOrderToGroup={addWorkOrderToGroup}
-                groupVisibleIndex={groupVisibleIndex}
-                setGroupVisibleIndex={setGroupVisibleIndex}
-                removeWorkOrderFromGroup={removeWorkOrderFromGroup}
-                removeWorkOrderFromPlan={removeWorkOrderFromPlan}
-                setModalWorkOrder={setModalWorkOrder}
-                setGroupOrders={setGroupOrders}
-                modalWorkOrder={modalWorkOrder}
-                setVisible={setVisible}
-                setVisibleSplit={setVisibleSplit}
-              />
-            ))}
-        </CRow>
-      </CCol>
-
-      <CModal
-        alignment="center"
-        scrollable
-        size="xl"
-        visible={visible}
-        onClose={() => setVisible(false)}
-        aria-labelledby="VerticallyCenteredScrollableExample2"
-      >
-        <CModalBody className="d-block">
-          <div className="mt-3">
-            {modalWorkOrder && (
-              <>
-                <span className="mt-5 fw-bold flex items-center gap-2">
-                  {modalWorkOrder.order_id}{' '}
-                  <div style={{ width: '45px', height: '40px' }}>
-                    <ProgressBar
-                      value={Math.min(
-                        Math.max(
-                          parseFloat(
-                            (
-                              (modalWorkOrder.finished_goods / modalWorkOrder.quantity) *
-                              100
-                            ).toFixed(1),
-                          ),
-                          0,
-                        ),
-                        100,
-                      )}
-                    />
-                  </div>
-                  <span className="ml-20 fw-light">
-                    Planned
-                    <span className="font-medium text-green-700">
-                      {' '}
-                      {modalWorkOrder.finished_goods}{' '}
-                    </span>
-                    out of
-                    <span className="font-medium text-blue-700">
-                      {' '}
-                      {modalWorkOrder.quantity}
-                    </span>{' '}
-                    Quantity.
-                  </span>
-                </span>
-
-                <CRow className="mt-3">
-                  <CCol xs={4} md={4} lg={4}>
-                    <CRow>
-                      <CCol xs={6} md={6}>
-                        <div className="mt-3 text-bold">
-                          SKU Name <br />
-                          Print <br />
-                          Route <br />
-                          Planned Start
-                        </div>
-                      </CCol>
-                      <CCol xs={6} md={6}>
-                        <div className="mt-3">
-                          {modalWorkOrder.sku_name} <br />
-                          {modalWorkOrder.print} <br />
-                          {modalWorkOrder.route} <br />
-                          {modalWorkOrder.planned_start}
-                        </div>
-                      </CCol>
-                    </CRow>
-                  </CCol>
-                  <CCol xs={4} md={4} lg={4}>
-                    <CRow>
-                      <CCol xs={6} md={6}>
-                        <div className="mt-3 text-bold">
-                          Layers <br />
-                          Dimensions <br />
-                          Qty <br />
-                          Planned End
-                        </div>
-                      </CCol>
-                      <CCol xs={6} md={6}>
-                        <div className="mt-3">
-                          {modalWorkOrder.layers} <br />
-                          {modalWorkOrder.dimension} <br />
-                          {modalWorkOrder.quantity} <br />
-                          {modalWorkOrder.planned_end}
-                        </div>
-                      </CCol>
-                    </CRow>
-                  </CCol>
-                  <CCol xs={4} md={4} lg={4} className="relative">
-                    <CRow>
+                
+                <CustomAlert
+                  alerts={alerts}
+                  handleClose={handleClose}
+                />
+                
+                {workOrders?.length === 0 ? (
+                  <div className="bg-gray-50 rounded-md p-5 text-center">
+                    <div className="flex flex-col items-center">
                       <CIcon
-                        icon={cilQrCode}
-                        className="absolute right-0"
-                        style={{
-                          marginRight: '20px',
-                          marginTop: '-90px',
-                          height: '110px',
-                          width: '150px',
-                        }}
+                        icon={cilBriefcase}
+                        className="text-3xl text-indigo-500 mb-2.5"
                       />
-                    </CRow>
-
-                    <CRow className="mt-5">
-                      <div>ETD (Estimated Delivery Date) : 12/12/2025</div>
-                      <div className="flex items-center gap-1">
-                        <span>Linked to Sales</span>
+                      <span className="text-gray-500 font-medium">No Work Orders in Production</span>
+                      <span className="text-gray-400 text-sm mt-1">
+                        Add work orders to begin production planning
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  workOrders
+                    ?.filter((order) => order.work_order_sku_values && order.work_order_sku_values.length > 0)
+                    ?.map((order) => (
+                      <WorkOrderCard
+                        key={order.id}
+                        order={order}
+                        index={order.id}
+                        visibleIndex={visibleIndex}
+                        setVisibleIndex={setVisibleIndex}
+                        removeWOFromPlan={removeWOFromPlan}
+                        setModalWorkOrder={setModalWorkOrder}
+                        modalWorkOrder={modalWorkOrder}
+                        setVisible={setVisible}
+                        setVisibleSplit={setVisibleSplit}
+                      />
+                    ))
+                )}
+              </div>
+  
+              {/* Manufacturing Groups Section */}
+              <div className="bg-slate-50 rounded-lg p-2.5 h-full overflow-y-auto min-h-0">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="text-[15px] font-semibold text-gray-700">
+                    Manufacturing Groups
+                  </div>
+                  <AddGroupButton text="Group" onClick={handleAutoSync} />
+                </div>
+                {/* Grid layout for groups: 2 columns */}
+                <div className="grid grid-cols-2 gap-4">
+                  {groups?.length > 0 &&
+                    groups?.map((groupOrder, groupIndex) => (
+                      <GroupOrderDropZone
+                        key={groupIndex}
+                        groupOrder={groupOrder}
+                        groupIndex={groupIndex}
+                        addWorkOrderToGroup={addWorkOrderToGroup}
+                        groupVisibleIndex={groupVisibleIndex}
+                        setGroupVisibleIndex={setGroupVisibleIndex}
+                        removeWorkOrderFromGroup={removeWorkOrderFromGroup}
+                        removeWorkOrderFromPlan={removeWorkOrderFromPlan}
+                        setModalWorkOrder={setModalWorkOrder}
+                        setGroupOrders={setGroupOrders}
+                        modalWorkOrder={modalWorkOrder}
+                        setVisible={setVisible}
+                        setVisibleSplit={setVisibleSplit}
+                      />
+                    ))}
+                </div>
+              </div>
+            </div>
+  
+            {/* Action Buttons */}
+            <div className="flex gap-2 justify-center items-end mt-3">
+              {/* <button className="px-3 py-1 rounded-lg border-none font-semibold cursor-pointer transition-all duration-200 ease-in-out bg-gray-200 text-gray-700 hover:bg-gray-300">
+                Back
+              </button> */}
+              <button
+                onClick={SubmitGroups}
+                className="px-3 py-1 text-sm rounded-md border-none font-semibold cursor-pointer transition-all duration-200 ease-in-out bg-indigo-500 text-white hover:bg-indigo-600 hover:-translate-y-px"
+              >
+                allocate rawmeterialS
+              </button>
+            </div>
+          </div>
+        </div>
+  
+        {/* All your existing modals stay exactly the same */}
+        <CModal
+          alignment="center"
+          scrollable
+          size="xl"
+          visible={visible}
+          onClose={() => setVisible(false)}
+          aria-labelledby="VerticallyCenteredScrollableExample2"
+        >
+          <CModalBody className="d-block">
+            <div className="mt-3">
+              {modalWorkOrder && (
+                <>
+                  <span className="mt-5 fw-bold flex items-center gap-2">
+                    {modalWorkOrder.order_id}{' '}
+                    <div className="w-11 h-10">
+                      <ProgressBar
+                        value={Math.min(
+                          Math.max(
+                            parseFloat(
+                              (
+                                (modalWorkOrder.finished_goods / modalWorkOrder.quantity) *
+                                100
+                              ).toFixed(1),
+                            ),
+                            0,
+                          ),
+                          100,
+                        )}
+                      />
+                    </div>
+                    <span className="ml-20 fw-light">
+                      Planned
+                      <span className="font-medium text-green-700">
+                        {' '}
+                        {modalWorkOrder.finished_goods}{' '}
+                      </span>
+                      out of
+                      <span className="font-medium text-blue-700">
+                        {' '}
+                        {modalWorkOrder.quantity}
+                      </span>{' '}
+                      Quantity.
+                    </span>
+                  </span>
+  
+                  <CRow className="mt-3">
+                    <CCol xs={4} md={4} lg={4}>
+                      <CRow>
+                        <CCol xs={6} md={6}>
+                          <div className="mt-3 text-bold">
+                            SKU Name <br />
+                            Print <br />
+                            Route <br />
+                            Planned Start
+                          </div>
+                        </CCol>
+                        <CCol xs={6} md={6}>
+                          <div className="mt-3">
+                            {modalWorkOrder.sku_name} <br />
+                            {modalWorkOrder.print} <br />
+                            {modalWorkOrder.route} <br />
+                            {modalWorkOrder.planned_start}
+                          </div>
+                        </CCol>
+                      </CRow>
+                    </CCol>
+                    <CCol xs={4} md={4} lg={4}>
+                      <CRow>
+                        <CCol xs={6} md={6}>
+                          <div className="mt-3 text-bold">
+                            Layers <br />
+                            Dimensions <br />
+                            Qty <br />
+                            Planned End
+                          </div>
+                        </CCol>
+                        <CCol xs={6} md={6}>
+                          <div className="mt-3">
+                            {modalWorkOrder.layers} <br />
+                            {modalWorkOrder.dimension} <br />
+                            {modalWorkOrder.quantity} <br />
+                            {modalWorkOrder.planned_end}
+                          </div>
+                        </CCol>
+                      </CRow>
+                    </CCol>
+                    <CCol xs={4} md={4} lg={4} className="relative">
+                      <CRow>
                         <CIcon
-                          icon={cilLink}
-                          className="me-1 cursor-pointer"
-                          style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
+                          icon={cilQrCode}
+                          className="absolute right-0 mr-5 -mt-[90px] h-[110px] w-[150px]"
                         />
-                        <span>S0 - 001</span>
-                      </div>
-                      <div>Client MERK</div>
-                    </CRow>
-                  </CCol>
-                </CRow>
-                <hr />
-                <CTable striped hover>
-                  <CTableHead>
-                    <CTableHeaderCell></CTableHeaderCell>
-                    <CTableHeaderCell>GSM</CTableHeaderCell>
-                    <CTableHeaderCell>Board Size</CTableHeaderCell>
-                    <CTableHeaderCell>BF</CTableHeaderCell>
-                    <CTableHeaderCell>Color</CTableHeaderCell>
-                    <CTableHeaderCell>Print</CTableHeaderCell>
-                    <CTableHeaderCell>Allocation Details</CTableHeaderCell>
-                    <CTableHeaderCell>Flute Ratio</CTableHeaderCell>
-                    <CTableHeaderCell>Allocated Material</CTableHeaderCell>
-                  </CTableHead>
-                  <CTableBody>
-                    {modalWorkOrder.layer_group &&
-                      modalWorkOrder.layer_group.map((lg) => (
-                        <CTableRow key={lg.id}>
-                          {' '}
-                          <CTableDataCell>{lg.layer_name}</CTableDataCell>
-                          <CTableDataCell>{lg.gsm}</CTableDataCell>
-                          <CTableDataCell>{lg.dimensions}</CTableDataCell>
-                          <CTableDataCell>{lg.bf}</CTableDataCell>
-                          <CTableDataCell>{lg.colors}</CTableDataCell>
-                          <CTableDataCell>{modalWorkOrder.print}</CTableDataCell>
-                          <CTableDataCell>FG</CTableDataCell>
-                          <CTableDataCell>NA</CTableDataCell>
-                          <CTableDataCell>
-                            <div style={{ width: '45px', height: '40px' }}>
-                              <ProgressBar value={80} />
-                            </div>
-                          </CTableDataCell>
-                        </CTableRow>
-                      ))}
-                  </CTableBody>
-                </CTable>
-              </>
-            )}
-          </div>
-        </CModalBody>
-
-        {/* <CModalFooter>
-          <CButton color="secondary" onClick={() => setVisible(false)}>
-            Close
-          </CButton>
-        </CModalFooter> */}
-      </CModal>
-
-      <PopUp
-        visible={splitVisible}
-        setVisible={setSplitVisible}
-        width="800px"
-        height="500px"
-        size="lg"
-      >
-        <CModalHeader>
-          <CModalTitle className="text-[#030303]">Split Work Order</CModalTitle>
-        </CModalHeader>
-        <CModalBody>
-          <div className="mb-3 text-[#023f81] text-[16px] flex float-right">
-            <strong>WO - #50015</strong> | <strong>Qty - 150</strong> | <strong>FG - 100</strong>
-          </div>
-          <h5 className="mb-1 text-[#023f81]">Balance Qty from Work Order:</h5>
-          <div className="mb-3 d-flex align-items-center gap-2">
-            <label className="form-label mb-0 ">Balance Qty</label>
-            <CFormInput
-              value="50"
-              disabled
-              style={{ width: '80px', height: '35px', marginLeft: '150px' }}
-            />
-          </div>
-          <div className="mb-3 d-flex align-items-center gap-2">
-            <label className="form-label mb-0 ">Allocate To</label>
-            <CFormSelect
-              onChange={(e) => setSelectedType(e.target.value)}
-              style={{ width: '150px', marginLeft: '150px' }}
-            >
-              <option value="">Select type</option>
-              <option value="Outsource">Outsource</option>
-              <option value="Purchase Order">Purchase Order</option>
-            </CFormSelect>
-            <CFormInput value="50" disabled style={{ width: '80px', height: '35px' }} />
-          </div>
-          <h5 className="text-[#023f81]">Allocated Finished Goods:</h5>
-          <div className="d-flex gap-2 mb-3">
-            <CFormSelect style={{ width: '220px', height: '35px', color: '#023f81' }}>
-              <option value="WO-50015">WO - 50015</option>
-            </CFormSelect>
-            <CFormInput style={{ width: '80px', height: '35px' }} value="50" disabled />
-            <CButton
-              style={{
-                width: '80px',
-                height: '35px',
-                backgroundColor: '#8761e5',
-                color: '#ffffff',
-              }}
-              color="success"
-            >
-              {' '}
-              Add
+                      </CRow>
+  
+                      <CRow className="mt-5">
+                        <div>ETD (Estimated Delivery Date) : 12/12/2025</div>
+                        <div className="flex items-center gap-1">
+                          <span>Linked to Sales</span>
+                          <CIcon
+                            icon={cilLink}
+                            className="me-1 cursor-pointer text-[1.4rem] font-bold"
+                          />
+                          <span>S0 - 001</span>
+                        </div>
+                        <div>Client MERK</div>
+                      </CRow>
+                    </CCol>
+                  </CRow>
+                  <hr />
+                  <CTable striped hover>
+                    <CTableHead>
+                      <CTableHeaderCell></CTableHeaderCell>
+                      <CTableHeaderCell>GSM</CTableHeaderCell>
+                      <CTableHeaderCell>Board Size</CTableHeaderCell>
+                      <CTableHeaderCell>BF</CTableHeaderCell>
+                      <CTableHeaderCell>Color</CTableHeaderCell>
+                      <CTableHeaderCell>Print</CTableHeaderCell>
+                      <CTableHeaderCell>Allocation Details</CTableHeaderCell>
+                      <CTableHeaderCell>Flute Ratio</CTableHeaderCell>
+                      <CTableHeaderCell>Allocated Material</CTableHeaderCell>
+                    </CTableHead>
+                    <CTableBody>
+                      {modalWorkOrder.layer_group &&
+                        modalWorkOrder.layer_group.map((lg) => (
+                          <CTableRow key={lg.id}>
+                            {' '}
+                            <CTableDataCell>{lg.layer_name}</CTableDataCell>
+                            <CTableDataCell>{lg.gsm}</CTableDataCell>
+                            <CTableDataCell>{lg.dimensions}</CTableDataCell>
+                            <CTableDataCell>{lg.bf}</CTableDataCell>
+                            <CTableDataCell>{lg.colors}</CTableDataCell>
+                            <CTableDataCell>{modalWorkOrder.print}</CTableDataCell>
+                            <CTableDataCell>FG</CTableDataCell>
+                            <CTableDataCell>NA</CTableDataCell>
+                            <CTableDataCell>
+                              <div className="w-11 h-10">
+                                <ProgressBar value={80} />
+                              </div>
+                            </CTableDataCell>
+                          </CTableRow>
+                        ))}
+                    </CTableBody>
+                  </CTable>
+                </>
+              )}
+            </div>
+          </CModalBody>
+        </CModal>
+  
+        <PopUp
+          visible={splitVisible}
+          setVisible={setSplitVisible}
+          width="800px"
+          height="500px"
+          size="lg"
+        >
+          <CModalHeader>
+            <CModalTitle className="text-[#030303]">Split Work Order</CModalTitle>
+          </CModalHeader>
+          <CModalBody>
+            <div className="mb-3 text-[#023f81] text-[16px] flex float-right">
+              <strong>WO - #50015</strong> | <strong>Qty - 150</strong> | <strong>FG - 100</strong>
+            </div>
+            <h5 className="mb-1 text-[#023f81]">Balance Qty from Work Order:</h5>
+            <div className="mb-3 d-flex align-items-center gap-2">
+              <label className="form-label mb-0 ">Balance Qty</label>
+              <CFormInput
+                value="50"
+                disabled
+                className="w-20 h-[35px] ml-[150px]"
+              />
+            </div>
+            <div className="mb-3 d-flex align-items-center gap-2">
+              <label className="form-label mb-0 ">Allocate To</label>
+              <CFormSelect
+                onChange={(e) => setSelectedType(e.target.value)}
+                className="w-[150px] ml-[150px]"
+              >
+                <option value="">Select type</option>
+                <option value="Outsource">Outsource</option>
+                <option value="Purchase Order">Purchase Order</option>
+              </CFormSelect>
+              <CFormInput value="50" disabled className="w-20 h-[35px]" />
+            </div>
+            <h5 className="text-[#023f81]">Allocated Finished Goods:</h5>
+            <div className="d-flex gap-2 mb-3">
+              <CFormSelect className="w-[220px] h-[35px] text-[#023f81]">
+                <option value="WO-50015">WO - 50015</option>
+              </CFormSelect>
+              <CFormInput className="w-20 h-[35px]" value="50" disabled />
+              <CButton
+                className="w-20 h-[35px] bg-[#8761e5] text-white"
+                color="success"
+              >
+                {' '}
+                Add
+              </CButton>
+            </div>
+          </CModalBody>
+  
+          <CModalFooter>
+            <CButton color="secondary" onClick={() => setVisible(false)}>
+              Close
             </CButton>
-          </div>
-          {/* <CListGroup style={{ maxWidth: "300px" }}>
-        <CListGroupItem className="d-flex justify-content-between">
-            <span>WO - 50015</span>
-            <span>Qty. 50</span>
-        </CListGroupItem>
-    </CListGroup> */}
-        </CModalBody>
-
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setVisible(false)}>
-            Close
-          </CButton>
-          <CButton style={{ backgroundColor: '#023f81', color: '#ffffff' }} color="primary">
-            Submit
-          </CButton>
-        </CModalFooter>
-      </PopUp>
-    </>
+            <CButton className="bg-[#023f81] text-white" color="primary">
+              Submit
+            </CButton>
+          </CModalFooter>
+        </PopUp>
+      </div>
+    </div>
   )
 }
 

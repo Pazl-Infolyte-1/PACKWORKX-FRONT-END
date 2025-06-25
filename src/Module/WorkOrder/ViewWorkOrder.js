@@ -233,23 +233,31 @@ const ViewWorkOrder = () => {
       
       console.log('Invoice created successfully:', response);
 
+      setAlerts([{ severity: "success", message: "Invoice Created Successfully" }]);
+
+
 
       const downloadResponse = await invoiceApi.downloadInvoice(response.data.data.id)
       const blob = new Blob([downloadResponse.data], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `INV-00${id}.pdf`
+      link.download = `INV-00${response.data.data.id}.pdf`
       link.click()
       URL.revokeObjectURL(url)
+
+      
+      setTimeout(() => {
+        navigate(`/invoice/view/${response.data.data.id}`);
+      }, 500);
       
 
       // Optionally refresh work order data or navigate to invoice
-      // navigate(`/invoice/view/${response.data.data.id}`);
 
       return response; // success
     } catch (err) {
-      // Throw the error so the modal knows it failed
+      // Show a user-friendly error message
+      setAlerts([{ severity: "error", message: err?.response?.data?.message || err?.message || "Unable to create invoice. Please try again or contact support." }]);
       throw err;
     }
   }

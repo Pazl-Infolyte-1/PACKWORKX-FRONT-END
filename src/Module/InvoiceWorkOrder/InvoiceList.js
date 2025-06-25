@@ -20,25 +20,26 @@ function InvoiceList() {
   const { searchQuery } = useSearch()
   const location = useLocation()
 
+  const fetchInvoices = async () => {
+    try {
+      const response = await workOrderApi.getInvoiceList({
+        search: searchQuery,
+        page: pagination.page,
+        limit: pagination.limit
+      });
+      setInvoices(response.data.invoices);
+      setPagination(prev => ({
+        ...prev,
+        totalPages: response.data.pagination.totalPages,
+        total: response.data.pagination.total
+      }))
+    } catch (error) {
+      console.error('Error fetching invoices:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const response = await workOrderApi.getInvoiceList({
-          search: searchQuery,
-          page: pagination.page,
-          limit: pagination.limit
-        });
-        setInvoices(response.data.invoices);
-        setPagination(prev => ({
-          ...prev,
-          totalPages: response.data.pagination.totalPages,
-          total: response.data.pagination.total
-        }))
-      } catch (error) {
-        console.error('Error fetching invoices:', error);
-      }
-    };
+
 
     fetchInvoices();
   }, [pagination.page, pagination.limit, searchQuery]);
@@ -66,6 +67,8 @@ function InvoiceList() {
         <InvoiceTable
           isMiniMised={isMiniMised}
           invoices={invoices}
+          fetchInvoices={fetchInvoices}
+
         />
         <div className="flex justify-end items-center gap-4 mt-4">
           <CompactPagination

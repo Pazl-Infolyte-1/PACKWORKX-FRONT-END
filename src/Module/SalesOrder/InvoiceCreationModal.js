@@ -171,7 +171,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
       total_amount: useCredit ? invoiceWithGst - credit_amount : invoiceWithGst, // invoice amount minus credit if used
       credit_amount: useCredit ? credit_amount : 0,
       received_amount,
-      sku_details:{
+      sku_details:[{
         sku_id: data?.sku_id,
         sku: workOrder?.sku_name,
         quantity_required: data?.quantity,
@@ -180,7 +180,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
         gst: gstAmount,
         total_incl__gst: useCredit ? invoiceWithGst - credit_amount : invoiceWithGst,
         discount: data?.discount,
-      }
+      }]
     };
 
     // Add email/whatsapp if sendViaEmail is checked

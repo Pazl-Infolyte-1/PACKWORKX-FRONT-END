@@ -79,7 +79,7 @@ const InventoryView = React.lazy(() => import('./Module/Inventory/ViewInventory.
 const BillingMain = React.lazy(() => import('./Module/Billing/BillingMain.js'))
 const ClientReport = React.lazy(() => import('./Module/ReportsModule/ClientReport.js'))
 const ClientPage = React.lazy(() => import('./Module/ReportsModule/Reports.js'))
-
+const Modules = React.lazy(() => import('./Module/Module/Module.js'))
 
 // const ProductionPlanning = React.lazy(
 //   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
@@ -332,17 +332,23 @@ const routes = [
     element: BillingForm,
     key: 'billingmain form',
   },
-    {
+  {
     path: '/clientReport',
     name: 'Client Report',
     element: ClientReport,
     key: 'client-report',
   },
-      {
+  {
     path: '/reportspage',
     name: 'Reportpage',
     element: ClientPage,
     key: 'client-page',
+  },
+  {
+    path: '/modules',
+    name: 'Modules',
+    element: Modules,
+    key: 'modules',
   },
   // {
   //   path: '/productionplanning',

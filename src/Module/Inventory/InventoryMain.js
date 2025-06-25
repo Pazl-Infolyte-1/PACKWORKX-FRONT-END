@@ -673,6 +673,7 @@ const InventoryMain = () => {
             subCategoryId={subCategoryId}
             totalInventoryValue={inventoryData}
             selectedItem={selectedItem}
+            categoryId={categoryId}
             setSelectedItem={setSelectedItem}
           />
 

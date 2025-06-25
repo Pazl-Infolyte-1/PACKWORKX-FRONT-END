@@ -21,7 +21,7 @@ const InventoryTable = ({
   setIsMinimised,
   isMinimised,
   setSelectedItem,
-  selectedItem,
+  categoryId,
   subCategoryQuantities = [], // New prop for handling case 2 data
 }) => {
   const [viewItem, setViewItem] = useState(false)
@@ -40,19 +40,19 @@ const InventoryTable = ({
     if (item.item_info) {
       return item.item_info
     }
-    
+
     // Try to find matching item info from subCategoryQuantities
     const matchingSubCategory = subCategoryQuantities.find(
-      subCat => subCat.item_info && subCat.sub_category === item.sub_category_id
+      (subCat) => subCat.item_info && subCat.sub_category === item.sub_category_id,
     )
-    
+
     return matchingSubCategory?.item_info || null
   }
 
   // Helper function to get product ID
   const getProductId = (item) => {
     const itemInfo = getItemInfoFromSubCategory(item)
-    return itemInfo?.item_generate_id || `INV-${item.id}` || '--'
+    return itemInfo?.item_generate_id || `PRD-${item.id}` || '--'
   }
 
   // Helper function to get item name
@@ -132,7 +132,7 @@ const InventoryTable = ({
   }
 
   // Helper function to get reorder level
-  const getReorderLevel = (item) => {    
+  const getReorderLevel = (item) => {
     const itemInfo = getItemInfoFromSubCategory(item)
     if (itemInfo && itemInfo.min_stock_level && (itemInfo.uom || itemInfo.net_weight)) {
       return `${parseFloat(itemInfo.min_stock_level)} ${itemInfo.uom || itemInfo.net_weight}`
@@ -143,7 +143,10 @@ const InventoryTable = ({
   // Helper function to get quantity
   const getQuantity = (item) => {
     const itemInfo = getItemInfoFromSubCategory(item)
-    if (item.quantity_available || (item.total_quantity && (itemInfo?.uom || itemInfo?.net_weight))) {
+    if (
+      item.quantity_available ||
+      (item.total_quantity && (itemInfo?.uom || itemInfo?.net_weight))
+    ) {
       return `${parseFloat(item.quantity_available || item.total_quantity)} ${itemInfo?.uom || itemInfo?.net_weight || ''}`.trim()
     }
     return item.quantity_available || '--'
@@ -160,7 +163,7 @@ const InventoryTable = ({
   const getStockStatus = (item) => {
     const itemInfo = getItemInfoFromSubCategory(item)
     let stockStatus = '--'
-    
+
     // Convert strings to numbers
     const totalQuantity = parseFloat(item.quantity_available || item.total_quantity)
     const minStockLevel = parseFloat(itemInfo?.min_stock_level)
@@ -206,9 +209,8 @@ const InventoryTable = ({
       >
         <CTable
           className={`border-separate border-spacing-0 ${
-            isMinimised
-              && // or min-h-[500px] if needed
-               'min-w-[900px] overflow-x-scroll'
+            isMinimised && // or min-h-[500px] if needed
+            'min-w-[900px] overflow-x-scroll'
           }`}
         >
           {!isMinimised && (
@@ -217,9 +219,11 @@ const InventoryTable = ({
                 <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                   Product ID <span className="text-gray-500">⌕</span>
                 </CTableHeaderCell>
-                <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                  Reorder Level
-                </CTableHeaderCell>
+                {categoryId !== 2 && (
+                  <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
+                    Reorder Level
+                  </CTableHeaderCell>
+                )}
                 <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                   Qty
                 </CTableHeaderCell>
@@ -257,7 +261,7 @@ const InventoryTable = ({
             {inventoryData && inventoryData.length > 0 ? (
               inventoryData.map((item, index) => {
                 const stockStatusInfo = getStockStatus(item)
-                
+
                 return (
                   <CTableRow
                     key={index}
@@ -285,9 +289,11 @@ const InventoryTable = ({
 
                     {!isMinimised && (
                       <>
-                        <CTableDataCell className="whitespace-nowrap">
-                          {getReorderLevel(item)}
-                        </CTableDataCell>
+                        {categoryId !== 2 && (
+                          <CTableDataCell className="whitespace-nowrap">
+                            {getReorderLevel(item)}
+                          </CTableDataCell> 
+                        )}
                         <CTableDataCell className="whitespace-nowrap">
                           {getQuantity(item)}
                         </CTableDataCell>

@@ -6,6 +6,7 @@ import { clientApi } from '../../api/client';
 import { skuApi } from '../../api/sku';
 import ActionButton from '../../components/New/ActionButton';
 import { invoiceApi } from '../../api/Invoice';
+import CustomAlert from '../../components/New/CustomAlert';
 
 const InvoiceAddForm = forwardRef((props, ref) => {
   const navigate = useNavigate();
@@ -96,6 +97,10 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+  
+  const handleClose = () => {
+    setAlerts([])
+  }
 
   // Fetch clients on search term change
   useEffect(() => {
@@ -419,13 +424,17 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       URL.revokeObjectURL(url)
       
       // Show success message
-      setAlerts([{
-        severity: "success",
-        message: "Invoice created successfully"
-      }]);
+
+        setAlerts([{
+          severity: "success",
+          message: "Invoice created successfully"
+        }])
+
 
       // Navigate to the invoice view page
-      navigate(`/invoice/view/${response.data.data.id}`);
+      setTimeout(() => {
+        navigate(`/invoice/view/${response.data.data.id}`);
+      }, 500);
 
     } catch (error) {
       console.error("Error creating invoice:", error);
@@ -1209,6 +1218,8 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                 label={ 'Submit'}
                 // onClick={handleSubmitClick}
               />
+                      <CustomAlert alerts={alerts} handleClose={handleClose} />
+
             </div>
           </div>
         </div>

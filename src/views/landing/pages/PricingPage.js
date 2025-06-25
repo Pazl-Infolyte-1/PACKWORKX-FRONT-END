@@ -63,16 +63,17 @@ useEffect(() => {
               </span>
             </div>
 
-            <ul className="landing-features-list">
-              {pkg.module_in_package?.slice(0, 8).map((feature, index) => (
-                <li key={index}>
-                  {feature.charAt(0).toUpperCase() + feature.slice(1).replace(/_/g, ' ')}
-                </li>
-              ))}
-              {pkg.module_in_package.length > 8 && (
-                <li>+ {pkg.module_in_package.length - 8} more modules</li>
-              )}
-            </ul>
+   <ul className="landing-features-list space-y-2">
+  {pkg.module_in_package?.map((feature, index) => (
+    <li key={index} className="flex items-center gap-2 ml-[40px]">
+      <span className="text-green-600 mt-0.5"></span>
+      <span>
+        {feature.charAt(0).toUpperCase() + feature.slice(1).replace(/_/g, ' ')}
+      </span>
+    </li>
+  ))}
+</ul>
+
 
             <button
               className="landing-btn landing-btn-primary"

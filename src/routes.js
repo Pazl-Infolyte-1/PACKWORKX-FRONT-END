@@ -77,6 +77,9 @@ const CreditNoteForm = React.lazy(() => import('./Module/CreditNote/CreditNoteFo
 const CreditNoteView = React.lazy(() => import('./Module/CreditNote/CreditNoteView.js'))
 const InventoryView = React.lazy(() => import('./Module/Inventory/ViewInventory.js'))
 const BillingMain = React.lazy(() => import('./Module/Billing/BillingMain.js'))
+const ClientReport = React.lazy(() => import('./Module/ReportsModule/ClientReport.js'))
+const ClientPage = React.lazy(() => import('./Module/ReportsModule/Reports.js'))
+
 
 // const ProductionPlanning = React.lazy(
 //   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
@@ -328,6 +331,18 @@ const routes = [
     name: 'Add Billing',
     element: BillingForm,
     key: 'billingmain form',
+  },
+    {
+    path: '/clientReport',
+    name: 'Client Report',
+    element: ClientReport,
+    key: 'client-report',
+  },
+      {
+    path: '/reportspage',
+    name: 'Reportpage',
+    element: ClientPage,
+    key: 'client-page',
   },
   // {
   //   path: '/productionplanning',

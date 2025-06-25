@@ -82,6 +82,30 @@ export const AppSideBarNew = ({ giveAccess }) => {
   const shouldDisplayAccounts = accountsModules.some(
     (module) => module.modules_description?.trim() !== '',
   )
+// Define this array at the top of your file or in a config
+const staticReportArray = [
+  { name: "Clients/Vendor", to: "/clientReport" },
+  { name: "Machine", to: "/reportspage" },
+  { name: "Process", to: "/reportspage" },
+  { name: "Routes", to: "/reportspage" },
+  { name: "Employee List", to: "/reportspage" },
+  { name: "Department", to: "/reportspage" },
+  { name: "Designation", to: "/reportspage" },
+  { name: "Role", to: "/reportspage" },
+  { name: "Sales Order", to: "/reportspage" },
+  { name: "Work Order", to: "/reportspage" },
+  { name: "Sku Details", to: "/reportspage" },
+  { name: "Purchase Order", to: "/reportspage" },
+    { name: "Inventory", to: "/reportspage" },
+  { name: "Sales Return", to: "/reportspage" },
+  { name: "Purchase Return", to: "/reportspage" },
+    { name: "GRN", to: "/reportspage" },
+  { name: "Invoice", to: "/reportspage" },
+  { name: "Credit Note", to: "/reportspage" },
+    { name: "Debit Note", to: "/reportspage" },
+  { name: "Stock Adjustments", to: "/reportspage" },
+  { name: "Bills", to: "/reportspage" },
+];
 
   return (
     <CSidebarNav className="sidebar-menu" as={SimpleBar}>
@@ -438,7 +462,7 @@ export const AppSideBarNew = ({ giveAccess }) => {
         </>
       )}
       {/*reports*/}
-      {shouldDisplayReports && (
+      {/*{shouldDisplayReports && (
         <>
           <CNavTitle className="!text-xs !py-1 !mt-0">Reports</CNavTitle>
           {reportModules.map((module, index) => {
@@ -454,7 +478,49 @@ export const AppSideBarNew = ({ giveAccess }) => {
             return null
           })}
         </>
+      )}*/}
+
+
+
+       {shouldDisplayReports && (
+        <>
+          <CNavTitle className="!text-xs !py-1 !mt-0">Reports</CNavTitle>
+
+                <li className={`nav-item nav-group text-xs ${isOpen ? 'show' : ''}`}>
+                  <a
+                    className="nav-link nav-group-toggle"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setIsOpen((prev) => !prev)
+                    }}
+                  >
+                    <CIcon icon={cilUser} className="nav-icon" />
+                    Reports
+                  </a>
+                  <ul
+                    className="nav-group-items text-xs !py-0"
+                    style={{ display: isOpen ? 'block' : 'none' }}
+                  >
+                    {staticReportArray.map((item, index) => (
+    <li key={index} className="nav-item">
+      <NavLink className="nav-link" to={item.to}>
+        <span className="nav-icon">
+          <span className="nav-icon-bullet ml-[30px]" />
+        </span>
+        {item.name}
+      </NavLink>
+    </li>
+  ))}
+                  </ul>
+                </li>
+
+        </>
       )}
+
+
+
+
 
       {/*Settings*/}
       {shouldDisplaySettings && (

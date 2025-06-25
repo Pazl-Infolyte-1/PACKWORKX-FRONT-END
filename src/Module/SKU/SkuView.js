@@ -948,14 +948,14 @@ useEffect(() => {
           <option value="">Select Material</option>
           {inventoryData.map((inv) => (
             <option key={inv.item_id} value={inv.item_id}>
-              {inv.item.item_name}
+              {inv.item_info.item_name}
             </option>
           ))}
         </select>
       </td>
 
       <td className="p-2 border">
-        {selectedItem ? parseFloat(selectedItem.item.standard_cost).toFixed(2) : '-'}
+        {selectedItem ? parseFloat(selectedItem.item_info.standard_cost).toFixed(2) : '-'}
       </td>
 
       <td className="p-2 border">
@@ -964,7 +964,7 @@ useEffect(() => {
 
       <td className="p-2 border">
         {selectedItem && selectedSku?.total_weight
-          ? (parseFloat(selectedItem.item.standard_cost) * parseFloat(selectedSku.total_weight)).toFixed(2)
+          ? (parseFloat(selectedItem.item_info.standard_cost) * parseFloat(selectedSku.total_weight)).toFixed(2)
           : '-'}
       </td>
     </tr>

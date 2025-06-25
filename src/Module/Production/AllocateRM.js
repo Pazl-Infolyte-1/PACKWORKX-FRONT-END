@@ -57,7 +57,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
     setOpenSFG((prevId) => (prevId === id ? null : id)) // Toggle behavior
   }
   return (
-    <CCard className="mt-2" ref={drag} key={sfg.id} style={{ border: 'none' }}>
+    <CCard className="mt-2 !bg-indigo-50 !border-2 !border-dashed !border-indigo-200 " ref={drag} key={sfg.id} >
       <CCardBody style={{ padding: '14px' }}>
         <div
           style={{
@@ -194,13 +194,11 @@ function GroupDropZone({
   return (
     <CCard
       key={itemIndex}
-      className="mb-2"
+      className="mb-2 bg-white border "
       style={{
         marginTop: '6px',
-        backgroundColor: '#f5f4f7',
         borderRadius: '8px',
         padding: '4px',
-        border: 'none'
       }}
     >
       <CCardBody style={{ padding: '8px' }}>
@@ -385,9 +383,8 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
     <CCard
       ref={drop}
       key={groupIndex}
-      className="mb-2"
+      className="mb-2 border"
       style={{
-        backgroundColor: isOver ? '#e0e0e0' : '#f5f4f7',
         borderRadius: '8px',
         border: isOver ? '2px dashed #8167e5' : 'none',
         transition: 'all 0.3s ease',
@@ -458,23 +455,33 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
               overflowY: 'auto',
               overflowX: 'hidden'
             }}>
-              {group?.layer_details?.map((i, itemIndex) => (
-                <GroupDropZone
-                  key={itemIndex}
-                  i={i}
-                  itemIndex={itemIndex}
-                  visibleItemIndex={visibleItemIndex}
-                  setVisibleItemIndex={setVisibleItemIndex}
-                />
-              ))}
+              {group?.layer_details?.length === 0 || !group?.layer_details ? (
+                <div style={{
+                  textAlign: 'center',
+                  color: '#9ca3af',
+                  fontSize: '14px',
+                  fontStyle: 'italic',
+                  padding: '20px'
+                }}>
+                  No layers available in this group
+                </div>
+              ) : (
+                group?.layer_details?.map((i, itemIndex) => (
+                  <GroupDropZone
+                    key={itemIndex}
+                    i={i}
+                    itemIndex={itemIndex}
+                    visibleItemIndex={visibleItemIndex}
+                    setVisibleItemIndex={setVisibleItemIndex}
+                  />
+                ))
+              )}
             </div>
 
             {/* Right Column - History List */}
-            <div className="custom-scrollbar" style={{ 
+            <div className="custom-scrollbar bg-white border-l" style={{ 
               flex: 1,
-              backgroundColor: '#f5f4f7',
               marginTop: '5px',
-              borderLeft: '1px solid #e5e7eb',
               padding: '12px',
               maxHeight: '400px',
               overflowY: 'auto',
@@ -492,32 +499,48 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
               </div>
 
               <div style={{ flex: 1, overflowY: 'auto' }}>
-                {group.allocation_history?.allocation_by_inventory?.map((allocation, index) => (
-                  <div key={index} style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '8px',
-                    backgroundColor: '#ffffff',
-                    borderRadius: '6px',
-                    fontSize: '0.85rem',
-                    marginBottom: '8px'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span>Inventory ID: {allocation.inventory_id}</span>
-                      <span>Total Allocated: {allocation.total_allocated_qty}</span>
+                {group.allocation_history?.allocation_by_inventory?.length > 0 ? (
+                  group.allocation_history.allocation_by_inventory.map((allocation, index) => (
+                    <div key={index} className='border' style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '8px',
+                      backgroundColor: '#ffffff',
+                      borderRadius: '6px',
+                      fontSize: '0.85rem',
+                      marginBottom: '8px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span>Inventory ID: {allocation.inventory_id}</span>
+                        <span>Total Allocated: {allocation.total_allocated_qty}</span>
+                      </div>
+                      <FaLock 
+                        size={14}
+                        style={{ 
+                          cursor: isDeallocating ? 'not-allowed' : 'pointer',
+                          color: isDeallocating ? '#9ca3af' : '#8167e5',
+                          opacity: isDeallocating ? 0.7 : 1
+                        }}
+                        onClick={() => !isDeallocating && handleDeAllocateClick(allocation.inventory_id, allocation.total_allocated_qty, group.id)}
+                      />
                     </div>
-                    <FaLock 
-                      size={14}
-                      style={{ 
-                        cursor: isDeallocating ? 'not-allowed' : 'pointer',
-                        color: isDeallocating ? '#9ca3af' : '#8167e5',
-                        opacity: isDeallocating ? 0.7 : 1
-                      }}
-                      onClick={() => !isDeallocating && handleDeAllocateClick(allocation.inventory_id, allocation.total_allocated_qty, group.id)}
-                    />
+                  ))
+                ) : (
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#b0b3b8',
+                    fontSize: '13px',
+                    fontStyle: 'italic',
+                    padding: '16px 0 8px 0',
+                  }}>
+                    <CIcon icon={cilClipboard} style={{ fontSize: '1.7rem', marginBottom: '4px', color: '#d1d5db' }} />
+                    <span>No allocation history yet</span>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
@@ -643,25 +666,26 @@ const AllocateRM = ({}) => {
           }}
            className=" rounded-t-lg text-white !px-8 py-2.5 border-b-[3px] border-indigo-600">
             <div className="text-base font-semibold mb-1">
-              Step 2: Group Similar Layers
+              Step 3: Allocate Raw Material
             </div>
             <div className="text-xs opacity-90">
-              Drag similar layers into groups for efficient manufacturing
+              Assign available raw materials to production groups to ensure efficient and accurate manufacturing.
             </div>
           </div>
       {/* Groups Column */}
       <div
-      className='flex'
+      className='flex gap-2'
       >
         
       <CCol xs={6}>
-      
-        <div className=" custom-srollbar" style={{ height: 'calc(95vh - 200px)', overflowY: 'auto' }}>
+        <div className="bg-slate-50 p-3 custom-srollbar" style={{ height: 'calc(95vh - 200px)', overflowY: 'auto' }}>
+          <div className="text-[15px] font-semibold mb-4 text-gray-700">
+            Available Groups
+          </div>
           {groupOrders?.length === 0 ? (
             <CCard
-              className="mb-2"
+              className="mb-2 "
               style={{
-                backgroundColor: '#f5f4f7',
                 borderRadius: '8px',
                 padding: '20px',
                 textAlign: 'center',
@@ -696,9 +720,8 @@ const AllocateRM = ({}) => {
       {/* Raw Material Column */}
       <CCol xs={6}>
         <CCard
-          className="mb-2"
+          className="mb-2 !bg-slate-50"
           style={{
-            backgroundColor: '#f5f4f7',
             borderRadius: '10px',
             height: 'calc(95vh - 200px)',
             display: 'flex',

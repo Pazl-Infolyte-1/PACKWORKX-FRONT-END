@@ -628,23 +628,35 @@ const AllocateRM = ({}) => {
   }
 
   return (
-    <CRow className="mt-4">
+    <div className="flex flex-col">
         <CustomAlert
         alerts={alerts}
         handleClose={handleClose}
         />
-      {/* Groups Column */}
-      <CCol xs={6}>
-        <div
-          className="text-black bold w-full bg-[#c7c7f1] text-md p-2 font-[Roboto]"
-        >
-          <CCardBody>
-            <div className="d-flex justify-content-between align-items-center">
-              <CCardText className=" ">Grouped Work Orders</CCardText>
+        
+                  {/* Screen Header */}
+                  <div
+          style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'white',
+            borderBottom: '3px solid #5a67d8'
+          }}
+           className=" rounded-t-lg text-white !px-8 py-2.5 border-b-[3px] border-indigo-600">
+            <div className="text-base font-semibold mb-1">
+              Step 2: Group Similar Layers
             </div>
-          </CCardBody>
-        </div>
-        <div className="mt-3 custom-srollbar" style={{ height: 'calc(95vh - 200px)', overflowY: 'auto' }}>
+            <div className="text-xs opacity-90">
+              Drag similar layers into groups for efficient manufacturing
+            </div>
+          </div>
+      {/* Groups Column */}
+      <div
+      className='flex'
+      >
+        
+      <CCol xs={6}>
+      
+        <div className=" custom-srollbar" style={{ height: 'calc(95vh - 200px)', overflowY: 'auto' }}>
           {groupOrders?.length === 0 ? (
             <CCard
               className="mb-2"
@@ -831,7 +843,8 @@ const AllocateRM = ({}) => {
           </CCardBody>
         </CCard>
       </CCol>
-    </CRow>
+      </div>
+    </div>
   )
 }
 

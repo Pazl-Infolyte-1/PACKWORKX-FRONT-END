@@ -384,7 +384,9 @@ const InvoiceAddForm = forwardRef((props, ref) => {
 
       const body = {
         ...data,
-        totals
+        totals,
+        discount: getIndividualDiscountTotal() > 0 ? getIndividualDiscountTotal() : (totals.discountAmount || 0),
+        discount_type: data.discount_type ? data.discount_type : 'fixed',
       };
       if (sendViaEmail) {
         body.client_email = email;

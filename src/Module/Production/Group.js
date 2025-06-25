@@ -52,6 +52,7 @@ import { productionApi } from '../../api/production'
 import WorkOrderCard from './GroupComponents/WorkOrderCard'
 import CustomAlert from '../../components/New/CustomAlert'
 import AddGroupButton from './AddGroupButton'
+import { add } from 'lodash'
 
 const ItemType = 'WORK_ORDER'
 
@@ -485,11 +486,13 @@ const Group = ({
   const [splitVisible, setSplitVisible] = useState(false)
   const navigate = useNavigate()
   const [groups1,setGroupOrders] = useState()
-  const { groups,addWorkOrderToGroup,workOrders,setWorkOrders,refreshData,handleClose,alerts } = useGroupLayers();
+  const { groups,addWorkOrderToGroup,workOrders,setWorkOrders,refreshData,handleClose,alerts,addGroup } = useGroupLayers();
   const {registerNextHandler} = useNextHandler()
 
   const {searchQuery,setGlobalPlaceholder} = useSearch()
   const [error,setError] = useState()
+
+
 
   const fetchWorkOrders = async () => {
     try {
@@ -562,6 +565,10 @@ const Group = ({
     return () => {
       setGlobalPlaceholder('Search...');
     }
+  }, []);
+
+  useEffect(() => {
+    addGroup();
   }, []);
 
   const removeWorkOrderFromGroup = (order, groupIndex) => {

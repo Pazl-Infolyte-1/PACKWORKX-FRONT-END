@@ -146,7 +146,9 @@ export default function WorkOrderCard({
   
     return (
       <div
-        className="bg-white border border-gray-200 rounded-lg p-1 px-2 mb-1 flex justify-between items-center"
+        className="bg-white border cursor-pointer border-gray-200 rounded-lg p-1 px-2 mb-1 flex justify-between items-center"
+        onClick={toggleCollapse}
+
       >
         <div className="flex-1">
           <div
@@ -154,8 +156,7 @@ export default function WorkOrderCard({
           >
             <div>
               <div
-                className="font-bold mb-1 text-sm cursor-pointer flex items-center gap-2"
-                onClick={toggleCollapse}
+                className="font-bold mb-1 text-sm  flex items-center gap-2"
               >
                 {order.work_generate_id}
                 {visibleIndex === index ? <FaAngleUp size={12} /> : <FaAngleDown size={12} />}

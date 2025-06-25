@@ -15,7 +15,7 @@ const DefaultLayout = () => {
         }`}
       >
         <AppHeader />
-        <div className="flex-1 px-2 overflow-hidden">
+        <div className="flex-1 px-2 overflow-y-auto">
           <AppContent />
         </div>
         {/* <AppFooter /> */}

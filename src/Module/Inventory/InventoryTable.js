@@ -21,7 +21,8 @@ const InventoryTable = ({
   setIsMinimised,
   isMinimised,
   setSelectedItem,
-  selectedItem,
+  categoryId,
+  subCategoryQuantities = [], // New prop for handling case 2 data
 }) => {
   const [viewItem, setViewItem] = useState(false)
   const navigate = useNavigate()
@@ -34,6 +35,32 @@ const InventoryTable = ({
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
 
+  // Helper function to get item info from subCategoryQuantities when item_info is null
+  const getItemInfoFromSubCategory = (item) => {
+    if (item.item_info) {
+      return item.item_info
+    }
+
+    // Try to find matching item info from subCategoryQuantities
+    const matchingSubCategory = subCategoryQuantities.find(
+      (subCat) => subCat.item_info && subCat.sub_category === item.sub_category_id,
+    )
+
+    return matchingSubCategory?.item_info || null
+  }
+
+  // Helper function to get product ID
+  const getProductId = (item) => {
+    const itemInfo = getItemInfoFromSubCategory(item)
+    return itemInfo?.item_generate_id || `PRD-${item.id}` || '--'
+  }
+
+  // Helper function to get item name
+  const getItemName = (item) => {
+    const itemInfo = getItemInfoFromSubCategory(item)
+    return itemInfo?.item_name || 'Unknown Item'
+  }
+
   const customFieldColumns = useMemo(() => {
     // Extract unique custom field keys when subcategory filter is applied
     if (!subCategoryId || !inventoryData || inventoryData.length === 0) {
@@ -43,13 +70,14 @@ const InventoryTable = ({
     const customFieldsSet = new Set()
 
     inventoryData.forEach((item) => {
-      if (item.item_info?.default_custom_fields) {
+      const itemInfo = getItemInfoFromSubCategory(item)
+      if (itemInfo?.default_custom_fields) {
         try {
           // Check if default_custom_fields is already an object or needs parsing
           const customFields =
-            typeof item.item_info.default_custom_fields === 'string'
-              ? JSON.parse(item.item_info.default_custom_fields)
-              : item.item_info.default_custom_fields
+            typeof itemInfo.default_custom_fields === 'string'
+              ? JSON.parse(itemInfo.default_custom_fields)
+              : itemInfo.default_custom_fields
 
           Object.keys(customFields).forEach((key) => {
             // Transform specific field names
@@ -68,18 +96,19 @@ const InventoryTable = ({
     })
 
     return Array.from(customFieldsSet)
-  }, [inventoryData, subCategoryId])
+  }, [inventoryData, subCategoryId, subCategoryQuantities])
 
   // Function to get custom field value for an item
   const getCustomFieldValue = (item, fieldKey) => {
-    if (!item.item_info?.default_custom_fields) return '--'
+    const itemInfo = getItemInfoFromSubCategory(item)
+    if (!itemInfo?.default_custom_fields) return '--'
 
     try {
       // Check if default_custom_fields is already an object or needs parsing
       const customFields =
-        typeof item.item_info.default_custom_fields === 'string'
-          ? JSON.parse(item.item_info.default_custom_fields)
-          : item.item_info.default_custom_fields
+        typeof itemInfo.default_custom_fields === 'string'
+          ? JSON.parse(itemInfo.default_custom_fields)
+          : itemInfo.default_custom_fields
 
       // Handle the transformed field names (Unit and Deckle)
       let originalKey = fieldKey
@@ -101,18 +130,87 @@ const InventoryTable = ({
       return '--'
     }
   }
+
+  // Helper function to get reorder level
+  const getReorderLevel = (item) => {
+    const itemInfo = getItemInfoFromSubCategory(item)
+    if (itemInfo && itemInfo.min_stock_level && (itemInfo.uom || itemInfo.net_weight)) {
+      return `${parseFloat(itemInfo.min_stock_level)} ${itemInfo.uom || itemInfo.net_weight}`
+    }
+    return '--'
+  }
+
+  // Helper function to get quantity
+  const getQuantity = (item) => {
+    const itemInfo = getItemInfoFromSubCategory(item)
+    if (
+      item.quantity_available ||
+      (item.total_quantity && (itemInfo?.uom || itemInfo?.net_weight))
+    ) {
+      return `${parseFloat(item.quantity_available || item.total_quantity)} ${itemInfo?.uom || itemInfo?.net_weight || ''}`.trim()
+    }
+    return item.quantity_available || '--'
+  }
+
+  // Helper function to get rate
+  const getRate = (item) => {
+    const itemInfo = getItemInfoFromSubCategory(item)
+    const rate = itemInfo?.standard_cost !== undefined ? itemInfo.standard_cost : item.rate
+    return rate ? `₹${rate}` : '--'
+  }
+
+  // Helper function to get stock status
+  const getStockStatus = (item) => {
+    const itemInfo = getItemInfoFromSubCategory(item)
+    let stockStatus = '--'
+
+    // Convert strings to numbers
+    const totalQuantity = parseFloat(item.quantity_available || item.total_quantity)
+    const minStockLevel = parseFloat(itemInfo?.min_stock_level)
+
+    if (totalQuantity === 0.0) {
+      stockStatus = 'Out of Stock'
+    } else if (!isNaN(minStockLevel) && totalQuantity >= minStockLevel) {
+      stockStatus = 'In Stock'
+    } else if (!isNaN(minStockLevel) && totalQuantity < minStockLevel) {
+      stockStatus = 'Low Stock'
+    } else if (totalQuantity > 0) {
+      stockStatus = 'In Stock' // Default to in stock if quantity exists but no min level
+    }
+
+    const statusStyles = {
+      'In Stock': {
+        backgroundColor: '#D1FAE5',
+        color: '#065F46',
+      },
+      'Out of Stock': {
+        backgroundColor: '#FECACA',
+        color: '#B91C1C',
+      },
+      'Low Stock': {
+        backgroundColor: '#FEF3C7',
+        color: '#92400E',
+      },
+      '--': {
+        backgroundColor: '#F3F4F6',
+        color: '#6B7280',
+      },
+    }
+
+    return { status: stockStatus, styles: statusStyles[stockStatus] }
+  }
+
   return (
     <>
       <div
-        className={`w-full overflow-y-scroll h-[calc(120vh-310px)] border rounded-md shadow-sm mt-1 mb-3 ${
+        className={`w-full overflow-y-scroll h-[calc(80vh-150px)] border rounded-md shadow-sm mt-1 mb-3 ${
           isMinimised ? '' : 'overflow-x-auto'
         }`}
       >
         <CTable
           className={`border-separate border-spacing-0 ${
-            isMinimised
-              ? 'max-h-[400px]' // or min-h-[500px] if needed
-              : 'min-w-[900px] overflow-x-scroll'
+            isMinimised && // or min-h-[500px] if needed
+            'min-w-[900px] overflow-x-scroll'
           }`}
         >
           {!isMinimised && (
@@ -121,9 +219,11 @@ const InventoryTable = ({
                 <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                   Product ID <span className="text-gray-500">⌕</span>
                 </CTableHeaderCell>
-                <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
-                  Reorder Level
-                </CTableHeaderCell>
+                {categoryId !== 2 && (
+                  <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
+                    Reorder Level
+                  </CTableHeaderCell>
+                )}
                 <CTableHeaderCell className="sticky top-0 bg-gray-100 text-center z-10 border-b border-gray-300 whitespace-nowrap text-sm">
                   Qty
                 </CTableHeaderCell>
@@ -134,7 +234,7 @@ const InventoryTable = ({
                 {customFieldColumns.map((fieldKey, index) => (
                   <CTableHeaderCell
                     key={`custom-${index}`}
-                    className="sticky top-0 bg-blue-50 text-center z-10 border-b border-blue-200 whitespace-nowrap text-sm  text-blue-700"
+                    className="sticky top-0 bg-blue-50 text-center z-10 border-b border-blue-200 whitespace-nowrap text-sm text-blue-700"
                   >
                     {fieldKey
                       .replace(/_/g, ' ')
@@ -159,141 +259,104 @@ const InventoryTable = ({
 
           <CTableBody>
             {inventoryData && inventoryData.length > 0 ? (
-              inventoryData.map((item, index) => (
-                <CTableRow
-                  key={index}
-                  className="text-sm text-center cursor-pointer hover:bg-gray-100"
-                  onClick={() => {
-                    setSelectedItem(item)
-                    //setViewItem(true)
-                    navigate(`/inventoryhandling/${item?.item_id}`, {
-                      state: {
-                        item,
-                        totalInventoryValue,
-                      },
-                    })
+              inventoryData.map((item, index) => {
+                const stockStatusInfo = getStockStatus(item)
 
-                    setIsMinimised(true)
-                  }}
-                >
-                  <CTableDataCell
-                    className={`whitespace-nowrap truncate ${
-                      isMinimised ? 'px-4 py-3 flex items-center gap-2 w-full' : 'max-w-[200px]'
-                    }`}
+                return (
+                  <CTableRow
+                    key={index}
+                    className="text-sm text-center cursor-pointer hover:bg-gray-100"
+                    onClick={() => {
+                      setSelectedItem(item)
+                      // For items without item_id, use the inventory id
+                      const navigationId = item.item_id || item.item_id
+                      navigate(`/inventoryhandling/${navigationId}`, {
+                        state: {
+                          item,
+                          totalInventoryValue,
+                        },
+                      })
+                      setIsMinimised(true)
+                    }}
                   >
-                    {item?.item_info?.item_generate_id || '--'}
-                  </CTableDataCell>
+                    <CTableDataCell
+                      className={`whitespace-nowrap truncate ${
+                        isMinimised ? 'px-4 py-3 flex items-center gap-2 w-full' : 'max-w-[200px]'
+                      }`}
+                    >
+                      {getProductId(item)}
+                    </CTableDataCell>
 
-                  {!isMinimised && (
-                    <>
-                      <CTableDataCell className="whitespace-nowrap">
-                        {item.item_info && item?.item_info?.min_stock_level && (item.item_info.uom || item.item_info.net_weight)
-                          ? `${parseFloat(item?.item_info?.min_stock_level)} ${item.item_info.uom || item.item_info.net_weight}`
-                          : '--'}
-                      </CTableDataCell>
-                      <CTableDataCell className="whitespace-nowrap">
-                        {item.item_info && (item.quantity_available || (item.total_quantity && (item.item_info.uom || item.item_info.net_weight)))
-                          ? `${parseFloat(item?.quantity_available || item?.total_quantity)} ${item?.item_info?.uom || item?.item_info?.net_weight}` ||
-                            item?.quantity_available
-                          : '--'}
-                      </CTableDataCell>
-                      <CTableDataCell className="whitespace-nowrap">
-                        ₹{item.item_info?.standard_cost !== undefined ? item.item?.standard_cost : '--'}
-                      </CTableDataCell>
+                    {!isMinimised && (
+                      <>
+                        {categoryId !== 2 && (
+                          <CTableDataCell className="whitespace-nowrap">
+                            {getReorderLevel(item)}
+                          </CTableDataCell> 
+                        )}
+                        <CTableDataCell className="whitespace-nowrap">
+                          {getQuantity(item)}
+                        </CTableDataCell>
+                        <CTableDataCell className="whitespace-nowrap">
+                          {getRate(item)}
+                        </CTableDataCell>
 
-                      {customFieldColumns.map((fieldKey, fieldIndex) => (
-                        <CTableDataCell
-                          key={`custom-value-${fieldIndex}`}
-                          className="whitespace-nowrap bg-blue-25 text-center"
-                        >
-                          <span className="inline-block px-2 py-1 text-sm rounded-full">
-                            {getCustomFieldValue(item, fieldKey)}
+                        {customFieldColumns.map((fieldKey, fieldIndex) => (
+                          <CTableDataCell
+                            key={`custom-value-${fieldIndex}`}
+                            className="whitespace-nowrap bg-blue-25 text-center"
+                          >
+                            <span className="inline-block px-2 py-1 text-sm rounded-full">
+                              {getCustomFieldValue(item, fieldKey)}
+                            </span>
+                          </CTableDataCell>
+                        ))}
+
+                        <CTableDataCell className="whitespace-nowrap text-center">
+                          <span
+                            style={{
+                              ...stockStatusInfo.styles,
+                              borderRadius: '4px',
+                              padding: '2px 8px',
+                              fontSize: '0.75rem',
+                              display: 'inline-block',
+                            }}
+                          >
+                            {stockStatusInfo.status}
                           </span>
                         </CTableDataCell>
-                      ))}
 
-                      <CTableDataCell className="whitespace-nowrap text-center">
-                        {(() => {
-                          let stockStatus = '--'
-                          // Convert strings to numbers
-                          const totalQuantity = parseFloat(
-                            item.quantity_available || item.total_quantity,
-                          )
-                          const minStockLevel = parseFloat(item.item_info.min_stock_level)
-
-                          if (totalQuantity === 0.0) {
-                            stockStatus = 'Out of Stock'
-                          } else if (totalQuantity >= minStockLevel) {
-                            stockStatus = 'In Stock'
-                          } else if (totalQuantity < minStockLevel) {
-                            stockStatus = 'Low Stock'
-                          }
-
-                          const statusStyles = {
-                            'In Stock': {
-                              backgroundColor: '#D1FAE5',
-                              color: '#065F46',
-                            },
-                            'Out of Stock': {
-                              backgroundColor: '#FECACA',
-                              color: '#B91C1C',
-                            },
-                            'Low Stock': {
-                              backgroundColor: '#FEF3C7',
-                              color: '#92400E',
-                            },
-                            '--': {
-                              backgroundColor: '#F3F4F6',
-                              color: '#6B7280',
-                            },
-                          }
-
-                          return (
-                            <span
-                              style={{
-                                ...statusStyles[stockStatus],
-                                borderRadius: '4px',
-                                padding: '2px 8px',
-                                fontSize: '0.75rem',
-                                display: 'inline-block',
-                              }}
-                            >
-                              {stockStatus}
-                            </span>
-                          )
-                        })()}
-                      </CTableDataCell>
-
-                      <CTableDataCell className="py-3" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex justify-center">
-                          <ThreeDotMenu
-                            value={[
-                              {
-                                label: 'Edit Product',
-                                icon: cilPencil,
-                                onClick: () => {
-                                  navigate('/inventoryhandling/inventory_form', {
-                                    state: {
-                                      item,
-                                      fromInventory: true,
-                                      isInventoryEditing: true,
-                                      isEdit: true,
-                                    },
-                                  })
+                        <CTableDataCell className="py-3" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex justify-center">
+                            <ThreeDotMenu
+                              value={[
+                                {
+                                  label: 'Edit Product',
+                                  icon: cilPencil,
+                                  onClick: () => {
+                                    navigate('/inventoryhandling/inventory_form', {
+                                      state: {
+                                        item,
+                                        fromInventory: true,
+                                        isInventoryEditing: true,
+                                        isEdit: true,
+                                      },
+                                    })
+                                  },
                                 },
-                              },
-                            ]}
-                          />
-                        </div>
-                      </CTableDataCell>
-                    </>
-                  )}
-                </CTableRow>
-              ))
+                              ]}
+                            />
+                          </div>
+                        </CTableDataCell>
+                      </>
+                    )}
+                  </CTableRow>
+                )
+              })
             ) : (
               <CTableRow>
                 <CTableDataCell
-                  colSpan={isMinimised ? 1 : 11 + customFieldColumns.length}
+                  colSpan={isMinimised ? 1 : 7 + customFieldColumns.length}
                   className="text-center text-gray-500 py-4"
                 >
                   No inventory data available.

@@ -71,7 +71,6 @@ function CreditNoteView() {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-h-[calc(95vh-120px)] overflow-y-auto px-2">
-        
         {/* Credit Note Information */}
         <div className="border border-gray-900 rounded p-3">
           <h3 className="text-sm font-medium text-gray-900 mb-3 border-l-2 border-blue-500 pl-2">
@@ -88,7 +87,9 @@ function CreditNoteView() {
             </div>
             <div className="flex justify-between items-start">
               <span className="text-gray-500">Subject</span>
-              <span className="font-medium text-gray-900 text-right max-w-[60%]">{creditData.subject}</span>
+              <span className="font-medium text-gray-900 text-right max-w-[60%]">
+                {creditData.subject}
+              </span>
             </div>
             <div className="flex justify-between items-center pt-1 border-t border-gray-100">
               <span className="text-gray-500">Credit Amount</span>
@@ -111,11 +112,15 @@ function CreditNoteView() {
             </div>
             <div className="flex justify-between items-start">
               <span className="text-gray-500">Company Name</span>
-              <span className="font-medium text-gray-900 text-right max-w-[60%]">{creditData.client.company_name}</span>
+              <span className="font-medium text-gray-900 text-right max-w-[60%]">
+                {creditData.client.company_name}
+              </span>
             </div>
             <div className="flex justify-between items-start">
               <span className="text-gray-500">Email</span>
-              <span className="font-medium text-gray-700 text-right max-w-[60%] break-all">{creditData.client.email}</span>
+              <span className="font-medium text-gray-700 text-right max-w-[60%] break-all">
+                {creditData.client.email}
+              </span>
             </div>
           </div>
         </div>
@@ -129,13 +134,13 @@ function CreditNoteView() {
             <div className="flex justify-between items-center">
               <span className="text-gray-500">Invoice Number</span>
               <span className="font-medium text-gray-900">
-                {creditData.workOrderInvoice.invoice_number}
+                {creditData?.work_order_invoice_number}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-500">Invoice Total</span>
               <span className="font-semibold text-sm text-gray-900">
-                {formatCurrency(creditData.workOrderInvoice.total_amount)}
+                {formatCurrency(creditData?.invoice_total_amout)}
               </span>
             </div>
           </div>
@@ -153,12 +158,14 @@ function CreditNoteView() {
               <p className="text-gray-600">{creditData.creator.email}</p>
               <p className="text-gray-400">{formatDate(creditData.created_at)}</p>
             </div>
-            <div className="space-y-1 sm:border-l sm:border-gray-200 sm:pl-3">
-              <p className="text-gray-500 font-medium">Last Updated By</p>
-              <p className="font-medium text-gray-900">{creditData.updater.name}</p>
-              <p className="text-gray-600">{creditData.updater.email}</p>
-              <p className="text-gray-400">{formatDate(creditData.updated_at)}</p>
-            </div>
+            {creditData?.updater && (
+              <div className="space-y-1 sm:border-l sm:border-gray-200 sm:pl-3">
+                <p className="text-gray-500 font-medium">Last Updated By</p>
+                <p className="font-medium text-gray-900">{creditData?.updater?.name}</p>
+                <p className="text-gray-600">{creditData?.updater?.email}</p>
+                <p className="text-gray-400">{formatDate(creditData.updated_at)}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

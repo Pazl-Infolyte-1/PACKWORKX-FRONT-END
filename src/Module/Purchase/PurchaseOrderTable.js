@@ -130,12 +130,6 @@ function PurchaseOrderTable({
       field: 'supplier_name',
     },
     {
-      key: 'supplier_contact',
-      header: 'Supplier Contact',
-      field: 'supplier_contact',
-      type: 'number',
-    },
-    {
       key: 'po_date',
       header: 'PO Date',
       field: 'po_date',
@@ -152,9 +146,12 @@ function PurchaseOrderTable({
       header: 'Status',
       type: 'custom',
       render: (row) => (
-        <>
+        <div className="flex justify-center items-center -ml-5 w-full">
           <span
-            className={`px-2 py-1 rounded-full text-xs font-semibold -ml-5 w-[110px] text-center inline-block
+            className={`px-2 py-1 rounded-full text-xs font-semibold text-center inline-block
+            min-w-[80px] max-w-[120px] w-auto whitespace-nowrap
+            sm:min-w-[90px] sm:max-w-[130px]
+            md:min-w-[100px] md:max-w-[140px]
             ${row.po_status === 'partialy-recieved' ? 'bg-blue-100 text-blue-800' : ''}
             ${row.po_status === 'created' ? 'bg-green-100 text-green-800' : ''}
             ${row.po_status === 'returned' ? 'bg-red-100 text-red-800' : ''}
@@ -163,10 +160,10 @@ function PurchaseOrderTable({
             `}
           >
             {row.po_status === 'partialy-recieved'
-              ? 'Partialy Recieved'
+              ? 'Partially Received'
               : row.po_status.charAt(0).toUpperCase() + row.po_status.slice(1)}
           </span>
-        </>
+        </div>
       ),
     },
     {
@@ -174,9 +171,12 @@ function PurchaseOrderTable({
       header: 'Payment Status',
       type: 'custom',
       render: (row) => (
-        <>
+        <div className="flex justify-center items-center w-full">
           <span
-            className={`px-2 py-1 rounded-full text-xs font-semibold w-24 text-center inline-block
+            className={`px-2 py-1 rounded-full text-xs font-semibold text-center inline-block
+            min-w-[70px] max-w-[100px] w-auto whitespace-nowrap
+            sm:min-w-[80px] sm:max-w-[110px]
+            md:min-w-[90px] md:max-w-[120px]
             ${row.payment_status === 'partial' ? 'bg-blue-100 text-blue-800' : ''}
             ${row.payment_status === 'pending' ? 'bg-red-100 text-red-800' : ''}
             ${row.payment_status === 'completed' ? 'bg-teal-500 text-white' : ''}
@@ -184,7 +184,7 @@ function PurchaseOrderTable({
           >
             {row.payment_status.charAt(0).toUpperCase() + row.payment_status.slice(1)}
           </span>
-        </>
+        </div>
       ),
     },
     {
@@ -192,29 +192,34 @@ function PurchaseOrderTable({
       header: 'Decision',
       field: 'decision',
       type: 'custom',
-      render: (row) =>
-        row.po_status === 'created' ? (
-          <select
-            className={`border rounded px-2 py-1 ${row.po_status === 'created' ? 'bg-sky-200 text-black border-green-300' : 'bg-red-100 text-red-800 border-red-300'} text-xs w-[120px]`}
-            value={row.po_status}
-            onChange={(e) => handleStatusChange(row.id, e.target.value)}
-          >
-            <option value="approve">Approve</option>
-            <option value="disapprove">Reject</option>
-          </select>
-        ) : (
-          <div
-            className={`${row.decision === 'approve' ? 'bg-green-100 text-green-800 border-green-300 text-xs py-[5px] rounded-md' : 'bg-red-100 text-red-800 py-[3px] rounded-md text-xs'}`}
-          >
-            {row.decision.charAt(0).toUpperCase() + row.decision.slice(1)}
-          </div>
-        ),
-    },
-
-    {
-      key: 'payment_terms',
-      header: 'Payment Terms',
-      field: 'payment_terms',
+      render: (row) => (
+        <div className="flex justify-center items-center w-full">
+          {row.decision === 'approve' ? (
+            <select
+              className={`border rounded px-2 py-1 text-xs
+              min-w-[80px] max-w-[120px] w-full
+              sm:min-w-[90px] sm:max-w-[130px]
+              md:min-w-[100px] md:max-w-[140px]
+              bg-sky-200 text-black border-green-300`}
+              value={row.decision}
+              onChange={(e) => handleStatusChange(row.id, e.target.value)}
+            >
+              <option value="approve">Approve</option>
+              <option value="disapprove">Reject</option>
+            </select>
+          ) : (
+            <div
+              className={`border rounded px-2 py-1 text-xs text-center
+              min-w-[80px] max-w-[120px] w-full
+              sm:min-w-[90px] sm:max-w-[130px]
+              md:min-w-[100px] md:max-w-[140px]
+              bg-red-100 text-red-800 border-red-300`}
+            >
+              {row.decision.charAt(0).toUpperCase() + row.decision.slice(1)}
+            </div>
+          )}
+        </div>
+      ),
     },
     {
       key: 'actions',
@@ -222,45 +227,47 @@ function PurchaseOrderTable({
       field: 'actions',
       type: 'custom',
       render: (row) => (
-        <ThreeDotMenu
-          value={[
-            {
-              label: 'View',
-              icon: cilHandPointRight,
-              onClick: () => navigate(`/purchaseorder/${row.id}`),
-            },
+        <div className="flex justify-center items-center w-full">
+          <ThreeDotMenu
+            value={[
+              {
+                label: 'View',
+                icon: cilHandPointRight,
+                onClick: () => navigate(`/purchaseorder/${row.id}`),
+              },
 
-            ...(row.po_status === 'created'
-              ? [
-                  {
-                    label: 'Edit',
-                    icon: cilPencil,
-                    onClick: () => navigate(`/purchaseorder/form/${row.id}`),
-                  },
-                  {
-                    label: 'Delete',
-                    icon: cilTrash,
-                    onClick: () => openDeleteModal(row.id),
-                  },
-                ]
-              : []),
+              ...(row.po_status === 'created'
+                ? [
+                    {
+                      label: 'Edit',
+                      icon: cilPencil,
+                      onClick: () => navigate(`/purchaseorder/form/${row.id}`),
+                    },
+                    {
+                      label: 'Delete',
+                      icon: cilTrash,
+                      onClick: () => openDeleteModal(row.id),
+                    },
+                  ]
+                : []),
 
-            ...(row.po_status === 'received' || row.po_status === 'partialy-recieved'
-              ? [
-                  {
-                    label: 'Purchase Return',
-                    icon: cilPencil,
-                    onClick: () => handlePurchaseDetails(row.id),
-                  },
-                ]
-              : []),
-            {
-              label: 'Payment',
-              icon: cilMoney,
-              onClick: () => handlePaymentClick(row),
-            },
-          ]}
-        />
+              ...(row.po_status === 'received' || row.po_status === 'partialy-recieved'
+                ? [
+                    {
+                      label: 'Purchase Return',
+                      icon: cilPencil,
+                      onClick: () => handlePurchaseDetails(row.id),
+                    },
+                  ]
+                : []),
+              {
+                label: 'Payment',
+                icon: cilMoney,
+                onClick: () => handlePaymentClick(row),
+              },
+            ]}
+          />
+        </div>
       ),
     },
   ]
@@ -271,15 +278,17 @@ function PurchaseOrderTable({
   }
 
   return (
-    <div>
+    <div className="w-full overflow-x-auto">
       <CustomAlert alerts={alerts} handleClose={handleCloseAlert} />
-      <ReusableTable
-        data={data}
-        columns={columns}
-        handleRowClick={(row) => handleView(row)}
-        isMinimiseTable={isMinimiseTable}
-        miniScreenFields={['purchase_generate_id', 'supplier_contact']}
-      />
+      <div className="min-w-full">
+        <ReusableTable
+          data={data}
+          columns={columns}
+          handleRowClick={(row) => handleView(row)}
+          isMinimiseTable={isMinimiseTable}
+          miniScreenFields={['purchase_generate_id', 'supplier_contact']}
+        />
+      </div>
 
       {/* Popups */}
       {showPopUp && (

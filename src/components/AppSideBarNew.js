@@ -105,6 +105,7 @@ const staticReportArray = [
     { name: "Debit Note", to: "/reportspage" },
   { name: "Stock Adjustments", to: "/reportspage" },
   { name: "Bills", to: "/reportspage" },
+  { name: 'Modules', to: '/modules' },
 ];
 
   return (
@@ -444,6 +445,15 @@ const staticReportArray = [
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/billingmain">
                     {navLink('Bills', 'cilMoney')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
+            if (module.modules_description === 'Modules') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/modules">
+                    {navLink('Modules', 'cilApps')}
                   </CNavLink>
                 </CNavItem>
               )

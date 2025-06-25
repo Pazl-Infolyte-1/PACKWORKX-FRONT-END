@@ -429,22 +429,22 @@ const SalesReturnForm = () => {
               <table className="w-full bg-gray-100 rounded border-collapse shadow">
                 <tbody>
                   <tr className="border-b border-gray-200">
-                    <td className="px-4 py-3 text-gray-500 text-sm">Return Qty:</td>
-                    <td className="px-4 py-3 text-gray-700 text-sm font-medium">
+                    <td className="px-4 py-2 text-gray-500 text-sm">Return Qty:</td>
+                    <td className="px-4 py-2 text-gray-700 text-sm font-medium">
                       {formValues.total_qty}
                     </td>
                   </tr>
                   <tr className="border-b border-gray-200">
-                    <td className="px-4 py-3 text-gray-500 text-sm">Total GST:</td>
-                    <td className="px-4 py-3 text-gray-700 text-sm font-medium">
+                    <td className="px-4 py-2 text-gray-500 text-sm">Total GST:</td>
+                    <td className="px-4 py-2 text-gray-700 text-sm font-medium">
                       {(Number(formValues.cgst_amount) + Number(formValues.sgst_amount)).toFixed(2)}
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 text-gray-800 font-semibold text-sm">
+                    <td className="px-4 py-2 text-gray-800 font-semibold text-sm">
                       Total Incl GST:
                     </td>
-                    <td className="px-4 py-3 text-gray-800 font-semibold text-sm">
+                    <td className="px-4 py-2 text-gray-800 font-semibold text-sm">
                       {Number(formValues.total_incl_gst).toFixed(2)}
                     </td>
                   </tr>

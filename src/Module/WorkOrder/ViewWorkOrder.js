@@ -237,14 +237,14 @@ const ViewWorkOrder = () => {
 
 
 
-      const downloadResponse = await invoiceApi.downloadInvoice(response.data.data.id)
-      const blob = new Blob([downloadResponse.data], { type: 'application/pdf' })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `INV-00${response.data.data.id}.pdf`
-      link.click()
-      URL.revokeObjectURL(url)
+      // const downloadResponse = await invoiceApi.downloadInvoice(response.data.data.id)
+      // const blob = new Blob([downloadResponse.data], { type: 'application/pdf' })
+      // const url = URL.createObjectURL(blob)
+      // const link = document.createElement('a')
+      // link.href = url
+      // link.download = `INV-00${response.data.data.id}.pdf`
+      // link.click()
+      // URL.revokeObjectURL(url)
 
       
       setTimeout(() => {

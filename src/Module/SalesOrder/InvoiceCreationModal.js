@@ -14,9 +14,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
     }
   }, [workOrder]);
 
-  useEffect(() => {
-    console.log(selectedSku)
-  }, [selectedSku]);
+
 
   const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm({
     defaultValues: {
@@ -173,6 +171,16 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
       total_amount: useCredit ? invoiceWithGst - credit_amount : invoiceWithGst, // invoice amount minus credit if used
       credit_amount: useCredit ? credit_amount : 0,
       received_amount,
+      sku_details:{
+        sku_id: data?.sku_id,
+        sku: workOrder?.sku_name,
+        quantity_required: data?.quantity,
+        rate_per_sku: data?.rate_per_qty,
+        total_amount: total,
+        gst: gstAmount,
+        total_incl__gst: useCredit ? invoiceWithGst - credit_amount : invoiceWithGst,
+        discount: data?.discount,
+      }
     };
 
     // Add email/whatsapp if sendViaEmail is checked
@@ -180,6 +188,8 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
       payload.client_email = email;
       payload.client_phone = whatsapp;
     }
+
+    console.log(payload)
 
     try {
       await onSubmit(payload);

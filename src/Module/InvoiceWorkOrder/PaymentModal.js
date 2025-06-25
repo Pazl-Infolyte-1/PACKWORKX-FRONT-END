@@ -122,6 +122,11 @@ console.log(clientName)
       work_order_invoice_id: invoiceId,
     };
 
+    // If payment type is wallet, add credit_amount to payload
+    if (data.payment_type === 'wallet') {
+      payload.credit_amount = +data.amount;
+    } 
+
     try {
       const response = await invoiceApi.createPayment(payload);
       console.log(response);

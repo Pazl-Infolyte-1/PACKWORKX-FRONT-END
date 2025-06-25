@@ -184,10 +184,14 @@ const GrnView = ({}) => {
                       gridTemplateColumns: '1fr 1fr 2fr 1fr 1fr 1fr 1fr 1fr',
                     }}
                   >
-                    <div>
-                      {items.find((i) => i.id === item.item_id)?.item_name || 'N/A'}
+                    <div className='flex items-center'>
+                      <div>
+                        {items.find((i) => i.id === item.item_id)
+                          ? `${items.find((i) => i.id === item.item_id).item_generate_id} - ${items.find((i) => i.id === item.item_id).item_name}`
+                          : 'N/A'}
+                      </div>
                       <span
-                        className="cursor-pointer text-indigo-500 hover:text-indigo-700 ml-2"
+                        className="cursor-pointer text-indigo-500 hover:text-indigo-700 mr-2"
                         onClick={() => openItemDetails(item.item_id)}
                       >
                         ℹ️

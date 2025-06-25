@@ -256,7 +256,7 @@ function PurchaseOrderDetails() {
                           <td className="px-3 w-44 py-4">
                             <div className="flex items-center justify-between gap-3">
                               <div>
-                                <div className="text-sm font-medium text-blue-600 cursor-pointer hover:underline">
+                                <div className="text-sm font-medium cursor-pointer">
                                   {item.item_info.item_generate_id}- {item.item_info.item_name}
                                 </div>
                               </div>

@@ -323,7 +323,7 @@ function PurchaseOrderPaymentHistoryModal({
           </div>
         </div>
         {/* PO Info */}
-        <div className="flex justify-between px-6 pt-2 pb-1 border-b border-gray-100 bg-white">
+        <div className="flex justify-between items-center px-6 pt-2 pb-1 border-b border-gray-100 bg-white">
           <div className="text-xs text-gray-500 flex flex-col gap-1">
             {purchaseOrderNumber && (
               <span>
@@ -341,9 +341,6 @@ function PurchaseOrderPaymentHistoryModal({
             </span>
             <span>
               <span className="font-semibold">Paid Amount: ₹{paidAmount} </span>
-            </span>
-            <span>
-              <span className="font-semibold">Pending Amount: ₹{pendingAmount}</span>
             </span>
           </div>
           <div className="text-sm font-bold">

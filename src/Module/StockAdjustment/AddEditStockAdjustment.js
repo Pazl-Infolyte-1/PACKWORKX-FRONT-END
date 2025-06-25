@@ -28,7 +28,7 @@ const AddEditStockAdjustment = () => {
   const [GRNItems, setGRNItems] = useState({})
   const [InventoryItems, setInventoryItems] = useState({})
   const selectedGRNIds = useSelector((state) => state?.auth?.stockAdjustmentGRNArray || [])
-  const PoID = location.state?.PoID
+  const PoID = location.state?.item_id
   const adjustmentMode = {
     // 'value Adjustment': 'Value Adjustment',
     'Quantity Adjustment': 'Quantity Adjustment',
@@ -162,7 +162,6 @@ const AddEditStockAdjustment = () => {
     const fetchProduct = async () => {
       try {
         const response = await grnApi.getProductsForStockAdjustment()
-        console.log('Product Data:', response.data)
         setProduct(response?.data)
       } catch (error) {
         console.error('Error fetching items:', error)
@@ -323,13 +322,13 @@ const AddEditStockAdjustment = () => {
     //   ...prev,
     //   [rowIndex]: [],
     // }))
-    getInventoryByItemId(selectedProductId, rowIndex)
+    // getInventoryByItemId(selectedProductId, rowIndex)
   }
 
   const getInventoryByItemId = async (selectedProductId, rowIndex) => {
     try {
       const response = await grnApi.getInventoryByItemId(selectedProductId)
-      console.log('Inventory Data:', response?.data?.data)
+      console.log('Inventory     Data:', response?.data?.data)
       setInventoryItems((prev) => ({
         ...prev,
         [rowIndex]: response?.data?.data || [],
@@ -461,7 +460,7 @@ const AddEditStockAdjustment = () => {
           </select>
         </div>
         <div className="flex items-center gap-4">
-          <label className="text-xs text-black-600 text-left text-xs placeholder:text-xs ml-4 w-40">
+          <label className="text-xs text-black-600 text-left placeholder:text-xs ml-4 w-40">
             Description
           </label>
           <input
@@ -670,7 +669,7 @@ const AddEditStockAdjustment = () => {
               <button
                 type="submit"
                 color="primary"
-                className="h-8 w- rounded-md flex text-xs  items-center justify-center px-4 py-2 shadow-md border-none cursor-pointer text-white bg-[#8167E5] text-white rounded-md hover:bg-opacity-90 transition-all"
+                className="h-8 w- rounded-md flex text-xs  items-center justify-center px-4 py-2 shadow-md border-none cursor-pointer text-white bg-[#8167E5] hover:bg-opacity-90 transition-all"
               >
                 Submit Adjustment
               </button>

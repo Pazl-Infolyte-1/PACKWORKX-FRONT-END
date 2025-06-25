@@ -123,7 +123,7 @@ export const purchaseOrderApi = {
     }
   },
 
-    getPurchaseOrderDropdown: async () => {
+  getPurchaseOrderDropdown: async () => {
     try {
       const response = await apiClient.get('/purchase-order?limit=10000')
       return response.data
@@ -212,6 +212,25 @@ export const purchaseOrderApi = {
       return await apiClient.get(`/purchase-order/bill-get`)
     } catch (error) {
       console.error('Error fetching bill for PO:', error.response?.data || error.message)
+      throw error
+    }
+  },
+  createPayment: async (payload) => {
+    try {
+      return await apiClient.post('/purchase-order/payment/details', payload)
+    } catch (error) {
+      console.error('Error creating purchase order payment:', error.response?.data || error.message)
+      throw error
+    }
+  },
+  getPaymentHistory: async (po_id) => {
+    try {
+      return await apiClient.get(`/purchase-order/payment/details/${po_id}`)
+    } catch (error) {
+      console.error(
+        `Error fetching payment history for PO ID ${po_id}:`,
+        error.response?.data || error.message,
+      )
       throw error
     }
   },

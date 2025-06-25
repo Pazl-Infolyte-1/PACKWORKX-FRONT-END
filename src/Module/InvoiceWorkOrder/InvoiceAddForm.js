@@ -6,6 +6,7 @@ import { clientApi } from '../../api/client';
 import { skuApi } from '../../api/sku';
 import ActionButton from '../../components/New/ActionButton';
 import { invoiceApi } from '../../api/Invoice';
+import CustomAlert from '../../components/New/CustomAlert';
 
 const InvoiceAddForm = forwardRef((props, ref) => {
   const navigate = useNavigate();
@@ -32,6 +33,12 @@ const InvoiceAddForm = forwardRef((props, ref) => {
   const [selectedWorkOrder, setSelectedWorkOrder] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [alerts, setAlerts] = useState([]);
+  const [creditBalance, setCreditBalance] = useState(0);
+  const [useCredit, setUseCredit] = useState(false);
+  const [sendViaEmail, setSendViaEmail] = useState(false);
+  const [email, setEmail] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [receivedAmount, setReceivedAmount] = useState("");
 
   const dropdownRef = useRef(null);
 
@@ -49,7 +56,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       balance: '',
       payment_expected_date: '',
       transaction_type: '',
-      discount_type: '',
+      discount_type: 'percentage',
       discount: '',
       payment_status: '',
       sku_details: [{
@@ -72,6 +79,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
   // Watch form values
   const formValues = watch();
   const skuDetailsData = watch('sku_details');
+  const paymentStatus = watch('payment_status');
 
   // Determine if form is opened from a work order
   const isFromWorkOrder = Boolean(location.state && location.state.workOrder);
@@ -89,6 +97,10 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+  
+  const handleClose = () => {
+    setAlerts([])
+  }
 
   // Fetch clients on search term change
   useEffect(() => {
@@ -173,24 +185,19 @@ const InvoiceAddForm = forwardRef((props, ref) => {
   }, [location.state, skuList, workOrders]);
 
   // Handle client selection
-  const selectClient = (clientName, client_id, client_state_id) => {
+  const selectClient = async (clientName, client_id, client_state_id) => {
     const stateID = localStorage.getItem('company_state_id');
-  
     const selectedClient = clients.find(
       (client) => client.company_name === clientName
     );
-
-
     if (selectedClient) {
       const isSameState = selectedClient?.addresses[0]?.state == stateID;
       setIsIgstApplicable(!isSameState);
     }
-
     setSelectedClient(client_id);
     setValue('client_name', clientName);
     setValue('client_id', client_id);
     setIsOpen(false);
-
     // Clear SKU details and work order selection when client changes
     setValue('sku_details', [{
       sku_id: null,
@@ -199,7 +206,8 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       rate_per_sku: '',
       total_amount: '',
       gst: '',
-      total_incl__gst: ''
+      total_incl__gst: '',
+      discount: '',
     }]);
     setValue('work_id', '');
     setSelectedWorkOrder(null);
@@ -212,7 +220,14 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       sgst: 0,
       igst: 0
     });
-
+    // Fetch credit balance
+    try {
+      const res = await clientApi.singleClients(client_id);
+      setCreditBalance(res?.data?.credit_balance || 0);
+    } catch (e) {
+      setCreditBalance(0);
+    }
+    // Fetch work orders
     const fetchWorkOrders = async () => {
       try {
         const response = await invoiceApi.getWorkOrdersListByClientId(client_id);
@@ -221,20 +236,31 @@ const InvoiceAddForm = forwardRef((props, ref) => {
         console.error("Error fetching work orders:", error);
       }
     };
-    
     fetchWorkOrders();
+    // Clear all form state
+    setValue('discount', '');
+    setValue('discount_type', '');
   };
 
   // Calculate row values
-  const calculateRowValues = (index) => {
+  const calculateRowValues = (index, overallDiscountShare = 0) => {
     const values = getValues(`sku_details[${index}]`);
     const quantity = parseFloat(values.quantity_required) || 0;
     const rate = parseFloat(values.rate_per_sku) || 0;
-    const totalAmount = quantity * rate;
-
+    let individualDiscount = parseFloat(values.discount) || 0;
+    // Use both overall discount share and individual discount for calculation
+    let totalDiscount = overallDiscountShare + individualDiscount;
+    let totalAmount = quantity * rate;
+    // If discount is percentage (e.g. < 1), treat as percent (only for individual discount)
+    if (individualDiscount > 0 && individualDiscount < 1) {
+      individualDiscount = totalAmount * individualDiscount;
+      totalDiscount = overallDiscountShare + individualDiscount;
+    }
+    // Subtract totalDiscount from totalAmount
+    totalAmount = totalAmount - totalDiscount;
+    if (totalAmount < 0) totalAmount = 0;
     const selectedSku = skuList.find(sku => sku.sku_name === values.sku);
     const gstPercentage = selectedSku?.gst_percentage || 0;
-
     if (isIgstApplicable) {
       const igstAmount = totalAmount * (gstPercentage / 100);
       setValue(`sku_details[${index}].gst`, igstAmount.toFixed(2));
@@ -248,38 +274,79 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       setValue(`sku_details[${index}].total_amount`, totalAmount.toFixed(2));
       setValue(`sku_details[${index}].total_incl__gst`, (totalAmount + sgstAmount + cgstAmount).toFixed(2));
     }
-
-    recalculateAllTotals();
   };
 
   // Recalculate all totals
   const recalculateAllTotals = () => {
     const currentData = getValues('sku_details') || [];
-    if (!currentData || currentData.length === 0) return;
-
-    const qty = currentData.reduce((sum, item) => sum + (parseFloat(item.quantity_required) || 0), 0);
-    const amount = currentData.reduce((sum, item) => sum + (parseFloat(item.total_amount) || 0), 0);
-    const withGST = currentData.reduce((sum, item) => sum + (parseFloat(item.total_incl__gst) || 0), 0);
-    
-    // Calculate total GST amount (difference between withGST and amount)
-    const totalGstAmount = withGST - amount;
-
-
-    setValue('total',amount)
-    setValue('total_tax',totalGstAmount)
-    setValue('total_amount',withGST)
-    setValue('quantity',qty)
-
+    if (!currentData || currentData.length === 0) {
+      setValue('total', 0);
+      setValue('total_tax', 0);
+      setValue('total_amount', 0);
+      setValue('quantity', 0);
+      setTotals({
+        total_qty: 0,
+        total_amount: 0,
+        totalGst: 0,
+        total_incl_gst: 0,
+        cgst: 0,
+        sgst: 0,
+        igst: 0,
+        discountAmount: 0,
+        discountedSubtotal: 0,
+        creditBalance,
+        useCredit
+      });
+      return;
+    }
+    // Subtotal before any discounts
+    let subtotal = currentData.reduce((sum, item) => sum + (parseFloat(item.quantity_required) || 0) * (parseFloat(item.rate_per_sku) || 0), 0);
+    // Overall discount logic
+    const discountType = getValues('discount_type');
+    let overallDiscount = parseFloat(getValues('discount')) || 0;
+    let discountAmount = 0;
+    if (discountType === 'percentage') {
+      discountAmount = subtotal * (overallDiscount / 100);
+    } else if (discountType === 'fixed') {
+      discountAmount = overallDiscount;
+    }
+    if (discountAmount > subtotal) discountAmount = subtotal;
+    // Calculate per-SKU share of overall discount
+    const numSkus = currentData.length;
+    const overallDiscountShare = numSkus > 0 ? discountAmount / numSkus : 0;
+    // Recalculate each row with its share of overall discount
+    currentData.forEach((item, idx) => {
+      calculateRowValues(idx, overallDiscountShare);
+    });
+    // Now, recalculate totals based on updated values
+    let discountedSubtotal = 0;
+    let totalGstAmount = 0;
+    let withGST = 0;
+    let totalQty = 0;
+    currentData.forEach((item) => {
+      const itemAmount = parseFloat(item.total_amount) || 0;
+      const itemGst = parseFloat(item.gst) || 0;
+      discountedSubtotal += itemAmount;
+      totalGstAmount += itemGst;
+      withGST += (parseFloat(item.total_incl__gst) || 0);
+      totalQty += parseFloat(item.quantity_required) || 0;
+    });
+    setValue('total', subtotal);
+    setValue('total_tax', totalGstAmount);
+    setValue('total_amount', withGST);
+    setValue('quantity', totalQty);
     setTotals({
-      total_qty: qty,
-      total_amount: amount,
+      total_qty: totalQty,
+      total_amount: subtotal,
       totalGst: totalGstAmount,
       total_incl_gst: withGST,
-            // For CGST and SGST, split the GST amount in half
-            cgst: isIgstApplicable ? 0 : totalGstAmount / 2,
-            sgst: isIgstApplicable ? 0 : totalGstAmount / 2,
-            // For IGST, use the full GST amount
-            igst: isIgstApplicable ? totalGstAmount : 0
+      cgst: isIgstApplicable ? 0 : totalGstAmount / 2,
+      sgst: isIgstApplicable ? 0 : totalGstAmount / 2,
+      igst: isIgstApplicable ? totalGstAmount : 0,
+      discountAmount,
+      discountedSubtotal,
+      creditBalance,
+      useCredit
     });
   };
 
@@ -288,6 +355,22 @@ const InvoiceAddForm = forwardRef((props, ref) => {
     try {
       setAttemptedSubmit(true);
       setIsSubmitting(true);
+
+      // If sendViaEmail is checked, validate email and WhatsApp
+      if (sendViaEmail) {
+        if (!email || !whatsapp) {
+          setAlerts([{ severity: "error", message: "Email and WhatsApp are required if sending invoice via Email/WhatsApp." }]);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // If payment status is partial, receivedAmount is required
+      if (data.payment_status === 'partial' && (!receivedAmount || isNaN(receivedAmount))) {
+        setAlerts([{ severity: "error", message: "Received Amount is required for partial payment status." }]);
+        setIsSubmitting(false);
+        return;
+      }
 
       // Check if any mandatory field is empty
       if (!data.client_name || !data.invoice_reference || !data.invoice_date || 
@@ -303,17 +386,55 @@ const InvoiceAddForm = forwardRef((props, ref) => {
         ...data,
         totals
       };
+      if (sendViaEmail) {
+        body.client_email = email;
+        body.client_phone = whatsapp;
+      }
+
+      // CREDIT LOGIC: pass used credit amount (not more than total_incl_gst)
+      let credit_amount = 0;
+      if (useCredit) {
+        credit_amount = Math.min(creditBalance, totals.total_incl_gst);
+      }
+      body.credit_amount = useCredit ? credit_amount : 0;
+
+      // Set total_amount as final amount after deducting used credit (if any)
+      if (useCredit) {
+        body.total_amount = Math.max((totals.total_incl_gst || 0) - credit_amount, 0);
+      } else {
+        body.total_amount = totals.total_incl_gst || 0;
+      }
+
+      if (data.payment_status === 'partial') {
+        body.received_amount = parseFloat(receivedAmount) || 0;
+      } else if (data.payment_status === 'paid') {
+        body.received_amount = totals.total_incl_gst || 0;
+      } else {
+        body.received_amount = 0;
+      }
 
       const response = await invoiceApi.createInvoice(body);
+            const downloadResponse = await invoiceApi.downloadInvoice(response.data.data.id)
+      const blob = new Blob([downloadResponse.data], { type: 'application/pdf' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `INV-00${response.data.data.id}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
       
       // Show success message
-      setAlerts([{
-        severity: "success",
-        message: "Invoice created successfully"
-      }]);
+
+        setAlerts([{
+          severity: "success",
+          message: "Invoice created successfully"
+        }])
+
 
       // Navigate to the invoice view page
-      navigate(`/invoice/view/${response.data.data.id}`);
+      setTimeout(() => {
+        navigate(`/invoice/view/${response.data.data.id}`);
+      }, 500);
 
     } catch (error) {
       console.error("Error creating invoice:", error);
@@ -347,8 +468,34 @@ const InvoiceAddForm = forwardRef((props, ref) => {
     // e.preventDefault();
   };
 
+  // Add this helper function after state declarations
+  const getIndividualDiscountTotal = () => {
+    return (getValues('sku_details') || []).reduce((sum, item) => sum + (parseFloat(item.discount) || 0), 0);
+  };
+
+  const discountType = watch('discount_type');
+
+  const discountPlaceholder = discountType === 'percentage'
+    ? 'Enter discount (%)'
+    : discountType === 'fixed'
+      ? 'Enter discount (₹)'
+      : 'Enter discount amount';
+
+  // Auto-set payment status to 'paid' if credit covers the full amount
+  useEffect(() => {
+    if (useCredit) {
+      const total = totals.total_incl_gst || 0;
+      const credit = creditBalance || 0;
+      const finalAmount = total - credit;
+      if (finalAmount <= 0) {
+        setValue('payment_status', 'paid');
+        setReceivedAmount(credit > total ? total : credit); // received amount is total if credit exceeds total
+      }
+    }
+  }, [useCredit, totals.total_incl_gst, creditBalance, setValue]);
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="pl-2">
+    <form onSubmit={handleSubmit(onSubmit)} className="pl-2 h-[90vh] overflow-scroll">
       <div className="relative">
         <div className="w-full">
           <div className="flex flex-col gap-3">
@@ -422,7 +569,9 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                     // Find the SKU from skuList to get its ID
                     const selectedSku = skuList.find(sku => sku.sku_name === workOrder?.sku_name);
                     // Clear existing SKUs and add the new one
-                    remove(0);
+                    remove();
+                    setValue('discount', '');
+                    setValue('discount_type', '');
                     append({
                       sku_id: selectedSku?.id || null,
                       sku: workOrder?.sku_name || '',
@@ -550,6 +699,14 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                   <div className="flex">
                     <select
                       {...register('discount_type')}
+                      onChange={e => {
+                        // Clear all individual discounts when overall discount type/amount is changed
+                        register('discount_type').onChange(e);
+                        setValue('discount', '');
+                        const skuDetails = getValues('sku_details') || [];
+                        skuDetails.forEach((_, idx) => setValue(`sku_details[${idx}].discount`, ''));
+                        recalculateAllTotals();
+                      }}
                       className={`h-7 w-32 rounded-l border px-3 text-sm ${
                         attemptedSubmit && errors.discount_type ? "ring-1 ring-red-600" : "border-gray-300"
                       }`}
@@ -562,7 +719,14 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                       type="number"
                       {...register('discount')}
                       onWheel={preventScroll}
-                      placeholder="Enter discount amount"
+                      onChange={e => {
+                        // Clear all individual discounts when overall discount amount is changed
+                        register('discount').onChange(e);
+                        const skuDetails = getValues('sku_details') || [];
+                        skuDetails.forEach((_, idx) => setValue(`sku_details[${idx}].discount`, ''));
+                        recalculateAllTotals();
+                      }}
+                      placeholder={discountPlaceholder}
                       className={`h-7 w-48 rounded-r border px-3 text-sm ${
                         attemptedSubmit && errors.discount ? "ring-1 ring-red-600" : "border-gray-300"
                       }`}
@@ -596,9 +760,68 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                     <option value="paid">Paid</option>
                     <option value="partial">Partial</option>
                   </select>
+                  {/* Received Amount input for Partial status */}
+                  {paymentStatus === 'partial' && (
+                    <div className="ml-1">
+                      {/* <label className="text-xs text-red-600">Received Amount*</label> */}
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={receivedAmount}
+                        onChange={e => setReceivedAmount(e.target.value)}
+                        className={`h-7 w-40 rounded border px-3 text-sm ${
+                          attemptedSubmit && (!receivedAmount || isNaN(receivedAmount)) ? 'ring-1 ring-red-600' : 'border-gray-300'
+                        }`}
+                        placeholder="received amount"
+                        required={paymentStatus === 'partial'}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
+
+            {/* Send via Email/WhatsApp Checkbox */}
+            <div className="mt-4 flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id="sendViaEmail"
+                checked={sendViaEmail}
+                onChange={e => setSendViaEmail(e.target.checked)}
+                className="accent-blue-600"
+              />
+              <label htmlFor="sendViaEmail" className="text-sm text-gray-700 font-medium">
+                Send Invoice via Email/WhatsApp?
+              </label>
+            </div>
+            {/* Conditional Email and WhatsApp fields */}
+            {sendViaEmail && (
+              <div className="flex flex-col md:flex-row gap-2 mt-2 mb-2 items-center">
+                <div className="flex flex-col w-full md:w-64">
+                  <label className="text-xs font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="h-7 w-full px-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    placeholder="Enter email address"
+                    required={sendViaEmail}
+                  />
+                </div>
+                <div className="flex flex-col w-full md:w-56">
+                  <label className="text-xs font-medium text-gray-700 mb-1">WhatsApp</label>
+                  <input
+                    type="tel"
+                    value={whatsapp}
+                    onChange={e => setWhatsapp(e.target.value)}
+                    className="h-7 w-full px-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    placeholder="WhatsApp number"
+                    required={sendViaEmail}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* SKU Table */}
             <div className="mt-8 bg-white rounded-md w-full">
@@ -611,15 +834,15 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                           <th className="py-2 px-2 text-sm font-bold text-left rounded-tl-xl">Item Table</th>
                           <th className=""></th>
                           <th className=""></th>
-                          {/* <th className=""></th> */}
+                          <th className=""></th>
                           <th className="rounded-tr-xl"></th>
                         </tr>
 
                         <tr>
                           <th className="py-2 pl-2 border-r border-b text-xs font-medium text-left">ITEM DETAILS</th>
                           <th className="p-2 border-r text-xs font-medium text-right">QUANTITY</th>
-                          {/* <th className="p-2 border-r text-xs font-medium text-right uppercase">Acceptable</th> */}
                           <th className="p-2 border-r text-xs font-medium text-right">RATE</th>
+                          <th className="p-2 border-r text-xs font-medium text-right">DISCOUNT ₹</th>
                           <th className="p-2 border-b text-xs font-medium text-right">AMOUNT</th>
                           <th className="py-2 w-10"></th>
                         </tr>
@@ -676,11 +899,16 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 <input
                                   {...register(`sku_details[${index}].quantity_required`)}
                                   type="number"
-                            min="0"
-
+                                  min="0"
                                   onWheel={preventScroll}
                                   onChange={e => {
-                                    register(`sku_details[${index}].quantity_required`).onChange(e);
+                                    let value = parseFloat(e.target.value);
+                                    if (isNaN(value) || value < 0) value = 0;
+                                    setValue(`sku_details[${index}].quantity_required`, value);
+                                    register(`sku_details[${index}].quantity_required`).onChange({
+                                      ...e,
+                                      target: { ...e.target, value }
+                                    });
                                     calculateRowValues(index);
                                     recalculateAllTotals();
                                   }}
@@ -691,26 +919,52 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 />
                               </td>
 
-                              <td className="p-1 border items-start">
-                                <input
-                                  {...register(`sku_details[${index}].discount`)}
-                                  type="number"
-                                  className="w-full h-[40px] text-right border-none focus:outline-none"
-                                />
-                              </td>
+
 
                               <td className="p-0 border">
                                 <input
                                   {...register(`sku_details[${index}].rate_per_sku`)}
                                   type="number"
+                                  min="0"
                                   onWheel={preventScroll}
                                   onChange={e => {
-                                    register(`sku_details[${index}].rate_per_sku`).onChange(e);
+                                    let value = parseFloat(e.target.value);
+                                    if (isNaN(value) || value < 0) value = 0;
+                                    setValue(`sku_details[${index}].rate_per_sku`, value);
+                                    register(`sku_details[${index}].rate_per_sku`).onChange({
+                                      ...e,
+                                      target: { ...e.target, value }
+                                    });
                                     calculateRowValues(index);
                                     recalculateAllTotals();
                                   }}
                                   className="w-full h-[40px] text-right border-none focus:outline-none"
                                 />
+                              </td>
+
+                              <td className="p-1 border items-start" style={{ position: 'relative' }}>
+                                <input
+                                  {...register(`sku_details[${index}].discount`)}
+                                  type="number"
+                                  min="0"
+                                  onChange={e => {
+                                    let value = parseFloat(e.target.value);
+                                    if (isNaN(value) || value < 0) value = 0;
+                                    setValue(`sku_details[${index}].discount`, value);
+                                    // Clear overall discount and type when individual discount is changed
+                                    setValue('discount', '');
+                                    setValue('discount_type', '');
+                                    register(`sku_details[${index}].discount`).onChange({
+                                      ...e,
+                                      target: { ...e.target, value }
+                                    });
+                                    calculateRowValues(index);
+                                    recalculateAllTotals();
+                                  }}
+                                  className="w-full h-[40px] text-right border-none focus:outline-none pr-6"
+                                />
+                                {/* Rupee icon */}
+                                <span style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#888' }}>₹</span>
                               </td>
 
                               <td className="pr-2 border-b text-right">
@@ -724,7 +978,10 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                               <td className="py-2 text-center">
                                 <button
                                   type="button"
-                                  onClick={() => remove(index)}
+                                  onClick={() => {
+                                    remove(index);
+                                    recalculateAllTotals();
+                                  }}
                                   disabled={!!selectedWorkOrder}
                                   className={`text-red-500 hover:text-red-700 ${selectedWorkOrder ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
@@ -742,10 +999,47 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                 <td colSpan={1} className="border-b pl-4 py-1 italic text-gray-500">
                                   GST Details ({skuDetailsData[index]?.sku})
                                 </td>
-                                <td colSpan={2} className="border-b pl-4 py-1 italic text-gray-500">
+
+                                <td colSpan={1} className="border-b pl-4 py-1 italic text-gray-500">
                                   {selectedWorkOrder ? (
                                     <>Pending Invoice Quantity : {selectedWorkOrder?.pending_invoice}</>
                                   ) : null}
+                                </td>
+
+                                <td colSpan={1} className="border-b pl-4 py-1 italic text-gray-500">
+                                  {(formValues.sku_details[index]?.quantity_required && formValues.sku_details[index]?.rate_per_sku) ? (
+                                    <>
+                                      {formValues.sku_details[index].quantity_required} × {formValues.sku_details[index].rate_per_sku}
+                                      {" = "}
+                                      {(parseFloat(formValues.sku_details[index].quantity_required) * parseFloat(formValues.sku_details[index].rate_per_sku)).toFixed(2)}
+                                    </>
+                                  ) : null}
+                                </td>
+
+                                <td className="border-b pr-2 py-1 italic text-blue-700 text-right">
+                                  {(() => {
+                                    // Calculate the total discount applied to this SKU (overall + individual)
+                                    const discountType = getValues('discount_type');
+                                    const overallDiscount = parseFloat(getValues('discount')) || 0;
+                                    const numSkus = skuDetailsData.length;
+                                    let overallShare = 0;
+                                    if (discountType === 'percentage') {
+                                      // Use the discountAmount calculated in recalculateAllTotals
+                                      const subtotal = skuDetailsData.reduce((sum, item) => sum + (parseFloat(item.quantity_required) || 0) * (parseFloat(item.rate_per_sku) || 0), 0);
+                                      const discountAmount = subtotal * (overallDiscount / 100);
+                                      overallShare = numSkus > 0 ? discountAmount / numSkus : 0;
+                                    } else if (discountType === 'fixed') {
+                                      overallShare = numSkus > 0 ? overallDiscount / numSkus : 0;
+                                    }
+                                    let individualDiscount = parseFloat(skuDetailsData[index]?.discount) || 0;
+                                    // If individual discount is a percent (<1), treat as percent of that SKU's subtotal
+                                    const skuSubtotal = (parseFloat(skuDetailsData[index]?.quantity_required) || 0) * (parseFloat(skuDetailsData[index]?.rate_per_sku) || 0);
+                                    if (individualDiscount > 0 && individualDiscount < 1) {
+                                      individualDiscount = skuSubtotal * individualDiscount;
+                                    }
+                                    const totalDiscount = overallShare + individualDiscount;
+                                    return `Discount applied: ₹${totalDiscount.toFixed(2)}`;
+                                  })()}
                                 </td>
                                 <td colSpan={3} className="border-b pr-2 py-1">
                                   <div className="flex justify-end gap-4">
@@ -786,7 +1080,8 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                           rate_per_sku: '',
                           total_amount: '',
                           gst: '',
-                          total_incl__gst: ''
+                          total_incl__gst: '',
+                          discount: ''
                         })}
                         disabled={!!selectedWorkOrder}
                         className={`flex items-center h-8 w-28 text-xs bg-gray-100 hover:bg-gray-200 text-blue-600 py-2 px-3 rounded mr-2 ${
@@ -801,30 +1096,83 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                           <tbody className="gap-4">
                             <tr className="border-b border-gray-200">
                               <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                                Total Amount:
+                                Subtotal (before SKU discounts):
                               </td>
                               <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                                {String(totals.total_amount || 0).slice(0, 20)}
+                                ₹{String(totals.total_amount || 0).slice(0, 20)}
                               </td>
                             </tr>
-
+                            <tr className="border-b border-gray-200">
+                              <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                                Total Discount:
+                              </td>
+                              <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                                {(() => {
+                                  const individualTotal = getIndividualDiscountTotal();
+                                  if (individualTotal > 0) {
+                                    return `-₹${String(individualTotal).slice(0, 20)}`;
+                                  } else {
+                                    return `-₹${String(totals.discountAmount || 0).slice(0, 20)}`;
+                                  }
+                                })()}
+                              </td>
+                            </tr>
+                            <tr className="border-b border-gray-200">
+                              <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                                Subtotal (after per-SKU discounts):
+                              </td>
+                              <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                                ₹{String(totals.discountedSubtotal || 0).slice(0, 20)}
+                              </td>
+                            </tr>
                             <tr className="border-b border-gray-200">
                               <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                                 Total GST:
                               </td>
                               <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                                 {isIgstApplicable 
-                                  ? String(totals.igst ?? 0).slice(0, 6)
-                                  : String((totals.cgst || 0) + (totals.sgst || 0)).slice(0, 20)}
+                                  ? `₹${String(totals.igst ?? 0).slice(0, 20)}`
+                                  : `₹${String((totals.cgst || 0) + (totals.sgst || 0)).slice(0, 20)}`}
                               </td>
                             </tr>
-
-                            <tr>
+                            <tr className="border-b border-gray-200">
                               <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
                                 Total Incl GST:
                               </td>
                               <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
-                                {String(totals.total_incl_gst || 0).slice(0, 20)}
+                                ₹{String(totals.total_incl_gst || 0).slice(0, 20)}
+                              </td>
+                            </tr>
+                            <tr className="border-b border-gray-200">
+                              <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
+                                Credit Balance:
+                              </td>
+                              <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
+                                ₹{String(creditBalance || 0)}
+                                <label className="ml-2 flex items-center cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={useCredit}
+                                    onChange={e => setUseCredit(e.target.checked)}
+                                    className="mr-1 accent-blue-600"
+                                  />
+                                  <span className="text-xs">Use Credit</span>
+                                </label>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="px-4 py-3 text-green-700 font-bold text-[15px] font-lato leading-[22px]">
+                                Final Amount to Pay:
+                              </td>
+                              <td className="px-4 py-3 text-green-700 font-bold text-[15px] font-lato leading-[22px]">
+                                ₹{(() => {
+                                  let final = totals.total_incl_gst || 0;
+                                  if (useCredit) {
+                                    final = final - creditBalance;
+                                    if (final < 0) final = 0;
+                                  }
+                                  return final.toFixed(2);
+                                })()}
                               </td>
                             </tr>
                           </tbody>
@@ -870,6 +1218,8 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                 label={ 'Submit'}
                 // onClick={handleSubmitClick}
               />
+                      <CustomAlert alerts={alerts} handleClose={handleClose} />
+
             </div>
           </div>
         </div>

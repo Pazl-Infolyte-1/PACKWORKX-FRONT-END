@@ -27,3 +27,5 @@ src/api/constant.js
 
 constant.js
 dummy.js
+package.json
+package-lock.json

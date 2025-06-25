@@ -72,17 +72,20 @@ function ThreeDotMenu({ value }) {
         <Dropdown.Menu>
           {value?.map((item, index) => (
             <Dropdown.Item
-              className="hover:!bg-blue-600 py-2 hover:!text-white text-xs"
+              className={`hover:!bg-blue-600 py-2 hover:!text-white text-xs ${item.disabled ? 'opacity-50 pointer-events-none !bg-gray-200 !text-gray-400' : ''}`}
               key={index}
+              disabled={item.disabled}
               onClick={(e) => {
                 e.stopPropagation();
-                item.onClick(e);
-                handleToggle(false);
+                if (!item.disabled) {
+                  item.onClick(e);
+                  handleToggle(false);
+                }
               }}
             >
               <CIcon
                 icon={item.icon}
-                className="me-3 text-blue-600 hover:!text-white text-xs"
+                className={`me-3 text-blue-600 hover:!text-white text-xs ${item.disabled ? '!text-gray-400' : ''}`}
                 style={{ fontSize: '1.4rem', fontWeight: 'bold' }}
               />
               {item.label}

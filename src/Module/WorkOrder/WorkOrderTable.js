@@ -144,6 +144,7 @@ const WorkOrderTable = ({
       onChange: (row, newValue) => {
         handlePriorityChange(newValue, row.id)
       },
+      disabled: (row) => row.progress === 'Invoiced',
     },
     {
       key: 'progress',
@@ -170,7 +171,8 @@ const WorkOrderTable = ({
       onChange: (row, newValue) => {
         handleProgressChange(newValue, row.id)
       },
-       searchIcon: true
+      searchIcon: true,
+      disabled: (row) => row.progress === 'Invoiced',
     },
 
     {

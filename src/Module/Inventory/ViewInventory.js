@@ -67,14 +67,12 @@ const ViewInventory = ({ setIsMinimised }) => {
 
       try {
         // Get unique po_ids from GRNs
-        const uniquePoIds = [...new Set(itemDetails.grns.map(grn => grn.grn.po_id))]
+        const uniquePoIds = [...new Set(itemDetails.grns.map((grn) => grn.grn.po_id))]
 
         // Fetch bill details for each unique po_id
         const promises = uniquePoIds.map(async (po_id) => {
           try {
             const response = await inventoryApi.getGrnBillID(po_id)
-            console.log(response.data.data);
-
             billDetailsMap[po_id] = response?.data || null
           } catch (error) {
             console.error(`Error fetching GRN bill for po_id ${po_id}:`, error)
@@ -159,7 +157,7 @@ const ViewInventory = ({ setIsMinimised }) => {
   }
 
   const rawCustomFields = itemDetails?.products?.default_custom_fields
-  const customData = rawCustomFields ? JSON.parse(rawCustomFields) : {}
+  const customData = rawCustomFields 
 
   const handleClose = () => {
     setIsMinimised(false)
@@ -176,7 +174,6 @@ const ViewInventory = ({ setIsMinimised }) => {
       },
     })
   }
-  console.log(grnBillDetails);
 
   // Function to render GRN bill information
   const renderGrnBillInfo = (po_id) => {
@@ -208,7 +205,10 @@ const ViewInventory = ({ setIsMinimised }) => {
     const firstBill = billData.data[0]
 
     return (
-      <div onClick={() => navigate(`/billingmain/${firstBill.id}`)} className="bg-green-50 rounded-lg cursor-pointer p-2 mb-3 border-l-4 border-green-400">
+      <div
+        onClick={() => navigate(`/billingmain/${firstBill.id}`)}
+        className="bg-green-50 rounded-lg cursor-pointer p-2 mb-3 border-l-4 border-green-400"
+      >
         <div className="text-sm text-green-700 font-medium mb-2">Bill Information:</div>
         <div className="space-y-1">
           {firstBill && firstBill.bill_generate_id && (
@@ -244,10 +244,11 @@ const ViewInventory = ({ setIsMinimised }) => {
             <button
               key={menu}
               onClick={() => setActiveMenu(menu)}
-              className={`pb-2 font-semibold transition-colors ${activeMenu === menu
-                ? 'border-b-2 border-blue-600 text-blue-600'
-                : 'text-gray-600 hover:text-blue-500'
-                }`}
+              className={`pb-2 font-semibold transition-colors ${
+                activeMenu === menu
+                  ? 'border-b-2 border-blue-600 text-blue-600'
+                  : 'text-gray-600 hover:text-blue-500'
+              }`}
             >
               {menu}
             </button>
@@ -272,10 +273,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                   >
                     + Product
                   </button>
-                  <button
-                    onClick={handleEdit}
-                    className="text-sm text-blue-600 hover:underline"
-                  >
+                  <button onClick={handleEdit} className="text-sm text-blue-600 hover:underline">
                     ✎ Edit
                   </button>
                   <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
@@ -350,7 +348,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                         <Package className="w-4 h-4 text-gray-500" />
                         <div>
                           <p className="text-xs text-gray-500 m-0">UOM</p>
-                          <p className="text-sm font-medium">{itemDetails.products.uom}</p>
+                          <p className="text-sm font-medium">{itemDetails.products.uom || 'N/A'}</p>
                         </div>
                       </div>
                     </div>
@@ -373,7 +371,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                     <div className="bg-orange-50 p-2 rounded-md">
                       <p className="text-xs text-gray-500">Reorder Level</p>
                       <p className="text-sm font-medium text-orange-700">
-                        {itemDetails.products.reorder_level}
+                        {itemDetails.products.reorder_level || 'N/A'}
                       </p>
                     </div>
                     <div className="bg-purple-50 p-2 rounded-md">
@@ -452,12 +450,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                     </div>
                     <h1 className="text-xl font-bold text-gray-900">Purchase Orders</h1>
                     <div className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-
-
-                      </div>
-
-
+                      <div className="flex items-center justify-end gap-2"></div>
                     </div>
                   </div>
 
@@ -466,7 +459,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() =>
-                          navigate("/purchaseorder/form", {
+                          navigate('/purchaseorder/form', {
                             state: {
                               item_id: itemDetails?.products?.id,
                             },
@@ -477,17 +470,11 @@ const ViewInventory = ({ setIsMinimised }) => {
                         + Purchase
                       </button>
                     </div>
-
                     <div className="text-right ml-2">
-                      <p className="text-xl font-bold m-0">
-                        {item?.item?.item_generate_id}
-                      </p>
-                      <h3 className="text-xs text-gray-800">
-                        {itemDetails?.products?.item_name}
-                      </h3>
+                      <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
+                      <h3 className="text-xs text-gray-800">{itemDetails?.products?.item_name}</h3>
                     </div>
                   </div>
-
                 </div>
               </div>
 
@@ -617,7 +604,6 @@ const ViewInventory = ({ setIsMinimised }) => {
                         </div>
                         {/* Footer */}
                         <div className="flex justify-between items-center pt-3 border-t text-xs text-gray-500">
-                          {console.log(po)}
                           <div className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             <span>Created: {formatDate(po.created_at)}</span>
@@ -666,7 +652,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() =>
-                            navigate("/stockadjustment/stock_form", {
+                            navigate('/stockadjustment/stock_form', {
                               state: {
                                 item_id: itemDetails?.products?.id,
                               },
@@ -678,11 +664,10 @@ const ViewInventory = ({ setIsMinimised }) => {
                         </button>
                       </div>
                       <div className="text-right ml-2">
-                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                      <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+                        <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
+                        <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
                       </div>
                     </div>
-
                   </div>
                 </div>
               </div>
@@ -851,7 +836,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                       + GRN
                     </button>
                     <div className="text-right">
-                      <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                      <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
                       <h3 className="text-xs text-gray-800">{itemDetails?.products?.item_name}</h3>
                     </div>
                   </div>
@@ -1037,7 +1022,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                 Debit Notes
               </h2>
               <div className="">
-                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
                 <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
               </div>
             </div>
@@ -1061,7 +1046,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                 Credit Notes
               </h2>
               <div className="">
-                <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+                <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
                 <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
               </div>
             </div>
@@ -1078,39 +1063,211 @@ const ViewInventory = ({ setIsMinimised }) => {
             )}
           </>
         ) : activeMenu === 'Purchase Returns' ? (
-          <>
-            <div className="flex justify-between">
-              <h2 className="text-xl font-bold mb-2   text-gray-800 flex items-center gap-2">
-                <RotateCcw className="w-6 h-6 text-blue-600" />
-                Purchase Returns
-              </h2>
-              <div className="flex gap-3 items-center">
-                <button
-                  onClick={() => navigate('/purchase-return/form')}
-                  className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-semibold px-2 rounded"
-                >
-                  + Purchase Returns
-                </button>
-                <div className="">
-                  <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
-                  <h3 className="text-xs text-gray-800">{itemDetails.products.item_name}</h3>
+          <div className="min-h-screen p-3">
+            <div className="max-w-7xl mx-auto">
+              {/* Header */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                      <RotateCcw className="w-6 h-6 text-white" />
+                    </div>
+                    <h1 className="text-xl font-bold text-gray-900">Purchase Returns</h1>
+                  </div>
+
+                  <div className="flex gap-3 items-center">
+                    <button
+                      onClick={() => navigate('/purchase-return/form')}
+                      className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-semibold px-2 rounded"
+                    >
+                      + Purchase Returns
+                    </button>
+                    <div className="text-right">
+                      <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
+                      <h3 className="text-xs text-gray-800">{itemDetails?.products?.item_name}</h3>
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              {itemDetails?.purchaseReturns?.length > 0 ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {itemDetails.purchaseReturns.map((returnItem) => (
+                    <div
+                      key={returnItem.id}
+                      className="group bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-red-200 transition-all duration-300 overflow-hidden"
+                    >
+                      {/* Card Header */}
+                      <div className="bg-red-100 p-2 text-black">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <RotateCcw className="w-5 h-5 text-red-600" />
+                            <span className="font-semibold text-sm">
+                              {returnItem.purchaseOrderReturnId.purchase_return_generate_id}
+                            </span>
+                          </div>
+                          <div className="px-3 py-1 rounded-full text-xs font-medium bg-red-500 text-white">
+                            Return
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Card Content */}
+                      <div className="p-4 space-y-4">
+                        {/* Date and Creator Info */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3 text-sm">
+                            <Calendar className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-600">Return Date:</span>
+                            <span className="font-medium text-gray-900">
+                              {formatDate(returnItem.purchaseOrderReturnId.return_date)}
+                            </span>
+                          </div>
+
+                          <div className="flex items-start gap-3 text-sm">
+                            <User className="w-4 h-4 text-gray-400 mt-0.5" />
+                            <div>
+                              <div className="text-gray-600 mb-1">Created By:</div>
+                              <div className="font-medium text-gray-900">
+                                {returnItem.purchaseOrderReturnId.creator.name}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {returnItem.purchaseOrderReturnId.creator.email}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Reason */}
+                        <div className="bg-orange-50 rounded-lg p-3 border-l-4 border-orange-400">
+                          <div className="flex items-start gap-2">
+                            <MessageSquare className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <div className="text-sm text-orange-700 font-medium mb-1">
+                                Reason:
+                              </div>
+                              <div className="text-sm text-orange-600 leading-relaxed">
+                                {returnItem.purchaseOrderReturnId.reason || 'No reason provided'}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Return Quantity and Unit Price */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="text-center bg-red-50 rounded-lg p-3">
+                            <div className="text-2xl font-bold text-red-600">
+                              {returnItem.return_qty}
+                            </div>
+                            <div className="text-xs text-gray-600 uppercase tracking-wide">
+                              Return Quantity
+                            </div>
+                          </div>
+                          <div className="text-center bg-blue-50 rounded-lg p-3">
+                            <div className="text-lg font-bold text-blue-600">
+                              {formatCurrency(returnItem.unit_price)}
+                            </div>
+                            <div className="text-xs text-gray-600 uppercase tracking-wide">
+                              Unit Price
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Tax Information */}
+                        <div className="bg-gray-50 rounded-lg p-3">
+                          <div className="text-sm text-gray-600 mb-2">Tax Details:</div>
+                          <div className="grid grid-cols-3 gap-3 text-sm">
+                            <div className="text-center">
+                              <div className="font-semibold text-gray-900">{returnItem.cgst}%</div>
+                              <div className="text-xs text-gray-500">CGST</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="font-semibold text-gray-900">{returnItem.sgst}%</div>
+                              <div className="text-xs text-gray-500">SGST</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="font-semibold text-gray-900">
+                                {formatCurrency(returnItem.tax_amount)}
+                              </div>
+                              <div className="text-xs text-gray-500">Tax Amount</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Amount Details */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-600">Base Amount:</span>
+                            <span className="font-medium text-gray-900">
+                              {formatCurrency(returnItem.amount)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-600">Tax Amount:</span>
+                            <span className="font-medium text-gray-900">
+                              {formatCurrency(returnItem.tax_amount)}
+                            </span>
+                          </div>
+                          <div className="border-t pt-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <FaRupeeSign className="w-5 h-5 text-red-500" />
+                                <span className="text-sm font-medium text-gray-700">
+                                  Total Return Amount:
+                                </span>
+                              </div>
+                              <div className="text-xl font-bold text-red-600">
+                                {formatCurrency(returnItem.total_amount)}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Notes */}
+                        {returnItem.notes && (
+                          <div className="bg-blue-50 rounded-lg p-3 border-l-4 border-blue-400">
+                            <div className="flex items-start gap-2">
+                              <FileText className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                              <div>
+                                <div className="text-sm text-blue-700 font-medium mb-1">Notes:</div>
+                                <div className="text-sm text-blue-600 leading-relaxed">
+                                  {returnItem.notes}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Footer */}
+                        <div className="flex justify-between items-center pt-3 border-t text-xs text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>Created: {formatDate(returnItem.created_at)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>
+                              Return: {formatDate(returnItem.purchaseOrderReturnId.return_date)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <RotateCcw className="w-10 h-10 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No Purchase Returns Found
+                  </h3>
+                  <p className="text-gray-500">No purchase returns have been recorded yet.</p>
+                </div>
+              )}
             </div>
-            {itemDetails?.purchaseReturns.length > 0 ? (
-              <></>
-            ) : (
-              <div className="text-center py-16">
-                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FileText className="w-10 h-10 text-gray-400" />
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No Purchase Returns Found
-                </h3>
-                <p className="text-gray-500">Get started by creating your first purchase order.</p>
-              </div>
-            )}
-          </>
+          </div>
         ) : (
           <div>
             <div className="text-center py-16">
@@ -1122,7 +1279,7 @@ const ViewInventory = ({ setIsMinimised }) => {
           </div>
         )}
       </div>
-    </div >
+    </div>
   )
 }
 

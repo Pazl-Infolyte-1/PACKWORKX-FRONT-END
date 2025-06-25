@@ -1,325 +1,325 @@
-  import React, { useState, useEffect } from 'react'
-  import {
-    CTable,
-    CTableHead,
-    CTableRow,
-    CTableHeaderCell,
-    CTableBody,
-    CTableDataCell,
-  } from '@coreui/react'
-  import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
-  import PurchaseOrderDetails from './PurchaseOrderDetails'
-  import ThreeDotMenu from '../../components/ThreeDotMenu'
-  import ConfirmationModale from '../../components/New/ConfirmationModale'
-  import CustomAlert from '../../components/New/CustomAlert'
-  import ReusableTable from '../SalesOrder/ReusableTable'
-  import { purchaseOrderApi } from '../../api/purchaseOrder'
-  import { useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import {
+  CTable,
+  CTableHead,
+  CTableRow,
+  CTableHeaderCell,
+  CTableBody,
+  CTableDataCell,
+} from '@coreui/react'
+import { cilHandPointRight, cilMoney, cilPencil, cilTrash } from '@coreui/icons'
+import PurchaseOrderDetails from './PurchaseOrderDetails'
+import ThreeDotMenu from '../../components/ThreeDotMenu'
+import ConfirmationModale from '../../components/New/ConfirmationModale'
+import CustomAlert from '../../components/New/CustomAlert'
+import ReusableTable from '../SalesOrder/ReusableTable'
+import { purchaseOrderApi } from '../../api/purchaseOrder'
+import { useNavigate } from 'react-router-dom'
+import PopUp from '../../components/New/ModifiedPopup'
+import {
+  PurchaseOrderPaymentHistoryModal,
+  PurchaseOrderPaymentModal,
+} from './PurchaseOrderPaymentModal'
 
-  function PurchaseOrderTable({
-    data = [],
-    isMinimiseTable,
-    setIsMinimiseTable,
-    handleEdit,
-    handlePurchaseDetails,
-    loading,
-    setRefresh,
-  }) {
-    const [showPopUp, setShowPopUp] = useState(null)
-    const [deleteModal, setDeleteModal] = useState(false)
-    const [deleteId, setDeleteId] = useState(null)
-    const [alerts, setAlerts] = useState([])
-    const [poData, setPoData] = useState([])
-    const [grnValidationMap, setGrnValidationMap] = useState({}) // ✅ for per-row validation
-    const [expandedRowId, setExpandedRowId] = useState(null)
-    const navigate = useNavigate()
-    // const [itemData, setItemData] = useState([])
+function PurchaseOrderTable({
+  data = [],
+  isMinimiseTable,
+  setIsMinimiseTable,
+  handleEdit,
+  handlePurchaseDetails,
+  loading,
+  setRefresh,
+}) {
+  const [showPopUp, setShowPopUp] = useState(null)
+  const [deleteModal, setDeleteModal] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
+  const [alerts, setAlerts] = useState([])
+  const [poData, setPoData] = useState([])
+  const [grnValidationMap, setGrnValidationMap] = useState({}) // ✅ for per-row validation
+  const [expandedRowId, setExpandedRowId] = useState(null)
+  const navigate = useNavigate()
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
+  const [isPaymentHistoryModalOpen, setIsPaymentHistoryModalOpen] = useState(false)
+  const [selectedPO, setSelectedPO] = useState(null)
 
-    const openItemDetails = (id) => {
-      setExpandedRowId((prevId) => (prevId === id ? null : id))
-    }
-    // getItemData
-    // const getItemData = async () => {
-    //   try {
-    //     const response = await apiMethods.getItemList()
-    //     const productData = response || []
-    //     console.log('Fetched Item Data:', productData)
-    //     setItemData(productData)
-    //   } catch (error) {
-    //     console.error('Error fetching Purchase Order data:', error)
-    //   }
-    // }
-    // useEffect(() => {
-    //   getItemData()
-    // }, [])
-
-    // const handleGrnCheck = async () => {
-    //   try {
-    //     const response = await apiMethods.getGrn()
-    //     const grnData = response?.data?.data || []
-
-    //     const poReturn = await apiMethods.getPurchaseReturn()
-    //     const poReturnData = [
-    //       ...(poReturn?.data?.approved || []),
-    //       ...(poReturn?.data?.disapproved || []),
-    //     ]
-
-    //     const map = {}
-
-    //     data.forEach((row) => {
-    //       const hasGrn = grnData.some((grn) => grn.po_id === row.id)
-    //       const matchingPor = poReturnData.find((por) => por.po_id === row.id)
-
-    //       let status = 'Created'
-
-    //       if (matchingPor) {
-    //         status =
-    //           Number(row.total_amount) === Number(matchingPor.total_amount) ? 'Returned' : 'Amendment'
-    //       } else if (hasGrn) {
-    //         status = 'Received'
-    //       }
-
-    //       map[row.id] = status
-    //     })
-
-    //     setGrnValidationMap(map)
-    //   } catch (error) {
-    //     console.error('Error fetching GRN or Purchase Return data:', error)
-    //   }
-    // }
-
-    // useEffect(() => {
-    //   if (data?.length > 0) {
-    //     handleGrnCheck()
-    //   }
-    // }, [data])
-
-    const handlePoDelete = async () => {
-      if (!deleteId) {
-        setAlerts([{ severity: 'warning', message: 'No Purchase Order selected to delete.' }])
-        return
-      }
-
-      try {
-        await purchaseOrderApi.deletePurchaseOrder(deleteId)
-        setPoData((prev) => prev.filter((po) => po.id !== deleteId))
-        setAlerts([{ severity: 'success', message: 'Purchase Order deleted successfully!' }])
-        setTimeout(() => {
-          window.location.reload()
-        }, 100)
-      } catch (error) {
-        setAlerts([{ severity: 'error', message: 'Failed to delete Purchase Order.' }])
-      } finally {
-        setDeleteModal(false)
-      }
+  const handlePoDelete = async () => {
+    if (!deleteId) {
+      setAlerts([{ severity: 'warning', message: 'No Purchase Order selected to delete.' }])
+      return
     }
 
-    const openDeleteModal = (id) => {
-      setDeleteId(id)
-      setDeleteModal(true)
+    try {
+      await purchaseOrderApi.deletePurchaseOrder(deleteId)
+      setPoData((prev) => prev.filter((po) => po.id !== deleteId))
+      setAlerts([{ severity: 'success', message: 'Purchase Order deleted successfully!' }])
+      setTimeout(() => {
+        window.location.reload()
+      }, 100)
+    } catch (error) {
+      setAlerts([{ severity: 'error', message: 'Failed to delete Purchase Order.' }])
+    } finally {
+      setDeleteModal(false)
+    }
+  }
+
+  const openDeleteModal = (id) => {
+    setDeleteId(id)
+    setDeleteModal(true)
+  }
+
+  const handleCloseAlert = () => {
+    setAlerts([])
+  }
+
+  const handleStatusChange = async (id, newStatus) => {
+    const currentPo = data.find((po) => po.id === id)
+    const payload = {
+      decision: newStatus,
+      items: currentPo.items || [],
     }
 
-    const handleCloseAlert = () => {
-      setAlerts([])
+    try {
+      const response = await purchaseOrderApi.updatePurchaseOrder(id, payload)
+      setAlerts([{ severity: 'success', message: response.data.message }])
+      setRefresh((prev) => !prev)
+    } catch (error) {
+      console.error('Error:', error)
+      setAlerts([
+        { severity: 'error', message: error?.response?.data?.message || 'Failed to update status' },
+      ])
     }
+  }
 
-    const handleStatusChange = async (id, newStatus) => {
-      const currentPo = data.find((po) => po.id === id)
-      const payload = {
-        decision: newStatus,
-        items: currentPo.items || [],
-      }
+  const handlePaymentClick = (row) => {
+    setSelectedPO(row)
+    setIsPaymentHistoryModalOpen(true)
+  }
 
-      try {
-        const response = await purchaseOrderApi.updatePurchaseOrder(id, payload)
-        setAlerts([{ severity: 'success', message: response.data.message }])
-        setRefresh((prev) => !prev)
-      } catch (error) {
-        console.error('Error:', error)
-        setAlerts([
-          { severity: 'error', message: error?.response?.data?.message || 'Failed to update status' },
-        ])
-      }
-    }
+  const handleCreatePayment = () => {
+    setIsPaymentHistoryModalOpen(false)
+    setIsPaymentModalOpen(true)
+  }
 
-    const columns = [
-      { key: 'purchase_generate_id', header: 'PO ID', field: 'purchase_generate_id' },
-      {
-        key: 'supplier_name',
-        header: (
-          <>
-            Supplier Name <span className="text-gray-500">⌕</span>
-          </>
-        ),
-        field: 'supplier_name',
-      },
-      {
-        key: 'supplier_contact',
-        header: 'Supplier Contact',
-        field: 'supplier_contact',
-        type: 'number',
-      },
-      {
-        key: 'po_date',
-        header: 'PO Date',
-        field: 'po_date',
-        type: 'date',
-      },
-      {
-        key: 'valid_till',
-        header: 'Valid Till',
-        field: 'valid_till',
-        type: 'date',
-      },
-      {
-        key: 'status',
-        header: 'Status',
-        type: 'custom',
-        render: (row) => (
-          <>
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-semibold -ml-11 w-28 text-center inline-block
+  const handleClosePaymentModal = () => {
+    setIsPaymentModalOpen(false)
+    setSelectedPO(null)
+  }
+  const handleClosePaymentHistoryModal = () => {
+    setIsPaymentHistoryModalOpen(false)
+    setSelectedPO(null)
+  }
+  const refreshTable = () => {
+    handleClosePaymentHistoryModal()
+    handleClosePaymentModal()
+    setRefresh((prev) => !prev)
+  }
+
+  const openItemDetails = (id) => {
+    setExpandedRowId((prevId) => (prevId === id ? null : id))
+  }
+
+  const columns = [
+    { key: 'purchase_generate_id', header: 'PO ID', field: 'purchase_generate_id' },
+    {
+      key: 'supplier_name',
+      header: (
+        <>
+          Supplier Name <span className="text-gray-500">⌕</span>
+        </>
+      ),
+      field: 'supplier_name',
+    },
+    {
+      key: 'supplier_contact',
+      header: 'Supplier Contact',
+      field: 'supplier_contact',
+      type: 'number',
+    },
+    {
+      key: 'po_date',
+      header: 'PO Date',
+      field: 'po_date',
+      type: 'date',
+    },
+    {
+      key: 'valid_till',
+      header: 'Valid Till',
+      field: 'valid_till',
+      type: 'date',
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      type: 'custom',
+      render: (row) => (
+        <>
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-semibold -ml-5 w-[110px] text-center inline-block
             ${row.po_status === 'partialy-recieved' ? 'bg-blue-100 text-blue-800' : ''}
             ${row.po_status === 'created' ? 'bg-green-100 text-green-800' : ''}
             ${row.po_status === 'returned' ? 'bg-red-100 text-red-800' : ''}
             ${row.po_status === 'received' ? 'bg-teal-500 text-white' : ''}
             ${row.po_status === 'amended' ? 'bg-orange-600 text-white' : ''}
             `}
-            >
-              {row.po_status === 'partialy-recieved'
-                ? 'Partialy Recieved'
-                : row.po_status.charAt(0).toUpperCase() + row.po_status.slice(1)}
-            </span>
-          </>
+          >
+            {row.po_status === 'partialy-recieved'
+              ? 'Partialy Recieved'
+              : row.po_status.charAt(0).toUpperCase() + row.po_status.slice(1)}
+          </span>
+        </>
+      ),
+    },
+    {
+      key: 'payment_status',
+      header: 'Payment Status',
+      type: 'custom',
+      render: (row) => (
+        <>
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-semibold w-24 text-center inline-block
+            ${row.payment_status === 'partial' ? 'bg-blue-100 text-blue-800' : ''}
+            ${row.payment_status === 'pending' ? 'bg-red-100 text-red-800' : ''}
+            ${row.payment_status === 'completed' ? 'bg-teal-500 text-white' : ''}
+            `}
+          >
+            {row.payment_status.charAt(0).toUpperCase() + row.payment_status.slice(1)}
+          </span>
+        </>
+      ),
+    },
+    {
+      key: 'decision',
+      header: 'Decision',
+      field: 'decision',
+      type: 'custom',
+      render: (row) =>
+        row.po_status === 'created' ? (
+          <select
+            className={`border rounded px-2 py-1 ${row.po_status === 'created' ? 'bg-sky-200 text-black border-green-300' : 'bg-red-100 text-red-800 border-red-300'} text-xs w-[120px]`}
+            value={row.po_status}
+            onChange={(e) => handleStatusChange(row.id, e.target.value)}
+          >
+            <option value="approve">Approve</option>
+            <option value="disapprove">Reject</option>
+          </select>
+        ) : (
+          <div
+            className={`${row.decision === 'approve' ? 'bg-green-100 text-green-800 border-green-300 text-xs py-[5px] rounded-md' : 'bg-red-100 text-red-800 py-[3px] rounded-md text-xs'}`}
+          >
+            {row.decision.charAt(0).toUpperCase() + row.decision.slice(1)}
+          </div>
         ),
-      },
-      {
-        key: 'decision',
-        header: 'Decision',
-        field: 'decision',
-        type: 'dropdown',
-        options: [
-          { label: 'Approve', value: 'approve' },
-          { label: 'Reject', value: 'disapprove' },
-        ],
-        getOptionClass: (val) => {
-          switch (val) {
-            case 'approve':
-              return 'bg-green-100 text-green-800 border-green-300 text-xs w-[120px]'
-            case 'disapprove':
-              return 'bg-red-100 text-red-800 border-red-300 text-xs w-[120px]'
-            default:
-              return 'bg-gray-100 text-gray-800 border-gray-300 text-xs w-[120px]'
-          }
-        },
-        onChange: (row, newValue) => {
-          handleStatusChange(row.id, newValue) // newValue will be 'approve' or 'disapprove'
-        },
-      },
-      {
-        key: 'payment_terms',
-        header: 'Payment Terms',
-        field: 'payment_terms',
-      },
-      {
-        key: 'actions',
-        header: 'Action',
-        field: 'actions',
-        type: 'custom',
-        render: (row) => (
-          <ThreeDotMenu
-            value={[
-              {
-                label: 'View',
-                icon: cilHandPointRight,
-                onClick: () => navigate(`/purchaseorder/${row.id}`),
-              },
+    },
 
-              ...(row.po_status === 'created'
-                ? [
-                    { label: 'Edit', icon: cilPencil, onClick: () => navigate(`/purchaseorder/form/${row.id}`)},
-                    {
-                      label: 'Delete',
-                      icon: cilTrash,
-                      onClick: () => openDeleteModal(row.id),
-                    },
-                  ]
-                : []),
+    {
+      key: 'payment_terms',
+      header: 'Payment Terms',
+      field: 'payment_terms',
+    },
+    {
+      key: 'actions',
+      header: 'Action',
+      field: 'actions',
+      type: 'custom',
+      render: (row) => (
+        <ThreeDotMenu
+          value={[
+            {
+              label: 'View',
+              icon: cilHandPointRight,
+              onClick: () => navigate(`/purchaseorder/${row.id}`),
+            },
 
-              ...(row.po_status === 'received' || row.po_status === 'partialy-recieved'
-                ? [
-                    {
-                      label: 'Purchase Return',
-                      icon: cilPencil,
-                      onClick: () => handlePurchaseDetails(row.id),
-                    },
-                  ]
-                : []),
-            ]}
-          />
-        ),
-      },
-    ]
+            ...(row.po_status === 'created'
+              ? [
+                  {
+                    label: 'Edit',
+                    icon: cilPencil,
+                    onClick: () => navigate(`/purchaseorder/form/${row.id}`),
+                  },
+                  {
+                    label: 'Delete',
+                    icon: cilTrash,
+                    onClick: () => openDeleteModal(row.id),
+                  },
+                ]
+              : []),
 
-    const handleView = (row) => {
-      setIsMinimiseTable(true)
-      navigate(`/purchaseorder/${row.id}`)
-    }
-
-    return (
-      <div>
-        <CustomAlert alerts={alerts} handleClose={handleCloseAlert} />
-        <ReusableTable
-          data={data}
-          columns={columns}
-          handleRowClick={(row) => handleView(row)}
-          isMinimiseTable={isMinimiseTable}
-          miniScreenFields={['purchase_generate_id', 'supplier_contact']}
+            ...(row.po_status === 'received' || row.po_status === 'partialy-recieved'
+              ? [
+                  {
+                    label: 'Purchase Return',
+                    icon: cilPencil,
+                    onClick: () => handlePurchaseDetails(row.id),
+                  },
+                ]
+              : []),
+            {
+              label: 'Payment',
+              icon: cilMoney,
+              onClick: () => handlePaymentClick(row),
+            },
+          ]}
         />
+      ),
+    },
+  ]
 
-        {/* Popups */}
-        {showPopUp && (
-          <PurchaseOrderDetails
-            showPopUp={showPopUp}
-            cell={data.find((row) => row.id === showPopUp)}
-            editTag={false}
-            setShowPopUp={setShowPopUp}
-            handleEdit={handleEdit}
-          />
-        )}
-
-        {/* expandedRow */}
-        {/* {expandedRowId === row.id && (
-              <CTableRow className="bg-gray-50">
-                <CTableDataCell colSpan={10} className="py-3 px-4 text-left">
-                  <div className="text-sm text-gray-800">
-                    <strong>Item Details:</strong>
-                    <ul className="list-disc list-inside mt-2">
-                      {row.supplier_name?.length > 0 ? (
-                        row.items.map((item, index) => (
-                          <li key={index}>
-                            {item.supplier_name} - Qty: {item.supplier_name} - Price: {item.supplier_name}
-                          </li>
-                        ))
-                      ) : (
-                        <li>No items available</li>
-                      )}
-                    </ul>
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-              )} */}
-
-        {/* Delete Modal (placed once outside loop) */}
-        <ConfirmationModale
-          isOpen={deleteModal}
-          onClose={() => setDeleteModal(false)}
-          onConfirm={handlePoDelete}
-          title="Delete Confirmation"
-          message="Are you sure you want to delete this PO?"
-        />
-      </div>
-    )
+  const handleView = (row) => {
+    setIsMinimiseTable(true)
+    navigate(`/purchaseorder/${row.id}`)
   }
 
-  export default PurchaseOrderTable
+  return (
+    <div>
+      <CustomAlert alerts={alerts} handleClose={handleCloseAlert} />
+      <ReusableTable
+        data={data}
+        columns={columns}
+        handleRowClick={(row) => handleView(row)}
+        isMinimiseTable={isMinimiseTable}
+        miniScreenFields={['purchase_generate_id', 'supplier_contact']}
+      />
+
+      {/* Popups */}
+      {showPopUp && (
+        <PurchaseOrderDetails
+          showPopUp={showPopUp}
+          cell={data.find((row) => row.id === showPopUp)}
+          editTag={false}
+          setShowPopUp={setShowPopUp}
+          handleEdit={handleEdit}
+        />
+      )}
+
+      <PurchaseOrderPaymentHistoryModal
+        isOpen={isPaymentHistoryModalOpen}
+        onClose={handleClosePaymentHistoryModal}
+        onCreatePayment={handleCreatePayment}
+        purchaseOrderId={selectedPO?.id}
+        purchaseOrderNumber={selectedPO?.purchase_generate_id}
+        supplierName={selectedPO?.supplier_name}
+        totalAmount={selectedPO?.total_amount}
+      />
+      <PurchaseOrderPaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={handleClosePaymentModal}
+        purchaseOrderId={selectedPO?.id}
+        purchaseOrderNumber={selectedPO?.purchase_generate_id}
+        supplierName={selectedPO?.supplier_name}
+        refreshTable={refreshTable}
+      />
+
+      {/* Delete Modal (placed once outside loop) */}
+      <ConfirmationModale
+        isOpen={deleteModal}
+        onClose={() => setDeleteModal(false)}
+        onConfirm={handlePoDelete}
+        title="Delete Confirmation"
+        message="Are you sure you want to delete this PO?"
+      />
+    </div>
+  )
+}
+
+export default PurchaseOrderTable

@@ -85,7 +85,7 @@ const InventoryMain = () => {
   // Function to determine stock statusconst getStockStatus = (item) => {
   const getStockStatus = (item) => {
     const quantity = parseFloat(item.quantity_available) || 0
-    const minStock = parseFloat(item.item?.min_stock_level) || 0
+    const minStock = parseFloat(item.item_info?.min_stock_level) || 0
 
     if (quantity <= 0) {
       return 'out_of_stock'
@@ -166,12 +166,25 @@ const InventoryMain = () => {
     const fetchInventory = async () => {
       try {
         if (activateSummary) {
-          const response = await inventoryApi.getInventorySummary()
+          const params = {
+            limit: 5000,
+            currentPage,
+            entriesPerPage,
+          }
+          const response = await inventoryApi.getInventorySummary(params)
           const data = response.data.data.inventoryData
           const selectedSubcategory = data.filter(
-            (item) => item.item.sub_category === subCategoryId,
+            (item) => item.item_info.sub_category === subCategoryId,
           )
           setInventoryData(selectedSubcategory)
+          setSubCategoryQuantities(response.data.data.subCategoryQuantities)
+          const pagination = response.data.pagination
+          console.log(pagination)
+
+          setCurrentPage(pagination.currentPage)
+          setTotalPage(pagination.totalPages)
+          setTotalRecords(pagination.totalCount)
+          setEntriesPerPage(pagination.perPage)
         } else {
           const response = await inventoryApi.getinventoryWithParams(
             categoryId,
@@ -299,9 +312,9 @@ const InventoryMain = () => {
     try {
       // const response = await inventoryApi.getInventorySummary()
       // const data = response.data.data.inventoryData
-      // const selectedSubcategory = data.filter((item) => item.item.sub_category === subCategoryId)
+      // const selectedSubcategory = data.filter((item) => item.item_info.sub_category === subCategoryId)
       // setInventoryData(selectedSubcategory)
-      setActivateSummary((prev)=> !prev)
+      setActivateSummary((prev) => !prev)
     } catch (error) {
       console.error(error)
     }

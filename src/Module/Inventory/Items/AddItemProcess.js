@@ -35,6 +35,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
     defaultValues: {
       item_type: 'raw-materials',
       tags: {},
+      net_weight: 'kg',
     },
   })
 
@@ -149,6 +150,12 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       allSubCategories.find((sc) => sc.id == selectedSubCategory)
     const subCatName = selectedSubCat?.sub_category_name
 
+    if (['2', '5', '6', '7', '8', '3', '4'].includes(selectedSubCategory)) {
+      setValue('net_weight', 'litre')
+    } else if (['1', '5', '6', '7', '8', '9', '4'].includes(selectedSubCategory)) {
+      setValue('net_weight', 'kg')
+    }
+
     // If this subcategory has predefined tags, set them
     if (subCatName && subcategoryTagsMap[subCatName] && !isEditing) {
       setTagFields(subcategoryTagsMap[subCatName])
@@ -175,6 +182,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
           description: itemData.description,
           category: itemData.category,
           sub_category: itemData.sub_category,
+          net_weight: itemData.net_weight || 'kg',
         })
 
         const categoryValue = String(itemData.category || '')
@@ -331,7 +339,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
           customFields[finalLabel] = String(field.value)
         }
       })
-      console.log(data, "data");
+      console.log(data, 'data')
 
       const formattedData = {
         ...data,
@@ -626,10 +634,12 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
               }}
               {...register('net_weight')}
             >
-              {(!selectedSubCategory || ['1', '5', '6', '7', '8', '9', '4'].includes(selectedSubCategory)) && (
+              {(!selectedSubCategory ||
+                ['1', '5', '6', '7', '8', '9', '4'].includes(selectedSubCategory)) && (
                 <option value="kg">Kg</option>
               )}
-              {(!selectedSubCategory || ['2', '5', '6', '7', '8', '3', '4'].includes(selectedSubCategory)) && (
+              {(!selectedSubCategory ||
+                ['2', '5', '6', '7', '8', '3', '4'].includes(selectedSubCategory)) && (
                 <option value="litre">Litre</option>
               )}
             </select>
@@ -647,7 +657,9 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Category <span className="text-red-500"> *</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Category <span className="text-red-500"> *</span>
+          </label>
           <select
             style={getInputStyle(errors.category)}
             className="w-full rounded px-3 py-1"
@@ -684,7 +696,9 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
 
         {selectedItemType && subCategory.length > 0 && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">SubCategory <span className="text-red-500"> *</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              SubCategory <span className="text-red-500"> *</span>
+            </label>
             <select
               style={getInputStyle(errors.sub_category)}
               className="w-full rounded px-3 py-1"
@@ -694,6 +708,14 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
                 const selectedId = e.target.value
                 setSelectedSubCategory(selectedId)
                 setValue('sub_category', selectedId)
+                if (['2', '5', '6', '7', '8', '3', '4'].includes(selectedId)) {
+                  setValue('net_weight', 'litre')
+                } else if (['1', '5', '6', '7', '8', '9', '4'].includes(selectedId)) {
+                  setValue('net_weight', 'kg')
+                } else {
+                  // Default fallback
+                  setValue('net_weight', 'kg')
+                }
               }}
             >
               <option value="">Select Subcategory</option>

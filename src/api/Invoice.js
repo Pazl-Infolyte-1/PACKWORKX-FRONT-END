@@ -16,6 +16,15 @@ export const invoiceApi = {
         return apiClient.get(`work-order-invoice/download/${id}`,{
             responseType: 'blob', // <-- This is important!
         })
+    },
+    createPayment:async(body)=>{
+        return apiClient.post(`work-order-invoice/partial-payment/create`,body)
+    },
+    getInvoiceHistory:async(id)=>{
+        return apiClient.get(`work-order-invoice/partial-payment/status/${id}`)
+    },
+    createPaymentLink:async(body)=>{
+        return apiClient.post(`work-order-invoice/send/payment/link/`,body)
     }
 
-}
+}   

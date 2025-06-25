@@ -229,22 +229,36 @@ const ViewWorkOrder = () => {
 
   const handleCreateInvoice = async (invoiceData) => {
     try {
-      console.log(invoiceData)
       const response = await workOrderApi.createInvoiceWorkOrder(invoiceData);
       
       console.log('Invoice created successfully:', response);
 
+      setAlerts([{ severity: "success", message: "Invoice Created Successfully" }]);
+
+
 
       const downloadResponse = await invoiceApi.downloadInvoice(response.data.data.id)
-      console.log(downloadResponse)
+      const blob = new Blob([downloadResponse.data], { type: 'application/pdf' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `INV-00${response.data.data.id}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
+
+      
+      setTimeout(() => {
+        navigate(`/invoice/view/${response.data.data.id}`);
+      }, 500);
       
 
       // Optionally refresh work order data or navigate to invoice
-      // navigate(`/invoice/view/${response.data.data.id}`);
 
-
+      return response; // success
     } catch (err) {
-      console.log(error)
+      // Show a user-friendly error message
+      setAlerts([{ severity: "error", message: err?.response?.data?.message || err?.message || "Unable to create invoice. Please try again or contact support." }]);
+      throw err;
     }
   }
 
@@ -490,7 +504,9 @@ const ViewWorkOrder = () => {
         <div className="px-4 py-2 mx-auto sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center  space-x-3">
-              <button className="p-1 text-gray-500 rounded hover:bg-gray-100" onClick={() => { navigate('/workorderlist') }}>
+              <button className="p-1 text-gray-500 rounded hover:bg-gray-100" onClick={() => {
+                 navigate('/workorderlist')
+                  }}>
                 <ChevronLeft size={20} />
               </button>
               {/* <h1 className="text-sm   font-medium text-gray-900">Work Order Details</h1> */}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Calendar, DollarSign, Percent, Hash } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import CustomAlert from '../../components/New/CustomAlert';
 
 const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
   const [selectedSku,setSelectedSku] = useState([])
@@ -195,10 +196,10 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
     setTimeout(() => {
       onClose();
     }, 200);
-
-
   };
 
+
+  
   // Compact input styles similar to Zoho
   const inputClass = `w-full h-8 px-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`;
   const selectClass = `w-full h-8 px-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white`;
@@ -271,7 +272,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
               >
                 <option value="">Select status</option>
                 <option value="pending">Pending</option>
-                <option value="partial">Partial</option>
+                {/* <option value="partial">Partial</option> */}
                 <option value="paid">Paid</option>
               </select>
             </div>
@@ -510,11 +511,8 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
               <div className="mt-2 text-sm font-bold text-green-700 border-t border-gray-200 pt-2">
                 Final Amount to Pay: ₹{useCredit ? balanceToPay.toFixed(2) : invoiceWithGst.toFixed(2)}
               </div>
-            </div>
-
-            
-            {/* Action buttons - right side */}
-            <div className="flex flex-row space-x-2">
+              <div className="flex  mt-2 flex-1 flex-row space-x-2">
+                
               <button
                 type="button"
                 onClick={handleClose}
@@ -525,11 +523,16 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-1.5  text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isSubmitting ? 'Creating...' : 'Create Invoice'}
               </button>
             </div>
+            </div>
+
+            
+            {/* Action buttons - right side */}
+            
           </div>
         </form>
       </div>

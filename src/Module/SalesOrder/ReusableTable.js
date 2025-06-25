@@ -171,7 +171,7 @@ export default function ReusableTable({
                         // ✅ Dropdown
                         if (col.type === 'dropdown') {
                           return (
-                            <CTableDataCell key={col.key} className="px-3 py-3">
+                            <CTableDataCell key={col.key} className="px-3 py-3  ">
                               <select
                                 value={cellValue || ''}
                                 onChange={(e) => {
@@ -183,9 +183,10 @@ export default function ReusableTable({
                                     onDropdownChange(row, col.field, newValue)
                                   }
                                 }}
-                                className={`px-2.5 py-1.5 rounded-md text-sm font-medium outline-none border border-gray-300 cursor-pointer focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                className={`px-2.5 py-1.5 rounded-md text-sm font-medium outline-none border disabled:cursor-not-allowed border-gray-300 cursor-pointer focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                   col.getOptionClass ? col.getOptionClass(cellValue) : ''
                                 }`}
+                                disabled={typeof col.disabled === 'function' ? col.disabled(row) : false}
                               >
                                 {col.options?.map((opt) => (
                                   <option
@@ -311,6 +312,7 @@ export default function ReusableTable({
                                   className={`px-2.5 py-1.5 rounded-md text-sm font-medium outline-none border border-gray-300 cursor-pointer focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                     col.getOptionClass ? col.getOptionClass(cellValue) : ''
                                   }`}
+                                  disabled={typeof col.disabled === 'function' ? col.disabled(row) : false}
                                 >
                                   {col.options?.map((opt) => (
                                     <option

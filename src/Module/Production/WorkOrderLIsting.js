@@ -41,20 +41,8 @@ function WorkOrderListing() {
   const [proggressOption, setProgressOption] = useState([{ value: '', label: 'All' }]);
 
   // Single date range state
-  const [dateRange, setDateRange] = useState([
-    {
-      startDate: new Date(),
-      endDate: new Date(),
-      key: 'selection'
-    }
-  ]);
-  const [pendingDateRange, setPendingDateRange] = useState([
-    {
-      startDate: new Date(),
-      endDate: new Date(),
-      key: 'selection'
-    }
-  ]);
+  const [dateRange, setDateRange] = useState([]);
+  const [pendingDateRange, setPendingDateRange] = useState(null);
 
   const [showDateRangePicker, setShowDateRangePicker] = useState(false);
 
@@ -152,8 +140,8 @@ function WorkOrderListing() {
         const params = {
           skuName: filterBoxType || '',
           clientName: filterCustomer || '',
-          startDate: dateRange[0].startDate ? format(dateRange[0].startDate, 'yyyy-MM-dd') : '',
-          endDate: dateRange[0].endDate ? format(dateRange[0].endDate, 'yyyy-MM-dd') : '',
+          startDate: dateRange?.[0]?.startDate ? format(dateRange[0].startDate, 'yyyy-MM-dd') : '',
+          endDate: dateRange?.[0]?.endDate ? format(dateRange[0].endDate, 'yyyy-MM-dd') : '',
           progress: filterStatus || '',
           sortBy: sortParams.sortBy,
           sortOrder: sortParams.sortOrder
@@ -272,11 +260,6 @@ function WorkOrderListing() {
     setPendingFilterCustomer('');
     setPendingFilterBoxType('');
     setPendingFilterStatus('');
-    setPendingDateRange([{
-      startDate: new Date(),
-      endDate: new Date(),
-      key: 'selection'
-    }]);
   };
 
   const handleDateRangeChange = (item) => {
@@ -552,11 +535,12 @@ function WorkOrderListing() {
                 {workOrders?.length > 0 ? (
                   <table style={{
                     width: '100%',
-                    borderCollapse: 'collapse',
+                    borderCollapse: 'separate',
                     background: 'white',
-                    borderRadius: '8px',
+                    borderRadius: '2px',
                     overflow: 'hidden',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                    // boxShadow: '0 2px 8px rgba(102,126,234,0.10)',
+                    border: '1px solid gray',
                   }}>
                     <thead>
                       <tr>

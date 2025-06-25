@@ -272,6 +272,11 @@ const InventoryMain = () => {
     }
   }
 
+  const handleCategorySelect = (categoryId) => {
+    setCategoryId(categoryId)
+    setOpenCategoryId(null)
+    setSubCategoryId(null)
+  }
   const handleSubCategorySelect = (subCategoryId) => {
     setSubCategoryId(subCategoryId)
     setOpenCategoryId(null)
@@ -371,7 +376,7 @@ const InventoryMain = () => {
                 }}
               >
                 <div
-                  onClick={() => setCategoryId(item.id)}
+                  onClick={() => handleCategorySelect(item.id)}
                   className={`p-2 py-3 rounded-md shadow-md text-center capitalize flex items-center justify-between w-full cursor-pointer ${
                     backgroundColors[index % backgroundColors.length]
                   } ${isSelected ? 'ring-4 ring-blue-400 ring-opacity-75' : ''}`}

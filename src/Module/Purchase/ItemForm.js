@@ -7,16 +7,27 @@ import { Package } from 'lucide-react'
 import ItemDetails from './ItemDetails'
 import { useLocation } from 'react-router-dom'
 
-const ItemForm = ({ items = [], setItems, formValues, setFormValues,fixedDebitBalance ,setBalanceAmount,balanceAmount,
-  debitBalanceAmount,setDebitBalanceAmount,debitUsedAmount,setDebitUsedAmount,useDebitBalance
+const ItemForm = ({
+  items = [],
+  setItems,
+  formValues,
+  setFormValues,
+  fixedDebitBalance,
+  setBalanceAmount,
+  balanceAmount,
+  debitBalanceAmount,
+  setDebitBalanceAmount,
+  debitUsedAmount,
+  setDebitUsedAmount,
+  useDebitBalance,
 }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [itemList, setItemList] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState(null)
-  console.log("fixed debit",fixedDebitBalance)
-const [overallTotal,setoveralltotal]=useState(0)
-const [invoiceAmount, setInvoiceAmount] = useState(0);
+  console.log('fixed debit', fixedDebitBalance)
+  const [overallTotal, setoveralltotal] = useState(0)
+  const [invoiceAmount, setInvoiceAmount] = useState(0)
   const location = useLocation()
   const PoID = location.state?.po_id
 
@@ -167,26 +178,48 @@ const [invoiceAmount, setInvoiceAmount] = useState(0);
   //}, [formData.items])
 
   const totals = useMemo(() => {
-  try {
-    const result = (getValues('items') || []).reduce(
-      (acc, item) => {
-        const qty = parseFloat(item.quantity) || 0;
-        const amt = parseFloat(item.amount) || 0;
-        const sgst = parseFloat(item.sgst) || 0;
-        const cgst = parseFloat(item.cgst) || 0;
-        const sgstAmt = parseFloat(item.sgst_amount) || 0;
-        const cgstAmt = parseFloat(item.cgst_amount) || 0;
+    try {
+      const result = (getValues('items') || []).reduce(
+        (acc, item) => {
+          const qty = parseFloat(item.quantity) || 0
+          const amt = parseFloat(item.amount) || 0
+          const sgst = parseFloat(item.sgst) || 0
+          const cgst = parseFloat(item.cgst) || 0
+          const sgstAmt = parseFloat(item.sgst_amount) || 0
+          const cgstAmt = parseFloat(item.cgst_amount) || 0
 
-        return {
-          total_qty: acc.total_qty + qty,
-          amount: parseFloat((acc.amount + amt).toFixed(2)),
-          total_amount: parseFloat((acc.total_amount + amt).toFixed(2)),
-          sgst: parseFloat((acc.sgst + sgstAmt).toFixed(2)),
-          cgst: parseFloat((acc.cgst + cgstAmt).toFixed(2)),
-          total_incl_gst: parseFloat((acc.total_incl_gst + amt + sgstAmt + cgstAmt).toFixed(2)),
-        };
-      },
-      {
+          return {
+            total_qty: acc.total_qty + qty,
+            amount: parseFloat((acc.amount + amt).toFixed(2)),
+            total_amount: parseFloat((acc.total_amount + amt).toFixed(2)),
+            sgst: parseFloat((acc.sgst + sgstAmt).toFixed(2)),
+            cgst: parseFloat((acc.cgst + cgstAmt).toFixed(2)),
+            total_incl_gst: parseFloat((acc.total_incl_gst + amt + sgstAmt + cgstAmt).toFixed(2)),
+          }
+        },
+        {
+          total_qty: 0,
+          total_amount: 0,
+          amount: 0,
+          sgst: 0,
+          cgst: 0,
+          total_incl_gst: 0,
+        },
+      )
+      setoveralltotal(result.total_incl_gst)
+      // Subtract fixedDebitBalance once here
+      const finalTotalInclGst = parseFloat((result.total_incl_gst - fixedDebitBalance).toFixed(2))
+
+      // Set balanceAmount: if negative use it, else 0
+      setBalanceAmount(finalTotalInclGst < 0 ? finalTotalInclGst : 0)
+
+      // Optionally update total_incl_gst if you still want to keep the reduced value
+      result.total_incl_gst = finalTotalInclGst
+      //setallTotalAmount(result.total_incl_gst)
+      return result
+    } catch (error) {
+      console.error('Totals calculation error:', error)
+      return {
         total_qty: 0,
         total_amount: 0,
         amount: 0,
@@ -194,32 +227,8 @@ const [invoiceAmount, setInvoiceAmount] = useState(0);
         cgst: 0,
         total_incl_gst: 0,
       }
-    );
-setoveralltotal(result.total_incl_gst)
-    // Subtract fixedDebitBalance once here
-   const finalTotalInclGst = parseFloat(
-      (result.total_incl_gst - fixedDebitBalance).toFixed(2)
-    );
-
-    // Set balanceAmount: if negative use it, else 0
-    setBalanceAmount(finalTotalInclGst < 0 ? finalTotalInclGst : 0);
-
-    // Optionally update total_incl_gst if you still want to keep the reduced value
-    result.total_incl_gst = finalTotalInclGst;
-    //setallTotalAmount(result.total_incl_gst)
-    return result;
-  } catch (error) {
-    console.error('Totals calculation error:', error);
-    return {
-      total_qty: 0,
-      total_amount: 0,
-      amount: 0,
-      sgst: 0,
-      cgst: 0,
-      total_incl_gst: 0,
-    };
-  }
-}, [formData.items, fixedDebitBalance]);
+    }
+  }, [formData.items, fixedDebitBalance])
 
   // Only update form values with totals when totals change
   useEffect(() => {
@@ -463,25 +472,24 @@ setoveralltotal(result.total_incl_gst)
     })
   }
 
-useEffect(() => {
-  if (fixedDebitBalance > overallTotal) {
-    setDebitBalanceAmount(fixedDebitBalance-overallTotal)
-    setDebitUsedAmount(overallTotal)
-    setInvoiceAmount(0);
-  } else {
-        setDebitBalanceAmount(0)
-        setDebitUsedAmount(fixedDebitBalance)
-    setInvoiceAmount(overallTotal - fixedDebitBalance);
-  }
-}, [fixedDebitBalance, overallTotal]);
+  useEffect(() => {
+    if (fixedDebitBalance > overallTotal) {
+      setDebitBalanceAmount(fixedDebitBalance - overallTotal)
+      setDebitUsedAmount(overallTotal)
+      setInvoiceAmount(0)
+    } else {
+      setDebitBalanceAmount(0)
+      setDebitUsedAmount(fixedDebitBalance)
+      setInvoiceAmount(overallTotal - fixedDebitBalance)
+    }
+  }, [fixedDebitBalance, overallTotal])
 
-useEffect(() => {
-  if (!useDebitBalance) {
-    setDebitBalanceAmount(0);
-    setDebitUsedAmount(0);
-  }
-}, [useDebitBalance]);
-
+  useEffect(() => {
+    if (!useDebitBalance) {
+      setDebitBalanceAmount(0)
+      setDebitUsedAmount(0)
+    }
+  }, [useDebitBalance])
 
   return (
     <div>
@@ -526,7 +534,7 @@ useEffect(() => {
                     <tr key={field.id} className="h-[70px]">
                       <td className="border-b w-[350px]">
                         <div className="flex items-center gap-2">
-                          {console.log(PoID, "PoID ")}
+                          {console.log(PoID, 'PoID ')}
                           <select
                             {...register(`items.${index}.item_id`)}
                             onChange={(e) => handleItemChange(index, e.target.value)}
@@ -534,7 +542,7 @@ useEffect(() => {
                             disabled={PoID && index === 0} // Disable if PoID is set for first item
                             value={PoID && index === 0 ? PoID : getValues(`items.${index}.item_id`)}
                           >
-                            {console.log(getValues(`items.${index}.item_id`), "getvalue ")}
+                            {console.log(getValues(`items.${index}.item_id`), 'getvalue ')}
                             <option value="">{isLoading ? 'Loading...' : 'Select'}</option>
                             {itemList.map((item) => (
                               <option key={item.id} value={item.id}>
@@ -605,45 +613,44 @@ useEffect(() => {
                           className="w-full h-[40px] text-right border-none focus:outline-none hover:outline-none outline-none focus-visible:outline-none"
                         />
                       </td>
-                     <td className="py-2 text-center">
-  <button
-    type="button"
-    onClick={() => {
-      const currentItems = getValues('items');
-      if (currentItems.length === 1 && index === 0) {
-        // If only one item remains and it's index 0, reset the form
-        reset({
-          items: [],
-          total_qty: 0,
-          cgst_amount: 0,
-          sgst_amount: 0,
-          amount: 0,
-          tax_amount: 0,
-          total_amount: 0,
-        });
-      } else {
-        remove(index);
-      }
-    }}
-    className="text-red-500 hover:text-red-700"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  </button>
-</td>
-
+                      <td className="py-2 text-center">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentItems = getValues('items')
+                            if (currentItems.length === 1 && index === 0) {
+                              // If only one item remains and it's index 0, reset the form
+                              reset({
+                                items: [],
+                                total_qty: 0,
+                                cgst_amount: 0,
+                                sgst_amount: 0,
+                                amount: 0,
+                                tax_amount: 0,
+                                total_amount: 0,
+                              })
+                            } else {
+                              remove(index)
+                            }
+                          }}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                          </svg>
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -659,58 +666,57 @@ useEffect(() => {
                   <span className="mr-1">+</span>
                   Add Item
                 </button>
-                <div className="pr-9">
+                <div className="pr-9 mb-20">
                   <table className="bg-gray-100 rounded w-full border-collapse">
                     <tbody className="gap-4">
                       <tr className="border-b border-gray-200">
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           Total Qty:
                         </td>
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           {totals.total_qty}
                         </td>
                       </tr>
-  <tr className="border-b border-gray-200">
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                      <tr className="border-b border-gray-200">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           Total Amount:
                         </td>
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                           ₹{totals.total_amount}
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          ₹{totals.total_amount}
                         </td>
                       </tr>
                       <tr className="border-b border-gray-200">
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           Total GST:
                         </td>
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                           ₹{(totals.cgst + totals.sgst).toFixed(2)}
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          ₹{(totals.cgst + totals.sgst).toFixed(2)}
                         </td>
                       </tr>
-    <tr className="border-b border-gray-200">
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                         Total Incl GST:
+                      <tr className="border-b border-gray-200">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          Total Incl GST:
                         </td>
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
-                     ₹{overallTotal}
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                          ₹{overallTotal}
                         </td>
                       </tr>
-                       <tr className="border-b border-gray-200">
-                        <td className="px-4 py-3 text-[#3c3c3c] font-semibold  text-[15px] font-lato leading-[22px]">
-                     Used Debit Balance :
+                      <tr className="border-b border-gray-200">
+                        <td className="px-4 py-2 text-[#3c3c3c] font-semibold  text-[15px] font-lato leading-[22px]">
+                          Used Debit Balance :
                         </td>
-                        <td className="px-4 py-3 text-[#3c3c3c] font-semibold  text-[15px] font-lato leading-[22px]">
-                    -₹{Math.abs(fixedDebitBalance).toFixed(2)}
+                        <td className="px-4 py-2 text-[#3c3c3c] font-semibold  text-[15px] font-lato leading-[22px]">
+                          -₹{Math.abs(fixedDebitBalance).toFixed(2)}
                         </td>
-                      </tr>              
-  <tr className="border-b border-gray-200">
-  <td className="px-4 py-3 text-red-600 text-[15px] font-lato leading-[22px]">
-    Invoice Amount:
-  </td>
-  <td className="px-4 py-3 text-red-600 text-[15px] font-lato leading-[22px]">
-    ₹{invoiceAmount.toFixed(2)}
-  </td>
-</tr>
-
+                      </tr>
+                      <tr className="border-b border-gray-200">
+                        <td className="px-4 py-2 text-red-600 text-[15px] font-lato leading-[22px]">
+                          Invoice Amount:
+                        </td>
+                        <td className="px-4 py-2 text-red-600 text-[15px] font-lato leading-[22px]">
+                          ₹{invoiceAmount.toFixed(2)}
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>

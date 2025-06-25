@@ -269,8 +269,11 @@ const GrnView = () => {
                     gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr',
                   }}
                 >
-                  <div>
-                    {item?.item_info?.item_generate_id}
+                  <div className='flex items-center gap-3'>
+                    <div>
+                      <p className='m-0'>{item?.item_info?.item_generate_id} </p>
+                      <p className='m-0'> {item?.grn_item_name}</p>
+                    </div>
                     <span
                       className="cursor-pointer text-indigo-500 hover:text-indigo-700"
                       onClick={() => openItemDetails(item.item_id)}

@@ -104,15 +104,15 @@ const InventoryTable = ({
   return (
     <>
       <div
-        className={`w-full overflow-y-scroll h-[calc(120vh-310px)] border rounded-md shadow-sm mt-1 mb-3 ${
+        className={`w-full overflow-y-scroll h-[calc(80vh-150px)] border rounded-md shadow-sm mt-1 mb-3 ${
           isMinimised ? '' : 'overflow-x-auto'
         }`}
       >
         <CTable
           className={`border-separate border-spacing-0 ${
             isMinimised
-              ? 'max-h-[400px]' // or min-h-[500px] if needed
-              : 'min-w-[900px] overflow-x-scroll'
+              && // or min-h-[500px] if needed
+               'min-w-[900px] overflow-x-scroll'
           }`}
         >
           {!isMinimised && (

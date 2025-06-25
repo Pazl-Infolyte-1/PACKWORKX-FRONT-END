@@ -444,7 +444,7 @@ const GrnItemsFrom = ({
                     {fields.map((item, index) => (
                       <tr
                         key={item.id}
-                        className="even:bg-gray-50 hover:bg-gray-100 border-b transition"
+                        className="even:bg-gray-50  border-b transition"
                       >
                         {/* Product */}
                         <td className="py-2 px-2 text-center w-[200px]">
@@ -490,7 +490,7 @@ const GrnItemsFrom = ({
                               watch(`grn_items.${index}.quantity_ordered`) ||
                               ''
                             }
-                            className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
+                            className="w-full h-8 text-center truncate bg-transparent border rounded-md focus:ring-0 focus:outline-none"
                           />
                         </td>
 
@@ -502,7 +502,7 @@ const GrnItemsFrom = ({
                               required: true,
                             })}
                             value={watch(`grn_items.${index}.accepted_quantity`)}
-                            className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
+                            className="w-full h-8 text-center truncate bg-transparent border rounded-md focus:ring-0 focus:outline-none"
                           />
                         </td>
 
@@ -512,7 +512,7 @@ const GrnItemsFrom = ({
                             type="number"
                             {...register(`grn_items[${index}].rejected_quantity`)}
                             value={watch(`grn_items.${index}.rejected_quantity`)}
-                            className="w-full h-8 text-center truncate bg-transparent border-none focus:ring-0 focus:outline-none"
+                            className="w-full h-8 text-center truncate bg-transparent border rounded-md focus:ring-0 focus:outline-none"
                           />
                         </td>
 
@@ -576,52 +576,52 @@ const GrnItemsFrom = ({
                   <table className="bg-gray-100 rounded w-full border-collapse">
                     <tbody className="gap-4">
                       <tr className="border-b border-gray-200">
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           Total Qty:
                         </td>
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           {grnFormData.total_qty}
                         </td>
                       </tr>
                       {/* <tr className="border-b border-gray-200">
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           C-GST:
                         </td>
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           {grnFormData.cgst_amount}
                         </td>
                       </tr>
                       <tr className="border-b border-gray-200">
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           S-GST:
                         </td>
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           {grnFormData.sgst_amount}
                         </td>
                       </tr>
 
                       <tr className="border-b border-gray-200">
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           Total:
                         </td>
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           {grnFormData.amount}
                         </td>
                       </tr> */}
                       <tr className="border-b border-gray-200">
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           Tax GST:
                         </td>
-                        <td className="px-4 py-3 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#7f7f7f] text-[15px] font-lato leading-[22px]">
                           {grnFormData.tax_amount}
                         </td>
                       </tr>
 
                       <tr>
-                        <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
                           Total Incl GST:
                         </td>
-                        <td className="px-4 py-3 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
+                        <td className="px-4 py-2 text-[#3c3c3c] font-semibold text-[15px] font-lato leading-[22px]">
                           {grnFormData.total_amount}
                         </td>
                       </tr>

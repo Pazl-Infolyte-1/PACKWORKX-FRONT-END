@@ -215,7 +215,7 @@ const ViewInventory = ({ setIsMinimised }) => {
             <div className="flex items-center gap-2 text-sm">
               <Receipt className="w-3 h-3 text-green-600" />
               <span className="text-gray-600">Bill No:</span>
-              <span className="font-medium text-gray-900">{firstBill.bill_generate_id}</span>
+              <span className="font-medium text-blue-500 hover:underline">{firstBill.bill_generate_id}</span>
             </div>
           )}
         </div>
@@ -886,7 +886,7 @@ const ViewInventory = ({ setIsMinimised }) => {
                           <div className="flex items-center gap-3 text-sm">
                             <FileText className="w-4 h-4 text-gray-400" />
                             <span className="text-gray-600">Invoice No:</span>
-                            <span className="font-medium text-blue-600">{grn.grn.invoice_no}</span>
+                            <span className="font-medium text-gray-900">{grn.grn.invoice_no}</span>
                           </div>
 
                           <div className="flex items-center gap-3 text-sm">

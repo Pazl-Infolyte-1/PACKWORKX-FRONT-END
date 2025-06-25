@@ -584,7 +584,7 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       <h2 className="text-lg font-semibold mb-4">{isEditing ? 'Edit Product' : 'Add Product'}</h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-3 gap-3 ">
+      <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-3 gap-3 max-h-[74vh] mb-24 overflow-y-scroll ">
         {formFields.map(({ label, name, type = 'text', required, min, max, step, readOnly }) => (
           <div key={name}>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -790,18 +790,18 @@ const AddItemProcess = ({ selectedItemID, setDrawer, fetchData }) => {
           </div>
         )}
 
-        <div className="flex fixed bottom-3 bg-white w-full justify-end right-10 ">
+        <div className="flex fixed bottom-1 bg-white w-full justify-end right-10 ">
           <button
             onClick={handleCancel}
             type="button"
-            className="p-2 border border-gray-300 rounded w-24 mr-2 hover:bg-gray-100 transition"
+            className="p-1 border border-gray-300 rounded w-24 mr-2 hover:bg-gray-100 transition"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow-sm transition duration-200
+            className={`px-6 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded shadow-sm transition duration-200
               ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {isSubmitting ? 'Processing...' : isEditing ? 'Update' : 'Submit'}

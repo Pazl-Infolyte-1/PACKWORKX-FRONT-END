@@ -147,7 +147,7 @@ function ItemsTable({
 
   return (
     <div>
-      <ReusableTable data={data} columns={columns} handleRowClick={(row) => handleView(row.id)} />
+      <ReusableTable data={data} columns={columns} handleRowClick={(row) => handleView(row.id)}  height={'40vh'}/>
     </div>
   )
 }

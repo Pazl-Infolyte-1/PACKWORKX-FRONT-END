@@ -322,7 +322,7 @@ const AddEditStockAdjustment = () => {
     //   ...prev,
     //   [rowIndex]: [],
     // }))
-    // getInventoryByItemId(selectedProductId, rowIndex)
+    getInventoryByItemId(selectedProductId, rowIndex)
   }
 
   const getInventoryByItemId = async (selectedProductId, rowIndex) => {
@@ -394,10 +394,10 @@ const AddEditStockAdjustment = () => {
   }
 
   return (
-    <div className="p-2 mt-2  rounded-lg  w-full">
+    <div className="p-2 mt-2  rounded-lg  w-full ">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-h-[80vh] overflow-y-scroll">
         {/* Items Section + Remarks */}
         <div className="flex items-start gap-4">
           <label className="text-xs text-black-600 text-left ml-4 w-40 pt-2">

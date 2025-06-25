@@ -290,8 +290,8 @@ const GrnForm = () => {
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <div className="relative">
-          <div className="w-full">
+        <div className="relative max-h-[100vh] overflow-y-scroll">
+          <div className="w-full  ">
             {/* Form Content */}
             <div className="w-full">
               <div className="flex flex-col gap-3">
@@ -433,7 +433,7 @@ const GrnForm = () => {
 
                   {/* Delivery Note No */}
                   <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">Delivery Note No.</label>
+                    <label className="text-xs text-black-600 w-40">Delivery Note No. <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="delivery_note_no"
@@ -446,7 +446,7 @@ const GrnForm = () => {
 
                   {/* Invoice No */}
                   <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">Invoice No.</label>
+                    <label className="text-xs text-black-600 w-40">Invoice No. <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="invoice_no"
@@ -459,7 +459,7 @@ const GrnForm = () => {
 
                   {/* Invoice Date */}
                   <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">Invoice Date</label>
+                    <label className="text-xs text-black-600 w-40">Invoice Date <span className="text-red-500">*</span></label>
                     <input
                       type="date"
                       name="invoice_date"
@@ -472,7 +472,7 @@ const GrnForm = () => {
 
                   {/* Received By */}
                   <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">Received By</label>
+                    <label className="text-xs text-black-600 w-40">Received By <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="received_by"
@@ -485,7 +485,7 @@ const GrnForm = () => {
 
                   {/* Notes */}
                   <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">Notes</label>
+                    <label className="text-xs text-black-600 w-40">Notes <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="notes"
@@ -502,7 +502,7 @@ const GrnForm = () => {
 
           {/* <div className="border-t border-gray-100 mt-10 pb-6 w-[90%] mx-auto" style={{ borderTopWidth: '0.5px' }}></div> */}
 
-          <div className="mt-8 mb-4">
+          <div className="mt-8 mb-10">
             <GrnItemsFrom
               grnFormData={grnFormData}
               setGrnFormData={setGrnFormData}

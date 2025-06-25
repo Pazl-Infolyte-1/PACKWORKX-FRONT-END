@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Calendar, DollarSign, Percent, Hash } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import CustomAlert from '../../components/New/CustomAlert';
 
 const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
   const [selectedSku,setSelectedSku] = useState([])
@@ -195,10 +196,10 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
     setTimeout(() => {
       onClose();
     }, 200);
-
-
   };
 
+
+  
   // Compact input styles similar to Zoho
   const inputClass = `w-full h-8 px-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`;
   const selectClass = `w-full h-8 px-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white`;

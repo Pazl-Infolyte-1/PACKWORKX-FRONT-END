@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { X, CheckCircle, Clock, XCircle, CreditCard, Hash, Mail, Phone } from 'lucide-react';
 import { invoiceApi } from '../../api/Invoice';
 import { clientApi } from '../../api/client';
+import CustomAlert from '../../components/New/CustomAlert';
+
 
 const paymentTypes = [
   { value: 'cash', label: 'Cash' },
@@ -60,6 +62,11 @@ function paymentTypeIcon(type) {
 }
 
 function PaymentModal({ isOpen, onClose, invoiceId, invoiceNumber, clientName, invoice }) {
+
+  const [alerts,setAlerts] = useState([])
+
+
+
   const [creditBalance,setCreditBalance] = useState('')
 
 console.log(clientName)
@@ -118,15 +125,27 @@ console.log(clientName)
     try {
       const response = await invoiceApi.createPayment(payload);
       console.log(response);
+
+
+      setAlerts([{ severity: "success", message: response?.data?.message || "Payment Done successfully" }]);
+
+
       setTimeout(() => {
         setIsSubmitting(false);
         handleClose();
       }, 500);
     } catch (error) {
       setIsSubmitting(false);
+      setAlerts([{ severity: "error", message: error?.response?.data?.message || error?.message || "Payment Failed " }]);
       // Optionally show error to user
+      
     }
   };
+
+  
+  const handleCloseAlert = () => {
+    setAlerts([])
+  }
 
   const inputClass = `w-full h-8 px-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500`;
   const selectClass = `w-full h-8 px-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white`;
@@ -139,6 +158,10 @@ console.log(clientName)
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center backdrop-blur-md bg-white/10">
+                 <CustomAlert
+              alerts={alerts}
+              handleClose={handleCloseAlert}
+            />
       <div
         className={`bg-white rounded-lg shadow-2xl w-full max-w-md mx-4 mt-[6%] transition-all duration-200 ease-out ${
           isAnimating ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'
@@ -397,6 +420,7 @@ function CreatePaymentLinkModal({ isOpen, onClose, invoiceId, invoiceNumber, cli
   const totalAmount = invoice && invoice.total_amount != null ? Number(invoice.total_amount) : null;
   const receivedAmount = invoice && invoice.received_amount != null ? Number(invoice.received_amount) : 0;
   const pendingAmount = totalAmount != null ? (totalAmount - receivedAmount) : null;
+  const [alerts,setAlerts] = useState([])
 
   const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm({
     defaultValues: {
@@ -425,6 +449,10 @@ function CreatePaymentLinkModal({ isOpen, onClose, invoiceId, invoiceNumber, cli
     }, 200);
   };
 
+  const handleCloseAlert = () => {
+    setAlerts([])
+  }
+
   // Accepts either a valid email or a valid phone number (10-15 digits)
   const emailOrPhonePattern = {
     value: /(^[\w-.]+@[\w-]+\.[a-zA-Z]{2,}$)|(^\d{10,15}$)/,
@@ -451,6 +479,10 @@ function CreatePaymentLinkModal({ isOpen, onClose, invoiceId, invoiceNumber, cli
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center backdrop-blur-md bg-white/10">
+                       <CustomAlert
+              alerts={alerts}
+              handleClose={handleCloseAlert}
+            />
       <div
         className={`bg-white rounded-lg shadow-2xl w-[60vw] mx-4 mt-[6%] transition-all duration-200 ease-out ${
           isAnimating ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'

@@ -5,6 +5,7 @@ import PaymentModal, { PaymentHistoryModal, CreatePaymentLinkModal } from './Pay
 import ThreeDotMenu from '../../components/ThreeDotMenu';
 import { cilCamera, cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons';
 import { invoiceApi } from '../../api/Invoice';
+import CustomAlert from '../../components/New/CustomAlert';
 
 function getStatusStyle(status) {
   switch ((status || '').toLowerCase()) {
@@ -26,7 +27,7 @@ function formatDateDMY(dateStr) {
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-function InvoiceTable({isMiniMised,invoices}) {
+function InvoiceTable({isMiniMised,invoices,fetchInvoices}) {
 
     const navigate = useNavigate()
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -34,6 +35,7 @@ function InvoiceTable({isMiniMised,invoices}) {
     const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
     const [selectedInvoice, setSelectedInvoice] = useState(null);
     const [isCreatePaymentLinkModalOpen, setIsCreatePaymentLinkModalOpen] = useState(false);
+    const[alerts,setAlerts] = useState([])
 
     const handlePaymentClick = (row)=>{
         setSelectedInvoiceId(row.id);
@@ -63,6 +65,10 @@ function InvoiceTable({isMiniMised,invoices}) {
         setIsCreatePaymentLinkModalOpen(false);
     };
 
+   const handleClose = ()=>{
+    setAlerts([])
+   }
+
     const handleCreatePaymentLink = async (data, invoiceId) => {
         // TODO: Implement API call to create payment link
         console.log('Create Payment Link:', data, invoiceId);
@@ -73,8 +79,12 @@ function InvoiceTable({isMiniMised,invoices}) {
 
         try {
           await invoiceApi.createPaymentLink(payload);
+          setAlerts([{ severity: "success", message: "payment link sent successfully." }]);
+
         } catch (error) {
+          setAlerts([{ severity: "error", message: error?.response?.data?.message || error?.message || "Unable to Send payment Link." }]);
           console.error('Failed to create payment link:', error);
+
           // Optionally, show a toast or feedback to the user here
         }
     };
@@ -150,6 +160,11 @@ function InvoiceTable({isMiniMised,invoices}) {
         miniScreenFields={['invoice_number']}
         />
 
+<CustomAlert
+              alerts={alerts}
+              handleClose={handleClose}
+            />
+
         
         {isPaymentHistoryModalOpen && (
           <PaymentHistoryModal
@@ -163,6 +178,8 @@ function InvoiceTable({isMiniMised,invoices}) {
             invoice={selectedInvoice}
           />
         )}
+                {isPaymentModalOpen && (
+
         <PaymentModal
           isOpen={isPaymentModalOpen}
           onClose={handleClosePaymentModal}
@@ -170,8 +187,11 @@ function InvoiceTable({isMiniMised,invoices}) {
           invoiceNumber={selectedInvoice?.invoice_number}
           clientName={selectedInvoice?.client_name}
           invoice={selectedInvoice}
+          fetchInvoices={fetchInvoices}
 
         />
+      )}
+
         <CreatePaymentLinkModal
           isOpen={isCreatePaymentLinkModalOpen}
           onClose={handleCloseCreatePaymentLinkModal}

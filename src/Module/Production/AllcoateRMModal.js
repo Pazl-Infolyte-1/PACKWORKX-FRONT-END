@@ -6,7 +6,9 @@ import { useRawMaterialContext } from '../../Context/AlocateRawMeterialContext'
 const AllcoateRMModal = ({ visibleAllocate, setVisibleAllocate, group, droppedItem }) => {
   const [allocateAmount, setAllocateAmount] = useState('')
   const [historyData, setHistoryData] = useState()
-  const { getData } = useRawMaterialContext()
+  const { getData,setAlertsApp } = useRawMaterialContext()
+
+
 
   useEffect(() => {
     async function fetchData() {
@@ -22,10 +24,15 @@ const AllcoateRMModal = ({ visibleAllocate, setVisibleAllocate, group, droppedIt
   const handleConfirm = async () => {
     const quantityNumber = parseFloat(allocateAmount)
     if (isNaN(quantityNumber) || quantityNumber <= 0) {
-      alert('Please enter a valid allocation amount.')
+      setAlertsApp([{severity:'warning',message:'Please enter a valid allocation amount.'}])
+
       return
     }
-
+    if (quantityNumber > group?.balance_Qty) {
+      setAlertsApp([{severity:'warning',message:'Cannot allocate more than the balance to allocate in group.'}])
+      // alert('Cannot allocate more than the balance to allocate in group.')
+      return
+    }
     const payload = {
       allocations: [
         {
@@ -84,7 +91,7 @@ const AllcoateRMModal = ({ visibleAllocate, setVisibleAllocate, group, droppedIt
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600"> Balance To Allocate In group</span>
                 <div className="bg-gray-100 px-3 py-1.5 rounded-md text-sm text-gray-600 w-24 text-right pr-2">
-                  {group?.balance_Qty} KG
+                  {group?.balance_Qty < 0 ? 0 : group?.balance_Qty} KG
                 </div>
               </div>
 
@@ -92,7 +99,7 @@ const AllcoateRMModal = ({ visibleAllocate, setVisibleAllocate, group, droppedIt
                 <span className="text-sm text-gray-600">How much to allocate</span>
                 <div className="relative">
                   <input
-                    type="text"
+                    type="number"
                     min="0"
                     value={allocateAmount}
                     onChange={(e) => setAllocateAmount(e.target.value)}

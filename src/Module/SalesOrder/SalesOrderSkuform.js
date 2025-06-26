@@ -27,6 +27,7 @@ const SalesOrderSkuForm = ({
   const [totalGst, setTotalGst] = useState(0);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
+
   // Initialize form with skuDetailsForm data if it exists
   const { register, control, watch, setValue, getValues } = useForm({
     defaultValues: {

@@ -40,7 +40,8 @@ function SkuVersionAddEdit({
         const [fluteDropdown,setFluteDropdown]=useState([])
 const [colorList, setColorList] = useState([]);
 
-    
+
+// console.log(allSkuData)
   const handleCloseSingleViewPopup = () => {
     setisSingleViewPopup(false)
   }

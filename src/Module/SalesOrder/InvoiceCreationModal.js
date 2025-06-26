@@ -178,7 +178,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
         rate_per_sku: data?.rate_per_qty,
         total_amount: total,
         gst: gstAmount,
-        total_incl__gst: useCredit ? invoiceWithGst - credit_amount : invoiceWithGst,
+        total_incl_gst: useCredit ? invoiceWithGst - credit_amount : invoiceWithGst,
         discount: data?.discount,
       }]
     };

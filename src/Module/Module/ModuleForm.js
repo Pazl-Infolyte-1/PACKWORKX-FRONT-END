@@ -1,6 +1,8 @@
 import { EyeIcon } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { moduleApi } from '../../api/module'
+import CustomAlert from '../../components/New/CustomAlert'
 
 // Mock modules (if not present)
 const mockModules = [
@@ -22,17 +24,61 @@ function ModuleForm() {
   const [selectedModule, setSelectedModule] = useState(null)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [moduleSearch, setModuleSearch] = useState('')
+  const [dropdownModules, setDropdownModules] = useState([])
+  const [isDownloading, setIsDownloading] = useState(false)
   const fileInputRef = useRef(null)
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
 
   // Download Sample Import File handler
-  const handleDownloadSample = () => {
-    // TODO: Implement actual download logic
-    setAlerts([
-      { severity: 'success', message: 'Sample import file download triggered (implement logic)' },
-    ])
+  const handleDownloadSample = async () => {
+    // Check if module is selected
+    if (!selectedModule) {
+      setErrors((prev) => ({ ...prev, download: 'Please select a module first' }))
+      setAlerts([
+        { severity: 'error', message: 'Please select a module before downloading the template' },
+      ])
+      return
+    }
+
+    // Clear any previous download errors
+    setErrors((prev) => ({ ...prev, download: '' }))
+    setIsDownloading(true)
+
+    try {
+      const response = await moduleApi.downloadTemplate(selectedModule.value)
+
+      // Create blob and download file
+      const blob = new Blob([response.data])
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${selectedModule.label || selectedModule.name}_template.xlsx`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      setAlerts([{ severity: 'success', message: 'Template downloaded successfully!' }])
+    } catch (error) {
+      console.error('Error downloading template:', error)
+      setAlerts([{ severity: 'error', message: 'Failed to download template. Please try again.' }])
+    } finally {
+      setIsDownloading(false)
+    }
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await moduleApi.getDropDownModules()
+        setDropdownModules(response.data.data)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    fetchData()
+  }, [])
 
   // File upload handlers
   const handleFileChange = (e) => {
@@ -70,15 +116,18 @@ function ModuleForm() {
   }, [])
 
   // Dropdown filter
-  const filteredModules = mockModules.filter(
-    (mod) => mod.name.toLowerCase().includes(moduleSearch.toLowerCase()) && mod.status === 'active',
+  const filteredModules = dropdownModules.filter((mod) =>
+    mod.label.toLowerCase().includes(moduleSearch.toLowerCase()),
   )
 
   // Form submit
-  const handleSubmit = (e) => {
+  // Form submit
+  const handleSubmit = async (e) => {
     e.preventDefault()
     let hasError = false
     const newErrors = {}
+
+    // Validation
     if (!selectedModule) {
       newErrors.module = true
       hasError = true
@@ -94,18 +143,72 @@ function ModuleForm() {
       newErrors.email = 'Invalid email address'
       hasError = true
     }
+
     setErrors(newErrors)
     if (hasError) return
-    setAlerts([{ severity: 'success', message: 'File and email submitted!' }])
-    setFile(null)
-    setEmail('')
-    setHasHeadingRow(false)
-    setSelectedModule(null)
-    setModuleSearch('')
+
+    try {
+      // Create FormData object
+      const formData = new FormData()
+      formData.append('module_name', selectedModule.value || selectedModule.name)
+      formData.append('email', email)
+      formData.append('file', file)
+      formData.append('has_heading_row', hasHeadingRow)
+
+      // Make API call
+      const response = await moduleApi.uploadModuleData(formData)
+      if (response.status === 200 || response.status === 201) {
+        // Success handling
+        setAlerts([
+          {
+            severity: 'success',
+            message:
+              'File uploaded successfully! You will be notified via email once processing is complete.',
+          },
+        ])
+        setTimeout(() => {
+          navigate('/modules')
+        }, 800)
+      }
+
+      // Reset form
+      setFile(null)
+      setEmail('')
+      setHasHeadingRow(false)
+      setSelectedModule(null)
+      setModuleSearch('')
+
+      // Clear any existing errors
+      setErrors({})
+
+      // Optional: Navigate to next step or another page
+      // navigate('/next-step') // Uncomment if you want to navigate
+    } catch (error) {
+      console.error('Error uploading file:', error)
+
+      // Handle different error scenarios
+      let errorMessage = 'Failed to upload file. Please try again.'
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.response?.status === 413) {
+        errorMessage = 'File is too large. Please select a smaller file.'
+      } else if (error.response?.status === 415) {
+        errorMessage = 'Unsupported file type. Please upload an Excel or CSV file.'
+      }
+
+      setAlerts([
+        {
+          severity: 'error',
+          message: errorMessage,
+        },
+      ])
+    }
   }
 
   return (
     <div className="w-full h-[calc(100vh-80px)]  rounded-lg  p-3">
+      <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       {/* Heading */}
       <h2 className="text-2xl font-semibold mb-6">Add Module</h2>
 
@@ -129,7 +232,7 @@ function ModuleForm() {
             }}
           >
             <span className="truncate text-sm text-gray-500">
-              {selectedModule ? selectedModule.name : 'Select a module'}
+              {selectedModule ? selectedModule.label || selectedModule.name : 'Select a module'}
             </span>
             <span className="text-gray-500">
               {isDropdownOpen ? (
@@ -192,15 +295,15 @@ function ModuleForm() {
               {filteredModules.length > 0 ? (
                 filteredModules.map((mod) => (
                   <div
-                    key={mod.id}
+                    key={mod.value}
                     className="cursor-pointer px-3 py-2 text-xs hover:bg-gray-50"
                     onClick={() => {
                       setSelectedModule(mod)
                       setIsDropdownOpen(false)
-                      setErrors((prev) => ({ ...prev, module: '' }))
+                      setErrors((prev) => ({ ...prev, module: '', download: '' }))
                     }}
                   >
-                    {mod.name}
+                    {mod.label}
                   </div>
                 ))
               ) : (
@@ -240,27 +343,40 @@ function ModuleForm() {
       </div>
 
       {/* Download Sample Import File */}
-      <button
-        type="button"
-        onClick={handleDownloadSample}
-        className="flex items-center gap-2  text-sm border border-gray-300 rounded px-4 py-2 text-gray-700 hover:bg-gray-100 mb-2"
-      >
-        <svg
-          width="18"
-          height="18"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          viewBox="0 0 24 24"
+      <div className="mb-2">
+        <button
+          type="button"
+          onClick={handleDownloadSample}
+          disabled={isDownloading}
+          className={`flex items-center gap-2 text-sm border border-gray-300 rounded px-4 py-2 text-gray-700 hover:bg-gray-100 ${
+            isDownloading ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
         >
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="7 10 12 15 17 10" />
-          <line x1="12" y1="15" x2="12" y2="3" />
-        </svg>
-        Download Sample Import File
-      </button>
+          <svg
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            viewBox="0 0 24 24"
+            className={isDownloading ? 'animate-spin' : ''}
+          >
+            {isDownloading ? (
+              <path d="M21 12a9 9 0 11-6.219-8.56" />
+            ) : (
+              <>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </>
+            )}
+          </svg>
+          {isDownloading ? 'Downloading...' : 'Download Sample Import File'}
+        </button>
+        {errors.download && <div className="text-xs text-red-600 mt-1">{errors.download}</div>}
+      </div>
 
       {/* File Upload */}
       <form onSubmit={handleSubmit}>
@@ -357,7 +473,7 @@ function ModuleForm() {
               <line x1="5" y1="12" x2="19" y2="12" />
               <polyline points="12 5 19 12 12 19" />
             </svg>
-            Upload And Move To Next Step
+            Submit
           </button>
           <button
             type="button"

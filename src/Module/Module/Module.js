@@ -24,7 +24,7 @@ function Module() {
       setGlobalPlaceholder('Search...')
     }
   }, [setGlobalPlaceholder])
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -35,14 +35,16 @@ function Module() {
         setModules(response.data.data)
         setPagination((prev) => ({
           ...prev,
-          totalPages: response.data.pagination?.totalPages || 1,
-          totalRecords: response.data.pagination?.totalRecords || 0,
+          totalPages: response.data.pagination?.total_pages || 1,
+          totalRecords: response.data.pagination?.total || 0,
+          page: response.data.pagination?.page || 1,
+          limit: response.data.pagination?.limit || prev.limit,
         }))
       } catch (error) {
         console.error(error)
       }
     }
-    // fetchData()
+    fetchData()
   }, [pagination.page, pagination.limit])
 
   const handlePageChange = (event, newPage) => {

@@ -486,7 +486,7 @@ const Group = ({
   const [splitVisible, setSplitVisible] = useState(false)
   const navigate = useNavigate()
   const [groups1,setGroupOrders] = useState()
-  const { groups,addWorkOrderToGroup,workOrders,setWorkOrders,refreshData,handleClose,alerts,addGroup } = useGroupLayers();
+  const { groups,addWorkOrderToGroup,workOrders,setWorkOrders,refreshData,handleClose,alerts,setAlertsApp,addGroup } = useGroupLayers();
   const {registerNextHandler} = useNextHandler()
 
   const {searchQuery,setGlobalPlaceholder} = useSearch()
@@ -510,6 +510,12 @@ const Group = ({
 
   const SubmitGroups = async () => {
     try {
+      // Check for empty groups
+      const emptyGroups = groups.filter(group => !group.group_value || group.group_value.length === 0)
+      if (emptyGroups.length > 0) {
+        setAlertsApp('warning','Please delete all empty groups before submitting.')
+        return;
+      }
       if (groups.length !== 0) {
         const payload = groups.map(group => {
           const groupItems = group?.group_value?.flatMap(item => {
@@ -742,9 +748,17 @@ const Group = ({
               </button> */}
               <button
                 onClick={SubmitGroups}
-                className="px-3 py-1 text-sm rounded-md border-none font-semibold cursor-pointer transition-all duration-200 ease-in-out bg-indigo-500 text-white hover:bg-indigo-600 hover:-translate-y-px"
+                disabled={groups.length == 0}
+                className={`
+                  px-4 py-2 rounded-md border-none font-semibold text-white text-sm
+                  transition-all duration-200 ease-in-out
+                  bg-indigo-500
+                  hover:bg-indigo-600 hover:-translate-y-px
+                  disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed
+                  shadow-sm
+                `}
               >
-                allocate rawmeterialS
+                allocate raw materials
               </button>
             </div>
           </div>

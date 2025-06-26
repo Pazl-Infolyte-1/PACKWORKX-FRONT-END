@@ -66,7 +66,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
         rate_per_sku: '',
         total_amount: '',
         gst: '',
-        total_incl__gst: '',
+        total_incl_gst: '',
       }]
     }
   });
@@ -172,7 +172,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
             rate_per_sku: '',
             total_amount: '',
             gst: '',
-            total_incl__gst: ''
+            total_incl_gst: ''
           }
         ]);
         setTimeout(() => {
@@ -206,7 +206,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       rate_per_sku: '',
       total_amount: '',
       gst: '',
-      total_incl__gst: '',
+      total_incl_gst: '',
       discount: '',
     }]);
     setValue('work_id', '');
@@ -265,14 +265,14 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       const igstAmount = totalAmount * (gstPercentage / 100);
       setValue(`sku_details[${index}].gst`, igstAmount.toFixed(2));
       setValue(`sku_details[${index}].total_amount`, totalAmount.toFixed(2));
-      setValue(`sku_details[${index}].total_incl__gst`, (totalAmount + igstAmount).toFixed(2));
+      setValue(`sku_details[${index}].total_incl_gst`, (totalAmount + igstAmount).toFixed(2));
     } else {
       const halfGst = gstPercentage / 2;
       const sgstAmount = totalAmount * (halfGst / 100);
       const cgstAmount = totalAmount * (halfGst / 100);
       setValue(`sku_details[${index}].gst`, (sgstAmount + cgstAmount).toFixed(2));
       setValue(`sku_details[${index}].total_amount`, totalAmount.toFixed(2));
-      setValue(`sku_details[${index}].total_incl__gst`, (totalAmount + sgstAmount + cgstAmount).toFixed(2));
+      setValue(`sku_details[${index}].total_incl_gst`, (totalAmount + sgstAmount + cgstAmount).toFixed(2));
     }
   };
 
@@ -328,7 +328,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
       const itemGst = parseFloat(item.gst) || 0;
       discountedSubtotal += itemAmount;
       totalGstAmount += itemGst;
-      withGST += (parseFloat(item.total_incl__gst) || 0);
+      withGST += (parseFloat(item.total_incl_gst) || 0);
       totalQty += parseFloat(item.quantity_required) || 0;
     });
     setValue('total', subtotal);
@@ -581,7 +581,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                       rate_per_sku: '',
                       total_amount: '',
                       gst: '',
-                      total_incl__gst: ''
+                      total_incl_gst: ''
                     });
                     // Calculate values for the new SKU
                     setTimeout(() => {
@@ -971,7 +971,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
 
                               <td className="pr-2 border-b text-right">
                                 <input
-                                  {...register(`sku_details[${index}].total_incl__gst`)}
+                                  {...register(`sku_details[${index}].total_incl_gst`)}
                                   readOnly
                                   className="w-full h-[40px] text-right border-none focus:outline-none"
                                 />
@@ -1048,17 +1048,17 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                                     {isIgstApplicable ? (
                                       <span>
                                         IGST: 
-                                        (₹{(parseFloat(skuDetailsData[index]?.total_incl__gst) - parseFloat(skuDetailsData[index]?.total_amount)).toFixed(2) || '0.00'})
+                                        (₹{(parseFloat(skuDetailsData[index]?.total_incl_gst) - parseFloat(skuDetailsData[index]?.total_amount)).toFixed(2) || '0.00'})
                                       </span>
                                     ) : (
                                       <>
                                         <span>
                                           CGST:
-                                          (₹{((parseFloat(skuDetailsData[index]?.total_incl__gst) - parseFloat(skuDetailsData[index]?.total_amount)) / 2).toFixed(2) || '0.00'})
+                                          (₹{((parseFloat(skuDetailsData[index]?.total_incl_gst) - parseFloat(skuDetailsData[index]?.total_amount)) / 2).toFixed(2) || '0.00'})
                                         </span>
                                         <span>
                                           SGST:
-                                          (₹{((parseFloat(skuDetailsData[index]?.total_incl__gst) - parseFloat(skuDetailsData[index]?.total_amount)) / 2).toFixed(2) || '0.00'})
+                                          (₹{((parseFloat(skuDetailsData[index]?.total_incl_gst) - parseFloat(skuDetailsData[index]?.total_amount)) / 2).toFixed(2) || '0.00'})
                                         </span>
                                       </>
                                     )}
@@ -1082,7 +1082,7 @@ const InvoiceAddForm = forwardRef((props, ref) => {
                           rate_per_sku: '',
                           total_amount: '',
                           gst: '',
-                          total_incl__gst: '',
+                          total_incl_gst: '',
                           discount: ''
                         })}
                         disabled={!!selectedWorkOrder}

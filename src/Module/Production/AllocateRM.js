@@ -8,6 +8,11 @@ import {
   CButton,
   CCollapse,
   CFormSelect,
+  CFormInput,
+  CModal,
+  CModalHeader,
+  CModalBody,
+  CModalFooter,
 } from '@coreui/react'
 import { FaAngleDown, FaAngleUp, FaEye, FaLock } from 'react-icons/fa'
 import CIcon from '@coreui/icons-react'
@@ -327,14 +332,20 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
   const [deallocationError, setDeallocationError] = useState(null);
   const {getData,setAlertsApp} = useRawMaterialContext()
 
+  // New state for deallocation modal
+  const [showDeallocateModal, setShowDeallocateModal] = useState(false);
+  const [deallocateInfo, setDeallocateInfo] = useState(null); // {inventory_id, total_allocated_qty, group_id}
+  const [deallocateQty, setDeallocateQty] = useState('');
+  const [deallocateInputError, setDeallocateInputError] = useState('');
+
   const addQuantity = (groupIndex, item) => {
     console.log('Group Index:', groupIndex)
     console.log('Item:', item)
     setVisibleAllocate(true)
   }
 
-
-  const handleDeAllocateClick = async (inventory_id, total_qty, grpId) => {
+  // Modified: Accepts custom quantity
+  const handleDeAllocateClick = async (inventory_id, qty, grpId) => {
     try {
       setIsDeallocating(true);
       setDeallocationError(null);
@@ -344,20 +355,20 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
           {
             production_group_id: grpId,
             inventory_id: inventory_id,
-            quantity_to_deallocate: total_qty,
+            quantity_to_deallocate: qty,
           }
         ]
       }
 
       const response = await productionApi.deAllocateInventoryFromGroup({...payload});
-      
-
       // Refresh data after successful deallocation
       await getData();
-      
+      setShowDeallocateModal(false);
+      setDeallocateQty('');
+      setDeallocateInputError('');
     } catch (error) {
-      console.error('Deallocation error:', error.response.data.message);
-      setAlertsApp([{severity:"error",message:error.response.data.message}])
+      console.error('Deallocation error:', error?.response?.data?.message || error.message);
+      setAlertsApp([{severity:"error",message:error?.response?.data?.message || 'Deallocation failed'}])
     } finally {
       setIsDeallocating(false);
     }
@@ -379,6 +390,33 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
     }),
   }))
 
+  // Handler for lock icon click
+  const handleLockClick = (allocation) => {
+    setDeallocateInfo({
+      inventory_id: allocation.inventory_id,
+      total_allocated_qty: allocation.total_allocated_qty,
+      group_id: group.id,
+    });
+    setDeallocateQty('');
+    setDeallocateInputError('');
+    setShowDeallocateModal(true);
+  };
+
+  // Handler for modal confirm
+  const handleDeallocateConfirm = () => {
+    const maxQty = Number(deallocateInfo?.total_allocated_qty);
+    const qty = Number(deallocateQty);
+    if (!qty || qty <= 0) {
+      setDeallocateInputError('Enter a valid quantity');
+      return;
+    }
+    if (qty > maxQty) {
+      setDeallocateInputError(`Cannot deallocate more than allocated (${maxQty})`);
+      return;
+    }
+    handleDeAllocateClick(deallocateInfo.inventory_id, qty, deallocateInfo.group_id);
+  };
+
   return (
     <CCard
       ref={drop}
@@ -393,6 +431,8 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
     >
       <CCardBody style={{ padding: '8px' }}>
         <div
+                    onClick={() => toggleGroupCollapse(groupIndex)}
+
           style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -402,7 +442,6 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
           }}
         >
           <span
-            onClick={() => toggleGroupCollapse(groupIndex)}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -424,9 +463,9 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
               fontSize: '0.85rem',
             }}
           >
-            {group.allocated_Qty}
+            {group.allocated_Qty || 0}
             /
-            {group.group_Qty}
+            {group.group_Qty || 0 } 
 
             <div style={{ marginLeft: '8px', width: '35px', height: '30px' }}>
               <ProgressBar
@@ -522,7 +561,7 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
                           color: isDeallocating ? '#9ca3af' : '#8167e5',
                           opacity: isDeallocating ? 0.7 : 1
                         }}
-                        onClick={() => !isDeallocating && handleDeAllocateClick(allocation.inventory_id, allocation.total_allocated_qty, group.id)}
+                        onClick={() => !isDeallocating && handleLockClick(allocation)}
                       />
                     </div>
                   ))
@@ -584,6 +623,40 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
         onClose={() => setGroupDetailsModal(prev => ({ ...prev, visible: false , id:null}))}
         />
       )}
+      {/* Deallocate Quantity Modal */}
+      <CModal visible={showDeallocateModal} onClose={() => setShowDeallocateModal(false)}>
+        <CModalHeader onClose={() => setShowDeallocateModal(false)}>
+          Deallocate Quantity
+        </CModalHeader>
+        <CModalBody>
+          <div style={{ marginBottom: 1 }}>
+            <span>Allocated: <b>{deallocateInfo?.total_allocated_qty}</b></span>
+          </div>
+          <CFormInput
+            type="number"
+            min={1}
+            max={deallocateInfo?.total_allocated_qty || 1}
+            value={deallocateQty}
+            onChange={e => {
+              setDeallocateQty(e.target.value);
+              setDeallocateInputError('');
+            }}
+            placeholder="Enter quantity to deallocate"
+            disabled={isDeallocating}
+          />
+          {deallocateInputError && (
+            <div style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{deallocateInputError}</div>
+          )}
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setShowDeallocateModal(false)} disabled={isDeallocating}>
+            Cancel
+          </CButton>
+          <CButton color="primary" onClick={handleDeallocateConfirm} disabled={isDeallocating}>
+            {isDeallocating ? 'Deallocating...' : 'Deallocate'}
+          </CButton>
+        </CModalFooter>
+      </CModal>
     </CCard>
   );
 }

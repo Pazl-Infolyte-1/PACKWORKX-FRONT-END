@@ -308,17 +308,19 @@ function WorkOrderListing() {
   }, [filterModalOpen]);
 
   return (
-    <div style={{ 
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      background: '#f5f7fa',
-      padding: '2px 5px'
-    }}>
+    <div
+      style={{ 
+        height: 'calc(100vh - 200px)',
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        background: '#f5f7fa',
+        padding: '2px 5px'
+      }}>
       <div style={{ margin: '0 auto' }}>
         {/* Screen Container */}
         <div style={{
           background: 'white',
           borderRadius: '12px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          // boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
           marginBottom: '40px',
           overflow: 'hidden'
         }}>
@@ -531,7 +533,13 @@ function WorkOrderListing() {
               justifyContent: 'space-between'
             }}>
               {/* Table or No Results Message */}
-              <div>
+              <div
+              className='border'
+               style={{
+                height: '50vh',
+                overflowY: 'auto',
+                width: '100%',
+              }}>
                 {workOrders?.length > 0 ? (
                   <table style={{
                     width: '100%',
@@ -540,7 +548,7 @@ function WorkOrderListing() {
                     borderRadius: '2px',
                     overflow: 'hidden',
                     // boxShadow: '0 2px 8px rgba(102,126,234,0.10)',
-                    border: '1px solid gray',
+
                   }}>
                     <thead>
                       <tr>

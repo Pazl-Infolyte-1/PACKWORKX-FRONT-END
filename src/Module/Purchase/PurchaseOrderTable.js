@@ -194,7 +194,7 @@ function PurchaseOrderTable({
       type: 'custom',
       render: (row) => (
         <div className="flex justify-center items-center w-full">
-          {row.decision === 'approve' ? (
+          {row.po_status === 'created' ? (
             <select
               className={`border rounded px-2 py-1 text-xs
               min-w-[80px] max-w-[120px] w-full

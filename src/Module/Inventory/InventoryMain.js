@@ -126,21 +126,33 @@ const InventoryMain = () => {
     return selectedSubCategory ? selectedSubCategory.sub_category_name.replace(/-/g, ' ') : null
   }
 
+  const getQuantityForCategory = (categoryId) => {
+    const found = subCategoryQuantities.find(
+      (item) => item.category === categoryId && item.category_info,
+    )
+    return found?.category_info?.total_quantity ? parseInt(found.category_info.total_quantity) : '0'
+  }
+
   // Fixed function to get total stock value for selected subcategory
   const getTotalStockValue = () => {
-    if (!subCategoryId || !subCategoryQuantities.length) return '0.00'
-
-    // Find the subcategory data that matches the selected subCategoryId
-    const selectedSubCategoryData = subCategoryQuantities.find(
-      (item) => item.sub_category === subCategoryId,
-    )
-
-    if (selectedSubCategoryData && selectedSubCategoryData.sub_category_info) {
-      const totalAmount = parseFloat(selectedSubCategoryData.sub_category_info.total_amount) || 0
-      return parseFloat(totalAmount) || '0'
+    // If subCategoryId is selected, try to find sub_category_info
+    if (subCategoryId) {
+      const subCat = subCategoryQuantities.find((item) => item.sub_category === subCategoryId)
+      if (subCat && subCat.sub_category_info) {
+        return subCat.sub_category_info.total_amount
+      }
     }
-
-    return '0.00'
+    // If categoryId is selected, try to find category_info
+    if (categoryId) {
+      const cat = subCategoryQuantities.find(
+        (item) => item.category === categoryId && item.category_info,
+      )
+      if (cat && cat.category_info) {
+        return cat.category_info.total_amount
+      }
+    }
+    // Fallback: sum from inventoryData
+    return inventoryData.reduce((sum, item) => sum + parseFloat(item.total_amount || 0), 0)
   }
 
   // // Function to get total quantity for selected subcategory
@@ -173,9 +185,21 @@ const InventoryMain = () => {
           }
           const response = await inventoryApi.getInventorySummary(params)
           const data = response.data.data.inventoryData
-          const selectedSubcategory = data.filter(
-            (item) => item.item_info.sub_category === subCategoryId,
-          )
+          const selectedSubcategory = data.filter((item) => {
+            // Handle case where item_info is null or undefined
+            if (!item?.item_info) {
+              return false
+            }
+
+            // Check if sub_category exists in item_info
+            if (item.item_info.sub_category !== undefined) {
+              return item.item_info.sub_category === subCategoryId
+            }
+
+            // Alternative: If subcategory data is stored differently
+            // You might need to check other fields based on your data structure
+            return false
+          })
           setInventoryData(selectedSubcategory)
           setSubCategoryQuantities(response.data.data.subCategoryQuantities)
           const pagination = response.data.pagination
@@ -403,7 +427,7 @@ const InventoryMain = () => {
                         <FaChevronDown className="text-sm text-white cursor-pointer" />
                       )
                     ) : (
-                      <span className="text-sm text-white">0</span>
+                      <span className="text-sm text-white">{getQuantityForCategory(item.id)}</span>
                     )}
                   </span>
                 </div>

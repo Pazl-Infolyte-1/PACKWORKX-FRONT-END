@@ -80,6 +80,7 @@ const BillingMain = React.lazy(() => import('./Module/Billing/BillingMain.js'))
 const ClientReport = React.lazy(() => import('./Module/ReportsModule/ClientReport.js'))
 const ClientPage = React.lazy(() => import('./Module/ReportsModule/Reports.js'))
 const Modules = React.lazy(() => import('./Module/Module/Module.js'))
+const ModuleForm = React.lazy(() => import('./Module/Module/ModuleForm.js'))
 
 // const ProductionPlanning = React.lazy(
 //   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
@@ -246,6 +247,8 @@ const routes = [
   { path: '/designation', name: 'Designation', element: Designation, key: '' },
   { path: '/department', name: 'Department', element: Department, key: '' },
   { path: '/role', name: 'role', element: Role, key: '' },
+  { path: '/modules', name: 'Modules', element: Modules, key: 'modules' },
+  { path: '/module/add-form', name: 'Add-Module', element: ModuleForm, key: 'Add-Module' },
   {
     path: '/debitnote',
     name: 'Debit Note',
@@ -343,12 +346,6 @@ const routes = [
     name: 'Reportpage',
     element: ClientPage,
     key: 'client-page',
-  },
-  {
-    path: '/modules',
-    name: 'Modules',
-    element: Modules,
-    key: 'modules',
   },
   // {
   //   path: '/productionplanning',

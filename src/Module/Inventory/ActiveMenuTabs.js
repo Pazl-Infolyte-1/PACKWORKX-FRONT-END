@@ -89,6 +89,7 @@ const formatCurrency = (amount) => {
 export const ProductDetails = ({ itemDetails, item, navigate, handleEdit }) => {
   const rawCustomFields = itemDetails?.products?.default_custom_fields
   const customData = rawCustomFields || {}
+console.log('customData:', );
 
   return (
     <div className="p-3">
@@ -180,7 +181,7 @@ export const ProductDetails = ({ itemDetails, item, navigate, handleEdit }) => {
                   <Package className="w-4 h-4 text-gray-500" />
                   <div>
                     <p className="text-xs text-gray-500 m-0">UOM</p>
-                    <p className="text-sm font-medium">{itemDetails.products.uom || 'N/A'}</p>
+                    <p className="text-sm font-medium">{itemDetails.products.custom_fields.uom || 'N/A'}</p>
                   </div>
                 </div>
               </div>
@@ -487,9 +488,9 @@ export const BillingsDetails = ({ itemDetails, item, navigate }) => {
           </div>
         </div>
         {/* Billings Content */}
-        {itemDetails?.billings?.length > 0 ? (
+        {itemDetails?.billing?.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {itemDetails.billings.map((billing) => (
+            {itemDetails.billing.map((billing) => (
               <div
                 key={billing.id}
                 className="group bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-purple-200 transition-all duration-300 overflow-hidden"

@@ -40,8 +40,9 @@ function SkuVersionAddEdit({
         const [fluteDropdown,setFluteDropdown]=useState([])
 const [colorList, setColorList] = useState([]);
 
+// Add this variable for strict adherence
+const isStrictAdherence = !!allSkuDetails?.strict_adherence;
 
-// console.log(allSkuData)
   const handleCloseSingleViewPopup = () => {
     setisSingleViewPopup(false)
   }
@@ -51,7 +52,7 @@ useEffect(() => {
     try {
       const response = await commonApi.getColors();
       setColorList(response.data.data); // contains objects with color_name
-      console.log("color data", response.data.data);
+      // console.log("color data", response.data.data);
     } catch (error) {
       console.error(error);
     }
@@ -99,8 +100,8 @@ const handleFluteSelection = (selectedFlute, fluteIndex) => {
     try {
       const response = await skuApi.getFluteType()
       setFluteDropdown(response.data.data)
-      console.log("flute",response.data.data)
-      console.log("flute type",JSON.stringify(response.data.data))
+      // console.log("flute",response.data.data)
+      // console.log("flute type",JSON.stringify(response.data.data))
     } catch (error) {
       console.error(error)
     }
@@ -121,7 +122,7 @@ const handleFluteSelection = (selectedFlute, fluteIndex) => {
   
         } else if (skuID && skuVersionID) {
           // 🔹 Case 2: Both skuID and skuVersionID are available (but not in edit mode)
-          console.log("Handling skuID + skuVersionID case (not edit mode)");
+          // console.log("Handling skuID + skuVersionID case (not edit mode)");
           // Add your custom logic here for this case
           // Example:
        const skuPromise = skuApi.getSingleSkuData(skuID);
@@ -255,6 +256,7 @@ const recalcRowValues = (item) => {
   }
 };
 const handleValueChange = (index, field, value) => {
+  if (isStrictAdherence) return; // Prevent changes if strict adherence
   const updatedValues = [...skuvaluesFromParent];
 
   if (field === 'flute_type') {
@@ -299,7 +301,7 @@ const totalBurstingStrength = skuvaluesFromParent?.reduce(
 
   const handleAddOption = async () => {
     try {
-      console.log(editedMap)
+      // console.log(editedMap)
       const field_options = Object.entries(editedMap).flatMap(([index, fields]) => {
         return Object.entries(fields).map(([fieldName, fieldValue]) => ({
           field_path: `sku_values.${index}.${fieldName}`,
@@ -308,7 +310,7 @@ const totalBurstingStrength = skuvaluesFromParent?.reduce(
         }));
       });
 
-      console.log("field_options:", field_options);
+      // console.log("field_options:", field_options);
 
       const requestBody = {
         sku_id: skuID,
@@ -380,7 +382,7 @@ const totalBurstingStrength = skuvaluesFromParent?.reduce(
   };
 
   const openViewCard = () => {
-    console.log("View flute card details");
+    // console.log("View flute card details");
     
   };
 
@@ -404,7 +406,8 @@ const cleanedSkuValues = skuvaluesFromParent.map((item) => {
 
   return {
     ...rest,
-    flute_type: flute_type === "--" ? null : flute_type
+    flute_type: flute_type === "--" ? null : flute_type,
+    // production_status: 'pending'
   };
 });
 
@@ -414,7 +417,7 @@ const cleanedSkuValues = skuvaluesFromParent.map((item) => {
         client_id: clientID,
         sku_values: cleanedSkuValues
       };
-      console.log("req body",JSON.stringify(requestBody))
+      // console.log("req body",JSON.stringify(requestBody))
       const response = await skuApi.addSkuVersion(requestBody);
       setAlerts([{ severity: "success", message: response?.data?.message || "Successfully added" }]);
 
@@ -450,16 +453,27 @@ setWorkOrders(prevOrders =>
     setVersionChoiceOpen(false);
   }
 
-  console.log("all data",allSkuData)
-    console.log("all data 2",skuvaluesFromParent)
-     console.log('llll')
-     console.log("all 888888",allSkuDetails)
+  // console.log("all data",allSkuData)
+    // console.log("all data 2",skuvaluesFromParent)
+    //  console.log('llll')
+    //  console.log("all 888888",allSkuDetails)
   return (
     <>
       {skuvaluesFromParent?.length > 0 && (
         <div className="p-4">
           <h2 className="text-sm font-semibold mb-4">SKU Version Details</h2>
           <CustomAlert alerts={alerts} handleClose={handleClose} />
+
+          {isStrictAdherence && (
+            <div className=" p-1 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 flex items-center gap-2 rounded">
+              <svg className="h-4 w-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 17v.01M12 13v-4m0 0a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <span>
+                <strong>Strict Adherence Applied:</strong> Editing is disabled for this SKU.
+              </span>
+            </div>
+          )}
 
           <div className="mt-6">
             <div className="border rounded-lg overflow-auto">
@@ -691,7 +705,7 @@ setWorkOrders(prevOrders =>
                     }
                   `}
                   onClick={handleSubmit}
-                  disabled={!hasChanges() || isLoading}
+                  disabled={!hasChanges() || isLoading || isStrictAdherence}
                 >
                   {isLoading ? (
                     <>

@@ -28,6 +28,7 @@ import { productionApi } from '../../api/production'
 import GroupData from './RawmeterialComponents/GroupData'
 import { ConstructionOutlined } from '@mui/icons-material'
 import CustomAlert from '../../components/New/CustomAlert'
+import { useNextHandler } from '../../Context/ProductionNextHandlerContext'
 
 const ItemType = 'RawMeterial'
 
@@ -672,6 +673,8 @@ const AllocateRM = ({}) => {
   const [bfOptions, setBfOptions] = useState([]);
   const [openSFG, setOpenSFG] = useState(null)
   const {groupOrders,refreshData, sfgData ,handleFilterChange,selectedFilters,alerts,setAlertsApp,handleClose} = useRawMaterialContext()
+  const {registerNextHandler} = useNextHandler()
+
 
 
 
@@ -722,6 +725,35 @@ const AllocateRM = ({}) => {
   const toggleGroupCollapse = (index) => {
     setVisibleGroupIndex(visibleGroupIndex === index ? null : index)
   }
+
+
+  const RemoveGroupsFromIndex = async () => {
+    if (!groupOrders || groupOrders.length === 0) {
+      return;
+    }
+
+    console.log(groupOrders)
+    const groupOrderObjects = groupOrders?.map(order => ({
+      id: order.id,
+      temporary_status: 0,
+      group_name:order.group_name,
+      group_value:[...order.group_value]
+    }));
+    const body = groupOrderObjects;
+
+    try {
+      const response = await productionApi.removeGroupsFromRawMeterialAllocations(body);
+      await refreshData()
+  
+    } catch (error) {
+      // setAlertsApp && setAlertsApp({ type: 'danger', message: error?.response?.data?.message || error.message || 'An error occurred while removing work orders from production.' });
+      console.error('Error while removing work orders from production:', error);
+    }
+  }
+
+  useEffect(() => {
+    registerNextHandler(RemoveGroupsFromIndex);
+  }, [RemoveGroupsFromIndex]);
 
   return (
     <div className="flex flex-col">

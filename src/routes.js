@@ -27,6 +27,7 @@ const AddEditMachine = React.lazy(() => import('./Module/Machine/AddEditMachine.
 const InventoryHandling = React.lazy(() => import('./Module/Inventory/InventoryHandling.js'))
 const InventoryMain = React.lazy(() => import('./Module/Inventory/InventoryMain.js'))
 const Production = React.lazy(() => import('./Module/Production/Index.js'))
+const ProductionList = React.lazy(() => import('./Module/Production/productionList.js'))
 const WorkOrderListProduction = React.lazy(() => import('./Module/Production/WorkOrderLIsting.js'))
 const GroupLayerProduction = React.lazy(() => import('./Module/Production/Group.js'))
 const RawMeterialProduction = React.lazy(() => import('./Module/Production/AllocateRM.js'))
@@ -167,9 +168,11 @@ const routes = [
     key: 28,
     children: [{ path: ':id', element: InventoryView, key: 'inventory' }],
   },
-  { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 230 },
+  { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 23 },
+  { path: '/production', name: 'Production Listing', element: ProductionList, key: 2382  },
+
   {
-    path: '/production',
+    path: '/production/form',
     name: 'Production',
     element: Production,
     key: 26,

@@ -6,11 +6,14 @@ export const productionApi = {
   addWorkOrderIntoProduction: async (body) => {
     return await apiClient.patch('/work-order/production/batch', body)
   },
+  removeWorkOrdersFromProduction: async (body) => {
+    return await apiClient.patch('/work-order/production/batch', body)
+  },
   getWorkOrderInGroup: async () => {
-    return await apiClient.get('/work-order/ungrouped-layers')
+    return await apiClient.get('/work-order/ungrouped-layers?temporary_status=1')
   },
   getWorkOrderInCreated: async (params) => {
-    return await apiClient.get('/work-order?production=created&&payment_status=except_invoiced',{params})
+    return await apiClient.get('/work-order?payment_status=except_invoiced',{params})
   },
   getWorkOrderCreatedInProduction:async (body) => {
     return await apiClient.patch('/work-order?production=created',body)
@@ -22,7 +25,7 @@ export const productionApi = {
     return await apiClient.post('/production/production-group',body)
   },
   getProductionGroups:async()=>{
-    return await apiClient.get('/production/production-group?include_work_orders=true')
+    return await apiClient.get('/production/production-group?include_work_orders=true&&temporary_status=1')
   },
   getDeckleOptions:async()=>{
     return await apiClient.get('/items/reels/deckle')
@@ -53,6 +56,9 @@ export const productionApi = {
   },
   getSingleGroupDetails:async(id)=>{
     return await apiClient.get(`/production/production-group/${id}/allocations`)
+  },
+  removeGroupsFromRawMeterialAllocations:async(body)=>{
+    return await apiClient.put(`/production/production-group`,body)
   }
 }
 

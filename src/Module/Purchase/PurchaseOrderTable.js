@@ -180,6 +180,7 @@ function PurchaseOrderTable({
             ${row.payment_status === 'partial' ? 'bg-blue-100 text-blue-800' : ''}
             ${row.payment_status === 'pending' ? 'bg-red-100 text-red-800' : ''}
             ${row.payment_status === 'completed' ? 'bg-teal-500 text-white' : ''}
+            ${row.payment_status === 'paid' ? 'bg-green-100 text-green-800' : ''}
             `}
           >
             {row.payment_status.charAt(0).toUpperCase() + row.payment_status.slice(1)}

@@ -154,8 +154,10 @@ const InventoryTable = ({
 
   // Helper function to get rate
   const getRate = (item) => {
+    console.log(item)
+
     const itemInfo = getItemInfoFromSubCategory(item)
-    const rate = itemInfo?.standard_cost !== undefined ? itemInfo.standard_cost : item.rate
+    const rate = item?.rate !== undefined ? item.rate : itemInfo.standard_cost
     return rate ? `₹${rate}` : '--'
   }
 
@@ -203,14 +205,15 @@ const InventoryTable = ({
   return (
     <>
       <div
-        className={`w-full overflow-y-scroll h-[calc(80vh-150px)] border rounded-md shadow-sm mt-1 mb-3 ${
-          isMinimised ? '' : 'overflow-x-auto'
+        className={`w-full overflow-y-scroll border rounded-md shadow-sm mt-1 mb-3 ${
+          isMinimised
+            ? 'h-[calc(100vh-100px)] overflow-x-auto'
+            : 'h-[calc(80vh-150px)] overflow-x-auto'
         }`}
       >
         <CTable
           className={`border-separate border-spacing-0 ${
-            isMinimised && // or min-h-[500px] if needed
-            'min-w-[900px] overflow-x-scroll'
+            isMinimised ? 'min-w-[900px] h-full' : ''
           }`}
         >
           {!isMinimised && (
@@ -292,7 +295,7 @@ const InventoryTable = ({
                         {categoryId !== 2 && (
                           <CTableDataCell className="whitespace-nowrap">
                             {getReorderLevel(item)}
-                          </CTableDataCell> 
+                          </CTableDataCell>
                         )}
                         <CTableDataCell className="whitespace-nowrap">
                           {getQuantity(item)}

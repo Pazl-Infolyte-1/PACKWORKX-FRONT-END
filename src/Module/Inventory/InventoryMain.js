@@ -717,7 +717,7 @@ const InventoryMain = () => {
                 )}
               </p>
 
-              <div className={`mr-3 mb-3 ${isMinimised ? 'ml-[20px]' : ''}`}>
+              <div className={`mr-3  ${isMinimised ? 'ml-[20px]' : ''}`}>
                 <CompactPagination
                   totalRecords={stockFilter ? filteredInventoryData.length : totalRecords}
                   count={totalPage}

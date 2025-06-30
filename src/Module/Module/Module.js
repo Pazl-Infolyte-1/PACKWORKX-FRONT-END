@@ -24,7 +24,7 @@ function Module() {
       setGlobalPlaceholder('Search...')
     }
   }, [setGlobalPlaceholder])
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {

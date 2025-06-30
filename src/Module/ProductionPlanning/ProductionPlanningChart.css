@@ -1,0 +1,776 @@
+.scheduler-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  background: #f9fafb;
+  font-family: sans-serif;
+}
+
+.scheduler-table-wrapper {
+  flex-grow: 1;
+  position: relative;
+}
+.scheduler-table {
+  border-collapse: collapse;
+  width: max-content;
+  table-layout: fixed;
+  min-width: 100px;
+  border-top: 1px solid #ccc; /* 👈 ensure table has a top border */
+}
+
+.scheduler-table th,
+.scheduler-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  background-color: #fff;
+}
+
+/* Sticky Header for ALL columns */
+/* Sticky Header for ALL columns */
+.scheduler-table th {
+  background-color: #f3f4f6;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.scheduler-table th.sticky-col {
+  font-weight: 600; /* or 500 for slightly bold */
+  color: #111827; /* optional: darker color for better contrast */
+}
+.scheduler-table td.sticky-col {
+  font-weight: 549; /* or 500 for slightly bold */
+  color: #111827; /* optional: darker color for better contrast */
+}
+
+/* Sticky First Three Columns (Header & Body) */
+.sticky-col {
+  position: sticky;
+  background: #f3f4f6;
+  left: 0;
+  z-index: 2;
+  text-align: left;
+  padding-left: 12px;
+  white-space: nowrap;
+}
+
+.sticky-employee {
+  left: 0;
+  min-width: 140px;
+}
+.sticky-machine {
+  left: 140px;
+  min-width: 140px;
+}
+.sticky-quantity {
+  left: 280px;
+  min-width: 120px;
+}
+
+/* Make sticky headers above sticky cells */
+.scheduler-table th.sticky-employee { z-index: 4; }
+.scheduler-table th.sticky-machine { z-index: 4; }
+.scheduler-table th.sticky-quantity { z-index: 4; }
+
+/* Time Columns */
+.scheduler-table th:not(.sticky-col),
+.scheduler-table td:not(.sticky-col) {
+  min-width: 130px;
+  white-space: nowrap;
+}
+
+.sticky-col:hover {
+  overflow: visible;
+  white-space: normal;
+  background: #f9fafb;
+  z-index: 80;
+}
+
+
+/* Time Columns */
+.scheduler-table th:not(.sticky-col),
+.scheduler-table td:not(.sticky-col) {
+  min-width: 130px;
+  white-space: nowrap;
+}
+
+.time-slot {
+  height: 80px;
+  vertical-align: top;
+  position: relative;
+}
+
+/* Draggable Cells (First 3 Columns) */
+.draggable-cell {
+  cursor: grab;
+  background-color: #f9fafb;
+}
+
+/* Dropped Event Card Styles */
+.event {
+  margin: 4px 0;
+  padding: 6px 3px;
+  border-radius: 6px;
+  font-size: 0.70rem;
+  color: #fff;
+  cursor: grab;
+  overflow-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 60px; /* Increased height */
+}
+
+.event-label {
+  font-weight: 600;
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+}
+
+.event-time {
+  font-size: 0.7rem;
+  opacity: 0.9;
+}
+
+/* Scrollbars styling for better UX */
+.scheduler-table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+.scheduler-table-wrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+.scheduler-table-wrapper::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+.popup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.popup-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-card h2 {
+  margin-top: 0;
+}
+
+.popup-card select,
+.popup-card input {
+  padding: 6px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.popup-actions button {
+  padding: 6px 12px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.popup-actions button:last-child {
+  background: #9ca3af;
+}
+
+.resize-handle {
+  width: 6px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  cursor: ew-resize;
+  background: rgba(0,0,0,0.1);
+}
+.resize-handle.left { left: 0; }
+.resize-handle.right { right: 0; }
+
+.resize-handle {
+  width: 4px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  cursor: ew-resize;
+  background: rgba(0, 0, 0, 0.1);
+}
+.resize-handle.left { left: 0; }
+.resize-handle.right { right: 0; }
+
+.resize-handle {
+  cursor: ew-resize !important;
+}
+.multi-select {
+  margin-bottom: 1rem;
+}
+
+.multi-select-options {
+  padding-left: 1rem;
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.popup-card.wide-card {
+  width: 500px;
+  max-width: 90vw;
+}
+
+.scrollable-card {
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding-bottom: 60px;
+}
+
+.sticky-footer {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 10px 0;
+  border-top: 1px solid #ccc;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popup-icons svg {
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 18px;
+  color: #555;
+}
+
+.popup-content {
+  padding: 10px;
+  background-color: #fdfdfd;
+  border-radius: 4px;
+}
+
+/* You can place this in your ProductionPlanningChart.css or global styles */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-card.wide-card.scrollable-card {
+  width: 600px;
+  max-height: 70vh;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.popup-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.popup-card .popup-content {
+  padding: 1rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.sticky-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid #e5e7eb;
+  background: white;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+/* Shared button base */
+.sticky-footer button {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+/* Save = primary */
+.sticky-footer .btn-save {
+  background-color: #2563eb; /* Tailwind's blue-600 */
+  color: white;
+}
+
+.sticky-footer .btn-save:hover {
+  background-color: #1e40af; /* Tailwind's blue-800 */
+}
+
+/* Cancel = secondary */
+.sticky-footer .btn-cancel {
+  background-color: #9ca3af; /* Tailwind's gray-400 */
+  color: white;
+}
+
+.sticky-footer .btn-cancel:hover {
+  background-color: #6b7280; /* Tailwind's gray-600 */
+}
+
+
+/* Edit Popup Overlay */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Edit Popup Card Container */
+.edit-popup-card {
+  width: 600px;
+  max-width: 90vw;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Header */
+.edit-popup-card h2 {
+  padding: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+  margin: 0;
+}
+
+/* Scrollable Content Area */
+.edit-popup-card .popup-content {
+  padding: 1rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+/* Sticky Footer */
+.edit-popup-card .sticky-footer {
+  padding: 1rem;
+  border-top: 1px solid #e5e7eb;
+  background: #fff;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+.time-selects {
+  display: flex;
+  gap: 1rem; /* space between from/to selects */
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.styled-select {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin-top: 4px;
+}
+/* group label + field */
+.field-group {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+.field-group label {
+  
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  color: #374151; /* dark gray */
+}
+
+/* shared text / textarea styling */
+.styled-input,
+.styled-input:focus {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: #ffffff;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.styled-input:focus {
+  border-color: #3b82f6; /* blue-500 */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* if you switch to a <textarea> */
+.styled-input[rows] {
+  resize: vertical;
+  min-height: 4rem;
+}
+
+.event-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 100%; /* restricts to parent */
+  overflow: hidden;
+}
+
+.event-label {
+  white-space: nowrap;         /* prevents line wrapping */
+  overflow: hidden;            /* hides overflow */
+  text-overflow: ellipsis;     /* adds ... */            /* smaller text if needed */
+  max-width: 100%;
+}
+
+.event-label {
+  font-weight: 600;
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;              /* Make sure it fills its container */
+  display: block;  
+  text-align: left;         /* Ensure ellipsis applies */
+}
+.event-labels {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.time-slot {
+  width: 100px; /* or whatever fixed width you want */
+  max-width: 100px;
+  overflow: hidden;
+}
+/* --- ENHANCEMENTS FOR STICKY COLUMNS --- */
+.sticky-col {
+  position: sticky;
+  background: #f3f4f6;
+  z-index: 2;
+  text-align: left;
+  padding-left: 12px;
+  white-space: nowrap;
+  border-right: 1px solid #d1d5db; /* ✅ sticky border */
+  box-shadow: 2px 0 2px -1px rgba(0, 0, 0, 0.08); /* subtle shadow to distinguish */
+}
+
+.scheduler-table th.sticky-col {
+  z-index: 4;
+  background-color: #e5e7eb;
+  border-right: 1px solid #d1d5db; /* ✅ sticky border */
+}
+
+/* Sticky Header Background */
+.scheduler-table th {
+  background-color: #f8fafc;
+  box-shadow: inset 0 -1px 0 #d1d5db;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: #374151;
+}
+
+/* --- ENHANCED TABLE APPEARANCE --- */
+.scheduler-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: white;
+}
+
+.scheduler-table td,
+.scheduler-table th {
+  border: 1px solid #e5e7eb;
+  font-size: 0.8rem;
+  transition: background-color 0.2s;
+}
+
+.scheduler-table td:hover {
+  background-color: #f3f4f6;
+}
+
+/* --- ENHANCED EVENT DESIGN --- */
+.event {
+  /* background: linear-gradient(135deg, #4f46e5, #6366f1); */
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.75rem;
+  color: white;
+  cursor: grab;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  position: relative;
+  transition: transform 0.1s;
+}
+
+.event:hover {
+  /* transform: scale(1.02); */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.event-time {
+  font-size: 0.65rem;
+  opacity: 0.9;
+  margin-top: auto;
+}
+
+/* --- CLEARER RESIZE HANDLES --- */
+.resize-handle {
+  width: 5px;
+  background-color: rgba(0, 0, 0, 0.15);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+.resize-handle.left {
+  left: 0;
+}
+
+.resize-handle.right {
+  right: 0;
+}
+
+/* --- ENHANCED DROPPABLE TIME SLOTS --- */
+.time-slot {
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  height: 80px;
+  position: relative;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.time-slot:hover {
+  background-color: #f9fafb;
+}
+
+/* --- SCROLLBAR ENHANCEMENT FOR WRAPPER --- */
+.scheduler-table-wrapper::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+}
+
+.scheduler-table-wrapper::-webkit-scrollbar-track {
+  background: #e5e7eb;
+}
+
+/* --- POPUP CARD STYLING TWEAKS --- */
+.popup-card,
+.edit-popup-card {
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.popup-card h2,
+.edit-popup-card h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* --- EVENT LABEL ENHANCEMENTS --- */
+.event-labels {
+  font-size: 0.68rem;
+  color: #e0e7ff;
+}
+
+.event-label {
+  font-weight: 500;
+  opacity: 0.95;
+  color: #e0e7ff;
+}
+
+/* --- DRAGGED EVENT VISUAL CUE --- */
+.event:active {
+  opacity: 0.8;
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.event-label {
+  font-weight: 700;         /* Bold */
+  color: #ffffff;           /* White */
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  display: block;
+  text-align: left;
+}
+
+.sticky-employee {
+  left: 0;
+  min-width: 140px;
+  width: 140px;
+  max-width: 140px;
+  z-index: 4;
+}
+
+.sticky-machine {
+  left: 140px; /* Matches sticky-employee width */
+  min-width: 140px;
+  width: 140px;
+  max-width: 140px;
+  z-index: 4;
+}
+
+.sticky-quantity {
+  left: 280px; /* 140 (employee) + 140 (machine) */
+  min-width: 120px;
+  width: 120px;
+  max-width: 120px;
+  z-index: 4;
+}
+.sticky-col {
+  background: #f3f4f6;
+  position: sticky;
+  z-index: 2;
+  border-right: 1px solid #ccc;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.date-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 50; /* Higher than sticky cols and headers */
+  background-color: #ffffff;
+  border-bottom: 1px solid #d1d5db;
+}
+.scheduler-table th.sticky-col {
+  z-index: 40;
+}
+.date-row-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 60; /* Must be higher than sticky-cols and headers */
+  background-color: #ffffff;
+}
+
+/* Ensure the th inside also supports sticky visuals */
+.date-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #d1d5db;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  z-index: inherit; /* Inherit from the tr's z-index */
+}
+
+/* Sticky first row (Date Picker) */
+.date-header-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #ffffff;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Sticky headers (Hour columns and sticky cols) */
+.header-sticky {
+  position: sticky;
+  top: 40px; /* Adjust based on height of date row */
+  background: #f3f4f6;
+  z-index: 40;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Sticky left columns */
+.sticky-col {
+  position: sticky;
+  z-index: 30;
+  background: #f3f4f6;
+  border-right: 1px solid #ccc;
+}
+
+/* Ensure left positions */
+.sticky-employee {
+  left: 0;
+  min-width: 140px;
+  width: 140px;
+}
+
+.sticky-machine {
+  left: 140px;
+  min-width: 140px;
+  width: 140px;
+}
+
+.sticky-quantity {
+  left: 280px;
+  min-width: 120px;
+  width: 120px;
+}
+
+/* Bump z-index for headers over side columns */
+.sticky-employee.header-sticky,
+.sticky-machine.header-sticky,
+.sticky-quantity.header-sticky {
+  z-index: 45;
+}
+
+
+
+
+
+
+
+
+
+
+
+

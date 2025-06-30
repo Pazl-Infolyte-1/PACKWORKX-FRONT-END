@@ -31,6 +31,7 @@ const ProductionList = React.lazy(() => import('./Module/Production/productionLi
 const WorkOrderListProduction = React.lazy(() => import('./Module/Production/WorkOrderLIsting.js'))
 const GroupLayerProduction = React.lazy(() => import('./Module/Production/Group.js'))
 const RawMeterialProduction = React.lazy(() => import('./Module/Production/AllocateRM.js'))
+const ReveiwPlan = React.lazy(() => import('./Module/Production/ReviewPlan.js'))
 const Packages = React.lazy(() => import('./Module/Admin/Packages/Packages.js'))
 const Billing = React.lazy(() => import('./Module/Admin/Billing/Billing.js'))
 const Companies = React.lazy(() => import('./Module/Admin/Companies/Companies.js'))
@@ -181,6 +182,7 @@ const routes = [
       { path: 'WorkOrders', name: 'WorkOrders', element: WorkOrderListProduction, key: '' },
       { path: 'GroupLayers', name: 'GroupLayers', element: GroupLayerProduction, key: '' },
       { path: 'AllocateRM', name: 'AllocateRM', element: RawMeterialProduction, key: '' },
+      { path: 'OutsourceAndPreview', name: 'ReviewPlan', element: ReveiwPlan, key: '' },
       // const tabs = ['Work Orders','Group Layers',  'Allocate RM', 'Returnables', 'Outsource & Preview']//'Allocate SFG'
     ],
   },

@@ -28,7 +28,6 @@ const Index = () => {
 const IndexContent = () => {
   const [workOrders, setWorkOrders] = useState([])
   const [autoSyncOrders, setAutoSyncOrders] = useState({})
-  const onNextHandlerRef = useRef(() => Promise.resolve(false));
   const [selectedType, setSelectedType] = useState('')
   const [visibleSplit, setVisibleSplit] = useState(false)
   const [groupOrders, setGroupOrders] = useState([])

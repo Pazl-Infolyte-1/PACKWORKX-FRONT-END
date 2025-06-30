@@ -1,4 +1,3 @@
-
 import { apiClient } from './config'
 
 export const productionApi = {
@@ -58,8 +57,17 @@ export const productionApi = {
     return await apiClient.get(`/production/production-group/${id}/allocations`)
   },
   removeGroupsFromRawMeterialAllocations:async(body)=>{
-    return await apiClient.put(`/production/production-group`,body)
+    console.log(body)
+    return await apiClient.delete('/production/production-groups', { data: body })
+  },
+  getGroupInRawmeterialById:async(id)=>{
+    return await apiClient.get(`/production/production-group/${id}?include_work_orders=true&&temporary_status=1`)
+  },
+  refreshForNewForm:async()=>{
+    return await apiClient.post(`/production/new`)
   }
+
+
 }
 
 

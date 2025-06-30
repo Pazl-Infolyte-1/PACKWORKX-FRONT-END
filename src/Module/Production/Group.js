@@ -512,6 +512,8 @@ const Group = ({
 
   const SubmitGroups = async () => {
     try {
+
+      
       // Check for empty groups
       const emptyGroups = groups.filter(group => !group.group_value || group.group_value.length === 0)
       if (emptyGroups.length > 0) {

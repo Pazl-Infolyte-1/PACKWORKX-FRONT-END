@@ -10,6 +10,8 @@ export const RawMaterialProvider = ({ children }) => {
   const [sfgData, setSfgData] = useState([]);
   const [error, setError] = useState(null);
   const [alerts,setAlerts] = useState([])
+  const [routeId, setRouteId] = useState(null);
+
 
 
 
@@ -54,15 +56,31 @@ export const RawMaterialProvider = ({ children }) => {
 
   const fetchWorkOrders = async () => {
     try {
-      const response = await productionApi.getProductionGroups();
-      const groupsWithHistory = response?.data?.data.map(group => ({
-        ...group,
-        history: {
-          inventory_id: group.id,
-          qty: group.allocated_Qty || 0
-        }
-      }));
-      setGroupOrders(groupsWithHistory);
+      let response;
+      if (routeId) {
+        response = await productionApi.getGroupInRawmeterialById(routeId);
+        // The API returns a single group, so wrap it in an array for consistency
+        const group = response?.data?.data;
+        setGroupOrders(group ? [
+          {
+            ...group,
+            history: {
+              inventory_id: group.id,
+              qty: group.allocated_Qty || 0
+            }
+          }
+        ] : []);
+      } else {
+        response = await productionApi.getProductionGroups();
+        const groupsWithHistory = response?.data?.data.map(group => ({
+          ...group,
+          history: {
+            inventory_id: group.id,
+            qty: group.allocated_Qty || 0
+          }
+        }));
+        setGroupOrders(groupsWithHistory);
+      }
     } catch (error) {
       console.error("Error fetching work orders:", error);
       setError(error?.response?.data?.message || 'Failed to fetch work orders');
@@ -110,8 +128,12 @@ export const RawMaterialProvider = ({ children }) => {
     
     // Fetch fresh data with cleared filters
     await fetchReels(clearedFilters);
-    await fetchWorkOrders();
+    // await fetchWorkOrders();
   };
+
+  useEffect(() => {
+    fetchWorkOrders();
+  }, [routeId]);
 
 
 
@@ -130,6 +152,7 @@ export const RawMaterialProvider = ({ children }) => {
     refreshData,
     setAlertsApp,
     handleClose,
+    setRouteId
   };
 
   return (

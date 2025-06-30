@@ -118,7 +118,7 @@ function productionList() {
                 style={{ color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate('/production/form/AllocateRM');
+                  navigate(`/production/form/AllocateRM?id=${row.id}`);
                 }}
               >
                 RM-Allocation
@@ -136,13 +136,16 @@ function productionList() {
     <>
       <ContentHeader
             heading={"Production"}
-            onAddClick={() => {
+            onAddClick={async() => {
+              await productionApi.refreshForNewForm()
               navigate('/production/form')
             }}
+
           />
           <ReusableTable
           columns={columns}
           data={tableData}
+
           />
 
       {/* Layers Modal */}

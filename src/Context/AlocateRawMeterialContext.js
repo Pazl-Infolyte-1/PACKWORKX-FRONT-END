@@ -132,7 +132,9 @@ export const RawMaterialProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchWorkOrders();
+    if (window.location.pathname.includes('AllocateRM')) {
+      fetchWorkOrders();
+    }
   }, [routeId]);
 
 

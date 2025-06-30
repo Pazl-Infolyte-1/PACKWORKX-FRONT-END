@@ -3,6 +3,7 @@ import { FaExclamationTriangle, FaCheck } from 'react-icons/fa';
 import { Package, Layers } from 'lucide-react';
 import { productionApi } from '../../api/production';
 import { useNextHandler } from '../../Context/ProductionNextHandlerContext';
+import { useLocation } from 'react-router-dom';
 
 function ReviewPlan() {
   const [groups, setGroups] = useState([]);
@@ -11,116 +12,30 @@ function ReviewPlan() {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
   const { registerNextHandler } = useNextHandler();
-
-  // Mock data based on your API response structure
-  const mockData = [
-    {
-      "id": 16,
-      "group_name": "GRP-#965",
-      "group_value": [{ "work_order_id": 5, "layer_id": 1 }],
-      "group_Qty": 0,
-      "allocated_Qty": null,
-      "status": "active",
-      "balance_Qty": 0,
-      "layer_details": [{
-        "work_order_id": 5,
-        "work_generate_id": "#WO-00005",
-        "layer_detail": {
-          "layer": "Top Layer",
-          "gsm": 10,
-          "bf": 20,
-          "material": "20",
-          "color": "Natural",
-          "weight": 0.0011279999999999999,
-          "bursting_strength": 0.2,
-          "layer_status": "grouped"
-        }
-      }]
-    },
-    {
-      "id": 17,
-      "group_name": "GRP-#817", 
-      "group_value": [{ "work_order_id": 5, "layer_id": 2 }],
-      "group_Qty": 0,
-      "allocated_Qty": null,
-      "status": "active",
-      "balance_Qty": 0,
-      "layer_details": [{
-        "work_order_id": 5,
-        "work_generate_id": "#WO-00005",
-        "layer_detail": {
-          "layer": "Corrugated Layer",
-          "gsm": 10,
-          "bf": 20,
-          "material": "5898",
-          "color": "Golden Yellow",
-          "weight": 0.0014663999999999999,
-          "bursting_strength": 0.1,
-          "layer_status": "grouped",
-          "flute_type": "B"
-        }
-      }]
-    },
-    {
-      "id": 18,
-      "group_name": "GRP-#960",
-      "group_value": [
-        { "work_order_id": 6, "layer_id": 2 },
-        { "work_order_id": 6, "layer_id": 3 },
-        { "work_order_id": 6, "layer_id": 4 },
-        { "work_order_id": 6, "layer_id": 5 }
-      ],
-      "group_Qty": 90,
-      "allocated_Qty": 45,
-      "status": "active",
-      "balance_Qty": 90,
-      "layer_details": [
-        {
-          "work_order_id": 6,
-          "work_generate_id": "#WO-00006",
-          "layer_detail": {
-            "layer": "Corrugated Layer 1",
-            "gsm": 500,
-            "bf": 12,
-            "material": "mills1",
-            "color": "Natural",
-            "weight": 27.00144,
-            "bursting_strength": 3,
-            "layer_status": "grouped",
-            "flute_type": "A"
-          }
-        },
-        {
-          "work_order_id": 6,
-          "work_generate_id": "#WO-00006",
-          "layer_detail": {
-            "layer": "Liner Layer 1",
-            "gsm": 500,
-            "bf": 12,
-            "material": "mills1",
-            "color": "Natural",
-            "weight": 18.00096,
-            "bursting_strength": 6,
-            "layer_status": "grouped"
-          }
-        }
-      ]
-    }
-  ];
+  const location = useLocation();
 
   const fetchGroups = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await productionApi.getProductionGroups();
-      setGroups(response.data.data);
+      const query = new URLSearchParams(location.search);
+      const queryId = query.get('id');
+      let response;
+      if (queryId) {
+        response = await productionApi.getGroupInRawmeterialById(queryId);
+        // API returns a single group, wrap in array for consistency
+        const group = response.data.data;
+        setGroups(group ? [group] : []);
+      } else {
+        response = await productionApi.getProductionGroups();
+        setGroups(response.data.data);
+      }
     } catch (err) {
       setError('Failed to fetch production groups.');
     } finally {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     registerNextHandler(() => Promise.resolve(false));

@@ -15,7 +15,7 @@ import {
 
 const ViewInventory = ({ setIsMinimised }) => {
   const [itemDetails, setItemDetails] = useState(null)
-  const [grnBillDetails, setGrnBillDetails] = useState({}) // Store GRN bill details by po_id
+  const [grnBillDetails, setGrnBillDetails] = useState({})
   const [loadingGrnBills, setLoadingGrnBills] = useState(false)
   const menus = [
     'Products',
@@ -197,41 +197,41 @@ const ViewInventory = ({ setIsMinimised }) => {
   }
 
   return (
-    <div className="border-l h-[600px] flex flex-col">
-      {/* Fixed Header Section */}
-      <div className="flex-shrink-0 bg-white border-b shadow-sm sticky top-0 z-10">
-        {/* Header buttons */}
-        <div className="flex justify-end items-center p-2 space-x-2">
-          <button
-            onClick={handleClose}
-            className="text-gray-500 hover:text-red-600 transition-colors"
-            aria-label="Close"
-          >
-            ✕
-          </button>
-        </div>
+ <div className="border-l h-[600px] flex flex-col">
+  {/* Fixed Header Section */}
+  <div className="flex bg-white border-b shadow-sm sticky top-0 z-10">
+    {/* Nav menu */}
+    <nav className="flex-1 flex space-x-8 px-4 pb-2 overflow-x-auto">
+      {menus.map((menu) => (
+        <button
+          key={menu}
+          onClick={() => setActiveMenu(menu)}
+          className={`pb-2 font-semibold transition-colors whitespace-nowrap ${
+            activeMenu === menu
+              ? 'border-b-2 border-blue-600 text-blue-600'
+              : 'text-gray-600 hover:text-blue-500'
+          }`}
+        >
+          {menu}
+        </button>
+      ))}
+    </nav>
 
-        {/* Nav menu */}
-        <nav className="flex space-x-8 px-4 pb-2 overflow-x-auto">
-          {menus.map((menu) => (
-            <button
-              key={menu}
-              onClick={() => setActiveMenu(menu)}
-              className={`pb-2 font-semibold transition-colors whitespace-nowrap ${
-                activeMenu === menu
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-600 hover:text-blue-500'
-              }`}
-            >
-              {menu}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      {/* Content area */}
-      <div className="flex-1 overflow-y-auto">{renderActiveComponent()}</div>
+    {/* Header buttons */}
+    <div className="flex-shrink-0 flex justify-end items-center p-2">
+      <button
+        onClick={handleClose}
+        className="text-gray-500 hover:text-red-600 transition-colors"
+        aria-label="Close"
+      >
+        ✕
+      </button>
     </div>
+  </div>
+
+  {/* Content area */}
+  <div className="flex-1 overflow-y-auto">{renderActiveComponent()}</div>
+</div>
   )
 }
 

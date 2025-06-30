@@ -328,7 +328,7 @@ const usedAmount = Number(orderData.debit_used_amount)
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
-      <div className="w-full max-h-[100vh] overflow-y-scroll ">
+      <div className="w-full ">
         <div className="w-full">
           <div className="w-full">
             <div className="flex flex-col gap-3 px-2">

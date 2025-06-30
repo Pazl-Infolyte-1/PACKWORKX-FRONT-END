@@ -89,7 +89,6 @@ const formatCurrency = (amount) => {
 export const ProductDetails = ({ itemDetails, item, navigate, handleEdit }) => {
   const rawCustomFields = itemDetails?.products?.default_custom_fields
   const customData = rawCustomFields || {}
-console.log('customData:', );
 
   return (
     <div className="p-3">
@@ -106,10 +105,10 @@ console.log('customData:', );
             >
               + Product
             </button>
-            <button onClick={handleEdit} className="text-sm text-blue-600 hover:underline">
+            <button onClick={handleEdit} className="bg-blue-600 h-8 hover:bg-blue-700 text-white font-bold px-2 rounded">
               ✎ Edit
             </button>
-            <p className="text-xl font-bold m-0">{item?.item?.item_generate_id}</p>
+            <p className="text-xl font-bold m-0">{item?.item_info?.item_generate_id}</p>
           </div>
           <p className="text-sm font-bold m-0">
             Available Qty: {parseFloat(item?.quantity_available)}
@@ -500,7 +499,7 @@ export const BillingsDetails = ({ itemDetails, item, navigate }) => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Receipt className="w-5 h-5 text-purple-600" />
-                      <span className="font-semibold text-sm">{billing.bill_reference_number}</span>
+                      <span className="font-semibold text-sm">{billing.bill_generate_id}</span>
                     </div>
                     <div
                       className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(

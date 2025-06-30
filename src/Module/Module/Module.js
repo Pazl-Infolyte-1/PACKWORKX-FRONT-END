@@ -24,7 +24,7 @@ function Module() {
       setGlobalPlaceholder('Search...')
     }
   }, [setGlobalPlaceholder])
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,7 +32,7 @@ function Module() {
           page: pagination.page,
           limit: pagination.limit,
         })
-        setModules(response.data.data)
+        setModules(response.data.data.transfers)
         setPagination((prev) => ({
           ...prev,
           totalPages: response.data.pagination?.total_pages || 1,

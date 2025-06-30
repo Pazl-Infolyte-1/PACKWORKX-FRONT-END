@@ -657,7 +657,7 @@ const ItemForm = ({
               </table>
 
               {/* Footer with Add Row and Totals */}
-              <div className="mt-3 grid grid-cols-2 pb-4">
+              <div className="mt-3 grid grid-cols-2">
                 <button
                   type="button"
                   onClick={addNewItem}
@@ -706,7 +706,7 @@ const ItemForm = ({
                           Used Debit Balance :
                         </td>
                         <td className="px-4 py-2 text-[#3c3c3c] font-semibold  text-[15px] font-lato leading-[22px]">
-                          -₹{Math.abs(fixedDebitBalance).toFixed(2)}
+                          -₹{Math.min(fixedDebitBalance, overallTotal).toFixed(2)}
                         </td>
                       </tr>
                       <tr className="border-b border-gray-200">

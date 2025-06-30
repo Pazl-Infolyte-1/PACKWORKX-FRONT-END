@@ -82,9 +82,9 @@ const ClientPage = React.lazy(() => import('./Module/ReportsModule/Reports.js'))
 const Modules = React.lazy(() => import('./Module/Module/Module.js'))
 const ModuleForm = React.lazy(() => import('./Module/Module/ModuleForm.js'))
 
-// const ProductionPlanning = React.lazy(
-//   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
-// )
+const ProductionPlanning = React.lazy(
+  () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
+)
 
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
@@ -347,12 +347,12 @@ const routes = [
     element: ClientPage,
     key: 'client-page',
   },
-  // {
-  //   path: '/productionplanning',
-  //   name: 'Production Planning',
-  //   element: ProductionPlanning,
-  //   key: '',
-  // },
+  {
+    path: '/productionplanning',
+    name: 'Production Planning',
+    element: ProductionPlanning,
+    key: '',
+  },
 ]
 
 export default routes

@@ -154,7 +154,7 @@ function ReviewPlan() {
                   <th className="py-2 px-2 font-medium">Work Orders</th>
                   <th className="py-2 px-2 font-medium">Quantity</th>
                   <th className="py-2 px-2 font-medium">Allocated</th>
-                  <th className="py-2 px-2 font-medium">Status</th>
+                  {/* <th className="py-2 px-2 font-medium">Status</th> */}
                   <th className="py-2 px-2 font-medium">Layers</th>
                   <th className="py-2 px-2 font-medium">Action</th>
                 </tr>
@@ -172,12 +172,12 @@ function ReviewPlan() {
                       </td>
                       <td className="py-2 px-2">{group.group_Qty}</td>
                       <td className="py-2 px-2">{group.allocated_Qty || 0}</td>
-                      <td className="py-2 px-2">
+                      {/* <td className="py-2 px-2">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${status.color}`}>
                           {status.icon}
                           {status.text}
                         </span>
-                      </td>
+                      </td> */}
                       <td className="py-2 px-2">{group.layer_details.length}</td>
                       <td className="py-2 px-2">
                         <button

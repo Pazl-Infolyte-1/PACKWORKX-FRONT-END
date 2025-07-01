@@ -1,7 +1,7 @@
 // Split your Index component into two parts:
 
 import React, { useEffect, useRef, useState } from "react"
-import { RawMaterialProvider } from "../../Context/AlocateRawMeterialContext"
+import { RawMaterialProvider, useRawMaterialContext } from "../../Context/AlocateRawMeterialContext"
 import { GroupLayersProvider, useGroupLayers } from "../../Context/GroupLayersContext"
 import { NextHandlerProvider, useNextHandler } from "../../Context/ProductionNextHandlerContext"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -39,12 +39,11 @@ const IndexContent = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingTab, setPendingTab] = useState(null);
   const locked = location.state?.lockedSteps === true;
+  const { groupOrders: rawMaterialGroupOrders } = useRawMaterialContext();
+  const [showPendingAllocAlert, setShowPendingAllocAlert] = useState(false);
+  const [pendingAllocTab, setPendingAllocTab] = useState(null);
+  const [pendingAllocDetails, setPendingAllocDetails] = useState([]);
 
-
-
-
-
-  
   // ✅ Now this will work because we're inside the provider
   const {triggerNext} = useNextHandler()
 
@@ -88,6 +87,21 @@ const IndexContent = () => {
 
   const handleTabChange = (tabPath) => {
     const targetTabIndex = tabs.findIndex(tab => tab.path === tabPath);
+    const isLeavingAllocateRM = currentPath === 'AllocateRM' && (tabPath === 'Returnables' || tabPath === 'OutsourceAndPreview');
+    if (isLeavingAllocateRM) {
+      const pendingGroups = Array.isArray(rawMaterialGroupOrders)
+        ? rawMaterialGroupOrders.filter(g => (g.allocated_Qty || 0) < (g.group_Qty || 0))
+        : [];
+      if (pendingGroups.length > 0) {
+        setPendingAllocTab(tabPath);
+        setPendingAllocDetails(pendingGroups.map(g => ({
+          name: g.group_name || g.id || 'Unnamed Group',
+          balance: (g.group_Qty || 0) - (g.allocated_Qty || 0)
+        })));
+        setShowPendingAllocAlert(true);
+        return;
+      }
+    }
     if (tabPath !== currentPath) {
       if (targetTabIndex < activeTabIndex) {
         setPendingTab(tabPath);
@@ -110,6 +124,20 @@ const IndexContent = () => {
   const handleCancelTabChange = () => {
     setShowConfirm(false);
     setPendingTab(null);
+  };
+
+  const handleConfirmPendingAlloc = () => {
+    setShowPendingAllocAlert(false);
+    if (pendingAllocTab) {
+      console.log('hi');
+      navigate(`/production/form/${pendingAllocTab}`);
+      setPendingAllocTab(null);
+    }
+  };
+
+  const handleCancelPendingAlloc = () => {
+    setShowPendingAllocAlert(false);
+    setPendingAllocTab(null);
   };
   
   return (
@@ -240,6 +268,25 @@ const IndexContent = () => {
         message="Are you sure? Unsaved data will be lost."
         onConfirm={handleConfirmTabChange}
         onCancel={handleCancelTabChange}
+      />
+      <UserConfirmation
+        open={showPendingAllocAlert}
+        message={
+          <div>
+            <div>There is still pending quantity to allocate. Do you want to continue?</div>
+            {pendingAllocDetails.length > 0 && (
+              <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 18, color: '#b91c1c', fontSize: 13 }}>
+                {pendingAllocDetails.map((g, idx) => (
+                  <li key={idx}>
+                    <b>{g.name}</b>: <span style={{ color: '#b91c1c' }}>{g.balance}</span> KG left to allocate
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        }
+        onConfirm={handleConfirmPendingAlloc}
+        onCancel={handleCancelPendingAlloc}
       />
     </div>
   )

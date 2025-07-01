@@ -171,7 +171,7 @@ export default function ReusableTable({
                         // ✅ Dropdown
                         if (col.type === 'dropdown') {
                           return (
-                            <CTableDataCell key={col.key} className="px-3 py-3  ">
+                            <CTableDataCell key={col.key} className="px-3 py-3 ">
                               <select
                                 value={cellValue || ''}
                                 onChange={(e) => {
@@ -207,7 +207,7 @@ export default function ReusableTable({
                           return (
                             <CTableDataCell
                               key={col.key}
-                              className="px-3 py-3  text-center"
+                              className="px-3 py-3  text-left"
                               onClick={(e) => e.stopPropagation()} // Prevent row click if needed
                             >
                               {col.render(row)}

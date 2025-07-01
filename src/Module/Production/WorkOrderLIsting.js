@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { FaClipboardList, FaBox, FaCalendarAlt, FaPlus, FaMinus, FaSort, FaFilter } from 'react-icons/fa'
+import { FaClipboardList, FaBox, FaCalendarAlt, FaPlus, FaMinus, FaSort, FaFilter, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa'
 import { useSearch } from '../../components/New/SearchContext';
 import { ArrowUpDown } from 'lucide-react';
 import { useNextHandler } from '../../Context/ProductionNextHandlerContext';
@@ -12,6 +12,7 @@ import { DateRange } from 'react-date-range';
 import { format } from 'date-fns';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
+import Modal from 'react-modal';
 
 function WorkOrderListing() {
   const [selectedOrders, setSelectedOrders] = useState([])
@@ -45,6 +46,10 @@ function WorkOrderListing() {
   const [pendingDateRange, setPendingDateRange] = useState(null);
 
   const [showDateRangePicker, setShowDateRangePicker] = useState(false);
+
+  const [layerModalOpen, setLayerModalOpen] = useState(false);
+  const [modalLayers, setModalLayers] = useState([]);
+  const [modalOrderId, setModalOrderId] = useState(null);
 
   useEffect(() => {
     const fetchClientsAndSkus = async () => {
@@ -316,6 +321,18 @@ function WorkOrderListing() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [filterModalOpen]);
 
+  const openLayerModal = (layers, orderId) => {
+    setModalLayers(layers);
+    setModalOrderId(orderId);
+    setLayerModalOpen(true);
+  };
+
+  const closeLayerModal = () => {
+    setLayerModalOpen(false);
+    setModalLayers([]);
+    setModalOrderId(null);
+  };
+
   return (
     <div
       style={{ 
@@ -547,15 +564,14 @@ function WorkOrderListing() {
                     <thead>
                       <tr>
                         <th style={headerStyle}>
-                          <input
+                          {/* <input
                             type="checkbox"
                             style={{
                               width: '15px',
                               height: '15px',
                               accentColor: '#667eea'
                             }}
-                            // TODO: Add select all logic if needed
-                          />
+                          /> */}
                         </th>
                         <th style={headerStyle}>Sales-ID</th>
                         <th style={headerStyle}>SO-Reference</th>
@@ -589,6 +605,7 @@ function WorkOrderListing() {
                           </div>
                         </th>
                         <th style={headerStyle}>Expected Delivery</th>
+                        <th style={headerStyle}>Grouping Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -623,6 +640,19 @@ function WorkOrderListing() {
                           <td style={rowStyle}>{order?.qty || '-'}</td>
                           <td style={rowStyle}>{order?.salesOrder.client || 'N/A'}</td>
                           <td style={rowStyle}>{order?.edd ? formatDate(order.edd) : 'N/A'}</td>
+                          <td style={rowStyle}>
+                            {order.work_order_sku_values?.every(layer => layer.layer_status === 'grouped') ? (
+                              <FaCheckCircle style={{ color: 'green', fontSize: 18 }} title="All layers grouped" />
+                            ) : (
+                              <span style={{ display: 'inline-block' }}>
+                                <FaExclamationTriangle 
+                                  style={{ color: '#f59e42', fontSize: 18, cursor: 'pointer' }} 
+                                  title="Some layers ungrouped"
+                                  onClick={() => openLayerModal(order.work_order_sku_values, order.work_generate_id)}
+                                />
+                              </span>
+                            )}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -753,6 +783,53 @@ function WorkOrderListing() {
             </button>
           </div>
         )}
+
+        {/* Layer Status Modal */}
+        <Modal
+          isOpen={layerModalOpen}
+          onRequestClose={closeLayerModal}
+          contentLabel="Layer Grouping Status"
+          ariaHideApp={false}
+          className="fixed top-1/4 left-1/2 transform -translate-x-1/2 bg-white rounded-xl p-8 border border-gray-200 max-w-md w-full shadow-lg focus:outline-none"
+          overlayClassName="fixed inset-0  bg-opacity-30 z-50 flex items-center justify-center"
+        >
+          <div className="font-semibold text-lg mb-3 text-indigo-700">
+            Layer Grouping Status
+          </div>
+          <div className="mb-4 text-sm text-gray-700">
+            Work Order ID: <span className="font-medium">{modalOrderId}</span>
+          </div>
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr>
+                <th className="text-left px-2 py-1 border-b border-gray-200">Layer</th>
+                <th className="text-left px-2 py-1 border-b border-gray-200">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {modalLayers.map((layer, idx) => (
+                <tr key={idx}>
+                  <td className="px-2 py-1 border-b border-gray-100">{layer.layer}</td>
+                  <td className="px-2 py-1 border-b border-gray-100">
+                    {layer.layer_status === 'grouped' ? (
+                      <span className="text-green-600 font-medium">Grouped</span>
+                    ) : (
+                      <span className="text-orange-400 font-medium">Ungrouped</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="text-right mt-5">
+            <button
+              onClick={closeLayerModal}
+              className="bg-indigo-600 text-white rounded-lg px-5 py-2 font-medium text-sm hover:bg-indigo-700 focus:outline-none"
+            >
+              Close
+            </button>
+          </div>
+        </Modal>
       </div>
     </div>
   )

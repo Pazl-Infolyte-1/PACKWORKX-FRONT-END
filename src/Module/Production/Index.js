@@ -37,6 +37,8 @@ const IndexContent = () => {
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingTab, setPendingTab] = useState(null);
+  const locked = location.state?.lockedSteps === true;
+
   
   // ✅ Now this will work because we're inside the provider
   const {triggerNext} = useNextHandler()
@@ -120,9 +122,14 @@ const IndexContent = () => {
           alignItems: 'flex-start',
         }}>
           {tabs.map((tab, index) => {
-            const isDisabled = '';
+            let isDisabled = '';
             const isActive = activeTabIndex === index;
             const isCompleted = activeTabIndex > index;
+
+            if (locked && index < activeTabIndex) {
+              isDisabled = true;
+            }
+          
             
             return (
               <React.Fragment key={tab.path}>
@@ -171,7 +178,7 @@ const IndexContent = () => {
                       border: 'none',
                       cursor: isDisabled ? 'not-allowed' : 'pointer',
                       fontSize: '13px',
-                      opacity: isDisabled ? 0.6 : 1,
+                      // opacity: isDisabled ? 0.6 : 1,
                       transition: 'background 0.2s, color 0.2s',
                       boxShadow: isActive ? '0 2px 8px rgba(102,126,234,0.08)' : 'none',
                     }}

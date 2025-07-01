@@ -467,6 +467,15 @@ const staticReportArray = [
                 </CNavItem>
               )
             }
+            if (module.modules_description === 'Production Planning') {
+              return (
+                <CNavItem key={index}>
+                  <CNavLink as={NavLink} to="/productionplanning">
+                    {navLink('Production Planning', 'cilDescription')}
+                  </CNavLink>
+                </CNavItem>
+              )
+            }
             return null
           })}
         </>

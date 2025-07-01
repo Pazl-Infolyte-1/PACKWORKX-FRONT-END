@@ -131,20 +131,30 @@ const AllcoateRMModal = ({ visibleAllocate, setVisibleAllocate, group, droppedIt
 
                 <div className="bg-white h-[250px] custom-scrollbar overflow-y-auto">
                   {historyData && historyData.group_allocations.length > 0 ? (
-                    historyData.group_allocations.map((order, index) => (
-                      <div key={index} className="flex">
-                        <div className="flex-1 px-4 py-3">
-                          <span className="text-sm text-blue-600 hover:underline cursor-pointer">
-                            GRP-#{order?.group_id}
-                          </span>
+                    historyData.group_allocations
+                      .filter((order) => order.net_allocated_qty > 0)
+                      .length > 0 ? (
+                        historyData.group_allocations
+                          .filter((order) => order.net_allocated_qty > 0)
+                          .map((order, index) => (
+                            <div key={index} className="flex">
+                              <div className="flex-1 px-4 py-3">
+                                <span className="text-sm text-blue-600 hover:underline cursor-pointer">
+                                  GRP-#{order?.group_id}
+                                </span>
+                              </div>
+                              <div className="w-px bg-gray-200"></div>
+                              <div className="flex-1 px-4 py-3 flex items-center justify-end gap-2">
+                                <span className="text-sm text-gray-800">{order.net_allocated_qty}</span>
+                                <Lock className="w-4 h-4 text-gray-600" />
+                              </div>
+                            </div>
+                          ))
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <span className="text-sm text-gray-500">No history available</span>
                         </div>
-                        <div className="w-px bg-gray-200"></div>
-                        <div className="flex-1 px-4 py-3 flex items-center justify-end gap-2">
-                          <span className="text-sm text-gray-800">{order.net_allocated_qty}</span>
-                          <Lock className="w-4 h-4 text-gray-600" />
-                        </div>
-                      </div>
-                    ))
+                      )
                   ) : (
                     <div className="flex items-center justify-center h-full">
                       <span className="text-sm text-gray-500">No history available</span>

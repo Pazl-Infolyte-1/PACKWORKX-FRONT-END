@@ -309,9 +309,9 @@ function ReviewPlan() {
             Back to Allocation
           </button>
           <div className="flex gap-2">
-            <button className="px-4 py-2 text-sm border border-purple-300 text-purple-700 rounded hover:bg-purple-50 transition-colors">
+            {/* <button className="px-4 py-2 text-sm border border-purple-300 text-purple-700 rounded hover:bg-purple-50 transition-colors">
               Save Draft
-            </button>
+            </button> */}
             <button className="px-4 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors">
               Finalize Plan
             </button>

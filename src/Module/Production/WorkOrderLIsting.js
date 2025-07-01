@@ -261,6 +261,14 @@ function WorkOrderListing() {
     setPendingFilterCustomer('');
     setPendingFilterBoxType('');
     setPendingFilterStatus('');
+    setPendingDateRange([]);
+    // Immediately apply cleared filters
+    setDateRange([]);
+    setFilterCustomer('');
+    setFilterBoxType('');
+    setFilterStatus('');
+    setFilterModalOpen(false);
+    setShowDateRangePicker(false);
   };
 
   const handleDateRangeChange = (item) => {
@@ -491,21 +499,6 @@ function WorkOrderListing() {
                       }}
                     >
                       Clear
-                    </button>
-                    <button 
-                      onClick={handleCloseFilterModal} 
-                      style={{
-                        background: '#e2e8f0', 
-                        color: '#4a5568', 
-                        border: 'none', 
-                        borderRadius: 5, 
-                        padding: '7px 16px', 
-                        fontWeight: 500, 
-                        fontSize: 13, 
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Cancel
                     </button>
                     <button 
                       onClick={handleApplyFilters} 

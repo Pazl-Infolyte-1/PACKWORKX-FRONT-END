@@ -63,8 +63,8 @@ export const productionApi = {
     console.log(body)
     return await apiClient.delete('/production/production-groups', { data: body })
   },
-  getGroupInRawmeterialById:async(id)=>{
-    return await apiClient.get(`/production/production-group/${id}?include_work_orders=true&&temporary_status=1`)
+  getGroupInRawmeterialByIds:async(ids)=>{
+    return await apiClient.post(`/production/production-group/multiple`,{group_ids:ids})
   },
   refreshForNewForm:async()=>{
     return await apiClient.post(`/production/new`)

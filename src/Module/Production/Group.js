@@ -746,9 +746,20 @@ const Group = ({
                   <AddGroupButton text="Group" onClick={handleAutoSync} />
                 </div>
                 {/* Grid layout for groups: 2 columns */}
-                <div className="grid grid-cols-2 gap-4">
-                  {groups?.length > 0 &&
-                    groups?.map((groupOrder, groupIndex) => (
+                {groups?.length === 0 ? (
+                  <div className="bg-gray-50 rounded-md p-5 text-center flex flex-col items-center justify-center min-h-[200px] border border-gray-200">
+                    <CIcon
+                      icon={cilBriefcase}
+                      className="text-3xl text-indigo-400 mb-2.5"
+                    />
+                    <span className="text-gray-500 font-medium">No Groups Created Yet</span>
+                    <span className="text-gray-400 text-sm mt-1">
+                      Create a group to start organizing layers for production
+                    </span>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    {groups?.map((groupOrder, groupIndex) => (
                       <GroupOrderDropZone
                         key={groupIndex}
                         groupOrder={groupOrder}
@@ -765,7 +776,8 @@ const Group = ({
                         setVisibleSplit={setVisibleSplit}
                       />
                     ))}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
   

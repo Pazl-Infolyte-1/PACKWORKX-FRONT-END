@@ -12,7 +12,15 @@ function productionList() {
   const [showWorkordersModal, setShowWorkordersModal] = useState(false)
   const [selectedRow, setSelectedRow] = useState(null)
   const [selectedWorkorders, setSelectedWorkorders] = useState([])
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const navigate = useNavigate()
+
+
+
+  useEffect(()=>{
+    console.log(tableData)
+  },[tableData])
 
 
   const fetchGroups = async () => {
@@ -40,7 +48,7 @@ function productionList() {
   const closeWorkordersModal = () => setShowWorkordersModal(false);
 
   const columns = [
-    { key: 'id', header: 'Number', field: 'id', cellClass: '' },
+    { key: 'id', header: 'id', field: 'production_group_generate_id', cellClass: '' },
     { key: 'group_name', header: 'Group Name', field: 'group_name', cellClass: '' },
     {
       key: 'layers',
@@ -127,6 +135,13 @@ function productionList() {
         </span>
       ),
     },
+    {
+      key: 'select',
+      header: '',
+      field: 'select',
+      type: 'checkbox',
+    }
+    
   ]
 
 
@@ -142,13 +157,37 @@ function productionList() {
           await productionApi.refreshForNewForm()
           navigate('/production/form')
         }}
+        isNewButton={selectedIds.length > 0}
+        newButtonLabel="Proceed >"
+        addNewButtonClick={()=>{
+          navigate('/production/form/AllocateRM',{
+            state:{
+              selectedIds:selectedIds,
+              lockedSteps:true
 
+            }
+          })
+        }}
       />
-      <ReusableTable
-        columns={columns}
-        data={tableData}
+<ReusableTable
+  columns={columns}
+  data={tableData}
+  onCheckboxChange={(row, field, isChecked) => {
+    setTableData(prevData =>
+      prevData.map(r =>
+        r.id === row.id ? { ...r, [field]: isChecked } : r
+      )
+    );
+    setSelectedIds((prev) => {
+      if (isChecked) {
+        return [...prev, row.id];
+      } else {
+        return prev.filter((id) => id !== row.id);
+      }
+    });
+  }}
+/>
 
-      />
 
       {/* Layers Modal */}
       {showLayersModal && selectedRow && (

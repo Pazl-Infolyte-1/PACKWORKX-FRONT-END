@@ -10,7 +10,7 @@ export const RawMaterialProvider = ({ children }) => {
   const [sfgData, setSfgData] = useState([]);
   const [error, setError] = useState(null);
   const [alerts,setAlerts] = useState([])
-  const [routeId, setRouteId] = useState(null);
+  const [routeId, setRouteId] = useState([]);
 
 
 
@@ -57,19 +57,18 @@ export const RawMaterialProvider = ({ children }) => {
   const fetchWorkOrders = async () => {
     try {
       let response;
-      if (routeId) {
-        response = await productionApi.getGroupInRawmeterialById(routeId);
-        // The API returns a single group, so wrap it in an array for consistency
-        const group = response?.data?.data;
-        setGroupOrders(group ? [
-          {
-            ...group,
-            history: {
-              inventory_id: group.id,
-              qty: group.allocated_Qty || 0
-            }
+      if (routeId.length > 0) {
+        response = await productionApi.getGroupInRawmeterialByIds(routeId);
+        // The API now returns an array of groups
+        const groups = response?.data?.data || [];
+        const groupsWithHistory = groups.map(group => ({
+          ...group,
+          history: {
+            inventory_id: group.id,
+            qty: group.allocated_Qty || 0
           }
-        ] : []);
+        }));
+        setGroupOrders(groupsWithHistory);
       } else {
         response = await productionApi.getProductionGroups();
         const groupsWithHistory = response?.data?.data.map(group => ({
@@ -131,11 +130,11 @@ export const RawMaterialProvider = ({ children }) => {
     // await fetchWorkOrders();
   };
 
-  useEffect(() => {
-    if (window.location.pathname.includes('AllocateRM')) {
-      fetchWorkOrders();
-    }
-  }, [routeId]);
+  // useEffect(() => {
+  //   if (window.location.pathname.includes('AllocateRM')) {
+  //     fetchWorkOrders();
+  //   }
+  // }, [routeId]);
 
 
 
@@ -154,7 +153,8 @@ export const RawMaterialProvider = ({ children }) => {
     refreshData,
     setAlertsApp,
     handleClose,
-    setRouteId
+    setRouteId,
+    routeId
   };
 
   return (

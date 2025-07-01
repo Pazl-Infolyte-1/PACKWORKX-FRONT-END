@@ -10,6 +10,7 @@ import UserConfirmation from './UserConfirmation'
 import { workOrderApi } from '../../api/workOrder'
 import { Outlet } from 'react-router-dom'
 import { CRow } from '@coreui/react'
+import CustomAlert from "../../components/New/CustomAlert"
 
 // 1. The main Index component that provides contexts
 const Index = () => {
@@ -38,6 +39,10 @@ const IndexContent = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingTab, setPendingTab] = useState(null);
   const locked = location.state?.lockedSteps === true;
+
+
+
+
 
   
   // ✅ Now this will work because we're inside the provider
@@ -166,8 +171,18 @@ const IndexContent = () => {
                       width: '24px',
                       height: '24px',
                       borderRadius: '50%',
-                      background: isCompleted ? '#10b981' : isActive ? '#667eea' : '#e2e8f0',
-                      color: isCompleted || isActive ? 'white' : '#64748b',
+                      background: isDisabled
+                        ? '#e2e8f0' // light gray for disabled
+                        : isCompleted
+                          ? '#10b981'
+                          : isActive
+                            ? '#667eea'
+                            : '#e2e8f0',
+                      color: isDisabled
+                        ? '#cbd5e1' // gray text for disabled
+                        : isCompleted || isActive
+                          ? 'white'
+                          : '#64748b',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -201,7 +216,7 @@ const IndexContent = () => {
                      tab.label === 'Group Layers' ? 'Group Layers' : 
                      tab.label === 'Allocate RM' ? 'allocate rawmeterials' : 
                      tab.label === 'Returnables' ? 'Allocate Inventory' : 
-                     'Review & Plan'}
+                     'Preview Allocation'}
                   </div>
                 </div>
               </React.Fragment>

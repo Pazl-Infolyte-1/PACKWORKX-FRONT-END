@@ -54,48 +54,57 @@ export const RawMaterialProvider = ({ children }) => {
     }
   };
 
-  const fetchWorkOrders = async () => {
-    try {
-      let response;
-      if (routeId.length > 0) {
-        response = await productionApi.getGroupInRawmeterialByIds(routeId);
-        // The API now returns an array of groups
-        const groups = response?.data?.data || [];
-        const groupsWithHistory = groups.map(group => ({
-          ...group,
-          history: {
-            inventory_id: group.id,
-            qty: group.allocated_Qty || 0
-          }
-        }));
-        setGroupOrders(groupsWithHistory);
-      } else {
-        response = await productionApi.getProductionGroups();
-        const groupsWithHistory = response?.data?.data.map(group => ({
-          ...group,
-          history: {
-            inventory_id: group.id,
-            qty: group.allocated_Qty || 0
-          }
-        }));
-        setGroupOrders(groupsWithHistory);
-      }
-    } catch (error) {
-      console.error("Error fetching work orders:", error);
-      setError(error?.response?.data?.message || 'Failed to fetch work orders');
-    }
-  };
-
-
   // const fetchWorkOrders = async () => {
   //   try {
-  //     const response = await productionApi.getProductionGroups();
-  //     setGroupOrders(response?.data?.data);
+  //     let response;
+  //     if (routeId.length > 0) {
+        // response = await productionApi.getGroupInRawmeterialByIds(routeId);
+  //       // The API now returns an array of groups
+  //       const groups = response?.data?.data || [];
+  //       const groupsWithHistory = groups.map(group => ({
+  //         ...group,
+  //         history: {
+  //           inventory_id: group.id,
+  //           qty: group.allocated_Qty || 0
+  //         }
+  //       }));
+  //       setGroupOrders(groupsWithHistory);
+  //     } else {
+  //       response = await productionApi.getProductionGroups();
+  //       const groupsWithHistory = response?.data?.data.map(group => ({
+  //         ...group,
+  //         history: {
+  //           inventory_id: group.id,
+  //           qty: group.allocated_Qty || 0
+  //         }
+  //       }));
+  //       setGroupOrders(groupsWithHistory);
+  //     }
   //   } catch (error) {
   //     console.error("Error fetching work orders:", error);
   //     setError(error?.response?.data?.message || 'Failed to fetch work orders');
   //   }
   // };
+
+
+  const fetchWorkOrders = async () => {
+    try {
+      const response1 = await productionApi.getGroupInRawmeterialByIds(routeId);
+
+      const response = await productionApi.getProductionGroups();
+      const groupsWithHistory = response?.data?.data.map(group => ({
+                ...group,
+                history: {
+                  inventory_id: group.id,
+                  qty: group.allocated_Qty || 0
+                }
+              }));
+              setGroupOrders(groupsWithHistory);
+    } catch (error) {
+      console.error("Error fetching work orders:", error);
+      setError(error?.response?.data?.message || 'Failed to fetch work orders');
+    }
+  };
 
   const handleFilterChange = async (filterName, value) => {
     const newFilters = {
@@ -127,7 +136,7 @@ export const RawMaterialProvider = ({ children }) => {
     
     // Fetch fresh data with cleared filters
     await fetchReels(clearedFilters);
-    // await fetchWorkOrders();
+    await fetchWorkOrders();
   };
 
   // useEffect(() => {

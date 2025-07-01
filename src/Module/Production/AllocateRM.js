@@ -786,7 +786,7 @@ const AllocateRM = ({}) => {
 
   useEffect(()=>{
     refreshData()
-    fetchWorkOrders()
+    // fetchWorkOrders()
   },[routeId])
 
 

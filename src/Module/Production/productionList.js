@@ -4,6 +4,7 @@ import ReusableTable from '../SalesOrder/ReusableTable'
 import { productionApi } from '../../api/production';
 import { useNavigate } from 'react-router-dom';
 import HorizontalProgressBar from './HorizontalProgressBar'
+import CompactPagination from '../../components/New/CompactPagination';
 
 
 function productionList() {
@@ -13,6 +14,11 @@ function productionList() {
   const [selectedRow, setSelectedRow] = useState(null)
   const [selectedWorkorders, setSelectedWorkorders] = useState([])
   const [selectedIds, setSelectedIds] = useState([]);
+  const [count, setCount] = useState(null)
+  const [pagination, setPagination] = useState({ page: 1, totalPages: 1 })
+  const [limit, setLimit] = useState(50)
+
+
 
   const navigate = useNavigate()
 
@@ -25,8 +31,16 @@ function productionList() {
 
   const fetchGroups = async () => {
     try {
-      const response = await productionApi.getProductionGroupTable()
+      const response = await productionApi.getProductionGroupTable({
+        page: pagination?.page,
+        limit: limit,
+      })
       setTableData(response?.data?.data)
+      setCount(response.data.pagination.totalRecords)
+      setPagination(prev => ({
+        ...prev,
+        totalPages: response.data.pagination.totalPages
+      }))
     }
     catch (error) {
       console.error('Error fetching invoices:', error);
@@ -115,31 +129,87 @@ function productionList() {
         return <HorizontalProgressBar value={percent} />;
       },
     },
+    // {
+    //   key: 'stage',
+    //   header: 'Stage',
+    //   field: 'stage',
+    //   cellClass: '',
+    //   type: 'custom',
+    //   render: (row) => (
+    //     <span
+    //       style={{ color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
+    //       onClick={(e) => {
+    //         e.stopPropagation();
+    //         navigate(`/production/form/AllocateRM?id=${row.id}`, {
+    //           state: { lockedSteps: true }
+    //         });
+    //       }}
+    //     >
+    //       RM-Allocation
+    //     </span>
+    //   ),
+    // },
     {
-      key: 'stage',
-      header: 'Stage',
-      field: 'stage',
-      cellClass: '',
+      key: 'status',
+      header: 'Status',
+      field: 'group_status',
       type: 'custom',
-      render: (row) => (
-        <span
-          style={{ color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/production/form/AllocateRM?id=${row.id}`, {
-              state: { lockedSteps: true }
-            });
-          }}
-        >
-          RM-Allocation
-        </span>
-      ),
+      render: (row) => {
+        let colorClass = '';
+        switch (row.group_status) {
+          case 'Completed':
+            colorClass = 'bg-green-100 text-green-800';
+            break;
+          case 'Pending':
+            colorClass = 'bg-yellow-100 text-yellow-800';
+            break;
+          case 'Rejected':
+            colorClass = 'bg-red-100 text-red-800';
+            break;
+          case 'In Progress':
+            colorClass = 'bg-blue-100 text-blue-800';
+            break;
+          default:
+            colorClass = 'bg-gray-100 text-gray-800';
+        }
+        return (
+          <span
+            className={`px-3 py-1 rounded-full font-semibold text-xs ${colorClass}`}
+            style={{ minWidth: '80px', display: 'inline-block', textAlign: 'center' }}
+          >
+            {row.group_status}
+          </span>
+        );
+      },
     },
     {
       key: 'select',
       header: '',
       field: 'select',
-      type: 'checkbox',
+      type: 'custom',
+      render: (row) =>
+        row.group_status === 'Pending' ? (
+          <input
+            type="checkbox"
+            checked={!!row.select}
+            onChange={(e) => {
+              const isChecked = e.target.checked;
+              setTableData((prevData) =>
+                prevData.map((r) =>
+                  r.id === row.id ? { ...r, select: isChecked } : r
+                )
+              );
+              setSelectedIds((prev) => {
+                if (isChecked) {
+                  return [...prev, row.id];
+                } else {
+                  return prev.filter((id) => id !== row.id);
+                }
+              });
+            }}
+            className="form-checkbox h-4 w-4 text-blue-600 cursor-pointer transition-all"
+          />
+        ) : null,
     }
     
   ]
@@ -147,10 +217,11 @@ function productionList() {
 
   useEffect(() => {
     fetchGroups();
-  }, []);
+  }, [pagination?.page, limit]);
 
   return (
-    <>
+    <div className='flex flex-col'>
+    
       <ContentHeader
         heading={"Production"}
         onAddClick={async () => {
@@ -159,12 +230,12 @@ function productionList() {
         }}
         isNewButton={selectedIds.length > 0}
         newButtonLabel="Proceed >"
-        addNewButtonClick={()=>{
+        addNewButtonClick={async()=>{
+          await productionApi.refreshForNewForm()
           navigate('/production/form/AllocateRM',{
             state:{
               selectedIds:selectedIds,
               lockedSteps:true
-
             }
           })
         }}
@@ -187,6 +258,28 @@ function productionList() {
     });
   }}
 />
+<div className="flex justify-end items-center gap-4  mt-4 ml-4 mr-4">
+              <p className='w-50 text-sm'>Total Count : <span className='font-semibold'>{count}</span></p>
+            <CompactPagination
+              count={pagination?.totalPages}
+              page={pagination?.page}
+              onPageChange={(event, value) =>
+                setPagination((prev) => ({
+                  ...prev,
+                  page: value,
+                }))
+              }
+              onEntriesChange={(newLimit) => {
+                setLimit(newLimit)
+                // Reset to first page when changing limit
+                setPagination((prev) => ({
+                  ...prev,
+                  page: 1,
+                }))
+              }}
+              entriesPerPage={limit}
+            />
+          </div>
 
 
       {/* Layers Modal */}
@@ -261,7 +354,7 @@ function productionList() {
           </div>
         </div>
       )}
-    </>
+    </div>
   )
 }
 

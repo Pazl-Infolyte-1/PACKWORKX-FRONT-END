@@ -26,8 +26,8 @@ export const productionApi = {
   getProductionGroups:async()=>{
     return await apiClient.get('/production/production-group?include_work_orders=true&&temporary_status=1')
   },
-   getProductionGroupTable:async()=>{
-    return await apiClient.get('/production/production-group?include_work_orders=true&&temporary_status=0')
+   getProductionGroupTable:async(params)=>{
+    return await apiClient.get('/production/production-group?include_work_orders=true&&temporary_status=0',{params})
   },
   getDeckleOptions:async()=>{
     return await apiClient.get('/items/reels/deckle')
@@ -68,7 +68,10 @@ export const productionApi = {
   },
   refreshForNewForm:async()=>{
     return await apiClient.post(`/production/new`)
-  }
+  },
+  finalStatusUpdate:async(body)=>{
+    return await apiClient.patch(`/production/production-group/final-status`,body)
+  },
 
 
 }

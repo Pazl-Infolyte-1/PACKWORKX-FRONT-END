@@ -17,7 +17,7 @@ function productionList() {
 
     const fetchGroups = async () => {
         try {
-          const response = await productionApi.getProductionGroups()
+          const response = await productionApi.getProductionGroupTable()
           setTableData(response?.data?.data)
           }
         catch (error) { 

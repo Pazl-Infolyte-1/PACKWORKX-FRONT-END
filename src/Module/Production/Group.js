@@ -556,7 +556,7 @@ const Group = ({
         console.log('Payload to submit:', payload);
     
         const response = await productionApi.createGroupInProduction(payload);
-        console.log(response);
+        console.log(response.data);
       }
       
       navigate('/production/form/AllocateRM');

@@ -31,6 +31,7 @@ function productionList() {
 
   const fetchGroups = async () => {
     try {
+      const repsonse1 = await productionApi.refreshForNewForm()
       const response = await productionApi.getProductionGroupTable({
         page: pagination?.page,
         limit: limit,

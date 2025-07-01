@@ -24,10 +24,10 @@ export const productionApi = {
     return await apiClient.post('/production/production-group',body)
   },
   getProductionGroups:async()=>{
-    return await apiClient.get('/production/production-group?include_work_orders=true&&temporary_status=1')
+    return await apiClient.get('/production/production-group?include_work_orders=true&temporary_status=1')
   },
    getProductionGroupTable:async(params)=>{
-    return await apiClient.get('/production/production-group?include_work_orders=true&&temporary_status=0',{params})
+    return await apiClient.get('/production/production-group?include_work_orders=true&temporary_status=0',{params})
   },
   getDeckleOptions:async()=>{
     return await apiClient.get('/items/reels/deckle')

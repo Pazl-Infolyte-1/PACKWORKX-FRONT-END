@@ -163,6 +163,7 @@ function WorkOrderListing() {
         const body = {
           workOrderIds: selectedOrders,
           production: 'in_production',
+          "temporary_status": 1,
         }
 
         const response = await productionApi.addWorkOrderIntoProduction(body)
@@ -171,7 +172,7 @@ function WorkOrderListing() {
           setError(null);
         }
       }
-      navigate('/production/GroupLayers');
+      navigate('/production/form/GroupLayers');
     } catch (err) {
       console.error('Error adding work orders to production:', err)
       setError(err.message || 'Failed to add work orders to production')
@@ -611,7 +612,8 @@ function WorkOrderListing() {
                           <td style={rowStyle}>
                             <input
                               type="checkbox"
-                              checked={selectedOrders.includes(order?.id)}
+                              checked={order.production === 'in_production' || selectedOrders.includes(order?.id)}
+                              disabled={order.production === 'in_production'}
                               onChange={() => handleOrderToggle(order?.id)}
                               style={{
                                 width: '15px',

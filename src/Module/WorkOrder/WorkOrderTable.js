@@ -16,6 +16,7 @@ import ReusableTable from '../SalesOrder/ReusableTable'
 import { data, useNavigate } from 'react-router-dom'
 import ProgressCompletedModal from './ProgressCompletedModale'
 import { workOrderApi } from '../../api/workOrder'
+import LayerProduction from './LayerProduction'
 
 const WorkOrderTable = ({
   cellData,
@@ -33,6 +34,8 @@ const WorkOrderTable = ({
   const [progressOptions, setProgressOptions] = useState([])
   const [isOpenProgressModale, setIsOpenProgressModale] = useState(false)
   const [completedWorkOrderData, setCompletedWorkOrderData] = useState(null) // or useState({})
+  const [isLayerProductionOpen,setIsLayerProductionOpen] = useState(false)
+  const [selectedWorkorder,setSelectedWorkorder] = useState('')
 
   useEffect(() => {
     const fetchProgressOptions = async () => {
@@ -49,6 +52,15 @@ const WorkOrderTable = ({
 
     fetchProgressOptions()
   }, [])
+
+  const hanleViewProductionClick = async(row)=>{
+    try {
+      setIsLayerProductionOpen(true)
+      setSelectedWorkorder(row)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const handlePriorityChange = async (e, id) => {
     const newValue = e
@@ -215,6 +227,13 @@ const WorkOrderTable = ({
               handleDelete(row.id)
             },
           },
+          {
+            label: 'view Production Status',
+            icon: cilTrash,
+            onClick: () => {
+              hanleViewProductionClick(row)
+            },
+          },
         ]}
       />
     )
@@ -234,6 +253,15 @@ const WorkOrderTable = ({
         isMinimiseTable={isMinimiseTable}
         handleRowClick={handleView}
       />
+      
+      <LayerProduction
+        isOpen={isLayerProductionOpen}
+        workorder={selectedWorkorder}
+        onClose={()=>{
+          setIsLayerProductionOpen(false)
+          setSelectedWorkorder('')
+        }}
+        ></LayerProduction>
 
       <ProgressCompletedModal
         qty={completedWorkOrderData?.qty}

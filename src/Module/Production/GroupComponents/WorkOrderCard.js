@@ -192,13 +192,13 @@ export default function WorkOrderCard({
                       handleViewSalesOrder(order.sales_order_id)
                     },
                   },
-                  {
-                    label: 'Remove from Plan',
-                    icon: cilTrash,
-                    onClick: () => {
-                      removeWOFromPlan(order.id)
-                    },
-                  },
+                  // {
+                  //   label: 'Remove from Plan',
+                  //   icon: cilTrash,
+                  //   onClick: () => {
+                  //     removeWOFromPlan(order.id)
+                  //   },
+                  // },
                 ]}
               />
             </div>

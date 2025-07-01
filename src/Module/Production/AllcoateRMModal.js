@@ -12,7 +12,6 @@ const AllcoateRMModal = ({ visibleAllocate, setVisibleAllocate, group, droppedIt
 
   useEffect(() => {
     async function fetchData() {
-      console.log(droppedItem.sfg.id, 'jjjj')
       const response = await productionApi.getInventoryHistory(droppedItem?.sfg?.id)
       setHistoryData(response.data.data)
       console.log('Modal opened with group & droppedItem:', response)
@@ -33,6 +32,8 @@ const AllcoateRMModal = ({ visibleAllocate, setVisibleAllocate, group, droppedIt
       // alert('Cannot allocate more than the balance to allocate in group.')
       return
     }
+
+    console.log(droppedItem)
     const payload = {
       allocations: [
         {

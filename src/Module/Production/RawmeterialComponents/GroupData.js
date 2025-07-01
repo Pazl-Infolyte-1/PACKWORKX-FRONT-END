@@ -50,7 +50,7 @@ function GroupData({ isVisible, onClose, data }) {
           <div className="text-sm font-medium">Allocation #{allocation.id}</div>
           <div className="flex gap-3 mt-2 text-xs">
             <span>Allocated Qty: {allocation.allocated_Qty}</span>
-            <span>Inventory ID: {allocation.Inventory.id}</span>
+            <span>Inventory ID: {allocation.Inventory?.inventory_generate_id}</span>
             <span className={allocation.Inventory.quantity_available === "0.00" ? "text-red-600" : ""}>
               Available In Inventory: {allocation.Inventory.quantity_available}
             </span>
@@ -144,7 +144,7 @@ function GroupData({ isVisible, onClose, data }) {
                     </div>
                     <div className="w-[35%] mb-3 mx-auto flex justify-center">
                       <ProgressBar
-                        value={allocation_status.allocation_percentage / 100}
+                        value={allocation_status.allocation_percentage}
                       />
                     </div>
                     <div className="grid grid-cols-1 gap-2 text-xs">

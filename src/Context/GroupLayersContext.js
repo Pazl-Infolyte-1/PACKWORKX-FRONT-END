@@ -398,6 +398,13 @@ export const GroupLayersProvider = ({ children }) => {
   const refreshData = async () => {
       setGroups([]);
   };
+
+
+  const resetCompleteData = async()=>{
+    setGroups([]);
+    setWorkOrders([])
+
+  }
   
   const value = {
     workOrders,
@@ -411,7 +418,8 @@ export const GroupLayersProvider = ({ children }) => {
     refreshData,
     handleClose,
     setAlertsApp,
-    deleteGroup
+    deleteGroup,
+    resetCompleteData
   };
 
   return (

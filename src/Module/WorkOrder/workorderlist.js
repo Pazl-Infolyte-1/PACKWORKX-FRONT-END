@@ -17,6 +17,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { FiDownload, FiUpload } from 'react-icons/fi'
 import CompactPagination from '../../components/New/CompactPagination'
 import { workOrderApi } from '../../api/workOrder'
+import LayerProduction from './LayerProduction'
 
 const WorkOrders = () => {
   const [data, setData] = useState([])
@@ -295,6 +296,8 @@ const WorkOrders = () => {
           onClose={() => setIsConfirmationModaleOpen(false)}
           onConfirm={ConfirmDelete}
         />
+
+
 
 
         <CustomAlert

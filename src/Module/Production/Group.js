@@ -486,7 +486,7 @@ const Group = ({
   const [splitVisible, setSplitVisible] = useState(false)
   const navigate = useNavigate()
   const [groups1,setGroupOrders] = useState()
-  const { groups,addWorkOrderToGroup,workOrders,setWorkOrders,refreshData,handleClose,alerts,setAlertsApp,addGroup } = useGroupLayers();
+  const { groups,addWorkOrderToGroup,workOrders,setWorkOrders,refreshData,handleClose,alerts,setAlertsApp,addGroup,resetCompleteData } = useGroupLayers();
   const {registerNextHandler} = useNextHandler()
 
   const {searchQuery,setGlobalPlaceholder} = useSearch()
@@ -504,12 +504,16 @@ const Group = ({
   };
 
   useEffect(() => {
-    refreshData(); 
-    fetchWorkOrders();
+    if(groups.length==0){
+      refreshData();  
+      fetchWorkOrders();
+    }
   }, []);
 
   const SubmitGroups = async () => {
     try {
+
+      
       // Check for empty groups
       const emptyGroups = groups.filter(group => !group.group_value || group.group_value.length === 0)
       if (emptyGroups.length > 0) {
@@ -545,6 +549,7 @@ const Group = ({
             group_name: group?.group_name,
             group_value: groupItems,
             group_Qty: groupQty,
+            temporary_status:1
           };
         });
     
@@ -554,16 +559,39 @@ const Group = ({
         console.log(response);
       }
       
-      navigate('/production/AllocateRM');
+      navigate('/production/form/AllocateRM');
 
     } catch (err) {
       console.error('Error while submitting groups:', err);
     }
   };
 
+
+  const removeWorkorderFromProduction = async () => {
+    if (!workOrders || workOrders.length === 0) {
+      return;
+    }
+    const workOrderIds = workOrders?.map(order => order.id);
+    const body = {
+      workOrderIds: workOrderIds,
+      production: 'created',
+      temporary_status: 0,
+    };
+
+    try {
+      const response = await productionApi.removeWorkOrdersFromProduction(body);
+      refreshData()
+      resetCompleteData()
+      
+    } catch (error) {
+      setAlertsApp && setAlertsApp({ type: 'danger', message: error?.response?.data?.message || error.message || 'An error occurred while removing work orders from production.' });
+      console.error('Error while removing work orders from production:', error);
+    }
+  }
+
   useEffect(() => {
-    registerNextHandler(SubmitGroups);
-  }, [SubmitGroups]);
+    registerNextHandler(removeWorkorderFromProduction);
+  }, [removeWorkorderFromProduction]);
 
   useEffect(() => {
     setGlobalPlaceholder('Search Work Order...')
@@ -574,7 +602,7 @@ const Group = ({
   }, []);
 
   useEffect(() => {
-    addGroup();
+    // addGroup();
   }, []);
 
   const removeWorkOrderFromGroup = (order, groupIndex) => {

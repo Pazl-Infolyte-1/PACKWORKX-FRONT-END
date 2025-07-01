@@ -28,6 +28,8 @@ import { productionApi } from '../../api/production'
 import GroupData from './RawmeterialComponents/GroupData'
 import { ConstructionOutlined } from '@mui/icons-material'
 import CustomAlert from '../../components/New/CustomAlert'
+import { useNextHandler } from '../../Context/ProductionNextHandlerContext'
+import { useParams, useLocation } from 'react-router-dom'
 
 const ItemType = 'RawMeterial'
 
@@ -57,7 +59,6 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
     }
   }), [sfg])
 
-
   const toggleCollapse = (id) => {
     setOpenSFG((prevId) => (prevId === id ? null : id)) // Toggle behavior
   }
@@ -69,27 +70,58 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            cursor: 'pointer',
+            padding: '8px 0',
+            borderBottom: '1px solid #f0f0f0',
+            borderRadius: '6px 6px 0 0',
+            minHeight: '40px',
           }}
         >
+          {/* Left: Inventory ID and collapse toggle */}
           <span
             onClick={() => toggleCollapse(sfg.id)}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '4px',
+              gap: '6px',
               whiteSpace: 'nowrap',
-              fontSize: '0.85rem',
-              fontWeight: '500',
+              fontSize: '0.95rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              color: '#3730a3',
+              minWidth: 0,
             }}
           >
-            Reel {sfg.id} {openSFG === sfg.id ? <FaAngleUp size={12} /> : <FaAngleDown size={12} />}
+            {sfg.inventory_generate_id}
+            {openSFG === sfg.id ? <FaAngleUp size={13} /> : <FaAngleDown size={13} />}
           </span>
+
+          {/* Center: Inline fields */}
+          <div
+          className='pl-4'
+           style={{
+            display: 'flex',
+            gap: '10px',
+            alignItems: 'center',
+            fontSize: '0.85rem',
+            color: '#374151',
+            flex: 1,
+            justifyContent: 'start',
+            minWidth: 0,
+          }}>
+            <span><b>GSM:</b> {sfg?.item_info?.default_custom_fields?.gsm}</span>
+            <span><b>BF:</b> {sfg?.item_info?.default_custom_fields?.bf}</span>
+            <span><b>Deckle:</b> {sfg?.item_info?.default_custom_fields?.size}</span>
+            <span><b>Available:</b> {sfg?.quantity_available < 0 ? 0 : sfg?.quantity_available} KG</span>
+            <span><b>Blocked:</b> {sfg?.quantity_blocked} KG</span>
+          </div>
+
+          {/* Right: ThreeDotMenu */}
           <span
             style={{
-              fontSize: '0.85rem',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'flex-end',
+              minWidth: '40px',
             }}
           >
             <ThreeDotMenu
@@ -129,21 +161,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
 
         <CCollapse className="custom-collapse" visible={openSFG === sfg.id}>
           <CRow className="align-items-center text-xs mt-2 mb-1">
-            <CCol md="2" className="text-nowrap">
-              <span>GSM: {sfg?.item?.default_custom_fields?.gsm}</span>
-            </CCol>
-            <CCol md="2" className="text-nowrap">
-              <span>BF: {sfg?.item?.default_custom_fields?.bf}</span>
-            </CCol>
-            <CCol md="2" className="text-nowrap">
-              <span>Deckle: {sfg?.item?.default_custom_fields?.deckle_size}</span>
-            </CCol>
-            <CCol md="3" className="text-nowrap">
-              <span>Available: {sfg?.quantity_available} KG</span>
-            </CCol>
-            <CCol md="3" className="text-nowrap">
-              <span>Blocked: {sfg?.quantity_blocked} KG</span>
-            </CCol>
+            {/* These fields are now in the header, so you can remove or repurpose this row if needed */}
           </CRow>
           <hr style={{ margin: '4px 0' }} />
           <CRow className="mt-2">
@@ -671,17 +689,18 @@ const AllocateRM = ({}) => {
   const [gsmOptions, setGsmOptions] = useState([]);
   const [bfOptions, setBfOptions] = useState([]);
   const [openSFG, setOpenSFG] = useState(null)
-  const {groupOrders,refreshData, sfgData ,handleFilterChange,selectedFilters,alerts,setAlertsApp,handleClose} = useRawMaterialContext()
+  const {groupOrders,refreshData, sfgData ,handleFilterChange,selectedFilters,alerts,setAlertsApp,handleClose,setRouteId,fetchWorkOrders} = useRawMaterialContext()
+  const {registerNextHandler} = useNextHandler()
+  const location = useLocation();
 
-
-
-
-
-
+  const query = new URLSearchParams(location.search);
+  const queryId = query.get('id');
 
   useEffect(() => {
+    setRouteId(queryId || null);
     refreshData()
-    }, [])
+    fetchWorkOrders()
+    }, [queryId])
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -722,6 +741,51 @@ const AllocateRM = ({}) => {
   const toggleGroupCollapse = (index) => {
     setVisibleGroupIndex(visibleGroupIndex === index ? null : index)
   }
+
+
+  const RemoveGroupsFromIndex = async () => {
+    if (!groupOrders || groupOrders.length === 0) {
+      return;
+    }
+
+    const groupOrderObjects = {
+      groupIds: groupOrders?.map(order => order.id)
+    };
+
+    // Gather all allocations for all groups
+    const deallocations = [];
+    groupOrders.forEach(group => {
+      if (group.allocation_history && group.allocation_history.allocation_by_inventory) {
+        group.allocation_history.allocation_by_inventory.forEach(allocation => {
+          if (allocation.total_allocated_qty > 0) {
+            deallocations.push({
+              production_group_id: group.id,
+              inventory_id: allocation.inventory_id,
+              quantity_to_deallocate: allocation.total_allocated_qty,
+            });
+          }
+        });
+      }
+    });
+
+    try {
+      // Deallocate all allocations first
+      if (deallocations.length > 0) {
+        await productionApi.deAllocateInventoryFromGroup({ deallocations });
+      }
+      // Then remove the groups
+      const response = await productionApi.removeGroupsFromRawMeterialAllocations(groupOrderObjects);
+      await refreshData()
+      await fetchWorkOrders()
+    } catch (error) {
+      // setAlertsApp && setAlertsApp({ type: 'danger', message: error?.response?.data?.message || error.message || 'An error occurred while removing work orders from production.' });
+      console.error('Error while removing work orders from production:', error);
+    }
+  }
+
+  useEffect(() => {
+    registerNextHandler(RemoveGroupsFromIndex);
+  }, [RemoveGroupsFromIndex]);
 
   return (
     <div className="flex flex-col">

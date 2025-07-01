@@ -563,6 +563,8 @@ const Group = ({
 
     } catch (err) {
       console.error('Error while submitting groups:', err);
+      setAlertsApp('error', err?.response.data.errors?.[0]  || 'An error occurred while submitting groups.')
+
     }
   };
 

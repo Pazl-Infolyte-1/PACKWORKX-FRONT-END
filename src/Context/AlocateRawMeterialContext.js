@@ -89,7 +89,10 @@ export const RawMaterialProvider = ({ children }) => {
 
   const fetchWorkOrders = async () => {
     try {
-      const response1 = await productionApi.getGroupInRawmeterialByIds(routeId);
+
+       if (routeId.length > 0) {
+         const response1 = await productionApi.getGroupInRawmeterialByIds(routeId);
+    }     
 
       const response = await productionApi.getProductionGroups();
       const groupsWithHistory = response?.data?.data.map(group => ({

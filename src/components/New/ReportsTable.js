@@ -128,7 +128,7 @@ const reorderedHeaders = [
 
   {/* Pagination & Entries */}
   {pagination && (
-    <div className="flex flex-col sm:flex-row sm:justify-between items-center gap-3 mt-4 text-sm">
+    <div className="flex flex-col sm:flex-row sm:justify-between items-center gap-3 mt-[150px] text-sm">
       {/* Entries Dropdown */}
       <div className="flex items-center gap-2">
         <label htmlFor="entries" className="text-gray-700">

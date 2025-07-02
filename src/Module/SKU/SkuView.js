@@ -552,14 +552,14 @@ useEffect(() => {
       <span className="text-gray-600">Status</span>
       <span className="font-medium">{selectedSku.status ?? '-'}</span>
     </div>
-    <div className="flex justify-between py-1">
+    {/* <div className="flex justify-between py-1">
       <span className="text-gray-600">Created By</span>
       <span className="font-medium">{selectedSku.created_by ?? '-'}</span>
     </div>
     <div className="flex justify-between py-1">
       <span className="text-gray-600">Updated By</span>
       <span className="font-medium">{selectedSku.updated_by ?? '-'}</span>
-    </div>
+    </div> */}
     <div className="flex justify-between py-1">
       <span className="text-gray-600">Sku Creator</span>
       <span className="font-medium">{selectedSku.sku_creator.name ?? '-'}</span>

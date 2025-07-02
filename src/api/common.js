@@ -133,4 +133,62 @@ export const commonApi = {
       console.error(error)
     }
   },
+
+  getClientsDropdown: async () => {
+    try {
+      const response = await apiClient.get(`clients/get/display-name`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  },
+
+    getSalesOrderDropdown: async () => {
+    try {
+      const response = await apiClient.get(`/sale-order/get/generate-id`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  },
+  
+    getSkuTypeDropdown: async () => {
+    try {
+      const response = await apiClient.get(`/sku-details/get/generate-id`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  },
+    getSupplierDropdown: async () => {
+    try {
+      const response = await apiClient.get(`/clients/get/display-name?entity_type=Vendor`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  },
+      getInvoiceDropdown: async () => {
+    try {
+      const response = await apiClient.get(`/work-order-invoice/get/invoice/generate-id`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  },
+        getPurchaseOrderDropdown: async () => {
+    try {
+      const response = await apiClient.get(`/purchase-order/ids`)
+      return response.data
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  },
+  
 }

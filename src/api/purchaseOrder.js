@@ -125,7 +125,7 @@ export const purchaseOrderApi = {
 
   getPurchaseOrderDropdown: async () => {
     try {
-      const response = await apiClient.get('/purchase-order?limit=10000')
+      const response = await apiClient.get('/purchase-order/ids?limit=10000')
       return response.data
     } catch (error) {
       console.error(error)

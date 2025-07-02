@@ -83,11 +83,35 @@ const ClientReport = React.lazy(() => import('./Module/ReportsModule/ClientRepor
 const ClientPage = React.lazy(() => import('./Module/ReportsModule/Reports.js'))
 const Modules = React.lazy(() => import('./Module/Module/Module.js'))
 const ModuleForm = React.lazy(() => import('./Module/Module/ModuleForm.js'))
+const MachineReport = React.lazy(() => import('./Module/ReportsModule/MachineReport.js'))
+const ProcessReport = React.lazy(() => import('./Module/ReportsModule/ProcessReport.js'))
+const RoutesReport = React.lazy(() => import('./Module/ReportsModule/RoutesReport.js'))
+const EmployeeListReport = React.lazy(() => import('./Module/ReportsModule/EmployeeListReport.js'))
+const SalesOrderReport = React.lazy(() => import('./Module/ReportsModule/SalesOrderReport.js'))
+const WorkOrderReport = React.lazy(() => import('./Module/ReportsModule/WorkOrderReport.js'))
+const SkuReport = React.lazy(() => import('./Module/ReportsModule/SkuReport.js'))
+const PurchaseOrderReport = React.lazy(
+  () => import('./Module/ReportsModule/PurchaseOrderReport.js'),
+)
+const InventoryReport = React.lazy(() => import('./Module/ReportsModule/InventoryReport.js'))
+const SalesReturnReport = React.lazy(() => import('./Module/ReportsModule/SalesReturnReport.js'))
+const PurchaseReturnReport = React.lazy(
+  () => import('./Module/ReportsModule/PurchaseReturnReport.js'),
+)
+const GrnReport = React.lazy(() => import('./Module/ReportsModule/GrnReport.js'))
+const InvoiceReport = React.lazy(() => import('./Module/ReportsModule/InvoiceReport.js'))
+const CreditNoteReport = React.lazy(() => import('./Module/ReportsModule/CreditNoteReport.js'))
+const DebitNoteReport = React.lazy(() => import('./Module/ReportsModule/DebitNoteReport.js'))
+const StockAdjustmentReport = React.lazy(
+  () => import('./Module/ReportsModule/StockAdjustmentReport.js'),
+)
+const BillsReport = React.lazy(() => import('./Module/ReportsModule/BillReport.js'))
 
 const ProductionPlanning = React.lazy(
   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
 )
-
+const Task = React.lazy(() => import('./Module/TaskView/Task.js'))
+const TaskView = React.lazy(() => import('./Module/TaskView/TaskView.js'))
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },
@@ -171,7 +195,7 @@ const routes = [
     children: [{ path: ':id', element: InventoryView, key: 'inventory' }],
   },
   { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 23 },
-  { path: '/production', name: 'Production Listing', element: ProductionList, key: 2382  },
+  { path: '/production', name: 'Production Listing', element: ProductionList, key: 2382 },
 
   {
     path: '/production/form',
@@ -357,6 +381,122 @@ const routes = [
     name: 'Production Planning',
     element: ProductionPlanning,
     key: '',
+  },
+  {
+    path: '/machineReport',
+    name: 'Machine Report',
+    element: MachineReport,
+    key: 'machine-report',
+  },
+  {
+    path: '/processReport',
+    name: 'Process Report',
+    element: ProcessReport,
+    key: 'process-report',
+  },
+  {
+    path: '/routesReport',
+    name: 'Routes Report',
+    element: RoutesReport,
+    key: 'routes-report',
+  },
+  {
+    path: '/employeeListReport',
+    name: 'Employee List Report',
+    element: EmployeeListReport,
+    key: 'employee-list-report',
+  },
+  {
+    path: '/salesOrderReport',
+    name: 'Sales Order Report',
+    element: SalesOrderReport,
+    key: 'sales-order-report',
+  },
+  {
+    path: '/workOrderReport',
+    name: 'Work Order Report',
+    element: WorkOrderReport,
+    key: 'sales-order-report',
+  },
+  {
+    path: '/skuReport',
+    name: 'Sku Report',
+    element: SkuReport,
+    key: 'sku-report',
+  },
+  {
+    path: '/purchaseOrderReport',
+    name: 'Purchase Order Report',
+    element: PurchaseOrderReport,
+    key: 'purchase-order-report',
+  },
+  {
+    path: '/inventoryReport',
+    name: 'Inventory Report',
+    element: InventoryReport,
+    key: 'inventory-report',
+  },
+  {
+    path: '/salesReturnReport',
+    name: 'Sales Return Report',
+    element: SalesReturnReport,
+    key: 'sales-return-report',
+  },
+  {
+    path: '/purchaseReturnReport',
+    name: 'Purchase Return Report',
+    element: PurchaseReturnReport,
+    key: 'purchase-return-report',
+  },
+  {
+    path: '/grnReport',
+    name: 'GRN Report',
+    element: GrnReport,
+    key: 'grn-report',
+  },
+  {
+    path: '/invoiceReport',
+    name: 'Invoice Report',
+    element: InvoiceReport,
+    key: 'grn-report',
+  },
+  {
+    path: '/creditNoteReport',
+    name: 'Credit Note Report',
+    element: CreditNoteReport,
+    key: 'credit-note-report',
+  },
+  {
+    path: '/debitNoteReport',
+    name: 'Debit Note Report',
+    element: DebitNoteReport,
+    key: 'debit-note-report',
+  },
+  {
+    path: '/stockAdjustmentReport',
+    name: 'Stock Adjustment Report',
+    element: StockAdjustmentReport,
+    key: 'stockadjustment-note-report',
+  },
+  {
+    path: '/billsReport',
+    name: 'Bills Report',
+    element: BillsReport,
+    key: 'bills-report',
+  },
+  {
+    path: '/task',
+    name: 'task',
+    element: Task,
+    key: '',
+    children: [
+      {
+        path: 'view/:id',
+        name: 'taskview',
+        element: TaskView,
+        key: '',
+      },
+    ],
   },
 ]
 

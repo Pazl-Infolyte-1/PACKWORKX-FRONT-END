@@ -469,7 +469,7 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
               fontWeight: '500',
             }}
           >
-            {group.group_name}{' '}
+            {group.production_group_generate_id}{' '} 
             {visibleGroupIndex === groupIndex ? <FaAngleUp size={14} /> : <FaAngleDown size={14} />}
           </span>
 

@@ -347,7 +347,7 @@ const staticReportArray = [
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/production">
-                    {navLink('Production', 'cilTruck')}
+                    {navLink('Raw Material', 'cilTruck')}
                   </CNavLink>
                 </CNavItem>
               )

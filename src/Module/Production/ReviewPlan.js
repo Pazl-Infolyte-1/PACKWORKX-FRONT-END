@@ -144,6 +144,7 @@ function ReviewPlan() {
             <table className="min-w-full text-xs text-left">
               <thead>
                 <tr className="border-b text-gray-600">
+                  <th className="py-2 px-2 font-medium">Group ID</th>
                   <th className="py-2 px-2 font-medium">Group Name</th>
                   <th className="py-2 px-2 font-medium">Work Orders</th>
                   <th className="py-2 px-2 font-medium">Quantity</th>
@@ -158,6 +159,7 @@ function ReviewPlan() {
                   const status = getStatusBadge(group);
                   return (
                     <tr key={group.id} className="border-b hover:bg-slate-50">
+                      <td className="py-2 px-2 font-medium text-gray-900">{group.production_group_generate_id}</td>
                       <td className="py-2 px-2 font-medium text-gray-900">{group.group_name}</td>
                       <td className="py-2 px-2">
                         {[...new Set(group.group_value.map(v => v.work_order_id))]

@@ -100,6 +100,7 @@ const IndexContent = () => {
         setPendingAllocDetails(pendingGroups.map(g => ({
           name: g.group_name || g.id || 'Unnamed Group',
           group_id: g.id,
+          production_group_generate_id: g.production_group_generate_id,
           inventory_id: g.allocation_history?.allocation_by_inventory?.[0]?.inventory_id || null,
           balance_allocate: (g.group_Qty || 0) - (g.allocated_qty || 0),
           qty: g.group_Qty || 0
@@ -145,7 +146,8 @@ const IndexContent = () => {
       .map(g => ({
         group_id: g.group_id,
         inventory_id: g.inventory_id,
-        balance_allocate: g.balance_allocate
+        balance_allocate: g.balance_allocate,
+        production_group_generate_id: g.production_group_generate_id
       }));
     console.log('body:', body);
     setShowPendingAllocAlert(false);
@@ -310,7 +312,7 @@ const IndexContent = () => {
               <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 18, color: '#b91c1c', fontSize: 13 }}>
                 {pendingAllocDetails.map((g, idx) => (
                   <li key={idx}>
-                    <b>{g.name}</b>: <span style={{ color: '#b91c1c' }}>{g.balance_allocate}</span> KG left to allocate
+                    <b>{g.production_group_generate_id}</b>: <span style={{ color: '#b91c1c' }}>{g.balance_allocate}</span> KG left to allocate
                   </li>
                 ))}
               </ul>

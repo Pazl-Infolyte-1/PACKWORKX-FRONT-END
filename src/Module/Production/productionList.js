@@ -224,7 +224,7 @@ function productionList() {
     <div className='flex flex-col'>
     
       <ContentHeader
-        heading={"Production"}
+        heading={"Raw Material Allocation"}
         onAddClick={async () => {
           await productionApi.refreshForNewForm()
           navigate('/production/form')

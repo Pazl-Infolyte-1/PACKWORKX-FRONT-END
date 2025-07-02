@@ -1,7 +1,7 @@
 // Split your Index component into two parts:
 
 import React, { useEffect, useRef, useState } from "react"
-import { RawMaterialProvider } from "../../Context/AlocateRawMeterialContext"
+import { RawMaterialProvider, useRawMaterialContext } from "../../Context/AlocateRawMeterialContext"
 import { GroupLayersProvider, useGroupLayers } from "../../Context/GroupLayersContext"
 import { NextHandlerProvider, useNextHandler } from "../../Context/ProductionNextHandlerContext"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -10,6 +10,7 @@ import UserConfirmation from './UserConfirmation'
 import { workOrderApi } from '../../api/workOrder'
 import { Outlet } from 'react-router-dom'
 import { CRow } from '@coreui/react'
+import CustomAlert from "../../components/New/CustomAlert"
 
 // 1. The main Index component that provides contexts
 const Index = () => {
@@ -37,7 +38,12 @@ const IndexContent = () => {
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingTab, setPendingTab] = useState(null);
-  
+  const locked = location.state?.lockedSteps === true;
+  const { groupOrders: rawMaterialGroupOrders } = useRawMaterialContext();
+  const [showPendingAllocAlert, setShowPendingAllocAlert] = useState(false);
+  const [pendingAllocTab, setPendingAllocTab] = useState(null);
+  const [pendingAllocDetails, setPendingAllocDetails] = useState([]);
+
   // ✅ Now this will work because we're inside the provider
   const {triggerNext} = useNextHandler()
 
@@ -81,6 +87,21 @@ const IndexContent = () => {
 
   const handleTabChange = (tabPath) => {
     const targetTabIndex = tabs.findIndex(tab => tab.path === tabPath);
+    const isLeavingAllocateRM = currentPath === 'AllocateRM' && (tabPath === 'Returnables' || tabPath === 'OutsourceAndPreview');
+    if (isLeavingAllocateRM) {
+      const pendingGroups = Array.isArray(rawMaterialGroupOrders)
+        ? rawMaterialGroupOrders.filter(g => (g.allocated_Qty || 0) < (g.group_Qty || 0))
+        : [];
+      if (pendingGroups.length > 0) {
+        setPendingAllocTab(tabPath);
+        setPendingAllocDetails(pendingGroups.map(g => ({
+          name: g.group_name || g.id || 'Unnamed Group',
+          balance: (g.group_Qty || 0) - (g.allocated_Qty || 0)
+        })));
+        setShowPendingAllocAlert(true);
+        return;
+      }
+    }
     if (tabPath !== currentPath) {
       if (targetTabIndex < activeTabIndex) {
         setPendingTab(tabPath);
@@ -104,6 +125,20 @@ const IndexContent = () => {
     setShowConfirm(false);
     setPendingTab(null);
   };
+
+  const handleConfirmPendingAlloc = () => {
+    setShowPendingAllocAlert(false);
+    if (pendingAllocTab) {
+      console.log('hi');
+      navigate(`/production/form/${pendingAllocTab}`);
+      setPendingAllocTab(null);
+    }
+  };
+
+  const handleCancelPendingAlloc = () => {
+    setShowPendingAllocAlert(false);
+    setPendingAllocTab(null);
+  };
   
   return (
     <div className='overflow-hidden h-[90vh] flex flex-col'>
@@ -120,9 +155,14 @@ const IndexContent = () => {
           alignItems: 'flex-start',
         }}>
           {tabs.map((tab, index) => {
-            const isDisabled = '';
+            let isDisabled = '';
             const isActive = activeTabIndex === index;
             const isCompleted = activeTabIndex > index;
+
+            if (locked && index < activeTabIndex) {
+              isDisabled = true;
+            }
+          
             
             return (
               <React.Fragment key={tab.path}>
@@ -159,8 +199,18 @@ const IndexContent = () => {
                       width: '24px',
                       height: '24px',
                       borderRadius: '50%',
-                      background: isCompleted ? '#10b981' : isActive ? '#667eea' : '#e2e8f0',
-                      color: isCompleted || isActive ? 'white' : '#64748b',
+                      background: isDisabled
+                        ? '#e2e8f0' // light gray for disabled
+                        : isCompleted
+                          ? '#10b981'
+                          : isActive
+                            ? '#667eea'
+                            : '#e2e8f0',
+                      color: isDisabled
+                        ? '#cbd5e1' // gray text for disabled
+                        : isCompleted || isActive
+                          ? 'white'
+                          : '#64748b',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -171,7 +221,7 @@ const IndexContent = () => {
                       border: 'none',
                       cursor: isDisabled ? 'not-allowed' : 'pointer',
                       fontSize: '13px',
-                      opacity: isDisabled ? 0.6 : 1,
+                      // opacity: isDisabled ? 0.6 : 1,
                       transition: 'background 0.2s, color 0.2s',
                       boxShadow: isActive ? '0 2px 8px rgba(102,126,234,0.08)' : 'none',
                     }}
@@ -194,7 +244,7 @@ const IndexContent = () => {
                      tab.label === 'Group Layers' ? 'Group Layers' : 
                      tab.label === 'Allocate RM' ? 'allocate rawmeterials' : 
                      tab.label === 'Returnables' ? 'Allocate Inventory' : 
-                     'Review & Plan'}
+                     'Preview Allocation'}
                   </div>
                 </div>
               </React.Fragment>
@@ -218,6 +268,25 @@ const IndexContent = () => {
         message="Are you sure? Unsaved data will be lost."
         onConfirm={handleConfirmTabChange}
         onCancel={handleCancelTabChange}
+      />
+      <UserConfirmation
+        open={showPendingAllocAlert}
+        message={
+          <div>
+            <div>There is still pending quantity to allocate. Do you want to continue?</div>
+            {pendingAllocDetails.length > 0 && (
+              <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 18, color: '#b91c1c', fontSize: 13 }}>
+                {pendingAllocDetails.map((g, idx) => (
+                  <li key={idx}>
+                    <b>{g.name}</b>: <span style={{ color: '#b91c1c' }}>{g.balance}</span> KG left to allocate
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        }
+        onConfirm={handleConfirmPendingAlloc}
+        onCancel={handleCancelPendingAlloc}
       />
     </div>
   )

@@ -4,149 +4,284 @@ import ReusableTable from '../SalesOrder/ReusableTable'
 import { productionApi } from '../../api/production';
 import { useNavigate } from 'react-router-dom';
 import HorizontalProgressBar from './HorizontalProgressBar'
+import CompactPagination from '../../components/New/CompactPagination';
 
 
 function productionList() {
-    const [tableData,setTableData] = useState([])
-    const [showLayersModal, setShowLayersModal] = useState(false)
-    const [showWorkordersModal, setShowWorkordersModal] = useState(false)
-    const [selectedRow, setSelectedRow] = useState(null)
-    const [selectedWorkorders, setSelectedWorkorders] = useState([])
-    const navigate = useNavigate()
+  const [tableData, setTableData] = useState([])
+  const [showLayersModal, setShowLayersModal] = useState(false)
+  const [showWorkordersModal, setShowWorkordersModal] = useState(false)
+  const [selectedRow, setSelectedRow] = useState(null)
+  const [selectedWorkorders, setSelectedWorkorders] = useState([])
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [count, setCount] = useState(null)
+  const [pagination, setPagination] = useState({ page: 1, totalPages: 1 })
+  const [limit, setLimit] = useState(50)
 
 
-    const fetchGroups = async () => {
-        try {
-          const response = await productionApi.getProductionGroupTable()
-          setTableData(response?.data?.data)
-          }
-        catch (error) { 
-          console.error('Error fetching invoices:', error);
+
+  const navigate = useNavigate()
+
+
+
+  useEffect(()=>{
+    console.log(tableData)
+  },[tableData])
+
+
+  const fetchGroups = async () => {
+    try {
+      const repsonse1 = await productionApi.refreshForNewForm()
+      const response = await productionApi.getProductionGroupTable({
+        page: pagination?.page,
+        limit: limit,
+      })
+      setTableData(response?.data?.data)
+      setCount(response.data.pagination.totalRecords)
+      setPagination(prev => ({
+        ...prev,
+        totalPages: response.data.pagination.totalPages
+      }))
+    }
+    catch (error) {
+      console.error('Error fetching invoices:', error);
+    }
+  };
+
+  const handleViewLayersClick = (row) => {
+    setSelectedRow(row);
+    setShowLayersModal(true);
+  };
+
+  const handleViewWorkordersClick = (row, uniqueWorkorders) => {
+    setSelectedRow(row);
+    setSelectedWorkorders(uniqueWorkorders);
+    setShowWorkordersModal(true);
+  };
+
+  const closeLayersModal = () => setShowLayersModal(false);
+  const closeWorkordersModal = () => setShowWorkordersModal(false);
+
+  const columns = [
+    { key: 'id', header: 'id', field: 'production_group_generate_id', cellClass: '' },
+    { key: 'group_name', header: 'Group Name', field: 'group_name', cellClass: '' },
+    {
+      key: 'layers',
+      header: 'Layers',
+      field: 'layer_details',
+      cellClass: '',
+      type: 'custom',
+      render: (row) => (
+        <span
+          style={{ color: 'blue', cursor: 'pointer' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleViewLayersClick(row);
+          }}
+        >
+          {row.layer_details?.length || 0}
+        </span>
+      ),
+    },
+    {
+      key: 'workorders',
+      header: 'Work Orders',
+      field: 'layer_details',
+      cellClass: '',
+      type: 'custom',
+      render: (row) => {
+        // Get unique workorder_ids
+        const uniqueWorkorders = [
+          ...new Set((row.layer_details || []).map((l) => l.work_order_id)),
+        ];
+        return (
+          <span
+            style={{ color: 'blue', cursor: 'pointer' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewWorkordersClick(row, uniqueWorkorders);
+            }}
+          >
+            {uniqueWorkorders.length}
+          </span>
+        );
+      },
+    },
+
+
+    {
+      key: 'allocated_qty',
+      header: 'Allocated/Qty',
+      field: 'allocated_qty',
+      cellClass: '',
+      type: 'custom',
+      render: (row) => `${row.allocated_Qty || 0}/${row.group_Qty || 0}`,
+    },
+    {
+      key: 'progress',
+      header: 'Allocated %',
+      field: 'progress',
+      cellClass: '',
+      type: 'custom',
+      render: (row) => {
+        const allocated = Number(row.allocated_Qty) || 0;
+        const total = Number(row.group_Qty) || 0;
+        const percent = total > 0 ? Math.round((allocated / total) * 100) : 0;
+        return <HorizontalProgressBar value={percent} />;
+      },
+    },
+    // {
+    //   key: 'stage',
+    //   header: 'Stage',
+    //   field: 'stage',
+    //   cellClass: '',
+    //   type: 'custom',
+    //   render: (row) => (
+    //     <span
+    //       style={{ color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
+    //       onClick={(e) => {
+    //         e.stopPropagation();
+    //         navigate(`/production/form/AllocateRM?id=${row.id}`, {
+    //           state: { lockedSteps: true }
+    //         });
+    //       }}
+    //     >
+    //       RM-Allocation
+    //     </span>
+    //   ),
+    // },
+    {
+      key: 'status',
+      header: 'Status',
+      field: 'group_status',
+      type: 'custom',
+      render: (row) => {
+        let colorClass = '';
+        switch (row.group_status) {
+          case 'Completed':
+            colorClass = 'bg-green-100 text-green-800';
+            break;
+          case 'Pending':
+            colorClass = 'bg-yellow-100 text-yellow-800';
+            break;
+          case 'Rejected':
+            colorClass = 'bg-red-100 text-red-800';
+            break;
+          case 'In Progress':
+            colorClass = 'bg-blue-100 text-blue-800';
+            break;
+          default:
+            colorClass = 'bg-gray-100 text-gray-800';
         }
-      };
-
-      const handleViewLayersClick = (row) => {
-        setSelectedRow(row);
-        setShowLayersModal(true);
-      };
-
-      const handleViewWorkordersClick = (row, uniqueWorkorders) => {
-        setSelectedRow(row);
-        setSelectedWorkorders(uniqueWorkorders);
-        setShowWorkordersModal(true);
-      };
-
-      const closeLayersModal = () => setShowLayersModal(false);
-      const closeWorkordersModal = () => setShowWorkordersModal(false);
-
-      const columns = [
-        { key: 'id', header: 'Number', field: 'id', cellClass: '' },
-        { key: 'group_name', header: 'Group Name', field: 'group_name', cellClass: '' },
-        {
-          key: 'layers',
-          header: 'Layers',
-          field: 'layer_details',
-          cellClass: '',
-          type: 'custom',
-          render: (row) => (
-            <span
-              style={{ color: 'blue', cursor: 'pointer' }}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleViewLayersClick(row);
-              }}
-            >
-              {row.layer_details?.length || 0}
-            </span>
-          ),
-        },
-        {
-          key: 'workorders',
-          header: 'Work Orders',
-          field: 'layer_details',
-          cellClass: '',
-          type: 'custom',
-          render: (row) => {
-            // Get unique workorder_ids
-            const uniqueWorkorders = [
-              ...new Set((row.layer_details || []).map((l) => l.work_order_id)),
-            ];
-            return (
-              <span
-                style={{ color: 'blue', cursor: 'pointer' }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleViewWorkordersClick(row, uniqueWorkorders);
-                }}
-              >
-                {uniqueWorkorders.length}
-              </span>
-            );
-          },
-        },
-
-        
-        {
-            key: 'allocated_qty',
-            header: 'Allocated/Qty',
-            field: 'allocated_qty',
-            cellClass: '',
-            type: 'custom',
-            render: (row) => `${row.allocated_Qty || 0}/${row.group_Qty || 0}`,
-          },
-        {
-          key: 'progress',
-          header: 'Allocated %',
-          field: 'progress',
-          cellClass: '',
-          type: 'custom',
-          render: (row) => {
-            const allocated = Number(row.allocated_Qty) || 0;
-            const total = Number(row.group_Qty) || 0;
-            const percent = total > 0 ? Math.round((allocated / total) * 100) : 0;
-            return <HorizontalProgressBar value={percent} />;
-          },
-        },
-        {
-            key: 'stage',
-            header: 'Stage',
-            field: 'stage',
-            cellClass: '',
-            type: 'custom',
-            render: (row) => (
-              <span
-                style={{ color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/production/form/AllocateRM?id=${row.id}`);
-                }}
-              >
-                RM-Allocation
-              </span>
-            ),
-          },
-      ]
+        return (
+          <span
+            className={`px-3 py-1 rounded-full font-semibold text-xs ${colorClass}`}
+            style={{ minWidth: '80px', display: 'inline-block', textAlign: 'center' }}
+          >
+            {row.group_status}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'select',
+      header: '',
+      field: 'select',
+      type: 'custom',
+      render: (row) =>
+        row.group_status === 'Pending' ? (
+          <input
+            type="checkbox"
+            checked={!!row.select}
+            onChange={(e) => {
+              const isChecked = e.target.checked;
+              setTableData((prevData) =>
+                prevData.map((r) =>
+                  r.id === row.id ? { ...r, select: isChecked } : r
+                )
+              );
+              setSelectedIds((prev) => {
+                if (isChecked) {
+                  return [...prev, row.id];
+                } else {
+                  return prev.filter((id) => id !== row.id);
+                }
+              });
+            }}
+            className="form-checkbox h-4 w-4 text-blue-600 cursor-pointer transition-all"
+          />
+        ) : null,
+    }
+    
+  ]
 
 
-      useEffect(() => {
-        fetchGroups();
-      }, []);
+  useEffect(() => {
+    fetchGroups();
+  }, [pagination?.page, limit]);
 
   return (
-    <>
+    <div className='flex flex-col'>
+    
       <ContentHeader
-            heading={"Production"}
-            onAddClick={async() => {
-              await productionApi.refreshForNewForm()
-              navigate('/production/form')
-            }}
+        heading={"Production"}
+        onAddClick={async () => {
+          await productionApi.refreshForNewForm()
+          navigate('/production/form')
+        }}
+        isNewButton={selectedIds.length > 0}
+        newButtonLabel="Proceed >"
+        addNewButtonClick={async()=>{
+          await productionApi.refreshForNewForm()
+          navigate('/production/form/AllocateRM',{
+            state:{
+              selectedIds:selectedIds,
+              lockedSteps:true
+            }
+          })
+        }}
+      />
+<ReusableTable
+  columns={columns}
+  data={tableData}
+  onCheckboxChange={(row, field, isChecked) => {
+    setTableData(prevData =>
+      prevData.map(r =>
+        r.id === row.id ? { ...r, [field]: isChecked } : r
+      )
+    );
+    setSelectedIds((prev) => {
+      if (isChecked) {
+        return [...prev, row.id];
+      } else {
+        return prev.filter((id) => id !== row.id);
+      }
+    });
+  }}
+/>
+<div className="flex justify-end items-center gap-4  mt-4 ml-4 mr-4">
+              <p className='w-50 text-sm'>Total Count : <span className='font-semibold'>{count}</span></p>
+            <CompactPagination
+              count={pagination?.totalPages}
+              page={pagination?.page}
+              onPageChange={(event, value) =>
+                setPagination((prev) => ({
+                  ...prev,
+                  page: value,
+                }))
+              }
+              onEntriesChange={(newLimit) => {
+                setLimit(newLimit)
+                // Reset to first page when changing limit
+                setPagination((prev) => ({
+                  ...prev,
+                  page: 1,
+                }))
+              }}
+              entriesPerPage={limit}
+            />
+          </div>
 
-          />
-          <ReusableTable
-          columns={columns}
-          data={tableData}
-
-          />
 
       {/* Layers Modal */}
       {showLayersModal && selectedRow && (
@@ -186,7 +321,7 @@ function productionList() {
           </div>
         </div>
       )}
-      
+
       {/* Workorders Modal */}
       {showWorkordersModal && selectedRow && (
         <div style={{
@@ -220,7 +355,7 @@ function productionList() {
           </div>
         </div>
       )}
-    </>
+    </div>
   )
 }
 

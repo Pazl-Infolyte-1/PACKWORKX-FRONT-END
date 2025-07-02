@@ -24,10 +24,10 @@ export const productionApi = {
     return await apiClient.post('/production/production-group',body)
   },
   getProductionGroups:async()=>{
-    return await apiClient.get('/production/production-group?include_work_orders=true&&temporary_status=1')
+    return await apiClient.get('/production/production-group?include_work_orders=true&temporary_status=1')
   },
-   getProductionGroupTable:async()=>{
-    return await apiClient.get('/production/production-group?include_work_orders=true&&temporary_status=0')
+   getProductionGroupTable:async(params)=>{
+    return await apiClient.get('/production/production-group?include_work_orders=true&temporary_status=0',{params})
   },
   getDeckleOptions:async()=>{
     return await apiClient.get('/items/reels/deckle')
@@ -63,12 +63,15 @@ export const productionApi = {
     console.log(body)
     return await apiClient.delete('/production/production-groups', { data: body })
   },
-  getGroupInRawmeterialById:async(id)=>{
-    return await apiClient.get(`/production/production-group/${id}?include_work_orders=true&&temporary_status=1`)
+  getGroupInRawmeterialByIds:async(ids)=>{
+    return await apiClient.post(`/production/production-group/multiple`,{group_ids:ids})
   },
   refreshForNewForm:async()=>{
     return await apiClient.post(`/production/new`)
-  }
+  },
+  finalStatusUpdate:async(body)=>{
+    return await apiClient.patch(`/production/production-group/final-status`,body)
+  },
 
 
 }

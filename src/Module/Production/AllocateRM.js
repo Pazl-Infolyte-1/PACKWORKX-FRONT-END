@@ -689,19 +689,9 @@ const AllocateRM = ({}) => {
   const [gsmOptions, setGsmOptions] = useState([]);
   const [bfOptions, setBfOptions] = useState([]);
   const [openSFG, setOpenSFG] = useState(null)
-  const {groupOrders,refreshData, sfgData ,handleFilterChange,selectedFilters,alerts,setAlertsApp,handleClose,setRouteId,fetchWorkOrders} = useRawMaterialContext()
+  const {groupOrders,refreshData, sfgData ,handleFilterChange,selectedFilters,alerts,setAlertsApp,handleClose,setRouteId,routeId,fetchWorkOrders} = useRawMaterialContext()
   const {registerNextHandler} = useNextHandler()
   const location = useLocation();
-
-  const query = new URLSearchParams(location.search);
-  const queryId = query.get('id');
-
-  useEffect(() => {
-    setRouteId(queryId || null);
-    refreshData()
-    fetchWorkOrders()
-    }, [queryId])
-
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -786,6 +776,20 @@ const AllocateRM = ({}) => {
   useEffect(() => {
     registerNextHandler(RemoveGroupsFromIndex);
   }, [RemoveGroupsFromIndex]);
+
+  useEffect(() => {
+    // Alert selectedIds if present in navigation state
+    if (location.state && Array.isArray(location.state.selectedIds) && location.state.selectedIds.length > 0) {
+      setRouteId(location.state.selectedIds || null);
+    }
+  }, [location.state]);
+
+  useEffect(()=>{
+    refreshData()
+    // fetchWorkOrders()
+  },[routeId])
+
+
 
   return (
     <div className="flex flex-col">

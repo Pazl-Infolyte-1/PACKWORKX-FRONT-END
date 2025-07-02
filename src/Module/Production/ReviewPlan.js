@@ -3,7 +3,7 @@ import { FaExclamationTriangle, FaCheck } from 'react-icons/fa';
 import { Package, Layers } from 'lucide-react';
 import { productionApi } from '../../api/production';
 import { useNextHandler } from '../../Context/ProductionNextHandlerContext';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 function ReviewPlan() {
   const [groups, setGroups] = useState([]);
@@ -13,6 +13,28 @@ function ReviewPlan() {
   const [error, setError] = useState(null);
   const { registerNextHandler } = useNextHandler();
   const location = useLocation();
+  const navigate = useNavigate()
+  
+
+  const handleFinalisePlan = async () => {
+    const groupIds = groups.map(i => i.id);
+    console.log('Finalizing with groupIds:', groupIds);
+    const body = {
+      group_ids: groupIds,
+      group_status: 'Completed',
+      temporary_status: 0
+    };
+
+    
+    try {
+      await productionApi.finalStatusUpdate(body);
+      // Optionally show a success message or redirect
+      navigate('/production')
+    } catch (err) {
+      setError('Failed to finalize plan.');
+      console.error('Finalize error:', err);
+    }
+  }
 
   const fetchGroups = async () => {
     try {
@@ -100,11 +122,11 @@ function ReviewPlan() {
       </div>
 
       <div className="flex-1 p-4 bg-slate-50 overflow-hidden">
-        {error && (
+        {/* {error && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-200">
             {error}
           </div>
-        )}
+        )} */}
         {/* Summary Stats */}
         <div className="grid grid-cols-3 gap-3 mb-4">
           <div className="bg-white rounded border p-3 text-center">
@@ -132,7 +154,7 @@ function ReviewPlan() {
                   <th className="py-2 px-2 font-medium">Work Orders</th>
                   <th className="py-2 px-2 font-medium">Quantity</th>
                   <th className="py-2 px-2 font-medium">Allocated</th>
-                  <th className="py-2 px-2 font-medium">Status</th>
+                  {/* <th className="py-2 px-2 font-medium">Status</th> */}
                   <th className="py-2 px-2 font-medium">Layers</th>
                   <th className="py-2 px-2 font-medium">Action</th>
                 </tr>
@@ -150,12 +172,12 @@ function ReviewPlan() {
                       </td>
                       <td className="py-2 px-2">{group.group_Qty}</td>
                       <td className="py-2 px-2">{group.allocated_Qty || 0}</td>
-                      <td className="py-2 px-2">
+                      {/* <td className="py-2 px-2">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${status.color}`}>
                           {status.icon}
                           {status.text}
                         </span>
-                      </td>
+                      </td> */}
                       <td className="py-2 px-2">{group.layer_details.length}</td>
                       <td className="py-2 px-2">
                         <button
@@ -305,14 +327,17 @@ function ReviewPlan() {
 
         {/* Action Buttons */}
         <div className="flex justify-between items-center pt-3 border-t bg-slate-50 mt-4">
-          <button className="px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">
+          <button
+           className="px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">
             Back to Allocation
           </button>
           <div className="flex gap-2">
-            <button className="px-4 py-2 text-sm border border-purple-300 text-purple-700 rounded hover:bg-purple-50 transition-colors">
+            {/* <button className="px-4 py-2 text-sm border border-purple-300 text-purple-700 rounded hover:bg-purple-50 transition-colors">
               Save Draft
-            </button>
-            <button className="px-4 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors">
+            </button> */}
+            <button
+            onClick={handleFinalisePlan}
+             className="px-4 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors">
               Finalize Plan
             </button>
           </div>

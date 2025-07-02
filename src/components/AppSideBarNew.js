@@ -84,29 +84,26 @@ export const AppSideBarNew = ({ giveAccess }) => {
   )
 // Define this array at the top of your file or in a config
 const staticReportArray = [
-  { name: "Clients/Vendor", to: "/clientReport" },
-  { name: "Machine", to: "/reportspage" },
-  { name: "Process", to: "/reportspage" },
-  { name: "Routes", to: "/reportspage" },
-  { name: "Employee List", to: "/reportspage" },
-  { name: "Department", to: "/reportspage" },
-  { name: "Designation", to: "/reportspage" },
-  { name: "Role", to: "/reportspage" },
-  { name: "Sales Order", to: "/reportspage" },
-  { name: "Work Order", to: "/reportspage" },
-  { name: "Sku Details", to: "/reportspage" },
-  { name: "Purchase Order", to: "/reportspage" },
-    { name: "Inventory", to: "/reportspage" },
-  { name: "Sales Return", to: "/reportspage" },
-  { name: "Purchase Return", to: "/reportspage" },
-    { name: "GRN", to: "/reportspage" },
-  { name: "Invoice", to: "/reportspage" },
-  { name: "Credit Note", to: "/reportspage" },
-    { name: "Debit Note", to: "/reportspage" },
-  { name: "Stock Adjustments", to: "/reportspage" },
-  { name: "Bills", to: "/reportspage" },
-  { name: 'Modules', to: '/modules' },
+  { name: "Clients/Vendor", to: "/clientReport",getApi:"/clients" },
+  { name: "Machine", to: "/machineReport" },
+  { name: "Process", to: "/processReport" },
+  { name: "Routes", to: "/routesReport" },
+  //{ name: "Employee List", to: "/employeeListReport" },
+  { name: "Sales Order", to: "/salesOrderReport" },
+  { name: "Work Order", to: "/workOrderReport" },
+  { name: "Sku Details", to: "/skuReport" },
+  { name: "Purchase Order", to: "/purchaseOrderReport" },
+    { name: "Inventory", to: "/inventoryReport" },
+  { name: "Sales Return", to: "/salesReturnReport" },
+  //{ name: "Purchase Return", to: "/purchaseReturnReport" },
+    { name: "GRN", to: "/grnReport" },
+  //{ name: "Invoice", to: "/invoiceReport" },
+  { name: "Credit Note", to: "/creditNoteReport" },
+    { name: "Debit Note", to: "/debitNoteReport" },
+  { name: "Stock Adjustments", to: "/stockAdjustmentReport" },
+  //{ name: "Bills", to: "/billsReport" },
 ];
+
 
   return (
     <CSidebarNav className="sidebar-menu" as={SimpleBar}>

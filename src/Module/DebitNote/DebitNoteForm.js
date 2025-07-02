@@ -17,7 +17,7 @@ const DebitNoteForm = () => {
   const { id } = useParams()
   const [debitNoteFormData, setDebitNoteFormData] = useState({
     po_return_id: null,
-    debit_note_number: '',
+    //debit_note_number: '',
     reference_id: '',
     debit_note_date: '',
     reason: '',
@@ -96,7 +96,7 @@ const DebitNoteForm = () => {
         // Create payload matching your structure
         const payload = {
           po_return_id: debitNoteFormData.po_return_id,
-          debit_note_number: debitNoteFormData.debit_note_number,
+          //debit_note_number: debitNoteFormData.debit_note_number,
           reference_id: debitNoteFormData.reference_id,
           debit_note_date: debitNoteFormData.debit_note_date,
           reason: debitNoteFormData.reason,
@@ -250,7 +250,7 @@ const DebitNoteForm = () => {
                 </button>
               </div>
               {/* Debit Note Number */}
-              <div className="flex items-center mt-1">
+              {/*<div className="flex items-center mt-1">
                 <label className="text-xs text-gray-700 w-40">Debit Note Number</label>
                 <div className="relative">
                   <input
@@ -262,7 +262,7 @@ const DebitNoteForm = () => {
                     placeholder="Enter debit note number"
                   />
                 </div>
-              </div>
+              </div>*/}
               {/* Reference ID */}
               <div className="flex items-center mt-1">
                 <label className="text-xs text-gray-700 w-40">Reference ID</label>

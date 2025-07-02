@@ -83,7 +83,7 @@ const ClientReport = React.lazy(() => import('./Module/ReportsModule/ClientRepor
 const ClientPage = React.lazy(() => import('./Module/ReportsModule/Reports.js'))
 const Modules = React.lazy(() => import('./Module/Module/Module.js'))
 const ModuleForm = React.lazy(() => import('./Module/Module/ModuleForm.js'))
-
+const ModuleView = React.lazy(() => import('./Module/Module/ModuleView.js'))
 const ProductionPlanning = React.lazy(
   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
 )
@@ -171,7 +171,7 @@ const routes = [
     children: [{ path: ':id', element: InventoryView, key: 'inventory' }],
   },
   { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 23 },
-  { path: '/production', name: 'Production Listing', element: ProductionList, key: 2382  },
+  { path: '/production', name: 'Production Listing', element: ProductionList, key: 2382 },
 
   {
     path: '/production/form',
@@ -252,7 +252,20 @@ const routes = [
   { path: '/designation', name: 'Designation', element: Designation, key: '' },
   { path: '/department', name: 'Department', element: Department, key: '' },
   { path: '/role', name: 'role', element: Role, key: '' },
-  { path: '/modules', name: 'Modules', element: Modules, key: 'modules' },
+  {
+    path: '/modules',
+    name: 'Modules',
+    element: Modules,
+    key: 'modules',
+    children: [
+      {
+        path: '/modules/:id',
+        name: 'ModuleView',
+        element: ModuleView,
+        key: '',
+      },
+    ],
+  },
   { path: '/module/add-form', name: 'Add-Module', element: ModuleForm, key: 'Add-Module' },
   {
     path: '/debitnote',

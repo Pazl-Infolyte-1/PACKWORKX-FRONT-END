@@ -1,6 +1,7 @@
 import { capitalize } from 'lodash'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import { render } from 'sass'
+import { useNavigate } from 'react-router-dom'
 
 const columns = [
   {
@@ -22,11 +23,17 @@ const columns = [
     type: 'custom',
     render: (row) => (
       <span
-        className={`text-center px-2 py-1 -ml-72 rounded-full text-xs font-semibold w-[70px] ${
-          row.status === 'completed'
-            ? 'bg-green-100 text-green-800 px-4'
-            : 'bg-red-100 text-red-800 px-4'
-        }`}
+        className={`flex items-center justify-center w-[80px] px-2 py-1 rounded-full text-xs font-semibold
+          ${
+            row.status === 'completed'
+              ? 'bg-green-100 text-black'
+              : row.status === 'uploaded'
+                ? 'bg-indigo-400 text-white'
+                : row.status === 'failed'
+                  ? 'bg-red-600 text-white'
+                  : ''
+          }
+        `}
       >
         {capitalize(row.status)}
       </span>
@@ -34,13 +41,23 @@ const columns = [
   },
 ]
 
-function ModuleTable({ modules, isMinimized }) {
+function ModuleTable({ modules, isMinimized, setIsMinimized }) {
+  const naviagte = useNavigate()
+
+  const handleNavigate = (row) => {
+    setIsMinimized(true)
+    naviagte(`/modules/${row.id}`)
+  }
   return (
     <ReusableTable
       columns={columns}
       data={modules}
       isMinimiseTable={isMinimized}
       height="calc(85vh - 74px)"
+      handleRowClick={(row) => {
+        handleNavigate(row)
+      }}
+      miniScreenFields={['module_name', 'created_at']}
     />
   )
 }

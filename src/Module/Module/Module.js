@@ -3,8 +3,9 @@ import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
 import ModuleTable from './ModuleTable'
 import { useSearch } from '../../components/New/SearchContext'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { moduleApi } from '../../api/module'
+import { el } from 'date-fns/locale'
 
 function Module() {
   const [modules, setModules] = useState([])
@@ -17,6 +18,7 @@ function Module() {
   const [isMinimized, setIsMinimized] = useState(false)
   const { setGlobalPlaceholder, searchQuery } = useSearch()
   const naviagate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     setGlobalPlaceholder('Search modules....')
@@ -26,12 +28,18 @@ function Module() {
   }, [setGlobalPlaceholder])
 
   useEffect(() => {
+    if (location.pathname === '/modules') {
+      setIsMinimized(false)
+    } else {
+      setIsMinimized(true)
+    }
+  }, [location])
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await moduleApi.getModules({
-          page: pagination.page,
-          limit: pagination.limit,
-        })
+        const params = { limit: pagination.limit, page: pagination.page }
+        const response = await moduleApi.getModules(params)
         setModules(response.data.data.transfers)
         setPagination((prev) => ({
           ...prev,
@@ -68,7 +76,11 @@ function Module() {
             heading="Modules"
             onAddClick={handleAddModuleClick}
           />
-          <ModuleTable modules={modules} isMinimized={isMinimized} />
+          <ModuleTable
+            modules={modules}
+            isMinimized={isMinimized}
+            setIsMinimized={setIsMinimized}
+          />
           <div className="bg-white py-2 mx-2">
             <CompactPagination
               count={pagination.totalPages}
@@ -81,6 +93,7 @@ function Module() {
           </div>
         </div>
       </div>
+      <Outlet />
     </div>
   )
 }

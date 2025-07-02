@@ -87,7 +87,8 @@ const ModuleForm = React.lazy(() => import('./Module/Module/ModuleForm.js'))
 const ProductionPlanning = React.lazy(
   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
 )
-
+const Task = React.lazy(() => import('./Module/TaskView/Task.js'))
+const TaskView = React.lazy(() => import('./Module/TaskView/TaskView.js'))
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },
@@ -171,7 +172,7 @@ const routes = [
     children: [{ path: ':id', element: InventoryView, key: 'inventory' }],
   },
   { path: '/inventoryhandling1', name: 'Inventory Handling', element: InventoryHandling, key: 23 },
-  { path: '/production', name: 'Production Listing', element: ProductionList, key: 2382  },
+  { path: '/production', name: 'Production Listing', element: ProductionList, key: 2382 },
 
   {
     path: '/production/form',
@@ -357,6 +358,20 @@ const routes = [
     name: 'Production Planning',
     element: ProductionPlanning,
     key: '',
+  },
+  {
+    path: '/task',
+    name: 'task',
+    element: Task,
+    key: '',
+    children: [
+      {
+        path: 'view/:id',
+        name: 'taskview',
+        element: TaskView,
+        key: '',
+      },
+    ],
   },
 ]
 

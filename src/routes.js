@@ -277,20 +277,20 @@ const routes = [
   { path: '/department', name: 'Department', element: Department, key: '' },
   { path: '/role', name: 'role', element: Role, key: '' },
   {
-    path: '/modules',
+    path: '/data_transfer',
     name: 'Modules',
     element: Modules,
     key: 'modules',
     children: [
       {
-        path: '/modules/:id',
+        path: '/data_transfer/:id',
         name: 'ModuleView',
         element: ModuleView,
         key: '',
       },
     ],
   },
-  { path: '/module/add-form', name: 'Add-Module', element: ModuleForm, key: 'Add-Module' },
+  { path: '/data_transfer/add-form', name: 'Add-Module', element: ModuleForm, key: 'Add-Module' },
   {
     path: '/debitnote',
     name: 'Debit Note',

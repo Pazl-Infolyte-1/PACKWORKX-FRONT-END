@@ -77,7 +77,6 @@ function ModuleView() {
               <h1 className="text-2xl font-semibold text-gray-900">
                 {capitalize(module.module_name)}
               </h1>
-              <p className="text-sm text-gray-600 m-0">Module ID: {module.id}</p>
             </div>
             <div className="flex items-center gap-1">
               <div
@@ -85,7 +84,7 @@ function ModuleView() {
               >
                 {module.status.charAt(0).toUpperCase() + module.status.slice(1)}
               </div>
-              <Close onClick={() => navigate('/modules')} className="cursor-pointer" />
+              <Close onClick={() => navigate('/data_transfer')} className="cursor-pointer" />
             </div>
           </div>
         </div>
@@ -173,7 +172,7 @@ function ModuleView() {
                       className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                         module.email_sent
                           ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
+                          : 'bg-red-500 text-white'
                       }`}
                     >
                       {module.email_sent ? 'Yes' : 'No'}

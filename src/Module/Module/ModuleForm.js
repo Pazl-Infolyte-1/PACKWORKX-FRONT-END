@@ -160,7 +160,7 @@ function ModuleForm() {
     if (!email) {
       newErrors.email = true
       hasError = true
-    } else if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = 'Invalid email address'
       hasError = true
     }
@@ -237,7 +237,7 @@ function ModuleForm() {
 
       if (response.status === 200 || response.status === 201) {
         setTimeout(() => {
-          navigate('/modules')
+          navigate('/data_transfer')
         }, 800)
       }
     } catch (error) {
@@ -251,10 +251,10 @@ function ModuleForm() {
   }
 
   return (
-    <div className="w-full rounded-lg p-3">
+    <div className="w-full rounded-lg p-3 pb-28">
       <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       {/* Heading */}
-      <h2 className="text-2xl font-semibold mb-6">Add Module</h2>
+      <h2 className="text-2xl font-semibold mb-6">Data Transfer</h2>
 
       {/* Info Alert */}
       <div className="bg-yellow-100 border border-yellow-200 text-yellow-800 rounded px-4 py-2 mb-6 text-sm">
@@ -486,7 +486,7 @@ function ModuleForm() {
           </div>
 
           {/* File Contains Headings Row Toggle */}
-          <div className="mb-8 flex items-center">
+          {/* <div className="mb-8 flex items-center">
             <span className="text-sm text-gray-700 mr-4">File Contains Headings Row</span>
             <label className="inline-flex relative items-center cursor-pointer">
               <input
@@ -498,10 +498,10 @@ function ModuleForm() {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
               <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow peer-checked:translate-x-5 transition-transform"></div>
             </label>
-          </div>
+          </div> */}
 
-          {/* Buttons */}
-          <div className="flex gap-4 mt-8">
+          {/* Buttons - now fixed at the bottom left */}
+          <div className="fixed left-48 bottom-0 w-full z-50 flex justify-start bg-white p-4 border-t gap-4">
             <button
               type="button"
               onClick={handleSubmit}

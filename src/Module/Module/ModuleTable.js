@@ -46,7 +46,7 @@ function ModuleTable({ modules, isMinimized, setIsMinimized }) {
 
   const handleNavigate = (row) => {
     setIsMinimized(true)
-    naviagte(`/modules/${row.id}`)
+    naviagte(`/data_transfer/${row.id}`)
   }
   return (
     <ReusableTable

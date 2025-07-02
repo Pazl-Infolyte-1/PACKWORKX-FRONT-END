@@ -481,23 +481,18 @@ function GroupRawMeterialDropZone({ group, groupIndex, visibleGroupIndex, toggle
               fontSize: '0.85rem',
             }}
           >
-            {group.allocated_Qty || 0}
+            {group.allocated_qty || 0}
             /
             {group.group_Qty || 0 } 
 
             <div style={{ marginLeft: '8px', width: '35px', height: '30px' }}>
               <ProgressBar
-                value={Math.min(
-                  Math.max(
-                    (() => {
-                      if (group.group_Qty < 1) return 0;
-                      const percentage = (group.allocated_Qty / group.group_Qty) * 100;
-                      return parseFloat(percentage.toFixed(1));
-                    })(),
-                    0,
-                  ),
-                  100,
-                )}
+                value={(() => {
+                  if (group.group_Qty < 1) return 0;
+                  const percentage = (group.allocated_qty / group.group_Qty) * 100;
+                  const parsed = parseFloat(percentage.toFixed(1));
+                  return Number.isFinite(parsed) ? Math.min(Math.max(parsed, 0), 100) : 0;
+                })()}
               />
             </div>
           </span>

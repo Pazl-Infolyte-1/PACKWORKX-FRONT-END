@@ -193,6 +193,102 @@ const InvoiceTypeSelectionModal = ({ isOpen, onClose, onFull, onPartial, disable
   );
 };
 
+const LayerConfigurationCollapsible = ({ groups, ungroupedLayers }) => {
+  const [expandedGroups, setExpandedGroups] = useState([]);
+  const [ungroupedOpen, setUngroupedOpen] = useState(false);
+
+  const toggleGroup = (groupId) => {
+    setExpandedGroups((prev) =>
+      prev.includes(groupId) ? prev.filter((id) => id !== groupId) : [...prev, groupId]
+    );
+  };
+
+  return (
+    <div className="p-4">
+      <div className="grid grid-cols-1 gap-2">
+        {/* Render Groups Dynamically */}
+        {groups && groups.length > 0 && groups.map((group, idx) => {
+          const groupLayers = (group.group_value || []).map(gv =>
+            group.work_order_sku_values.find(l => l.layer_id === gv.layer_id)
+          ).filter(Boolean);
+          const isOpen = expandedGroups.includes(group.id || idx);
+          return (
+            <div key={group.id || idx} className="border border-gray-100 rounded-md bg-gray-50">
+              <button
+                className="w-full flex items-center justify-between px-2 py-1 focus:outline-none hover:bg-blue-50 rounded-t-md min-h-0"
+                onClick={() => toggleGroup(group.id || idx)}
+                type="button"
+              >
+                <div>
+                  <p className="text-xs text-gray-500 font-medium leading-tight">{group.group_name || group.production_group_generate_id || `Group ${idx + 1}`}</p>
+                  {group.production_group_generate_id && (
+                    <span className="block text-[11px] text-blue-700 font-mono leading-tight">ID: {group.production_group_generate_id}</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">{groupLayers.length} Layer{groupLayers.length !== 1 ? 's' : ''}</span>
+                  {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </div>
+              </button>
+              <div className={`transition-all duration-200 ease-in-out ${isOpen ? 'max-h-96 opacity-100 py-1 px-1' : 'max-h-0 opacity-0 overflow-hidden py-0 px-1'}`}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {groupLayers.map((layer, lidx) => (
+                    <div key={layer.layer_id} className="flex items-center justify-between p-2 bg-white rounded border border-gray-100">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: layer.color ? layer.color : '#888' }}></div>
+                        <p className="text-sm font-medium">{layer.layer}</p>
+                      </div>
+                      {/* <div className="flex flex-col items-end text-xs text-gray-500">
+                        <span>GSM: {layer.gsm}</span>
+                        {layer.flute_type && <span>Flute: {layer.flute_type}</span>}
+                      </div> */}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Render Ungrouped Layers as a collapsible section */}
+        {ungroupedLayers && ungroupedLayers.length > 0 && (
+          <div className="mt-4 border border-gray-100 rounded-md bg-gray-50">
+            <button
+              className="w-full flex items-center justify-between px-3 py-2 focus:outline-none hover:bg-blue-50 rounded-t-md"
+              onClick={() => setUngroupedOpen((prev) => !prev)}
+              type="button"
+            >
+              <div className="text-xs text-gray-500 font-medium">Ungrouped Layers</div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                  {ungroupedLayers.length} Layer{ungroupedLayers.length !== 1 ? 's' : ''}
+                </span>
+                {ungroupedOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </div>
+            </button>
+            <div className={`transition-all duration-200 ease-in-out ${ungroupedOpen ? 'max-h-96 opacity-100 py-2 px-2' : 'max-h-0 opacity-0 overflow-hidden py-0 px-2'}`}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {ungroupedLayers.map((layer) => (
+                  <div key={layer.layer_id} className="flex items-center justify-between p-2 bg-white rounded border border-gray-100">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: layer.color ? layer.color : '#888' }}></div>
+                      <p className="text-sm font-medium">{layer.layer}</p>
+                    </div>
+                    <div className="flex flex-col items-end text-xs text-gray-500">
+                      <span>GSM: {layer.gsm}</span>
+                      {layer.flute_type && <span>Flute: {layer.flute_type}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const ViewWorkOrder = () => {
   const { id } = useParams();
   const [workOrder, setWorkOrder] = useState([]);
@@ -703,63 +799,10 @@ const ViewWorkOrder = () => {
               <div className="p-3 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">Layer Configuration</h3>
               </div>
-              <div className="p-4">
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Group 1 */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs text-gray-500">Group 1</p>
-                      <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">3 Layers</span>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-yellow-800"></div>
-                          <p className="text-sm font-medium">Top Layer</p>
-                        </div>
-                        <p className="text-xs text-gray-500">GSM: 1</p>
-                      </div>
-                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                          <p className="text-sm font-medium">Corrugated Layer 1</p>
-                        </div>
-                        <p className="text-xs text-gray-500">Flute: A</p>
-                      </div>
-                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-yellow-800"></div>
-                          <p className="text-sm font-medium">Bottom Layer</p>
-                        </div>
-                        <p className="text-xs text-gray-500">GSM: 1</p>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Group 2 */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs text-gray-500">Group 2</p>
-                      <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">2 Layers</span>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-yellow-800"></div>
-                          <p className="text-sm font-medium">Layer 1</p>
-                        </div>
-                        <p className="text-xs text-gray-500">GSM: 1</p>
-                      </div>
-                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-100">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                          <p className="text-sm font-medium">Layer 2</p>
-                        </div>
-                        <p className="text-xs text-gray-500">GSM: 1</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <LayerConfigurationCollapsible
+                groups={workOrder?.production_groups?.map(g => ({ ...g, work_order_sku_values: workOrder.work_order_sku_values })) || []}
+                ungroupedLayers={workOrder.work_order_sku_values?.filter(l => l.layer_status === 'ungrouped') || []}
+              />
             </div>
           </div>
 

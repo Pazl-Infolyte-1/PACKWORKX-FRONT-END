@@ -115,7 +115,7 @@ function productionList() {
       field: 'allocated_qty',
       cellClass: '',
       type: 'custom',
-      render: (row) => `${row.allocated_Qty || 0}/${row.group_Qty || 0}`,
+      render: (row) => `${row.allocated_qty || 0}/${row.group_Qty || 0}`,
     },
     {
       key: 'progress',
@@ -124,7 +124,7 @@ function productionList() {
       cellClass: '',
       type: 'custom',
       render: (row) => {
-        const allocated = Number(row.allocated_Qty) || 0;
+        const allocated = Number(row.allocated_qty) || 0;
         const total = Number(row.group_Qty) || 0;
         const percent = total > 0 ? Math.round((allocated / total) * 100) : 0;
         return <HorizontalProgressBar value={percent} />;

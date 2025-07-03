@@ -43,15 +43,9 @@ function ReviewPlan() {
       const query = new URLSearchParams(location.search);
       const queryId = query.get('id');
       let response;
-      if (queryId) {
-        response = await productionApi.getGroupInRawmeterialById(queryId);
-        // API returns a single group, wrap in array for consistency
-        const group = response.data.data;
-        setGroups(group ? [group] : []);
-      } else {
         response = await productionApi.getProductionGroups();
         setGroups(response.data.data);
-      }
+      
     } catch (err) {
       setError('Failed to fetch production groups.');
     } finally {
@@ -68,7 +62,7 @@ function ReviewPlan() {
     if (group.balance_Qty === 0 && group.group_Qty === 0) {
       return { color: 'bg-yellow-100 text-yellow-800', icon: <FaExclamationTriangle size={10} />, text: 'Pending' };
     }
-    if (group.allocated_Qty && group.allocated_Qty > 0) {
+    if (group.allocated_qty && group.allocated_qty > 0) {
       return { color: 'bg-green-100 text-green-800', icon: <FaCheck size={10} />, text: 'Allocated' };
     }
     return { color: 'bg-gray-100 text-gray-800', icon: <Package size={10} />, text: 'Ready' };
@@ -76,7 +70,7 @@ function ReviewPlan() {
 
   const totalGroups = groups.length;
   const totalQuantity = groups.reduce((sum, group) => sum + group.group_Qty, 0);
-  const allocatedGroups = groups.filter(g => g.allocated_Qty > 0).length;
+  const allocatedGroups = groups.filter(g => g.allocated_qty > 0).length;
 
   const openModal = (group) => {
     setSelectedGroup(group);
@@ -150,6 +144,7 @@ function ReviewPlan() {
             <table className="min-w-full text-xs text-left">
               <thead>
                 <tr className="border-b text-gray-600">
+                  <th className="py-2 px-2 font-medium">Group ID</th>
                   <th className="py-2 px-2 font-medium">Group Name</th>
                   <th className="py-2 px-2 font-medium">Work Orders</th>
                   <th className="py-2 px-2 font-medium">Quantity</th>
@@ -164,6 +159,7 @@ function ReviewPlan() {
                   const status = getStatusBadge(group);
                   return (
                     <tr key={group.id} className="border-b hover:bg-slate-50">
+                      <td className="py-2 px-2 font-medium text-gray-900">{group.production_group_generate_id}</td>
                       <td className="py-2 px-2 font-medium text-gray-900">{group.group_name}</td>
                       <td className="py-2 px-2">
                         {[...new Set(group.group_value.map(v => v.work_order_id))]
@@ -171,7 +167,7 @@ function ReviewPlan() {
                           .join(', ')}
                       </td>
                       <td className="py-2 px-2">{group.group_Qty}</td>
-                      <td className="py-2 px-2">{group.allocated_Qty || 0}</td>
+                      <td className="py-2 px-2">{group.allocated_qty || 0}</td>
                       {/* <td className="py-2 px-2">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${status.color}`}>
                           {status.icon}

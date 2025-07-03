@@ -72,6 +72,9 @@ export const productionApi = {
   finalStatusUpdate:async(body)=>{
     return await apiClient.patch(`/production/production-group/final-status`,body)
   },
+  AllocateInventoryForPendingQuantityGroups:async(body)=>{
+    return await apiClient.post(`/production/inventory-allocation`,body)
+  }
 
 
 }

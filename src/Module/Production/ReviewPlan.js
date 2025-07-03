@@ -21,7 +21,7 @@ function ReviewPlan() {
     console.log('Finalizing with groupIds:', groupIds);
     const body = {
       group_ids: groupIds,
-      group_status: 'Completed',
+      group_status: 'allocation_completed',
       temporary_status: 0
     };
 

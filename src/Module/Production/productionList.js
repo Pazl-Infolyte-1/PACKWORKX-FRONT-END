@@ -211,29 +211,36 @@ function productionList() {
       field: 'group_status',
       type: 'custom',
       render: (row) => {
+        // Map enum to user-friendly label and color
+        let label = '';
         let colorClass = '';
         switch (row.group_status) {
-          case 'Completed':
-            colorClass = 'bg-green-100 text-green-800';
-            break;
-          case 'Pending':
+          case 'pending':
+            label = 'Pending';
             colorClass = 'bg-yellow-100 text-yellow-800';
             break;
-          case 'Rejected':
-            colorClass = 'bg-red-100 text-red-800';
-            break;
-          case 'In Progress':
+          case 'allocation_completed':
+            label = 'Allocation Completed';
             colorClass = 'bg-blue-100 text-blue-800';
             break;
+          case 'production_completed':
+            label = 'Production Completed';
+            colorClass = 'bg-green-100 text-green-800';
+            break;
+          case 'cancelled':
+            label = 'Cancelled';
+            colorClass = 'bg-red-100 text-red-800';
+            break;
           default:
+            label = row.group_status ? row.group_status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Unknown';
             colorClass = 'bg-gray-100 text-gray-800';
         }
         return (
           <span
             className={`px-3 py-1 rounded-full font-semibold text-xs ${colorClass}`}
-            style={{ minWidth: '80px', display: 'inline-block', textAlign: 'center' }}
+            style={{ minWidth: '120px', display: 'inline-block', textAlign: 'center' }}
           >
-            {row.group_status}
+            {label}
           </span>
         );
       },
@@ -244,7 +251,7 @@ function productionList() {
       field: 'select',
       type: 'custom',
       render: (row) =>
-        row.group_status === 'Pending' ? (
+        row.group_status === 'pending' ? (
           <input
             type="checkbox"
             checked={!!row.select}

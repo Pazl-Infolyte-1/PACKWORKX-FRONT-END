@@ -1,8 +1,12 @@
 import { apiClient } from './config'
 
 export const moduleApi = {
-  getModules: async () => {
-    const response = await apiClient.get('/data-transfer/history')
+  getModules: async (params) => {
+    const response = await apiClient.get('/data-transfer/history',{params})
+    return response
+  },
+  getModuleById: async (id) => {
+    const response = await apiClient.get(`/data-transfer/status/${id}`)
     return response
   },
   getDropDownModules: async () => {
@@ -23,4 +27,15 @@ export const moduleApi = {
     })
     return response
   },
+  getNextStep: async (id) => {
+    const response = await apiClient.get(`/data-transfer/preview/${id}`)
+    return response
+  },
+  mapColumns: async (transfer_id, column_mapping) => {
+    const response = await apiClient.post(`/data-transfer/map-columns/${transfer_id}`, {
+      column_mapping,
+    })
+    return response
+  },
+
 }

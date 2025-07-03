@@ -95,7 +95,7 @@ function Module() {
         <div className="relative">
           <ContentHeader
             isMinimized={isMinimized}
-            heading="Data Transfers"
+            heading="Data Transfer"
             onAddClick={handleAddModuleClick}
           />
           <ModuleTable

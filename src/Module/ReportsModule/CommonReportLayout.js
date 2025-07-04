@@ -216,7 +216,6 @@ const handleSubmit = () => {
       filters.sku_type_id = selectedSku || '';
       filters.status = status || '';
       break;
-
     case 'Purchase Order Report':
       filters.po_status = status || '';
       filters.payment_status = selectedPaymentStatus || '';
@@ -268,8 +267,9 @@ setSelectedCategory('')
   setSelectedInvoice('')
   setSelectedPo('')
   setSelectedStockStatus('')
+      clearSearch()
     fetchReports(1, entries, {});
-    clearSearch()
+
 };
 
   //useEffect(() => {

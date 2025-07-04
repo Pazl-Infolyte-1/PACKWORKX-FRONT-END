@@ -28,7 +28,7 @@ const Index = () => {
 
 // 2. IndexContent component that uses the contexts
 const IndexContent = () => {
-  const [workOrders, setWorkOrders] = useState([])
+  // const [workOrders, setWorkOrders] = useState([])
   const [autoSyncOrders, setAutoSyncOrders] = useState({})
   const [selectedType, setSelectedType] = useState('')
   const [visibleSplit, setVisibleSplit] = useState(false)
@@ -66,18 +66,18 @@ const IndexContent = () => {
     }
   }, [currentPath, navigate]);
 
-  useEffect(() => {
-    async function getWorkOrders() {
-      try {
-        const response = await workOrderApi.getWorkOrders()
-        setWorkOrders(response?.data?.workOrders)
-      } catch (error) {
-        console.error('Error fetching work orders:', error)
-      }
-    }
+  // useEffect(() => {
+  //   async function getWorkOrders() {
+  //     try {
+  //       const response = await workOrderApi.getWorkOrders()
+  //       setWorkOrders(response?.data?.workOrders)
+  //     } catch (error) {
+  //       console.error('Error fetching work orders:', error)
+  //     }
+  //   }
 
-    getWorkOrders()
-  }, [])
+  //   getWorkOrders()
+  // }, [])
 
   useEffect(() => {
     const currentTab = tabs.find(tab => tab.path === currentPath);

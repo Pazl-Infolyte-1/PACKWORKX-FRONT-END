@@ -21,7 +21,7 @@ import { RiEyeLine } from 'react-icons/ri'
 import ProcessForm from '../Process/AddProcessNameForm'
 import FieldValues from './FieldValues'
 import MachineField from './MachineField'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import ContentHeader from '../../components/New/ContentHeader'
 import { FaEye } from 'react-icons/fa'
 import ReusableTable from '../SalesOrder/ReusableTable'
@@ -51,6 +51,7 @@ export default function MachineMaster() {
   const { searchQuery, setGlobalPlaceholder } = useSearch()
   const searchBarRef = useRef(null)
   const navigate = useNavigate()
+  const location = useLocation()
   //process
   const [showAddProcessModal, setShowAddProcessModal] = useState(false)
   const [openFieldValuesModal, setOpenFieldValuesModal] = useState({ show: false, id: null })
@@ -60,6 +61,7 @@ export default function MachineMaster() {
   })
   const [openMachineValuesModal, setOpenMachineValuesModal] = useState({ open: false, id: null })
   const [openMachineFieldModal, setOpenMachineFieldModal] = useState({ open: false, id: null })
+  const [isMinimized, setIsMinimized] = useState(false)
 
   const machineData = [
     {
@@ -108,6 +110,14 @@ export default function MachineMaster() {
       setGlobalPlaceholder('Search...')
     }
   }, [])
+
+  useEffect(()=>{
+    if(location.pathname === '/machinedashboard'){
+      setIsMinimized(false)
+    }else{
+      setIsMinimized(true)
+    }
+  },[location.pathname])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -221,201 +231,198 @@ export default function MachineMaster() {
   }
 
   return (
-    <div className="m-0 p-0">
-      <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
-      <ContentHeader
-        heading={'Machine Master Dashboard'}
-        onAddClick={() => navigate('/machinedashboard/form', { state: { isEdit: false } })}
-        menuOptions={[
-          {
-            icon: <FaEye className="mr-2 text-blue-500" />,
-            label: 'View Process',
-            onClick: () => setAssignModal(true),
-          },
-          // {
-          //   icon: <FiDownload className="mr-2 text-blue-500" />,
-          //   label: 'Export',
-          //   onClick: downloadClientExcelSheet,
-          // },
-        ]}
-      />
+    <div className="flex">
+      <div className={`m-0 p-0 ${isMinimized ? 'w-1/4' : 'w-full'}`}>
+        <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
+        <ContentHeader
+          heading={'Machine Master Dashboard'}
+          onAddClick={() => navigate('/machinedashboard/form', { state: { isEdit: false } })}
+          menuOptions={[
+            {
+              icon: <FaEye className="mr-2 text-blue-500" />,
+              label: 'View Process',
+              onClick: () => setAssignModal(true),
+            },
+            // {
+            //   icon: <FiDownload className="mr-2 text-blue-500" />,
+            //   label: 'Export',
+            //   onClick: downloadClientExcelSheet,
+            // },
+          ]}
+          isMinimized={isMinimized}
+        />
 
-      <div className="flex flex-wrap justify-between gap-2 m-2 px-3">
-        {machineData.map((item, index) => (
-          <div
-            key={index}
-            className={`w-full sm:w-[250px] flex items-center justify-between  font-bold rounded-lg shadow-md text-white border p-2`}
-            style={{ backgroundColor: item.bgColor }}
-          >
-            <div className="flex  gap-2 items-center">
-              <h2 className="text-xl text-white">{item.icon}</h2>
-              <h2 className="text-sm font-bold text-white ">{item.label}</h2>
-            </div>
-            <div
-              className="h-[40px] w-[40px] flex items-center justify-center rounded-lg  "
-              style={{ backgroundColor: item.color }}
-            >
-              {item.count}
-            </div>
+        {!isMinimized && (
+          <div className="flex flex-wrap justify-between gap-2 m-2 px-3">
+            {machineData.map((item, index) => (
+              <div
+                key={index}
+                className={`w-full sm:w-[250px] flex items-center justify-between  font-bold rounded-lg shadow-md text-white border p-2`}
+                style={{ backgroundColor: item.bgColor }}
+              >
+                <div className="flex  gap-2 items-center">
+                  <h2 className="text-xl text-white">{item.icon}</h2>
+                  <h2 className="text-sm font-bold text-white ">{item.label}</h2>
+                </div>
+                <div
+                  className="h-[40px] w-[40px] flex items-center justify-center rounded-lg  "
+                  style={{ backgroundColor: item.color }}
+                >
+                  {item.count}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        )}
 
-      <MachineDashboardTable
-        cellData={tableData}
-        onView={handleView}
-        onEdit={handleEdit}
-        onAddProcess={handleAddProcess}
-        setRefresh={setRefresh}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-        setAlerts={setAlerts}
-        setOpenFieldValuesModal={setOpenFieldValuesModal}
-        setOpenFieldModal={setOpenFieldModal}
-        setOpenRoutes={setOpenRoutes}
-      />
-
-      <div className="flex justify-center md:justify-end items-center gap-4 mt-2 ml-4 mr-4">
-        <div className=" flex w-32 items-center gap-1 font-normal text-sm">
-          <span>Total Count:</span>
-          <span className="font-medium">{pagination.total}</span>
-        </div>
-        <CompactPagination
-          count={pagination.totalPages || 1}
-          page={pagination.page || 1}
-          onPageChange={(event, value) => {
-            setPagination((prev) => ({
-              ...prev,
-              page: value,
-            }))
-          }}
-          onEntriesChange={(newLimit) => {
-            setLimit(newLimit)
-            // Reset to first page when changing limit
-            setPagination((prev) => ({
-              ...prev,
-              page: 1,
-            }))
-          }}
-          entriesPerPage={limit}
-        />
-      </div>
-
-      <PopUp
-        visible={isViewMode}
-        setVisible={setIsViewMode}
-        width={900}
-        height={600}
-        header="Machine Details"
-        showCloseButton={true}
-      >
-        <ViewMachineData Id={viewDataId} />
-      </PopUp>
-
-      <PopUp
-        visible={assignModal}
-        setVisible={setAssignModal}
-        width={800}
-        height={500}
-        header="Assign Process"
-        showCloseButton={true}
-      >
-        <AssignProcess
-          refresh={refresh}
+        <MachineDashboardTable
+          cellData={tableData}
+          onView={handleView}
+          onEdit={handleEdit}
+          onAddProcess={handleAddProcess}
           setRefresh={setRefresh}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
           setAlerts={setAlerts}
-          isEdit={isEdit}
-          setIsEdit={setIsEdit}
-          preSelectedMachineId={preSelectedMachineId}
-        />
-      </PopUp>
-
-      <PopUp
-        visible={addProcessModal.show}
-        setVisible={setAddProcessModal}
-        width={800}
-        header="Add Process to Machine"
-        showCloseButton={true}
-      >
-        <AddAssign
-          isAddModalOpen={{ show: true, id: addProcessModal.machineId }}
-          setIsAddModalOpen={setAddProcessModal}
-          setRefresh={setRefresh}
-          setAlerts={setAlerts}
-          isEdit={false}
-          disableMachineSelection={true}
-        />
-      </PopUp>
-
-      <PopUp
-        visible={showAddProcessModal}
-        setVisible={setShowAddProcessModal}
-        width="500px"
-        header={isEdit ? 'Edit Process' : 'Add Process'}
-        showCloseButton={true}
-      >
-        <ProcessForm
-          isEdit={isEdit}
-          initialData={formData}
-          onCancel={() => {
-            setShowAddProcessModal(false)
-            setIsEdit(false)
-            setFormData({
-              process_name: '',
-              id: null,
-            })
-          }}
-          onSubmit={handleProcessSubmit}
-        />
-      </PopUp>
-
-      <PopUp
-        visible={openFieldValuesModal.show}
-        setVisible={setOpenFieldValuesModal}
-        header={' '}
-        width={800}
-        showCloseButton={true}
-      >
-        <FieldValues
-          openFieldValuesModal={openFieldValuesModal}
+          setOpenFieldValuesModal={setOpenFieldValuesModal}
           setOpenFieldModal={setOpenFieldModal}
-          // setOpenMachineFieldModal={setOpenMachineFieldModal}
-          setOpenMachineValuesModal={setOpenMachineValuesModal}
-          openMachineValuesModal={openMachineValuesModal}
-          setShowAddProcessModal={setShowAddProcessModal}
-          handleEditProcess={handleEditProcess}
-          setIsEdit={setIsEdit}
-        />
-      </PopUp>
-
-      <PopUp
-        visible={openMachineFieldModal.open}
-        setVisible={() => setOpenMachineFieldModal({ open: false, id: null })}
-        width={800}
-        height={600}
-        header="Add Field"
-        showCloseButton={true}
-      >
-        <MachineField
-          openMachineFieldModal={openMachineFieldModal}
-          isEdit={isEdit}
-          setIsEdit={setIsEdit}
-          setAlerts={setAlerts}
-        />
-      </PopUp>
-      <PopUp
-        visible={openRoutes.show}
-        setVisible={() => setOpenRoutes({ show: false, id: null })}
-        width={800}
-        header="Process Routes"
-        showCloseButton={true}
-      >
-        <ProcessRoutes
-          openRoutes={openRoutes}
           setOpenRoutes={setOpenRoutes}
-          setAlerts={setAlerts}
+          setIsMinimized={setIsMinimized}
+          isMinimized={isMinimized}
         />
-      </PopUp>
+
+        <div className="flex justify-center md:justify-end items-center  mt-2 ml-4 mr-4">
+          <div className=" flex w-32 items-center gap-1 font-normal text-sm">
+            <span>Total Count:</span>
+            <span className="font-medium">{pagination.total}</span>
+          </div>
+          <CompactPagination
+            count={pagination.totalPages || 1}
+            page={pagination.page || 1}
+            onPageChange={(event, value) => {
+              setPagination((prev) => ({
+                ...prev,
+                page: value,
+              }))
+            }}
+            onEntriesChange={(newLimit) => {
+              setLimit(newLimit)
+              // Reset to first page when changing limit
+              setPagination((prev) => ({
+                ...prev,
+                page: 1,
+              }))
+            }}
+            entriesPerPage={limit}
+          />
+        </div>
+
+        <PopUp
+          visible={assignModal}
+          setVisible={setAssignModal}
+          width={800}
+          height={500}
+          header="Assign Process"
+          showCloseButton={true}
+        >
+          <AssignProcess
+            refresh={refresh}
+            setRefresh={setRefresh}
+            setAlerts={setAlerts}
+            isEdit={isEdit}
+            setIsEdit={setIsEdit}
+            preSelectedMachineId={preSelectedMachineId}
+          />
+        </PopUp>
+
+        <PopUp
+          visible={addProcessModal.show}
+          setVisible={setAddProcessModal}
+          width={800}
+          header="Add Process to Machine"
+          showCloseButton={true}
+        >
+          <AddAssign
+            isAddModalOpen={{ show: true, id: addProcessModal.machineId }}
+            setIsAddModalOpen={setAddProcessModal}
+            setRefresh={setRefresh}
+            setAlerts={setAlerts}
+            isEdit={false}
+            disableMachineSelection={true}
+          />
+        </PopUp>
+
+        <PopUp
+          visible={showAddProcessModal}
+          setVisible={setShowAddProcessModal}
+          width="500px"
+          header={isEdit ? 'Edit Process' : 'Add Process'}
+          showCloseButton={true}
+        >
+          <ProcessForm
+            isEdit={isEdit}
+            initialData={formData}
+            onCancel={() => {
+              setShowAddProcessModal(false)
+              setIsEdit(false)
+              setFormData({
+                process_name: '',
+                id: null,
+              })
+            }}
+            onSubmit={handleProcessSubmit}
+          />
+        </PopUp>
+
+        <PopUp
+          visible={openFieldValuesModal.show}
+          setVisible={setOpenFieldValuesModal}
+          header={' '}
+          width={800}
+          showCloseButton={true}
+        >
+          <FieldValues
+            openFieldValuesModal={openFieldValuesModal}
+            setOpenFieldModal={setOpenFieldModal}
+            // setOpenMachineFieldModal={setOpenMachineFieldModal}
+            setOpenMachineValuesModal={setOpenMachineValuesModal}
+            openMachineValuesModal={openMachineValuesModal}
+            setShowAddProcessModal={setShowAddProcessModal}
+            handleEditProcess={handleEditProcess}
+            setIsEdit={setIsEdit}
+          />
+        </PopUp>
+
+        <PopUp
+          visible={openMachineFieldModal.open}
+          setVisible={() => setOpenMachineFieldModal({ open: false, id: null })}
+          width={800}
+          height={600}
+          header="Add Field"
+          showCloseButton={true}
+        >
+          <MachineField
+            openMachineFieldModal={openMachineFieldModal}
+            isEdit={isEdit}
+            setIsEdit={setIsEdit}
+            setAlerts={setAlerts}
+          />
+        </PopUp>
+        <PopUp
+          visible={openRoutes.show}
+          setVisible={() => setOpenRoutes({ show: false, id: null })}
+          width={800}
+          header="Process Routes"
+          showCloseButton={true}
+        >
+          <ProcessRoutes
+            openRoutes={openRoutes}
+            setOpenRoutes={setOpenRoutes}
+            setAlerts={setAlerts}
+          />
+        </PopUp>
+      </div>
+      <Outlet />
     </div>
   )
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import ProcessDropDown from '../Machine/ProcessDropDown'
 import ActionButton from '../../components/New/ActionButton'
 import CustomAlert from '../../components/New/CustomAlert'
-import {machineApi} from "../../api/machine"
+import { machineApi } from '../../api/machine'
 const AddFieldForm = ({
   processData,
   setRefresh,
@@ -132,7 +132,9 @@ const AddFieldForm = ({
 
           {/* Is Required */}
           <div className="mt-6">
-            <label className="block mb-2 text-gray-600">Is Required <span className="text-red-500">*</span></label>
+            <label className="block mb-2 text-gray-600">
+              Is Required <span className="text-red-500">*</span>
+            </label>
             <div className="flex items-center gap-6">
               <label className="flex items-center">
                 <input
@@ -172,7 +174,12 @@ const AddFieldForm = ({
 
           {/* Field Type */}
           <div className="mt-6">
-            <label className="block mb-2 text-gray-600">Field Type <span className="text-red-500 text-xs">{isEdit ? '(Not Editable)': <span className="text-red-500">*</span>}</span></label>
+            <label className="block mb-2 text-gray-600">
+              Field Type{' '}
+              <span className="text-red-500 text-xs">
+                {isEdit ? '(Not Editable)' : <span className="text-red-500">*</span>}
+              </span>
+            </label>
             <select
               value={fieldType}
               onChange={(e) => setFieldType(e.target.value)}
@@ -194,6 +201,7 @@ const AddFieldForm = ({
           label="Cancel"
           onClick={() => {
             setIsFieldModaleOpen(false)
+            setShowAddFieldModal({ show: false, processId: null })
             if (setShowProcessFields) {
               setShowProcessFields(false)
             }

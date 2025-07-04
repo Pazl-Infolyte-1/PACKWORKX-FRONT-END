@@ -27,7 +27,7 @@ const AllcoateRMModal = ({ visibleAllocate, setVisibleAllocate, group, droppedIt
 
       return
     }
-    if (quantityNumber > group?.balance_Qty) {
+    if (quantityNumber > group?.balance_qty) {
       setAlertsApp([{severity:'warning',message:'Cannot allocate more than the balance to allocate in group.'}])
       // alert('Cannot allocate more than the balance to allocate in group.')
       return
@@ -92,7 +92,7 @@ const AllcoateRMModal = ({ visibleAllocate, setVisibleAllocate, group, droppedIt
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600"> Balance To Allocate In group</span>
                 <div className="bg-gray-100 px-3 py-1.5 rounded-md text-sm text-gray-600 w-24 text-right pr-2">
-                  {group?.balance_Qty < 0 ? 0 : group?.balance_Qty} KG
+                  {group?.balance_qty < 0 ? 0 : group?.balance_qty} KG
                 </div>
               </div>
 

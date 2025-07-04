@@ -106,7 +106,7 @@ const StockAdjustmentReport = React.lazy(
   () => import('./Module/ReportsModule/StockAdjustmentReport.js'),
 )
 const BillsReport = React.lazy(() => import('./Module/ReportsModule/BillReport.js'))
-
+const ModuleView = React.lazy(() => import('./Module/Module/ModuleView.js'))
 const ProductionPlanning = React.lazy(
   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
 )
@@ -278,8 +278,21 @@ const routes = [
   { path: '/designation', name: 'Designation', element: Designation, key: '' },
   { path: '/department', name: 'Department', element: Department, key: '' },
   { path: '/role', name: 'role', element: Role, key: '' },
-  { path: '/modules', name: 'Modules', element: Modules, key: 'modules' },
-  { path: '/module/add-form', name: 'Add-Module', element: ModuleForm, key: 'Add-Module' },
+  {
+    path: '/data_transfer',
+    name: 'Modules',
+    element: Modules,
+    key: 'modules',
+    children: [
+      {
+        path: '/data_transfer/:id',
+        name: 'ModuleView',
+        element: ModuleView,
+        key: '',
+      },
+    ],
+  },
+  { path: '/data_transfer/add-form', name: 'Add-Module', element: ModuleForm, key: 'Add-Module' },
   {
     path: '/debitnote',
     name: 'Debit Note',

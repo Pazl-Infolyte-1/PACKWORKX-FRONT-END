@@ -116,7 +116,8 @@ total_bursting_strength:null,
         flute_type: null,
         weight: null,
         bursting_strength: null,
-        layer_status:"ungrouped"
+        layer_status:"ungrouped",
+        production_status:"pending"
         //flute_ratio: null,
       },
     ],
@@ -392,7 +393,8 @@ useEffect(() => {
       weight: '',
       bursting_strength: '',
       //flute_ratio: '',
-      layer_status:layer.layer_status
+      layer_status:layer.layer_status,
+      production_status:layer.production_status
     }))
 
     setAddNewSkuData((prevData) => ({

@@ -347,7 +347,7 @@ const staticReportArray = [
               return (
                 <CNavItem key={index}>
                   <CNavLink as={NavLink} to="/production">
-                    {navLink('Production', 'cilTruck')}
+                    {navLink('Raw Material', 'cilTruck')}
                   </CNavLink>
                 </CNavItem>
               )
@@ -446,11 +446,11 @@ const staticReportArray = [
                 </CNavItem>
               )
             }
-            if (module.modules_description === 'Modules') {
+            if (module.modules_description === 'Data Transfer') {
               return (
                 <CNavItem key={index}>
-                  <CNavLink as={NavLink} to="/modules">
-                    {navLink('Modules', 'cilApps')}
+                  <CNavLink as={NavLink} to="/data_transfer">
+                    {navLink('Data Transfer', 'cilApps')}
                   </CNavLink>
                 </CNavItem>
               )

@@ -11,6 +11,7 @@ import { workOrderApi } from '../../api/workOrder'
 import { Outlet } from 'react-router-dom'
 import { CRow } from '@coreui/react'
 import CustomAlert from "../../components/New/CustomAlert"
+import { productionApi } from "../../api/production"
 
 // 1. The main Index component that provides contexts
 const Index = () => {
@@ -43,6 +44,8 @@ const IndexContent = () => {
   const [showPendingAllocAlert, setShowPendingAllocAlert] = useState(false);
   const [pendingAllocTab, setPendingAllocTab] = useState(null);
   const [pendingAllocDetails, setPendingAllocDetails] = useState([]);
+  const [pendingAllocLoading, setPendingAllocLoading] = useState(false);
+  const [pendingAllocError, setPendingAllocError] = useState(null);
 
   // ✅ Now this will work because we're inside the provider
   const {triggerNext} = useNextHandler()
@@ -90,15 +93,23 @@ const IndexContent = () => {
     const isLeavingAllocateRM = currentPath === 'AllocateRM' && (tabPath === 'Returnables' || tabPath === 'OutsourceAndPreview');
     if (isLeavingAllocateRM) {
       const pendingGroups = Array.isArray(rawMaterialGroupOrders)
-        ? rawMaterialGroupOrders.filter(g => (g.allocated_Qty || 0) < (g.group_Qty || 0))
+        ? rawMaterialGroupOrders.filter(g => (g.allocated_qty || 0) < (g.group_Qty || 0) && (g.allocated_qty || 0) > 0)
         : [];
       if (pendingGroups.length > 0) {
         setPendingAllocTab(tabPath);
         setPendingAllocDetails(pendingGroups.map(g => ({
           name: g.group_name || g.id || 'Unnamed Group',
-          balance: (g.group_Qty || 0) - (g.allocated_Qty || 0)
+          group_id: g.id,
+          production_group_generate_id: g.production_group_generate_id,
+          inventory_id: g.allocation_history?.allocation_by_inventory?.[0]?.inventory_id || null,
+          balance_allocate: (g.group_Qty || 0) - (g.allocated_qty || 0),
+          qty: g.group_Qty || 0
         })));
         setShowPendingAllocAlert(true);
+        return;
+      } else {
+        // No pending allocations, proceed to navigate directly
+        navigate(`/production/form/${tabPath}`);
         return;
       }
     }
@@ -126,12 +137,35 @@ const IndexContent = () => {
     setPendingTab(null);
   };
 
-  const handleConfirmPendingAlloc = () => {
+  const handleConfirmPendingAlloc = async () => {
+    setPendingAllocLoading(true);
+    setPendingAllocError(null);
+    // Only include items where qty !== balance_allocate (i.e., some allocation has happened)
+    const body = pendingAllocDetails
+      .filter(g => g.qty !== g.balance_allocate)
+      .map(g => ({
+        group_id: g.group_id,
+        inventory_id: g.inventory_id,
+        balance_allocate: g.balance_allocate,
+        production_group_generate_id: g.production_group_generate_id
+      }));
+    console.log('body:', body);
     setShowPendingAllocAlert(false);
-    if (pendingAllocTab) {
-      console.log('hi');
-      navigate(`/production/form/${pendingAllocTab}`);
-      setPendingAllocTab(null);
+
+    if (pendingAllocTab.length !== 0) {
+      try {
+        await productionApi.AllocateInventoryForPendingQuantityGroups(body);
+        navigate(`/production/form/${pendingAllocTab}`);
+        setPendingAllocTab(null);
+      } catch (error) {
+        setPendingAllocError('Failed to allocate pending quantity. Please try again.');
+        setShowPendingAllocAlert(true); // Optionally re-show the alert
+        console.error('Error allocating pending quantity:', error);
+      } finally {
+        setPendingAllocLoading(false);
+      }
+    } else {
+      setPendingAllocLoading(false);
     }
   };
 
@@ -278,15 +312,19 @@ const IndexContent = () => {
               <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 18, color: '#b91c1c', fontSize: 13 }}>
                 {pendingAllocDetails.map((g, idx) => (
                   <li key={idx}>
-                    <b>{g.name}</b>: <span style={{ color: '#b91c1c' }}>{g.balance}</span> KG left to allocate
+                    <b>{g.production_group_generate_id}</b>: <span style={{ color: '#b91c1c' }}>{g.balance_allocate}</span> KG left to allocate
                   </li>
                 ))}
               </ul>
+            )}
+            {pendingAllocError && (
+              <div style={{ color: '#b91c1c', marginTop: 8 }}>{pendingAllocError}</div>
             )}
           </div>
         }
         onConfirm={handleConfirmPendingAlloc}
         onCancel={handleCancelPendingAlloc}
+        confirmDisabled={pendingAllocLoading}
       />
     </div>
   )

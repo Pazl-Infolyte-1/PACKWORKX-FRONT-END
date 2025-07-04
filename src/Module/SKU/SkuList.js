@@ -122,7 +122,8 @@ const navigate=useNavigate()
         weight: null,
         bursting_strength: null,
         flute_ratio: null,
-        layer_status:"ungrouped"
+        layer_status:"ungrouped",
+        production_status:" pending"
       },
     ],
   })
@@ -549,7 +550,8 @@ total_bursting_strength:selectedSku.total_bursting_strength ||null,
           weight: null,
           bursting_strength: null,
           flute_ratio: null,
-          layer_status: null
+          layer_status: null,
+          production_status: "pending",
         },
       ],
     })

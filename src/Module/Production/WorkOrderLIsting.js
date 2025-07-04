@@ -43,7 +43,13 @@ function WorkOrderListing() {
 
   // Single date range state
   const [dateRange, setDateRange] = useState([]);
-  const [pendingDateRange, setPendingDateRange] = useState(null);
+  const [pendingDateRange, setPendingDateRange] = useState([
+    {
+      startDate: null,
+      endDate: null,
+      key: 'selection',
+    },
+  ]);
 
   const [showDateRangePicker, setShowDateRangePicker] = useState(false);
 
@@ -244,7 +250,11 @@ function WorkOrderListing() {
     setPendingFilterCustomer(filterCustomer);
     setPendingFilterBoxType(filterBoxType);
     setPendingFilterStatus(filterStatus);
-    setPendingDateRange([...dateRange]);
+    setPendingDateRange(
+      dateRange && dateRange.length > 0 && dateRange[0]?.startDate && dateRange[0]?.endDate
+        ? [...dateRange]
+        : [{ startDate: null, endDate: null, key: 'selection' }]
+    );
     setFilterModalOpen(true);
   };
 
@@ -311,7 +321,8 @@ function WorkOrderListing() {
         filterPopoverRef.current &&
         !filterPopoverRef.current.contains(event.target) &&
         filterBtnRef.current &&
-        !filterBtnRef.current.contains(event.target)
+        !filterBtnRef.current.contains(event.target) &&
+        (!datePickerRef.current || !datePickerRef.current.contains(event.target))
       ) {
         setFilterModalOpen(false);
         setShowDateRangePicker(false);
@@ -622,8 +633,9 @@ function WorkOrderListing() {
                           <td style={rowStyle}>
                             <input
                               type="checkbox"
-                              checked={order.production === 'in_production' || selectedOrders.includes(order?.id)}
-                              disabled={order.production === 'in_production'}
+                              checked={order.production === 'in_production' || selectedOrders.includes(order?.id) || (order.work_order_sku_values?.length > 0 && order.work_order_sku_values.every(layer => layer.layer_status === 'grouped'))}
+                              disabled={order.production === 'in_production' || (order.work_order_sku_values?.length > 0 && order.work_order_sku_values.every(layer => layer.layer_status === 'grouped'))}
+                              // disabled={order.production === 'in_production'}
                               onChange={() => handleOrderToggle(order?.id)}
                               style={{
                                 width: '15px',

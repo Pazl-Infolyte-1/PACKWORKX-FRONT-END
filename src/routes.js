@@ -111,6 +111,8 @@ const ProductionPlanning = React.lazy(
   () => import('./Module/ProductionPlanning/ProductionPlanning.js'),
 )
 const Task = React.lazy(() => import('./Module/TaskView/Task.js'))
+const TaskForm = React.lazy(() => import('./Module/TaskView/TaskForm.js'))
+
 const TaskView = React.lazy(() => import('./Module/TaskView/TaskView.js'))
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
@@ -497,6 +499,12 @@ const routes = [
         key: '',
       },
     ],
+  },
+    {
+    path: '/taskForm',
+    name: 'task',
+    element: TaskForm,
+    key: 'task00',
   },
 ]
 

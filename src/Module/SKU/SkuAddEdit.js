@@ -752,10 +752,18 @@ useEffect(() => {
     0
   )
 
-  const totalBurstingStrength = addNewSkuData.sku_values.reduce(
-    (acc, item) => acc + ((item.gsm && item.bf) ? (item.gsm * item.bf) / 1000 : 0),
-    0
-  )
+const totalBurstingStrength = addNewSkuData.sku_values.reduce((acc, item) => {
+  const gsm = Number(item.gsm);
+  const bf = Number(item.bf);
+  const isCorrugated = item.layer?.toLowerCase().includes('corrugated');
+
+  if (gsm && bf) {
+    const divisor = isCorrugated ? 2000 : 1000;
+    return acc + (gsm * bf) / divisor;
+  }
+  return acc;
+}, 0);
+
 
   setAddNewSkuData((prevData) => ({
     ...prevData,

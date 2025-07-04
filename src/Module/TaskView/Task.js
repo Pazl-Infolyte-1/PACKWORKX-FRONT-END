@@ -72,7 +72,7 @@ const Task = () => {
             isMinimized={isMinimized}
             onAddClick={() => {
               setIsEdit(false)
-              navigate('/task')
+              navigate('/taskForm')
             }}
           />
           <div>

@@ -2,13 +2,13 @@ import React from 'react'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import { useNavigate } from 'react-router-dom'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilPlus, cilTrash } from '@coreui/icons'
+import { cilPencil, cilPlus, cilTrash } from '@coreui/icons'
 
 const TaskTable = ({ isMinimized, handleEdit, taskData }) => {
   const navigate = useNavigate()
   const columns = [
-    { key: 'work_order', header: 'Work Order', field: 'work_order' },
     { key: 'group', header: 'Group', field: 'group' },
+        { key: 'work_order', header: 'Work Order', field: 'work_order' },
     { key: 'task', header: 'Task', field: 'task' },
     {
       key: 'actions',
@@ -19,8 +19,8 @@ const TaskTable = ({ isMinimized, handleEdit, taskData }) => {
         <ThreeDotMenu
           value={[
             {
-              label: 'Add Task',
-              icon: cilPlus,
+              label: 'Update',
+              icon: cilPencil,
               onClick: () => {
                 // handleEdit(row)
               },

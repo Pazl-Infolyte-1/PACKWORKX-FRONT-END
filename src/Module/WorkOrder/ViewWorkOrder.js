@@ -43,29 +43,38 @@ const formatDate = (dateString) => {
 // Render production stages based on current progress
 const renderProductionStages = (currentProgress) => {
   const stages = [
-    { name: "Material Preparation", date: formatDate(workOrder?.planned_start_date) },
-    { name: "Production", date: null },
-    { name: "Quality Control", date: null },
-    { name: "Packaging", date: null }
+    { name: "Pending" },
+    { name: "Raw Material Allocation" },
+    { name: "Production Planned" },
+    { name: "Board Stage" },
+    { name: "Finish Stage" },
+    { name: "Completed" },
+    { name: "Invoiced" }
   ];
 
   // Determine the current stage index
   let currentIndex = -1;
   switch (currentProgress) {
-    case "Not Started":
-      currentIndex = -1;
-      break;
-    case "Material Preparation":
+    case "Pending":
       currentIndex = 0;
       break;
-    case "In Progress":
+    case "Raw Material Allocation":
       currentIndex = 1;
       break;
-    case "Quality Control":
+    case "Production Planned":
       currentIndex = 2;
       break;
+    case "Board Stage":
+      currentIndex = 3;
+      break;
+    case "Finish Stage":
+      currentIndex = 4;
+      break;
     case "Completed":
-      currentIndex = 4; // Beyond all stages
+      currentIndex = 5;
+      break;
+    case "Invoiced":
+      currentIndex = 6;
       break;
     default:
       currentIndex = -1;
@@ -84,9 +93,9 @@ const renderProductionStages = (currentProgress) => {
       statusText = `Completed${stage.date ? ` on ${stage.date}` : ''}`;
     } else if (index === currentIndex) {
       // Current stage
-      statusColor = "bg-purple-500";
-      bgColor = "bg-purple-50";
-      borderColor = "border border-purple-100";
+      statusColor = "bg-blue-500"; // Changed to blue to match the image
+      bgColor = "bg-blue-50";
+      borderColor = "border border-blue-100";
       statusText = "In progress";
     }
 
@@ -97,7 +106,6 @@ const renderProductionStages = (currentProgress) => {
         </div>
         <div className={`p-2 ${bgColor} rounded-md ${borderColor}`}>
           <p className="text-xs font-medium">{stage.name}</p>
-          <p className="text-xs text-gray-500">{statusText}</p>
         </div>
       </li>
     );
@@ -377,8 +385,10 @@ const ViewWorkOrder = () => {
   const renderProductionStages = (currentProgress) => {
     const stages = [
       { name: "Pending" },
-      { name: "Raw Meterial Allocation" },
+      { name: "Raw Material Allocation" },
       { name: "Production Planned" },
+      { name: "Board Stage" },
+      { name: "Finish Stage" },
       { name: "Completed" },
       { name: "Invoiced" }
     ];
@@ -392,17 +402,20 @@ const ViewWorkOrder = () => {
       case "Raw Material Allocation":
         currentIndex = 1;
         break;
-      // case "Procurement Sourcing":
-      //   currentIndex = 2;
-      //   break;
       case "Production Planned":
         currentIndex = 2;
         break;
-      case "Completed":
+      case "Board Stage":
         currentIndex = 3;
         break;
-      case "Invoiced":
+      case "Finish Stage":
         currentIndex = 4;
+        break;
+      case "Completed":
+        currentIndex = 5;
+        break;
+      case "Invoiced":
+        currentIndex = 6;
         break;
       default:
         currentIndex = -1;

@@ -274,10 +274,10 @@ const LayerConfigurationCollapsible = ({ groups, ungroupedLayers }) => {
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: layer.color ? layer.color : '#888' }}></div>
                       <p className="text-sm font-medium">{layer.layer}</p>
                     </div>
-                    <div className="flex flex-col items-end text-xs text-gray-500">
+                    {/* <div className="flex flex-col items-end text-xs text-gray-500">
                       <span>GSM: {layer.gsm}</span>
                       {layer.flute_type && <span>Flute: {layer.flute_type}</span>}
-                    </div>
+                    </div> */}
                   </div>
                 ))}
               </div>

@@ -1,9 +1,17 @@
 import { useState } from 'react'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilFlipToBack, cilGraph, cilHandPointRight, cilPencil, cilPlus, cilTrash } from '@coreui/icons'
+import {
+  cilFlipToBack,
+  cilGraph,
+  cilHandPointRight,
+  cilPencil,
+  cilPlus,
+  cilTrash,
+} from '@coreui/icons'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import { machineApi } from '../../api/machine'
+import { useNavigate } from 'react-router-dom'
 
 const MachineDashboardTable = ({
   cellData,
@@ -15,10 +23,12 @@ const MachineDashboardTable = ({
   onAddProcess,
   setAlerts,
   setOpenFieldValuesModal,
-  setOpenRoutes
+  isMinimized,
+  setIsMinimized,
 }) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
+  const navigate = useNavigate()
 
   const handleCancel = () => {
     setIsConfirmationModalOpen(false)
@@ -32,12 +42,12 @@ const MachineDashboardTable = ({
   const handledeleteConfirmClick = async () => {
     setIsLoading(true)
     const response = await machineApi.deleteMachine(deleteId)
-    console.log("ressss",response)
+    console.log('ressss', response)
     if (response.status === 200) {
-         setAlerts([
+      setAlerts([
         {
           severity: 'success',
-          message: response.data.message
+          message: response.data.message,
         },
       ])
       console.log()
@@ -169,9 +179,21 @@ const MachineDashboardTable = ({
     },
   ]
 
+  const handleView = (row) => {
+    setIsMinimized(true)
+    navigate(`/machinedashboard/${row.id}`)
+  }
+
   return (
     <>
-      <ReusableTable data={cellData} columns={columns} handleRowClick={onView} height={'64vh'} />
+      <ReusableTable
+        data={cellData}
+        columns={columns}
+        handleRowClick={(row) => handleView(row)}
+        height={isMinimized ? '73vh' : '66vh'}
+        isMinimiseTable={isMinimized}
+        miniScreenFields={['machine_generate_id', 'machine_name']}
+      />
       <ConfirmationModale
         isOpen={isConfirmationModalOpen}
         onClose={handleCancel}

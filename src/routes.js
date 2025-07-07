@@ -21,7 +21,7 @@ const PurchaseOrderDetails = React.lazy(() => import('./Module/Purchase/Purchase
 const PurchaseOrderReturnView = React.lazy(
   () => import('./Module/PurchaseReturn/PurchaseOrderReturnView.js'),
 )
-
+const ViewMachineData = React.lazy(() => import('./Module/Machine/ViewMachineData.js'))
 const MachineDashboard = React.lazy(() => import('./Module/Machine/MachineDashboard.js'))
 const AddEditMachine = React.lazy(() => import('./Module/Machine/AddEditMachine.js'))
 const InventoryHandling = React.lazy(() => import('./Module/Inventory/InventoryHandling.js'))
@@ -182,7 +182,20 @@ const routes = [
     element: AddPurchaseReturn,
     key: 'return form',
   },
-  { path: '/machinedashboard', name: 'Machine Dashboard', element: MachineDashboard, key: 22 },
+  {
+    path: '/machinedashboard',
+    name: 'Machine Dashboard',
+    element: MachineDashboard,
+    key: 22,
+    children: [
+      {
+        path: '/machinedashboard/:id',
+        name: 'MachineDashboardView',
+        element: ViewMachineData,
+        key: '',
+      },
+    ],
+  },
   {
     path: '/machinedashboard/form',
     name: 'Form Machine Dashboard',
@@ -513,7 +526,7 @@ const routes = [
       },
     ],
   },
-    {
+  {
     path: '/taskForm',
     name: 'task',
     element: TaskForm,

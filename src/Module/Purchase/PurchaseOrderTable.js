@@ -252,15 +252,15 @@ function PurchaseOrderTable({
                   ]
                 : []),
 
-              ...(row.po_status === 'received' || row.po_status === 'partialy-recieved'
-                ? [
-                    {
-                      label: 'Purchase Return',
-                      icon: cilPencil,
-                      onClick: () => handlePurchaseDetails(row.id),
-                    },
-                  ]
-                : []),
+              // ...(row.po_status === 'received' || row.po_status === 'partialy-recieved'
+              //   ? [
+              //       {
+              //         label: 'Purchase Return',
+              //         icon: cilPencil,
+              //         onClick: () => handlePurchaseDetails(row.id),
+              //       },
+              //     ]
+              //   : []),
               {
                 label: 'Payment',
                 icon: cilMoney,

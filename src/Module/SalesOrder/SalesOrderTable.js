@@ -64,27 +64,28 @@ function SalesOrderTable({
         key: 'sales_status',
         header: 'Sales Status',
         field: 'sales_status',
-        type: 'dropdown',
-        searchIcon: true ,
-        options: ['Pending', 'In-progress', 'Completed', 'Rejected'],
-        
-        getOptionClass: (val) => {
-          switch (val) {
-            case 'Pending':
-              return 'bg-yellow-100 text-yellow-800 w-[120px]';
-            case 'In-progress':
-              return 'bg-blue-100 text-blue-800 w-[120px]';
-            case 'Completed':
-              return 'bg-green-100 text-green-800 w-[120px]';
-            case 'Rejected':
-              return 'bg-red-100 text-red-800 w-[120px]';
-            default:
-              return 'bg-gray-100 text-gray-800 w-[120px]';
-          }
+        type: 'custom',
+        render: (row) => {
+          const status = row.sales_status;
+          const statusColors = {
+            Pending: 'bg-yellow-100 text-yellow-800',
+            'In-progress': 'bg-blue-100 text-blue-800',
+            Completed: 'bg-green-100 text-green-800',
+            Rejected: 'bg-red-100 text-red-800',
+          };
+          return (
+            <select
+              className={`px-2 py-1 rounded-full text-xs font-semibold border outline-none min-w-[120px] ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}
+              value={status}
+              onChange={(e) => handleStatusChange(row.id, e.target.value)}
+            >
+              <option value="Pending" className="text-gray-700 bg-white">Pending</option>
+              <option value="In-progress" className="text-gray-700 bg-white">In-progress</option>
+              <option value="Completed" className="text-gray-700 bg-white">Completed</option>
+              <option value="Rejected" className="text-gray-700 bg-white">Rejected</option>
+            </select>
+          );
         },
-        onChange: (row, newValue) => {
-          handleStatusChange(row.id, newValue)
-        }
       },
       {
         key: 'actions',

@@ -883,7 +883,7 @@ console.log("add sku data",addNewSkuData.client_id)
                           value={item.layer}
                           onChange={(e) => handleSkuValuesChange(index, 'layer', e.target.value)}
                           readOnly="true"
-
+ 
                         />
                         <img
                           src={updown}
@@ -1039,17 +1039,7 @@ console.log("add sku data",addNewSkuData.client_id)
         </tr>
       )}*/}
 
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 pb-6 px-4 flex justify-end space-x-4 z-20">
-{/*<button   className="p-1.5 border border-gray-300 rounded w-20 text-sm" onClick={handleCancel}>
-  Cancel
-</button>
-
-  <ActionButton
-    onClick={handleAddSkuSubmit}
-    label={editTag ? 'Update' : 'Submit'}
-    variant="save"
-    className="bg-[#079b54] text-white px-1 py-1 rounded-md"
-  />*/}
+    {/*<div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 pb-6 px-4 flex justify-end space-x-4 z-20">
         <button
             className="p-1.5 border border-gray-300 rounded w-20 text-sm"
             onClick={handleCancel}
@@ -1064,7 +1054,24 @@ console.log("add sku data",addNewSkuData.client_id)
           </button>
 
   
-</div>
+</div>*/}
+  <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-2 z-10">
+          <div className="pr-3 mx-auto flex justify-end">
+            <div className='flex gap-2'>
+              <ActionButton
+                onClick={handleCancel}
+                variant="cancel"
+                label={"cancel"}
+              />
+
+              <ActionButton
+                label={"Submit"}
+                variant=''
+               onClick={handleAddSkuSubmit}
+              />
+            </div>
+          </div>
+        </div>
 
       <PopUp
         visible={isSingleViewPopup}

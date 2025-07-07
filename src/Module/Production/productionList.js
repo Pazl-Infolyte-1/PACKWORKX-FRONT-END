@@ -170,7 +170,38 @@ function productionList() {
       field: 'allocated_qty',
       cellClass: '',
       type: 'custom',
-      render: (row) => `${row.allocated_qty || 0}/${row.group_Qty || 0}`,
+      render: (row) => {
+        const allocated = row.allocated_qty || 0;
+        const total = row.group_Qty || 0;
+        return (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(90deg, #f3f4f6 60%, #d1d5db 100%)',
+              color: '#3730a3',
+              border: '1px solid #a5b4fc',
+              borderRadius: '20px',
+              padding: '2px 0',
+              fontWeight: 700,
+              fontSize: '1em',
+              boxShadow: '0 2px 6px rgba(55, 48, 163, 0.08)',
+              width: '90px',
+              minWidth: '90px',
+              maxWidth: '90px',
+              textAlign: 'center',
+              letterSpacing: 0.2,
+              transition: 'box-shadow 0.2s, transform 0.2s',
+              userSelect: 'none',
+            }}
+          >
+            <span style={{color: '#3730a3', width: 24, display: 'inline-block', textAlign: 'right'}}>{allocated}</span>
+            <span style={{color: '#a5b4fc', margin: '0 4px', fontWeight: 600}}>/</span>
+            <span style={{color: '#6366f1', width: 24, display: 'inline-block', textAlign: 'left'}}>{total}</span>
+          </span>
+        );
+      },
     },
     {
       key: 'progress',
@@ -182,7 +213,7 @@ function productionList() {
         const allocated = Number(row.allocated_qty) || 0;
         const total = Number(row.group_Qty) || 0;
         const percent = total > 0 ? Math.round((allocated / total) * 100) : 0;
-        return <HorizontalProgressBar value={percent} />;
+        return <HorizontalProgressBar value={percent} height={20} />;
       },
     },
     // {
@@ -237,7 +268,7 @@ function productionList() {
         }
         return (
           <span
-            className={`px-3 py-1 rounded-full font-semibold text-xs ${colorClass}`}
+            className={`px-3 py-1 rounded-full -ml-8 font-semibold text-xs ${colorClass}`}
             style={{ minWidth: '120px', display: 'inline-block', textAlign: 'center' }}
           >
             {label}
@@ -427,8 +458,12 @@ function productionList() {
                       <div style={{color:'#7a7f87', fontWeight:500}}>BF: <span style={{color:'#23272f', fontWeight:600}}>{layer.layer_detail?.bf}</span></div>
                       <div style={{color:'#7a7f87', fontWeight:500}}>Material: <span style={{color:'#23272f', fontWeight:600}}>{layer.layer_detail?.material}</span></div>
                       <div style={{color:'#7a7f87', fontWeight:500}}>Color: <span style={{color:'#23272f', fontWeight:600}}>{layer.layer_detail?.color}</span></div>
-                      <div style={{color:'#7a7f87', fontWeight:500}}>Weight: <span style={{color:'#23272f', fontWeight:600}}>{layer.layer_detail?.weight}</span></div>
-                      <div style={{color:'#7a7f87', fontWeight:500}}>Bursting Strength: <span style={{color:'#23272f', fontWeight:600}}>{layer.layer_detail?.bursting_strength}</span></div>
+                      <div style={{color:'#7a7f87', fontWeight:500}}>Weight: <span style={{color:'#23272f', fontWeight:600}}>{
+                        typeof layer.layer_detail?.weight === 'number' ? String(layer.layer_detail.weight).split('.')[0] + (String(layer.layer_detail.weight).includes('.') ? '.' + String(layer.layer_detail.weight).split('.')[1].slice(0,3) : '') : layer.layer_detail?.weight
+                      }</span></div>
+                      <div style={{color:'#7a7f87', fontWeight:500}}>Bursting Strength: <span style={{color:'#23272f', fontWeight:600}}>{
+                        typeof layer.layer_detail?.bursting_strength === 'number' ? String(layer.layer_detail.bursting_strength).split('.')[0] + (String(layer.layer_detail.bursting_strength).includes('.') ? '.' + String(layer.layer_detail.bursting_strength).split('.')[1].slice(0,3) : '') : layer.layer_detail?.bursting_strength
+                      }</span></div>
                       <div style={{color:'#7a7f87', fontWeight:500}}>Status: <span style={{color:'#23272f', fontWeight:600}}>{layer.layer_detail?.layer_status}</span></div>
                       {layer.layer_detail?.flute_type && <div style={{color:'#7a7f87', fontWeight:500}}>Flute Type: <span style={{color:'#23272f', fontWeight:600}}>{layer.layer_detail.flute_type}</span></div>}
                     </div>

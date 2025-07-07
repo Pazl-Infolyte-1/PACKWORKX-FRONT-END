@@ -141,50 +141,72 @@ const WorkOrderTable = ({
       key: 'priority',
       header: 'priority',
       field: 'priority',
-      type: 'dropdown',
-      options: ['High', 'Medium', 'Low'],
-      getOptionClass: (val) => {
-        switch (val) {
-          case 'High':
-            return 'bg-red-100 text-red-800'
-          case 'Medium':
-            return 'bg-amber-100 text-amber-800'
-          default:
-            return 'bg-green-100 text-green-800'
+      type: 'custom',
+      render: (row) => {
+        const statusColors = {
+          High: 'bg-red-100 text-red-800',
+          Medium: 'bg-amber-100 text-amber-800',
+          Low: 'bg-green-100 text-green-800',
+        };
+        const fixedSelectClass = "w-[120px] h-[32px] px-2 py-1 rounded-full text-xs font-semibold border outline-none min-w-[100px]";
+        if (row.progress === 'Invoiced') {
+          return (
+            <div className={`${fixedSelectClass} ${statusColors[row.priority] || 'bg-gray-100 text-gray-800'}`}>
+              {row.priority}
+            </div>
+          );
         }
+        return (
+          <select
+            className={`${fixedSelectClass} ${statusColors[row.priority] || 'bg-gray-100 text-gray-800'}`}
+            value={row.priority}
+            onChange={(e) => handlePriorityChange(e.target.value, row.id)}
+            style={{ minWidth: 100, width: 120, height: 32 }}
+          >
+            <option value="High" className="text-gray-700 bg-white">High</option>
+            <option value="Medium" className="text-gray-700 bg-white">Medium</option>
+            <option value="Low" className="text-gray-700 bg-white">Low</option>
+          </select>
+        );
       },
-      onChange: (row, newValue) => {
-        handlePriorityChange(newValue, row.id)
-      },
-      disabled: (row) => row.progress === 'Invoiced',
     },
     {
       key: 'progress',
       header: 'progress',
       field: 'progress',
-      type: 'dropdown',
-      options: [...progressOptions],
-      getOptionClass: (val) => {
-        switch (val) {
-          case 'Completed':
-            return 'bg-green-100 text-green-800'
-          case 'Pending':
-            return 'bg-orange-100 text-orange-800'
-          case 'Raw Material Allocation':
-            return 'bg-blue-100 text-blue-800'
-          case 'Production Planned':
-            return 'bg-gray-100 text-gray-800'
-          case 'Invoiced':
-            return 'bg-red-100 text-red-800'
-          default:
-            return 'bg-gray-100 text-gray-800'
+      type: 'custom',
+      render: (row) => {
+        const statusColors = {
+          Pending: 'bg-orange-100 text-orange-800',
+          'Raw Material Allocation': 'bg-blue-100 text-blue-800',
+          'Production Planned': 'bg-gray-100 text-gray-800',
+          'Board Stage': 'bg-yellow-100 text-yellow-800',
+          'Finish Stage': 'bg-purple-100 text-purple-800',
+          Completed: 'bg-green-100 text-green-800',
+          Invoiced: 'bg-red-100 text-red-800',
+        };
+        const fixedSelectClass = "w-[160px] h-[32px] px-2 py-1 rounded-full text-xs font-semibold border outline-none min-w-[140px]";
+        if (row.progress === 'Invoiced') {
+          return (
+            <div className={`${fixedSelectClass} ${statusColors[row.progress] || 'bg-gray-100 text-gray-800'}`}>
+              {row.progress}
+            </div>
+          );
         }
-      },
-      onChange: (row, newValue) => {
-        handleProgressChange(newValue, row.id)
+        return (
+          <select
+            className={`${fixedSelectClass} ${statusColors[row.progress] || 'bg-gray-100 text-gray-800'}`}
+            value={row.progress}
+            onChange={(e) => handleProgressChange(e.target.value, row.id)}
+            style={{ minWidth: 140, width: 160, height: 32 }}
+          >
+            {progressOptions.map((option) => (
+              <option key={option} value={option} className="text-gray-700 bg-white">{option}</option>
+            ))}
+          </select>
+        );
       },
       searchIcon: true,
-      disabled: (row) => row.progress === 'Invoiced',
     },
 
     {

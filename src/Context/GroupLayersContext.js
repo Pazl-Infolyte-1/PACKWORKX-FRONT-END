@@ -24,7 +24,7 @@ export const GroupLayersProvider = ({ children }) => {
     const seconds = new Date().getSeconds();
     const uniqueCode = (random + seconds) % 10000; // Keep it under 4 digits
     console.log(uniqueCode)
-    const groupName = `GRP-#${uniqueCode.toString().padStart(3, '0')}`;
+    const groupName = `GRPNAME-${uniqueCode.toString().padStart(3, '0')}`;
     setGroups((prev) => [
       ...prev,
       {

@@ -71,6 +71,7 @@ function ReviewPlan() {
   const totalGroups = groups.length;
   const totalQuantity = groups.reduce((sum, group) => sum + group.group_Qty, 0);
   const allocatedGroups = groups.filter(g => g.allocated_qty > 0).length;
+  const totalLayers = groups.reduce((sum, group) => sum + (group.layer_details?.length || 0), 0);
 
   const openModal = (group) => {
     setSelectedGroup(group);
@@ -132,8 +133,8 @@ function ReviewPlan() {
             <div className="text-xs text-gray-600">Total Quantity</div>
           </div>
           <div className="bg-white rounded border p-3 text-center">
-            <div className="text-lg font-bold text-gray-900">{allocatedGroups}</div>
-            <div className="text-xs text-gray-600">Allocated</div>
+            <div className="text-lg font-bold text-gray-900">{totalLayers}</div>
+            <div className="text-xs text-gray-600">Total Layers</div>
           </div>
         </div>
 

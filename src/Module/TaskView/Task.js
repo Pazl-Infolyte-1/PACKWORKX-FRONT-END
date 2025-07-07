@@ -5,29 +5,19 @@ import CustomAlert from '../../components/New/CustomAlert'
 import ContentHeader from '../../components/New/ContentHeader'
 import CompactPagination from '../../components/New/CompactPagination'
 import { useSearch } from '../../components/New/SearchContext'
+import { taskApi } from '../../api/task'
 
 const Task = () => {
   const [isMinimized, setIsMinimized] = useState(false)
-  const [taskData, setTaskData] = useState([
-    {
-      id: 1,
-      work_order: 'WO-001',
-      group: 'Group 1',
-      task: 'Task 1',
-    },
-    {
-      id: 2,
-      work_order: 'WO-002',
-      group: 'Group 2',
-      task: 'Task 2',
-    },
-  ])
+  const [taskData, setTaskData] = useState([])
   const [count, setCount] = useState(1)
   const [pagination, setPagination] = useState({
     current_page: 1,
     total_pages: 1,
     total_records: 1,
   })
+   const [selectedStatus, setSelectedStatus] = useState('');
+
   const [limit, setLimit] = useState(50)
   const [isEdit, setIsEdit] = useState(false)
   const [alerts, setAlerts] = useState([])
@@ -36,7 +26,19 @@ const Task = () => {
   const navigate = useNavigate()
 
   const location = useLocation()
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const response = await taskApi.getTaskData();
+      console.log('Task Data:', response.data); // assuming axios returns `data` in `response`
+      setTaskData(response.data.workOrders)
+    } catch (error) {
+      console.error('Error fetching task data:', error.response?.data || error.message);
+    }
+  };
 
+  fetchData();
+}, [selectedStatus]);
   useEffect(() => {
     if (location.pathname === '/task') {
       setIsMinimized(false)
@@ -47,7 +49,6 @@ const Task = () => {
 
   useEffect(() => {
     setGlobalPlaceholder('Search Task...')
-
     return () => {
       setGlobalPlaceholder('Search...')
     }
@@ -61,6 +62,7 @@ const Task = () => {
     console.log('Edit')
   }
 
+  console.log("task////",taskData)
   return (
     <div>
       <div className="flex w-full h-[calc(100vh-<HEADER_HEIGHT>px)] overflow-hidden">
@@ -76,7 +78,7 @@ const Task = () => {
             }}
           />
           <div>
-            <TaskTable isMinimized={isMinimized} handleEdit={handleEdit} taskData={taskData} />
+            <TaskTable selectedStatus={selectedStatus} setSelectedStatus={setSelectedStatus} isMinimized={isMinimized} handleEdit={handleEdit} taskData={taskData} />
           </div>
           <div className="flex justify-end items-center gap-4 mt-2 py-2 border-t bg-white">
             <p className="w-40 text-sm">

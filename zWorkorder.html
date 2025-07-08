@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Order Management Templates</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .template-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .template-section {
+            margin-bottom: 4rem;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .template-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        /* Common Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            width: 300px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        /* Work Order Table Templates */
+        .table-template {
+            padding: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .table-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .table-subtitle {
+            color: #64748b;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Enhanced Table Design */
+        .modern-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .modern-table th {
+            background: #f8fafc;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .modern-table td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .modern-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .work-order-id {
+            font-weight: 700;
+            color: #1e293b;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .sales-id-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .sales-id-link:hover {
+            background: #dbeafe;
+        }
+
+        .status-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .priority-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .priority-high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .progress-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .progress-invoiced {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .progress-material {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .progress-production {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .progress-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .quantity-badge {
+            background: #f0f9ff;
+            color: #0284c7;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        /* Enhanced Card View */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .work-order-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .work-order-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
+
+        .work-order-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .card-body {
+            space-y: 0.75rem;
+        }
+
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .card-row:last-child {
+            border-bottom: none;
+        }
+
+        .card-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .card-value {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        /* Work Order Form Styles */
+        .form-template {
+            padding: 2rem;
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .form-subtitle {
+            color: #64748b;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .form-content {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .form-section {
+            padding: 2rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .manufacture-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .manufacture-option {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-align: center;
+            flex: 1;
+        }
+
+        .manufacture-option.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .manufacture-option:hover:not(.active) {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+        }
+
+        .plant-type-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .plant-option {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .plant-option.active {
+            background: #8b5cf6;
+            color: white;
+            border-color: #8b5cf6;
+        }
+
+        .version-history-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-left: 1rem;
+        }
+
+        .version-history-link:hover {
+            text-decoration: underline;
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        /* Filters and Advanced Features */
+        .filters-section {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            background: #e0f2fe;
+            color: #0891b2;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .filter-chip:hover, .filter-chip.active {
+            background: #0891b2;
+            color: white;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.875rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background: #e0f2fe;
+            color: #0891b2;
+        }
+
+        .btn-view:hover {
+            background: #0891b2;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .btn-edit:hover {
+            background: #d97706;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .table-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .table-actions {
+                justify-content: space-between;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .modern-table {
+                font-size: 0.875rem;
+            }
+
+            .modern-table th,
+            .modern-table td {
+                padding: 0.75rem 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .manufacture-options,
+            .plant-type-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="template-container">
+        <!-- Work Order Table - Enhanced Design -->
+        <div class="template-section">
+            <div class="template-header">
+                Enhanced Work Order Table Design
+            </div>
+            <div class="table-template">
+                <div class="table-header">
+                    <div>
+                        <h1 class="table-title">Work Orders</h1>
+                        <p class="table-subtitle">Manage production work orders and track manufacturing progress</p>
+                    </div>
+                    <div class="table-actions">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search work orders...">
+                        </div>
+                        <button class="btn-primary">
+                            ➕ New Work Order
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-number">13</div>
+                        <div class="stat-label">Total Work Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">Invoiced</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label">In Progress</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">6,820</div>
+                        <div class="stat-label">Total Quantity</div>
+                    </div>
+                </div>
+
+                <div class="filters-section">
+                    <div class="filters-header">
+                        <strong>Filters</strong>
+                        <span style="font-size: 0.875rem; color: #64748b;">13 results</span>
+                    </div>
+                    <div class="filter-chips">
+                        <span class="filter-chip active">All Orders</span>
+                        <span class="filter-chip">Low Priority</span>
+                        <span class="filter-chip">In Progress</span>
+                        <span class="filter-chip">Invoiced</span>
+                        <span class="filter-chip">Inhouse</span>
+                        <span class="filter-chip">This Week</span>
+                    </div>
+                </div>
+
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Work Order</th>
+                            <th>Sales Order</th>
+                            <th>SKU Details</th>
+                            <th>Manufacturing</th>
+                            <th>Schedule</th>
+                            <th>Quantity</th>
+                            <th>Priority</th>
+                            <th>Progress</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="work-order-id">#WO-00012</div>
+                                <div style="font-size: 0.75rem; color: #64748b;">Jul 4, 2025</div>
+                            </td>
+                            <td>
+                                <a href="#" class="sales-id-link">SO-00006</a>
+                                <div style="font-size: 0.75rem; color: #64748b;">krish-ref</div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 600;">krish SKU</div>
+                                <div style="font-size: 0.75rem; color: #64748b;">Version 1.2</div>
+                            </td>
+                            <td>
+                                <span style="background: #f0f9ff; color: #0284c7; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                                    🏭 Inhouse
+                                </span>
+                            </td>
+                            <td>
+                                <div style="font-size: 0.875rem;">Start: Jul 4</div>
+                                <div style="font-size: 0.875rem;">Due: Jul 10</div>
+                            </td>
+                            <td>
+                                <span class="quantity-badge">198</span>
+                            </td>
+                            <td>
+                                <span class="status-badge priority-low">Low</span>
+                            </td>
+                            <td>
+                                <span class="progress-badge progress-invoiced">Invoiced</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon btn-view" title="View Details">👁</button>
+                                    <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="work-order-id">#WO-00004</div>
+                                <div style="font-size: 0.75rem; color: #64748b;">Jul 4, 2025</div>
+                            </td>
+                            <td>
+                                <a href="#" class="sales-id-link">SO-00004</a>
+                                <div style="font-size: 0.75rem; color: #64748b;">SO-MT4</div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 600;">60 ml</div>
+                                <div style="font-size: 0.75rem; color: #64748b;">Version 2.1</div>
+                            </td>
+                            <td>
+                                <span style="background: #f0f9ff; color: #0284c7; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                                    🏭 Inhouse
+                                </span>
+                            </td>
+                            <td>
+                                <div style="font-size: 0.875rem;">Start: Jul 4</div>
+                                <div style="font-size: 0.875rem;">Due: Jul 12</div>
+                            </td>
+                            <td>
+                                <span class="quantity-badge">500</span>
+                            </td>
+                            <td>
+                                <span class="status-badge priority-low">Low</span>
+                            </td>
+                            <td>
+                                <span class="progress-badge progress-material">Raw Material</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon btn-view" title="View Details">👁</button>
+                                    <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="work-order-id">#WO-00011</div>
+                                <div style="font-size: 0.75rem; color: #64748b;">Jul 4, 2025</div>
+                            </td>
+                            <td>
+                                <a href="#" class="sales-id-link">SO-00004</a>
+                                <div style="font-size: 0.75rem; color: #64748b;">SO-MT4</div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 600;">60 ml</div>
+                                <div style="font-size: 0.75rem; color: #64748b;">Version 2.1</div>
+                            </td>
+                            <td>
+                                <span style="background: #f0f9ff; color: #0284c7; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                                    🏭 Inhouse
+                                </span>
+                            </td>
+                            <td>
+                                <div style="font-size: 0.875rem;">Start: Jul 4</div>
+                                <div style="font-size: 0.875rem;">Due: Jul 15</div>
+                            </td>
+                            <td>
+                                <span class="quantity-badge">3474</span>
+                            </td>
+                            <td>
+                                <span class="status-badge priority-medium">Medium</span>
+                            </td>
+                            <td>
+                                <span class="progress-badge progress-invoiced">Invoiced</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon btn-view" title="View Details">👁</button>
+                                    <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Work Order Card View -->
+        <div class="template-section">
+            <div class="template-header">
+                Work Order Card View
+            </div>
+            <div class="table-template">
+                <div class="table-header">
+                    <div>
+                        <h1 class="table-title">Work Orders</h1>
+                        <p class="table-subtitle">Card view for better visual organization of work orders</p>
+                    </div>
+                    <div class="table-actions">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search work orders...">
+                        </div>
+                        <button class="btn-primary">
+                            ➕ New Work Order
+                        </button>
+                    </div>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="work-order-card">
+                        <div class="card-header">
+                            <div>
+                                <div class="work-order-id">#WO-00012</div>
+                                <div style="font-size: 0.875rem; color: #64748b; margin-top: 0.25rem;">
+                                    Sales Order: <a href="#" class="sales-id-link">SO-00006</a>
+                                </div>
+                            </div>
+                            <span class="status-badge priority-low">Low</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-row">
+                                <span class="card-label">SKU</span>
+                                <span class="card-value">krish SKU</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Quantity</span>
+                                <span class="card-value">198</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Manufacturing</span>
+                                <span class="card-value">🏭 Inhouse</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Schedule</span>
+                                <span class="card-value">Jul 4 - Jul 10</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Progress</span>
+                                <span class="progress-badge progress-invoiced">Invoiced</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="work-order-card">
+                        <div class="card-header">
+                            <div>
+                                <div class="work-order-id">#WO-00004</div>
+                                <div style="font-size: 0.875rem; color: #64748b; margin-top: 0.25rem;">
+                                    Sales Order: <a href="#" class="sales-id-link">SO-00004</a>
+                                </div>
+                            </div>
+                            <span class="status-badge priority-low">Low</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-row">
+                                <span class="card-label">SKU</span>
+                                <span class="card-value">60 ml</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Quantity</span>
+                                <span class="card-value">500</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Manufacturing</span>
+                                <span class="card-value">🏭 Inhouse</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Schedule</span>
+                                <span class="card-value">Jul 4 - Jul 12</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Progress</span>
+                                <span class="progress-badge progress-material">Raw Material</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="work-order-card">
+                        <div class="card-header">
+                            <div>
+                                <div class="work-order-id">#WO-00011</div>
+                                <div style="font-size: 0.875rem; color: #64748b; margin-top: 0.25rem;">
+                                    Sales Order: <a href="#" class="sales-id-link">SO-00004</a>
+                                </div>
+                            </div>
+                            <span class="status-badge priority-medium">Medium</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-row">
+                                <span class="card-label">SKU</span>
+                                <span class="card-value">60 ml</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Quantity</span>
+                                <span class="card-value">3474</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Manufacturing</span>
+                                <span class="card-value">🏭 Inhouse</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Schedule</span>
+                                <span class="card-value">Jul 4 - Jul 15</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Progress</span>
+                                <span class="progress-badge progress-invoiced">Invoiced</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Work Order Form - Modern Design -->
+        <div class="template-section">
+            <div class="template-header">
+                Enhanced Add Work Order Form
+            </div>
+            <div class="form-template">
+                <div class="form-header">
+                    <div>
+                        <h1 class="form-title">Create Work Order</h1>
+                        <p class="form-subtitle">Set up a new work order for manufacturing</p>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn-secondary">Save Draft</button>
+                        <button class="btn-primary">Create Work Order</button>
+                    </div>
+                </div>
+
+                <div class="form-content">
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            🏭 Manufacturing Configuration
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">How do you want to manufacture?</label>
+                            <div class="manufacture-options">
+                                <div class="manufacture-option active">
+                                    🏭 Inhouse
+                                </div>
+                                <div class="manufacture-option">
+                                    🤝 OutSource
+                                </div>
+                                <div class="manufacture-option">
+                                    📦 Purchase Order
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            📋 Order Details
+                        </h3>
+                        <div class="form-grid">
+                            <div>
+                                <div class="form-group">
+                                    <label class="form-label">Sales Order <span class="required">*</span></label>
+                                    <select class="form-select" required>
+                                        <option value="">Select Sales Order</option>
+                                        <option value="SO-00006">SO-00006 - Krish Tech</option>
+                                        <option value="SO-00004">SO-00004 - Group Pharmaceuticals</option>
+                                        <option value="SO-00005">SO-00005 - Group Pharmaceuticals</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">SKU <span class="required">*</span></label>
+                                    <select class="form-select" required>
+                                        <option value="">Select SKU</option>
+                                        <option value="krish-sku">krish SKU</option>
+                                        <option value="60ml">60 ml</option>
+                                        <option value="gfgf">gfgf</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        SKU Version
+                                        <a href="#" class="version-history-link">Version History</a>
+                                    </label>
+                                    <select class="form-select">
+                                        <option value="">Select SKU Version</option>
+                                        <option value="v1.0">Version 1.0</option>
+                                        <option value="v1.1">Version 1.1</option>
+                                        <option value="v2.0">Version 2.0</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="form-group">
+                                    <label class="form-label">Quantity <span class="required">*</span></label>
+                                    <input type="number" class="form-input" placeholder="Enter quantity" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Acceptable Excess</label>
+                                    <input type="number" class="form-input" placeholder="Enter acceptable excess">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Plant Type</label>
+                                    <div class="plant-type-options">
+                                        <div class="plant-option active">Auto Plant</div>
+                                        <div class="plant-option">Semi Auto Plant</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            📅 Schedule & Timeline
+                        </h3>
+                        <div class="form-grid">
+                            <div>
+                                <div class="form-group">
+                                    <label class="form-label">Start Date <span class="required">*</span></label>
+                                    <input type="date" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">End Date <span class="required">*</span></label>
+                                    <input type="date" class="form-input" required>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="form-group">
+                                    <label class="form-label">Delivery Date <span class="required">*</span></label>
+                                    <input type="date" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Priority Level</label>
+                                    <select class="form-select">
+                                        <option value="low">Low Priority</option>
+                                        <option value="medium">Medium Priority</option>
+                                        <option value="high">High Priority</option>
+                                        <option value="urgent">Urgent</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            📝 Additional Information
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-textarea" placeholder="Enter work order description and special instructions..."></textarea>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Special Instructions</label>
+                                <input type="text" class="form-input" placeholder="Any special handling requirements">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Quality Standards</label>
+                                <select class="form-select">
+                                    <option value="standard">Standard Quality</option>
+                                    <option value="premium">Premium Quality</option>
+                                    <option value="export">Export Quality</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-footer">
+                        <button class="btn-secondary">Cancel</button>
+                        <button class="btn-primary">Create Work Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compact Work Order Form -->
+        <div class="template-section">
+            <div class="template-header">
+                Compact Work Order Form
+            </div>
+            <div class="form-template">
+                <div class="form-header">
+                    <div>
+                        <h1 class="form-title">Quick Work Order</h1>
+                        <p class="form-subtitle">Streamlined form for faster work order creation</p>
+                    </div>
+                </div>
+
+                <div class="form-content">
+                    <div class="form-section">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                            <div class="form-group">
+                                <label class="form-label">Manufacturing Type</label>
+                                <div class="manufacture-options">
+                                    <div class="manufacture-option active">Inhouse</div>
+                                    <div class="manufacture-option">OutSource</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Sales Order <span class="required">*</span></label>
+                                <select class="form-select" required>
+                                    <option>Select Sales Order</option>
+                                    <option>SO-00006 - Krish Tech</option>
+                                    <option>SO-00004 - Group Pharmaceuticals</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">SKU <span class="required">*</span></label>
+                                <select class="form-select" required>
+                                    <option>Select SKU</option>
+                                    <option>krish SKU</option>
+                                    <option>60 ml</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Quantity <span class="required">*</span></label>
+                                <input type="number" class="form-input" placeholder="Qty" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Start Date <span class="required">*</span></label>
+                                <input type="date" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Delivery Date <span class="required">*</span></label>
+                                <input type="date" class="form-input" required>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-textarea" placeholder="Work order description..." style="min-height: 80px;"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-footer">
+                        <button class="btn-secondary">Cancel</button>
+                        <button class="btn-primary">Create Work Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Manufacture option selection
+        document.querySelectorAll('.manufacture-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const container = this.parentElement;
+                container.querySelectorAll('.manufacture-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Plant type selection
+        document.querySelectorAll('.plant-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const container = this.parentElement;
+                container.querySelectorAll('.plant-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Filter chips
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Search functionality
+        document.querySelectorAll('.search-box input').forEach(input => {
+            input.addEventListener('input', function() {
+                console.log('Searching for:', this.value);
+            });
+        });
+
+        // Form validation
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            if (btn.textContent.includes('Create Work Order')) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Form validation and submission would be implemented here');
+                });
+            }
+        });
+
+        // Table row interactions
+        document.querySelectorAll('.modern-table tr').forEach(row => {
+            if (row.querySelector('td')) {
+                row.addEventListener('click', function(e) {
+                    if (!e.target.closest('button') && !e.target.closest('a')) {
+                        console.log('Row clicked:', this);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Work Order Form - Design Variants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .template-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .template-section {
+            margin-bottom: 4rem;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .template-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* Common Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8fafc;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+        }
+
+        /* Template 1: Step-by-Step Wizard */
+        .wizard-template {
+            padding: 2rem;
+        }
+
+        .wizard-progress {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .wizard-progress::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: #e2e8f0;
+            z-index: 1;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            height: 2px;
+            background: #3b82f6;
+            transition: width 0.5s ease;
+            z-index: 2;
+        }
+
+        .step {
+            background: white;
+            border: 3px solid #e2e8f0;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+            margin: 0 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 3;
+            cursor: pointer;
+        }
+
+        .step.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+            transform: scale(1.1);
+        }
+
+        .step.completed {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .step-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .wizard-content {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 3rem;
+            min-height: 500px;
+            position: relative;
+        }
+
+        .step-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .step-description {
+            color: #64748b;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .wizard-navigation {
+            position: absolute;
+            bottom: 2rem;
+            left: 3rem;
+            right: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .manufacture-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .manufacture-card {
+            background: white;
+            border: 3px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .manufacture-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+        }
+
+        .manufacture-card.selected {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        /* Template 2: Tabbed Interface */
+        .tabbed-template {
+            padding: 0;
+        }
+
+        .tab-navigation {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1.5rem 2rem;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-size: 0.875rem;
+        }
+
+        .tab:hover {
+            color: #3b82f6;
+            background: #f0f9ff;
+        }
+
+        .tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+            background: white;
+        }
+
+        .tab-content {
+            padding: 3rem;
+            min-height: 600px;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .form-section {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Template 3: Sidebar Layout */
+        .sidebar-template {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: 700px;
+        }
+
+        .form-sidebar {
+            background: linear-gradient(145deg, #1e293b, #334155);
+            color: white;
+            padding: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-subtitle {
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-menu a {
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .sidebar-progress {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #475569;
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .progress-check {
+            color: #10b981;
+        }
+
+        .sidebar-main {
+            padding: 3rem;
+            background: white;
+        }
+
+        .main-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .main-subtitle {
+            color: #64748b;
+            margin-bottom: 3rem;
+        }
+
+        /* Template 4: Modal/Card Style */
+        .modal-template {
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-subtitle {
+            opacity: 0.9;
+            font-size: 0.875rem;
+        }
+
+        .modal-body {
+            padding: 2rem 2rem 1rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 1rem 2rem 2rem;
+            background: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .quick-select {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-option {
+            background: #f0f9ff;
+            border: 2px solid #e0f2fe;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-option:hover {
+            border-color: #0284c7;
+            background: #0284c7;
+            color: white;
+        }
+
+        .quick-option.selected {
+            border-color: #0284c7;
+            background: #0284c7;
+            color: white;
+        }
+
+        .option-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .option-description {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar-template {
+                grid-template-columns: 1fr;
+            }
+
+            .form-sidebar {
+                order: 2;
+            }
+
+            .sidebar-main {
+                order: 1;
+                padding: 2rem;
+            }
+
+            .wizard-progress {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .step {
+                width: 60px;
+                height: 60px;
+                margin: 0;
+            }
+
+            .manufacture-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-card {
+                margin: 1rem;
+                max-width: calc(100% - 2rem);
+            }
+
+            .quick-select {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="template-container">
+        <!-- Template 1: Step-by-Step Wizard -->
+        <div class="template-section">
+            <div class="template-header">
+                Template 1: Step-by-Step Wizard
+            </div>
+            <div class="wizard-template">
+                <div class="wizard-progress">
+                    <div class="progress-line" style="width: 33%;"></div>
+                    <div class="step completed">
+                        <div class="step-icon">🏭</div>
+                        <div>Setup</div>
+                    </div>
+                    <div class="step active">
+                        <div class="step-icon">📋</div>
+                        <div>Details</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon">📅</div>
+                        <div>Schedule</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon">✅</div>
+                        <div>Review</div>
+                    </div>
+                </div>
+
+                <div class="wizard-content">
+                    <div class="step-content active">
+                        <h2 class="step-title">Work Order Details</h2>
+                        <p class="step-description">Configure the basic information for your work order</p>
+                        
+                        <div class="form-grid">
+                            <div>
+                                <div class="form-group">
+                                    <label class="form-label">Sales Order <span class="required">*</span></label>
+                                    <select class="form-select" required>
+                                        <option value="">Select Sales Order</option>
+                                        <option value="SO-00006">SO-00006 - Krish Tech</option>
+                                        <option value="SO-00004">SO-00004 - Group Pharmaceuticals</option>
+                                        <option value="SO-00005">SO-00005 - Group Pharmaceuticals</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">SKU Selection <span class="required">*</span></label>
+                                    <select class="form-select" required>
+                                        <option value="">Choose SKU</option>
+                                        <option value="krish-sku">krish SKU</option>
+                                        <option value="60ml">60 ml Container</option>
+                                        <option value="gfgf">gfgf Product</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="form-group">
+                                    <label class="form-label">Production Quantity <span class="required">*</span></label>
+                                    <input type="number" class="form-input" placeholder="Enter quantity" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Acceptable Excess (%)</label>
+                                    <input type="number" class="form-input" placeholder="Excess percentage" min="0" max="100">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">SKU Version</label>
+                            <select class="form-select">
+                                <option value="">Select Version</option>
+                                <option value="v1.0">Version 1.0 (Current)</option>
+                                <option value="v1.1">Version 1.1 (Beta)</option>
+                                <option value="v2.0">Version 2.0 (Development)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="wizard-navigation">
+                        <button class="btn-secondary" onclick="previousStep()">← Previous</button>
+                        <div style="color: #64748b; font-weight: 500;">Step 2 of 4</div>
+                        <button class="btn-primary" onclick="nextStep()">Next Step →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template 2: Tabbed Interface -->
+        <div class="template-section">
+            <div class="template-header">
+                Template 2: Tabbed Interface
+            </div>
+            <div class="tabbed-template">
+                <div class="tab-navigation">
+                    <button class="tab active" onclick="switchTab('manufacturing')">
+                        🏭 Manufacturing
+                    </button>
+                    <button class="tab" onclick="switchTab('order-details')">
+                        📋 Order Details
+                    </button>
+                    <button class="tab" onclick="switchTab('scheduling')">
+                        📅 Scheduling
+                    </button>
+                    <button class="tab" onclick="switchTab('specifications')">
+                        ⚙️ Specifications
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    <div class="tab-panel active" id="manufacturing">
+                        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-bottom: 2rem;">Manufacturing Configuration</h2>
+                        
+                        <div class="manufacture-cards">
+                            <div class="manufacture-card selected">
+                                <div class="card-icon">🏭</div>
+                                <div class="card-title">In-house</div>
+                                <div class="card-description">Manufacture using internal facilities and resources</div>
+                            </div>
+                            <div class="manufacture-card">
+                                <div class="card-icon">🤝</div>
+                                <div class="card-title">Outsource</div>
+                                <div class="card-description">Contract manufacturing with external partners</div>
+                            </div>
+                            <div class="manufacture-card">
+                                <div class="card-icon">📦</div>
+                                <div class="card-title">Purchase Order</div>
+                                <div class="card-description">Direct procurement from suppliers</div>
+                            </div>
+                        </div>
+
+                        <div class="form-section" style="margin-top: 2rem;">
+                            <div class="section-title">🏗️ Plant Configuration</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Plant Type</label>
+                                    <select class="form-select">
+                                        <option value="auto">Auto Plant</option>
+                                        <option value="semi-auto">Semi Auto Plant</option>
+                                        <option value="manual">Manual Plant</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Production Line</label>
+                                    <select class="form-select">
+                                        <option value="">Select Production Line</option>
+                                        <option value="line-1">Production Line 1</option>
+                                        <option value="line-2">Production Line 2</option>
+                                        <option value="line-3">Production Line 3</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="order-details">
+                        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-bottom: 2rem;">Order Information</h2>
+                        
+                        <div class="form-grid">
+                            <div class="form-section">
+                                <div class="section-title">📋 Basic Details</div>
+                                <div class="form-group">
+                                    <label class="form-label">Sales Order <span class="required">*</span></label>
+                                    <select class="form-select" required>
+                                        <option value="">Select Sales Order</option>
+                                        <option value="SO-00006">SO-00006 - Krish Tech</option>
+                                        <option value="SO-00004">SO-00004 - Group Pharmaceuticals</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Reference Number</label>
+                                    <input type="text" class="form-input" placeholder="Auto-generated or custom">
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <div class="section-title">🏷️ Product Details</div>
+                                <div class="form-group">
+                                    <label class="form-label">SKU <span class="required">*</span></label>
+                                    <select class="form-select" required>
+                                        <option value="">Select SKU</option>
+                                        <option value="krish-sku">krish SKU</option>
+                                        <option value="60ml">60 ml Container</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">SKU Version</label>
+                                    <select class="form-select">
+                                        <option value="v1.0">Version 1.0</option>
+                                        <option value="v1.1">Version 1.1</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="section-title">📊 Quantities</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Production Quantity <span class="required">*</span></label>
+                                    <input type="number" class="form-input" placeholder="Enter quantity" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Acceptable Excess</label>
+                                    <input type="number" class="form-input" placeholder="Excess units allowed">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="scheduling">
+                        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-bottom: 2rem;">Schedule & Timeline</h2>
+                        
+                        <div class="form-grid">
+                            <div class="form-section">
+                                <div class="section-title">📅 Production Dates</div>
+                                <div class="form-group">
+                                    <label class="form-label">Start Date <span class="required">*</span></label>
+                                    <input type="date" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">End Date <span class="required">*</span></label>
+                                    <input type="date" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Delivery Date <span class="required">*</span></label>
+                                    <input type="date" class="form-input" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <div class="section-title">⚡ Priority & Urgency</div>
+                                <div class="form-group">
+                                    <label class="form-label">Priority Level</label>
+                                    <select class="form-select">
+                                        <option value="low">🟢 Low Priority</option>
+                                        <option value="medium">🟡 Medium Priority</option>
+                                        <option value="high">🟠 High Priority</option>
+                                        <option value="urgent">🔴 Urgent</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Shift Preference</label>
+                                    <select class="form-select">
+                                        <option value="any">Any Shift</option>
+                                        <option value="day">Day Shift Only</option>
+                                        <option value="night">Night Shift Only</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="specifications">
+                        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-bottom: 2rem;">Additional Specifications</h2>
+                        
+                        <div class="form-section">
+                            <div class="section-title">🎯 Quality Requirements</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Quality Standard</label>
+                                    <select class="form-select">
+                                        <option value="standard">Standard Quality</option>
+                                        <option value="premium">Premium Quality</option>
+                                        <option value="export">Export Quality</option>
+                                        <option value="pharmaceutical">Pharmaceutical Grade</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Testing Requirements</label>
+                                    <select class="form-select">
+                                        <option value="standard">Standard Testing</option>
+                                        <option value="enhanced">Enhanced Testing</option>
+                                        <option value="full">Full Validation</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="section-title">📝 Instructions & Notes</div>
+                            <div class="form-group">
+                                <label class="form-label">Production Instructions</label>
+                                <textarea class="form-textarea" placeholder="Special production instructions, handling requirements, etc."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Quality Notes</label>
+                                <textarea class="form-textarea" placeholder="Quality control notes and special requirements"></textarea>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 3rem;">
+                            <button class="btn-secondary">Save as Draft</button>
+                            <button class="btn-primary">Create Work Order 🚀</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template 3: Sidebar Layout -->
+        <div class="template-section">
+            <div class="template-header">
+                Template 3: Sidebar Navigation Layout
+            </div>
+            <div class="sidebar-template">
+                <div class="form-sidebar">
+                    <h2 class="sidebar-title">Work Order Creation</h2>
+                    <p class="sidebar-subtitle">Complete each section to create your work order</p>
+                    
+                    <ul class="sidebar-menu">
+                        <li><a href="#" class="active">🏭 Manufacturing Type</a></li>
+                        <li><a href="#">📋 Order Information</a></li>
+                        <li><a href="#">🏷️ Product Details</a></li>
+                        <li><a href="#">📅 Scheduling</a></li>
+                        <li><a href="#">⚙️ Specifications</a></li>
+                        <li><a href="#">📝 Documentation</a></li>
+                    </ul>
+
+                    <div class="sidebar-progress">
+                        <h4 style="margin-bottom: 1rem; color: white;">Progress</h4>
+                        <div class="progress-item">
+                            <span>Manufacturing Type</span>
+                            <span class="progress-check">✓</span>
+                        </div>
+                        <div class="progress-item">
+                            <span>Order Information</span>
+                            <span style="color: #fbbf24;">○</span>
+                        </div>
+                        <div class="progress-item">
+                            <span>Product Details</span>
+                            <span style="color: #6b7280;">○</span>
+                        </div>
+                        <div class="progress-item">
+                            <span>Scheduling</span>
+                            <span style="color: #6b7280;">○</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-main">
+                    <h1 class="main-title">Order Information</h1>
+                    <p class="main-subtitle">Configure the basic details for your work order</p>
+
+                    <div class="form-grid">
+                        <div>
+                            <div class="form-group">
+                                <label class="form-label">Sales Order Reference <span class="required">*</span></label>
+                                <select class="form-select" required>
+                                    <option value="">Choose Sales Order</option>
+                                    <option value="SO-00006">SO-00006 - Krish Tech (krish-ref)</option>
+                                    <option value="SO-00004">SO-00004 - Group Pharmaceuticals (SO-MT4)</option>
+                                    <option value="SO-00005">SO-00005 - Group Pharmaceuticals (710)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Work Order ID</label>
+                                <input type="text" class="form-input" placeholder="Auto-generated: #WO-00013" readonly style="background: #f8fafc;">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Customer</label>
+                                <input type="text" class="form-input" placeholder="Auto-filled from Sales Order" readonly style="background: #f8fafc;">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label class="form-label">SKU Selection <span class="required">*</span></label>
+                                <select class="form-select" required>
+                                    <option value="">Select Product SKU</option>
+                                    <option value="krish-sku">krish SKU (Primary Product)</option>
+                                    <option value="60ml">60 ml Container</option>
+                                    <option value="gfgf">gfgf Product Line</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">SKU Version</label>
+                                <select class="form-select">
+                                    <option value="latest">Latest Version (Recommended)</option>
+                                    <option value="v2.0">Version 2.0</option>
+                                    <option value="v1.1">Version 1.1</option>
+                                    <option value="v1.0">Version 1.0</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Production Quantity <span class="required">*</span></label>
+                                <input type="number" class="form-input" placeholder="Enter production quantity" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: #f0f9ff; padding: 1.5rem; border-radius: 12px; border-left: 4px solid #3b82f6; margin: 2rem 0;">
+                        <h4 style="color: #1e40af; margin-bottom: 0.5rem;">💡 Quick Tip</h4>
+                        <p style="color: #1e40af; font-size: 0.875rem;">
+                            Select your Sales Order first to automatically populate available SKUs and customer information.
+                        </p>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 3rem;">
+                        <button class="btn-secondary">← Previous Section</button>
+                        <div style="color: #64748b; font-size: 0.875rem;">2 of 6 sections completed</div>
+                        <button class="btn-primary">Continue to Product Details →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template 4: Modal/Card Style -->
+        <div class="template-section">
+            <div class="template-header">
+                Template 4: Modal/Card Overlay Style
+            </div>
+            <div class="modal-template">
+                <div class="modal-card">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Create New Work Order</h2>
+                        <p class="modal-subtitle">Quick setup for manufacturing orders</p>
+                    </div>
+
+                    <div class="modal-body">
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="font-size: 1.25rem; font-weight: 700; color: #1e293b; margin-bottom: 1rem;">
+                                🚀 Quick Start Options
+                            </h3>
+                            <div class="quick-select">
+                                <div class="quick-option selected">
+                                    <div class="option-icon">⚡</div>
+                                    <div class="option-title">Express Order</div>
+                                    <div class="option-description">Standard production with default settings</div>
+                                </div>
+                                <div class="quick-option">
+                                    <div class="option-icon">⚙️</div>
+                                    <div class="option-title">Custom Order</div>
+                                    <div class="option-description">Full configuration with custom specifications</div>
+                                </div>
+                                <div class="quick-option">
+                                    <div class="option-icon">📋</div>
+                                    <div class="option-title">From Template</div>
+                                    <div class="option-description">Use existing work order as template</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Sales Order <span class="required">*</span></label>
+                                <select class="form-select" required>
+                                    <option value="">Select Sales Order</option>
+                                    <option value="SO-00006">SO-00006 - Krish Tech</option>
+                                    <option value="SO-00004">SO-00004 - Group Pharmaceuticals</option>
+                                    <option value="SO-00005">SO-00005 - Group Pharmaceuticals</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Manufacturing Method</label>
+                                <select class="form-select">
+                                    <option value="inhouse">🏭 In-house Production</option>
+                                    <option value="outsource">🤝 Outsource Manufacturing</option>
+                                    <option value="purchase">📦 Direct Purchase</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Product SKU <span class="required">*</span></label>
+                                <select class="form-select" required>
+                                    <option value="">Choose Product</option>
+                                    <option value="krish-sku">krish SKU</option>
+                                    <option value="60ml">60 ml Container</option>
+                                    <option value="gfgf">gfgf Product</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Quantity <span class="required">*</span></label>
+                                <input type="number" class="form-input" placeholder="Production quantity" required>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Start Date <span class="required">*</span></label>
+                                <input type="date" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Target Completion</label>
+                                <input type="date" class="form-input">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Priority & Special Instructions</label>
+                            <textarea class="form-textarea" placeholder="Enter any special production requirements, priority notes, or quality specifications..." style="min-height: 80px;"></textarea>
+                        </div>
+
+                        <div style="background: #fef3c7; padding: 1rem; border-radius: 8px; border-left: 4px solid #f59e0b; margin-top: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: #92400e; font-weight: 600; margin-bottom: 0.5rem;">
+                                ⚠️ Production Notice
+                            </div>
+                            <p style="color: #92400e; font-size: 0.875rem;">
+                                This work order will be queued for production scheduling. Estimated start time will be calculated based on current capacity.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn-secondary">Cancel</button>
+                        <button class="btn-secondary">Save Draft</button>
+                        <button class="btn-primary">Create Work Order ✨</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Wizard functionality
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateWizard();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateWizard();
+            }
+        }
+
+        function updateWizard() {
+            const progressLine = document.querySelector('.progress-line');
+            const steps = document.querySelectorAll('.step');
+            
+            progressLine.style.width = `${((currentStep - 1) / (totalSteps - 1)) * 60}%`;
+            
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+        }
+
+        // Tab functionality
+        function switchTab(tabName) {
+            // Remove active from all tabs and panels
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            
+            // Add active to clicked tab and corresponding panel
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Manufacture card selection
+        document.querySelectorAll('.manufacture-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.manufacture-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Quick option selection
+        document.querySelectorAll('.quick-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.quick-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Form validation
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            if (btn.textContent.includes('Create Work Order')) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Work Order creation functionality would be implemented here');
+                });
+            }
+        });
+
+        // Auto-fill functionality simulation
+        document.querySelectorAll('select[placeholder*="Sales Order"], select option[value*="SO-"]').forEach(select => {
+            select.addEventListener('change', function() {
+                // Simulate auto-filling customer information
+                console.log('Auto-filling customer data for:', this.value);
+            });
+        });
+    </script>
+</body>
+</html>

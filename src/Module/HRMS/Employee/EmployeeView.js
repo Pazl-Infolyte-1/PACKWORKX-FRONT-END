@@ -210,10 +210,10 @@ function EmployeeView({ employeeData, showEmployeeData, setVisible }) {
                     <span className="text-sm font-medium text-gray-500">Updated At</span>
                     <span className="text-gray-800 mt-1">{new Date(employeeData.updated_at).toLocaleString()}</span>
                   </div>
-                  <div className="flex flex-col">
+                  {/* <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-500">Company ID</span>
                     <span className="text-gray-800 mt-1">{employeeData.company_id}</span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

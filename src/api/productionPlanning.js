@@ -11,6 +11,9 @@ export const productionPlanningApi = {
   getProductionPlanningByDate: async (date) => {
     return await apiClient.get(`/production-schedule/get-all?date=${date}`)
   },
+  getProductionPlanningByTimeline: async (params = {}) => {
+    return await apiClient.get('/production-schedule/get-all', { params })
+  },
   deleteProductionPlanning: async (productionId) => {
     return await apiClient.delete(`/production-schedule/delete/${productionId}`)
   },

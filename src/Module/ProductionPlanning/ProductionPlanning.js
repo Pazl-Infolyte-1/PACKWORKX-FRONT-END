@@ -15,6 +15,19 @@ const ProductionPlanning = () => {
   const [machinesData, setMachinesData] = useState([])
   const [groupsData, setGroupsData] = useState([])
   const [alerts, setAlerts] = useState([])
+  const [selectedFilter, setSelectedFilter] = useState('')
+  const GroupFilterOptions = [
+    {
+      id: 0,
+      label: 'In Progress',
+      value: 'in_progress',
+    },
+    {
+      id: 1,
+      label: 'Completed',
+      value: 'completed',
+    },
+  ]
 
   const handleFullScreen = () => {
     if (planningRef.current) {
@@ -45,8 +58,11 @@ const ProductionPlanning = () => {
       setEmployeesData(employeeData?.data?.data)
       const machines = await machineApi.getMachine({})
       setMachinesData(machines?.data?.data)
-      const group = await productionApi.getProductionGroups()
-      setGroupsData(group?.data?.data)
+      const groups = await productionApi.getProductionGroups({})
+      const productionGroups = groups?.data?.data.filter(
+        (group) => group.group_status === 'allocation_completed',
+      )
+      setGroupsData(productionGroups)
     }
     fetchData()
 
@@ -66,6 +82,12 @@ const ProductionPlanning = () => {
       <ContentHeader
         heading={'Production Planning'}
         isAddNew={false}
+        filterButton={true}
+        filterButtonClick={(e) => {
+          const selected = e.target.value
+          setSelectedFilter(selected)
+        }}
+        filterOptions={GroupFilterOptions}
         menuOptions={[
           {
             icon: <FaEye className="mr-2 text-blue-500" />,
@@ -74,9 +96,10 @@ const ProductionPlanning = () => {
           },
         ]}
       />
+
       <div
         className={`mt-2 p-2 ${
-          isFullScreen ? 'w-screen' : 'w-[calc(100vw-210px)]'
+          isFullScreen ? 'w-screen' : ''
         } max-w-full flex-grow overflow-hidden`}
       >
         <Suspense fallback={<div>Loading...</div>}>
@@ -85,6 +108,8 @@ const ProductionPlanning = () => {
             machinesData={machinesData}
             groupsData={groupsData}
             setAlerts={setAlerts}
+            selectedFilter={selectedFilter}
+            setSelectedFilter={setSelectedFilter}
           />
         </Suspense>
       </div>

@@ -17,6 +17,9 @@ function ContentHeader({
   addNewButtonClick,
   newButtonLabel,
   activateSummary = false,
+  filterButton = false,
+  filterOptions = [],
+  filterButtonClick,
 }) {
   const [showMenu, setShowMenu] = useState(false)
   const [showHeadingDropdown, setShowHeadingDropdown] = useState(false)
@@ -148,6 +151,34 @@ function ContentHeader({
           </button>
         )}
 
+        {filterButton && (
+          <div className="relative inline-block w-48">
+            <select
+              className="w-full appearance-none border border-gray-200 bg-gray-100 text-black text-sm px-4 py-2 pr-10 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8167e5] hover:bg-white transition duration-150"
+              defaultValue={''}
+              onChange={filterButtonClick}
+            >
+              <option value="" disabled>
+                Filter Schedule
+              </option>
+              {filterOptions.map((option) => (
+                <option key={option.id} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+              <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M10 14a1 1 0 01-.7-.3l-4-4a1 1 0 111.4-1.4L10 11.6l3.3-3.3a1 1 0 011.4 1.4l-4 4a1 1 0 01-.7.3z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+          </div>
+        )}
+
         {/* Three Dot Menu */}
         {menuOptions.length > 0 && (
           <div className="relative">
@@ -162,7 +193,8 @@ function ContentHeader({
             {showMenu && (
               <div
                 ref={menuRef}
-                className="absolute right-0 mt-2 w-44 text-xs bg-white rounded-md shadow-lg z-50 border border-gray-200"
+                style={{ zIndex: 150 }}
+                className="absolute right-0 mt-2 w-44 text-xs bg-white rounded-md shadow-lg border border-gray-200"
               >
                 <div className="py-1">
                   {menuOptions.map((option, index) => (

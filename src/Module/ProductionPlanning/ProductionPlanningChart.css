@@ -17,10 +17,11 @@
   flex-grow: 1;
   position: relative;
   overflow: hidden;
+  scrollbar-width: thin;
 }
 .scrollable-body {
   display: block;
-  max-height: calc(100vh - 110px); /* adjust depending on how tall your header is */
+  max-height: calc(100vh - 110px);
   overflow-y: auto;
   overflow-x:auto;
 }

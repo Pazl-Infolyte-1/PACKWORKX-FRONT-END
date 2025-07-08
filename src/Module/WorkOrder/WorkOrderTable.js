@@ -346,7 +346,7 @@ const WorkOrderTable = ({
                 <div className="flex justify-between items-center p-2 pb-1">
                   <div className="flex items-center space-x-2">
                     <h3 className="text-sm font-medium text-gray-800">
-                      Layer {layer?.layer}
+                       {layer?.layer}
                     </h3>
                     {layer?.layer_status && (
                       <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${layer.layer_status === 'pending' ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>{layer.layer_status}</span>

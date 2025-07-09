@@ -245,7 +245,6 @@ function EmployeeView() {
           </div>
         </div>
       </div>
-    </div>
   )
 }
 

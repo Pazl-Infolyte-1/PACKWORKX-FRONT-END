@@ -793,16 +793,6 @@ const ProductionPlanningChart = ({
                         className="border px-2 py-1 rounded text-sm w-full"
                         placeholderText="Select date range"
                         popperPlacement="bottom-start"
-                        popperModifiers={[
-                          {
-                            name: 'offset',
-                            options: { offset: [0, 8] },
-                          },
-                          {
-                            name: 'preventOverflow',
-                            options: { boundary: 'viewport' },
-                          },
-                        ]}
                       />
                     </div>
                   )}

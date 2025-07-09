@@ -2,8 +2,35 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import './ProductionPlanningChart.css'
 import { productionPlanningApi } from '../../api/productionPlanning'
 import { FaEdit, FaTimes, FaTrash } from 'react-icons/fa'
+import dayjs from 'dayjs'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import ConfirmationModale from '../../components/New/ConfirmationModale'
 
-const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setAlerts }) => {
+const ProductionPlanningChart = ({
+  employeesData,
+  machinesData,
+  groupsData,
+  setAlerts,
+  selectedFilter,
+  setSelectedFilter,
+}) => {
+  const [timelineOption, setTimelineOption] = useState('today')
+  const [customDays, setCustomDays] = useState(1)
+  const [startDate, setStartDate] = useState(null)
+  const [endDate, setEndDate] = useState(null)
+  const [events, setEvents] = useState([])
+  const [selectedEvent, setSelectedEvent] = useState(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [draggingEvent, setDraggingEvent] = useState(null)
+  const [resizeData, setResizeData] = useState(null)
+  const [justResized, setJustResized] = useState(false)
+  const [dragSourceRowId, setDragSourceRowId] = useState(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const tableContainerRef = useRef(null)
+
+  const updatedResizeEventRef = useRef(null)
+
   const unifiedRows = useMemo(() => {
     const maxLength = Math.max(employeesData.length, machinesData.length, groupsData.length)
     return Array.from({ length: maxLength }, (_, i) => ({
@@ -18,39 +45,148 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
     const today = new Date()
     return today.toISOString().split('T')[0]
   })
-  console.log('unifiedRows', unifiedRows)
+
   useEffect(() => {
     if (employeesData.length && machinesData.length && groupsData.length) {
       fetchEvents()
     }
-  }, [selectedDate, employeesData, machinesData, groupsData])
+  }, [selectedDate, employeesData, machinesData, groupsData, selectedFilter])
 
-  const convertToHour = (timeStr) => {
-    const [time, meridian] = timeStr.split(' ')
-    let [hours] = time.split(':').map(Number)
-    if (meridian === 'AM' && hours === 12) hours = 0
-    if (meridian === 'PM' && hours !== 12) hours += 12
-    return hours
+  const formatLocalDate = (date) => {
+    const offsetMs = date.getTimezoneOffset() * 60 * 1000
+    const localDate = new Date(date.getTime() - offsetMs)
+    return localDate.toISOString().split('T')[0]
+  }
+
+  const formatHour = (hour) => {
+    const normalizedHour = hour % 24
+    const suffix = normalizedHour >= 12 ? 'PM' : 'AM'
+    const hour12 = normalizedHour % 12 === 0 ? 12 : normalizedHour % 12
+    return `${hour12}:00 ${suffix}`
+  }
+
+  function formatDateToCustomDisplay(isoString) {
+    const date = new Date(isoString)
+    const options = {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: 'Asia/Kolkata', // Adjust if needed
+    }
+
+    const formatted = date.toLocaleString('en-US', options)
+    const [monthDay, time] = formatted.split(', ')
+    const [month, day] = monthDay.split(' ')
+
+    return `${day} ${month}, ${time}`
+  }
+
+  const formatDateForInput = (isoString) => {
+    const date = new Date(isoString)
+    const offset = date.getTimezoneOffset()
+    const localDate = new Date(date.getTime() - offset * 60000)
+
+    return localDate.toISOString().slice(0, 16)
+  }
+
+  function toLocalISOString(date) {
+    const pad = (n) => (n < 10 ? '0' + n : n)
+    return (
+      date.getFullYear() +
+      '-' +
+      pad(date.getMonth() + 1) +
+      '-' +
+      pad(date.getDate()) +
+      'T' +
+      pad(date.getHours()) +
+      ':' +
+      pad(date.getMinutes()) +
+      ':' +
+      pad(date.getSeconds())
+    )
+  }
+
+  const toLocalDateString = (dateObj) => {
+    const year = dateObj.getFullYear()
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+    const day = String(dateObj.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   }
 
   const fetchEvents = async () => {
+    let params = {}
+
+    if (timelineOption === 'today') {
+      params.date = selectedDate
+    } else if (timelineOption === 'thisWeek') {
+      params.thisWeek = true
+    } else if (timelineOption === 'thisMonth') {
+      params.thisMonth = true
+    } else if (timelineOption === 'custom' && startDate && endDate) {
+      params.startDate = formatLocalDate(startDate)
+      params.endDate = formatLocalDate(endDate)
+    } else if (timelineOption === 'year') {
+      params.year = new Date().getFullYear()
+    }
+
     try {
-      const response = await productionPlanningApi.getProductionPlanningByDate(selectedDate)
-      const apiEvents = response.data?.data || []
+      const response = await productionPlanningApi.getProductionPlanningByTimeline(params)
+      const schedule_data = response.data?.data || []
+      const apiEvents =
+        selectedFilter === 'completed'
+          ? schedule_data.filter((item) => item.production_status == 'completed') || []
+          : selectedFilter === 'in_progress'
+            ? schedule_data.filter((item) => item.production_status == 'in_progress') || []
+            : schedule_data
 
       const transformed = apiEvents.map((item) => {
-        const rowId = unifiedRows.findIndex((r) => r.employeeGroup?.id === item.employee_id)
+        const start = new Date(item.start_time)
+        const end = new Date(item.end_time)
+
+        let timelineStart = new Date(selectedDate)
+        timelineStart.setHours(0, 0, 0, 0)
+
+        if (timelineOption === 'thisWeek') {
+          const dayOfWeek = timelineStart.getDay()
+          timelineStart.setDate(timelineStart.getDate() - dayOfWeek)
+          timelineStart.setHours(0, 0, 0, 0)
+        } else if (timelineOption === 'custom' && startDate) {
+          timelineStart = new Date(startDate)
+          timelineStart.setHours(0, 0, 0, 0)
+        }
+
+        const hour = Math.floor((start - timelineStart) / (1000 * 60 * 60))
+        const endHour = Math.ceil((end - timelineStart) / (1000 * 60 * 60))
 
         const labels = []
         if (item.employee_id) labels.push({ employeeGroup: item.employee_id })
         if (item.machine_id) labels.push({ machine: item.machine_id })
         if (item.group_id) labels.push({ groupQty: item.group_id })
 
+        let color = '#ea7a57'
+        const now = new Date()
+
+        if (now > end) {
+          if (item.production_status === 'completed') {
+            color = '#DCFCE7'
+          } else if (item.production_status === 'in_progress') {
+            color = '#ea7a57'
+          }
+        } else if (start > now) {
+          color = '#fec200'
+        } else if (now >= start && now <= end) {
+          color = '#5978ee'
+        }
+
+        const rowId = unifiedRows.findIndex((r) => r.employeeGroup?.id === item.employee_id)
+
         return {
           id: item.id,
           rowId,
-          hour: convertToHour(item.start_time), // ✅ Corrected
-          endHour: convertToHour(item.end_time), // ✅ Corrected
+          hour,
+          endHour,
           employee_id: item.employee_id,
           machine_id: item.machine_id,
           group_id: item.group_id,
@@ -59,14 +195,15 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
           date: item.date,
           start_time: item.start_time,
           end_time: item.end_time,
-          status: item.status,
+          status: item.production_status,
           notes: item.notes,
-          color: getRandomColor(),
+          total_quantity: item.group_total_quantity,
+          manufactured_quantity: item.group_manufactured_quantity,
+          balance_quantity: item.group_balanced_quantity,
+          color,
           labels,
         }
       })
-
-      console.log('transformed', transformed)
 
       setEvents(transformed)
     } catch (error) {
@@ -74,24 +211,41 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
     }
   }
 
-  const hours = Array.from({ length: 24 }, (_, i) => i)
-
-  const hourOptions = Array.from({ length: 25 }, (_, i) => {
-    const suffix = i === 24 || i < 12 ? 'AM' : 'PM'
-    const hour12 = i % 12 === 0 ? 12 : i % 12
-    return {
-      value: i === 24 ? 0 : i,
-      label: `${hour12}:00 ${suffix}`,
+  useEffect(() => {
+    if (
+      (timelineOption === 'custom' && startDate && endDate) ||
+      timelineOption === 'today' ||
+      timelineOption === 'thisWeek' ||
+      timelineOption === 'thisMonth' ||
+      timelineOption === 'year'
+    ) {
+      fetchEvents()
     }
-  })
+  }, [timelineOption, startDate, endDate])
 
-  const [events, setEvents] = useState([])
-  const [selectedEvent, setSelectedEvent] = useState(null)
-  const [isEditing, setIsEditing] = useState(false)
-  const [draggingEvent, setDraggingEvent] = useState(null)
-  const [resizeData, setResizeData] = useState(null)
-  const [justResized, setJustResized] = useState(false)
-  const [dragSourceRowId, setDragSourceRowId] = useState(null)
+  const selectedDays =
+    timelineOption === 'today'
+      ? 1
+      : timelineOption === 'thisWeek'
+        ? 7
+        : timelineOption === 'custom' && startDate && endDate
+          ? Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1
+          : 1
+
+  const weekStart =
+    timelineOption === 'thisWeek'
+      ? dayjs().startOf('week') // Sunday
+      : timelineOption === 'custom' && startDate
+        ? dayjs(startDate)
+        : dayjs(selectedDate)
+
+  const hours = useMemo(() => {
+    let days = 1
+    if (timelineOption === 'thisWeek') days = 7
+    else if (timelineOption === 'custom') days = customDays
+
+    return Array.from({ length: 24 * days }, (_, i) => i)
+  }, [timelineOption, customDays])
 
   const startResize = (e, event, direction) => {
     e.preventDefault()
@@ -103,7 +257,7 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
       console.warn('Pointer capture failed', err)
     }
     setResizeData({
-      event,
+      event: JSON.parse(JSON.stringify(event)),
       direction,
       startX: e.clientX,
       originalHour: event.hour,
@@ -112,15 +266,6 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
     })
     document.body.style.cursor = 'ew-resize'
   }
-
-  const formatHour = (hour) => {
-    const normalizedHour = hour % 24
-    const suffix = normalizedHour >= 12 ? 'PM' : 'AM'
-    const hour12 = normalizedHour % 12 === 0 ? 12 : normalizedHour % 12
-    return `${hour12}:00 ${suffix}`
-  }
-
-  const updatedResizeEventRef = useRef(null)
 
   const handleMouseMove = (e) => {
     if (!resizeData) return
@@ -135,18 +280,49 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
     let newEnd = originalEnd
 
     if (resizeData.direction === 'left') {
-      newStart = Math.max(0, originalStart + Math.round(hourDelta))
+      newStart = Math.round(originalStart + hourDelta)
       if (originalEnd - newStart < 1) return
     } else if (resizeData.direction === 'right') {
-      newEnd = Math.min(24, originalEnd + Math.round(hourDelta))
+      newEnd = Math.round(originalEnd + hourDelta)
       if (newEnd - originalStart < 1) return
     }
 
-    const currentEv = events.find((ev) => ev.id === resizeData.event.id) || resizeData.event
+    let timelineStart = new Date(selectedDate)
+    timelineStart.setHours(0, 0, 0, 0)
+
+    if (timelineOption === 'thisWeek') {
+      const dayOfWeek = timelineStart.getDay()
+      timelineStart.setDate(timelineStart.getDate() - dayOfWeek)
+      timelineStart.setHours(0, 0, 0, 0)
+    } else if (timelineOption === 'custom' && startDate) {
+      timelineStart = new Date(startDate)
+      timelineStart.setHours(0, 0, 0, 0)
+    }
+
+    const startTime = new Date(timelineStart.getTime() + newStart * 60 * 60 * 1000)
+    const endTime = new Date(timelineStart.getTime() + newEnd * 60 * 60 * 1000)
+
+    const originalEv = resizeData.event
+
+    // 🔒 Overlap Protection
+    const overlapping = events.find(
+      (ev) =>
+        ev.id !== originalEv.id &&
+        ev.rowId === originalEv.rowId &&
+        ((newStart >= ev.hour && newStart < (ev.endHour || ev.hour + 1)) ||
+          (newEnd > ev.hour && newEnd <= (ev.endHour || ev.hour + 1)) ||
+          (newStart <= ev.hour && newEnd >= (ev.endHour || ev.hour + 1))),
+    )
+
+    if (overlapping) return
+
     const updatedEvent = {
-      ...currentEv,
+      ...originalEv,
       hour: newStart,
       endHour: newEnd,
+      start_time: toLocalISOString(startTime),
+      end_time: toLocalISOString(endTime),
+      date: toLocalDateString(startTime),
     }
 
     updatedResizeEventRef.current = updatedEvent
@@ -156,7 +332,7 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
 
   const handleMouseUp = () => {
     if (updatedResizeEventRef.current) {
-      handleEdit(updatedResizeEventRef.current)
+      handleResizeEdit(updatedResizeEventRef.current)
       updatedResizeEventRef.current = null
     }
     setResizeData(null)
@@ -201,17 +377,95 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
   }
 
   const handleDrop = (e, rowId, hour) => {
+    e.preventDefault()
     const row = unifiedRows.find((r) => r.id === rowId)
     if (!row) return
-
-    e.preventDefault()
 
     const raw = e.dataTransfer.getData('application/json')
     if (!raw) return
 
-    const { itemType, value } = JSON.parse(raw)
+    const parsedData = JSON.parse(raw)
 
-    // ❗ Block drop if employeeGroup does NOT match the current row’s employee
+    let timelineStart = new Date(selectedDate)
+    timelineStart.setHours(0, 0, 0, 0)
+
+    if (timelineOption === 'thisWeek') {
+      const dayOfWeek = timelineStart.getDay()
+      timelineStart.setDate(timelineStart.getDate() - dayOfWeek)
+      timelineStart.setHours(0, 0, 0, 0)
+    } else if (timelineOption === 'custom' && startDate) {
+      timelineStart = new Date(startDate)
+      timelineStart.setHours(0, 0, 0, 0)
+    }
+
+    if (parsedData?.id && parsedData?.hour !== undefined) {
+      const movedEvent = parsedData
+      const duration = movedEvent.endHour - movedEvent.hour
+      const newStart = hour
+      const newEnd = newStart + duration
+
+      const overlapping = events.find(
+        (ev) =>
+          ev.id !== movedEvent.id &&
+          ev.rowId === rowId &&
+          ((newStart >= ev.hour && newStart < (ev.endHour || ev.hour + 1)) ||
+            (newEnd > ev.hour && newEnd <= (ev.endHour || ev.hour + 1)) ||
+            (newStart <= ev.hour && newEnd >= (ev.endHour || ev.hour + 1))),
+      )
+
+      if (overlapping) {
+        fetchEvents()
+        setAlerts((prev) => [
+          ...prev,
+          {
+            severity: 'warning',
+            message: 'Cannot drop event here — time slot is already occupied.',
+          },
+        ])
+
+        return
+      }
+
+      const originalRow = unifiedRows.find((r) => r.id === movedEvent.rowId)
+      const targetRow = unifiedRows.find((r) => r.id === rowId)
+
+      if (
+        (originalRow?.employeeGroup?.id &&
+          targetRow?.employeeGroup?.id &&
+          originalRow.employeeGroup.id !== targetRow.employeeGroup.id) ||
+        targetRow.employeeGroup == ''
+      ) {
+        setAlerts((prev) => [
+          ...prev,
+          {
+            severity: 'warning',
+            message: 'Cannot move task to a different employee row.',
+          },
+        ])
+        return
+      }
+
+      const startTime = new Date(timelineStart.getTime() + newStart * 60 * 60 * 1000)
+      const endTime = new Date(timelineStart.getTime() + newEnd * 60 * 60 * 1000)
+
+      const updatedEvent = {
+        ...movedEvent,
+        rowId,
+        hour: newStart,
+        endHour: newEnd,
+        start_time: toLocalISOString(startTime),
+        end_time: toLocalISOString(endTime),
+        date: toLocalDateString(startTime),
+      }
+
+      if (updatedEvent.employee_id && updatedEvent.machine_id && updatedEvent.group_id) {
+        handleResizeEdit(updatedEvent)
+      }
+      return
+    }
+
+    const { itemType, value } = parsedData
+
     if (itemType === 'employeeGroup' && row.employeeGroup?.id !== value) {
       setAlerts((prev) => [
         ...prev,
@@ -229,16 +483,16 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
 
         const isAlreadyPresent = updatedEvent.labels?.some((label) => label[itemType] === value)
 
-        // 🔒 Prevent multiple machine/group entries
         if (
           (itemType === 'machine' && updatedEvent.machine_id) ||
-          (itemType === 'groupQty' && updatedEvent.group_id)
+          (itemType === 'groupQty' && updatedEvent.group_id) ||
+          (itemType === 'employeeGroup' && updatedEvent.employee_id)
         ) {
           setAlerts((prev) => [
             ...prev,
             {
               severity: 'warning',
-              message: `Cannot assign multiple ${itemType === 'machine' ? 'machines' : 'groups'} to a single event.`,
+              message: `Cannot assign multiple ${itemType === 'machine' ? 'machines' : itemType === 'groupQty' ? 'groups' : 'employees'} to a single event.`,
             },
           ])
           return prev
@@ -258,16 +512,31 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
 
         return prev.map((ev) => (ev.id === existingEvent.id ? updatedEvent : ev))
       } else {
+        const startTime = new Date(timelineStart.getTime() + hour * 60 * 60 * 1000)
+        const endTime = new Date(timelineStart.getTime() + (hour + 1) * 60 * 60 * 1000)
+
+        const now = new Date()
+
+        let color = '#ea7a57'
+        if (now < startTime) {
+          color = '#fec200'
+        } else if (now >= startTime && now <= endTime) {
+          color = '#5978ee'
+        } else if (now > endTime) {
+          color = '#1aaa55'
+        }
+
         const newEvent = {
+          id: Date.now() + Math.random(),
           rowId,
           hour,
           endHour: hour + 1,
-          color: getRandomColor(),
+          color,
           labels: [newLabelObj],
           task_name: '',
-          date: selectedDate,
-          start_time: formatHour(hour),
-          end_time: formatHour(hour + 1),
+          date: toLocalDateString(startTime),
+          start_time: toLocalISOString(startTime),
+          end_time: toLocalISOString(endTime),
           status: 'Scheduled',
           notes: '',
         }
@@ -291,52 +560,37 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
       machine_id: event.machine_id,
       group_id: event.group_id,
       task_name: '',
-      date: selectedDate,
-      start_time: formatHour(event.hour),
-      end_time: formatHour(event.endHour || event.hour + 1),
+      date: event.date,
+      start_time: event.start_time,
+      end_time: event.end_time,
       notes: '',
     }
 
     productionPlanningApi
       .addProductionPlanning(payload)
-      .then((res) => console.log('API success', res))
-      .catch((err) => console.error('API error', err))
+      .then((res) => {
+        // setSelectedFilter('')
+        fetchEvents()
+        setAlerts((prev) => [
+          ...prev,
+          {
+            severity: 'success',
+            message: 'Task added successfully. Drag the edges to adjust the time.',
+          },
+        ])
+      })
+      .catch((err) => {
+        console.error('API error', err)
+        setAlerts((prev) => [...prev, { severity: 'error', message: 'Failed to add event.' }])
+      })
   }
 
-  const handleDragOver = (e) => e.preventDefault()
+  const handleDragOver = (e) => {
+    e.preventDefault()
+  }
 
   const getEventsForCell = (rowId, hour) => {
     return events.find((ev) => ev.rowId === rowId && ev.hour === hour)
-  }
-
-  const getRandomColor = () => {
-    const colors = [
-      '#ea7a57', // coral
-      '#7fa900', // olive green
-      '#5978ee', // periwinkle
-      '#fec200', // gold
-      '#df5286', // pink
-      '#00bdae', // teal
-      '#865fcf', // violet
-      '#1aaa55', // green
-      '#710193', // deep purple
-      '#2d9cdb', // sky blue
-      '#27ae60', // emerald
-      '#f39c12', // orange
-      '#8e44ad', // plum
-      '#e74c3c', // red
-      '#16a085', // dark teal
-      '#3498db', // bright blue
-      '#9b59b6', // light purple
-      '#f1c40f', // bright yellow
-      '#34495e', // navy gray
-      '#e67e22', // pumpkin
-      '#1abc9c', // aqua green
-      '#2ecc71', // mint green
-      '#95a5a6', // gray
-    ]
-
-    return colors[Math.floor(Math.random() * colors.length)]
   }
 
   const getEventDuration = (event) => {
@@ -357,23 +611,71 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
     )
   }
 
-  const handleEdit = async (selectedEvent) => {
-    if (selectedEvent.id) {
+  const handleResizeEdit = async (selectedEvent) => {
+    if (Number.isInteger(selectedEvent.id)) {
       const payload = {
         employee_id: selectedEvent.employee_id,
         machine_id: selectedEvent.machine_id,
         group_id: selectedEvent.group_id,
         task_name: selectedEvent.task_name || '',
-        date: selectedDate,
-        start_time: formatHour(selectedEvent.hour),
-        end_time: formatHour(selectedEvent.endHour || selectedEvent.hour + 1),
+        date: selectedEvent.date,
+        start_time: selectedEvent.start_time,
+        end_time: selectedEvent.end_time,
         notes: selectedEvent.notes || '',
       }
 
       try {
         const res = await productionPlanningApi.updateProductionPlanning(selectedEvent.id, payload)
-        console.log('API success', res)
-        setEvents((prev) => prev.map((ev) => (ev.id === selectedEvent.id ? selectedEvent : ev)))
+
+        setAlerts((prev) => [
+          ...prev,
+          { severity: 'success', message: 'Task updated successfully.' },
+        ])
+        fetchEvents()
+        // setEvents((prev) => prev.map((ev) => (ev.id === selectedEvent.id ? selectedEvent : ev)))
+      } catch (error) {
+        console.error('API error', error)
+      }
+
+      setSelectedEvent(null)
+      setIsEditing(false)
+    }
+  }
+
+  const handleEditForm = async (selectedEvent) => {
+    if (Number.isInteger(selectedEvent.id)) {
+      const start = new Date(selectedEvent.start_time)
+      const end = new Date(selectedEvent.end_time)
+      const formatDateTime = (dateObj) => {
+        const year = dateObj.getFullYear()
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+        const day = String(dateObj.getDate()).padStart(2, '0')
+        const hours = String(dateObj.getHours()).padStart(2, '0')
+        const minutes = String(dateObj.getMinutes()).padStart(2, '0')
+        const seconds = String(dateObj.getSeconds()).padStart(2, '0')
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
+      }
+
+      const payload = {
+        employee_id: selectedEvent.employee_id,
+        user_id: selectedEvent.user_id || 1,
+        machine_id: selectedEvent.machine_id,
+        group_id: selectedEvent.group_id,
+        task_name: selectedEvent.task_name || '',
+        date: selectedEvent.date,
+        start_time: formatDateTime(start),
+        end_time: formatDateTime(end),
+        notes: selectedEvent.notes || '',
+      }
+
+      try {
+        const res = await productionPlanningApi.updateProductionPlanning(selectedEvent.id, payload)
+
+        setAlerts((prev) => [
+          ...prev,
+          { severity: 'success', message: 'Task updated successfully.' },
+        ])
+        fetchEvents()
       } catch (error) {
         console.error('API error', error)
       }
@@ -384,16 +686,18 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
   }
 
   const handleDeleteEvent = async (event) => {
-    if (event.id) {
+    const isSavedEvent = Number.isInteger(event.id)
+
+    if (event.id && isSavedEvent) {
       try {
         const res = await productionPlanningApi.deleteProductionPlanning(event.id)
-        console.log('API success', res)
 
         setEvents((prevEvents) => prevEvents.filter((ev) => ev.id !== event.id))
       } catch (error) {
         console.error('API error', error)
       }
     } else {
+      // 🧹 Local-only event delete (not saved to DB)
       setEvents((prevEvents) =>
         prevEvents.filter(
           (ev) =>
@@ -404,43 +708,130 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
 
     setSelectedEvent(null)
   }
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false)
+  }
+
+  // useEffect(() => {
+  //   const isTodaySelected =
+  //     selectedDate && new Date(selectedDate).toDateString() === new Date().toDateString()
+
+  //   console.log('isTodaySelected', isTodaySelected)
+
+  //   if (timelineOption === 'today' && isTodaySelected && tableContainerRef.current) {
+  //     const currentHour = new Date().getHours()
+  //     const columnWidth = 100
+  //     const scrollX = currentHour * columnWidth
+
+  //     requestAnimationFrame(() => {
+  //       tableContainerRef.current?.scrollTo({
+  //         left: scrollX,
+  //         behavior: 'smooth',
+  //       })
+  //     })
+  //   }
+  // }, [timelineOption, selectedDate])
 
   return (
     <div className="scheduler-container">
-      <div className="scheduler-table-wrapper">
+      <div ref={tableContainerRef} className="scheduler-table-wrapper overflow-x-auto max-w-full">
         <table className="scheduler-table">
-          <thead>
-            {/* Date Picker Row */}
-            <tr>
-              <th colSpan={hours.length + 3} className="date-header-sticky">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium">Date:</label>
-                  <input
-                    type="date"
-                    className="border rounded px-2 py-1 text-sm"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                  />
+          <thead className="sticky-col">
+            <tr className=" text-xs sticky top-0 z-[60] bg-white">
+              <th className="sticky-date-header" colSpan={3}>
+                <div className="flex justify-between items-center w-full gap-2 pr-2">
+                  {/* Left: Timeline option dropdown */}
+                  <select
+                    value={timelineOption}
+                    onChange={(e) => {
+                      setStartDate(null)
+                      setEndDate(null)
+                      setTimelineOption(e.target.value)
+                      setSelectedDate(new Date().toISOString().split('T')[0])
+                    }}
+                    className="border px-2 py-1 rounded text-sm"
+                  >
+                    <option value="today">Today</option>
+                    <option value="thisWeek">This Week</option>
+                    <option value="custom">Custom</option>
+                  </select>
+
+                  {/* Right: Date input based on option */}
+                  {timelineOption === 'today' && (
+                    <input
+                      type="date"
+                      className="border rounded px-2 py-1 text-sm"
+                      value={selectedDate}
+                      placeholder="Select date"
+                      onChange={(e) => {
+                        setStartDate(null)
+                        setEndDate(null)
+                        setSelectedDate(e.target.value)
+                        setTimelineOption('today')
+                      }}
+                    />
+                  )}
+
+                  {timelineOption === 'custom' && (
+                    <div className="relative z-[9999]">
+                      <DatePicker
+                        selectsRange
+                        startDate={startDate}
+                        endDate={endDate}
+                        onChange={(update) => {
+                          setStartDate(update[0])
+                          setEndDate(update[1])
+                          if (update[0] && update[1]) {
+                            const daysDiff =
+                              Math.ceil((update[1] - update[0]) / (1000 * 60 * 60 * 24)) + 1
+                            setCustomDays(daysDiff)
+                            setTimelineOption('custom')
+                          }
+                        }}
+                        onCalendarOpen={() => console.log('Calendar opened')}
+                        dateFormat="dd-MM-yyyy"
+                        className="border px-2 py-1 rounded text-sm w-full"
+                        placeholderText="Select date range"
+                        popperPlacement="bottom-start"
+                      />
+                    </div>
+                  )}
                 </div>
               </th>
-            </tr>
 
-            {/* Header Row */}
-            <tr className="header-row">
-              <th className="sticky-col sticky-employee header-sticky">Employee</th>
-              <th className="sticky-col sticky-machine header-sticky">Machine</th>
-              <th className="sticky-col sticky-quantity header-sticky">Group Qty</th>
-              {hours.map((hour) => (
-                <th className="header-sticky" key={hour}>
-                  {hour === 0
-                    ? '12 AM'
-                    : hour < 12
-                      ? `${hour} AM`
-                      : hour === 12
-                        ? '12 PM'
-                        : `${hour - 12} PM`}
-                </th>
-              ))}
+              {Array.from({ length: selectedDays }, (_, dayIndex) => {
+                const date = weekStart.add(dayIndex, 'day')
+                return (
+                  <th
+                    key={`date-${dayIndex}`}
+                    colSpan={24}
+                    className=" right-date text-left whitespace-nowrap border-l border-gray-300 sticky-x bg-white z-10"
+                  >
+                    <div className="pl-2 text-left w-max">{date.format('MMM D, dddd')}</div>
+                  </th>
+                )
+              })}
+            </tr>
+            <tr className="header-row text-xs bg-gray-100 top-[40px] z-10">
+              <th className="sticky-header sticky-col sticky-employee header-sticky">Employee</th>
+              <th className="sticky-header sticky-col sticky-machine header-sticky">Machine</th>
+              <th className="sticky-header sticky-col sticky-quantity header-sticky">Group Qty</th>
+              {hours.map((hour, i) => {
+                const hourOfDay = hour % 24
+                const suffix = hourOfDay < 12 ? 'AM' : 'PM'
+                const hour12 = hourOfDay === 0 || hourOfDay === 12 ? 12 : hourOfDay % 12
+
+                return (
+                  <th
+                    key={`hour-${i}`}
+                    className="right-date text-left justify-content-left header-sticky bg-white border-x border-gray-200 date-group-cell"
+                  >
+                    <span className="absolute left-0 pl-1 top-1 text-xs font-semibold text-gray-800">
+                      {`${hour12}:00 ${suffix}`}
+                    </span>
+                  </th>
+                )
+              })}
             </tr>
           </thead>
 
@@ -448,7 +839,7 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
             {unifiedRows.map((row, i) => (
               <tr key={row.id || i}>
                 <td
-                  className="sticky-col sticky-employee draggable-cell"
+                  className="sticky-col sticky-employee draggable-cell  bg-white z-[10]"
                   draggable={!!row.employeeGroup?.id}
                   onDragStart={(e) => {
                     if (row.employeeGroup?.id) {
@@ -460,7 +851,7 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
                 </td>
 
                 <td
-                  className="sticky-col sticky-machine draggable-cell"
+                  className="sticky-col sticky-machine draggable-cell  bg-white z-[10]"
                   draggable={!!row.machine?.id}
                   onDragStart={(e) => {
                     if (row.machine?.id) {
@@ -472,15 +863,20 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
                 </td>
 
                 <td
-                  className="sticky-col sticky-quantity draggable-cell"
+                  className="sticky-col sticky-quantity draggable-cell bg-white z-[10]"
                   draggable={!!row.groupQty?.id}
                   onDragStart={(e) => {
                     if (row.groupQty?.id) {
-                      handleDragStart(e, 'groupQty', row.groupQty?.id)
+                      handleDragStart(e, 'groupQty', row.groupQty.id)
                     }
                   }}
                 >
-                  {row?.groupQty?.group_name || ''}
+                  <div className="font-medium text-gray-700">{row.groupQty?.group_name || ''}</div>
+                  {row.groupQty?.group_name && (
+                    <div className="text-[11px] mt-1 text-gray-600">
+                      {`${row.groupQty?.manufactured_qty || 0} / ${row.groupQty?.group_Qty || ''}`}
+                    </div>
+                  )}
                 </td>
 
                 {hours.map((hour) => {
@@ -488,27 +884,31 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
 
                   const event = getEventsForCell(row.id, hour)
                   const colSpan = event ? getEventDuration(event) : 1
+                  const isCompleted = event?.status === 'completed'
 
                   return (
                     <td
                       key={hour}
-                      onDrop={(e) => handleDrop(e, row.id, hour)}
-                      onDragOver={handleDragOver}
+                      onDrop={(e) => !isCompleted && handleDrop(e, row.id, hour)}
+                      onDragOver={(e) => !isCompleted && handleDragOver(e)}
                       className="time-slot"
                       colSpan={colSpan}
                     >
                       {event && (
                         <div
-                          className="event"
+                          className={`event ${isCompleted ? 'opacity-50 cursor-default' : ''}`}
                           style={{ backgroundColor: event.color }}
-                          draggable
+                          draggable={!isCompleted}
                           onDragStart={(e) => {
+                            if (isCompleted) return
                             e.stopPropagation()
-                            setDraggingEvent({
+                            const payload = {
                               ...event,
                               hour: event.hour,
                               endHour: event.endHour ?? event.hour + 1,
-                            })
+                            }
+                            setDraggingEvent(payload)
+                            e.dataTransfer.setData('application/json', JSON.stringify(payload))
                           }}
                           onClick={(e) => {
                             if (justResized) {
@@ -519,18 +919,23 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
                             setSelectedEvent(event)
                           }}
                         >
-                          <div
-                            className="resize-handle left"
-                            onMouseDown={(e) => startResize(e, event, 'left')}
-                          />
-                          <div
-                            className="resize-handle right"
-                            onMouseDown={(e) => startResize(e, event, 'right')}
-                          />
+                          {/* Show resize handles only if not completed */}
+                          {!isCompleted && (
+                            <>
+                              <div
+                                className="resize-handle left"
+                                onMouseDown={(e) => startResize(e, event, 'left')}
+                              />
+                              <div
+                                className="resize-handle right"
+                                onMouseDown={(e) => startResize(e, event, 'right')}
+                              />
+                            </>
+                          )}
+
                           <div className="event-labels">
                             {event.labels.map((labelObj, i) => {
                               const [type, id] = Object.entries(labelObj)[0]
-
                               let displayText = ''
                               if (type === 'employeeGroup') {
                                 displayText =
@@ -586,17 +991,46 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
                 <span className="text-lg font-semibold">
                   {selectedEvent.task_name ? selectedEvent.task_name : 'Event'}
                 </span>
+                {/* Status Badge */}
+                {selectedEvent.status && (
+                  <div className="px-2 mt-1">
+                    <span
+                      className={`inline-block px-2 py-0.5 text-xs font-semibold rounded-full ${
+                        selectedEvent.status === 'completed'
+                          ? 'bg-green-100 text-green-700'
+                          : selectedEvent.status === 'in_progress'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-gray-200 text-gray-600'
+                      }`}
+                    >
+                      {selectedEvent.status
+                        .split('_')
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')}
+                    </span>
+                  </div>
+                )}
+
                 <div className="popup-icons flex gap-2 text-gray-600 text-lg">
-                  <FaEdit
-                    title="Edit"
-                    className="cursor-pointer hover:text-blue-500 transition"
-                    onClick={() => setIsEditing(true)}
-                  />
-                  <FaTrash
-                    title="Delete"
-                    className="cursor-pointer hover:text-red-500 transition"
-                    onClick={() => handleDeleteEvent(selectedEvent)}
-                  />
+                  {selectedEvent.status === 'in_progress' && (
+                    <FaEdit
+                      title="Edit"
+                      className="cursor-pointer hover:text-blue-500 transition"
+                      disabled={selectedEvent.status === 'in_progress'}
+                      onClick={() => setIsEditing(true)}
+                    />
+                  )}
+
+                  {selectedEvent.status !== 'completed' && (
+                    <FaTrash
+                      title="Delete"
+                      className="cursor-pointer hover:text-red-500 transition"
+                      onClick={() => {
+                        setIsDeleteModalOpen(true)
+                      }}
+                    />
+                  )}
+
                   <FaTimes
                     title="Close"
                     className="cursor-pointer hover:text-gray-800 transition"
@@ -645,32 +1079,38 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
                   <div className="space-y-1">
                     {employeeGroupLabels.length > 0 && (
                       <div className="flex">
-                        <div className="w-32 font-semibold">Employee:</div>
+                        <div className="w-40 font-semibold">Employee:</div>
                         <div>{employeeGroupLabels.join(', ')}</div>
                       </div>
                     )}
                     {machineLabels.length > 0 && (
                       <div className="flex">
-                        <div className="w-32 font-semibold">Machine:</div>
+                        <div className="w-40 font-semibold">Machine:</div>
                         <div>{machineLabels.join(', ')}</div>
                       </div>
                     )}
                     {qtyLabels.length > 0 && (
                       <div className="flex">
-                        <div className="w-32 font-semibold">Grouped Qty:</div>
+                        <div className="w-40 font-semibold">Group:</div>
                         <div>{qtyLabels.join(', ')}</div>
                       </div>
                     )}
                     <div className="flex">
-                      <div className="w-32 font-semibold">Notes:</div>
-                      <div>{selectedEvent.notes || '-'}</div>
+                      <div className="w-40 font-semibold">Total Qty:</div>
+                      <div>{selectedEvent.total_quantity || '-'}</div>
                     </div>
                     <div className="flex">
-                      <div className="w-32 font-semibold">Time:</div>
-                      <div>
-                        {formatHour(selectedEvent.hour)} -{' '}
-                        {formatHour(selectedEvent.endHour || selectedEvent.hour + 1)}
-                      </div>
+                      <div className="w-40 font-semibold">Manufactured Qty:</div>
+                      <div>{selectedEvent.manufactured_quantity || '-'}</div>
+                    </div>
+                    <div className="flex">
+                      <div className="w-40 font-semibold">Balance Qty:</div>
+                      <div>{selectedEvent.balance_quantity || '-'}</div>
+                    </div>
+                    <div className="flex">
+                      <div className="w-40 font-semibold">Time:</div>
+                      {formatDateToCustomDisplay(selectedEvent.start_time)} -{' '}
+                      {formatDateToCustomDisplay(selectedEvent.end_time)}
                     </div>
                   </div>
                 )
@@ -762,7 +1202,7 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
               </div>
 
               <div className="field-group">
-                <label>Planned Qty:</label>
+                <label>Group:</label>
                 <select
                   className="styled-select"
                   value={selectedEvent.labels.find((label) => 'groupQty' in label)?.groupQty || ''}
@@ -778,7 +1218,7 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
                     }))
                   }}
                 >
-                  <option value="">-- Select Planned Qty --</option>
+                  <option value="">-- Select Group --</option>
                   {groupsData.map((row) => (
                     <option key={row.id} value={row.id}>
                       {row.group_name}
@@ -789,51 +1229,48 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
 
               <div className="time-selects">
                 <div className="field-group">
-                  <label>From (hour):</label>
-                  <select
+                  <label>From:</label>
+                  <input
+                    type="datetime-local"
                     className="styled-select"
-                    value={selectedEvent.hour}
+                    value={formatDateForInput(selectedEvent.start_time)}
                     onChange={(e) => {
-                      const newFrom = parseInt(e.target.value, 10)
+                      const newStart = e.target.value
                       setSelectedEvent((prev) => {
-                        // ensure the end is at least newFrom + 1
-                        const minEnd = newFrom + 1
+                        const start = new Date(newStart)
+                        const end = new Date(prev.end_time)
+
+                        // Ensure start is not after end
+                        const adjustedEnd =
+                          start >= end ? new Date(start.getTime() + 60 * 60 * 1000) : end
+
                         return {
                           ...prev,
-                          hour: newFrom,
-                          endHour: Math.max(prev.endHour ?? prev.hour + 1, minEnd),
+                          start_time: newStart,
+                          end_time: adjustedEnd.toISOString().slice(0, 16),
                         }
                       })
                     }}
-                  >
-                    {hourOptions.slice(0, 24).map(({ value, label }) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
 
                 <div className="field-group">
-                  <label>To (hour):</label>
-                  <select
+                  <label>To:</label>
+                  <input
+                    type="datetime-local"
                     className="styled-select"
-                    value={selectedEvent.endHour || selectedEvent.hour + 1}
-                    onChange={(e) =>
+                    value={formatDateForInput(selectedEvent.end_time)}
+                    min={formatDateForInput(selectedEvent.start_time)} // prevent selecting before start
+                    onChange={(e) => {
                       setSelectedEvent((prev) => ({
                         ...prev,
-                        endHour: parseInt(e.target.value),
+                        end_time: e.target.value,
                       }))
-                    }
-                  >
-                    {hourOptions.slice(selectedEvent.hour + 1, 25).map(({ value, label }) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
+                    }}
+                  />
                 </div>
               </div>
+
               <div className="field-group">
                 <label>Notes:</label>
                 <textarea
@@ -854,8 +1291,7 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
               <button
                 className="btn-save"
                 onClick={() => {
-                  console.log('Save clicked', selectedEvent)
-                  handleEdit(selectedEvent)
+                  handleEditForm(selectedEvent)
                 }}
               >
                 Save
@@ -868,6 +1304,11 @@ const ProductionPlanningChart = ({ employeesData, machinesData, groupsData, setA
           </div>
         </div>
       )}
+      <ConfirmationModale
+        isOpen={isDeleteModalOpen}
+        onConfirm={() => handleDeleteEvent(selectedEvent)}
+        onClose={closeDeleteModal}
+      />
     </div>
   )
 }

@@ -222,22 +222,23 @@ function EmployeeView() {
               </div>
             </div> */}
 
-          {/* Timestamps Card */}
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Record Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-500">Created At</span>
-                  <span className="text-gray-800 mt-1">
-                    {new Date(employeeData.created_at).toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-500">Updated At</span>
-                  <span className="text-gray-800 mt-1">
-                    {new Date(employeeData.updated_at).toLocaleString()}
-                  </span>
+            {/* Timestamps Card */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+              <div className="p-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">Record Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-500">Created At</span>
+                    <span className="text-gray-800 mt-1">{new Date(employeeData.created_at).toLocaleString()}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-500">Updated At</span>
+                    <span className="text-gray-800 mt-1">{new Date(employeeData.updated_at).toLocaleString()}</span>
+                  </div>
+                  {/* <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-500">Company ID</span>
+                    <span className="text-gray-800 mt-1">{employeeData.company_id}</span>
+                  </div> */}
                 </div>
               </div>
             </div>

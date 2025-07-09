@@ -2,7 +2,6 @@ import { useState, useEffect, use, useRef } from 'react'
 import { IoCheckmarkCircleOutline } from 'react-icons/io5'
 import { TbSmartHome } from 'react-icons/tb'
 import CompactPagination from '../../../components/New/CompactPagination'
-import EmployeeForm from './EmployeeForm'
 import EmployeeTable from './EmployeeTable'
 import ActionButton from '../../../components/New/ActionButton'
 import SearchBar from '../../../components/New/SearchBar'
@@ -14,7 +13,7 @@ import { FiDownload, FiUpload } from 'react-icons/fi'
 import { companyApi } from '../../../api/company'
 import { commonApi } from '../../../api/common'
 import { employeeApi } from '../../../api/employee'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 function EmployeeList() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -57,8 +56,9 @@ function EmployeeList() {
     ],
   })
 
-  // State to manage form data
-  const [formData, setFormData] = useState({
+  const navigate = useNavigate()
+
+  const defaultFormState = {
     name: '',
     email: '',
     password: '',
@@ -79,7 +79,8 @@ function EmployeeList() {
     image: '',
     country_phonecode: null,
     country_id: null,
-  })
+  }
+  const [formData, setFormData] = useState(defaultFormState)
 
   useEffect(() => {
     const fetchDropDownData = async () => {
@@ -141,149 +142,8 @@ function EmployeeList() {
     fetchEmployeeData()
   }, [paginationParams, searchQuery, status, filters])
 
-  const handleEdit = async (id, userId) => {
-    setIsEdit(true)
-    setCurrentEmployeeId(userId)
-
-    try {
-      const response = await employeeApi.getEmployeeData(id)
-
-      if (!response || !response.data || !response.data.data) {
-        console.error('Invalid API response structure:', response)
-        return
-      }
-
-      const selectedEmployee = response.data.data
-
-      // Set form data and then open drawer
-      setFormData({
-        name: selectedEmployee.user_name || '',
-        email: selectedEmployee.user_email || '',
-        password: selectedEmployee.password || '',
-        mobile: selectedEmployee.mobile || '',
-        employee_id: selectedEmployee.employee_id || '',
-        address: selectedEmployee.address || '',
-        skills: selectedEmployee.skills || '',
-        department_id: selectedEmployee.department_id,
-        designation_id: selectedEmployee.designation_id,
-        company_address_id: selectedEmployee.company_address_id,
-        role_id: selectedEmployee.role_id || '',
-        reporting_to: selectedEmployee.reporting_to,
-        joining_date: selectedEmployee.joining_date || '',
-        date_of_birth: selectedEmployee.date_of_birth || '',
-        about_me: selectedEmployee.about_me || '',
-        contract_end_date: selectedEmployee.contract_end_date || '',
-        employment_type: selectedEmployee.employment_type || '',
-        image: selectedEmployee.image || '',
-        country_phonecode: selectedEmployee.country_phonecode || '',
-        country_id: selectedEmployee.country_id || '',
-      })
-
-      // Add a delay before opening the drawer to ensure state is updated
-      setTimeout(() => {
-        setDrawerOpen(true)
-      }, 100)
-    } catch (error) {
-      console.error('Error fetching employee data:', error)
-    }
-  }
-
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    const requiredFields = [
-      'name',
-      'email',
-      'mobile',
-      'employee_id',
-      'department_id',
-      'designation_id',
-      'joining_date',
-      'date_of_birth',
-      'reporting_to',
-      'employment_type',
-      'company_address_id',
-      'role_id',
-      'skills',
-      'country_id',
-    ]
-
-    if (formData.employment_type === 'Contract') {
-      requiredFields.push('contract_end_date')
-    }
-    if (!isEdit) {
-      requiredFields.push('password')
-    }
-
-    const missingFields = requiredFields.filter((field) => !formData[field])
-    if (missingFields.length > 0) {
-      const message =
-        missingFields.length > 5
-          ? 'Please fill all mandatory fields.'
-          : `Please fill the following mandatory fields: ${missingFields.join(', ')}`
-
-      setAlerts([{ severity: 'error', message }])
-      return
-    }
-
-    try {
-      const response = isEdit
-        ? await employeeApi.editEmployee(CurrentEmployeeId, formData)
-        : await employeeApi.createNewEmployee(formData)
-
-      if (response?.status === 200 || response?.status === 201) {
-        setAlerts([
-          {
-            severity: 'success',
-            message:
-              response?.data?.message ||
-              (isEdit ? 'Employee updated successfully.' : 'Employee created successfully.'),
-          },
-        ])
-
-        setTimeout(() => {
-          handleClose()
-        }, 3000)
-        clearFilters()
-        fetchEmployeeData()
-        setDrawerOpen(false)
-        setIsEdit(false)
-        setFormData({
-          name: '',
-          email: '',
-          password: '',
-          mobile: '',
-          employee_id: '',
-          address: '',
-          skills: '',
-          department_id: null,
-          designation_id: null,
-          joining_date: '',
-          date_of_birth: '',
-          about_me: '',
-          reporting_to: null,
-          contract_end_date: '',
-          employment_type: '',
-          company_address_id: null,
-          role_id: null,
-          image: '',
-        })
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error)
-
-      const errorMsg =
-        error?.response?.data?.message ||
-        error?.message ||
-        'An error occurred while submitting the form.'
-
-      setAlerts([{ severity: 'error', message: errorMsg }])
-
-      setTimeout(() => {
-        handleClose()
-      }, 3000)
-    }
+  const handleEdit = (id, userId) => {
+    navigate(`/employeelist/form/${id}`)
   }
 
   const handlePageChange1 = (event, newPage) => {
@@ -415,9 +275,7 @@ function EmployeeList() {
         <CustomAlert alerts={alerts} handleClose={handleClose} />
         <ContentHeader
           heading={'Employee'}
-          onAddClick={() => {
-            setDrawerOpen(true), setIsEdit(false)
-          }}
+          onAddClick={() => navigate('/employeelist/form')}
           menuOptions={[
             {
               icon: <FiUpload className="mr-2 text-blue-500" />,
@@ -561,19 +419,6 @@ function EmployeeList() {
                 entriesPerPage={paginationParams.pageSize}
               />
             </div>
-          </div>
-          <div>
-            <EmployeeForm
-              isDrawerOpen={isDrawerOpen}
-              setDrawerOpen={setDrawerOpen}
-              formData={formData}
-              setFormData={setFormData}
-              isEdit={isEdit}
-              handleSubmit={handleSubmit}
-              dropdownOptions={dropdownOptions}
-              setDropdownOptions={setDropdownOptions}
-              setAlerts={setAlerts}
-            />
           </div>
         </div>
       </div>

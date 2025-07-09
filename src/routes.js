@@ -15,6 +15,7 @@ const SKU = React.lazy(() => import('./Module/SKU/SkuList.js'))
 const SkuAddEdit = React.lazy(() => import('./Module/SKU/SkuAddEdit.js'))
 const EmployeeList = React.lazy(() => import('./Module/HRMS/Employee/EmployeeList.js'))
 const EmployeeListView = React.lazy(() => import('./Module/HRMS/Employee/EmployeeView.js'))
+const EmployeeListForm = React.lazy(() => import('./Module/HRMS/Employee/EmployeeForm.js'))
 const PurchaseOrder = React.lazy(() => import('./Module/Purchase/PurchaseOrder.js'))
 const AddPurchaseOrder = React.lazy(() => import('./Module/Purchase/AddPurchaseOrder.js'))
 const AddPurchaseReturn = React.lazy(() => import('./Module/PurchaseReturn/AddPurchaseReturn.js'))
@@ -161,6 +162,12 @@ const routes = [
         key: 'employee view',
       },
     ],
+  },
+  {
+    path: '/employeelist/form/:id?',
+    name: 'Employee List',
+    element: EmployeeListForm,
+    key: 21,
   },
   {
     path: '/purchaseorder',

@@ -1,9 +1,6 @@
-
-
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import ContentHeader from '../../../components/New/ContentHeader';
- import CompaniesTable from './Companiestable';
-
+import CompaniesTable from './Companiestable';
 import CompaniesForm from './CompaniesForm';
 import CompaniesSingleViewCard from './CompaniesSingleViewCard';
 import Drawer from '../../../components/Drawer/Drawer';
@@ -11,11 +8,13 @@ import CustomAlert from '../../../components/New/CustomAlert';
 import CompactPagination from '../../../components/New/CompactPagination';
 import Loader from '../../../components/New/Loader';
 import { useSearch } from '../../../components/New/SearchContext';
-import { companyApi } from '../../../api/company';
+import { companyApi } from '../../../api/company'; // ✅ single import
 import { debounce } from 'lodash';
 
 const CompanyManagement = () => {
   const [companiesData, setCompaniesData] = useState([]);
+  const [packages, setPackages] = useState([]); // ✅ package data state
+
   const [showCompanyForm, setShowCompanyForm] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [formData, setFormData] = useState(null);
@@ -41,6 +40,7 @@ const CompanyManagement = () => {
     return () => setGlobalPlaceholder('Search...');
   }, [setGlobalPlaceholder]);
 
+  // ✅ fetch companies
   const fetchCompanies = useCallback(async (search, pageParams) => {
     setLoading(true);
     try {
@@ -72,13 +72,29 @@ const CompanyManagement = () => {
     }
   }, []);
 
+  // ✅ fetch packages using companyApi.getPackages
+  const fetchPackages = useCallback(async () => {
+    try {
+      const res = await companyApi.getPackages();
+      const data = Array.isArray(res.data?.data)
+        ? res.data.data
+        : Array.isArray(res.data)
+        ? res.data
+        : [];
+      setPackages(data);
+    } catch (error) {
+      console.error('Failed to fetch packages', error);
+    }
+  }, []);
+
   const debouncedFetchCompanies = useRef(
     debounce((search, params) => fetchCompanies(search, params), 500)
   ).current;
 
   useEffect(() => {
     debouncedFetchCompanies(searchQuery, paginationParams);
-  }, [searchQuery, paginationParams, refresh, debouncedFetchCompanies]);
+    fetchPackages(); // ✅ fetch packages on mount
+  }, [searchQuery, paginationParams, refresh, debouncedFetchCompanies, fetchPackages]);
 
   useEffect(() => {
     return () => debouncedFetchCompanies.cancel();
@@ -107,7 +123,6 @@ const CompanyManagement = () => {
   const handleEditCompany = (company) => {
     setIsEdit(true);
     setFormData(company);
-    console.log('Editing company:', company);
     setShowCompanyForm(true);
   };
 
@@ -123,6 +138,10 @@ const CompanyManagement = () => {
 
   const handleSuccess = () => {
     setShowCompanyForm(false);
+    setPaginationParams((prev) => ({
+      ...prev,
+      currentPage: 1, // reset to page 1 to see newly created record
+    }));
     setRefresh((prev) => !prev);
     setAlerts({
       show: true,
@@ -154,6 +173,7 @@ const CompanyManagement = () => {
           <div className="flex-1 flex flex-col min-w-0">
             <CompaniesTable
               companiesData={companiesData}
+              packages={packages} // ✅ pass packages for mapping
               handleEditCompany={handleEditCompany}
               handleViewCompany={handleViewCompany}
               setRefresh={setRefresh}

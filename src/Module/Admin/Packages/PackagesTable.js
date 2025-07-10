@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons';
 import ThreeDotMenu from '../../../components/ThreeDotMenu';
@@ -60,6 +58,25 @@ const PackagesTable = ({
       ),
     },
     {
+      key: 'features_count',
+      header: 'Features count',
+      field: 'package.module_in_package',
+      type: 'custom',
+      render: (row) => {
+        const modules = row.package.module_in_package;
+        const count = Array.isArray(modules) ? modules.length : 0;
+        return (
+          <span
+            className="text-left block cursor-pointer"
+            onClick={() => handleViewClick(row.package)}
+            title="View Package Details"
+          >
+            {count}
+          </span>
+        );
+      },
+    },
+    {
       key: 'monthly_price',
       header: 'Monthly Price',
       field: 'package.monthly_price',
@@ -68,11 +85,6 @@ const PackagesTable = ({
       key: 'annual_price',
       header: 'Annual Price',
       field: 'package.annual_price',
-    },
-    {
-      key: 'max_employees',
-      header: 'Max Employees',
-      field: 'package.max_employees',
     },
     {
       key: 'status',
@@ -145,7 +157,6 @@ const PackagesTable = ({
       <ReusableTable
         columns={isMinimized ? minimizedColumns : fullColumns}
         data={packagedata}
-        // ✅ This makes the entire row clickable except the actions
         handleRowClick={(row) => handleViewClick(row.package)}
       />
 

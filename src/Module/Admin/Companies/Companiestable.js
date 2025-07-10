@@ -1,8 +1,3 @@
-
-
-
-
-
 import React, { useState } from 'react';
 import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons';
 import ThreeDotMenu from '../../../components/ThreeDotMenu';
@@ -12,6 +7,7 @@ import { companyApi } from '../../../api/company';
 
 const CompaniesTable = ({
   companiesData = [],
+  packages = [],
   handleEditCompany,
   handleViewCompany,
   setRefresh,
@@ -47,21 +43,66 @@ const CompaniesTable = ({
     handleViewCompany(company);
   };
 
-  // ✅ Full columns with Expiry Date added
   const fullColumns = [
     {
       key: 'company_name',
       header: 'Company Name',
       field: 'company_name',
     },
-    { key: 'package_type', header: 'Package', field: 'package_type' },
-    { key: 'created_at', header: 'Created Date', field: 'created_at', type: 'date' },
-    { key: 'last_login', header: 'Last Activity', field: 'last_login' },
     {
-      key: 'expiry_date',
-      header: 'Expiry Date',
-      field: 'expiry_date',
+      key: 'package',
+      header: 'Package',
+      field: 'package',
+      type: 'custom',
+      render: (row) => {
+        const matchedPackage = packages.find(
+          (pkg) =>
+            pkg.package?.id === row.package_id || pkg.id === row.package_id
+        );
+
+        const packageName = matchedPackage
+          ? matchedPackage.package?.name || matchedPackage.name
+          : '-';
+
+        const displayValue =
+          packageName !== '-' && row.package_type
+            ? `${packageName} / ${row.package_type}`
+            : packageName !== '-'
+            ? packageName
+            : row.package_type || '-';
+
+        return (
+          <div className="text-left w-full">
+            <div className="inline-block px-2 py-1 bg-gray-100 rounded">
+              {displayValue}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      key: 'created_at',
+      header: 'Created Date',
+      field: 'created_at',
       type: 'date',
+    },
+    {
+      key: 'last_login',
+      header: 'Last Activity',
+      field: 'last_login',
+    },
+    {
+      key: 'package_end_date',
+      header: 'Expiry Date',
+      field: 'package_end_date',
+      type: 'custom',
+      render: (row) => (
+        <span>
+          {row.package_end_date
+            ? new Date(row.package_end_date).toLocaleDateString()
+            : '-'}
+        </span>
+      ),
     },
     {
       key: 'status',
@@ -88,25 +129,27 @@ const CompaniesTable = ({
       field: 'actions',
       type: 'custom',
       render: (row) => (
-        <ThreeDotMenu
-          value={[
-            {
-              label: 'View',
-              icon: cilHandPointRight,
-              onClick: () => handleViewClick(row),
-            },
-            {
-              label: 'Edit',
-              icon: cilPencil,
-              onClick: () => handleEditCompany(row),
-            },
-            {
-              label: 'Delete',
-              icon: cilTrash,
-              onClick: () => openDeleteModal(row.id),
-            },
-          ]}
-        />
+        <div onClick={(e) => e.stopPropagation()}>
+          <ThreeDotMenu
+            value={[
+              {
+                label: 'View',
+                icon: cilHandPointRight,
+                onClick: () => handleViewClick(row),
+              },
+              {
+                label: 'Edit',
+                icon: cilPencil,
+                onClick: () => handleEditCompany(row),
+              },
+              {
+                label: 'Delete',
+                icon: cilTrash,
+                onClick: () => openDeleteModal(row.id),
+              },
+            ]}
+          />
+        </div>
       ),
     },
   ];
@@ -124,8 +167,7 @@ const CompaniesTable = ({
       <ReusableTable
         columns={isMinimized ? minimizedColumns : fullColumns}
         data={companiesData}
-        // ✅ This makes the entire row clickable except actions
-        handleRowClick={(row) => handleViewClick(row)}
+        handleRowClick={handleViewClick}
       />
 
       <DeleteModal
@@ -140,8 +182,3 @@ const CompaniesTable = ({
 };
 
 export default CompaniesTable;
-
-
-
-
-

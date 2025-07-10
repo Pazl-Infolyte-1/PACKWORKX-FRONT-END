@@ -132,25 +132,23 @@ export const employeeApi = {
       console.error(error)
     }
   },
-   getDepartmentsListDisplay: async (search) => {
-  try {
-    const params = search ? { search } : {};
-    return await apiClient.get(`/departments`, { params });
-  } catch (error) {
-    console.error('Error in getDepartmentsListDisplay:', error);
-  }
-},
-
-
+  getDepartmentsListDisplay: async (search) => {
+    try {
+      const params = search ? { search } : {}
+      return await apiClient.get(`/departments`, { params })
+    } catch (error) {
+      console.error('Error in getDepartmentsListDisplay:', error)
+    }
+  },
 
   getDesignationListDisplay: async (search) => {
-  try {
-    const params = search ? { search } : {};
-    return await apiClient.get(`/designations`, { params });
-  } catch (error) {
-    console.error('Error in getDepartmentsListDisplay:', error);
-  }
-},
+    try {
+      const params = search ? { search } : {}
+      return await apiClient.get(`/designations`, { params })
+    } catch (error) {
+      console.error('Error in getDepartmentsListDisplay:', error)
+    }
+  },
 
   DeleteEmployee: async (id) => {
     try {
@@ -160,7 +158,7 @@ export const employeeApi = {
     }
   },
 
-    GetEmployeelist: async (params) => {
+  GetEmployeelist: async (params) => {
     try {
       const response = await apiClient.get('/user/employees', {
         params: {
@@ -174,6 +172,14 @@ export const employeeApi = {
         },
       })
       return response
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  getEmployeeDataById: async (id) => {
+    try {
+      return await apiClient.get(`/user/employees/${id}`)
     } catch (error) {
       console.error(error)
     }

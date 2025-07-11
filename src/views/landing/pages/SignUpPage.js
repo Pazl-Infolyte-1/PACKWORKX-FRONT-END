@@ -8,19 +8,19 @@ const SignUpPage = ({ showPage, handleTrailFormSubmit, packageName }) => {
           <h2>Start Your {packageName} Trial</h2>
           <form onSubmit={handleTrailFormSubmit}>
             <div className="landing-form-group">
-              <label htmlFor="company">Company Name</label>
+              <label htmlFor="company">Company Name<span className="text-red-500">*</span></label>
               <input type="text" id="company" name="company" required />
             </div>
             <div className="landing-form-group">
-              <label htmlFor="fullname">Full Name</label>
+              <label htmlFor="fullname">Full Name<span className="text-red-500">*</span></label>
               <input type="text" id="fullname" name="fullname" required />
             </div>
             <div className="landing-form-group">
-              <label htmlFor="signup-email">Email Address</label>
+              <label htmlFor="signup-email">Email Address<span className="text-red-500">*</span></label>
               <input type="email" id="signup-email" name="email" required />
             </div>
             <div className="landing-form-group">
-              <label htmlFor="phone">Phone Number</label>
+              <label htmlFor="phone">Phone Number<span className="text-red-500">*</span></label>
               <input
                 type="tel"
                 id="phone"
@@ -32,7 +32,7 @@ const SignUpPage = ({ showPage, handleTrailFormSubmit, packageName }) => {
               />
             </div>
             <div className="landing-form-group">
-              <label htmlFor="signup-password">Password</label>
+              <label htmlFor="signup-password">Password<span className="text-red-500">*</span></label>
               <input type="password" id="signup-password" name="password" required />
             </div>
             <div className="landing-form-group">

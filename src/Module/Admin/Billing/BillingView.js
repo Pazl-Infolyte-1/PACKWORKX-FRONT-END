@@ -36,6 +36,8 @@ const formatDate = (dateString) => {
   });
 };
 
+
+
 // Determine status badge color
 const getStatusColor = (status) => {
   switch (status?.toLowerCase()) {
@@ -97,7 +99,7 @@ function BillingView() {
   // Error state
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex flex-col items-center justify-center min-h-screen w-full bg-gray-50">
         <AlertCircle className="w-10 h-10 text-red-500" />
         <p className="mt-4 text-sm text-gray-600">{error}</p>
         <button
@@ -123,6 +125,7 @@ function BillingView() {
   return (
     <div className="bg-gray-50">
       {/* Header */}
+
       <div className="bg-white border-b border-gray-200">
         <div className="px-4 py-2 mx-auto sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex items-center justify-between">

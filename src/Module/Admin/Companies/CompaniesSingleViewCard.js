@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { companyApi } from '../../../api/company';
+import CustomAlert from '../../../components/New/CustomAlert';
 
 // Editable Modal Form Component
-const PaymentLinkModal = ({ show, onClose, billId, initialAmount, initialEmail }) => {
+const PaymentLinkModal = ({ show, setAlerts,onClose, billId, initialAmount, initialEmail }) => {
   const [form, setForm] = useState({
     amount: initialAmount || '',
     emailOrMobileNumber: initialEmail || '',
@@ -48,15 +49,19 @@ const PaymentLinkModal = ({ show, onClose, billId, initialAmount, initialEmail }
       
       // Check if response is successful
       if (response && response.data && response.data.success) {
+        setAlerts([{ severity: "success", message: "Payment Link Sent Successfully" }]).
         // Success - close modal
         handleClose();
       } else {
         // Not successful - show error and don't close
+        setAlerts([{ severity: "error", message: "Unable To Sent Payment link" }]).
+
         console.error('Payment link creation failed:', response);
         alert('Failed to create payment link. Please try again.');
       }
     } catch (error) {
       // Handle error - show error and don't close
+      setAlerts([{ severity: "error", message: "unable to send paymentLink" }]).
       console.error('Payment link creation error:', error);
       alert('Error creating payment link. Please try again.');
     } finally {
@@ -68,6 +73,7 @@ const PaymentLinkModal = ({ show, onClose, billId, initialAmount, initialEmail }
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center backdrop-blur-md bg-white/10">
+
       <div
         className={`bg-white rounded-lg shadow-2xl w-full max-w-md mx-4 mt-[6%] transition-all duration-200 ease-out ${
           isAnimating ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'
@@ -124,7 +130,7 @@ const PaymentLinkModal = ({ show, onClose, billId, initialAmount, initialEmail }
   );
 };
 
-const ExpiryFormModal = ({ show, onClose, initialData, onBillingCreated }) => {
+const ExpiryFormModal = ({ show, onClose,setAlerts, initialData, onBillingCreated }) => {
   const [form, setForm] = useState(initialData || {});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -169,15 +175,20 @@ const ExpiryFormModal = ({ show, onClose, initialData, onBillingCreated }) => {
             email: res.data.data.contact_email,
           });
         }
+      setAlerts([{ severity: "success", message: "Bill Created Successfully" }])
+
       } else {
         // Not successful - show error and don't close
+      setAlerts([{ severity: "error", message: "unable to create bill" }]).
+
         console.error('Billing creation failed:', res);
-        setError('Failed to create billing. Please try again.');
+        // setError('Failed to create billing. Please try again.');
       }
     } catch (err) {
       // Handle error - show error and don't close
+      setAlerts([{ severity: "error", message: "unable to create bill" }]).
       console.error('Billing creation error:', err);
-      setError('Error creating billing. Please try again.');
+      // setError('Error creating billing. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -290,6 +301,13 @@ const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData, package
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [packageName, setPackageName] = useState('-');
   const [packageAmount, setPackageAmount] = useState('');
+  const [alerts,setAlerts] = useState([])
+
+
+  const handleCloseAlert = ()=>{
+    setAlerts([])
+}
+  
 
   // Popup state
   const [showModal, setShowModal] = useState(false);
@@ -400,6 +418,10 @@ const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData, package
 
   return (
     <div className="w-full p-6 relative rounded border bg-white overflow-hidden">
+                  <CustomAlert
+              alerts={alerts}
+              handleClose={handleCloseAlert}
+            />
       <div className="flex justify-between items-start mb-6">
         <div>
           <h2 className="text-xl font-bold mb-1">
@@ -521,9 +543,9 @@ const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData, package
       </div>
 
       {/* Expiry Modal Form */}
-      <ExpiryFormModal show={showModal} onClose={handleModalClose} initialData={autofillData} onBillingCreated={handleBillingCreated} />
+      <ExpiryFormModal show={showModal} onClose={handleModalClose} initialData={autofillData} setAlerts={setAlerts} onBillingCreated={handleBillingCreated} />
       {/* Payment Link Modal */}
-      <PaymentLinkModal show={showPaymentModal} onClose={handlePaymentModalClose} billId={paymentModalData.billId} initialAmount={paymentModalData.amount} initialEmail={paymentModalData.email} />
+      <PaymentLinkModal show={showPaymentModal} onClose={handlePaymentModalClose} billId={paymentModalData.billId} setAlerts={setAlerts} initialAmount={paymentModalData.amount} initialEmail={paymentModalData.email} />
     </div>
   );
 };

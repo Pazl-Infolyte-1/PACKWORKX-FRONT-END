@@ -55,5 +55,13 @@ displayPricing: async () => {
     console.error("API error in demo:", error);
     throw error; // preserves original error object
   }
+},
+
+getRequestType: async () =>{
+  return await apiClient.get(`/companies/request-type/get`)
+},
+
+addTrailOffline: async (submissionData) =>{
+  return await apiClient.post(`/companies/offline-request`, submissionData)
 }
 }

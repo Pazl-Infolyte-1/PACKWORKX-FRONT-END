@@ -30,14 +30,14 @@ const LandingPage = () => {
   const [activePage, setActivePage] = useState('home')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-    const [alerts, setAlerts] = useState([])
-  const [packagename,setPackageName]=useState("Free")
-   const location = useLocation()
-   
-  const dispatch = useDispatch();
+  const [formData, setFormData] = useState({ email: '', password: '' })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [alerts, setAlerts] = useState([])
+  const [packagename, setPackageName] = useState('Free')
+  const location = useLocation()
+
+  const dispatch = useDispatch()
   const showPage = (pageId) => {
     setActivePage(pageId)
     window.scrollTo(0, 0)
@@ -48,65 +48,91 @@ const LandingPage = () => {
     setMobileMenuOpen(!mobileMenuOpen)
   }
 
-  const handleTrailFormSubmit = async (e, message = 'Thank you! Your submission has been received. We will contact you soon.') => {
-   e.preventDefault();
+  const handleTrailFormSubmit = async (
+    e,
+    message = 'Thank you! Your submission has been received. We will contact you soon.',
+  ) => {
+    e.preventDefault()
 
-    const formData = new FormData(e.target);
-    const company = formData.get('company');
-    const fullname = formData.get('fullname');
-    const email = formData.get('email');
-    const phone = formData.get('phone');
-    const password = formData.get('password');
+    const formData = new FormData(e.target)
+    const company = formData.get('company')
+    const fullname = formData.get('fullname')
+    const email = formData.get('email')
+    const phone = formData.get('phone')
+    const password = formData.get('password')
 
     const submissionData = {
       name: company,
       email: email,
       phone: phone,
-      website: "https://premiumboxmfg.com",
-      address: "chennai",
-      currency: "4",
-      timezone: "America/Chicago",
-      language: "en",
-      company_state_id: "1",
-      logo: "https://premiumboxmfg.com/assets/logo.png",
-  package_name: packagename === "Free" ? "Trial" : (packagename || "Trial"),
+      website: 'https://premiumboxmfg.com',
+      address: 'chennai',
+      currency: '4',
+      timezone: 'America/Chicago',
+      language: 'en',
+      company_state_id: '1',
+      logo: 'https://premiumboxmfg.com/assets/logo.png',
+      package_name: packagename === 'Free' ? 'Trial' : packagename || 'Trial',
       password: password,
       companyAccountDetails: [
         {
           accountName: fullname,
           accountEmail: email,
-        }
-      ]
-    };
-
-    console.log("submitted data",submissionData);
-
-   try {
-  const response = await landingApi.addTrail(submissionData);
-  console.log("resss",response)
-  if (response?.data?.message) {
-    //alert(message);
-     setAlerts([
-        {
-          severity: 'success',
-          message: response?.data?.message || 'Sign Up Success',
         },
-      ])
-       e.target.reset();
-      showPage('home')
-  } else {
-    alert("Something went wrong. Please try again.");
-  }
-} catch (error) {
-  console.error("API Error:", error);
-   setAlerts([
+      ],
+      package_id: 2,
+      package_type: 'monthly',
+      version: 'trial',
+    }
+
+    const OfflineTrailData = {
+      company_name: company,
+      full_name: fullname,
+      email: email,
+      phone: phone,
+      password: password,
+    }
+
+
+    try {
+      const req_type = await landingApi.getRequestType()
+      if (req_type.data.requestType === 'offline request') {
+        const response = await landingApi.addTrailOffline(OfflineTrailData)
+        if (response.status === 200 || response.status === 201) {
+          showPage('home')
+          setAlerts([
+            {
+              severity: 'success',
+              message: 'Completed Successfully',
+            },
+          ])
+        }
+      } else {
+        const response = await landingApi.addTrail(submissionData)
+        if (response?.data?.message) {
+          //alert(message);
+          setAlerts([
+            {
+              severity: 'success',
+              message: response?.data?.message || 'Sign Up Success',
+            },
+          ])
+          e.target.reset()
+          showPage('home')
+        } else {
+          alert('Something went wrong. Please try again.')
+        }
+      }
+    } catch (error) {
+      console.error('API Error:', error)
+      setAlerts([
         {
           severity: 'error',
           message: error?.response?.data?.message || 'Sign Up Failed',
         },
       ])
-  //alert(error.message || "Error submitting form. Please try again.");
-}
+      //alert(error.message || "Error submitting form. Please try again.");
+    }
 
     //alert('Thank you! Your submission has been received. We will contact you soon.');
   }
@@ -118,19 +144,19 @@ const LandingPage = () => {
   //}
 
   const handleSignIn = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    e.preventDefault()
+    setError('')
+    setLoading(true)
 
     try {
       const response = await authApi.login({
         email: formData.email,
         password: formData.password,
-      });
+      })
 
       if (response.status === true && response) {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('company_state_id', response.company_state_id);
+        localStorage.setItem('token', response.token)
+        localStorage.setItem('company_state_id', response.company_state_id)
 
         dispatch({
           type: 'LOGIN_SUCCESS',
@@ -138,15 +164,15 @@ const LandingPage = () => {
             email: response.user?.email || formData.email,
             token: response.token,
           },
-        });
+        })
 
-        navigate('/dashboard', { replace: true });
+        navigate('/dashboard', { replace: true })
       } else {
-        setError('Invalid login response');
+        setError('Invalid login response')
       }
     } catch (error) {
-      console.error('Login failed', error?.response?.data?.message);
- setAlerts([
+      console.error('Login failed', error?.response?.data?.message)
+      setAlerts([
         {
           severity: 'error',
           message: error?.response?.data?.message || 'Login Failed',
@@ -154,14 +180,14 @@ const LandingPage = () => {
       ])
       //setError(error.response?.data?.message || 'Login failed. Please try again.');
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-const createDemo = async (e) => {
-    e.preventDefault();
+  const createDemo = async (e) => {
+    e.preventDefault()
 
-    const form = e.target;
+    const form = e.target
 
     const demoData = {
       company_name: form.company.value,
@@ -171,191 +197,186 @@ const createDemo = async (e) => {
       role: form.role.value,
       preferred_demo_time: form.time.value,
       needs_description: form.message.value,
-    };
-
-    console.log("Demo Submitted:", demoData);
+    }
 
     try {
-      const response = await landingApi.addDemo(demoData);
-      console.log("Demo created successfully:", response.data);
-       setAlerts([
+      const response = await landingApi.addDemo(demoData)
+      setAlerts([
         {
           severity: 'success',
           message: response?.data?.message || 'Demo request Success!',
         },
       ])
       //alert("Thank you! We’ll get back to you soon.");
-      form.reset(); // Reset form after successful submission
-            showPage('home')
-
+      form.reset() // Reset form after successful submission
+      showPage('home')
     } catch (error) {
-      console.error("Failed to submit demo request:", error);
-       setAlerts([
+      console.error('Failed to submit demo request:', error)
+      setAlerts([
         {
           severity: 'error',
           message: error?.response?.data?.message || 'Demo request Failed!',
         },
       ])
       //alert("Oops! Something went wrong. Please try again.");
-    } 
-  };
+    }
+  }
 
-const setEmailForForgotPassword = async (e) => {
-  e.preventDefault();
+  const setEmailForForgotPassword = async (e) => {
+    e.preventDefault()
 
-  const dataval = {
-    email: formData.email
-  };
+    const dataval = {
+      email: formData.email,
+    }
 
-  console.log("Email clicked:", formData.email);
-  console.log("dataval:", dataval);
-
-  try {
-    const response = await landingApi.setPasswordForEmail(dataval);
-    console.log("API Success:", response.data);
-           e.target.reset();
-        setAlerts([
+    try {
+      const response = await landingApi.setPasswordForEmail(dataval)
+      e.target.reset()
+      setAlerts([
         {
           severity: 'success',
-          message:response?.data?.message || 'Check Your Mail',
+          message: response?.data?.message || 'Check Your Mail',
         },
       ])
-            showPage("signin")
-    //alert("Password reset link sent to your email.");
-    // Optionally clear email field
-    // setFormData({ email: "" });
-  } catch (error) {
-    console.error("API Error:", error.response.data.message);
+      showPage('signin')
+      //alert("Password reset link sent to your email.");
+      // Optionally clear email field
+      // setFormData({ email: "" });
+    } catch (error) {
+      console.error('API Error:', error.response.data.message)
       setAlerts([
         {
           severity: 'error',
-          message:error.response.data.message || 'Email Error',
+          message: error.response.data.message || 'Email Error',
         },
       ])
-    //alert("Something went wrong. Please try again.");
+      //alert("Something went wrong. Please try again.");
+    }
   }
-};
-useEffect(() => {
-  const { pathname, search } = window.location;
+  useEffect(() => {
+    const { pathname, search } = window.location
 
-  if (pathname === "/reset-password") {
-    const queryParams = new URLSearchParams(search);
-    const token = queryParams.get("token");
-    const email = queryParams.get("email");
+    if (pathname === '/reset-password') {
+      const queryParams = new URLSearchParams(search)
+      const token = queryParams.get('token')
+      const email = queryParams.get('email')
 
-    setFormData(prev => ({
-      ...prev,
-      token,
+      setFormData((prev) => ({
+        ...prev,
+        token,
+        email,
+      }))
+
+      setActivePage('confirmPassword')
+    }
+  }, [])
+
+  useEffect(() => {
+    const { pathname, search } = window.location
+
+    if (pathname === '/login') {
+      showPage('signin')
+    }
+  }, [])
+
+  const setNewPassword = async (e) => {
+    e.preventDefault()
+
+    if (formData.newPassword !== formData.confirmPassword) {
+      setAlerts([
+        {
+          severity: 'error',
+          message: 'Passwords Do Not Match',
+        },
+      ])
+      return
+    }
+
+    const { email, token, newPassword, confirmPassword } = formData
+
+    const payload = {
       email,
-    }));
+      token,
+      newPassword,
+      confirmPassword,
+    }
 
-    setActivePage("confirmPassword");
+    try {
+      const response = await landingApi.resetPassword(payload)
+      if (response?.data?.message) {
+        setAlerts([
+          {
+            severity: 'success',
+            message: response?.data?.message,
+          },
+        ])
+        // Optionally redirect or update UI here
+        showPage('signin')
+      }
+    } catch (error) {
+      console.error('error', error)
+      setAlerts([
+        {
+          severity: 'error',
+          message: error.response.data.message,
+        },
+      ])
+    }
   }
-}, []);
 
-useEffect(() => {
-  const { pathname, search } = window.location;
+  const submitContacts = async (e) => {
+    e.preventDefault()
 
-  if (pathname === "/login") {
-         showPage("signin")
-  }
-}, []);
+    const form = e.target
 
-const setNewPassword = async (e) => {
-  e.preventDefault();
+    const contactData = {
+      name: form.name.value,
+      email: form.email.value,
+      company: form.company.value,
+      subject: form.subject.value,
+      message: form.message.value,
+    }
 
-  if (formData.newPassword !== formData.confirmPassword) {
-    setAlerts([
-      {
-        severity: 'error',
-        message: "Passwords Do Not Match",
-      },
-    ]);
-    return;
-  }
-
-  const { email, token, newPassword, confirmPassword } = formData;
-
-  const payload = {
-    email,
-    token,
-    newPassword,
-    confirmPassword,
-  };
-
-  console.log("Password Reset Payload:", payload);
-
-  try {
-    const response = await landingApi.resetPassword(payload);
-console.log("success",response)
-    if (response?.data?.message) {
+    try {
+      const response = await landingApi.createContacts(contactData)
       setAlerts([
         {
           severity: 'success',
           message: response?.data?.message,
         },
-      ]);
-      // Optionally redirect or update UI here
-      showPage("signin")
-    } 
-  } catch (error) {
-    console.log("error",error)
-    setAlerts([
-      {
-        severity: 'error',
-        message: error.response.data.message
-      },
-    ]);
+      ])
+      // Optionally show success message to user
+      //alert("Message sent successfully!");
+
+      // Reset the form
+      form.reset()
+    } catch (error) {
+      console.error('API Error:', error)
+      setAlerts([
+        {
+          severity: 'error',
+          message: error.response.data.message,
+        },
+      ])
+      //alert("Something went wrong. Please try again.");
+    }
   }
-};
-
-const submitContacts = async (e) => {
-  e.preventDefault();
-
-  const form = e.target;
-
-  const contactData = {
-    name: form.name.value,
-    email: form.email.value,
-    company: form.company.value,
-    subject: form.subject.value,
-    message: form.message.value,
-  };
-
-  console.log("Submitted Contact:", contactData);
-
-  try {
-    const response = await landingApi.createContacts(contactData);
-    console.log("API Success:", response?.data);
-  setAlerts([
-      {
-        severity: 'success',
-        message: response?.data?.message
-      },
-    ]);
-    // Optionally show success message to user
-    //alert("Message sent successfully!");
-
-    // Reset the form
-    form.reset();
-  } catch (error) {
-    console.error("API Error:", error);
-       setAlerts([
-      {
-        severity: 'error',
-        message: error.response.data.message
-      },
-    ]);
-    //alert("Something went wrong. Please try again.");
-  }
-};
-
 
   const renderActivePage = () => {
-    const pageProps = { showPage, handleTrailFormSubmit, handleSignIn ,  setFormData,formData,createDemo,setEmailForForgotPassword,
-      setNewPassword,submitContacts,packagename,setPackageName
+    const pageProps = {
+      showPage,
+      handleTrailFormSubmit,
+      handleSignIn,
+      setFormData,
+      formData,
+      createDemo,
+      setEmailForForgotPassword,
+      setNewPassword,
+      submitContacts,
+      packagename,
+      setPackageName,
     }
-    
+
     switch (activePage) {
       case 'home':
         return <HomePage {...pageProps} />
@@ -381,9 +402,9 @@ const submitContacts = async (e) => {
         return <SignInPage {...pageProps} />
       case 'signup':
         return <SignUpPage {...pageProps} packageName={packagename} />
-        case 'forgotPassword':
+      case 'forgotPassword':
         return <ForgotPassword {...pageProps} />
-        case 'confirmPassword':
+      case 'confirmPassword':
         return <ConfirmPassword {...pageProps} />
       default:
         return <HomePage {...pageProps} />
@@ -395,20 +416,18 @@ const submitContacts = async (e) => {
 
   return (
     <div className="landing-page">
-          <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <Header 
-        showPage={showPage} 
-        mobileMenuOpen={mobileMenuOpen} 
-        toggleMobileMenu={toggleMobileMenu} 
+      <CustomAlert alerts={alerts} handleClose={handleClose} />
+      <Header
+        showPage={showPage}
+        mobileMenuOpen={mobileMenuOpen}
+        toggleMobileMenu={toggleMobileMenu}
         setPackageName={setPackageName}
       />
-      
-      <main className="landing-content">
-        {renderActivePage()}
-      </main>
-      
+
+      <main className="landing-content">{renderActivePage()}</main>
+
       <Footer />
-      
+
       {/* Support Chatbot */}
       <AdvancedSupportChatbot />
     </div>

@@ -7,8 +7,8 @@ function NotificationSetting() {
   const [formData, setFormData] = useState({
     mail_from_name: '',
     mail_from_email: '',
-    enable_email_queue: 'Yes',
-    mail_driver: '',
+    // enable_email_queue: 'Yes',
+    mail_driver: 'smtp',
     mail_host: '',
     mail_encryption: '',
     mail_port: '',
@@ -42,10 +42,10 @@ function NotificationSetting() {
     }
   }
 
-  const sendTestEmail = () => {
-    // Send test email using current formData
-    console.log('Sending test email with:', formData)
-  }
+  // const sendTestEmail = () => {
+  //   // Send test email using current formData
+  //   console.log('Sending test email with:', formData)
+  // }
 
   return (
     <div className="bg-white p-4 font-sans mb-4">
@@ -110,7 +110,7 @@ function NotificationSetting() {
                   </div>
 
                   {/* Enable Email Queue */}
-                  <div>
+                  {/* <div>
                     <label className="text-gray-500 mb-2 flex items-center">
                       Enable Email Queue
                       <span className="ml-1 w-5 h-5 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm">
@@ -126,13 +126,13 @@ function NotificationSetting() {
                       <option>Yes</option>
                       <option>No</option>
                     </select>
-                  </div>
+                  </div> */}
 
                   {/* Mail Driver */}
                   <div>
                     <label className="block text-gray-500 mb-2">Mail Driver</label>
                     <div className="flex items-center">
-                      <label className="mr-6 flex items-center">
+                      {/* <label className="mr-6 flex items-center">
                         <input
                           type="radio"
                           name="mail_driver"
@@ -142,7 +142,7 @@ function NotificationSetting() {
                           className="mr-2"
                         />
                         <span>Mail</span>
-                      </label>
+                      </label> */}
                       <label className="flex items-center">
                         <input
                           type="radio"
@@ -258,7 +258,7 @@ function NotificationSetting() {
               />
             </svg>
           </ActionButton>
-          <ActionButton
+          {/* <ActionButton
             label={'Send Test Email'}
             variant="minimal"
             className="ml-4 border border-gray-300  text-gray-600 py-2 px-4 rounded flex items-center"
@@ -267,7 +267,7 @@ function NotificationSetting() {
             <svg className="w-4 h-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
             </svg>
-          </ActionButton>
+          </ActionButton> */}
         </div>
       </form>
     </div>

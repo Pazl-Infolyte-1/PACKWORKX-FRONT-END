@@ -1,20 +1,21 @@
 import React, { useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
 import { FaCheckCircle } from 'react-icons/fa'
- 
+import { SettingsApi } from '../../api/Settings'
+
 function NotificationSetting() {
   const [formData, setFormData] = useState({
-    mailFromName: '',
-    mailFromEmail: '',
-    enableEmailQueue: '',
-    mailDriver: '',
-    mailHost: '',
-    mailEncryption: '',
-    mailPort: '',
-    mailPassword: '',
-    mailUsername: '',
+    mail_from_name: '',
+    mail_from_email: '',
+    enable_email_queue: 'Yes',
+    mail_driver: '',
+    mail_host: '',
+    mail_encryption: '',
+    mail_port: '',
+    mail_password: '',
+    mail_username: '',
   })
- 
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData({
@@ -22,31 +23,37 @@ function NotificationSetting() {
       [name]: value,
     })
   }
- 
+
   const handleRadioChange = (value) => {
     setFormData({
       ...formData,
-      mailDriver: value,
+      mail_driver: value,
     })
   }
- 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     console.log('Form data to be sent:', formData)
+    const response = await SettingsApi.notificationSettings(formData)
+    if (response.status === 200) {
+      console.log('Test email sent successfully')
+    } else {
+      console.error('Failed to send test email:', response.data)
+    }
   }
- 
+
   const sendTestEmail = () => {
     // Send test email using current formData
     console.log('Sending test email with:', formData)
   }
- 
+
   return (
     <div className="bg-white p-4 font-sans mb-4">
       {/* Tabs */}
       <div className="flex border-b">
         <div className="px-4 py-2 text-gray-600 font-medium">Email</div>
       </div>
- 
+
       <form onSubmit={handleSubmit}>
         <div className="border border-gray-400">
           <div className="flex">
@@ -64,9 +71,11 @@ function NotificationSetting() {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-green-800 text-xs sm:text-sm">Your SMTP details are correct</span>
+                <span className="text-green-800 text-xs sm:text-sm">
+                  Your SMTP details are correct
+                </span>
               </div>
- 
+
               {/* Form with border */}
               <div className="rounded px-2 sm:px-6 flex-grow my-3 ">
                 <div className="grid sm:grid-cols-2 gap-6">
@@ -77,14 +86,14 @@ function NotificationSetting() {
                     </label>
                     <input
                       type="text"
-                      name="mailFromName"
+                      name="mail_from_name"
                       placeholder="from name"
                       className="w-full border border-gray-300 rounded p-2"
-                      value={formData.mailFromName}
+                      value={formData.mail_from_name}
                       onChange={handleInputChange}
                     />
                   </div>
- 
+
                   {/* Mail From Email */}
                   <div>
                     <label className="block text-gray-500 mb-2">
@@ -92,14 +101,14 @@ function NotificationSetting() {
                     </label>
                     <input
                       type="email"
-                      name="mailFromEmail"
+                      name="mail_from_email"
                       placeholder="from email"
                       className="w-full border border-gray-300 rounded p-2"
-                      value={formData.mailFromEmail}
+                      value={formData.mail_from_email}
                       onChange={handleInputChange}
                     />
                   </div>
- 
+
                   {/* Enable Email Queue */}
                   <div>
                     <label className="text-gray-500 mb-2 flex items-center">
@@ -109,16 +118,16 @@ function NotificationSetting() {
                       </span>
                     </label>
                     <select
-                      name="enableEmailQueue"
+                      name="enable_email_queue"
                       className="w-full border border-gray-300 rounded p-2 bg-white"
-                      value={formData.enableEmailQueue}
+                      value={formData.enable_email_queue}
                       onChange={handleInputChange}
                     >
                       <option>Yes</option>
                       <option>No</option>
                     </select>
                   </div>
- 
+
                   {/* Mail Driver */}
                   <div>
                     <label className="block text-gray-500 mb-2">Mail Driver</label>
@@ -126,9 +135,9 @@ function NotificationSetting() {
                       <label className="mr-6 flex items-center">
                         <input
                           type="radio"
-                          name="mailDriver"
+                          name="mail_driver"
                           value="mail"
-                          checked={formData.mailDriver === 'mail'}
+                          checked={formData.mail_driver === 'mail'}
                           onChange={() => handleRadioChange('mail')}
                           className="mr-2"
                         />
@@ -137,9 +146,9 @@ function NotificationSetting() {
                       <label className="flex items-center">
                         <input
                           type="radio"
-                          name="mailDriver"
+                          name="mail_driver"
                           value="smtp"
-                          checked={formData.mailDriver === 'smtp'}
+                          checked={formData.mail_driver === 'smtp'}
                           onChange={() => handleRadioChange('smtp')}
                           className="mr-2"
                         />
@@ -147,7 +156,7 @@ function NotificationSetting() {
                       </label>
                     </div>
                   </div>
- 
+
                   {/* Mail Host */}
                   <div>
                     <label className="block text-gray-500 mb-2">
@@ -155,21 +164,21 @@ function NotificationSetting() {
                     </label>
                     <input
                       type="text"
-                      name="mailHost"
+                      name="mail_host"
                       placeholder="host"
                       className="w-full border border-gray-300 rounded p-2"
-                      value={formData.mailHost}
+                      value={formData.mail_host}
                       onChange={handleInputChange}
                     />
                   </div>
- 
+
                   {/* Mail Encryption */}
                   <div>
                     <label className="block text-gray-500 mb-2">Mail Encryption</label>
                     <select
-                      name="mailEncryption"
+                      name="mail_encryption"
                       className="w-full border border-gray-300 rounded p-2 bg-white"
-                      value={formData.mailEncryption}
+                      value={formData.mail_encryption}
                       onChange={handleInputChange}
                     >
                       <option>none</option>
@@ -177,7 +186,7 @@ function NotificationSetting() {
                       <option>ssl</option>
                     </select>
                   </div>
- 
+
                   {/* Mail Port */}
                   <div>
                     <label className="block text-gray-500 mb-2">
@@ -185,27 +194,27 @@ function NotificationSetting() {
                     </label>
                     <input
                       type="text"
-                      name="mailPort"
+                      name="mail_port"
                       placeholder="port"
                       className="w-full border border-gray-300 rounded p-2"
-                      value={formData.mailPort}
+                      value={formData.mail_port}
                       onChange={handleInputChange}
                     />
                   </div>
- 
+
                   {/* Mail Password */}
                   <div>
                     <label className="block text-gray-500 mb-2">Mail Password</label>
                     <input
                       type="password"
-                      name="mailPassword"
+                      name="mail_password"
                       placeholder="password"
                       className="w-full border border-gray-300 rounded p-2"
-                      value={formData.mailPassword}
+                      value={formData.mail_password}
                       onChange={handleInputChange}
                     />
                   </div>
- 
+
                   {/* Mail Username */}
                   <div>
                     <label className="block text-gray-500 mb-2">
@@ -213,10 +222,10 @@ function NotificationSetting() {
                     </label>
                     <input
                       type="text"
-                      name="mailUsername"
+                      name="mail_username"
                       placeholder="username"
                       className="w-full border border-gray-300 rounded p-2"
-                      value={formData.mailUsername}
+                      value={formData.mail_username}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -232,7 +241,7 @@ function NotificationSetting() {
             </div>
           </div>
         </div>
- 
+
         {/* Buttons */}
         <div className="mt-6 flex justify-end">
           <ActionButton
@@ -264,5 +273,5 @@ function NotificationSetting() {
     </div>
   )
 }
- 
+
 export default NotificationSetting

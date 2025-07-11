@@ -47,7 +47,7 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const tab = queryParams.get('tab');
- 
+    
     if (tab) {
       setActiveTab(tab);
     } else {
@@ -359,6 +359,16 @@ const { id } = useParams(); // assuming the route has a parameter like /edit/:id
   useEffect(() => {
     setIsEdit(!!selectedSalesOrderID); // ✅ if id exists → edit mode
   }, [selectedSalesOrderID]);
+ 
+  useEffect(() => {
+    if (!isWorkOrderList && !isSalesOrderCompleted && activeTab === 'skuDetails') {
+      setActiveTab('salesOrder');
+      // Optionally, update the URL as well:
+      const params = new URLSearchParams(location.search);
+      params.set('tab', 'salesOrder');
+      window.history.replaceState({}, '', `${location.pathname}?${params}`);
+    }
+  }, [isSalesOrderCompleted, activeTab, isWorkOrderList, location]);
  
   return (
     <div className="h-[91vh] overflow-hidden flex flex-col">

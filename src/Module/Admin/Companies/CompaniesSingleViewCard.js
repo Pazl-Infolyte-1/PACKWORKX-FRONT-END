@@ -1,6 +1,4 @@
-
-
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 
 const Section = ({ title, content }) => (
@@ -8,10 +6,7 @@ const Section = ({ title, content }) => (
     <h4 className="text-md font-semibold mb-2 border-b pb-1">{title}</h4>
     <div className="space-y-1">
       {content.map(([label, value], idx) => (
-        <div
-          key={idx}
-          className="flex justify-between text-sm border-b pb-1"
-        >
+        <div key={idx} className="flex justify-between text-sm border-b pb-1">
           <span className="text-gray-500">{label}:</span>
           <span className="text-gray-800">{value}</span>
         </div>
@@ -20,14 +15,35 @@ const Section = ({ title, content }) => (
   </div>
 );
 
-const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData }) => {
+const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData, packages }) => {
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const [packageName, setPackageName] = useState('-');
 
   useEffect(() => {
     if (companyData) {
       setSelectedCompany(companyData);
+
+      // ✅ Package name logic
+      if (companyData.package && companyData.package.name) {
+        setPackageName(companyData.package.name);
+      } else if (packages && packages.length > 0 && companyData.package_id) {
+        const matchedPackage = packages.find(
+          (pkg) =>
+            pkg.package?.id === companyData.package_id || pkg.id === companyData.package_id
+        );
+        setPackageName(
+          matchedPackage
+            ? matchedPackage.package?.name || matchedPackage.name
+            : '-'
+        );
+      } else {
+        setPackageName('-');
+      }
+    } else {
+      setSelectedCompany(null);
+      setPackageName('-');
     }
-  }, [companyData]);
+  }, [companyData, packages]);
 
   if (!selectedCompany) {
     return (
@@ -38,16 +54,15 @@ const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData }) => {
   }
 
   const statusClass =
-    selectedCompany.status === 'active'
-      ? 'bg-green-500'
-      : 'bg-red-500';
+    selectedCompany.status === 'active' ? 'bg-green-500' : 'bg-red-500';
 
   return (
     <div className="w-full p-6 rounded border bg-white overflow-hidden">
-      {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div>
-          <h2 className="text-xl font-bold mb-1">{selectedCompany.company_name}</h2>
+          <h2 className="text-xl font-bold mb-1">
+            {selectedCompany.company_name}
+          </h2>
           <p className="text-sm text-gray-600">{selectedCompany.company_email}</p>
           <p className="text-sm text-gray-600">{selectedCompany.company_phone}</p>
           <span
@@ -73,14 +88,11 @@ const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData }) => {
         </div>
       </div>
 
-      {/* Two-column layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left side: Details + Location */}
         <div>
           <Section
             title="Details"
             content={[
-              // ✅ Removed ID
               ['Name', selectedCompany.company_name],
               ['Email', selectedCompany.company_email || '-'],
               ['Phone', selectedCompany.company_phone || '-'],
@@ -113,38 +125,30 @@ const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData }) => {
           />
         </div>
 
-        {/* Right side: Package Details + Meta */}
         <div>
           <Section
             title="Package Details"
             content={[
+              ['Package Name', packageName],
               ['Type', selectedCompany.package_type || '-'],
-              // Uncomment if needed:
-              // [
-              //   'Start Date',
-              //   selectedCompany.package_start_date
-              //     ? new Date(selectedCompany.package_start_date).toLocaleDateString()
-              //     : '-',
-              // ],
-              // [
-              //   'End Date',
-              //   selectedCompany.package_end_date
-              //     ? new Date(selectedCompany.package_end_date).toLocaleDateString()
-              //     : '-',
-              // ],
-              // [
-              //   'Features',
-              //   selectedCompany.package_features?.length
-              //     ? selectedCompany.package_features.join(', ')
-              //     : '-',
-              // ],
+              [
+                'Start Date',
+                selectedCompany.package_start_date
+                  ? new Date(selectedCompany.package_start_date).toLocaleDateString()
+                  : '-',
+              ],
+              [
+                'End Date',
+                selectedCompany.package_end_date
+                  ? new Date(selectedCompany.package_end_date).toLocaleDateString()
+                  : '-',
+              ],
             ]}
           />
 
           <Section
             title="Meta"
             content={[
-              
               ['Date Format', selectedCompany.date_format || '-'],
               ['Time Format', selectedCompany.time_format || '-'],
               [
@@ -168,65 +172,3 @@ const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData }) => {
 };
 
 export default CompaniesSingleViewCard;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

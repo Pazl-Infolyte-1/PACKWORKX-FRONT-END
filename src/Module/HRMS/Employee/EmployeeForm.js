@@ -22,6 +22,9 @@ import ConfirmationModale from '../../../components/New/ConfirmationModale'
 import { employeeApi } from '../../../api/employee'
 import { commonApi } from '../../../api/common'
 import { machineApi } from '../../../api/machine'
+import { useNavigate, useParams } from 'react-router-dom'
+import CustomAlert from '../../../components/New/CustomAlert'
+import { companyApi } from '../../../api/company'
 
 const REPORTING_OPTIONS = [
   { id: 1, name: 'Jane Smith' },
@@ -51,24 +54,14 @@ const defaultFormState = {
   company_address_id: null,
   role_id: null,
   image: '',
-  country_phonecode: null,
+  country_phonecode: 91,
   country_id: null,
 }
 
-function EmployeeForm({
-  isDrawerOpen,
-  setDrawerOpen,
-  formData,
-  setFormData,
-  handleSubmit,
-  isEdit,
-  dropdownOptions,
-  setDropdownOptions,
-  setAlerts,
-}) {
+function EmployeeForm() {
   const label = { inputProps: { 'aria-label': 'Switch demo' } }
-
-  // Add this at the top with your other useState/useEffect hooks
+  const [formData, setFormData] = useState(defaultFormState)
+  const { id } = useParams()
   const fileInputRef = useRef(null)
   const dropdownRef = useRef(null)
   const [previewImage, setPreviewImage] = useState('')
@@ -87,15 +80,29 @@ function EmployeeForm({
   const [canDeactivate, setCanDeactivate] = useState(false)
   const [isTouched, setIsTouched] = useState(false)
   const [validationErrors, setValidationErrors] = useState({})
+  const navigate = useNavigate()
+  const [alerts, setAlerts] = useState([])
+  const [dropdownOptions, setDropdownOptions] = useState({
+    countries: [],
+    companiesAddresses: [],
+    departments: [],
+    designations: [],
+    roles: [],
+    reporting_to: [
+      { id: 3, name: 'Jane Smith' },
+      { id: 3, name: 'Mike Johnson' },
+      { id: 3, name: 'Sarah Williams' },
+    ],
+  })
 
   // This effect monitors drawer close events
   useEffect(() => {
     // When drawer closes, reset the form
-    if (!isDrawerOpen) {
+    if (!id) {
       resetForm()
       setValidationErrors({})
     }
-  }, [isDrawerOpen])
+  }, [id])
 
   // Add click outside handler for the dropdown
   useEffect(() => {
@@ -141,9 +148,97 @@ function EmployeeForm({
     fetchMachineData()
   }, [machineSearchQuery])
 
+  useEffect(() => {
+    const fetchDropDownData = async () => {
+      try {
+        const [
+          countriesResponse,
+          companiesAddressResponse,
+          departmentsResponse,
+          designationsResponse,
+          rolesResponse,
+        ] = await Promise.all([
+          commonApi.getCountries(),
+          companyApi.getCompanyAddress(),
+          employeeApi.getDepartmentsList(),
+          employeeApi.getDesignation(),
+          employeeApi.getRoles(),
+        ])
+
+        const countries = countriesResponse?.data?.data || []
+
+        // Find India in the countries list and set it as default
+        const india = countries.find(
+          (country) =>
+            country.nicename === 'India' || country.phonecode === 91 || country.iso === 'IN',
+        )
+
+        setDropdownOptions({
+          countries: countries,
+          companiesAddresses: companiesAddressResponse?.data?.data,
+          departments: departmentsResponse?.data?.data,
+          designations: designationsResponse?.data?.data,
+          roles: rolesResponse?.data?.data,
+        })
+
+        // Set India as default country if not in edit mode and India is found
+        if (!id && india) {
+          setFormData((prev) => ({
+            ...prev,
+            country_id: india.id,
+            country_phonecode: india.phonecode,
+          }))
+        }
+      } catch (error) {
+        console.error('Error fetching dropdown data:', error)
+      }
+    }
+
+    fetchDropDownData()
+  }, [id])
+
+  // Fetch employee data in edit mode
+  useEffect(() => {
+    if (id) {
+      ;(async () => {
+        try {
+          const response = await employeeApi.getEmployeeData(id)
+          const data = response?.data?.data
+          if (data) {
+            setFormData({
+              ...defaultFormState,
+              ...data,
+              name: data.user_name || data.name || '',
+              email: data.user_email || data.email || '',
+              // If API returns skills as array, join to string
+              skills: Array.isArray(data.skills) ? data.skills.join(',') : data.skills || '',
+            })
+            // Set skills state for UI chips
+            if (data.skills) {
+              setSkills(Array.isArray(data.skills) ? data.skills : data.skills.split(','))
+            } else {
+              setSkills([])
+            }
+          }
+        } catch (error) {
+          setAlerts([{ severity: 'error', message: 'Failed to fetch employee data.' }])
+        }
+      })()
+    }
+  }, [id])
+
   // Function to reset the form to default state
   const resetForm = () => {
-    setFormData(defaultFormState)
+    // Find India in the countries list to set as default
+    const india = dropdownOptions.countries?.find(
+      (country) => country.nicename === 'India' || country.phonecode === 91 || country.iso === 'IN',
+    )
+
+    setFormData({
+      ...defaultFormState,
+      country_id: india?.id || null,
+      country_phonecode: india?.phonecode || 91,
+    })
     setSkills([])
     setInputValue('')
     setPreviewImage('')
@@ -160,12 +255,12 @@ function EmployeeForm({
     if (isTouched) {
       setCanDeactivate(true) // show modal
     } else {
-      setDrawerOpen(false) // just close
+      navigate('/employeelist')
     }
   }
 
   // If you want to log after state update, use useEffect
-  useEffect(() => {}, [isEdit])
+  useEffect(() => {}, [id])
 
   const handleInputChange = (e) => {
     setIsTouched(true)
@@ -197,10 +292,9 @@ function EmployeeForm({
     }
   }
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault()
 
-    // Define same required fields as in parent
     const requiredFields = [
       'name',
       'email',
@@ -221,25 +315,70 @@ function EmployeeForm({
     if (formData.employment_type === 'Contract') {
       requiredFields.push('contract_end_date')
     }
-    if (!isEdit) {
+    if (!id) {
       requiredFields.push('password')
     }
 
-    // Check for missing fields and set validation errors
     const errors = {}
     requiredFields.forEach((field) => {
       if (!formData[field]) {
         errors[field] = 'Required'
       }
     })
-
-    // Update validation errors state
     setValidationErrors(errors)
+    if (Object.keys(errors).length > 0) return
 
-    // If there are no errors, call the parent's handleSubmit
-    console.log(errors, 'ffff')
-    if (Object.keys(errors).length === 0) {
-      handleSubmit(e)
+    try {
+      let response
+      if (id) {
+        // Prepare the payload for edit mode (flat structure, not nested)
+        const editPayload = {
+          name: formData.name,
+          email: formData.email,
+          password: '', // or formData.password if you want to allow password change
+          mobile: formData.mobile,
+          employee_id: formData.employee_id,
+          address: formData.address,
+          skills: formData.skills,
+          department_id: formData.department_id,
+          designation_id: formData.designation_id,
+          company_address_id: formData.company_address_id,
+          role_id: formData.role_id,
+          reporting_to: formData.reporting_to,
+          joining_date: formData.joining_date,
+          date_of_birth: formData.date_of_birth,
+          about_me: formData.about_me,
+          contract_end_date: formData.contract_end_date,
+          employment_type: formData.employment_type,
+          image: formData.image,
+          country_phonecode: formData.country_phonecode,
+          country_id: formData.country_id,
+        }
+
+        response = await employeeApi.editEmployee(formData?.user_id, editPayload)
+      } else {
+        // For create mode, send the formData as is
+        response = await employeeApi.createNewEmployee(formData)
+      }
+
+      setAlerts([
+        {
+          severity: 'success',
+          message: id ? 'Employee updated successfully.' : 'Employee created successfully.',
+        },
+      ])
+      setTimeout(() => {
+        navigate('/employeelist')
+      }, 1200)
+    } catch (error) {
+      setAlerts([
+        {
+          severity: 'error',
+          message:
+            error?.response?.data?.message ||
+            (id ? 'Failed to update employee.' : 'Failed to create employee.'),
+        },
+      ])
     }
   }
 
@@ -288,7 +427,7 @@ function EmployeeForm({
       setAlerts([
         {
           severity: 'error',
-          message: 'Image upload failed. Please try again.',
+          message: error?.response?.data?.message || 'Invalid file format, try with jpg or png',
         },
       ])
       setImageLoading(false)
@@ -343,7 +482,7 @@ function EmployeeForm({
   }
 
   useEffect(() => {
-    if (isEdit && formData.skills) {
+    if (id && formData.skills) {
       // Fix the typo: skill -> skills
       const skillsArray = formData.skills.split(',').map((s) => s.trim())
       setSkills(skillsArray)
@@ -351,9 +490,9 @@ function EmployeeForm({
         ...prev,
         skills: formData.skills, // Keep it as a string for submission
       }))
-    } else if (!isEdit) {
+    } else if (!id) {
     }
-  }, [isEdit, formData.skills]) // Add formData.skills to dependency array
+  }, [id, formData.skills]) // Add formData.skills to dependency array
 
   const handleCountrySearchChange = (e) => {
     setCountrySearchValue(e.target.value)
@@ -398,7 +537,7 @@ function EmployeeForm({
     setAlerts([
       {
         severity: 'success',
-        message: isEdit ? 'Department updated successfully.' : 'Department created successfully.',
+        message: id ? 'Department updated successfully.' : 'Department created successfully.',
       },
     ])
   }
@@ -415,7 +554,7 @@ function EmployeeForm({
     setAlerts([
       {
         severity: 'success',
-        message: isEdit ? 'Role updated successfully.' : 'Role created successfully.',
+        message: id ? 'Role updated successfully.' : 'Role created successfully.',
       },
     ])
   }
@@ -432,873 +571,244 @@ function EmployeeForm({
     setAlerts([
       {
         severity: 'success',
-        message: isEdit ? 'Designation updated successfully.' : 'Designation created successfully.',
+        message: id ? 'Designation updated successfully.' : 'Designation created successfully.',
       },
     ])
   }
 
   return (
     <>
-      <Drawer
-        isOpen={isDrawerOpen}
-        onClose={handleCloseDrawer}
-        maxWidth="1280px"
-        title={isEdit ? 'Edit Employee' : 'Add Employee'}
-      >
-        <form onSubmit={handleFormSubmit} className="">
-          {/* <div className="max-w-7xl mx-auto h-[90vh] px-3 py-3 mt-6 "> */}
-          <div className=" mx-auto px-3 py-3 mt-6 ">
-            {/* Replace your existing image preview with this */}
-            <div className="flex flex-col items-center justify-center">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleImageUpload}
-                accept="image/*"
-                className="hidden"
-              />
-              <div className="relative w-24 h-24">
-                {/* Image Container */}
-                <div
-                  className="w-24 h-24 rounded-full overflow-hidden cursor-pointer"
-                  onClick={handleImageClick}
-                >
-                  {/* Display image with an opacity effect while loading */}
-                  <img
-                    src={formData.image || profile}
-                    alt="Profile"
-                    className={`w-24 h-24 object-cover ${imageLoading ? 'opacity-40' : 'opacity-100'}`}
-                    onLoad={() => setImageLoading(false)} // 👈 This ensures loader is hidden only after image is loaded
-                  />
-                </div>
-
-                {/* Loading Indicator - Only shows when imageLoading is true */}
-                {imageLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-                  </div>
-                )}
-
-                {/* Optional: Add an overlay with a camera icon to indicate it's clickable */}
-                <div
-                  className="absolute bottom-0 right-0 bg-black rounded-full p-1 shadow cursor-pointer"
-                  onClick={handleImageClick}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
-              {/* Name */}
-              <div>
-                <h6 className="mb-2">
-                  Name <span className="text-red-600">*</span>
-                </h6>
-                <div className="flex items-center border border-stone-200 rounded-md">
-                  <input
-                    type="text"
-                    name="name"
-                    className="w-full outline-none text-zinc-500 px-3 py-2"
-                    // placeholder="Enter Your Name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                  />
-                  <RiUserLine className="pr-2 h-10 w-10" />
-                </div>
-
-                {validationErrors.name && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.name}
-                  </div>
-                )}
+      <form onSubmit={handleFormSubmit} className="">
+        <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
+        {/* <div className="max-w-7xl mx-auto h-[90vh] px-3 py-3 mt-6 "> */}
+        <div className=" mx-auto px-3 py-3 mt-6 ">
+          {/* Replace your existing image preview with this */}
+          <div className="flex flex-col items-center justify-center">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              accept="image/*"
+              className="hidden"
+            />
+            <div className="relative w-24 h-24">
+              {/* Image Container */}
+              <div
+                className="w-24 h-24 rounded-full overflow-hidden cursor-pointer"
+                onClick={handleImageClick}
+              >
+                {/* Display image with an opacity effect while loading */}
+                <img
+                  src={formData.image || profile}
+                  alt="Profile"
+                  className={`w-24 h-24 object-cover ${imageLoading ? 'opacity-40' : 'opacity-100'}`}
+                  onLoad={() => setImageLoading(false)} // 👈 This ensures loader is hidden only after image is loaded
+                />
               </div>
 
-              {/* Email */}
-              <div>
-                <h6 className="mb-2">
-                  Email <span className="text-red-600">*</span>
-                </h6>
-                <div className="flex items-center border border-stone-200 rounded-md">
-                  <input
-                    type="email"
-                    name="email"
-                    className="w-full outline-none text-zinc-500 px-3 py-2"
-                    placeholder="name@company.com"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                  />
-                  <IoIosAt className="pr-2 h-10 w-10" />
-                </div>
-                {validationErrors.email && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.email}
-                  </div>
-                )}
-              </div>
-
-              {/* Employee ID */}
-              <div>
-                <h6 className="mb-2">
-                  Employee ID <span className="text-red-600">*</span>
-                </h6>
-                <div className="flex items-center border border-stone-200 rounded-md">
-                  <input
-                    type="text"
-                    name="employee_id"
-                    className="w-full outline-none text-zinc-500 px-3 py-2"
-                    // placeholder="Enter Employee ID"
-                    value={formData.employee_id}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                {validationErrors.employee_id && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.employee_id}
-                  </div>
-                )}
-              </div>
-
-              {/* Mobile */}
-              <div>
-                <h6 className="mb-2">
-                  Mobile Number <span className="text-red-600">*</span>
-                </h6>
-                <div className="flex border border-stone-200 rounded-md">
-                  {/* Custom country code dropdown */}
-                  <div className="relative" ref={dropdownRef}>
-                    <button
-                      type="button"
-                      className="flex items-center justify-between border-0 rounded-0 border-r border-stone-200 h-10 px-3 bg-white"
-                      onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
-                      style={{
-                        paddingRight: '30px',
-                        position: 'relative',
-                      }}
-                    >
-                      {formData.country_id ? (
-                        <div className="flex items-center pr-4">
-                          {(() => {
-                            const selectedCountry = dropdownOptions.countries.find(
-                              (country) => country.id === formData.country_id,
-                            )
-
-                            return selectedCountry ? (
-                              <>
-                                <img
-                                  src={`https://flagcdn.com/w40/${selectedCountry.iso.toLowerCase()}.png`}
-                                  alt={selectedCountry.nicename}
-                                  className="mr-2"
-                                  style={{ width: '24px', height: '16px' }}
-                                />
-                                <span>+{selectedCountry.phonecode}</span>
-                              </>
-                            ) : (
-                              <span>Select</span>
-                            )
-                          })()}
-                        </div>
-                      ) : (
-                        <span>Select</span>
-                      )}
-                      <span
-                        style={{
-                          position: 'absolute',
-                          right: '3px',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                        }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="10"
-                          height="10"
-                          fill="currentColor"
-                          viewBox="0 0 16 16"
-                        >
-                          <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
-                        </svg>
-                      </span>
-                    </button>
-
-                    {countryDropdownOpen && (
-                      <div className="absolute z-10 mt-1 w-64 bg-white rounded-md shadow-lg">
-                        <div className="p-2 border-b">
-                          <input
-                            type="text"
-                            placeholder="Search countries"
-                            className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            value={countrySearchValue}
-                            onChange={handleCountrySearchChange}
-                          />
-                        </div>
-                        <div className="max-h-60 overflow-y-auto">
-                          {filteredCountries && filteredCountries.length > 0 ? (
-                            filteredCountries.map((country) => (
-                              <div
-                                key={country.id}
-                                className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                                onClick={() => {
-                                  handleInputChange({
-                                    target: { name: 'country_phonecode', value: country.phonecode },
-                                  })
-                                  handleInputChange({
-                                    target: { name: 'country_id', value: country.id },
-                                  })
-                                  setCountryDropdownOpen(false)
-                                }}
-                              >
-                                <img
-                                  src={`https://flagcdn.com/w40/${country.iso.toLowerCase()}.png`}
-                                  alt={country.nicename}
-                                  className="mr-2"
-                                  style={{ width: '24px', height: '16px' }}
-                                />
-                                <span className="flex-grow">{country.nicename}</span>
-                                <span className="text-blue-600">+{country.phonecode}</span>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="px-3 py-2 text-gray-500">No countries found</div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Phone number input */}
-                  <input
-                    type="tel"
-                    name="mobile"
-                    // placeholder="Enter Mobile Number"
-                    value={formData.mobile || ''}
-                    onChange={handleInputChange}
-                    className="flex-grow border-0 h-10 px-3 outline-none"
-                  />
-                </div>
-                {validationErrors.mobile && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.mobile}
-                  </div>
-                )}
-              </div>
-              {/* Password */}
-              <div>
-                <h6 className="mb-2">
-                  Password <span className="text-red-600">*</span>
-                </h6>
-                <div className="flex items-center border border-stone-200 rounded-md">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name="password"
-                    className="w-full outline-none text-zinc-500 px-3 py-2"
-                    // placeholder="Enter Password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                  />
-                  <button
-                    type="button"
-                    onClick={togglePasswordVisibility}
-                    className="pr-2 flex items-center justify-center"
-                  >
-                    {showPassword ? (
-                      <RiEyeOffLine className=" h-7 w-7" />
-                    ) : (
-                      <RiEyeLine className=" h-7 w-7" />
-                    )}
-                  </button>
-                </div>
-                {validationErrors.password && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.password}
-                  </div>
-                )}
-              </div>
-
-              {/* Company Address */}
-              <div>
-                <h6 className="mb-2">
-                  Company Address <span className="text-red-600">*</span>
-                </h6>
-                <div className="border border-stone-200 rounded-md">
-                  <select
-                    name="company_address_id"
-                    className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.company_address_id || ''}
-                    onChange={handleInputChange}
-                  >
-                    <option value="" disabled>
-                      Select Company Address
-                    </option>
-                    {dropdownOptions.companiesAddresses.map((dept) => (
-                      <option key={dept.id} value={dept.id}>
-                        {dept.address}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {validationErrors.company_address_id && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.company_address_id}
-                  </div>
-                )}
-              </div>
-
-              {/* Department */}
-              <div>
-                <h6 className="mb-2">
-                  Department <span className="text-red-600">*</span>
-                </h6>
-                <div className="flex gap-2">
-                  <div className="border border-stone-200 rounded-md flex-grow">
-                    <select
-                      name="department_id"
-                      className="h-10 w-full outline-none text-zinc-500 px-3"
-                      value={formData.department_id || ''}
-                      onChange={handleInputChange}
-                    >
-                      <option value="" disabled>
-                        Select Department
-                      </option>
-                      {dropdownOptions.departments.map((dept) => (
-                        <option key={dept.id} value={dept.id}>
-                          {dept.department_name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <ActionButton
-                    type="button"
-                    label={'Add Department'}
-                    variant="minimal"
-                    className="rounded-md"
-                    onClick={() => openModal('department')}
-                  />
-                  {/* <button
-                    type="button"
-                    className="h-10 px-4 border border-stone-200 rounded-md text-zinc-500 hover:bg-gray-50 transition-colors"
-                  >
-                    Add Department
-                  </button> */}
-                </div>
-                {validationErrors.department_id && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.department_id}
-                  </div>
-                )}
-              </div>
-
-              {/* Designation */}
-              <div>
-                <h6 className="mb-2">
-                  Designation <span className="text-red-600">*</span>
-                </h6>
-                <div className="flex gap-2">
-                  <div className="border border-stone-200 rounded-md flex-grow">
-                    <select
-                      name="designation_id"
-                      className="h-10 w-full outline-none text-zinc-500 px-3"
-                      value={formData.designation_id || ''}
-                      onChange={handleInputChange}
-                    >
-                      <option value="" disabled>
-                        Select Designation
-                      </option>
-                      {dropdownOptions.designations.map((desig) => (
-                        <option key={desig.id} value={desig.id}>
-                          {desig.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <ActionButton
-                    type="button"
-                    label={'Add Designation'}
-                    variant="minimal"
-                    className="rounded-md"
-                    onClick={() => openModal('designation')}
-                  />
-                </div>
-                {validationErrors.designation_id && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.designation_id}
-                  </div>
-                )}
-              </div>
-
-              {/* Role */}
-              <div>
-                <h6 className="mb-2">
-                  Role <span className="text-red-600">*</span>
-                </h6>
-                <div className="flex gap-2">
-                  <div className="border border-stone-200 rounded-md flex-grow">
-                    <select
-                      name="role_id"
-                      className="h-10 w-full outline-none text-zinc-500 px-3"
-                      value={formData.role_id || ''}
-                      onChange={handleInputChange}
-                    >
-                      <option value="" disabled>
-                        Select Role
-                      </option>
-                      {dropdownOptions.roles.map((desig) => (
-                        <option key={desig.id} value={desig.id}>
-                          {desig.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <ActionButton
-                      type="button"
-                      label={'Add Role'}
-                      variant="minimal"
-                      className="rounded-md"
-                      onClick={() => openModal('role')}
-                    />
-                  </div>
-                </div>
-                {validationErrors.role_id && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.role_id}
-                  </div>
-                )}
-              </div>
-
-              {/* Joining Date */}
-              <div>
-                <h6 className="mb-2">
-                  Joining Date <span className="text-red-600">*</span>
-                </h6>
-                <div className="border border-stone-200 rounded-md">
-                  <input
-                    type="date"
-                    name="joining_date"
-                    className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.joining_date}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                {validationErrors.joining_date && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.joining_date}
-                  </div>
-                )}
-              </div>
-
-              {/* Date of Birth */}
-              <div>
-                <h6 className="mb-2">
-                  Date of Birth <span className="text-red-600">*</span>
-                </h6>
-                <div className="border border-stone-200 rounded-md">
-                  <input
-                    type="date"
-                    name="date_of_birth"
-                    className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.date_of_birth}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                {validationErrors.date_of_birth && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.date_of_birth}
-                  </div>
-                )}
-              </div>
-
-              {/* About Me */}
-              <div>
-                <h6 className="mb-2">About Me</h6>
-                <div className="border border-stone-200 rounded-md">
-                  <input
-                    type="text"
-                    name="about_me"
-                    className="h-10 w-full outline-none text-zinc-500 px-3"
-                    // placeholder="Enter About Me"
-                    value={formData.about_me}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-
-              {/* Reporting To */}
-              <div>
-                <h6 className="mb-2">
-                  Reporting To <span className="text-red-600">*</span>
-                </h6>
-                <div className="border border-stone-200 rounded-md">
-                  <select
-                    name="reporting_to"
-                    className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.reporting_to || ''}
-                    onChange={handleInputChange}
-                  >
-                    <option value="" disabled>
-                      Select Reporting To
-                    </option>
-
-                    {REPORTING_OPTIONS.map((manager) => (
-                      <option key={manager.id} value={3}>
-                        {manager.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {validationErrors.reporting_to && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.reporting_to}
-                  </div>
-                )}
-              </div>
-
-              {/* Employment Type */}
-              <div>
-                <h6 className="mb-2">
-                  Employment Type <span className="text-red-600">*</span>
-                </h6>
-                <div className="border border-stone-200 rounded-md">
-                  <select
-                    name="employment_type"
-                    className="h-10 w-full outline-none text-zinc-500 px-3"
-                    value={formData.employment_type || ''}
-                    onChange={handleInputChange}
-                  >
-                    <option value="" disabled>
-                      Select Employment Type
-                    </option>
-
-                    {EMPLOYMENT_TYPES.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {validationErrors.employment_type && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.employment_type}
-                  </div>
-                )}
-              </div>
-
-              {/* Contract End Date */}
-              {formData.employment_type === 'Contract' && (
-                <div>
-                  <h6 className="mb-2">
-                    Contract End Date <span className="text-red-600">*</span>
-                  </h6>
-                  <div className="border border-stone-200 rounded-md">
-                    <input
-                      type="date"
-                      name="contract_end_date"
-                      className="h-10 w-full outline-none text-zinc-500 px-3"
-                      value={formData.contract_end_date}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  {validationErrors.contract_end_date && (
-                    <div className="text-red-500 text-xs mt-1 flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-1"
-                      >
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                      </svg>
-                      {validationErrors.contract_end_date}
-                    </div>
-                  )}
+              {/* Loading Indicator - Only shows when imageLoading is true */}
+              {imageLoading && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
                 </div>
               )}
 
-              {/* Address */}
-              <div>
-                <h6 className="mb-2">Address </h6>
-                <div className="flex items-center border border-stone-200 rounded-md">
-                  <input
-                    type="text"
-                    name="address"
-                    className="w-full outline-none text-zinc-500 px-3 py-2"
-                    // placeholder="Enter Address"
-                    value={formData.address}
-                    onChange={handleInputChange}
+              {/* Optional: Add an overlay with a camera icon to indicate it's clickable */}
+              <div
+                className="absolute bottom-0 right-0 bg-black rounded-full p-1 shadow cursor-pointer"
+                onClick={handleImageClick}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
                   />
-                  <RiHome2Line className="pr-2 h-10 w-10" />
-                </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+            {/* Name */}
+            <div>
+              <h6 className="mb-2">
+                Name <span className="text-red-600">*</span>
+              </h6>
+              <div className="flex items-center border border-stone-200 rounded-md">
+                <input
+                  type="text"
+                  name="name"
+                  className="w-full outline-none text-zinc-500 px-3 py-1"
+                  // placeholder="Enter Your Name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                />
+                <RiUserLine className="pr-2h-8 w-8" />
               </div>
 
-              {/* Skills */}
-              <div>
-                <h6 className="mb-2">
-                  Machine Mapping<span className="text-red-600">*</span>
-                </h6>
-                <div className={`flex flex-wrap gap-2 ${skills.length > 0 ? 'mb-2' : ''}`}>
-                  {skills?.map((skill, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center bg-gray-200 text-gray-700 px-3 py-1 rounded-md"
-                    >
-                      {skill}
-                      <RiCloseLine
-                        className="ml-2 cursor-pointer text-red-500 hover:text-red-700"
-                        onClick={() => handleRemoveSkill(skill)}
-                      />
-                    </div>
-                  ))}
+              {validationErrors.name && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.name}
                 </div>
-                <div className="relative" ref={machineDropdownRef}>
-                  <div
-                    className={`flex items-center justify-between border border-stone-200 rounded-md p-2 ${machineList && machineList.length > 0 ? 'cursor-pointer' : 'cursor-not-allowed bg-gray-100'}`}
-                    onClick={() => {
-                      if (machineList && machineList.length > 0) {
-                        setMachineDropdownOpen(!machineDropdownOpen)
-                      }
+              )}
+            </div>
+
+            {/* Email */}
+            <div>
+              <h6 className="mb-2">
+                Email <span className="text-red-600">*</span>
+              </h6>
+              <div className="flex items-center border border-stone-200 rounded-md">
+                <input
+                  type="email"
+                  name="email"
+                  className="w-full outline-none text-zinc-500 px-3 py-1"
+                  placeholder="name@gmail.com"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                />
+                <IoIosAt className="pr-2h-8 w-8" />
+              </div>
+              {validationErrors.email && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.email}
+                </div>
+              )}
+            </div>
+
+            {/* Date of Birth */}
+            <div>
+              <h6 className="mb-2">
+                Date of Birth <span className="text-red-600">*</span>
+              </h6>
+              <div className="border border-stone-200 rounded-md">
+                <input
+                  type="date"
+                  name="date_of_birth"
+                  className="h-8  w-full outline-none text-zinc-500 px-3"
+                  value={formData.date_of_birth}
+                  onChange={handleInputChange}
+                />
+              </div>
+              {validationErrors.date_of_birth && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.date_of_birth}
+                </div>
+              )}
+            </div>
+
+            {/* Mobile */}
+            <div>
+              <h6 className="mb-2">
+                Mobile Number <span className="text-red-600">*</span>
+              </h6>
+              <div className="flex border border-stone-200 rounded-md">
+                {/* Custom country code dropdown */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    type="button"
+                    className="flex items-center justify-between border-0 rounded-0 border-r border-stone-200 h-8  px-3 bg-white"
+                    onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
+                    style={{
+                      paddingRight: '30px',
+                      position: 'relative',
                     }}
                   >
-                    <span className="text-zinc-500">
-                      {machineList && machineList.length > 0
-                        ? 'Select Machine as Skill'
-                        : 'No machines available'}
-                    </span>
-                    <span>
+                    {formData.country_id ? (
+                      <div className="flex items-center pr-4">
+                        {(() => {
+                          const selectedCountry = dropdownOptions.countries.find(
+                            (country) => country.id === formData.country_id,
+                          )
+
+                          return selectedCountry ? (
+                            <>
+                              <img
+                                src={`https://flagcdn.com/w40/${selectedCountry.iso.toLowerCase()}.png`}
+                                alt={selectedCountry.nicename}
+                                className="mr-2"
+                                style={{ width: '24px', height: '16px' }}
+                              />
+                              <span>+{selectedCountry.phonecode}</span>
+                            </>
+                          ) : (
+                            <span>Select</span>
+                          )
+                        })()}
+                      </div>
+                    ) : (
+                      <span>Select</span>
+                    )}
+                    <span
+                      style={{
+                        position: 'absolute',
+                        right: '3px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                      }}
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="10"
@@ -1309,58 +819,564 @@ function EmployeeForm({
                         <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
                       </svg>
                     </span>
-                  </div>
+                  </button>
 
-                  {machineDropdownOpen && (
-                    <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg">
+                  {countryDropdownOpen && (
+                    <div className="absolute z-10 mt-1 w-64 bg-white rounded-md shadow-lg">
                       <div className="p-2 border-b">
                         <input
                           type="text"
-                          placeholder="Search machines"
+                          placeholder="Search countries"
                           className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                          value={machineSearchQuery}
-                          onChange={(e) => setMachineSearchQuery(e.target.value)}
+                          value={countrySearchValue}
+                          onChange={handleCountrySearchChange}
                         />
                       </div>
                       <div className="max-h-60 overflow-y-auto">
-                        {machineList && machineList.length > 0 ? (
-                          machineList
-                            .filter((machine) => !skills.includes(machine.machine_name))
-                            .filter((machine) =>
-                              machine.machine_name
-                                .toLowerCase()
-                                .includes(machineSearchQuery.toLowerCase()),
-                            )
-                            .map((machine) => (
-                              <div
-                                key={machine.id}
-                                className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                                onClick={() => handleAddMachineSkill(machine)}
-                              >
-                                <span>{machine.machine_name}</span>
-                              </div>
-                            ))
-                        ) : (
-                          <div className="px-3 py-2 text-gray-500">No machines available</div>
-                        )}
-                        {machineList &&
-                          machineList.length > 0 &&
-                          machineList.filter(
-                            (machine) =>
-                              !skills.includes(machine.machine_name) &&
-                              machine.machine_name
-                                .toLowerCase()
-                                .includes(machineSearchQuery.toLowerCase()),
-                          ).length === 0 && (
-                            <div className="px-3 py-2 text-gray-500">
-                              No matching machines found
+                        {filteredCountries && filteredCountries.length > 0 ? (
+                          filteredCountries.map((country) => (
+                            <div
+                              key={country.id}
+                              className="flex items-center px-3 py-1 hover:bg-gray-100 cursor-pointer"
+                              onClick={() => {
+                                handleInputChange({
+                                  target: { name: 'country_phonecode', value: country.phonecode },
+                                })
+                                handleInputChange({
+                                  target: { name: 'country_id', value: country.id },
+                                })
+                                setCountryDropdownOpen(false)
+                              }}
+                            >
+                              <img
+                                src={`https://flagcdn.com/w40/${country.iso.toLowerCase()}.png`}
+                                alt={country.nicename}
+                                className="mr-2"
+                                style={{ width: '24px', height: '16px' }}
+                              />
+                              <span className="flex-grow">{country.nicename}</span>
+                              <span className="text-blue-600">+{country.phonecode}</span>
                             </div>
-                          )}
+                          ))
+                        ) : (
+                          <div className="px-3 py-1 text-gray-500">No countries found</div>
+                        )}
                       </div>
                     </div>
                   )}
                 </div>
-                {validationErrors.skills && (
+
+                {/* Phone number input */}
+                <input
+                  type="tel"
+                  name="mobile"
+                  // placeholder="Enter Mobile Number"
+                  value={formData.mobile || ''}
+                  onChange={handleInputChange}
+                  className="flex-grow border-0 h-8  px-3 outline-none"
+                />
+              </div>
+              {validationErrors.mobile && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.mobile}
+                </div>
+              )}
+            </div>
+
+            {/* Address */}
+            <div>
+              <h6 className="mb-2">Address </h6>
+              <div className="flex items-center border border-stone-200 rounded-md">
+                <input
+                  type="text"
+                  name="address"
+                  className="w-full outline-none text-zinc-500 px-3 py-1"
+                  // placeholder="Enter Address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                />
+                <RiHome2Line className="pr-2h-8 w-8" />
+              </div>
+            </div>
+
+            {/* About Me */}
+            <div>
+              <h6 className="mb-2">About Me</h6>
+              <div className="border border-stone-200 rounded-md">
+                <input
+                  type="text"
+                  name="about_me"
+                  className="h-8  w-full outline-none text-zinc-500 px-3"
+                  // placeholder="Enter About Me"
+                  value={formData.about_me}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+
+            {/* Employee ID */}
+            <div>
+              <h6 className="mb-2">
+                Employee ID <span className="text-red-600">*</span>
+              </h6>
+              <div className="flex items-center border border-stone-200 rounded-md">
+                <input
+                  type="text"
+                  name="employee_id"
+                  className="w-full outline-none text-zinc-500 px-3 py-1"
+                  // placeholder="Enter Employee ID"
+                  value={formData.employee_id}
+                  onChange={handleInputChange}
+                />
+              </div>
+              {validationErrors.employee_id && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.employee_id}
+                </div>
+              )}
+            </div>
+
+            {/* Password */}
+            <div>
+              <h6 className="mb-2">
+                Password <span className="text-red-600">*</span>
+              </h6>
+              <div className="flex items-center border border-stone-200 rounded-md">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  className="w-full outline-none text-zinc-500 px-3 py-1"
+                  // placeholder="Enter Password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="pr-2 flex items-center justify-center"
+                >
+                  {showPassword ? (
+                    <RiEyeOffLine className=" h-5 w-5" />
+                  ) : (
+                    <RiEyeLine className=" h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              {validationErrors.password && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.password}
+                </div>
+              )}
+            </div>
+
+            {/* Company Address */}
+            <div>
+              <h6 className="mb-2">
+                Company Address <span className="text-red-600">*</span>
+              </h6>
+              <div className="border border-stone-200 rounded-md">
+                <select
+                  name="company_address_id"
+                  className="h-8  w-full outline-none text-zinc-500 px-3"
+                  value={formData.company_address_id || ''}
+                  onChange={handleInputChange}
+                >
+                  <option value="" disabled>
+                    Select Company Address
+                  </option>
+                  {dropdownOptions.companiesAddresses.map((dept) => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.address}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {validationErrors.company_address_id && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.company_address_id}
+                </div>
+              )}
+            </div>
+
+            {/* Department */}
+            <div>
+              <h6 className="mb-2">
+                Department <span className="text-red-600">*</span>
+              </h6>
+              <div className="flex gap-2">
+                <div className="border border-stone-200 rounded-md flex-grow">
+                  <select
+                    name="department_id"
+                    className="h-8  w-full outline-none text-zinc-500 px-3"
+                    value={formData.department_id || ''}
+                    onChange={handleInputChange}
+                  >
+                    <option value="" disabled>
+                      Select Department
+                    </option>
+                    {dropdownOptions.departments.map((dept) => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.department_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <ActionButton
+                  type="button"
+                  label={'Add Department'}
+                  variant="minimal"
+                  className="rounded-md"
+                  onClick={() => openModal('department')}
+                />
+                {/* <button
+                    type="button"
+                    className="h-8  px-4 border border-stone-200 rounded-md text-zinc-500 hover:bg-gray-50 transition-colors"
+                  >
+                    Add Department
+                  </button> */}
+              </div>
+              {validationErrors.department_id && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.department_id}
+                </div>
+              )}
+            </div>
+
+            {/* Designation */}
+            <div>
+              <h6 className="mb-2">
+                Designation <span className="text-red-600">*</span>
+              </h6>
+              <div className="flex gap-2">
+                <div className="border border-stone-200 rounded-md flex-grow">
+                  <select
+                    name="designation_id"
+                    className="h-8  w-full outline-none text-zinc-500 px-3"
+                    value={formData.designation_id || ''}
+                    onChange={handleInputChange}
+                  >
+                    <option value="" disabled>
+                      Select Designation
+                    </option>
+                    {dropdownOptions.designations.map((desig) => (
+                      <option key={desig.id} value={desig.id}>
+                        {desig.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <ActionButton
+                  type="button"
+                  label={'Add Designation'}
+                  variant="minimal"
+                  className="rounded-md"
+                  onClick={() => openModal('designation')}
+                />
+              </div>
+              {validationErrors.designation_id && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.designation_id}
+                </div>
+              )}
+            </div>
+
+            {/* Role */}
+            <div>
+              <h6 className="mb-2">
+                Role <span className="text-red-600">*</span>
+              </h6>
+              <div className="flex gap-2">
+                <div className="border border-stone-200 rounded-md flex-grow">
+                  <select
+                    name="role_id"
+                    className="h-8  w-full outline-none text-zinc-500 px-3"
+                    value={formData.role_id || ''}
+                    onChange={handleInputChange}
+                  >
+                    <option value="" disabled>
+                      Select Role
+                    </option>
+                    {dropdownOptions.roles.map((desig) => (
+                      <option key={desig.id} value={desig.id}>
+                        {desig.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <ActionButton
+                    type="button"
+                    label={'Add Role'}
+                    variant="minimal"
+                    className="rounded-md"
+                    onClick={() => openModal('role')}
+                  />
+                </div>
+              </div>
+              {validationErrors.role_id && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.role_id}
+                </div>
+              )}
+            </div>
+
+            {/* Joining Date */}
+            <div>
+              <h6 className="mb-2">
+                Joining Date <span className="text-red-600">*</span>
+              </h6>
+              <div className="border border-stone-200 rounded-md">
+                <input
+                  type="date"
+                  name="joining_date"
+                  className="h-8  w-full outline-none text-zinc-500 px-3"
+                  value={formData.joining_date}
+                  onChange={handleInputChange}
+                />
+              </div>
+              {validationErrors.joining_date && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.joining_date}
+                </div>
+              )}
+            </div>
+
+            {/* Reporting To */}
+            <div>
+              <h6 className="mb-2">
+                Reporting To <span className="text-red-600">*</span>
+              </h6>
+              <div className="border border-stone-200 rounded-md">
+                <select
+                  name="reporting_to"
+                  className="h-8  w-full outline-none text-zinc-500 px-3"
+                  value={formData.reporting_to || ''}
+                  onChange={handleInputChange}
+                >
+                  <option value="" disabled>
+                    Select Reporting To
+                  </option>
+
+                  {REPORTING_OPTIONS.map((manager) => (
+                    <option key={manager.id} value={3}>
+                      {manager.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {validationErrors.reporting_to && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.reporting_to}
+                </div>
+              )}
+            </div>
+
+            {/* Employment Type */}
+            <div>
+              <h6 className="mb-2">
+                Employment Type <span className="text-red-600">*</span>
+              </h6>
+              <div className="border border-stone-200 rounded-md">
+                <select
+                  name="employment_type"
+                  className="h-8  w-full outline-none text-zinc-500 px-3"
+                  value={formData.employment_type || ''}
+                  onChange={handleInputChange}
+                >
+                  <option value="" disabled>
+                    Select Employment Type
+                  </option>
+
+                  {EMPLOYMENT_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {validationErrors.employment_type && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.employment_type}
+                </div>
+              )}
+            </div>
+
+            {/* Contract End Date */}
+            {formData.employment_type === 'Contract' && (
+              <div>
+                <h6 className="mb-2">
+                  Contract End Date <span className="text-red-600">*</span>
+                </h6>
+                <div className="border border-stone-200 rounded-md">
+                  <input
+                    type="date"
+                    name="contract_end_date"
+                    className="h-8  w-full outline-none text-zinc-500 px-3"
+                    value={formData.contract_end_date}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                {validationErrors.contract_end_date && (
                   <div className="text-red-500 text-xs mt-1 flex items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -1378,69 +1394,185 @@ function EmployeeForm({
                       <line x1="12" y1="8" x2="12" y2="12"></line>
                       <line x1="12" y1="16" x2="12.01" y2="16"></line>
                     </svg>
-                    {validationErrors.skills}
+                    {validationErrors.contract_end_date}
                   </div>
                 )}
               </div>
-            </div>
+            )}
 
-            {/* Action Buttons */}
-            <div className="p-4 flex justify-end space-x-4">
-              <ActionButton
-                label="Cancel"
-                variant="cancel"
-                type="button"
-                onClick={() => {
-                  // TODO: Implement edit functionality
-                  // setCanDeactivate(true)
-                  handleCloseDrawer()
-                }}
-              />
-              <ActionButton label="Save" variant="save" type="submit" />
+            {/* Skills */}
+            <div>
+              <h6 className="mb-2">
+                Machine Mapping<span className="text-red-600">*</span>
+              </h6>
+              <div className={`flex flex-wrap gap-2 ${skills.length > 0 ? 'mb-2' : ''}`}>
+                {skills?.map((skill, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center bg-gray-200 text-gray-700 px-3 py-1 rounded-md"
+                  >
+                    {skill}
+                    <RiCloseLine
+                      className="ml-2 cursor-pointer text-red-500 hover:text-red-700"
+                      onClick={() => handleRemoveSkill(skill)}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="relative" ref={machineDropdownRef}>
+                <div
+                  className={`flex items-center justify-between border border-stone-200 rounded-md p-1 ${machineList && machineList.length > 0 ? 'cursor-pointer' : 'cursor-not-allowed bg-gray-100'}`}
+                  onClick={() => {
+                    if (machineList && machineList.length > 0) {
+                      setMachineDropdownOpen(!machineDropdownOpen)
+                    }
+                  }}
+                >
+                  <span className="text-zinc-500">
+                    {machineList && machineList.length > 0
+                      ? 'Select Machine as Skill'
+                      : 'No machines available'}
+                  </span>
+                  <span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="10"
+                      height="10"
+                      fill="currentColor"
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+                    </svg>
+                  </span>
+                </div>
+
+                {machineDropdownOpen && (
+                  <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg">
+                    <div className="p-2 border-b">
+                      <input
+                        type="text"
+                        placeholder="Search machines"
+                        className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        value={machineSearchQuery}
+                        onChange={(e) => setMachineSearchQuery(e.target.value)}
+                      />
+                    </div>
+                    <div className="max-h-60 overflow-y-auto">
+                      {machineList && machineList.length > 0 ? (
+                        machineList
+                          .filter((machine) => !skills.includes(machine.machine_name))
+                          .filter((machine) =>
+                            machine.machine_name
+                              .toLowerCase()
+                              .includes(machineSearchQuery.toLowerCase()),
+                          )
+                          .map((machine) => (
+                            <div
+                              key={machine.id}
+                              className="flex items-center px-3 py-1 hover:bg-gray-100 cursor-pointer"
+                              onClick={() => handleAddMachineSkill(machine)}
+                            >
+                              <span>{machine.machine_name}</span>
+                            </div>
+                          ))
+                      ) : (
+                        <div className="px-3 py-1 text-gray-500">No machines available</div>
+                      )}
+                      {machineList &&
+                        machineList.length > 0 &&
+                        machineList.filter(
+                          (machine) =>
+                            !skills.includes(machine.machine_name) &&
+                            machine.machine_name
+                              .toLowerCase()
+                              .includes(machineSearchQuery.toLowerCase()),
+                        ).length === 0 && (
+                          <div className="px-3 py-1 text-gray-500">No matching machines found</div>
+                        )}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {validationErrors.skills && (
+                <div className="text-red-500 text-xs mt-1 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-1"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {validationErrors.skills}
+                </div>
+              )}
             </div>
           </div>
-        </form>
 
-        {canDeactivate && (
-          <ConfirmationModale
-            isOpen={canDeactivate}
-            onClose={() => setCanDeactivate(false)}
-            onConfirm={() => {
-              setDrawerOpen(false)
-              setIsTouched(false)
-              setCanDeactivate(false)
-            }}
-            variant="unsavedChanges"
-          />
-        )}
+          {/* Action Buttons */}
+          <div className="p-4 flex justify-end space-x-4">
+            <ActionButton
+              label="Cancel"
+              variant="cancel"
+              type="button"
+              onClick={() => {
+                // TODO: Implement edit functionality
+                // setCanDeactivate(true)
+                handleCloseDrawer()
+              }}
+            />
+            <ActionButton label="Save" variant="save" type="submit" />
+          </div>
+        </div>
+      </form>
 
-        {activeModal === 'department' && (
-          <AddEditDepartmentForm
-            showForm={activeModal === 'department'}
-            setShowForm={closeModal}
-            isEdit={false}
-            onSuccess={handleDepartmentFormSuccess}
-          />
-        )}
+      {canDeactivate && (
+        <ConfirmationModale
+          isOpen={canDeactivate}
+          onClose={() => setCanDeactivate(false)}
+          onConfirm={() => {
+            setIsTouched(false)
+            setCanDeactivate(false)
+            navigate('/employeelist')
+          }}
+          variant="unsavedChanges"
+        />
+      )}
 
-        {activeModal === 'designation' && (
-          <AddEditDesignation
-            showForm={activeModal === 'designation'}
-            setShowForm={closeModal}
-            isEdit={false}
-            onSuccess={handleDesignationFormSuccess}
-          />
-        )}
+      {activeModal === 'department' && (
+        <AddEditDepartmentForm
+          showForm={activeModal === 'department'}
+          setShowForm={closeModal}
+          isEdit={false}
+          onSuccess={handleDepartmentFormSuccess}
+        />
+      )}
 
-        {activeModal === 'role' && (
-          <AddEditRoleForm
-            showForm={activeModal === 'role'}
-            setShowForm={closeModal}
-            isEdit={false}
-            onSuccess={handleRoleFormSuccess}
-          />
-        )}
-      </Drawer>
+      {activeModal === 'designation' && (
+        <AddEditDesignation
+          showForm={activeModal === 'designation'}
+          setShowForm={closeModal}
+          isEdit={false}
+          onSuccess={handleDesignationFormSuccess}
+        />
+      )}
+
+      {activeModal === 'role' && (
+        <AddEditRoleForm
+          showForm={activeModal === 'role'}
+          setShowForm={closeModal}
+          isEdit={false}
+          onSuccess={handleRoleFormSuccess}
+        />
+      )}
     </>
   )
 }

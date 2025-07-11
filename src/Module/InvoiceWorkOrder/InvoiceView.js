@@ -91,10 +91,10 @@ function InvoiceView() {
                         <CIcon icon={cilPencil} className="h-3 w-3" />
                         <span>Edit</span>
                     </button> */}
-                    <button className="flex items-center gap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
+                    {/* <button className="flex items-center gap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">
                         <CIcon icon={cilEnvelopeOpen} className="h-3 w-3" />
                         <span>Email</span>
-                    </button>
+                    </button> */}
                     <button
                     onClick={handlePrint}
                      className="flex items-center gap-1 px-3 py-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600">

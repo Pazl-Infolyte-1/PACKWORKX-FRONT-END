@@ -29,7 +29,10 @@ const AllcoateRMModal = ({ visibleAllocate, setVisibleAllocate, group, droppedIt
     }
     if (quantityNumber > group?.balance_qty) {
       setAlertsApp([{severity:'warning',message:'Cannot allocate more than the balance to allocate in group.'}])
-      // alert('Cannot allocate more than the balance to allocate in group.')
+      return
+    }
+    if (quantityNumber > droppedItem?.sfg?.quantity_available) {
+      setAlertsApp([{severity:'warning',message:'Cannot allocate more than available inventory quantity.'}])
       return
     }
 

@@ -1,25 +1,22 @@
-import React, { useEffect, useState } from 'react'
-import {
-  CTable,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
-  CButton,
-} from '@coreui/react'
+import React, { useState } from 'react'
 import ThreeDotMenu from '../../../components/ThreeDotMenu'
-import { cilActionRedo, cilActionUndo, cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
+import { cilActionRedo, cilHandPointRight, cilPencil } from '@coreui/icons'
 import ConfirmationModale from '../../../components/New/ConfirmationModale'
 import CustomAlert from '../../../components/New/CustomAlert'
 import ResuableTable from '../../SalesOrder/ReusableTable'
-import Loading from '../../../components/New/Loading'
 import { employeeApi } from '../../../api/employee'
-function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, handleView, loading }) {
+import { useNavigate } from 'react-router-dom'
+function EmployeeTable({
+  employeesdata = [],
+  handleEdit,
+  fetchEmployeeData,
+  setIsMinimized,
+  isMinimized,
+}) {
   const [isConfirmationModaleOpen, setIsConfirmationModaleOpen] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState('')
   const [alerts, setAlerts] = useState([])
-
+  const navigate = useNavigate()
   const handleClose = () => {
     setAlerts([])
   }
@@ -151,10 +148,22 @@ function EmployeeTable({ employeesdata = [], handleEdit, fetchEmployeeData, hand
     },
   ]
 
+  const handleView = (id) => {
+    navigate(`/employeelist/${id}`)
+    setIsMinimized(true)
+  }
+
   return (
     <>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
-      <ResuableTable data={employeesdata} columns={columns} handleRowClick={(row) => handleView(row.id)} height={'66vh'}/>
+      <ResuableTable
+        data={employeesdata}
+        columns={columns}
+        handleRowClick={(row) => handleView(row.id)}
+        height={isMinimized ? '75vh' : '68vh'}
+        isMinimiseTable={isMinimized}
+        miniScreenFields={['employee_id', 'employee_name']}
+      />
       <ConfirmationModale
         isOpen={isConfirmationModaleOpen}
         title="Confirm Change"

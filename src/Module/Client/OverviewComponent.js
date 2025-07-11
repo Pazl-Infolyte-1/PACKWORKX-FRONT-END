@@ -192,8 +192,12 @@ const OverviewComponent = ({ tableData }) => {
                     </td>
                   </tr>
                   <tr>
-                    <td className="py-2 text-gray-400 font-semiboldpr-4">Created By</td>
-                    <td className="py-2 font-medium">{tableData?.created_by}</td>
+                    <td className="py-2 text-gray-400 font-semiboldpr-4">Creator Name</td>
+                    <td className="py-2 font-medium">{tableData?.creator?.name}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 text-gray-400 font-semiboldpr-4">Creator Email</td>
+                    <td className="py-2 font-medium">{tableData?.creator?.email}</td>
                   </tr>
                 </tbody>
               </table>

@@ -17,6 +17,7 @@ import { data, useNavigate } from 'react-router-dom'
 import ProgressCompletedModal from './ProgressCompletedModale'
 import { workOrderApi } from '../../api/workOrder'
 import LayerProduction from './LayerProduction'
+import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'
 
 const WorkOrderTable = ({
   cellData,
@@ -36,6 +37,8 @@ const WorkOrderTable = ({
   const [completedWorkOrderData, setCompletedWorkOrderData] = useState(null) // or useState({})
   const [isLayerProductionOpen,setIsLayerProductionOpen] = useState(false)
   const [selectedWorkorder,setSelectedWorkorder] = useState('')
+  const [selectedRow,setSelectedRow] = useState('')
+  const [showLayersModal,setShowLayersModal] = useState(false)
 
   useEffect(() => {
     const fetchProgressOptions = async () => {
@@ -61,6 +64,13 @@ const WorkOrderTable = ({
       console.log(error)
     }
   }
+
+  const handleViewLayersClick = (row) => {
+    setSelectedRow(row);
+    setShowLayersModal(true);
+  };
+
+  const closeLayersModal = () => setShowLayersModal(false);
 
   const handlePriorityChange = async (e, id) => {
     const newValue = e
@@ -134,57 +144,123 @@ const WorkOrderTable = ({
     { key: 'sales_generate_id', header: 'SALES-ID', field: 'salesOrder.sales_generate_id', cellClass: '', searchIcon: true },
     { key: 'sales_ui_id', header: 'SO-Reference', field: 'salesOrder.sales_ui_id', cellClass: '', searchIcon: true },
     { key: 'sku_name', header: 'SKU Name', field: 'sku_name', searchIcon: true },
-    { key: 'manufacture', header: 'Manufacture', field: 'manufacture', searchIcon: true  },
+    // { key: 'manufacture', header: 'Manufacture', field: 'manufacture', searchIcon: true  },
+    {
+      key: 'layers',
+      header: 'Layers',
+      field: 'layer_details',
+      cellClass: '',
+      type: 'custom',
+      render: (row) => (
+        <button
+          title="View Layers"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'linear-gradient(90deg, #e0e7ff 60%, #c7d2fe 100%)',
+            color: '#3730a3',
+            border: '1px solid #a5b4fc',
+            borderRadius: '20px',
+            padding: '2px 12px',
+            cursor: 'pointer',
+            fontWeight: 600,
+            fontSize: '1em',
+            boxShadow: '0 2px 6px rgba(55, 48, 163, 0.08)',
+            transition: 'box-shadow 0.2s, transform 0.2s',
+            outline: 'none',
+          }}
+          onMouseOver={e => {
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(55, 48, 163, 0.18)';
+            e.currentTarget.style.transform = 'translateY(-2px) scale(1.04)';
+          }}
+          onMouseOut={e => {
+            e.currentTarget.style.boxShadow = '0 2px 6px rgba(55, 48, 163, 0.08)';
+            e.currentTarget.style.transform = 'none';
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleViewLayersClick(row);
+          }}
+        >
+          {/* Layers Icon */}
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L18 7.5L10 12L2 7.5L10 3Z" fill="#6366f1"/><path d="M18 12.5L10 17L2 12.5" stroke="#6366f1" strokeWidth="1.5" strokeLinejoin="round"/></svg>
+          {row.work_order_sku_values?.length || 0}
+        </button>
+      ),
+    },
     { key: 'created_at', header: 'Created Date', field: 'created_at', type: 'date' },
     { key: 'qty', header: 'Qty', type: 'number', field: 'qty' },
     {
       key: 'priority',
       header: 'priority',
       field: 'priority',
-      type: 'dropdown',
-      options: ['High', 'Medium', 'Low'],
-      getOptionClass: (val) => {
-        switch (val) {
-          case 'High':
-            return 'bg-red-100 text-red-800'
-          case 'Medium':
-            return 'bg-amber-100 text-amber-800'
-          default:
-            return 'bg-green-100 text-green-800'
+      type: 'custom',
+      render: (row) => {
+        const statusColors = {
+          High: 'bg-red-100 text-red-800',
+          Medium: 'bg-amber-100 text-amber-800',
+          Low: 'bg-green-100 text-green-800',
+        };
+        const fixedSelectClass = "w-[120px] h-[32px] px-2 py-1 rounded-full text-xs font-semibold border outline-none min-w-[100px]";
+        if (row.progress === 'Invoiced') {
+          return (
+            <div className={`${fixedSelectClass} ${statusColors[row.priority] || 'bg-gray-100 text-gray-800'}`}>
+              {row.priority}
+            </div>
+          );
         }
+        return (
+          <select
+            className={`${fixedSelectClass} ${statusColors[row.priority] || 'bg-gray-100 text-gray-800'}`}
+            value={row.priority}
+            onChange={(e) => handlePriorityChange(e.target.value, row.id)}
+            style={{ minWidth: 100, width: 120, height: 32 }}
+          >
+            <option value="High" className="text-gray-700 bg-white">High</option>
+            <option value="Medium" className="text-gray-700 bg-white">Medium</option>
+            <option value="Low" className="text-gray-700 bg-white">Low</option>
+          </select>
+        );
       },
-      onChange: (row, newValue) => {
-        handlePriorityChange(newValue, row.id)
-      },
-      disabled: (row) => row.progress === 'Invoiced',
     },
     {
       key: 'progress',
       header: 'progress',
       field: 'progress',
-      type: 'dropdown',
-      options: [...progressOptions],
-      getOptionClass: (val) => {
-        switch (val) {
-          case 'Completed':
-            return 'bg-green-100 text-green-800'
-          case 'Pending':
-            return 'bg-orange-100 text-orange-800'
-          case 'Raw Material Allocation':
-            return 'bg-blue-100 text-blue-800'
-          case 'Production Planned':
-            return 'bg-gray-100 text-gray-800'
-          case 'Invoiced':
-            return 'bg-red-100 text-red-800'
-          default:
-            return 'bg-gray-100 text-gray-800'
+      type: 'custom',
+      render: (row) => {
+        const statusColors = {
+          Pending: 'bg-orange-100 text-orange-800',
+          'Raw Material Allocation': 'bg-blue-100 text-blue-800',
+          'Production Planned': 'bg-gray-100 text-gray-800',
+          'Board Stage': 'bg-yellow-100 text-yellow-800',
+          'Finish Stage': 'bg-purple-100 text-purple-800',
+          Completed: 'bg-green-100 text-green-800',
+          Invoiced: 'bg-red-100 text-red-800',
+        };
+        const fixedSelectClass = "w-[160px] h-[32px] px-2 py-1 rounded-full text-xs font-semibold border outline-none min-w-[140px]";
+        if (row.progress === 'Invoiced') {
+          return (
+            <div className={`${fixedSelectClass} ${statusColors[row.progress] || 'bg-gray-100 text-gray-800'}`}>
+              {row.progress}
+            </div>
+          );
         }
-      },
-      onChange: (row, newValue) => {
-        handleProgressChange(newValue, row.id)
+        return (
+          <select
+            className={`${fixedSelectClass} ${statusColors[row.progress] || 'bg-gray-100 text-gray-800'}`}
+            value={row.progress}
+            onChange={(e) => handleProgressChange(e.target.value, row.id)}
+            style={{ minWidth: 140, width: 160, height: 32 }}
+          >
+            {progressOptions.map((option) => (
+              <option key={option} value={option} className="text-gray-700 bg-white">{option}</option>
+            ))}
+          </select>
+        );
       },
       searchIcon: true,
-      disabled: (row) => row.progress === 'Invoiced',
     },
 
     {
@@ -253,6 +329,75 @@ const WorkOrderTable = ({
         isMinimiseTable={isMinimiseTable}
         handleRowClick={handleView}
       />
+
+      {/* Layers Modal */}
+      <CustomPopup isOpen={showLayersModal} onClose={closeLayersModal} width="w-[500px]" height="500px">
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="border-b pb-2 mb-2">
+            <h2 className="text-lg font-semibold text-gray-800">Layers</h2>
+            <p className="text-xs text-gray-500 mt-0.5">{selectedRow?.work_order_sku_values?.length || 0} layers found</p>
+          </div>
+          {/* Scrollable content */}
+          <div className="overflow-y-auto pr-1 space-y-2">
+            {(selectedRow?.work_order_sku_values || []).map((layer, idx) => (
+              <div key={idx} className="border border-gray-200 rounded-md bg-white hover:shadow-sm transition-shadow duration-200">
+                {/* Header row */}
+                <div className="flex justify-between items-center p-2 pb-1">
+                  <div className="flex items-center space-x-2">
+                    <h3 className="text-sm font-medium text-gray-800">
+                       {layer?.layer}
+                    </h3>
+                    {layer?.layer_status && (
+                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${layer.layer_status === 'pending' ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>{layer.layer_status}</span>
+                    )}
+                  </div>
+                  <div className="text-[10px] text-gray-500">{layer.work_generate_id}</div>
+                </div>
+                {/* Content grid */}
+                <div className="px-2 pb-2">
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">GSM:</span>
+                      <span className="font-medium text-gray-800 ml-1">{layer?.gsm}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">BF:</span>
+                      <span className="font-medium text-gray-800">{layer?.bf}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Material:</span>
+                      <span className="font-medium text-gray-800">{layer?.material}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Color:</span>
+                      <span className="font-medium text-gray-800">{layer?.color}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Weight:</span>
+                      <span className="font-medium text-gray-800">{
+                        typeof layer?.weight === 'number' ? String(layer.weight).split('.')[0] + (String(layer.weight).includes('.') ? '.' + String(layer.weight).split('.')[1].slice(0,3) : '') : layer?.weight
+                      }</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Bursting Strength:</span>
+                      <span className="font-medium text-gray-800">{
+                        typeof layer?.bursting_strength === 'number' ? String(layer.bursting_strength).split('.')[0] + (String(layer.bursting_strength).includes('.') ? '.' + String(layer.bursting_strength).split('.')[1].slice(0,3) : '') : layer?.bursting_strength
+                      }</span>
+                    </div>
+                    {layer?.flute_type && (
+                      <div className="flex justify-between col-span-2">
+                        <span className="text-gray-500">Flute Type:</span>
+                        <span className="font-medium text-gray-800">{layer.flute_type}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </CustomPopup>
       
       <LayerProduction
         isOpen={isLayerProductionOpen}

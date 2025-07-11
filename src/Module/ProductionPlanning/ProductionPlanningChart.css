@@ -2,114 +2,140 @@
   display: flex;
   height: 100%;
   width: 100%;
-  overflow: auto;
+  overflow: hidden;
   background: #f9fafb;
   font-family: sans-serif;
 }
-
+.scheduler-table thead {
+  position: sticky;
+  top: 0;
+  left: 0px;
+  z-index: 101;
+  background-color: #ffffff;
+}
 .scheduler-table-wrapper {
   flex-grow: 1;
   position: relative;
+  overflow: hidden;
+  scrollbar-width: thin;
 }
-.scheduler-table {
-  border-collapse: collapse;
-  width: max-content;
-  table-layout: fixed;
-  min-width: 100px;
-  border-top: 1px solid #ccc; /* 👈 ensure table has a top border */
+.scrollable-body {
+  display: block;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+  overflow-x:auto;
 }
 
+/* Table Cells */
 .scheduler-table th,
 .scheduler-table td {
-  border: 1px solid #ccc;
-  padding: 8px;
   text-align: center;
   font-size: 0.8rem;
   background-color: #fff;
 }
 
-/* Sticky Header for ALL columns */
-/* Sticky Header for ALL columns */
+/* General Sticky Header */
 .scheduler-table th {
   background-color: #f3f4f6;
   position: sticky;
   top: 0;
-  z-index: 3;
+  /* z-index: 999; */
+  overflow-x: hidden;
 }
 
 .scheduler-table th.sticky-col {
-  font-weight: 600; /* or 500 for slightly bold */
-  color: #111827; /* optional: darker color for better contrast */
+  font-weight: 600;
+  color: #111827;
+  z-index: 150;
 }
+
 .scheduler-table td.sticky-col {
-  font-weight: 549; /* or 500 for slightly bold */
-  color: #111827; /* optional: darker color for better contrast */
+  font-weight: 549;
+  color: #111827;
 }
 
-/* Sticky First Three Columns (Header & Body) */
-.sticky-col {
+/* Sticky Top Headers */
+.scheduler-table thead tr:nth-child(1) th {
   position: sticky;
-  background: #f3f4f6;
-  left: 0;
-  z-index: 2;
-  text-align: left;
-  padding-left: 12px;
-  white-space: nowrap;
+  top: 0;
+  background: #ffffff;
+  z-index: 100;
+  border-bottom: 1px solid #e5e7eb;
+  overflow: visible;
 }
 
+.scheduler-table thead tr:nth-child(2) th {
+  position: sticky;
+  top: 40px;
+  background: #f3f4f6;
+  z-index: 90;
+  border-bottom: 1px solid #e5e7eb;
+  overflow: visible;
+}
+
+/* Sticky Columns */
 .sticky-employee {
   left: 0;
+  width: 140px;
   min-width: 140px;
+  z-index: 105;
 }
 .sticky-machine {
   left: 140px;
+  width: 140px;
   min-width: 140px;
+  z-index: 105;
 }
 .sticky-quantity {
   left: 280px;
+  width: 120px;
   min-width: 120px;
+  z-index: 11;
 }
-
-/* Make sticky headers above sticky cells */
-.scheduler-table th.sticky-employee { z-index: 4; }
-.scheduler-table th.sticky-machine { z-index: 4; }
-.scheduler-table th.sticky-quantity { z-index: 4; }
-
+.right-date{
+  position: sticky;
+  z-index: 60;
+  top: 0;
+  left:0px;
+}
 /* Time Columns */
 .scheduler-table th:not(.sticky-col),
 .scheduler-table td:not(.sticky-col) {
   min-width: 130px;
   white-space: nowrap;
 }
-
-.sticky-col:hover {
+.sticky-date-header {
+  position: sticky;
+  top: 40px; /* below the first header row */
+  left: 0;   /* fixed horizontally */
+  z-index: 100; /* above other cells */
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+/* .sticky-col:hover {
   overflow: visible;
   white-space: normal;
   background: #f9fafb;
-  z-index: 80;
-}
+  z-index: 5;
+} */
 
-
-/* Time Columns */
-.scheduler-table th:not(.sticky-col),
-.scheduler-table td:not(.sticky-col) {
-  min-width: 130px;
-  white-space: nowrap;
-}
-
+/* Time Slots */
 .time-slot {
+  background: white;
   height: 80px;
-  vertical-align: top;
+  overflow: hidden;
   position: relative;
+  z-index: 1;
 }
 
-/* Draggable Cells (First 3 Columns) */
+/* Draggable First Columns */
 .draggable-cell {
   cursor: grab;
   background-color: #f9fafb;
 }
 
-/* Dropped Event Card Styles */
+/* Event Card Styles */
 .event {
   margin: 4px 0;
   padding: 6px 3px;
@@ -121,13 +147,12 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  min-height: 60px; /* Increased height */
+  min-height: 60px;
 }
 
 .event-label {
   font-weight: 600;
   font-size: 0.7rem;
-  margin-bottom: 4px;
 }
 
 .event-time {
@@ -135,7 +160,7 @@
   opacity: 0.9;
 }
 
-/* Scrollbars styling for better UX */
+/* Scrollbars for Wrapper */
 .scheduler-table-wrapper::-webkit-scrollbar {
   height: 8px;
 }
@@ -146,16 +171,22 @@
 .scheduler-table-wrapper::-webkit-scrollbar-track {
   background: #f0f0f0;
 }
+
+/* Popup Overlay */
 .popup-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.4);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
 }
 
+/* Popup Card */
 .popup-card {
   background: #fff;
   padding: 20px;
@@ -197,31 +228,21 @@
   background: #9ca3af;
 }
 
+/* Resize Handles */
 .resize-handle {
-  width: 6px;
-  height: 100%;
+  width: 5px;
+  background-color: rgba(0, 0, 0, 0.15);
   position: absolute;
   top: 0;
+  bottom: 0;
+  z-index: 1;
   cursor: ew-resize;
-  background: rgba(0,0,0,0.1);
 }
+
 .resize-handle.left { left: 0; }
 .resize-handle.right { right: 0; }
 
-.resize-handle {
-  width: 4px;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  cursor: ew-resize;
-  background: rgba(0, 0, 0, 0.1);
-}
-.resize-handle.left { left: 0; }
-.resize-handle.right { right: 0; }
-
-.resize-handle {
-  cursor: ew-resize !important;
-}
+/* Multi-select dropdown */
 .multi-select {
   margin-bottom: 1rem;
 }
@@ -234,9 +255,20 @@
   border-radius: 4px;
 }
 
+/* Popup Cards */
 .popup-card.wide-card {
   width: 500px;
   max-width: 90vw;
+}
+
+.popup-card.wide-card.scrollable-card {
+  width: 600px;
+  max-height: 70vh;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
 .scrollable-card {
@@ -246,12 +278,21 @@
   padding-bottom: 60px;
 }
 
-.sticky-footer {
-  position: sticky;
-  bottom: 0;
-  background: white;
-  padding: 10px 0;
-  border-top: 1px solid #ccc;
+/* Popup Layout */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-content {
+  padding: 10px;
+  background-color: #fdfdfd;
+  border-radius: 4px;
 }
 
 .popup-header {
@@ -267,45 +308,58 @@
   color: #555;
 }
 
-.popup-content {
-  padding: 10px;
-  background-color: #fdfdfd;
-  border-radius: 4px;
+/* Sticky Footer */
+.sticky-footer {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 10px 0;
+  border-top: 1px solid #ccc;
 }
 
-/* You can place this in your ProductionPlanningChart.css or global styles */
+/* ---------- POPUP BASE STYLES ---------- */
 .popup-overlay {
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.4);
-  z-index: 50;
+  z-index: 999;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
-.popup-card.wide-card.scrollable-card {
-  width: 600px;
-  max-height: 70vh;
-  background: white;
-  display: flex;
-  flex-direction: column;
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
-.popup-card h2 {
+.popup-card h2,
+.edit-popup-card h2 {
   font-size: 1.25rem;
   font-weight: 600;
+  padding: 1rem;
+  margin: 0;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.popup-card .popup-content {
+.popup-card .popup-content,
+.edit-popup-card .popup-content {
   padding: 1rem;
   overflow-y: auto;
   flex-grow: 1;
 }
 
-.sticky-footer {
+/* ---------- EDIT POPUP CONTAINER ---------- */
+.edit-popup-card {
+  width: 600px;
+  max-width: 90vw;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- STICKY FOOTER ---------- */
+.sticky-footer,
+.edit-popup-card .sticky-footer {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
@@ -315,6 +369,7 @@
   position: sticky;
   bottom: 0;
   z-index: 10;
+  flex-shrink: 0;
 }
 
 /* Shared button base */
@@ -330,26 +385,310 @@
 
 /* Save = primary */
 .sticky-footer .btn-save {
-  background-color: #2563eb; /* Tailwind's blue-600 */
+  background-color: #2563eb;
   color: white;
 }
-
 .sticky-footer .btn-save:hover {
-  background-color: #1e40af; /* Tailwind's blue-800 */
+  background-color: #1e40af;
 }
 
 /* Cancel = secondary */
 .sticky-footer .btn-cancel {
-  background-color: #9ca3af; /* Tailwind's gray-400 */
+  background-color: #9ca3af;
   color: white;
 }
-
 .sticky-footer .btn-cancel:hover {
-  background-color: #6b7280; /* Tailwind's gray-600 */
+  background-color: #6b7280;
 }
 
+/* ---------- FORM FIELD STYLES ---------- */
+.time-selects {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+}
 
-/* Edit Popup Overlay */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.field-group label {
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.styled-select,
+.styled-input,
+.styled-input:focus {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.styled-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.styled-input[rows] {
+  resize: vertical;
+  min-height: 4rem;
+}
+
+/* ---------- EVENT LABELS ---------- */
+.event-labels {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.event-label {
+  font-weight: 600;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  display: block;
+  text-align: left;
+}
+
+.scheduler-table th.sticky-col {
+  z-index: 6;
+  background-color: #e5e7eb;
+  border-right: 1px solid #d1d5db;
+}
+
+.scheduler-table th,
+.scheduler-table td {
+  white-space: nowrap;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  font-size: 0.8rem;
+  padding: 6px 6px;
+}
+
+.scheduler-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+}
+
+.time-slot {
+  background: white;
+  height: 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.scheduler-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  background: #f9fafb;
+  font-family: sans-serif;
+}
+
+.scheduler-table-wrapper {
+  flex-grow: 1;
+  position: relative;
+  overflow: visible;
+}
+
+.scheduler-table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+.scheduler-table-wrapper::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 4px;
+}
+.scheduler-table-wrapper::-webkit-scrollbar-track {
+  background: #e5e7eb;
+}
+
+/* ---------- TABLE STYLING ---------- */
+.scheduler-table td,
+.scheduler-table th {
+  text-align: center;
+  font-size: 0.8rem;
+  background-color: #fff;
+}
+
+.scheduler-table td:hover {
+  background-color: #f3f4f6;
+}
+
+.scheduler-table th {
+  background-color: #f3f4f6;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+/* ---------- STICKY HEADER ROWS ---------- */
+.scheduler-table thead tr:nth-child(1) th {
+  top: 0;
+  background: #ffffff;
+  z-index: 60;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.scheduler-table thead tr:nth-child(2) th {
+  top: 40px;
+  background: #f3f4f6;
+  z-index: 50;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.date-header-row th {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 30;
+  height: 40px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* ---------- STICKY FIRST COLUMNS ---------- */
+.sticky-col {
+  position: sticky;
+  background: #f3f4f6;
+  white-space: nowrap;
+  border-right: 1px solid #ccc;
+  z-index: 70;
+}
+
+.sticky-employee {
+  left: 0;
+  width: 140px;
+  z-index: 100;
+}
+.sticky-machine {
+  left: 140px;
+  width: 140px;
+  z-index: 100;
+}
+.sticky-quantity {
+  left: 280px;
+  width: 120px;
+  z-index: 100;
+ 
+}
+
+/* ---------- STICKY HEADERS OVER STICKY COLS ---------- */
+.sticky-x {
+ position: sticky;
+  top: 0;
+  z-index: 40;
+  background: white;
+}
+
+/* ---------- TIME SLOT CELLS ---------- */
+.time-slot {
+  background: white;
+  height: 80px;
+  overflow: hidden;
+  position: relative;
+  z-index: 50;
+  padding: 4px;
+}
+.time-slot:hover {
+  background-color: #f9fafb;
+}
+
+/* ---------- EVENTS ---------- */
+.event {
+  margin: 4px 0;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 60px;
+  position: relative;
+  transition: transform 0.1s;
+}
+.right-header{
+  z-index: -1;
+  position: sticky;
+top: 0px;
+
+}
+.event:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.event:active {
+  opacity: 0.8;
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.event-labels {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 0.68rem;
+  color: #e0e7ff;
+  gap: 2px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.event-label {
+  font-weight: 700;
+  font-size: 0.7rem;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: left;
+}
+
+.event-time {
+  font-size: 0.65rem;
+  opacity: 0.9;
+  margin-top: auto;
+}
+
+/* ---------- RESIZE HANDLES ---------- */
+/* .resize-handle {
+  width: 5px;
+  background-color: rgba(0, 0, 0, 0.15);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  cursor: ew-resize;
+} */
+.resize-handle.left {
+  left: 0;
+}
+.resize-handle.right {
+  right: 0;
+}
+
+/* ---------- POPUP COMPONENTS ---------- */
 .popup-overlay {
   position: fixed;
   inset: 0;
@@ -360,7 +699,7 @@
   align-items: center;
 }
 
-/* Edit Popup Card Container */
+.popup-card,
 .edit-popup-card {
   width: 600px;
   max-width: 90vw;
@@ -370,245 +709,6 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Header */
-.edit-popup-card h2 {
-  padding: 1rem;
-  font-size: 1.25rem;
-  font-weight: 600;
-  border-bottom: 1px solid #e5e7eb;
-  margin: 0;
-}
-
-/* Scrollable Content Area */
-.edit-popup-card .popup-content {
-  padding: 1rem;
-  overflow-y: auto;
-  flex-grow: 1;
-}
-
-/* Sticky Footer */
-.edit-popup-card .sticky-footer {
-  padding: 1rem;
-  border-top: 1px solid #e5e7eb;
-  background: #fff;
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  flex-shrink: 0;
-}
-.time-selects {
-  display: flex;
-  gap: 1rem; /* space between from/to selects */
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.field-group {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.styled-select {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  width: 100%;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  margin-top: 4px;
-}
-/* group label + field */
-.field-group {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-}
-.field-group label {
-  
-  margin-bottom: 0.25rem;
-  font-weight: 500;
-  color: #374151; /* dark gray */
-}
-
-/* shared text / textarea styling */
-.styled-input,
-.styled-input:focus {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  background-color: #ffffff;
-  transition: border-color 0.2s;
-  outline: none;
-}
-
-.styled-input:focus {
-  border-color: #3b82f6; /* blue-500 */
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-/* if you switch to a <textarea> */
-.styled-input[rows] {
-  resize: vertical;
-  min-height: 4rem;
-}
-
-.event-labels {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  max-width: 100%; /* restricts to parent */
-  overflow: hidden;
-}
-
-.event-label {
-  white-space: nowrap;         /* prevents line wrapping */
-  overflow: hidden;            /* hides overflow */
-  text-overflow: ellipsis;     /* adds ... */            /* smaller text if needed */
-  max-width: 100%;
-}
-
-.event-label {
-  font-weight: 600;
-  font-size: 0.7rem;
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;              /* Make sure it fills its container */
-  display: block;  
-  text-align: left;         /* Ensure ellipsis applies */
-}
-.event-labels {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-.time-slot {
-  width: 100px; /* or whatever fixed width you want */
-  max-width: 100px;
-  overflow: hidden;
-}
-/* --- ENHANCEMENTS FOR STICKY COLUMNS --- */
-.sticky-col {
-  position: sticky;
-  background: #f3f4f6;
-  z-index: 2;
-  text-align: left;
-  padding-left: 12px;
-  white-space: nowrap;
-  border-right: 1px solid #d1d5db; /* ✅ sticky border */
-  box-shadow: 2px 0 2px -1px rgba(0, 0, 0, 0.08); /* subtle shadow to distinguish */
-}
-
-.scheduler-table th.sticky-col {
-  z-index: 4;
-  background-color: #e5e7eb;
-  border-right: 1px solid #d1d5db; /* ✅ sticky border */
-}
-
-/* Sticky Header Background */
-.scheduler-table th {
-  background-color: #f8fafc;
-  box-shadow: inset 0 -1px 0 #d1d5db;
-  font-weight: 600;
-  font-size: 0.75rem;
-  color: #374151;
-}
-
-/* --- ENHANCED TABLE APPEARANCE --- */
-.scheduler-table {
-  border-collapse: separate;
-  border-spacing: 0;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  background: white;
-}
-
-.scheduler-table td,
-.scheduler-table th {
-  border: 1px solid #e5e7eb;
-  font-size: 0.8rem;
-  transition: background-color 0.2s;
-}
-
-.scheduler-table td:hover {
-  background-color: #f3f4f6;
-}
-
-/* --- ENHANCED EVENT DESIGN --- */
-.event {
-  /* background: linear-gradient(135deg, #4f46e5, #6366f1); */
-  border-radius: 6px;
-  padding: 6px 8px;
-  font-size: 0.75rem;
-  color: white;
-  cursor: grab;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-  position: relative;
-  transition: transform 0.1s;
-}
-
-.event:hover {
-  /* transform: scale(1.02); */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.event-time {
-  font-size: 0.65rem;
-  opacity: 0.9;
-  margin-top: auto;
-}
-
-/* --- CLEARER RESIZE HANDLES --- */
-.resize-handle {
-  width: 5px;
-  background-color: rgba(0, 0, 0, 0.15);
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  z-index: 1;
-}
-
-.resize-handle.left {
-  left: 0;
-}
-
-.resize-handle.right {
-  right: 0;
-}
-
-/* --- ENHANCED DROPPABLE TIME SLOTS --- */
-.time-slot {
-  background-color: #ffffff;
-  border-right: 1px solid #e5e7eb;
-  height: 80px;
-  position: relative;
-  padding: 4px;
-  overflow: hidden;
-}
-
-.time-slot:hover {
-  background-color: #f9fafb;
-}
-
-/* --- SCROLLBAR ENHANCEMENT FOR WRAPPER --- */
-.scheduler-table-wrapper::-webkit-scrollbar-thumb {
-  background: #9ca3af;
-}
-
-.scheduler-table-wrapper::-webkit-scrollbar-track {
-  background: #e5e7eb;
-}
-
-/* --- POPUP CARD STYLING TWEAKS --- */
-.popup-card,
-.edit-popup-card {
   border: 1px solid #e5e7eb;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
@@ -618,159 +718,125 @@
   font-size: 1.2rem;
   font-weight: 600;
   color: #111827;
+  padding: 1rem;
+  margin: 0;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-/* --- EVENT LABEL ENHANCEMENTS --- */
-.event-labels {
-  font-size: 0.68rem;
-  color: #e0e7ff;
+.popup-content {
+  padding: 1rem;
+  background-color: #fdfdfd;
+  border-radius: 4px;
+  overflow-y: auto;
+  flex-grow: 1;
 }
 
-.event-label {
+/* ---------- POPUP FOOTER BUTTONS ---------- */
+.sticky-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid #e5e7eb;
+  background: white;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.sticky-footer button {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  opacity: 0.95;
-  color: #e0e7ff;
+  border-radius: 6px;
+  border: none;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
 }
 
-/* --- DRAGGED EVENT VISUAL CUE --- */
-.event:active {
-  opacity: 0.8;
-  transform: scale(0.98);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+.sticky-footer .btn-save {
+  background-color: #2563eb;
+  color: white;
+}
+.sticky-footer .btn-save:hover {
+  background-color: #1e40af;
+}
+.sticky-footer .btn-cancel {
+  background-color: #9ca3af;
+  color: white;
+}
+.sticky-footer .btn-cancel:hover {
+  background-color: #6b7280;
 }
 
-.event-label {
-  font-weight: 700;         /* Bold */
-  color: #ffffff;           /* White */
-  font-size: 0.7rem;
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* ---------- FORM STYLING ---------- */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.field-group label {
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.styled-select,
+.styled-input {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
   width: 100%;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+.styled-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  outline: none;
+}
+
+.styled-input[rows] {
+  resize: vertical;
+  min-height: 4rem;
+}
+
+.time-selects {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+/* ---------- MISC ---------- */
+.react-datepicker-popper {
+  z-index: 9999 !important;
+}
+
+.overflow-unset {
+  overflow: unset !important;
+}
+
+.date-group-cell {
+  position: relative;
+  min-width: 1440px;
+  background-color: white;
+}
+.date-group-cell span {
+  position: static;
   display: block;
-  text-align: left;
 }
 
-.sticky-employee {
-  left: 0;
-  min-width: 140px;
-  width: 140px;
-  max-width: 140px;
-  z-index: 4;
+.z-60 { z-index: 60; }
+.z-50 { z-index: 50; }
+.z-10 { z-index: 10; }
+
+.react-datepicker-popper {
+  z-index: 9999 !important;
 }
-
-.sticky-machine {
-  left: 140px; /* Matches sticky-employee width */
-  min-width: 140px;
-  width: 140px;
-  max-width: 140px;
-  z-index: 4;
+.right-date{
+  z-index: 20 !important;
 }
-
-.sticky-quantity {
-  left: 280px; /* 140 (employee) + 140 (machine) */
-  min-width: 120px;
-  width: 120px;
-  max-width: 120px;
-  z-index: 4;
-}
-.sticky-col {
-  background: #f3f4f6;
-  position: sticky;
-  z-index: 2;
-  border-right: 1px solid #ccc;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.date-header {
-  position: sticky;
-  top: 0;
-  left: 0;
-  z-index: 50; /* Higher than sticky cols and headers */
-  background-color: #ffffff;
-  border-bottom: 1px solid #d1d5db;
-}
-.scheduler-table th.sticky-col {
-  z-index: 40;
-}
-.date-row-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 60; /* Must be higher than sticky-cols and headers */
-  background-color: #ffffff;
-}
-
-/* Ensure the th inside also supports sticky visuals */
-.date-header {
-  background-color: #ffffff;
-  border-bottom: 1px solid #d1d5db;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  z-index: inherit; /* Inherit from the tr's z-index */
-}
-
-/* Sticky first row (Date Picker) */
-.date-header-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: #ffffff;
-  border-bottom: 1px solid #ccc;
-}
-
-/* Sticky headers (Hour columns and sticky cols) */
-.header-sticky {
-  position: sticky;
-  top: 40px; /* Adjust based on height of date row */
-  background: #f3f4f6;
-  z-index: 40;
-  border-bottom: 1px solid #ccc;
-}
-
-/* Sticky left columns */
-.sticky-col {
-  position: sticky;
-  z-index: 30;
-  background: #f3f4f6;
-  border-right: 1px solid #ccc;
-}
-
-/* Ensure left positions */
-.sticky-employee {
-  left: 0;
-  min-width: 140px;
-  width: 140px;
-}
-
-.sticky-machine {
-  left: 140px;
-  min-width: 140px;
-  width: 140px;
-}
-
-.sticky-quantity {
-  left: 280px;
-  min-width: 120px;
-  width: 120px;
-}
-
-/* Bump z-index for headers over side columns */
-.sticky-employee.header-sticky,
-.sticky-machine.header-sticky,
-.sticky-quantity.header-sticky {
-  z-index: 45;
-}
-
-
-
-
-
-
-
-
-
-
-
-

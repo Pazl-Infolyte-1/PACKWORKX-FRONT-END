@@ -14,6 +14,8 @@ const BillingForm = React.lazy(() => import('./Module/Billing/BillingForm.js'))
 const SKU = React.lazy(() => import('./Module/SKU/SkuList.js'))
 const SkuAddEdit = React.lazy(() => import('./Module/SKU/SkuAddEdit.js'))
 const EmployeeList = React.lazy(() => import('./Module/HRMS/Employee/EmployeeList.js'))
+const EmployeeListView = React.lazy(() => import('./Module/HRMS/Employee/EmployeeView.js'))
+const EmployeeListForm = React.lazy(() => import('./Module/HRMS/Employee/EmployeeForm.js'))
 const PurchaseOrder = React.lazy(() => import('./Module/Purchase/PurchaseOrder.js'))
 const AddPurchaseOrder = React.lazy(() => import('./Module/Purchase/AddPurchaseOrder.js'))
 const AddPurchaseReturn = React.lazy(() => import('./Module/PurchaseReturn/AddPurchaseReturn.js'))
@@ -21,7 +23,7 @@ const PurchaseOrderDetails = React.lazy(() => import('./Module/Purchase/Purchase
 const PurchaseOrderReturnView = React.lazy(
   () => import('./Module/PurchaseReturn/PurchaseOrderReturnView.js'),
 )
-
+const ViewMachineData = React.lazy(() => import('./Module/Machine/ViewMachineData.js'))
 const MachineDashboard = React.lazy(() => import('./Module/Machine/MachineDashboard.js'))
 const AddEditMachine = React.lazy(() => import('./Module/Machine/AddEditMachine.js'))
 const InventoryHandling = React.lazy(() => import('./Module/Inventory/InventoryHandling.js'))
@@ -148,7 +150,27 @@ const routes = [
   //  element: SkuAddEdit,
   //  key: 'SKU_EDIT',
   //},
-  { path: '/employeelist', name: 'Employee List', element: EmployeeList, key: 21 },
+
+  {
+    path: '/employeelist',
+    name: 'Employee List',
+    element: EmployeeList,
+    key: 21,
+    children: [
+      {
+        path: '/employeelist/:id?',
+        name: 'Employee View',
+        element: EmployeeListView,
+        key: 'employee view',
+      },
+    ],
+  },
+  {
+    path: '/employeelist/form/:id?',
+    name: 'Employee List',
+    element: EmployeeListForm,
+    key: 21,
+  },
   {
     path: '/purchaseorder',
     name: 'Purchase Order',
@@ -184,7 +206,20 @@ const routes = [
     element: AddPurchaseReturn,
     key: 'return form',
   },
-  { path: '/machinedashboard', name: 'Machine Dashboard', element: MachineDashboard, key: 22 },
+  {
+    path: '/machinedashboard',
+    name: 'Machine Dashboard',
+    element: MachineDashboard,
+    key: 22,
+    children: [
+      {
+        path: '/machinedashboard/:id',
+        name: 'MachineDashboardView',
+        element: ViewMachineData,
+        key: '',
+      },
+    ],
+  },
   {
     path: '/machinedashboard/form',
     name: 'Form Machine Dashboard',
@@ -515,7 +550,7 @@ const routes = [
       },
     ],
   },
-    {
+  {
     path: '/taskForm',
     name: 'task',
     element: TaskForm,

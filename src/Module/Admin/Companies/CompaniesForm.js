@@ -1,16 +1,16 @@
-
-import React, { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import {
   CRow,
   CCol,
   CFormInput,
   CFormSelect,
-} from '@coreui/react'
+  CFormCheck,
+} from '@coreui/react';
 
-import ActionButton from '../../../components/New/ActionButton'
-import CustomAlert from '../../../components/New/CustomAlert'
-import { companyApi } from '../../../api/company'
+import ActionButton from '../../../components/New/ActionButton';
+import CustomAlert from '../../../components/New/CustomAlert';
+import { companyApi } from '../../../api/company';
 
 const CompaniesForm = ({
   isEdit,
@@ -19,13 +19,39 @@ const CompaniesForm = ({
   onSuccess,
   setAlerts,
 }) => {
+  const [packages, setPackages] = useState([]);
+  const [selectedPackage, setSelectedPackage] = useState('');
+  const [selectedPackageType, setSelectedPackageType] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm()
+  } = useForm();
 
+  // Fetch packages
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const res = await companyApi.getPackages();
+        if (res && Array.isArray(res.data.data)) {
+          setPackages(res.data.data);
+        } else {
+          setPackages([]);
+        }
+      } catch (err) {
+        console.error('Error fetching packages:', err);
+        setPackages([]);
+      }
+    };
+
+    fetchPackages();
+  }, []);
+
+  // Reset form with initial data on edit
   useEffect(() => {
     if (initialData) {
       reset({
@@ -41,38 +67,75 @@ const CompaniesForm = ({
         logo: initialData.logo || '',
         accountName: initialData.accountName || '',
         accountEmail: initialData.accountEmail || '',
-      })
+      });
+      setSelectedPackage(initialData.package_id || '');
+      setSelectedPackageType(initialData.package_type || '');
+      setStartDate(initialData.package_start_date || '');
+      setEndDate(initialData.package_end_date || '');
     } else {
-      reset()
+      reset();
+      setSelectedPackage('');
+      setSelectedPackageType('');
+      setStartDate('');
+      setEndDate('');
     }
-  }, [initialData, reset])
+  }, [initialData, reset]);
+
+  // Calculate end date whenever startDate or selectedPackageType changes
+  useEffect(() => {
+    if (startDate && selectedPackageType) {
+      const start = new Date(startDate);
+      let end;
+
+      if (selectedPackageType === 'monthly') {
+        end = new Date(start);
+        end.setDate(start.getDate() + 30);
+      } else if (selectedPackageType === 'annual') {
+        end = new Date(start);
+        end.setDate(start.getDate() + 364);
+      }
+
+      // Format end date as yyyy-mm-dd
+      const formattedEndDate = end.toISOString().split('T')[0];
+      setEndDate(formattedEndDate);
+    } else {
+      setEndDate('');
+    }
+  }, [startDate, selectedPackageType]);
 
   const onSubmit = async (data) => {
     try {
-      // Prepare payload
-      const payload = { ...data }
+      const payload = {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        website: data.website,
+        currency: Number(data.currency),
+        timezone: data.timezone,
+        language: data.language,
+        status: data.status,
+        address: data.address,
+        logo: 'https://techvibe.com/logo.png', // hardcoded for now
 
-      // Add company account details if creating
-      // if (!isEdit) {
-        payload.companyAccountDetails = [
+        package_name: selectedPackage,
+        package_type: selectedPackageType,
+        package_start_date: startDate,
+        package_end_date: endDate,
+
+        companyAccountDetails: [
           {
             accountName: data.accountName,
             accountEmail: data.accountEmail,
           },
-        ]
-      // }
+        ],
+      };
 
-      // // Remove fields not needed in backend payload
-      delete payload.accountName
-      delete payload.accountEmail
-
-      // TODO: real file upload — for now use static URL
-      payload.logo = 'https://techvibe.com/logo.png'
+      console.log('Submitting payload:', payload);
 
       if (isEdit && initialData?.id) {
-        await companyApi.updateCompany(initialData.id, payload)
+        await companyApi.updateCompany(initialData.id, payload);
       } else {
-        await companyApi.createCompany(payload)
+        await companyApi.createCompany(payload);
       }
 
       setAlerts?.([
@@ -80,19 +143,19 @@ const CompaniesForm = ({
           severity: 'success',
           message: 'Company saved successfully.',
         },
-      ])
+      ]);
 
-      onSuccess?.()
+      onSuccess?.();
     } catch (err) {
-      console.error(err)
+      console.error('Error saving company:', err);
       setAlerts?.([
         {
           severity: 'error',
           message: err?.response?.data?.message || 'An unexpected error occurred.',
         },
-      ])
+      ]);
     }
-  }
+  };
 
   return (
     <form
@@ -110,9 +173,7 @@ const CompaniesForm = ({
             placeholder="Enter Company Name"
             {...register('name', { required: 'Required' })}
           />
-          {errors.name && (
-            <p className="text-red-500 text-sm">{errors.name.message}</p>
-          )}
+          {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
         </CCol>
 
         <CCol md={4}>
@@ -121,9 +182,7 @@ const CompaniesForm = ({
             placeholder="Enter Company Email"
             {...register('email', { required: 'Required' })}
           />
-          {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
         </CCol>
 
         <CCol md={4}>
@@ -144,10 +203,12 @@ const CompaniesForm = ({
 
         <CCol md={4}>
           <CFormInput
-            label="Currency ID *"
             type="number"
-            placeholder="Enter Currency ID"
-            {...register('currency', { required: 'Required' })}
+            label="Currency Amount *"
+            placeholder="Enter Currency Amount"
+            {...register('currency', { required: 'Required', valueAsNumber: true })}
+            min="0"
+            step="0.01"
           />
           {errors.currency && (
             <p className="text-red-500 text-sm">{errors.currency.message}</p>
@@ -189,12 +250,74 @@ const CompaniesForm = ({
         </CCol>
 
         <CCol md={4}>
-          <CFormInput
-            type="file"
-            label="Logo"
-            {...register('logo')}
-          />
+          <CFormInput type="file" label="Logo" {...register('logo')} />
         </CCol>
+
+        {/* Packages */}
+        <CCol md={4}>
+          <CFormSelect
+            label="Packages"
+            value={selectedPackage}
+            onChange={(e) => setSelectedPackage(e.target.value)}
+          >
+            <option hidden>Select Package</option>
+            {packages.length > 0 ? (
+              packages.map((pkg, index) => {
+                const packageId = pkg.package?.id || pkg.id || index;
+                const packageName = pkg.package?.name || `Package ${packageId}`;
+                return (
+                  <option key={packageId} value={packageName}>
+                    {packageName}
+                  </option>
+                );
+              })
+            ) : (
+              <option disabled>No packages available</option>
+            )}
+          </CFormSelect>
+        </CCol>
+
+        {selectedPackage && (
+          <>
+            <CCol md={4}>
+              <label className="block mb-2">Package Type</label>
+              <CFormCheck
+                type="radio"
+                name="packageType"
+                id="monthly"
+                label="Monthly"
+                checked={selectedPackageType === 'monthly'}
+                onChange={() => setSelectedPackageType('monthly')}
+              />
+              <CFormCheck
+                type="radio"
+                name="packageType"
+                id="annual"
+                label="Annual"
+                checked={selectedPackageType === 'annual'}
+                onChange={() => setSelectedPackageType('annual')}
+              />
+            </CCol>
+
+            <CCol md={4}>
+              <CFormInput
+                type="date"
+                label="Package Start Date *"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </CCol>
+
+            <CCol md={4}>
+              <CFormInput
+                type="date"
+                label="Package End Date"
+                value={endDate}
+                readOnly
+              />
+            </CCol>
+          </>
+        )}
       </CRow>
 
       <h3 className="text-lg font-semibold border-b pb-2 mt-6">
@@ -206,7 +329,7 @@ const CompaniesForm = ({
           <CFormInput
             label="Name *"
             placeholder="Enter Admin Name"
-            {...register('accountName')}
+            {...register('accountName', { required: 'Required' })}
           />
         </CCol>
 
@@ -214,7 +337,7 @@ const CompaniesForm = ({
           <CFormInput
             label="Email *"
             placeholder="Enter Admin Email"
-            {...register('accountEmail')}
+            {...register('accountEmail', { required: 'Required' })}
           />
         </CCol>
       </CRow>
@@ -237,12 +360,7 @@ const CompaniesForm = ({
         </div>
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default CompaniesForm
-
-
-
-
-
+export default CompaniesForm;

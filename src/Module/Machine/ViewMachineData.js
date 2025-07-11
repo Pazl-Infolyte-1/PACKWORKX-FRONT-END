@@ -1,28 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import { machineApi } from '../../api/machine'
+import { useNavigate, useParams } from 'react-router-dom'
+import { CloseButton } from 'react-bootstrap'
 
-function ViewMachineData({ Id }) {
+function ViewMachineData() {
   const [machineData, setMachineData] = useState(null)
   const [AllProcess, setAllProcess] = useState([])
   const [values, setValues] = useState([])
+  const { id } = useParams()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await machineApi.getMachineById(Id)
+        const response = await machineApi.getMachineById(id)
         setMachineData(response.data.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
     fetchData()
-  }, [Id])
+  }, [id])
 
   useEffect(() => {
     const fetchValues = async () => {
       try {
         const response = await machineApi.getProcessValues()
-        const Process = await machineApi.getByMachineId(Id)
+        const Process = await machineApi.getByMachineId(id)
         setAllProcess(Process.data.data)
 
         const allValues = response.data.data
@@ -43,13 +47,11 @@ function ViewMachineData({ Id }) {
       }
     }
     fetchValues()
-  }, [Id])
-
-  console.log(values)
+  }, [id])
 
   if (!machineData) {
     return (
-      <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg border border-gray-200">
+      <div className="flex items-center justify-center w-full bg-gray-50 rounded-lg border border-gray-200">
         <p className="text-black italic flex items-center">
           <svg
             className="w-5 h-5 mr-2"
@@ -82,14 +84,14 @@ function ViewMachineData({ Id }) {
       return dateString
     }
   }
-  console.log(machineData)
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 ">
+    <div className="w-full h-[calc(100vh-75px)] overflow-y-scroll bg-white p-6 rounded-lg shadow-md border border-gray-100 ">
       <div className="mb-4 flex justify-between items-center">
         <h2 className="text-xl font-bold text-gray-800">{machineData.machine_name}</h2>
-        <span
-          className={`px-2.5 py-1 rounded-full text-sm font-medium outline-none border border-gray-300
+        <div>
+          <span
+            className={`px-2.5 py-1 rounded-full text-sm font-medium outline-none border border-gray-300
             ${
               machineData.machine_status === 'Under Maintenance'
                 ? 'bg-blue-100 text-blue-800'
@@ -99,9 +101,11 @@ function ViewMachineData({ Id }) {
                     ? 'bg-red-100 text-red-800'
                     : 'bg-gray-100 text-gray-800'
             }`}
-        >
-          {machineData.machine_status}
-        </span>
+          >
+            {machineData.machine_status}
+          </span>
+          <CloseButton onClick={() => navigate('/machinedashboard')} className="ml-2 text-xs" />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -28,7 +28,7 @@ const Index = () => {
 
 // 2. IndexContent component that uses the contexts
 const IndexContent = () => {
-  const [workOrders, setWorkOrders] = useState([])
+  // const [workOrders, setWorkOrders] = useState([])
   const [autoSyncOrders, setAutoSyncOrders] = useState({})
   const [selectedType, setSelectedType] = useState('')
   const [visibleSplit, setVisibleSplit] = useState(false)
@@ -56,7 +56,7 @@ const IndexContent = () => {
     { label: 'Work Orders', path: 'WorkOrders' },
     { label: 'Group Layers', path: 'GroupLayers' },
     { label: 'Allocate RM', path: 'AllocateRM' },
-    { label: 'Returnables', path: 'Returnables' },
+    // { label: 'Returnables', path: 'Returnables' },
     { label: 'Outsource & Preview', path: 'OutsourceAndPreview' },
   ];
 
@@ -66,18 +66,18 @@ const IndexContent = () => {
     }
   }, [currentPath, navigate]);
 
-  useEffect(() => {
-    async function getWorkOrders() {
-      try {
-        const response = await workOrderApi.getWorkOrders()
-        setWorkOrders(response?.data?.workOrders)
-      } catch (error) {
-        console.error('Error fetching work orders:', error)
-      }
-    }
+  // useEffect(() => {
+  //   async function getWorkOrders() {
+  //     try {
+  //       const response = await workOrderApi.getWorkOrders()
+  //       setWorkOrders(response?.data?.workOrders)
+  //     } catch (error) {
+  //       console.error('Error fetching work orders:', error)
+  //     }
+  //   }
 
-    getWorkOrders()
-  }, [])
+  //   getWorkOrders()
+  // }, [])
 
   useEffect(() => {
     const currentTab = tabs.find(tab => tab.path === currentPath);
@@ -189,13 +189,18 @@ const IndexContent = () => {
           alignItems: 'flex-start',
         }}>
           {tabs.map((tab, index) => {
-            let isDisabled = '';
+            let isDisabled = false;
             const isActive = activeTabIndex === index;
             const isCompleted = activeTabIndex > index;
 
-            if (locked && index < activeTabIndex) {
+            // Only allow going back to the immediate previous step
+            if (index < activeTabIndex - 1) {
+              isDisabled = true;
+            } else if (locked && index < activeTabIndex) {
+              // If locked, keep previous steps disabled as per original logic
               isDisabled = true;
             }
+            // All other steps (current, next, and immediate previous) follow normal logic
           
             
             return (
@@ -277,7 +282,7 @@ const IndexContent = () => {
                     {tab.label === 'Work Orders' ? 'Select Work Orders' : 
                      tab.label === 'Group Layers' ? 'Group Layers' : 
                      tab.label === 'Allocate RM' ? 'allocate rawmeterials' : 
-                     tab.label === 'Returnables' ? 'Allocate Inventory' : 
+                    //  tab.label === 'Returnables' ? 'Allocate Inventory' : 
                      'Preview Allocation'}
                   </div>
                 </div>

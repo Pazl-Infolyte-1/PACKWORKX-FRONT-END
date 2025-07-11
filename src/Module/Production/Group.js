@@ -474,7 +474,7 @@ function formatDate(dateString) {
   return `${day}/${month}/${year}`;
 }
 
-const Group = ({
+const   Group = ({
   autoSyncOrders,
   setVisibleSplit,
 }) => {

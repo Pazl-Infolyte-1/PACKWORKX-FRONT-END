@@ -162,6 +162,9 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
     } else if (data.payment_status === 'partial') {
       received_amount = parseFloat(data.received_amount) || 0;
     }
+    
+    // Debug log for discount calculation
+    console.log({ total, discountType, discountValue, discountAmount });
 
     // Build the payload
     const payload = {
@@ -170,6 +173,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
       total_tax: gstAmount, // GST amount
       total_amount: useCredit ? invoiceWithGst - credit_amount : invoiceWithGst, // invoice amount minus credit if used
       credit_amount: useCredit ? credit_amount : 0,
+      discount: discountAmount,
       received_amount,
       sku_details:[{
         sku_id: data?.sku_id,
@@ -179,7 +183,7 @@ const InvoiceCreationModal = ({ isOpen, onClose, workOrder, onSubmit }) => {
         total_amount: total,
         gst: gstAmount,
         total_incl_gst: useCredit ? invoiceWithGst - credit_amount : invoiceWithGst,
-        discount: data?.discount,
+        discount: discountAmount,
       }]
     };
 

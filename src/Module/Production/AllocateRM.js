@@ -763,8 +763,9 @@ const AllocateRM = ({}) => {
       await refreshData()
       await fetchWorkOrders()
     } catch (error) {
-      // setAlertsApp && setAlertsApp({ type: 'danger', message: error?.response?.data?.message || error.message || 'An error occurred while removing work orders from production.' });
+      // setAlertsApp && setAlertsApp([{ severity: 'error', message: error?.response?.data?.message || error.message || 'An error occurred while removing work orders from production.' }]);
       console.error('Error while removing work orders from production:', error);
+      return
     }
   }
 

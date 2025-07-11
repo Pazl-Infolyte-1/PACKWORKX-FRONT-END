@@ -107,7 +107,7 @@ const deleteBilling = async () => {
                           </div>
                         </CTableDataCell>
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
-                          {bill.purchaseOrder.purchase_generate_id || 'N/A'}
+                          {bill?.purchaseOrder?.purchase_generate_id || 'N/A'}
                         </CTableDataCell>
                       </>
                     ) : (
@@ -118,32 +118,32 @@ const deleteBilling = async () => {
                           }}
                           className="px-4 py-3 text-sm !text-blue-600 font-semibold  whitespace-nowrap"
                         >
-                          {bill.bill_generate_id || 'N/A'}
+                          {bill?.bill_generate_id || 'N/A'}
                         </CTableDataCell>
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
-                          {bill.purchaseOrder.purchase_generate_id || 'N/A'}
+                          {bill?.purchaseOrder?.purchase_generate_id || 'N/A'}
                         </CTableDataCell>
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
-                          {bill.purchaseOrder.supplier_name || 'N/A'}
+                          {bill?.purchaseOrder?.supplier_name || 'N/A'}
                         </CTableDataCell>
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
-                          {bill.bill_reference_number || 'N/A'}
+                          {bill?.bill_reference_number || 'N/A'}
                         </CTableDataCell>
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
-                          {bill.bill_date || 'N/A'}
+                          {bill?.bill_date || 'N/A'}
                         </CTableDataCell>
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
-                          {bill.remarks || 'N/A'}
+                          {bill?.remarks || 'N/A'}
                         </CTableDataCell>
                        <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
   <span
     className={`px-2 py-0.5 rounded-full text-xs font-medium 
-      ${bill.status?.toLowerCase() === 'active'
+      ${bill?.status?.toLowerCase() === 'active'
         ? 'bg-green-100 text-green-700'
         : 'bg-red-100 text-red-700'}
     `}
   >
-    {bill.status || 'N/A'}
+    {bill?.status || 'N/A'}
   </span>
 </CTableDataCell>
 

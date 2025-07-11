@@ -61,7 +61,8 @@ function RSCBox({
   setRscUnits,
   uploadedFiles,
   setUploadedFiles,
-  rscUnits
+  rscUnits,
+  taxMaster
 }) {
   const [alerts, setAlerts] = useState([])
   const [unitTooltip, setUnitTooltip] = useState('Enter Millimeter')
@@ -631,34 +632,45 @@ setHelperBoard(widthBoardSizeHelper)
   }
 
   //document edit
-  useEffect(() => {
-    // Clear files only if print_type is 'None' and documents are not already empty
-    if (addNewSkuData.print_type === 'None') {
-      if (uploadedFiles.length > 0 || addNewSkuData.documents.length > 0) {
-        setUploadedFiles([])
-        setFileNames([])
+ useEffect(() => {
+  let parsedDocuments = []
 
-        // Only update documents if not already empty
-        if (addNewSkuData.documents.length > 0) {
-          setAddNewSkuData((prev) => ({
-            ...prev,
-            documents: [],
-          }))
-        }
+  try {
+    parsedDocuments = Array.isArray(addNewSkuData.documents)
+      ? addNewSkuData.documents
+      : JSON.parse(addNewSkuData.documents || '[]')
+  } catch (err) {
+    console.error('Invalid documents format', err)
+    parsedDocuments = []
+  }
+
+  // Clear files if print_type is 'None'
+  if (addNewSkuData.print_type === 'None') {
+    if (uploadedFiles.length > 0 || parsedDocuments.length > 0) {
+      setUploadedFiles([])
+      setFileNames([])
+
+      if (parsedDocuments.length > 0) {
+        setAddNewSkuData((prev) => ({
+          ...prev,
+          documents: [],
+        }))
       }
-      return
     }
+    return
+  }
 
-    // Load files only if editing and there are documents to load
-    if (editTag && addNewSkuData.documents?.length > 0 && uploadedFiles.length === 0) {
-      setUploadedFiles([...addNewSkuData.documents])
-      setFileNames(
-        addNewSkuData.documents.map((file) =>
-          typeof file === 'string' ? file.split('/').pop() : file.name,
-        ),
-      )
-    }
-  }, [editTag, addNewSkuData.print_type]) // <- remove addNewSkuData.documents from deps
+  // Load files if editing
+  if (editTag && parsedDocuments.length > 0 && uploadedFiles.length === 0) {
+    setUploadedFiles([...parsedDocuments])
+    setFileNames(
+      parsedDocuments.map((file) =>
+        typeof file === 'string' ? file.split('/').pop() : file.name,
+      ),
+    )
+  }
+}, [editTag, addNewSkuData?.print_type])
+
 
 
   useEffect(() => {
@@ -677,6 +689,7 @@ setHelperBoard(widthBoardSizeHelper)
 
 
 console.log("unit///",rscUnits)
+console.log("rsccc",addNewSkuData)
   return (
     <div className="rounded-lg ">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -779,15 +792,15 @@ console.log("unit///",rscUnits)
     const selectedClient = client.find(
       (item) => item.client_id === selected
     );
-    return selectedClient ? selectedClient.display_name : 'Unknown';
+    return selectedClient ? selectedClient?.display_name : 'Unknown';
   }}
 >
   <MenuItem value="" disabled>
     <em>Select</em>
   </MenuItem>
-  {client.map((item) => (
-    <MenuItem key={item.client_id} value={item.client_id}>
-      {item.display_name}
+  {client?.map((item) => (
+    <MenuItem key={item?.client_id} value={item?.client_id}>
+      {item?.display_name}
     </MenuItem>
   ))}
                 </Select>
@@ -1278,21 +1291,26 @@ console.log("unit///",rscUnits)
           errors={errors}
         />
 
-        <div className="w-[200px]">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Tax Master</label>
-          <select
-            id="gst_percentage"
-            name="gst_percentage"
-            value={addNewSkuData?.gst_percentage || null}
-            onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          >
-            <option value="">Select Tax</option>
-            <option value={5}>5%</option>
-            <option value={10}>10%</option>
-            <option value={15}>15%</option>
-          </select>
-        </div>
+      <div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">Tax Master</label>
+  <select
+    id="gst_percentage"
+    name="gst_percentage"
+    value={addNewSkuData?.gst_percentage || ''}
+    onChange={handleChange}
+    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+  >
+    <option value="">Select Tax</option>
+    {taxMaster
+      //?.filter((tax) => tax.deleted_at === null)
+      .map((tax) => (
+        <option key={tax.id} value={tax.rate_percent}>
+          {tax.rate_percent}%
+        </option>
+      ))}
+  </select>
+</div>
+
 
         <div className="w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">Print Type</label>

@@ -112,6 +112,8 @@ const ProductionPlanning = React.lazy(
 )
 const Task = React.lazy(() => import('./Module/TaskView/Task.js'))
 const TaskForm = React.lazy(() => import('./Module/TaskView/TaskForm.js'))
+const SkuForm = React.lazy(() => import('./Module/SKU/SkuAddEdit.js'))
+
 
 const TaskView = React.lazy(() => import('./Module/TaskView/TaskView.js'))
 const routes = [
@@ -519,6 +521,13 @@ const routes = [
     element: TaskForm,
     key: 'task00',
   },
+    {
+  path: '/skuForm/:id?',
+  name: 'SkuForm',
+  element: SkuForm,
+  key: 'sku-Form',
+}
+
 ]
 
 export default routes

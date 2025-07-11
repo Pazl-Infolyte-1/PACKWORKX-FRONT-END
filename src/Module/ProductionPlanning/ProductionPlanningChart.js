@@ -27,6 +27,8 @@ const ProductionPlanningChart = ({
   const [justResized, setJustResized] = useState(false)
   const [dragSourceRowId, setDragSourceRowId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [showGroupDetails, setShowGroupDetails] = useState(false)
+  const [selectedGroup, setSelectedGroup] = useState({})
   const tableContainerRef = useRef(null)
 
   const updatedResizeEventRef = useRef(null)
@@ -712,6 +714,13 @@ const ProductionPlanningChart = ({
     setIsDeleteModalOpen(false)
   }
 
+  const handleGroupClick = async (id) => {
+    const response = await productionPlanningApi.getGroupData(id)
+    console.log('response', response?.data?.data)
+    setSelectedGroup(response?.data?.data || {})
+    setShowGroupDetails(true)
+  }
+
   // useEffect(() => {
   //   const isTodaySelected =
   //     selectedDate && new Date(selectedDate).toDateString() === new Date().toDateString()
@@ -865,6 +874,7 @@ const ProductionPlanningChart = ({
                 <td
                   className="sticky-col sticky-quantity draggable-cell bg-white z-[10]"
                   draggable={!!row.groupQty?.id}
+                  onClick={() => handleGroupClick(row.groupQty?.id)}
                   onDragStart={(e) => {
                     if (row.groupQty?.id) {
                       handleDragStart(e, 'groupQty', row.groupQty.id)
@@ -1304,6 +1314,195 @@ const ProductionPlanningChart = ({
           </div>
         </div>
       )}
+
+      {showGroupDetails && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(30,34,44,0.10)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            animation: 'fadeIn 0.25s',
+          }}
+          onClick={() => setShowGroupDetails(false)}
+        >
+          <div
+            style={{
+              background: '#fafbfc',
+              borderRadius: 20,
+              minWidth: 480, // reduced
+              maxWidth: 620, // reduced
+              maxHeight: '85vh',
+              overflowY: 'auto',
+              boxShadow: '0 4px 24px rgba(30,34,44,0.13), 0 1.5px 6px rgba(30,34,44,0.07)',
+              padding: 0,
+              position: 'relative',
+              fontFamily: 'inherit',
+              transform: 'scale(1)',
+              animation: 'modalScaleIn 0.22s',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '22px 28px 0 28px',
+                flexWrap: 'wrap',
+                gap: 10,
+              }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#23272f' }}>
+                  {selectedGroup.production_group.group_name}
+                </div>
+                <div style={{ fontSize: 14, color: '#374151' }}>
+                  Total Qty: <strong>{selectedGroup.production_group.group_Qty}</strong>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span
+                  style={{
+                    background:
+                      selectedGroup.production_group.group_status === 'production_completed'
+                        ? '#d1fae5'
+                        : '#e0f2fe',
+                    color:
+                      selectedGroup.production_group.group_status === 'production_completed'
+                        ? '#065f46'
+                        : '#1e40af',
+                    padding: '4px 10px',
+                    fontSize: 13,
+                    borderRadius: 20,
+                    fontWeight: 600,
+                    textTransform: 'capitalize',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {selectedGroup.production_group.group_status
+                    .replace(/_/g, ' ')
+                    .replace(/\b\w/g, (l) => l.toUpperCase())}
+                </span>
+
+                <button
+                  onClick={() => setShowGroupDetails(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 6,
+                    borderRadius: '50%',
+                    transition: 'background 0.18s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  title="Close"
+                  onMouseOver={(e) => (e.currentTarget.style.background = '#f0f1f3')}
+                  onMouseOut={(e) => (e.currentTarget.style.background = 'none')}
+                >
+                  <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+                    <path
+                      d="M6 6L14 14M14 6L6 14"
+                      stroke="#888"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div style={{ height: 1, background: '#ececec', margin: '18px 0 0 0' }} />
+
+            <div style={{ padding: '0 28px 24px 28px' }}>
+              <div style={{ marginTop: 18 }}>
+                {selectedGroup.production_histories.length === 0 ? (
+                  <div
+                    style={{
+                      background: '#fff7ed',
+                      border: '1px solid #fdba74',
+                      borderRadius: 12,
+                      padding: '16px 20px',
+                      fontSize: 15,
+                      fontWeight: 500,
+                      color: '#9a3412',
+                      textAlign: 'center',
+                    }}
+                  >
+                    Group hasn't been scheduled yet.
+                  </div>
+                ) : (
+                  selectedGroup.production_histories.map((history) => (
+                    <div
+                      key={history.id}
+                      className="bg-gray-50 rounded-xl border border-gray-100 shadow-sm mb-4 px-4 py-3"
+                    >
+                      {[
+                        ['Employee', history.employee?.name || '-'],
+                        ['Machine', history.machine?.name || '-'],
+                        ['Manufactured Qty', history.group_manufactured_quantity],
+                        [
+                          'Start',
+                          new Date(history.start_time).toLocaleString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true,
+                          }),
+                        ],
+                        [
+                          'End',
+                          new Date(history.end_time).toLocaleString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true,
+                          }),
+                        ],
+                      ].map(([label, value]) => (
+                        <div key={label} className="flex text-sm text-gray-700 py-0.5">
+                          <div className="w-36 font-medium text-gray-900">{label}:</div>
+                          <div className="text-gray-700">{value}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ))
+                )}
+
+                <div
+                  style={{
+                    marginTop: 24,
+                    padding: '14px 18px',
+                    background: '#fefce8',
+                    borderRadius: 10,
+                    fontWeight: 600,
+                    fontSize: 15,
+                    color: '#92400e',
+                    textAlign: 'center',
+                    border: '1px solid #fde68a',
+                  }}
+                >
+                  Balance Quantity: {selectedGroup.production_group.balance_manufacture_qty}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ConfirmationModale
         isOpen={isDeleteModalOpen}
         onConfirm={() => handleDeleteEvent(selectedEvent)}

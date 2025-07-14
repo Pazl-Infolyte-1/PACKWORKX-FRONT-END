@@ -55,35 +55,28 @@ const OfflineRequestTable = ({ data }) => {
       render: (row) => {
         const isChecked = checkedRows[row.id] || false
         return (
-          <label className="flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isChecked}
-              onChange={() => {
-                setCheckedRows((prev) => ({
-                  ...prev,
-                  [row.id]: !prev[row.id],
-                }))
+          <div className="flex gap-2">
+            <button
+              className="flex items-center justify-center p-0"
+              title="Approve"
+              style={{ background: 'none', border: 'none' }}
+              onClick={() => {
+                /* handle approve action here */
               }}
-              className="hidden"
-            />
-            <span
-              className={`w-6 h-6 flex rounded border-2 items-center justify-center transition-colors duration-200
-                ${isChecked ? 'bg-green-500 border-green-600' : 'bg-gray-200 border-gray-400'}`}
             >
-              {isChecked && (
-                <svg
-                  className="w-4 h-4 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-            </span>
-          </label>
+              <CheckCircleIcon className="w-6 h-6 text-green-600" />
+            </button>
+            <button
+              className="flex items-center justify-center p-0"
+              title="Reject"
+              style={{ background: 'none', border: 'none' }}
+              onClick={() => {
+                /* handle reject action here */
+              }}
+            >
+              <XCircleIcon className="w-6 h-6 text-red-600" />
+            </button>
+          </div>
         )
       },
     },

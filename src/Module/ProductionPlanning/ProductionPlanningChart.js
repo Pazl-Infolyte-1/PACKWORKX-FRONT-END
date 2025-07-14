@@ -884,7 +884,7 @@ const ProductionPlanningChart = ({
                   <div className="font-medium text-gray-700">{row.groupQty?.group_name || ''}</div>
                   {row.groupQty?.group_name && (
                     <div className="text-[11px] mt-1 text-gray-600">
-                      {`${row.groupQty?.manufactured_qty || 0} / ${row.groupQty?.group_Qty || ''}`}
+                      {`${row.groupQty?.manufactured_qty || 0} / ${row.groupQty?.group_Qty || 0}`}
                     </div>
                   )}
                 </td>

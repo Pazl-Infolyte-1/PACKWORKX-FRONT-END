@@ -31,6 +31,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { machineApi } from '../../api/machine'
 import { skuApi } from '../../api/sku'
+import CustomAlert from '../../components/New/CustomAlert'
 
 
 const compositeTypes = [
@@ -66,7 +67,9 @@ function Composite({
   setMessage,
   errors,
   setErrors,
-  validationErrors
+  validationErrors,
+  compositeSkuMessage,
+  taxMaster
 }) {
   const [skuListTable, setSkuListTable] = useState([])
   const [skuFields, setSkuFields] = useState([])
@@ -103,6 +106,12 @@ function Composite({
   const [isSingleViewPopupRoute, setisSingleViewPopupRoute] = useState(false)
   const [fullRouteResponse, setFullRouteResponse] = useState(null)
 const navigate=useNavigate()
+  const [alerts, setAlerts] = useState([])
+   useEffect(() => {
+    if (compositeSkuMessage) {
+      setAlerts([{ severity: 'success', message: compositeSkuMessage }]);
+    }
+  }, [compositeSkuMessage]);
 
  const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -150,6 +159,9 @@ const MenuProps = {
     } catch (error) {
       console.error('Failed to fetch SKU list:', error)
     }
+  }
+    const handleClose = () => {
+    setAlerts([])
   }
 
   useEffect(() => {
@@ -529,6 +541,8 @@ useEffect(() => {
 }, [])
   return (
     <div className="rounded-lg">
+              <CustomAlert alerts={alerts} handleClose={handleClose} />
+      
       {/* Top header fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-3 border border-gray-200 rounded-lg">
         <div className="w-[200px]">
@@ -724,20 +738,24 @@ useEffect(() => {
           errors={errors}
         />
         <div className="w-[200px]">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Tax Master</label>
-          <select
-            id="gst_percentage"
-            name="gst_percentage"
-            value={addNewSkuData?.gst_percentage || ''}
-            onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          >
-            <option value="">Select Tax</option>
-            <option value={5}>5%</option>
-            <option value={10}>10%</option>
-            <option value={15}>15%</option>
-          </select>
-        </div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">Tax Master</label>
+  <select
+    id="gst_percentage"
+    name="gst_percentage"
+    value={addNewSkuData?.gst_percentage || ''}
+    onChange={handleChange}
+    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+  >
+    <option value="">Select Tax</option>
+    {taxMaster
+      //?.filter((tax) => tax.deleted_at === null)
+      .map((tax) => (
+        <option key={tax.id} value={tax.rate_percent}>
+          {tax.rate_percent}%
+        </option>
+      ))}
+  </select>
+</div>
       </div>
 
       <div className="col-span-3">
@@ -771,7 +789,7 @@ useEffect(() => {
               className="block w-full rounded-md border-gray-300 py-2 px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
             >
               <option value="">Create New</option>
-              {skuType.map((option) => (
+              {skuType?.map((option) => (
                 <option
                   key={option.id}
                   value={option.sku_type || ''}

@@ -209,6 +209,14 @@ export const skuApi = {
     } catch (error) {
       console.error(error)
     }
-  }
+  },
+    getTaxMaster: async () => {
+    try {
+      const response = await apiClient.get('/taxes')
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
 
 }

@@ -225,7 +225,9 @@ const navigate = useNavigate()
                   type: 'SET_DECKLE_SIZE',
                   payload: { deckle_size: '', deckleError: '' },
                 });
-                handleSkuEdit(cell.id);
+                //handleSkuEdit(cell.id);
+            navigate(`/skuForm/${cell.id}`);
+
               },
             },
             {

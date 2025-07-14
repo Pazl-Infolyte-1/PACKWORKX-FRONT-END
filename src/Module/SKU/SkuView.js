@@ -125,7 +125,7 @@ useEffect(() => {
 
         <div className="flex gap-2">
           <button
-            onClick={() => handleSkuEdit(selectedSku.id)}
+            onClick={() =>      navigate(`/skuForm/${selectedSku.id}`)}
             className="px-2 py-1 border rounded text-sm"
           >
             Edit

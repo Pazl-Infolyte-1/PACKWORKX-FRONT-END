@@ -48,48 +48,64 @@ const OverviewComponent = ({ tableData }) => {
           </div>
 
           {/* Accordion Content */}
-          {isOpen && (
-            <div>
-              <div className="py-1 text-sm text-gray-700 relative">
-                <div>
-                  <p className="font-semibold m-0">Billing Address</p>
-                  <div className="relative">
-                    <p className="m-0 inline">{tableData?.addresses[0]?.attention}</p>
-                  </div>
-                  <p className="m-0">{tableData?.addresses[0]?.street1}</p>
-                  <p className="m-0">{tableData?.addresses[0]?.street2}</p>
-                  <p className="m-0">{tableData?.addresses[0]?.city}</p>
-                  <p className="m-0">
-                    {tableData?.addresses[0]?.state}-{tableData?.addresses[0]?.pincode}
-                  </p>
-                  <p className="m-0">{tableData?.addresses[0]?.country}</p>
-                  <p className="m-0">Phone:{tableData?.addresses[0]?.phone}</p>
-                  <p className="m-0">Fax:{tableData?.addresses[0]?.faxNumber}</p>
-                </div>
-              </div>
-
-              <div className="py-1 text-sm text-gray-700 relative">
-                <div>
-                  <p className="font-semibold m-0">Shipping Address</p>
-                  <div className="relative">
-                    <p className="m-0 inline">{tableData?.addresses[1]?.attention}</p>
-                  </div>
-                  <p className="m-0">{tableData?.addresses[1]?.street1}</p>
-                  <p className="m-0">{tableData?.addresses[1]?.street2}</p>
-                  <p className="m-0">{tableData?.addresses[1]?.city}</p>
-                  <p className="m-0">
-                    {tableData?.addresses[1]?.state}-{tableData?.addresses[1]?.pincode}
-                  </p>
-                  <p className="m-0">{tableData?.addresses[1]?.country}</p>
-                  <p className="m-0">Phone:{tableData?.addresses[1]?.phone}</p>
-                  <p className="m-0">Fax:{tableData?.addresses[1]?.faxNumber}</p>
-                </div>
-              </div>
-              <div className="py-1 text-sm text-gray-700 relative">
-                <p className="text-xs m-0 text-[#3e8efd]">Add Additional Address</p>
-              </div>
+        {isOpen && (
+  <div>
+    {/* Billing Address */}
+    {tableData?.addresses?.[0] && (
+      <div className="py-1 text-sm text-gray-700 relative">
+        <div>
+          <p className="font-semibold m-0">Billing Address</p>
+          {tableData.addresses[0].attention && (
+            <div className="relative">
+              <p className="m-0 inline">{tableData.addresses[0].attention}</p>
             </div>
           )}
+          {tableData.addresses[0].street1 && <p className="m-0">{tableData.addresses[0].street1}</p>}
+          {tableData.addresses[0].street2 && <p className="m-0">{tableData.addresses[0].street2}</p>}
+          {tableData.addresses[0].city && <p className="m-0">{tableData.addresses[0].city}</p>}
+          {(tableData.addresses[0].state_name || tableData.addresses[0].pinCode) && (
+            <p className="m-0">
+              {tableData.addresses[0].state_name}-{tableData.addresses[0].pinCode}
+            </p>
+          )}
+          {tableData.addresses[0].country && <p className="m-0">{tableData.addresses[0].country}</p>}
+          {tableData.addresses[0].phone && <p className="m-0">Phone: {tableData.addresses[0].phone}</p>}
+          {tableData.addresses[0].faxNumber && <p className="m-0">Fax: {tableData.addresses[0].faxNumber}</p>}
+        </div>
+      </div>
+    )}
+
+    {/* Shipping Address */}
+    {tableData?.addresses?.[1] && (
+      <div className="py-1 text-sm text-gray-700 relative">
+        <div>
+          <p className="font-semibold m-0">Shipping Address</p>
+          {tableData.addresses[1].attention && (
+            <div className="relative">
+              <p className="m-0 inline">{tableData.addresses[1].attention}</p>
+            </div>
+          )}
+          {tableData.addresses[1].street1 && <p className="m-0">{tableData.addresses[1].street1}</p>}
+          {tableData.addresses[1].street2 && <p className="m-0">{tableData.addresses[1].street2}</p>}
+          {tableData.addresses[1].city && <p className="m-0">{tableData.addresses[1].city}</p>}
+          {(tableData.addresses[1].state_name || tableData.addresses[1].pinCode) && (
+            <p className="m-0">
+              {tableData.addresses[1].state_name}-{tableData.addresses[1].pinCode}
+            </p>
+          )}
+          {tableData.addresses[1].country && <p className="m-0">{tableData.addresses[1].country}</p>}
+          {tableData.addresses[1].phone && <p className="m-0">Phone: {tableData.addresses[1].phone}</p>}
+          {tableData.addresses[1].faxNumber && <p className="m-0">Fax: {tableData.addresses[1].faxNumber}</p>}
+        </div>
+      </div>
+    )}
+
+    <div className="py-1 text-sm text-gray-700 relative">
+      <p className="text-xs m-0 text-[#3e8efd]">Add Additional Address</p>
+    </div>
+  </div>
+)}
+
         </div>
         {/*other details*/}
         <div className="pt-3">

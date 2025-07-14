@@ -17,4 +17,7 @@ export const productionPlanningApi = {
   deleteProductionPlanning: async (productionId) => {
     return await apiClient.delete(`/production-schedule/delete/${productionId}`)
   },
+  getGroupData: async (groupID) => {
+    return await apiClient.get(`/production-schedule/group/history/${groupID}`)
+  },
 }

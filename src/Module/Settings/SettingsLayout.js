@@ -1,28 +1,35 @@
-import React, { useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import { cilSettings, cilUser, cilBell, cilLanguage, cilMenu,cilApplicationsSettings, cibMarketo  } from '@coreui/icons';
-import CIcon from '@coreui/icons-react';
-import EmptyState from '../User/EmptyState';
-import SearchBar from '../../components/New/SearchBar';
-import { CgTemplate } from "react-icons/cg";
+import React, { useState } from 'react'
+import { Link, Outlet, useLocation } from 'react-router-dom'
+import {
+  cilSettings,
+  cilUser,
+  cilBell,
+  cilLanguage,
+  cilMenu,
+  cilApplicationsSettings,
+  cibMarketo,
+} from '@coreui/icons'
+import CIcon from '@coreui/icons-react'
+import EmptyState from '../User/EmptyState'
+import SearchBar from '../../components/New/SearchBar'
+import { CgTemplate } from 'react-icons/cg'
 
 const SettingsLayout = () => {
-  const location = useLocation();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const location = useLocation()
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const menuItems = [
     { path: '/settings/app-settings', label: 'App Settings', icon: cilSettings },
     { path: '/settings/notification', label: 'Notification Settings', icon: cilBell },
-    { path: '/settings/language', label: 'Language Settings', icon: cilLanguage },
-    { path: '/settings/superAdmin', label: 'Super Admin', icon: cilUser },
-    { path: '/settings/dropdown', label: 'Dropdown Settings', icon: cilApplicationsSettings  },
-    { path: '/settings/template', label: 'Template', icon: cibMarketo  },
+    // { path: '/settings/language', label: 'Language Settings', icon: cilLanguage },
+    // { path: '/settings/superAdmin', label: 'Super Admin', icon: cilUser },
+    // { path: '/settings/dropdown', label: 'Dropdown Settings', icon: cilApplicationsSettings  },
+    { path: '/settings/template', label: 'Template', icon: cibMarketo },
+  ]
 
-  ];
+  const isActive = (path) => location.pathname === path
 
-  const isActive = (path) => location.pathname === path;
-
-  const isChildRouteSelected = menuItems.some(item => location.pathname === item.path);
+  const isChildRouteSelected = menuItems.some((item) => location.pathname === item.path)
 
   return (
     <div className="flex flex-col md:flex-row overflow-hidden w-full bg-gray-700 h-[calc(95vh-64px)]">
@@ -53,7 +60,7 @@ const SettingsLayout = () => {
       <aside className="hidden md:flex w-64 flex-col bg-white border-r border-gray-200">
         <div className="p-4 border-b border-gray-200">
           <h1 className="text-lg font-semibold text-gray-800">Settings</h1>
-          <SearchBar text={'Search Settings'} data={menuItems}/>
+          <SearchBar text={'Search Settings'} data={menuItems} />
         </div>
 
         <div
@@ -93,7 +100,7 @@ const SettingsLayout = () => {
         {isChildRouteSelected ? <Outlet /> : <EmptyState />}
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default SettingsLayout;
+export default SettingsLayout

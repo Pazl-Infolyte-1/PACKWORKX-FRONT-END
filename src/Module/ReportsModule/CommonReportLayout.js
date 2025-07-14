@@ -24,6 +24,7 @@ const CommonReportLayout = ({ fetchReportsApi,exportReports,reportTitle,clientEn
 //const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'));
 const [startDate, setStartDate] = useState(null);
 const [endDate, setEndDate] = useState(null);
+const [selectedRange, setSelectedRange] = useState('');
 
   const [status, setStatus] = useState('');
   const [project, setProject] = useState('');
@@ -267,9 +268,9 @@ setSelectedCategory('')
   setSelectedInvoice('')
   setSelectedPo('')
   setSelectedStockStatus('')
+  setSelectedRange('');
       clearSearch()
     fetchReports(1, entries, {});
-
 };
 
   //useEffect(() => {
@@ -395,7 +396,6 @@ setFilters(filters)
     console.log("filters///",filters)
     // Call the export API
     const response = await exportReports(filters);
-	
 	// Create a blob from the response data
 	const blob = new Blob([response.data], {
 	  type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -671,21 +671,26 @@ const handleFilter=()=>{
     <div className="space-y-3">
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">Select Range</label>
-        <select
-          onChange={(e) => handleRangeChange(e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700"
-          defaultValue=""
-        >
-          <option value="" disabled>Select Range</option>
-          <option value="today">Today</option>
-          <option value="30days">Last 30 Days</option>
-          <option value="thisMonth">This Month</option>
-          <option value="lastMonth">Last Month</option>
-          <option value="90days">Last 90 Days</option>
-          <option value="6months">Last 6 Months</option>
-          <option value="1year">Last 1 Year</option>
-          <option value="custom">Custom Range</option>
-        </select>
+     <select
+  value={selectedRange}
+  onChange={(e) => {
+    const value = e.target.value;
+    setSelectedRange(value);
+    handleRangeChange(value);
+  }}
+  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700"
+>
+  <option value="" disabled>Select Range</option>
+  <option value="today">Today</option>
+  <option value="30days">Last 30 Days</option>
+  <option value="thisMonth">This Month</option>
+  <option value="lastMonth">Last Month</option>
+  <option value="90days">Last 90 Days</option>
+  <option value="6months">Last 6 Months</option>
+  <option value="1year">Last 1 Year</option>
+  <option value="custom">Custom Range</option>
+</select>
+
       </div>
 
       <div className="space-y-2">

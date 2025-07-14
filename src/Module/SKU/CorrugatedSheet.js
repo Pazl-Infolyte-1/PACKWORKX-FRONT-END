@@ -54,6 +54,7 @@ function CorrugatedSheet({
   setUploadedFiles,
   setRscUnits,
   onMeterDataChange,
+  taxMaster
 }) {
   const [alerts, setAlerts] = useState([])
   const filteredClient = locationvalue
@@ -465,34 +466,45 @@ function CorrugatedSheet({
   }
 
   //document edit
-  useEffect(() => {
-    // Clear files only if print_type is 'None' and documents are not already empty
-    if (addNewSkuData.print_type === 'None') {
-      if (uploadedFiles.length > 0 || addNewSkuData.documents.length > 0) {
-        setUploadedFiles([])
-        setFileNames([])
+ useEffect(() => {
+  let parsedDocuments = []
 
-        // Only update documents if not already empty
-        if (addNewSkuData.documents.length > 0) {
-          setAddNewSkuData((prev) => ({
-            ...prev,
-            documents: [],
-          }))
-        }
+  try {
+    parsedDocuments = Array.isArray(addNewSkuData.documents)
+      ? addNewSkuData.documents
+      : JSON.parse(addNewSkuData.documents || '[]')
+  } catch (err) {
+    console.error('Invalid documents format', err)
+    parsedDocuments = []
+  }
+
+  // Clear files if print_type is 'None'
+  if (addNewSkuData.print_type === 'None') {
+    if (uploadedFiles.length > 0 || parsedDocuments.length > 0) {
+      setUploadedFiles([])
+      setFileNames([])
+
+      if (parsedDocuments.length > 0) {
+        setAddNewSkuData((prev) => ({
+          ...prev,
+          documents: [],
+        }))
       }
-      return
     }
+    return
+  }
 
-    // Load files only if editing and there are documents to load
-    if (editTag && addNewSkuData.documents?.length > 0 && uploadedFiles.length === 0) {
-      setUploadedFiles([...addNewSkuData.documents])
-      setFileNames(
-        addNewSkuData.documents.map((file) =>
-          typeof file === 'string' ? file.split('/').pop() : file.name,
-        ),
-      )
-    }
-  }, [editTag, addNewSkuData.print_type]) // <- remove addNewSkuData.documents from deps
+  // Load files if editing
+  if (editTag && parsedDocuments.length > 0 && uploadedFiles.length === 0) {
+    setUploadedFiles([...parsedDocuments])
+    setFileNames(
+      parsedDocuments.map((file) =>
+        typeof file === 'string' ? file.split('/').pop() : file.name,
+      ),
+    )
+  }
+}, [editTag, addNewSkuData?.print_type])
+
 
   useEffect(() => {
     let area = addNewSkuData.width_board_size_cm2 * addNewSkuData.width_board_size_cm2
@@ -1060,21 +1072,25 @@ console.log("unit sheet///",addNewSkuData.unit)
           errors={errors}
         />
 
-        <div className="w-[200px]">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Tax Master</label>
-          <select
-            id="gst_percentage"
-            name="gst_percentage"
-            value={addNewSkuData?.gst_percentage || ''}
-            onChange={handleChange}
-            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          >
-            <option value="">Select Tax</option>
-            <option value={5}>5%</option>
-            <option value={10}>10%</option>
-            <option value={15}>15%</option>
-          </select>
-        </div>
+         <div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">Tax Master</label>
+  <select
+    id="gst_percentage"
+    name="gst_percentage"
+    value={addNewSkuData?.gst_percentage || ''}
+    onChange={handleChange}
+    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+  >
+    <option value="">Select Tax</option>
+    {taxMaster
+      //?.filter((tax) => tax.deleted_at === null)
+      .map((tax) => (
+        <option key={tax.id} value={tax.rate_percent}>
+          {tax.rate_percent}%
+        </option>
+      ))}
+  </select>
+</div>
 
         <div className="w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">Print Type</label>
@@ -1131,6 +1147,7 @@ console.log("unit sheet///",addNewSkuData.unit)
                         <button
                           type="button"
                           onClick={() => removeFile(index)}
+                             disabled={editTag}
                           className="ml-1 text-red-500 hover:text-red-700 text-sm"
                         >
                           ✕

@@ -114,4 +114,33 @@ export const companyApi = {
       console.error(error)
     }
   },
+  createCompanyBilling:async(body)=>{
+    try {
+      return await apiClient.post(`/companies/billing/create`,body)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  createBillingPaymentLink:async(body)=>{
+    try {
+      return await apiClient.post(`/billing/send/payment/link`,body)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getCompanyBilling:async(params)=>{
+    try {
+      return await apiClient.get(`/companies/billing/get`,params)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  getCompanyBillingById:async(id)=>{
+    try {
+      return await apiClient.get(`/companies/billing/get/${id}`)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
 }

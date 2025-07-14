@@ -45,6 +45,7 @@ function CustomItem({
   message,
   setMessage,
   errors,
+  taxMaster
 }) {
   const [tagFields, setTagFields] = useState([])
   const [editingLabelIndex, setEditingLabelIndex] = useState(null)
@@ -511,21 +512,25 @@ const navigate=useNavigate()
           />
         </div>
 
-          <div className="w-[200px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Tax Master</label>
-            <select
-              id="gst_percentage"
-              name="gst_percentage"
-              value={addNewSkuData?.gst_percentage ? parseFloat(addNewSkuData.gst_percentage) : ''}
-              onChange={handleChange}
-              className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            >
-              <option value="">Select Tax</option>
-              <option value={5}>5%</option>
-              <option value={10}>10%</option>
-              <option value={15}>15%</option>
-            </select>
-          </div>
+           <div className="w-[200px]">
+  <label className="block text-sm font-medium text-gray-700 mb-2">Tax Master</label>
+  <select
+    id="gst_percentage"
+    name="gst_percentage"
+    value={addNewSkuData?.gst_percentage || ''}
+    onChange={handleChange}
+    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+  >
+    <option value="">Select Tax</option>
+    {taxMaster
+      //?.filter((tax) => tax.deleted_at === null)
+      .map((tax) => (
+        <option key={tax.id} value={tax.rate_percent}>
+          {tax.rate_percent}%
+        </option>
+      ))}
+  </select>
+</div>
         </div>
 
         <div className="col-span-4 mt-2 mb-2">

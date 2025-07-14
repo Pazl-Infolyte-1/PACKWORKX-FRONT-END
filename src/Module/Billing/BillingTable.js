@@ -107,7 +107,7 @@ const BillingTable = ({ billingdata, refreshBilling, isMinimized, setSingleStatu
                           </div>
                         </CTableDataCell>
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
-                          {bill.purchaseOrder.purchase_generate_id || 'N/A'}
+                          {bill?.purchaseOrder?.purchase_generate_id || 'N/A'}
                         </CTableDataCell>
                       </>
                     ) : (

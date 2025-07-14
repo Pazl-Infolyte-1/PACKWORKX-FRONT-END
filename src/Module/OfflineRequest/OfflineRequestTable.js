@@ -2,7 +2,7 @@ import { capitalize } from 'lodash'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import CIcon from '@coreui/icons-react'
 import { cilCheckCircle, cilX } from '@coreui/icons'
-import { CheckCircleIcon, XCircleIcon } from 'lucide-react'
+import { CheckCircleIcon, XCircleIcon, Trash2Icon } from 'lucide-react'
 import React, { useState } from 'react'
 
 const OfflineRequestTable = ({ data }) => {
@@ -57,7 +57,7 @@ const OfflineRequestTable = ({ data }) => {
         return (
           <div className="flex gap-2">
             <button
-              className="flex items-center justify-center p-0"
+              className="flex items-center justify-center p-1 rounded-full hover:bg-green-100 cursor-pointer transition duration-150"
               title="Approve"
               style={{ background: 'none', border: 'none' }}
               onClick={() => {
@@ -66,19 +66,27 @@ const OfflineRequestTable = ({ data }) => {
             >
               <CheckCircleIcon className="w-6 h-6 text-green-600" />
             </button>
-            <button
-              className="flex items-center justify-center p-0"
-              title="Reject"
-              style={{ background: 'none', border: 'none' }}
-              onClick={() => {
-                /* handle reject action here */
-              }}
-            >
-              <XCircleIcon className="w-6 h-6 text-red-600" />
-            </button>
           </div>
         )
       },
+    },
+    {
+      key: 'trash',
+      field: 'trash',
+      header: '',
+      type: 'custom',
+      render: (row) => (
+        <button
+          className="flex items-center justify-center p-0"
+          title="Delete"
+          style={{ background: 'none', border: 'none' }}
+          onClick={() => {
+            /* handle delete action here */
+          }}
+        >
+          <Trash2Icon className="w-4 h-4 text-gray-500 hover:text-red-600" />
+        </button>
+      ),
     },
   ]
 

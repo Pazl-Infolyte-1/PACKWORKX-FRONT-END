@@ -82,32 +82,12 @@ const InventoryMain = () => {
     }
   }, [openCategoryId])
 
-  // Function to determine stock statusconst getStockStatus = (item) => {
-  const getStockStatus = (item) => {
-    const quantity = parseFloat(item.quantity_available) || 0
-    const minStock = parseFloat(item.item_info?.min_stock_level) || 0
-
-    if (quantity <= 0) {
-      return 'out_of_stock'
-    } else if (quantity > 0 && quantity <= minStock) {
-      return 'low_stock'
-    } else {
-      return 'in_stock'
-    }
-  }
-  // Function to apply stock filtering
-  const applyStockFilter = (data, filter) => {
-    if (!filter) return data
-
-    return data.filter((item) => {
-      const status = getStockStatus(item)
-      return status === filter
-    })
-  }
-
   // Update filtered data when inventory data or stock filter changes
   useEffect(() => {
-    const filtered = applyStockFilter(inventoryData, stockFilter)
+    const filtered = inventoryData.filter((item) => {
+      const status = item.stock_status
+      return status === stockFilter
+    })
     setFilteredInventoryData(filtered)
   }, [inventoryData, stockFilter])
 
@@ -203,7 +183,6 @@ const InventoryMain = () => {
           setInventoryData(selectedSubcategory)
           setSubCategoryQuantities(response.data.data.subCategoryQuantities)
           const pagination = response.data.pagination
-          console.log(pagination)
 
           setCurrentPage(pagination.currentPage)
           setTotalPage(pagination.totalPages)
@@ -216,6 +195,7 @@ const InventoryMain = () => {
             entriesPerPage,
             searchQuery,
             subCategoryId,
+            stockFilter,
           )
           if (response?.data?.success) {
             setInventoryData(response.data.data.inventoryData)
@@ -233,7 +213,15 @@ const InventoryMain = () => {
     }
 
     fetchInventory()
-  }, [categoryId, subCategoryId, currentPage, entriesPerPage, searchQuery, activateSummary])
+  }, [
+    categoryId,
+    subCategoryId,
+    currentPage,
+    entriesPerPage,
+    searchQuery,
+    activateSummary,
+    stockFilter,
+  ])
 
   const handlePageChange = (_, newPage) => {
     setCurrentPage(newPage)
@@ -469,8 +457,6 @@ const InventoryMain = () => {
                         const found = subCategoryQuantities.find(
                           (item) => item.sub_category === subCategoryId,
                         )
-                        console.log(found)
-
                         return found?.sub_category_info.total_quantity
                           ? parseInt(found.sub_category_info.total_quantity)
                           : '0'
@@ -583,7 +569,7 @@ const InventoryMain = () => {
                       : stockFilter === 'low_stock'
                         ? 'Low Stock'
                         : 'Out of Stock'}
-                    ({filteredInventoryData.length})
+                    ({inventoryData.length})
                   </span>
                   <FaTimes
                     className={`cursor-pointer ${
@@ -625,7 +611,7 @@ const InventoryMain = () => {
                         : 'bg-red-600'
                   }`}
                 >
-                  {filteredInventoryData.length}
+                  {inventoryData.length}
                 </span>
               )}
               <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -693,7 +679,7 @@ const InventoryMain = () => {
           <InventoryTable
             isMinimised={isMinimised}
             setIsMinimised={setIsMinimised}
-            inventoryData={filteredInventoryData}
+            inventoryData={inventoryData}
             subCategoryId={subCategoryId}
             totalInventoryValue={inventoryData}
             selectedItem={selectedItem}
@@ -709,7 +695,7 @@ const InventoryMain = () => {
               }`}
             >
               <p className="text-sm font-medium text-gray-700 ml-[200px] whitespace-nowrap">
-                Total Records: {stockFilter ? filteredInventoryData.length : totalRecords}
+                Total Records: {stockFilter ? inventoryData.length : totalRecords}
                 {stockFilter && (
                   <span className="ml-2 text-blue-600">
                     (Filtered by {stockFilter.replace('_', ' ')})
@@ -719,7 +705,7 @@ const InventoryMain = () => {
 
               <div className={`mr-3  ${isMinimised ? 'ml-[20px]' : ''}`}>
                 <CompactPagination
-                  totalRecords={stockFilter ? filteredInventoryData.length : totalRecords}
+                  totalRecords={stockFilter ? inventoryData.length : totalRecords}
                   count={totalPage}
                   page={currentPage}
                   onPageChange={handlePageChange}

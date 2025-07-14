@@ -9,7 +9,7 @@ export const inventoryApi = {
     }
   },
 
-  getinventoryWithParams: async (catId, page, limit = 50, search = '', subCatId) => {
+  getinventoryWithParams: async (catId, page, limit = 50, search = '', subCatId, stockStatus) => {
     try {
       // Build query string manually to control order
       let query = `/inventory?search=${encodeURIComponent(search || '')}`
@@ -19,6 +19,9 @@ export const inventoryApi = {
       }
       if (subCatId) {
         query += `&subCategoryId=${subCatId}`
+      }
+      if (stockStatus) {
+        query += `&stock_status=${stockStatus}`
       }
 
       return await apiClient.get(query)

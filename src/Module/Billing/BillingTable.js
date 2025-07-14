@@ -85,10 +85,10 @@ const BillingTable = ({ billingdata, refreshBilling, isMinimized, setSingleStatu
               {billingdata?.length > 0 ? (
                 billingdata?.map((bill) => (
                   <CTableRow
-                    key={bill.id}
+                    key={bill?.id}
                     onClick={() => navigate(`/billingmain/${bill.id}`)}
                     className={`${
-                      selectedRows.includes(bill.id) ? 'bg-blue-50' : 'hover:bg-gray-50'
+                      selectedRows.includes(bill?.id) ? 'bg-blue-50' : 'hover:bg-gray-50'
                     } border-b cursor-pointer`}
                   >
                     {/* When minimized: Only render checkbox and display name */}
@@ -102,7 +102,7 @@ const BillingTable = ({ billingdata, refreshBilling, isMinimized, setSingleStatu
                             className="cursor-pointer flex flex-col"
                           >
                             <span className="text-sm text-black font-semibold">
-                              {bill.bill_generate_id || 'N/A'}
+                              {bill?.bill_generate_id || 'N/A'}
                             </span>
                           </div>
                         </CTableDataCell>
@@ -138,12 +138,12 @@ const BillingTable = ({ billingdata, refreshBilling, isMinimized, setSingleStatu
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
                           <span
                             className={`px-2 py-0.5 rounded-full text-xs font-medium 
-      ${
-        bill.status?.toLowerCase() === 'active'
-          ? 'bg-green-100 text-green-700'
-          : 'bg-red-100 text-red-700'
-      }
-    `}
+                            ${
+                              bill.status?.toLowerCase() === 'active'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-red-100 text-red-700'
+                            }
+                          `}
                           >
                             {bill.status || 'N/A'}
                           </span>

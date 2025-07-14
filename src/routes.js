@@ -118,7 +118,7 @@ const SkuForm = React.lazy(() => import('./Module/SKU/SkuAddEdit.js'))
 
 
 const TaskView = React.lazy(() => import('./Module/TaskView/TaskView.js'))
-const companyBillingView = React.lazy(() => import('./Module/Admin/Billing/billingView.js'))
+const companyBillingView = React.lazy(() => import('./Module/Admin/Billing/BillingView.js'))
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },

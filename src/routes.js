@@ -115,6 +115,7 @@ const ProductionPlanning = React.lazy(
 const Task = React.lazy(() => import('./Module/TaskView/Task.js'))
 const TaskForm = React.lazy(() => import('./Module/TaskView/TaskForm.js'))
 const SkuForm = React.lazy(() => import('./Module/SKU/SkuAddEdit.js'))
+const CompanyForm = React.lazy(() => import('./Module/Admin/Companies/CompaniesForm.js'))
 
 
 const TaskView = React.lazy(() => import('./Module/TaskView/TaskView.js'))
@@ -574,7 +575,13 @@ const routes = [
   name: 'SkuForm',
   element: SkuForm,
   key: 'sku-Form',
-}
+},
+   {
+  path: '/companyForm/:id?',
+  name: 'CompanyForm',
+  element: CompanyForm,
+  key: 'company-Form',
+},
 
 ]
 

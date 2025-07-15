@@ -157,6 +157,14 @@ export const companyApi = {
     console.error(error)
     throw error
   }
-}
+},
+ getCompaniesByOfflineId: async (id) => {
+  try {
+    return await apiClient.get(`companies/offline-request/get/${id}`)
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+},
 
 }

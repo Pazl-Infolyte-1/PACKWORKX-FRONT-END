@@ -132,15 +132,14 @@ const BillingView = () => {
           </svg>
         </button>
         <div className="bg-white shadow-lg rounded-lg mb-6">
-          <div className="px-6 py-4 border-b border-gray-200">
+          <div className="px-6 py-2 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Bill {billData?.bill_generate_id}
+                <h1 className="text-xl font-bold text-gray-900">
+                  # {billData?.bill_generate_id}
                 </h1>
-                <p className="text-sm text-gray-500 mt-1">Bill ID: {billData?.id}</p>
               </div>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 mr-4">
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(billData?.status)}`}
                 >

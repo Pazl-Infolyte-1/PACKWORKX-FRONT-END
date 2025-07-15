@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { companyApi } from '../../../api/company';
 import CustomAlert from '../../../components/New/CustomAlert';
+import { useNavigate } from 'react-router-dom';
 
 // Editable Modal Form Component
 const PaymentLinkModal = ({ show, setAlerts,onClose, billId, initialAmount, initialEmail }) => {
@@ -11,7 +12,6 @@ const PaymentLinkModal = ({ show, setAlerts,onClose, billId, initialAmount, init
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-
   useEffect(() => {
     if (show) {
       setIsAnimating(true);
@@ -307,7 +307,8 @@ const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData, package
   const handleCloseAlert = ()=>{
     setAlerts([])
 }
-  
+  const navigate = useNavigate()
+
 
   // Popup state
   const [showModal, setShowModal] = useState(false);
@@ -447,7 +448,8 @@ const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData, package
             </button>
           )}
           <button
-            onClick={() => handleEdit && handleEdit(selectedCompany)}
+            //onClick={() => handleEdit && handleEdit(selectedCompany)}
+            onClick={()=>navigate(`/companyForm/${selectedCompany.id}`)}
             className="px-4 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
           >
             Edit

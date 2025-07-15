@@ -10,7 +10,7 @@ import Loader from '../../../components/New/Loader';
 import { useSearch } from '../../../components/New/SearchContext';
 import { companyApi } from '../../../api/company'; // ✅ single import
 import { debounce } from 'lodash';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const CompanyManagement = () => {
   const [companiesData, setCompaniesData] = useState([]);
@@ -23,32 +23,44 @@ const CompanyManagement = () => {
   const [selectedViewCompany, setSelectedViewCompany] = useState(null);
   const [isMinimiseTable, setIsMinimiseTable] = useState(false);
 
-  const [alerts, setAlerts] = useState({ show: false, message: '', type: '' });
+  const [alerts, setAlerts] = useState([])
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
   const [refresh, setRefresh] = useState(false);
 const navigate = useNavigate()
+const location = useLocation();
+const successMessage = location.state?.companiesCreateSuccess;
+
+useEffect(() => {
+  if (successMessage) {
+    console.log('Create success message:', successMessage);
+          setAlerts([{ severity: 'success', message: successMessage }]);
+
+  }
+}, [successMessage]);
   const [paginationParams, setPaginationParams] = useState({
     currentPage: 1,
     pageSize: 50,
   });
 
   const { searchQuery, setGlobalPlaceholder } = useSearch();
-
+  const handleClose = () => {
+    setAlerts([])
+  }
   useEffect(() => {
     setGlobalPlaceholder('Search companies...');
-    return () => setGlobalPlaceholder('Search...');
   }, [setGlobalPlaceholder]);
 
   // ✅ fetch companies
-  const fetchCompanies = useCallback(async (search, pageParams) => {
+ useEffect(() => {
+  const fetchData = async () => {
     setLoading(true);
     try {
       const res = await companyApi.getCompanies({
-        search,
-        page: pageParams.currentPage,
-        limit: pageParams.pageSize,
+        search: searchQuery,
+        page: paginationParams.currentPage,
+        limit: paginationParams.pageSize,
       });
 
       const responseData = res.data;
@@ -63,18 +75,23 @@ const navigate = useNavigate()
       setTotalPages(pagination.totalPages || 1);
       setTotalRecords(typeof pagination.total === 'number' ? pagination.total : data.length);
     } catch {
-      setAlerts({
-        show: true,
-        message: 'Failed to fetch companies',
-        type: 'error',
-      });
+      //setAlerts({
+      //  show: true,
+      //  message: 'Failed to fetch companies',
+      //  type: 'error',
+      //});
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
+
+  fetchData();
+}, [searchQuery, paginationParams, refresh]);
+
 
   // ✅ fetch packages using companyApi.getPackages
-  const fetchPackages = useCallback(async () => {
+ useEffect(() => {
+  const fetchPackages = async () => {
     try {
       const res = await companyApi.getPackages();
       const data = Array.isArray(res.data?.data)
@@ -86,20 +103,12 @@ const navigate = useNavigate()
     } catch (error) {
       console.error('Failed to fetch packages', error);
     }
-  }, []);
+  };
 
-  const debouncedFetchCompanies = useRef(
-    debounce((search, params) => fetchCompanies(search, params), 500)
-  ).current;
+  fetchPackages();
+}, []);
 
-  useEffect(() => {
-    debouncedFetchCompanies(searchQuery, paginationParams);
-    fetchPackages(); // ✅ fetch packages on mount
-  }, [searchQuery, paginationParams, refresh, debouncedFetchCompanies, fetchPackages]);
 
-  useEffect(() => {
-    return () => debouncedFetchCompanies.cancel();
-  }, [debouncedFetchCompanies]);
 
   const handlePageChange = (_, newPage) => {
     setPaginationParams((prev) => ({
@@ -144,29 +153,23 @@ const navigate = useNavigate()
       currentPage: 1, // reset to page 1 to see newly created record
     }));
     setRefresh((prev) => !prev);
-    setAlerts({
-      show: true,
-      message: `Company ${isEdit ? 'updated' : 'created'} successfully`,
-      type: 'success',
-    });
+    //setAlerts({
+    //  show: true,
+    //  message: `Company ${isEdit ? 'updated' : 'created'} successfully`,
+    //  type: 'success',
+    //});
   };
 
-  const closeAlert = () => {
-    setAlerts({ show: false, message: '', type: '' });
-  };
+  //const closeAlert = () => {
+  //  setAlerts({ show: false, message: '', type: '' });
+  //};
 
   const handleAddCompany=()=>{
     navigate("/companyForm")
   }
   return (
     <div className="flex">
-      {alerts.show && (
-        <CustomAlert
-          message={alerts.message}
-          severity={alerts.type}
-          onClose={closeAlert}
-        />
-      )}
+        <CustomAlert alerts={alerts} handleClose={handleClose} />
 
       <div className={`${isMinimiseTable ? 'w-1/4 min-w-0' : 'w-full'} flex flex-col`}>
         <ContentHeader heading="Company Management" onAddClick={handleAddCompany} />
@@ -211,14 +214,6 @@ const navigate = useNavigate()
               isEdit={isEdit}
               onCancel={() => setShowCompanyForm(false)}
               onSuccess={handleSuccess}
-              setAlerts={(alertsArray) => {
-                const alert = alertsArray[0];
-                setAlerts({
-                  show: true,
-                  message: alert.message,
-                  type: alert.severity,
-                });
-              }}
             />
           )}
         </Drawer>

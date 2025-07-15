@@ -860,8 +860,9 @@ const ProductionPlanningChart = ({
                 </td>
 
                 <td
-                  className="sticky-col sticky-machine draggable-cell  bg-white z-[10]"
+                  className="sticky-col sticky-machine draggable-cell machine-name-cell bg-white z-[10]"
                   draggable={!!row.machine?.id}
+                  data-fullname={row.machine?.machine_name}
                   onDragStart={(e) => {
                     if (row.machine?.id) {
                       handleDragStart(e, 'machine', row.machine?.id)
@@ -884,7 +885,7 @@ const ProductionPlanningChart = ({
                   <div className="font-medium text-gray-700">{row.groupQty?.group_name || ''}</div>
                   {row.groupQty?.group_name && (
                     <div className="text-[11px] mt-1 text-gray-600">
-                      {`${row.groupQty?.manufactured_qty || 0} / ${row.groupQty?.group_Qty || ''}`}
+                      {`${row.groupQty?.manufactured_qty || 0} / ${row.groupQty?.group_Qty || 0}`}
                     </div>
                   )}
                 </td>
@@ -907,7 +908,10 @@ const ProductionPlanningChart = ({
                       {event && (
                         <div
                           className={`event ${isCompleted ? 'opacity-50 cursor-default' : ''}`}
-                          style={{ backgroundColor: event.color }}
+                          style={{
+                            backgroundColor: event.color,
+                            width: `${colSpan * 130}px`, // 130 is your min-width of a column
+                          }}
                           draggable={!isCompleted}
                           onDragStart={(e) => {
                             if (isCompleted) return

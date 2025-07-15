@@ -10,6 +10,7 @@ import Loader from '../../../components/New/Loader';
 import { useSearch } from '../../../components/New/SearchContext';
 import { companyApi } from '../../../api/company'; // ✅ single import
 import { debounce } from 'lodash';
+import { useNavigate } from 'react-router-dom';
 
 const CompanyManagement = () => {
   const [companiesData, setCompaniesData] = useState([]);
@@ -27,7 +28,7 @@ const CompanyManagement = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
   const [refresh, setRefresh] = useState(false);
-
+const navigate = useNavigate()
   const [paginationParams, setPaginationParams] = useState({
     currentPage: 1,
     pageSize: 50,
@@ -154,6 +155,9 @@ const CompanyManagement = () => {
     setAlerts({ show: false, message: '', type: '' });
   };
 
+  const handleAddCompany=()=>{
+    navigate("/companyForm")
+  }
   return (
     <div className="flex">
       {alerts.show && (
@@ -165,8 +169,8 @@ const CompanyManagement = () => {
       )}
 
       <div className={`${isMinimiseTable ? 'w-1/4 min-w-0' : 'w-full'} flex flex-col`}>
-        <ContentHeader heading="Company Management" onAddClick={handleAddNew} />
-
+        <ContentHeader heading="Company Management" onAddClick={handleAddCompany} />
+{/*<button onClick={handleAddCompany}>Add Company</button>*/}
         {loading ? (
           <Loader />
         ) : (

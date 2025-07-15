@@ -15,7 +15,7 @@ const SignInPage = ({ showPage, handleSignIn, formData, setFormData,setPackageNa
         <h2>Sign In to PackWorkX</h2>
         <form onSubmit={handleSignIn}>
           <div className="landing-form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">Email Address<span className="text-red-500">*</span></label>
             <input
               type="email"
               id="email"
@@ -26,7 +26,7 @@ const SignInPage = ({ showPage, handleSignIn, formData, setFormData,setPackageNa
             />
           </div>
           <div className="landing-form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Password<span className="text-red-500">*</span></label>
             <input
               type="password"
               id="password"

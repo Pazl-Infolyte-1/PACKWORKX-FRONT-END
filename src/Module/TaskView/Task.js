@@ -11,14 +11,15 @@ const Task = () => {
   const [isMinimized, setIsMinimized] = useState(false)
   const [taskData, setTaskData] = useState([])
   const [count, setCount] = useState(1)
-  const [pagination, setPagination] = useState({
-    current_page: 1,
-    total_pages: 1,
-    total_records: 1,
-  })
+const [pagination, setPagination] = useState({
+  current_page: 1,
+  total_pages: 1,
+  total: 0,
+});
+const [limit, setLimit] = useState(50);
+
    const [selectedStatus, setSelectedStatus] = useState('');
 
-  const [limit, setLimit] = useState(50)
   const [isEdit, setIsEdit] = useState(false)
   const [alerts, setAlerts] = useState([])
   const [refresh, setRefresh] = useState(false)
@@ -29,16 +30,29 @@ const Task = () => {
 useEffect(() => {
   const fetchData = async () => {
     try {
-      const response = await taskApi.getTaskData();
-      console.log('Task Data:', response.data); // assuming axios returns `data` in `response`
-      setTaskData(response.data.workOrders)
+      const response = await taskApi.getTaskData({
+        page: pagination.current_page,
+        limit,
+        search: searchQuery,
+      });
+
+      setTaskData(response.data.workOrders);
+
+      // Set pagination meta
+      setPagination((prev) => ({
+        ...prev,
+        total: response.data.pagination.total,
+        total_pages: response.data.pagination.totalPages,
+        current_page: response.data.pagination.page,
+      }));
     } catch (error) {
       console.error('Error fetching task data:', error.response?.data || error.message);
     }
   };
 
   fetchData();
-}, [selectedStatus]);
+}, [pagination.current_page, limit, searchQuery,selectedStatus]);
+
   useEffect(() => {
     if (location.pathname === '/task') {
       setIsMinimized(false)
@@ -80,29 +94,30 @@ useEffect(() => {
           <div>
             <TaskTable selectedStatus={selectedStatus} setSelectedStatus={setSelectedStatus} isMinimized={isMinimized} handleEdit={handleEdit} taskData={taskData} />
           </div>
-          <div className="flex justify-end items-center gap-4 mt-2 py-2 border-t bg-white">
-            <p className="w-40 text-sm">
-              Total Count: <span className="font-semibold">{count}</span>
-            </p>
-            <CompactPagination
-              count={pagination?.total_pages || 1}
-              page={pagination?.current_page || 1}
-              onPageChange={(event, value) => {
-                setPagination((prev) => ({
-                  ...prev,
-                  current_page: value,
-                }))
-              }}
-              onEntriesChange={(newLimit) => {
-                setLimit(newLimit)
-                setPagination((prev) => ({
-                  ...prev,
-                  page: 1,
-                }))
-              }}
-              entriesPerPage={limit}
-            />
-          </div>
+         <div className="flex justify-end items-center gap-4 mt-2 py-2 border-t bg-white">
+  <p className="w-40 text-sm">
+    Total Records: <span className="font-semibold">{pagination.total}</span>
+  </p>
+  <CompactPagination
+    count={pagination.total_pages}
+    page={pagination.current_page}
+    onPageChange={(event, value) =>
+      setPagination((prev) => ({
+        ...prev,
+        current_page: value,
+      }))
+    }
+    onEntriesChange={(newLimit) => {
+      setLimit(newLimit);
+      setPagination((prev) => ({
+        ...prev,
+        current_page: 1, // reset to page 1 on limit change
+      }));
+    }}
+    entriesPerPage={limit}
+  />
+</div>
+
         </div>
 
         <div

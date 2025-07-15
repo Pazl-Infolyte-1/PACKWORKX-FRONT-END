@@ -859,8 +859,10 @@ console.log("rsccc",addNewSkuData)
             <select
               value={addNewSkuData.unit || rscUnits}
               onChange={handleUnitChange}
-              className="w-full appearance-none bg-gray-700 text-white py-1.5 px-2 pr-7 rounded-md text-sm hover:bg-gray-400 transition-colors focus:outline-none"
-            >
+               disabled={editTag}
+  className={`w-full appearance-none bg-gray-700 text-white py-1.5 px-2 pr-7 rounded-md text-sm transition-colors focus:outline-none ${
+    editTag ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-400'
+  }`}            >
               <option value="mm" className="bg-white text-gray-800">
                 mm
               </option>

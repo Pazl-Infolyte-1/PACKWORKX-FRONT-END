@@ -15,6 +15,7 @@ import { companyApi } from '../../../api/company';
 import { commonApi } from '../../../api/common';
 import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useSearch } from '../../../components/New/SearchContext';
 
 const CompaniesForm = ({
   isEdit,
@@ -31,6 +32,9 @@ const CompaniesForm = ({
 const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'));
 const [endDate, setEndDate] = useState(dayjs().add(1, 'month').format('YYYY-MM-DD'));
   const [stateOptions, setStateOptions] = useState([])
+  const [editTag,setEditTag]=useState(false)
+    //const { searchQuery, setGlobalPlaceholder,clearSearch } = useSearch();
+  
     const [isUploading, setIsUploading] = useState(false)
   const [fileNames, setFileNames] = useState([])
 const [logoFileName, setLogoFileName] = useState('');
@@ -55,7 +59,8 @@ const navigate=useNavigate()
             const company = response?.data?.data;
 
         if (company) {
-          setValue('name', company.company_name || '');
+          setEditTag(true)
+                    setValue('name', company.company_name || '');
           setValue('email', company.company_email || '');
           setValue('phone', company.company_phone || '');
           setValue('website', company.website || '');
@@ -207,7 +212,7 @@ setSelectedPackageType(company.package_type || '');
         package_start_date: data.package_start_date,
         package_end_date: data.package_end_date,
         version:data.version,
-
+        password:data.password,
         companyAccountDetails: [
           {
             accountName: data.accountName,
@@ -226,13 +231,11 @@ setSelectedPackageType(company.package_type || '');
     }
 
     console.log('✅ Success response:',response.message);
-      //setAlerts?.([
-      //  {
-      //    severity: 'success',
-      //    message: response.message,
-      //  },
-      //]);
-        navigate('/companies');
+      navigate('/companies', {
+  state: {
+    companiesCreateSuccess: response.message,
+  },
+});
 
     } catch (err) {
       console.error('Error saving company:', err);
@@ -318,7 +321,7 @@ console.log("selectedpackages",selectedPackage)
     
        <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6 p-4 bg-white rounded-md border border-gray-200"
+      className="space-y-6 p-4 bg-white rounded-md border border-gray-200 mb-[90px]"
     >
 
       <h2 className="text-xl font-semibold mb-4">Company Details</h2>
@@ -611,6 +614,17 @@ console.log("selectedpackages",selectedPackage)
     <option value="paid">Paid</option>
   </CFormSelect>
 </CCol>
+{!editTag && (
+  <CCol md={4}>
+    <label className="form-label">
+      Password <span className="text-red-500">*</span>
+    </label>
+    <CFormInput
+      {...register('password', { required: 'Required' })}
+      invalid={!!errors.password}
+    />
+  </CCol>
+)}
 
       </CRow>
 
@@ -640,23 +654,23 @@ console.log("selectedpackages",selectedPackage)
         </CCol>
       </CRow>
 
-      <div className="flex justify-end gap-3 mt-6">
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="w-32 h-10 border border-gray-300 rounded hover:bg-gray-100 transition"
-        >
-          Cancel
-        </button>
-        <div className="w-32 h-10">
-          <ActionButton
-            type="submit"
-            label={isEdit ? 'Update' : 'Submit'}
-            variant="primary"
-            isLoading={isSubmitting}
-          />
-        </div>
-      </div>
+     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-10">
+  <div className="flex justify-end gap-3 max-w-7xl mx-auto">
+      <ActionButton
+        variant="cancel"
+     onClick={handleCancel}
+        label={"Cancel"}
+      />
+    <div className="w-32 h-10">
+      <ActionButton
+        type="submit"
+        label={isEdit ? 'Update' : 'Submit'}
+        variant="primary"
+        isLoading={isSubmitting}
+      />
+    </div>
+  </div>
+</div>
     </form>
     </>
  

@@ -4,8 +4,11 @@ import CIcon from '@coreui/icons-react'
 import { cilCheckCircle, cilX } from '@coreui/icons'
 import { CheckCircleIcon, XCircleIcon, Trash2Icon } from 'lucide-react'
 import React, { useState } from 'react'
+import { offlineRequestApi } from '../../api/offlineRequestApi'
+import { LockClosedIcon } from '@heroicons/react/solid'
+import { companyApi } from '../../api/company'
 
-const OfflineRequestTable = ({ data }) => {
+const OfflineRequestTable = ({ data,setApproveMessage,setAlerts }) => {
   const [checkedRows, setCheckedRows] = useState({})
 
   // Move columns inside the component to access checkedRows
@@ -47,29 +50,86 @@ const OfflineRequestTable = ({ data }) => {
         </span>
       ),
     },
-    {
-      key: 'action',
-      field: 'action',
-      header: 'Action',
-      type: 'custom',
-      render: (row) => {
-        const isChecked = checkedRows[row.id] || false
-        return (
-          <div className="flex gap-2">
-            <button
-              className="flex items-center justify-center p-1 rounded-full hover:bg-green-100 cursor-pointer transition duration-150"
-              title="Approve"
-              style={{ background: 'none', border: 'none' }}
-              onClick={() => {
-                /* handle approve action here */
-              }}
-            >
-              <CheckCircleIcon className="w-6 h-6 text-green-600" />
-            </button>
+   {
+  key: 'action',
+  field: 'action',
+  header: 'Action',
+  type: 'custom',
+  render: (row) => {
+    const isChecked = checkedRows[row.id] || false
+    const isApproved = row.approval_status === 'approved'
+    
+    return (
+      <div className="flex gap-2">
+        {isApproved ? (
+          <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-md opacity-60">
+            <LockClosedIcon className="w-4 h-4 text-gray-500" />
+            <span className="text-xs text-gray-500 font-medium">Approved</span>
           </div>
-        )
-      },
+        ) : (
+          <button
+            className="flex items-center gap-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-md transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-sm hover:shadow-md"
+            title="Approve"
+          onClick={async () => {
+  try {
+    const response = await offlineRequestApi.approveStatus({
+      id: row.id,
+      approval_status: 'approved',
+    })
+    console.log('Approval Response:', response)
+
+    setAlerts([{ severity: 'success', message: response?.data?.message }])
+    setApproveMessage(response?.data?.message)
+
+    if (response?.data?.message) {
+      const companyResponse = await companyApi.getCompaniesByOfflineId(row.id)
+      console.log('Company Details:', JSON.stringify(companyResponse))
+
+      const companyData = companyResponse?.data?.data || {}
+const submissionData = {
+  name: companyData.company_name || null,
+  email: companyData.email || null,
+  phone: companyData.phone || null,
+  website: 'https://premiumboxmfg.com',
+  address: 'chennai',
+  currency: 4,
+  timezone: 'America/Chicago',
+  language: 'en',
+  company_state_id: 1,
+  logo: 'https://premiumboxmfg.com/assets/logo.png',
+  package_name:
+    (companyData.package_name === 'Free'
+      ? 'Trial'
+      : companyData.package_name) || 'Trial',
+  password: "1234546", // assuming password exists or is handled elsewhere
+  companyAccountDetails: [
+    {
+      accountName: companyData.full_name || null,
+      accountEmail: companyData.email,
     },
+  ],
+  package_id: 2,
+  package_type: 'monthly',
+  version: 'trial',
+}
+      const companyCreate = await companyApi.createCompany(submissionData)
+      console.log('Company Created Response:', companyCreate)
+    }
+  } catch (error) {
+    console.error('Approval Error:', error)
+  }
+}}
+
+          >
+            <CheckCircleIcon className="w-4 h-4" />
+            <span className="text-xs font-medium">Approve</span>
+          </button>
+        )}
+      </div>
+    )
+  },
+}
+,
     {
       key: 'trash',
       field: 'trash',

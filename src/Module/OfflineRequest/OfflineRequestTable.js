@@ -1,15 +1,40 @@
-import { capitalize } from 'lodash'
+import { capitalize, set } from 'lodash'
 import ReusableTable from '../SalesOrder/ReusableTable'
-import CIcon from '@coreui/icons-react'
-import { cilCheckCircle, cilX } from '@coreui/icons'
 import { CheckCircleIcon, XCircleIcon, Trash2Icon } from 'lucide-react'
 import React, { useState } from 'react'
+import CustomAlert from '../../components/New/CustomAlert'
+import ConfirmationModale from '../../components/New/ConfirmationModale'
+import { offlineRequestApi } from '../../api/offlineRequestApi'
 import { offlineRequestApi } from '../../api/offlineRequestApi'
 import { LockClosedIcon } from '@heroicons/react/solid'
 import { companyApi } from '../../api/company'
 
 const OfflineRequestTable = ({ data,setApproveMessage,setAlerts }) => {
-  const [checkedRows, setCheckedRows] = useState({})
+  const [approvedRows, setApprovedRows] = useState({})
+  const [deleteModal, setDeleteModal] = useState({ open: false, id: null })
+  const [alerts, setAlerts] = useState([])
+
+  const openDeleteModal = (id) => {
+    setDeleteModal({ open: true, id })
+  }
+
+  const handleDelete = async () => {
+    try {
+      const response = await offlineRequestApi.deleteOfflineRequest(deleteModal.id)
+      if (response.status === 200 || response.status === 201) {
+        setDeleteModal({ open: false, id: null })
+        setAlerts([{ severity: 'success', message: 'Offline request deleted successfully!' }])
+      }
+    } catch (error) {
+      console.error(error)
+      setAlerts([
+        {
+          severity: 'error',
+          message: error?.response?.data?.message || 'Failed to delete offline request',
+        },
+      ])
+    }
+  }
 
   // Move columns inside the component to access checkedRows
   const columns = [
@@ -141,7 +166,7 @@ const submissionData = {
           title="Delete"
           style={{ background: 'none', border: 'none' }}
           onClick={() => {
-            /* handle delete action here */
+            openDeleteModal(row.id)
           }}
         >
           <Trash2Icon className="w-4 h-4 text-gray-500 hover:text-red-600" />
@@ -150,7 +175,19 @@ const submissionData = {
     },
   ]
 
-  return <ReusableTable columns={columns} data={data} height="75vh" />
+  return (
+    <>
+      <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
+      <ReusableTable columns={columns} data={data} height="75vh" />
+      <ConfirmationModale
+        isOpen={deleteModal.open}
+        onClose={() => setDeleteModal({ open: false, id: null })}
+        onConfirm={handleDelete}
+        title="Delete Confirmation"
+        message="Are you sure you want to delete this item?"
+      />
+    </>
+  )
 }
 
 export default OfflineRequestTable

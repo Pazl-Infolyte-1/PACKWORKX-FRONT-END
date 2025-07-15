@@ -60,7 +60,7 @@ const navigate=useNavigate()
 
         if (company) {
           setEditTag(true)
-                    setValue('name', company.company_name || '');
+                    setValue('company_name', company.company_name || '');
           setValue('email', company.company_email || '');
           setValue('phone', company.company_phone || '');
           setValue('website', company.website || '');
@@ -71,8 +71,9 @@ const navigate=useNavigate()
           setValue('version', company.version || '');
           setValue('package_start_date', company.package_start_date || '');
           setValue('package_end_date', company.package_end_date || '');
-          setValue('accountName', company.companyAccountDetails?.[0]?.accountName || '');
-          setValue('accountEmail', company.companyAccountDetails?.[0]?.accountEmail || '');
+        setValue('accountName', company.users?.[0]?.name || '');
+          setValue('accountEmail', company.users?.[0]?.email || '');
+          setValue('password','123456');
 
           // For controlled fields using useState
            setValue('selectedPackage', company.package_id?.toString() || '');
@@ -193,70 +194,73 @@ setSelectedPackageType(company.package_type || '');
   //  }
   //}, [startDate, selectedPackageType]);
 
-  const onSubmit =  async(data) => {
-    console.log("datasss",data)
-    try {
-  const payload = {
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        website: data.website,
-        currency: Number(data.currency),
-        company_state_id:data.company_state_id,
-        timezone: data.timezone,
-        address: data.address,
-        logo: data.logo, // hardcoded for now
-        package_id: Number(selectedPackage),
-          package_name: selectedPackageName,
-        package_type: selectedPackageType,
-        package_start_date: data.package_start_date,
-        package_end_date: data.package_end_date,
-        version:data.version,
-        password:data.password,
-        companyAccountDetails: [
-          {
-            accountName: data.accountName,
-            accountEmail: data.accountEmail,
-          },
-        ],
-      };
+ const onSubmit = async (data) => {
+  console.log("datasss", data);
+    console.log("editTag", data);
 
-      console.log('Submitting payload:', payload);
-     
+  const payload = {
+    ...(editTag ? { company_name: data.company_name } : { name: data.company_name }),
+    email: data.email,
+    phone: data.phone,
+    website: data.website,
+    currency: Number(data.currency),
+    company_state_id: data.company_state_id,
+    timezone: data.timezone,
+    address: data.address,
+    logo: data.logo, // hardcoded for now
+    package_id: Number(selectedPackage),
+    package_name: selectedPackageName,
+    package_type: selectedPackageType,
+    package_start_date: data.package_start_date,
+    package_end_date: data.package_end_date,
+    version: data.version,
+    ...(!editTag && { password: data.password }),
+    //password: "123456",
+    companyAccountDetails: [
+      {
+        accountName: data.accountName,
+        accountEmail: data.accountEmail,
+      },
+    ],
+  };
+
+  console.log('Submitting payload:', payload);
+  
+  try {
     let response;
-    if (isEdit && initialData?.id) {
-      response = await companyApi.updateCompany(initialData.id, payload);
+    if (editTag) {
+      response = await companyApi.updateCompany(id, payload);
     } else {
       response = await companyApi.createCompany(payload);
     }
 
-    console.log('✅ Success response:',response.message);
-      navigate('/companies', {
-  state: {
-    companiesCreateSuccess: response.message,
-  },
-});
+    console.log('✅ Success response:', response.message);
+    
+    navigate('/companies', {
+      state: {
+        companiesCreateSuccess: response.message,
+      },
+    });
 
-    } catch (err) {
-      console.error('Error saving company:', err);
-     if (err?.response?.data?.errors?.length) {
-  const errorMessages = err.response.data.errors.map((error) => ({
-    severity: 'error',
-    message: error.message,
-  }));
-  setAlerts?.(errorMessages);
-} else {
-  //setAlerts?.([
-  //  {
-  //    severity: 'error',
-  //    message: err?.response?.data?.message || 'An unexpected error occurred.',
-  //  },
-  //]);
-}
+  } catch (err) {
+    console.error('Error saving company:', err);
 
+    if (err?.response?.data?.errors?.length) {
+      const errorMessages = err.response.data.errors.map((error) => ({
+        severity: 'error',
+        message: error.message,
+      }));
+      setAlerts?.(errorMessages);
+    } else {
+      //setAlerts?.([
+      //  {
+      //    severity: 'error',
+      //    message: err?.response?.data?.message || 'An unexpected error occurred.',
+      //  },
+      //]);
     }
-  };
-
+  }
+};
   console.log("state options",stateOptions)
 
  const handleLogoUpload = async (event) => {
@@ -321,7 +325,7 @@ console.log("selectedpackages",selectedPackage)
     
        <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6 p-4 bg-white rounded-md border border-gray-200 mb-[90px]"
+      className="space-y-6 p-4 bg-white rounded-md border border-gray-200 mb-[50px]"
     >
 
       <h2 className="text-xl font-semibold mb-4">Company Details</h2>
@@ -333,8 +337,8 @@ console.log("selectedpackages",selectedPackage)
   </label>
   <CFormInput
     placeholder="Enter Company Name"
-    {...register('name', { required: 'Required' })}
-    invalid={!!errors.name}
+    {...register('company_name', { required: 'Required' })}
+    invalid={!!errors.company_name}
   />
 </CCol>
 
@@ -512,7 +516,7 @@ console.log("selectedpackages",selectedPackage)
 
         {selectedPackage && (
           <>
-            <CCol md={4}>
+         <CCol md={4}>
   <label className="form-label d-flex align-items-center gap-1">
     Package Type <span className="text-danger">*</span>
     {errors.packageType?.message && (
@@ -525,7 +529,7 @@ console.log("selectedpackages",selectedPackage)
     control={control}
     rules={{ required: 'Required' }}
     render={({ field }) => (
-      <>
+      <div className="d-flex gap-3"> {/* Flex container for radio buttons */}
         <CFormCheck
           type="radio"
           name="packageType"
@@ -548,10 +552,11 @@ console.log("selectedpackages",selectedPackage)
             setSelectedPackageType('annual');
           }}
         />
-      </>
+      </div>
     )}
   />
 </CCol>
+
 
           <CCol md={4}>
   <CFormLabel htmlFor="packageStartDate" className="form-label">
@@ -654,14 +659,14 @@ console.log("selectedpackages",selectedPackage)
         </CCol>
       </CRow>
 
-     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-10">
-  <div className="flex justify-end gap-3 max-w-7xl mx-auto">
-      <ActionButton
-        variant="cancel"
-     onClick={handleCancel}
-        label={"Cancel"}
-      />
-    <div className="w-32 h-10">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 shadow-lg z-10">
+  <div className="flex justify-end gap-2 max-w-7xl mx-auto w-full">
+    <ActionButton
+      variant="cancel"
+      onClick={handleCancel}
+      label="Cancel"
+    />
+    <div className="w-32 h-9"> {/* Slightly reduced height */}
       <ActionButton
         type="submit"
         label={isEdit ? 'Update' : 'Submit'}
@@ -671,6 +676,7 @@ console.log("selectedpackages",selectedPackage)
     </div>
   </div>
 </div>
+
     </form>
     </>
  

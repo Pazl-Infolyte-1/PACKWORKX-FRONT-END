@@ -5,11 +5,10 @@ import React, { useState } from 'react'
 import CustomAlert from '../../components/New/CustomAlert'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import { offlineRequestApi } from '../../api/offlineRequestApi'
-import { offlineRequestApi } from '../../api/offlineRequestApi'
 import { LockClosedIcon } from '@heroicons/react/solid'
 import { companyApi } from '../../api/company'
 
-const OfflineRequestTable = ({ data,setApproveMessage,setAlerts }) => {
+const OfflineRequestTable = ({ data,setApproveMessage,setDelMessage }) => {
   const [approvedRows, setApprovedRows] = useState({})
   const [deleteModal, setDeleteModal] = useState({ open: false, id: null })
   const [alerts, setAlerts] = useState([])
@@ -18,23 +17,20 @@ const OfflineRequestTable = ({ data,setApproveMessage,setAlerts }) => {
     setDeleteModal({ open: true, id })
   }
 
-  const handleDelete = async () => {
-    try {
-      const response = await offlineRequestApi.deleteOfflineRequest(deleteModal.id)
-      if (response.status === 200 || response.status === 201) {
-        setDeleteModal({ open: false, id: null })
-        setAlerts([{ severity: 'success', message: 'Offline request deleted successfully!' }])
-      }
-    } catch (error) {
-      console.error(error)
-      setAlerts([
-        {
-          severity: 'error',
-          message: error?.response?.data?.message || 'Failed to delete offline request',
-        },
-      ])
-    }
+const handleDelete = async () => {
+  try {
+    const response = await offlineRequestApi.deleteOfflineRequest(deleteModal.id);
+    
+    // Log the success response
+    console.log('Delete successful:', response.data.message);
+    setAlerts([{ severity: 'success', message: response?.data?.message }])
+    setDelMessage(response?.data?.message)
+    setDeleteModal({ open: false, id: null });
+  } catch (error) {
+    console.error('Delete failed:', error);
   }
+};
+
 
   // Move columns inside the component to access checkedRows
   const columns = [
@@ -81,7 +77,7 @@ const OfflineRequestTable = ({ data,setApproveMessage,setAlerts }) => {
   header: 'Action',
   type: 'custom',
   render: (row) => {
-    const isChecked = checkedRows[row.id] || false
+    //const isChecked = checkedRows[row.id] || false
     const isApproved = row.approval_status === 'approved'
     
     return (
@@ -155,24 +151,27 @@ const submissionData = {
   },
 }
 ,
-    {
-      key: 'trash',
-      field: 'trash',
-      header: '',
-      type: 'custom',
-      render: (row) => (
-        <button
-          className="flex items-center justify-center p-0"
-          title="Delete"
-          style={{ background: 'none', border: 'none' }}
-          onClick={() => {
-            openDeleteModal(row.id)
-          }}
-        >
-          <Trash2Icon className="w-4 h-4 text-gray-500 hover:text-red-600" />
-        </button>
-      ),
-    },
+ {
+  key: 'trash',
+  field: 'trash',
+  header: '',
+  type: 'custom',
+  render: (row) => {
+    if (row.approval_status === 'approved') return null;
+
+    return (
+      <button
+        className="flex items-center justify-center p-0"
+        title="Delete"
+        style={{ background: 'none', border: 'none' }}
+        onClick={() => openDeleteModal(row.id)}
+      >
+        <Trash2Icon className="w-4 h-4 text-gray-500 hover:text-red-600" />
+      </button>
+    );
+  },
+}
+
   ]
 
   return (

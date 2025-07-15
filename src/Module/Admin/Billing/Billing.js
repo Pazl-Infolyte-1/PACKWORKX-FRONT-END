@@ -8,8 +8,9 @@ import CustomAlert from '../../../components/New/CustomAlert';
 import CompactPagination from '../../../components/New/CompactPagination';
 import Loader from '../../../components/New/Loader';
 import { useSearch } from '../../../components/New/SearchContext';
-// import { billingApi } from '../../../api/billing'; // ✅ You must create this API module
 import { debounce } from 'lodash';
+import { companyApi } from '../../../api/company';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 const Billing = () => {
   const [billingData, setBillingData] = useState([]);
@@ -25,6 +26,9 @@ const Billing = () => {
   });
 
   const { searchQuery, setGlobalPlaceholder } = useSearch();
+  const [isMiniMised, setIsMinimised] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // ✅ Set placeholder
   useEffect(() => {
@@ -36,13 +40,14 @@ const Billing = () => {
   const fetchBills = useCallback(async (search, pageParams) => {
     setLoading(true);
     try {
-      const res = await billingApi.getBills({
+      const res = await companyApi.getCompanyBilling({
         search,
         page: pageParams.currentPage,
         limit: pageParams.pageSize,
       });
 
-      const responseData = res.data;
+      console.log(res)
+      const responseData = res?.data?.bills;
       const data = Array.isArray(responseData.data)
         ? responseData.data
         : Array.isArray(responseData)
@@ -78,6 +83,14 @@ const Billing = () => {
     return () => debouncedFetchBills.cancel();
   }, [debouncedFetchBills]);
 
+  useEffect(() => {
+    if (location.pathname.includes('/billing/view/')) {
+      setIsMinimised(true);
+    } else {
+      setIsMinimised(false);
+    }
+  }, [location.pathname]);
+
   // ✅ Pagination handlers
   const handlePageChange = (_, newPage) => {
     setPaginationParams((prev) => ({
@@ -98,51 +111,59 @@ const Billing = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {alerts.show && (
-        <CustomAlert
-          message={alerts.message}
-          severity={alerts.type}
-          onClose={closeAlert}
+    <div className="flex flex-row h-full">
+      <div className={`${isMiniMised ? 'w-2/6' : 'w-full'}  flex-col flex`}>
+        {alerts.show && (
+          <CustomAlert
+            message={alerts.message}
+            severity={alerts.type}
+            onClose={closeAlert}
+          />
+        )}
+
+        <ContentHeader
+          heading="Billing Management"
+          onAddClick={() => {
+            console.log('Add Bill Clicked');
+          }}
         />
-      )}
 
-      <ContentHeader
-        heading="Billing Management"
-        onAddClick={() => {
-          console.log('Add Bill Clicked');
-        }}
-      />
+        <Loader isLoading={loading} />
 
-      <Loader isLoading={loading} />
+        {!loading && (
+          <>
+            <div className="bg-white rounded-lg w-full h-full overflow-x-auto overflow-y-auto">
+              <BillingTable
+                billingData={billingData}
+                setBillingData={setBillingData}
+                handleEditBill={(bill) =>
+                  console.log('Edit Bill Clicked:', bill)
+                }
+                setRefresh={setRefresh}
+                onInvoiceClick={(row) => {
+                  setIsMinimised(true);
+                  navigate(`/billing/view/${row.id}`);
+                }}
+                isMinimiseTable={isMiniMised}
+              />
+            </div>
 
-      {!loading && (
-        <>
-          <div className="bg-white rounded-lg w-full h-full overflow-x-auto overflow-y-auto">
-            <BillingTable
-              billingData={billingData}
-              setBillingData={setBillingData}
-              handleEditBill={(bill) =>
-                console.log('Edit Bill Clicked:', bill)
-              }
-              setRefresh={setRefresh}
-            />
-          </div>
-
-          <div className="flex justify-end items-center gap-4 mt-2 ml-4 mr-4 py-2 border-t bg-white">
-            <p className="text-sm whitespace-nowrap">
-              Total Count: <span className="font-semibold">{totalRecords}</span>
-            </p>
-            <CompactPagination
-              count={totalPages}
-              page={paginationParams.currentPage}
-              onPageChange={handlePageChange}
-              onEntriesChange={handleEntriesChange}
-              entriesPerPage={paginationParams.pageSize}
-            />
-          </div>
-        </>
-      )}
+            <div className="flex justify-end items-center gap-4 mt-2 ml-4 mr-4 py-2 border-t bg-white">
+              <p className="text-sm whitespace-nowrap">
+                Total Count: <span className="font-semibold">{totalRecords}</span>
+              </p>
+              <CompactPagination
+                count={totalPages}
+                page={paginationParams.currentPage}
+                onPageChange={handlePageChange}
+                onEntriesChange={handleEntriesChange}
+                entriesPerPage={paginationParams.pageSize}
+              />
+            </div>
+          </>
+        )}
+      </div>
+      <Outlet />
     </div>
   );
 };

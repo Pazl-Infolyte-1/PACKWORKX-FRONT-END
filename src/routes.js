@@ -119,6 +119,7 @@ const CompanyForm = React.lazy(() => import('./Module/Admin/Companies/CompaniesF
 
 
 const TaskView = React.lazy(() => import('./Module/TaskView/TaskView.js'))
+const companyBillingView = React.lazy(() => import('./Module/Admin/Billing/billingView.js'))
 const routes = [
   { path: '/', exact: true, name: 'Home', key: '' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, key: 5006 },
@@ -263,7 +264,19 @@ const routes = [
   { path: '/grn_form', name: 'GRNForm', element: GRNForm, key: '' },
   { path: '/grn_form/:id', name: 'GRNEditForm', element: GRNForm, key: '' },
 
-  { path: '/billing', name: 'Billing', element: Billing, key: 5003 },
+  { path: '/billing',
+    name: 'Billing',
+    element: Billing,
+    key: 5003,
+    children: [
+      {
+        path: 'view/:id',
+        name: 'billsView',
+        element: companyBillingView,
+        key: 'billsView', // Assigned a proper unique key
+      },
+    ],
+  },
   { path: '/companies', name: 'Companies', element: Companies, key: 5002 },
 
   {

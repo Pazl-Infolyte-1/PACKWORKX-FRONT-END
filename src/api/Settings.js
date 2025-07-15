@@ -16,5 +16,10 @@ export const SettingsApi = {
   applyInvoiceTemplate: async (id) => {
     return await apiClient.get(`/work-order-invoice/activate/${id}`)
   },
-
+  appSettings: async (body) => {
+    return await apiClient.put('/common-service/system-settings', body)
+  },
+  notificationSettings: async (body) => {
+    return await apiClient.post('/common-service/mail-configuration', body)
+  },
 }

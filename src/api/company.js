@@ -114,4 +114,20 @@ export const companyApi = {
       console.error(error)
     }
   },
+   getPackagesDropdown: async (params) => {
+    try {
+      return await apiClient.get('/companies/packages/master', { params })
+    } catch (error) {
+      console.error(error)
+    }
+  },
+ getCompaniesById: async (id) => {
+  try {
+    return await apiClient.get(`/companies/${id}`)
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
 }

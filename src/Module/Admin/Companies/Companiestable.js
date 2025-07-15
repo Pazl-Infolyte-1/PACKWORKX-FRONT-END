@@ -4,6 +4,7 @@ import ThreeDotMenu from '../../../components/ThreeDotMenu';
 import DeleteModal from '../../../components/New/DeleteModal';
 import ReusableTable from '../../SalesOrder/ReusableTable';
 import { companyApi } from '../../../api/company';
+import { useNavigate } from 'react-router-dom';
 
 const CompaniesTable = ({
   companiesData = [],
@@ -15,7 +16,7 @@ const CompaniesTable = ({
 }) => {
   const [selectedCompanyDeleteId, setSelectedCompanyDeleteId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
+const navigate=useNavigate()
   const openDeleteModal = (companyId) => {
     setSelectedCompanyDeleteId(companyId);
     setIsDeleteModalOpen(true);
@@ -140,7 +141,8 @@ const CompaniesTable = ({
               {
                 label: 'Edit',
                 icon: cilPencil,
-                onClick: () => handleEditCompany(row),
+                //onClick: () => handleEditCompany(row),
+               onClick: () => navigate(`/companyForm/${row.id}`)
               },
               {
                 label: 'Delete',

@@ -19,7 +19,7 @@ const LandingPage = React.lazy(() => import('./views/landing/LandingPage'))
 const PublicRoute = ({ element }) => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
   //return isAuthenticated ? <Navigate to="/dashboard" replace /> : element
-  return isAuthenticated ? <Navigate to="/landing" replace /> : element
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : element
 }
 
 const App = () => {

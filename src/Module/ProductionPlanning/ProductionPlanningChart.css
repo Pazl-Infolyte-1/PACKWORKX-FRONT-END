@@ -840,3 +840,64 @@ top: 0px;
 .right-date{
   z-index: 20 !important;
 }
+.time-slot {
+  position: relative;
+  overflow: hidden; /* Already there, good */
+  padding: 4px;
+  width: 100%;  /* Ensure it takes table cell width */
+}
+
+.event {
+  width: 100%;   /* Prevent overflow */
+  box-sizing: border-box; /* Include padding inside width */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.event-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  display: block;
+}
+.event-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.machine-name-cell {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.machine-name-cell:hover::after {
+  content: 'TEST TOOLTIP';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: red;
+  color: white;
+  padding: 4px;
+  z-index: 999;
+}
+
+.sticky-machine {
+  position: sticky;
+  left: 140px;
+  width: 140px;
+  min-width: 140px;
+  max-width: 140px;
+  background: #ffffff;
+  z-index: 100;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.scheduler-scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+

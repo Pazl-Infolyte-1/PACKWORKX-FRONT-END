@@ -8,7 +8,7 @@ import CustomAlert from '../../components/New/CustomAlert'
 const OfflineRequest = () => {
   const [data, setData] = useState([])
     const [alerts, setAlerts] = useState([])
-  
+  const [delMessage,setDelMessage]=useState("")
   const [pagination, setPagination] = useState({
     page: 1,
     totalPages: 1,
@@ -37,7 +37,8 @@ const OfflineRequest = () => {
     }
     fetchData()
     setApproveMessage("")
-  }, [pagination.page, pagination.limit,approveMessage])
+    setDelMessage("")
+  }, [pagination.page, pagination.limit,approveMessage,delMessage])
 
   const handlePageChange = (event, value) => {
     setPagination((prev) => ({ ...prev, page: value }))
@@ -53,7 +54,7 @@ const OfflineRequest = () => {
     <div className="flex flex-col">
          <CustomAlert alerts={alerts} handleClose={handleClose} />
       <ContentHeader heading="Offline Requests" onAddClick={() => {}} isAddNew={false} />
-      <OfflineRequestTable data={data} setApproveMessage={setApproveMessage} setAlerts={setAlerts} />
+      <OfflineRequestTable data={data} setApproveMessage={setApproveMessage} setAlerts={setAlerts} setDelMessage={setDelMessage}/>
       <div className="flex justify-end items-center gap-4 mt-2 py-2 border-t bg-white">
         <p className="w-40 text-sm">
           Total Count: <span className="font-semibold">{pagination.total}</span>

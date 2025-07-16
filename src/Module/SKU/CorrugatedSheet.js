@@ -1101,6 +1101,7 @@ console.log("unit sheet///",addNewSkuData.unit)
             name="print_type"
             value={addNewSkuData?.print_type || ''}
             onChange={handleChange}
+                  disabled={editTag}
             className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="">Select Type</option>
@@ -1126,6 +1127,7 @@ console.log("unit sheet///",addNewSkuData.unit)
                 type="file"
                 accept="application/pdf"
                 onChange={handleFileUpload}
+                      disabled={editTag}
                 multiple
                 className="hidden"
               />

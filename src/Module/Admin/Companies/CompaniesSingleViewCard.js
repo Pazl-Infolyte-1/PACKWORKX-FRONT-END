@@ -405,8 +405,8 @@ const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData, package
   let daysLeft = null;
   if (selectedCompany.package_end_date) {
     const endDate = new Date(selectedCompany.package_end_date);
-    // const today = new Date(); // Use real today
-    const today = new Date('2026-07-03'); // For testing, fixed date (YYYY-MM-DD)
+    const today = new Date(); // Use real today
+    // const today = new Date('2026-07-03'); // For testing, fixed date (YYYY-MM-DD)
     // Zero out time for accurate day diff
     endDate.setHours(0,0,0,0);
     today.setHours(0,0,0,0);
@@ -438,7 +438,7 @@ const CompaniesSingleViewCard = ({ handleEdit, handleClose, companyData, package
                 </div>
         <div className="flex items-center gap-2">
           {/* Show button if 5 days or less left and end date is in the future */}
-          {daysLeft !== null && daysLeft <= 5 && daysLeft >= 0 && (
+          {daysLeft !== null && daysLeft <= 5 && ( // daysLeft >= 0
             <button
               className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-colors shadow-sm"
               title="Generate billing for package renewal"

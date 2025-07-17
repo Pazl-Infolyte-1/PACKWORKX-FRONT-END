@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { CContainer, CSpinner } from '@coreui/react'
 import ErrorBoundary from './ErrorBoundary'
@@ -7,9 +7,22 @@ import ErrorBoundary from './ErrorBoundary'
 import routes from '../routes'
 
 const AppContent = () => {
+    const [reloadKey, setReloadKey] = useState(0)
+
+  useEffect(() => {
+    const handleBranchChange = () => {
+      setReloadKey((prevKey) => prevKey + 1)
+    }
+
+    window.addEventListener('branchIdChanged', handleBranchChange)
+
+    return () => {
+      window.removeEventListener('branchIdChanged', handleBranchChange)
+    }
+  }, [])
   return (
     <ErrorBoundary>
-      <CContainer className="bg-white" fluid>
+      <CContainer className="bg-white" fluid key={reloadKey}>
         <Suspense fallback={<CSpinner color="primary" />}>
           <Routes>
           {routes.map((route, idx) => {

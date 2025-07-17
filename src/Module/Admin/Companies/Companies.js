@@ -30,15 +30,18 @@ const CompanyManagement = () => {
   const [refresh, setRefresh] = useState(false);
 const navigate = useNavigate()
 const location = useLocation();
-const successMessage = location.state?.companiesCreateSuccess;
-
+//const successMessage = location.state?.companiesCreateSuccess;
+const [successMessage, setSuccessMessage] = useState(() => location.state?.companiesCreateSuccess || '');
 useEffect(() => {
   if (successMessage) {
     console.log('Create success message:', successMessage);
-          setAlerts([{ severity: 'success', message: successMessage }]);
+    setAlerts([{ severity: 'success', message: successMessage }]);
+    setSuccessMessage('');
 
+    // Clear location.state to prevent message on reload
+    navigate(location.pathname, { replace: true });
   }
-}, [successMessage]);
+}, [successMessage, navigate, location.pathname]);
   const [paginationParams, setPaginationParams] = useState({
     currentPage: 1,
     pageSize: 50,

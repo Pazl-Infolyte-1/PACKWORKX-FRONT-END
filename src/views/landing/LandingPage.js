@@ -165,7 +165,7 @@ const LandingPage = () => {
             token: response.token,
           },
         })
-
+localStorage.setItem('company-branch-id', "")
         navigate('/dashboard', { replace: true })
       } else {
         setError('Invalid login response')

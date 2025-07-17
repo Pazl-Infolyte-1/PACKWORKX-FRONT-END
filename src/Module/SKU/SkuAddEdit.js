@@ -105,6 +105,7 @@ const [selectedFluteIndex, setSelectedFluteIndex] = useState(null);
 const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
   const skuTypeFromClient = location?.state?.sku_type_for_navigate_from_client;
 const [compositeSkuMessage,setCompositeSkuMessage]=useState("")
+const [branchList, setBranchList] = useState([]);
 
 const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
@@ -143,7 +144,7 @@ const [addNewSkuData, setAddNewSkuData] = useState({
     description: null,
     default_sku_details: null,
     documents:[],
-    print_type:null,
+    print_type:"None",
     tags: {},
     gst_percentage: null,
     total_weight:null,
@@ -328,7 +329,7 @@ console.log("data",rscUnits)
     description: null,
     default_sku_details: null,
     documents:[],
-    print_type:null,
+    print_type:"None",
     tags: {},
     gst_percentage: null,
         total_weight:null,
@@ -1092,6 +1093,12 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
         newErrors.route = 'Required'
       }
+   if (
+  addNewSkuData?.print_type !== 'None' &&
+  (!addNewSkuData.documents || addNewSkuData.documents.length === 0)
+) {
+  newErrors.documents = 'Required';
+}
             if (Array.isArray(addNewSkuData.sku_values)) {
     addNewSkuData.sku_values.forEach((layer, index) => {
       const layerErrors = {}
@@ -1133,6 +1140,12 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
         newErrors.route = 'Required'
       }
+       if (
+  addNewSkuData?.print_type !== 'None' &&
+  (!addNewSkuData.documents || addNewSkuData.documents.length === 0)
+) {
+  newErrors.documents = 'Required';
+}
             if (Array.isArray(addNewSkuData.sku_values)) {
     addNewSkuData.sku_values.forEach((layer, index) => {
       const layerErrors = {}
@@ -1188,6 +1201,14 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
         newErrors.route = 'Required'
       }
+   if (
+  addNewSkuData?.print_type !== 'None' &&
+  (!addNewSkuData.documents || addNewSkuData.documents.length === 0)
+) {
+  newErrors.documents = 'Required';
+}
+
+
       if (Array.isArray(addNewSkuData.sku_values)) {
     addNewSkuData.sku_values.forEach((layer, index) => {
       const layerErrors = {}
@@ -1206,6 +1227,7 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
         if (!newErrors.sku_values) newErrors.sku_values = {}
         newErrors.sku_values[index] = layerErrors
       }
+
     })
   }
     } else {
@@ -1406,6 +1428,23 @@ console.log("editinggg data",addNewSkuData)
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
+
+useEffect(() => {
+  const fetchBranches = async () => {
+    try {
+      const response = await commonApi.getCompanyBranchDropdown();
+      console.log('Branch dropdown response:', response.data);
+      setBranchList(response.data);
+    } catch (error) {
+      console.error('Error fetching branches:', error);
+    }
+  };
+
+  fetchBranches();
+}, []);
+// Compute toggle state based on addNewSkuData.strict_adherence
+const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherence;
+
   return (
     <div className="p-6 bg-white rounded-lg">
       {/* conditional rendring according to sku_type */}
@@ -1421,8 +1460,8 @@ console.log("editinggg data",addNewSkuData)
             <span className="text-[14px] font-medium">Strict Adherence for All Layers</span>
             <button
               className={`w-11 h-[23px] flex items-center border border-blue-600 rounded-full p-1 cursor-pointer 
-              ${strictAdherence ? 'bg-blue-600' : 'bg-gray-300'}`}
-              onClick={!editTag && handleStrictAdherenceToggle}
+  ${isStrictActive ? 'bg-blue-600' : 'bg-gray-300'}`}
+             onClick={!editTag ? handleStrictAdherenceToggle : undefined} 
             >
               <div
                 className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out 
@@ -1430,7 +1469,7 @@ console.log("editinggg data",addNewSkuData)
               ></div>
             </button>
           </div>
-          {editTag && (
+          {!isStrictActive && (
             <select
               onChange={handleVersionSelect}
               value={selectedVersion?.sku_version || ''}

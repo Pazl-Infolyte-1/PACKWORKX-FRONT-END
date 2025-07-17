@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -13,6 +13,7 @@ import {
   CNavLink,
   CNavItem,
   useColorModes,
+  CFormSelect,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -30,6 +31,8 @@ import { AppHeaderDropdown } from './header/index'
 import SearchBar from './New/SearchBar'
 import { MdOutlineMenu } from 'react-icons/md'
 import NotificationPanel from './NotificationPanel'
+import { commonApi } from '../api/common'
+import SelectBranches from './New/SelectBranches'
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -46,84 +49,82 @@ const AppHeader = () => {
   }, [])
 
   return (
-    <CHeader position="sticky" className="p-0" ref={headerRef}>
-      <CContainer fluid className="border-bottom py-1 bg-[#1E232F]">
-        <button
-          onClick={() => {
-            console.log('Raw button clicked')
-            dispatch({ type: 'set', sidebarShow: !sidebarShow })
-          }}
-          className={`${sidebarShow ? 'ml-3' : 'ml-2'} p-2 text-white`}
-        >
-          <CIcon icon={cilMenu} size="lg" />
-        </button>
-        <CHeaderNav className="d-none d-md-flex">
-          <CNavItem>
-            <CNavLink className="text-white font-normal !text-sm" to="/dashboard" as={NavLink}>
-              Dashboard
-            </CNavLink>
-          </CNavItem>
-          {/* <CNavItem>
-            <CNavLink className="text-white font-normal !text-sm" to="/users" as={NavLink}>
-              Users
-            </CNavLink>
-          </CNavItem> */}
-          {/* <CNavItem>
-            <CNavLink className="text-white font-normal !text-sm" to="/settings" as={NavLink}>
-              Settings
-            </CNavLink>
-          </CNavItem> */}
-          <SearchBar />
-        </CHeaderNav>
-        <CHeaderNav className="ms-auto">
-          <CNavItem>
-            <NotificationPanel />
-          </CNavItem>
-        </CHeaderNav>
-        <CHeaderNav className="pe-0">
-          <li className="nav-item py-1">
-            <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
-          </li>
-          <CDropdown variant="nav-item" placement="bottom-end">
-            <CDropdownToggle caret={false}>
-              {colorMode === 'dark' ? (
-                <CIcon icon={cilMoon} size="lg" className="text-white" />
-              ) : colorMode === 'auto' ? (
-                <CIcon icon={cilContrast} size="lg" className="text-white" />
-              ) : (
-                <CIcon icon={cilSun} size="lg" className="text-white" />
-              )}
-            </CDropdownToggle>
-            <CDropdownMenu>
-              <CDropdownItem
-                active={colorMode === 'light'}
-                className="d-flex align-items-center"
-                as="button"
-                type="button"
-                onClick={() => setColorMode('light')}
-              >
-                <CIcon className="me-2" icon={cilSun} size="lg" /> Light
-              </CDropdownItem>
-              {/* <CDropdownItem
-                active={colorMode === 'dark'}
-                className="d-flex align-items-center"
-                as="button"
-                type="button"
-                onClick={() => setColorMode('dark')}
-              >
-                <CIcon className="me-2" icon={cilSun} size="lg" /> Dark
-              </CDropdownItem> */}
-            </CDropdownMenu>
-          </CDropdown>
-          <li className="nav-item py-1">
-            <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
-          </li>
-          <div className="d-flex align-items-center">
-            <AppHeaderDropdown />
-          </div>
-        </CHeaderNav>
-      </CContainer>
-    </CHeader>
+   <CHeader position="sticky" className="p-0" ref={headerRef}>
+  <CContainer fluid className="border-bottom py-1 bg-[#1E232F]">
+    <button
+      onClick={() => {
+        console.log('Raw button clicked')
+        dispatch({ type: 'set', sidebarShow: !sidebarShow })
+      }}
+      className={`${sidebarShow ? 'ml-3' : 'ml-2'} p-2 text-white`}
+    >
+      <CIcon icon={cilMenu} size="lg" />
+    </button>
+    
+    <CHeaderNav className="d-none d-md-flex">
+      <CNavItem>
+        <CNavLink className="text-white font-normal !text-sm" to="/dashboard" as={NavLink}>
+          Dashboard
+        </CNavLink>
+      </CNavItem>
+      <SearchBar />
+    </CHeaderNav>
+    
+    <CHeaderNav className="ms-auto">
+    <SelectBranches/>
+      
+      <CNavItem>
+        <NotificationPanel />
+      </CNavItem>
+    </CHeaderNav>
+    
+    <CHeaderNav className="pe-0">
+      <li className="nav-item py-1">
+        <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
+      </li>
+      
+      <CDropdown variant="nav-item" placement="bottom-end">
+        <CDropdownToggle caret={false}>
+          {colorMode === 'dark' ? (
+            <CIcon icon={cilMoon} size="lg" className="text-white" />
+          ) : colorMode === 'auto' ? (
+            <CIcon icon={cilContrast} size="lg" className="text-white" />
+          ) : (
+            <CIcon icon={cilSun} size="lg" className="text-white" />
+          )}
+        </CDropdownToggle>
+        <CDropdownMenu>
+          <CDropdownItem
+            active={colorMode === 'light'}
+            className="d-flex align-items-center"
+            as="button"
+            type="button"
+            onClick={() => setColorMode('light')}
+          >
+            <CIcon className="me-2" icon={cilSun} size="lg" /> Light
+          </CDropdownItem>
+          {/* <CDropdownItem
+            active={colorMode === 'dark'}
+            className="d-flex align-items-center"
+            as="button"
+            type="button"
+            onClick={() => setColorMode('dark')}
+          >
+            <CIcon className="me-2" icon={cilSun} size="lg" /> Dark
+          </CDropdownItem> */}
+        </CDropdownMenu>
+      </CDropdown>
+      
+      <li className="nav-item py-1">
+        <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
+      </li>
+      
+      <div className="d-flex align-items-center">
+        <AppHeaderDropdown/>
+      </div>
+    </CHeaderNav>
+  </CContainer>
+</CHeader>
   )
 }
 

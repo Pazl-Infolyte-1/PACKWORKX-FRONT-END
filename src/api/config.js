@@ -16,19 +16,41 @@ const apiClient = axios.create({
  
  
 // Request interceptor
+
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token');
+    const branchId = localStorage.getItem('company-branch-id'); // 👈 Get branch ID
+console.log("branch id",branchId)
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return config
+
+    if (branchId) {
+      config.headers['company-branch-id'] = branchId;  // 👈 Add to headers
+    }
+
+    return config;
   },
   (error) => {
-    console.error('Request interceptor error:', error)
-    return Promise.reject(error)
-  },
-)
+    console.error('Request interceptor error:', error);
+    return Promise.reject(error);
+  }
+);
+
+//apiClient.interceptors.request.use(
+//  (config) => {
+//    const token = localStorage.getItem('token')
+//    if (token) {
+//      config.headers.Authorization = `Bearer ${token}`
+//    }
+//    return config
+//  },
+//  (error) => {
+//    console.error('Request interceptor error:', error)
+//    return Promise.reject(error)
+//  },
+//)
  
 // Response interceptor
 apiClient.interceptors.response.use(

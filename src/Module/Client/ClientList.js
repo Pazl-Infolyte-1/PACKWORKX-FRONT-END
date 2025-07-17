@@ -43,6 +43,7 @@ function ClientList() {
   const [status,setStatus]=useState("active")
     const [singleStatusUpdate,setSingleStatusUpdate]=useState(false)
 
+
    const { setGlobalPlaceholder, searchQuery  } = useSearch()
   const selectionFrame = {
     vendor: { id: 1, name: 'vendor', image: vendorImg },
@@ -54,7 +55,6 @@ function ClientList() {
       console.log('ClientList width:', clientListRef.current.offsetWidth, 'px')
     }
   }, [])
-
     useEffect(() => {
     // Set the placeholder when component mounts
     setGlobalPlaceholder("Search clients....")

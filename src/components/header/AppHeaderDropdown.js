@@ -33,6 +33,7 @@ const AppHeaderDropdown = () => {
   const navigate = useNavigate()
 
   const handleLogout = () => {
+    localStorage.setItem('company-branch-id', "")
     dispatch(logout())
     
   }

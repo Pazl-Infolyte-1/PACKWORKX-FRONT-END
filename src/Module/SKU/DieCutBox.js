@@ -977,7 +977,9 @@ const MenuProps = {
          <label className="block text-sm font-medium text-gray-700 mb-2">Documents</label>
      <label
           htmlFor="file-upload"
-          className="cursor-pointer inline-block hover:bg-gray-200 text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200"
+                      className={`cursor-pointer inline-block text-sm px-4 py-1 rounded-md shadow-sm transition-colors duration-200 
+      ${errors.documents ? 'border-2 border-red-500' : 'border border-gray-300 hover:bg-gray-200'}
+    `}
         >
           <CIcon icon={cilCloudUpload} size="sm" className="text-gray-700" /> Upload Files
         </label>

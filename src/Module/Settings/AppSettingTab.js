@@ -3,8 +3,10 @@ import CIcon from '@coreui/icons-react'
 import React, { useState } from 'react'
 import ActionButton from '../../components/New/ActionButton'
 import { SettingsApi } from '../../api/Settings'
+import CustomAlert from '../../components/New/CustomAlert'
 
 function AppSettingTab() {
+  const [alerts, setAlerts] = useState([])
   const [formData, setFormData] = useState({
     date_format: 'DD-MM-YYYY',
     time_format: '12-hour',
@@ -51,14 +53,12 @@ function AppSettingTab() {
       company_need_approval: formData.companyNeedApproval ? 1 : 0,
     }
 
-    console.log('Payload to send:', payload)
     const response = await SettingsApi.appSettings(payload)
     if (response.status === 200) {
-      console.log('Settings saved successfully:', response.data)
-      // Optionally, you can show a success message or redirect the user
+      setAlerts([{ severity: 'success', message: response.data.message || 'Settings saved successfully' }])
     } else {
       console.error('Error saving settings:', response.data)
-      // Optionally, you can show an error message to the user
+      setAlerts([{ severity: 'error', message: response.data.message || 'Failed to save settings' }])
     }
   }
 
@@ -79,6 +79,7 @@ function AppSettingTab() {
 
   return (
     <form className="p-4 bg-white">
+      <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-6">
         {/* Date Format */}
         <div>
@@ -210,7 +211,8 @@ function AppSettingTab() {
               name="locale"
               value={formData.locale}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded p-2 pr-8 appearance-none text-gray-700"
+              className="w-full border border-gray-300 rounded p-2 pr-8 appearance-none cursor-not-allowed text-gray-700"
+              disabled={true}
             >
               {localeOptions.map((option) => (
                 <option key={option} value={option}>
@@ -218,15 +220,6 @@ function AppSettingTab() {
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg
-                className="fill-current h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
           </div>
         </div>
 

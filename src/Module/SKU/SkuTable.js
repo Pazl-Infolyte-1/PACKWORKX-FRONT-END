@@ -7,15 +7,12 @@ import {
   CTableBody,
   CTableDataCell,
 } from '@coreui/react'
-import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
-import { TiFlowSwitch } from 'react-icons/ti'
-import SkuDetails from './SkuDetails'
+import { cilPencil, cilTrash } from '@coreui/icons'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CustomAlert from '../../components/New/CustomAlert'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import moment from 'moment'
 import { skuApi } from '../../api/sku'
 
 function SkuTable({
@@ -28,7 +25,7 @@ function SkuTable({
   setAlerts,
   onSkuDeleted,
   setErrors,
-  setSelectedSku
+  setSelectedSku,
 }) {
   const [showPopUp, setShowPopUp] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
@@ -37,7 +34,7 @@ function SkuTable({
   const [tableHeight, setTableHeight] = useState('calc(85vh - 200px)')
   const tableRef = useRef(null)
   const dispatch = useDispatch()
-const navigate = useNavigate()
+  const navigate = useNavigate()
   // Handle window resize to update table height dynamically/
   useEffect(() => {
     const updateHeight = () => {
@@ -114,42 +111,74 @@ const navigate = useNavigate()
   }
 
   return (
-   <div className="border-t border-gray-300  overflow-hidden flex flex-col" ref={tableRef}>
+    <div className="border-t border-gray-300  overflow-hidden flex flex-col" ref={tableRef}>
       <CustomAlert alerts={alerts} handleClose={handleClose} />
       <div className="relative flex-grow">
-      <div
-  className={`overflow-hidden flex flex-col ${
-    isMinimized ? 'h-[515px]' : 'h-[375px]'
-  }`}
->
+        <div className={`overflow-hidden flex flex-col ${isMinimized ? 'h-[515px]' : 'h-[375px]'}`}>
           <div className="overflow-y-auto flex-grow border" style={{ height: tableHeight }}>
             <CTable hover className="w-full m-0 table-fixed">
-            <CTableHead className="!bg-gray-100">
-  <CTableRow className='sticky top-0 z-10 bg-gray-100'>
-    {!isMinimized && (
-      <>
-        {/*<CTableHeaderCell style={{ width: '20px' }} className="text-center">
+              <CTableHead className="!bg-gray-100">
+                <CTableRow className="sticky top-0 z-10 bg-gray-100">
+                  {!isMinimized && (
+                    <>
+                      {/*<CTableHeaderCell style={{ width: '20px' }} className="text-center">
         </CTableHeaderCell>*/}
-        <CTableHeaderCell style={{ width: '120px' }} className="text-center font-semibold">SKU Id</CTableHeaderCell>
-        <CTableHeaderCell style={{ width: '140px' }} className="text-center font-semibold">SKU Name</CTableHeaderCell>
-        <CTableHeaderCell style={{ width: '130px' }} className="text-center font-semibold">SKU Type <span className="text-gray-500">⌕</span></CTableHeaderCell>
-        <CTableHeaderCell style={{ width: '180px' }} className="text-center font-semibold">Client <span className="text-gray-500">⌕</span></CTableHeaderCell>
-        <CTableHeaderCell style={{ width: '120px' }} className="text-center font-semibold">Dimensions</CTableHeaderCell>
-        <CTableHeaderCell style={{ width: '100px' }} className="text-center font-semibold">Deckle <span className="text-gray-500">⌕</span></CTableHeaderCell>
-        <CTableHeaderCell style={{ width: '160px' }} className="text-center font-semibold">Created Date</CTableHeaderCell>
-        <CTableHeaderCell style={{ width: '100px' }} className="text-center font-semibold">Action</CTableHeaderCell>
-      </>
-    )}
-  </CTableRow>
-</CTableHead>
+                      <CTableHeaderCell
+                        style={{ width: '120px' }}
+                        className="text-center font-semibold"
+                      >
+                        SKU Id <span className="text-gray-500">⌕</span>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        style={{ width: '140px' }}
+                        className="text-center font-semibold"
+                      >
+                        SKU Name <span className="text-gray-500">⌕</span>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        style={{ width: '130px' }}
+                        className="text-center font-semibold"
+                      >
+                        SKU Type <span className="text-gray-500">⌕</span>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        style={{ width: '180px' }}
+                        className="text-center font-semibold"
+                      >
+                        Client <span className="text-gray-500">⌕</span>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        style={{ width: '120px' }}
+                        className="text-center font-semibold"
+                      >
+                        Dimensions
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        style={{ width: '100px' }}
+                        className="text-center font-semibold"
+                      >
+                        Deckle
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        style={{ width: '160px' }}
+                        className="text-center font-semibold"
+                      >
+                        Created Date
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        style={{ width: '100px' }}
+                        className="text-center font-semibold"
+                      >
+                        Action
+                      </CTableHeaderCell>
+                    </>
+                  )}
+                </CTableRow>
+              </CTableHead>
 
+              {/* Table body - scrollable with dynamic height */}
 
-
-
-          {/* Table body - scrollable with dynamic height */}
-
-
-              <CTableBody  className='cursor-pointer'>
+              <CTableBody className="cursor-pointer">
                 {skudata.length > 0 ? (
                   skudata
                     .filter((item) => item?.status === 'active')
@@ -160,88 +189,106 @@ const navigate = useNavigate()
                           if (!e.target.closest('.dropdown')) {
                             setIsMinimized(true)
                             setSelectedSku(cell)
-                            navigate(`/sku/${cell?.id}`);
+                            navigate(`/sku/${cell?.id}`)
                           }
                         }}
-                        className={`border-b text-sm ${
-                          isMinimized ? 'h-10 hover:bg-gray-50' : ''
-                        }`}
+                        className={`border-b text-sm ${isMinimized ? 'h-10 hover:bg-gray-50' : ''}`}
                       >
-                    {isMinimized ? (
-  <>
-    <CTableDataCell className="text-start py-3 text-sm text-black-700 font-semibold">
-      {cell.sku_name || '-'}
-    </CTableDataCell>
-  </>
-) : (
-  <>
-    {/*<CTableDataCell style={{ width: '20px' }} className="text-center">
+                        {isMinimized ? (
+                          <>
+                            <CTableDataCell className="text-start py-3 text-sm text-black-700 font-semibold">
+                              {cell.sku_name || '-'}
+                            </CTableDataCell>
+                          </>
+                        ) : (
+                          <>
+                            {/*<CTableDataCell style={{ width: '20px' }} className="text-center">
     </CTableDataCell>*/}
-    <CTableDataCell style={{ width: '120px' }} className="text-center text-gray-700">
-      {cell.sku_ui_id}
-    </CTableDataCell>
-    <CTableDataCell style={{ width: '140px' }} className="text-center !text-blue-700 font-semibold">
-      {cell.sku_name}
-    </CTableDataCell>
-    <CTableDataCell style={{ width: '130px' }} className="text-center text-gray-700">
-      {cell.sku_type}
-    </CTableDataCell>
-    <CTableDataCell style={{ width: '180px' }} className="text-center text-gray-700">
-      {cell.client}
-    </CTableDataCell>
-<CTableDataCell style={{ width: '120px' }} className="text-center text-gray-700">
-  {cell.length && cell.width && cell.height ? (
-    `${Number(cell.length) % 1 === 0 ? Number(cell.length) : Number(cell.length).toFixed(2)} x ` +
-    `${Number(cell.width) % 1 === 0 ? Number(cell.width) : Number(cell.width).toFixed(2)} x ` +
-    `${Number(cell.height) % 1 === 0 ? Number(cell.height) : Number(cell.height).toFixed(2)}`
-  ) : (
-    '-'
-  )}
-</CTableDataCell>
+                            <CTableDataCell
+                              style={{ width: '120px' }}
+                              className="text-center text-gray-700"
+                            >
+                              {cell.sku_ui_id}
+                            </CTableDataCell>
+                            <CTableDataCell
+                              style={{ width: '140px' }}
+                              className="text-center text-gray-700"
+                            >
+                              {cell.sku_name}
+                            </CTableDataCell>
+                            <CTableDataCell
+                              style={{ width: '130px' }}
+                              className="text-center text-gray-700"
+                            >
+                              {cell.sku_type}
+                            </CTableDataCell>
+                            <CTableDataCell
+                              style={{ width: '180px' }}
+                              className="text-center text-gray-700"
+                            >
+                              {cell.client}
+                            </CTableDataCell>
+                            <CTableDataCell
+                              style={{ width: '120px' }}
+                              className="text-center text-gray-700"
+                            >
+                              {cell.length && cell.width && cell.height
+                                ? `${Number(cell.length) % 1 === 0 ? Number(cell.length) : Number(cell.length).toFixed(2)} x ` +
+                                  `${Number(cell.width) % 1 === 0 ? Number(cell.width) : Number(cell.width).toFixed(2)} x ` +
+                                  `${Number(cell.height) % 1 === 0 ? Number(cell.height) : Number(cell.height).toFixed(2)}`
+                                : '-'}
+                            </CTableDataCell>
 
-    <CTableDataCell style={{ width: '100px' }} className="text-center text-gray-700">
-      {cell.deckle_size}
-    </CTableDataCell>
-    <CTableDataCell style={{ width: '160px' }} className="text-center text-gray-700">
-    {moment(cell.updated_at).format('DD/MM/YYYY')}
-    </CTableDataCell>
-    <CTableDataCell style={{ width: '100px' }} className="text-center py-2 text-gray-700">
-      <div className="flex justify-center">
-        <ThreeDotMenu
-          value={[
-            //{
-            //  label: 'View',
-            //  icon: cilHandPointRight,
-            //  onClick: () => setShowPopUp(cell.id),
-            //},
-            {
-              label: 'Edit',
-              icon: cilPencil,
-              onClick: () => {
-                setErrors({});
-                dispatch({ type: 'RESET_DIECUT_CALCULATIONS' });
-                dispatch({ type: 'SET_SELECTED_ROUTE_IDS', payload: [] });
-                dispatch({
-                  type: 'SET_DECKLE_SIZE',
-                  payload: { deckle_size: '', deckleError: '' },
-                });
-                //handleSkuEdit(cell.id);
-            navigate(`/skuForm/${cell.id}`);
-
-              },
-            },
-            {
-              label: 'Delete',
-              icon: cilTrash,
-              onClick: () => openDeleteModal(cell.id),
-            },
-          ]}
-        />
-      </div>
-    </CTableDataCell>
-  </>
-)}
-
+                            <CTableDataCell
+                              style={{ width: '100px' }}
+                              className="text-center text-gray-700"
+                            >
+                              {cell.deckle_size}
+                            </CTableDataCell>
+                            <CTableDataCell
+                              style={{ width: '160px' }}
+                              className="text-center text-gray-700"
+                            >
+                              {cell.updated_at}
+                            </CTableDataCell>
+                            <CTableDataCell
+                              style={{ width: '100px' }}
+                              className="text-center py-2 text-gray-700"
+                            >
+                              <div className="flex justify-center">
+                                <ThreeDotMenu
+                                  value={[
+                                    //{
+                                    //  label: 'View',
+                                    //  icon: cilHandPointRight,
+                                    //  onClick: () => setShowPopUp(cell.id),
+                                    //},
+                                    {
+                                      label: 'Edit',
+                                      icon: cilPencil,
+                                      onClick: () => {
+                                        setErrors({})
+                                        dispatch({ type: 'RESET_DIECUT_CALCULATIONS' })
+                                        dispatch({ type: 'SET_SELECTED_ROUTE_IDS', payload: [] })
+                                        dispatch({
+                                          type: 'SET_DECKLE_SIZE',
+                                          payload: { deckle_size: '', deckleError: '' },
+                                        })
+                                        //handleSkuEdit(cell.id);
+                                        navigate(`/skuForm/${cell.id}`)
+                                      },
+                                    },
+                                    {
+                                      label: 'Delete',
+                                      icon: cilTrash,
+                                      onClick: () => openDeleteModal(cell.id),
+                                    },
+                                  ]}
+                                />
+                              </div>
+                            </CTableDataCell>
+                          </>
+                        )}
                       </CTableRow>
                     ))
                 ) : (

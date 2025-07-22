@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import {clientApi} from '../../api/client'
+import { clientApi } from '../../api/client'
 import ClientTable from './ClientTable'
 import ClientForm from './ClientForm'
 import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'
@@ -40,28 +40,22 @@ function ClientList() {
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
-  const [status,setStatus]=useState("active")
-    const [singleStatusUpdate,setSingleStatusUpdate]=useState(false)
+  const [status, setStatus] = useState('active')
+  const [singleStatusUpdate, setSingleStatusUpdate] = useState(false)
 
-
-   const { setGlobalPlaceholder, searchQuery  } = useSearch()
+  const { setGlobalPlaceholder, searchQuery } = useSearch()
   const selectionFrame = {
     vendor: { id: 1, name: 'vendor', image: vendorImg },
     client: { id: 2, name: 'client', image: clientImg },
   }
 
   useEffect(() => {
-    if (clientListRef.current) {
-      console.log('ClientList width:', clientListRef.current.offsetWidth, 'px')
-    }
-  }, [])
-    useEffect(() => {
     // Set the placeholder when component mounts
-    setGlobalPlaceholder("Search clients....")
-    
+    setGlobalPlaceholder('Search clients....')
+
     // Clean up when component unmounts
     return () => {
-      setGlobalPlaceholder("Search...") // Reset to default
+      setGlobalPlaceholder('Search...') // Reset to default
     }
   }, [setGlobalPlaceholder])
 
@@ -96,7 +90,7 @@ function ClientList() {
           limit: entriesPerPage,
           page: currentPage,
           entity_type: selectedFilter,
-          status:status
+          status: status,
         }
         const response = await clientApi.getClients(queryParams)
         setData(response?.data || [])
@@ -110,7 +104,15 @@ function ClientList() {
     }
     fetchClientData()
     setSingleStatusUpdate(false)
-  }, [reloadData, searchQuery, entriesPerPage, currentPage, selectedFilter,status,singleStatusUpdate])
+  }, [
+    reloadData,
+    searchQuery,
+    entriesPerPage,
+    currentPage,
+    selectedFilter,
+    status,
+    singleStatusUpdate,
+  ])
 
   const handleEntriesChange = (newEntries) => {
     setEntriesPerPage(newEntries)
@@ -142,8 +144,8 @@ function ClientList() {
     setShowAddDropdown(false)
     setDrawerOpen(true)
     navigate(`/clients/clientForm`, {
-    state: { entityType: type },
-  });
+      state: { entityType: type },
+    })
   }
 
   const handleSelection = (selection) => {
@@ -220,11 +222,6 @@ function ClientList() {
             onAddClick={handleAddEntityClick}
             menuOptions={[
               {
-                icon: <FiUpload className="mr-2 text-blue-500" />,
-                label: 'Import',
-                onClick: () => console.log('Import clicked'),
-              },
-              {
                 icon: <FiDownload className="mr-2 text-blue-500" />,
                 label: 'Export',
                 onClick: downloadClientExcelSheet,
@@ -234,17 +231,17 @@ function ClientList() {
               {
                 label: 'All Clients',
                 icon: <FaUserGroup size={16} />,
-                onClick: () =>  setStatus(""),
+                onClick: () => setStatus(''),
               },
               {
                 label: 'Active Clients',
                 icon: <FaUserCheck size={16} />,
-                onClick: () => setStatus("active"),
+                onClick: () => setStatus('active'),
               },
               {
                 label: 'Inactive Clients',
                 icon: <FaUserSlash size={16} />,
-                 onClick: () => setStatus("inactive"),
+                onClick: () => setStatus('inactive'),
               },
             ]}
           />
@@ -252,7 +249,7 @@ function ClientList() {
           {showAddDropdown && (
             <div
               ref={dropdownRef}
-              className="absolute right-4 mt-1 w-32 bg-white rounded-md shadow-lg z-50 border border-gray-200 mr-4"
+              className="absolute top-full right-0 mt-2 w-36 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]"
             >
               <ul className="py-1 m-1">
                 <li
@@ -278,7 +275,7 @@ function ClientList() {
 
         <div className="mt-3 overflow-x-auto">
           <ClientTable
-          setSingleStatusUpdate={setSingleStatusUpdate}
+            setSingleStatusUpdate={setSingleStatusUpdate}
             isMinimized={isMinimized}
             refreshClients={refreshClients}
             clientdata={data}

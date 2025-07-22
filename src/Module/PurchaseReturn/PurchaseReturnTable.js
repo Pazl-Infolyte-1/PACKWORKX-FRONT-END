@@ -17,11 +17,18 @@ import ReusableTable from '../SalesOrder/ReusableTable'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
 import { useNavigate } from 'react-router-dom'
 
-const PurchaseReturnTable = ({ porData, setPoData, setAlerts, handleEdit ,isMinimiseTable ,setIsMinimiseTable}) => {
+const PurchaseReturnTable = ({
+  porData,
+  setPoData,
+  setAlerts,
+  fetchData,
+  isMinimiseTable,
+  setIsMinimiseTable,
+}) => {
   const [confirmModal, setConfirmModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [openPOModal, setOpenPoReturnModal] = useState(false)
-const navigate = useNavigate()
+  const navigate = useNavigate()
   const closeDeleteModal = () => {
     setConfirmModal(false)
   }
@@ -36,7 +43,7 @@ const navigate = useNavigate()
       const response = await purchaseOrderApi.deletePoReturn(deleteId)
       if (response.status === 200) {
         setConfirmModal(false)
-        setPoData((prev) => prev.filter((item) => item.id !== deleteId))
+        fetchData()
 
         setAlerts([{ severity: 'error', message: 'Purchase Ordern Return deleted successfully!' }])
       }
@@ -78,7 +85,6 @@ const navigate = useNavigate()
       key: 'return_date',
       header: 'Return Date ',
       field: 'return_date',
-      type: 'date',
     },
     {
       key: 'reason',
@@ -108,9 +114,9 @@ const navigate = useNavigate()
               icon: cilHandPointRight,
               onClick: () => {
                 //setOpenPoReturnModal({ open: true, id: row.id })
-                  setIsMinimiseTable(true)
-      navigate(`/purchase-return/${row.id}`)
-            },
+                setIsMinimiseTable(true)
+                navigate(`/purchase-return/${row.id}`)
+              },
             },
             // {
             //   label: 'Edit',
@@ -120,17 +126,17 @@ const navigate = useNavigate()
             {
               label: 'Delete',
               icon: cilTrash,
-              onClick: () => openDeleteModal(item.id),
+              onClick: () => openDeleteModal(row.id),
             },
           ]}
         />
       ),
     },
   ]
-    const handleView = (row) => {
-      setIsMinimiseTable(true)
-      navigate(`/purchase-return/${row.id}`)
-    }
+  const handleView = (row) => {
+    setIsMinimiseTable(true)
+    navigate(`/purchase-return/${row.id}`)
+  }
 
   return (
     <>
@@ -139,11 +145,9 @@ const navigate = useNavigate()
           data={porData}
           columns={columns}
           //handleRowClick={(row) => setOpenPoReturnModal({ open: true, id: row.id })}
-                    handleRowClick={(row) => handleView(row)}
-
-                    isMinimiseTable={isMinimiseTable}
+          handleRowClick={(row) => handleView(row)}
+          isMinimiseTable={isMinimiseTable}
           miniScreenFields={['purchase_return_generate_id']}
-
         />
       </div>
       <ConfirmationModale

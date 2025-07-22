@@ -14,7 +14,6 @@ const columns = [
     key: 'created_at',
     field: 'created_at',
     header: 'Date',
-    type: 'date',
   },
   {
     key: 'status',

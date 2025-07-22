@@ -72,7 +72,6 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh, isMi
 
     try {
       const response = await grnApi.editGrn(payload)
-      console.log('Response:', response)
 
       setAlerts([{ severity: 'success', message: 'Status updated successfully' }])
       setRefresh((prev) => !prev)
@@ -139,7 +138,7 @@ const GrnTable = ({ grnData, setGrnData, setAlerts, handleEdit, setRefresh, isMi
 
         return (
           <span
-            className={`px-2 py-1 rounded-full text-xs font-semibold -ml-11 w-28 text-center inline-block
+            className={`px-2 py-1 mx-1 rounded-full text-xs font-semibold -ml-11 w-28 text-center inline-block
           ${row.grn_status === 'partially_received' ? 'bg-blue-100 text-blue-800' : ''}
           ${row.grn_status === 'fully_received' ? 'bg-green-100 text-green-800' : ''}
           ${row.grn_status === 'returned' ? 'bg-red-100 text-red-800' : ''}

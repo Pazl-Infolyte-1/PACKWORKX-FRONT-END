@@ -62,7 +62,7 @@ function RSCBox({
   uploadedFiles,
   setUploadedFiles,
   rscUnits,
-  taxMaster
+  taxMaster,
 }) {
   const [alerts, setAlerts] = useState([])
   const [unitTooltip, setUnitTooltip] = useState('Enter Millimeter')
@@ -85,7 +85,7 @@ function RSCBox({
   const [fullRouteResponse, setFullRouteResponse] = useState(null)
   const [displayAsChips, setDisplayAsChips] = useState([])
   const [isUploading, setIsUploading] = useState(false)
-  const [helperBoard,setHelperBoard] = useState(0)
+  const [helperBoard, setHelperBoard] = useState(0)
   //const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
   const [fileNames, setFileNames] = useState([])
   const ITEM_HEIGHT = 48
@@ -126,10 +126,10 @@ function RSCBox({
     const upsval = parseFloat(data.ups) || 0
     const flapWidth = Number(parseFloat(data.flap_width)) || 0
 
-    const lengthBoardSize = ((length + width) * 2) + lengthTrimmingTolerance + flapWidth
-    const widthBoardSize = ((width + height)*upsval) + widthTrimmingTolerance
-        const widthBoardSizeHelper= ((width + height)*1) + widthTrimmingTolerance
-setHelperBoard(widthBoardSizeHelper)
+    const lengthBoardSize = (length + width) * 2 + lengthTrimmingTolerance + flapWidth
+    const widthBoardSize = (width + height) * upsval + widthTrimmingTolerance
+    const widthBoardSizeHelper = (width + height) * 1 + widthTrimmingTolerance
+    setHelperBoard(widthBoardSizeHelper)
     const totalBoardSize = lengthBoardSize * widthBoardSize
     //const deckleSizeVal = widthBoardSize * upsval
     const EPSILON = 0.001
@@ -236,9 +236,7 @@ setHelperBoard(widthBoardSizeHelper)
 
   const handleUnitChange = (e) => {
     const newUnit = e.target.value
-    console.log('Unit changed to:', newUnit)
     setRscUnits(newUnit)
-    console.log('Previous unit:', addNewSkuData.unit)
     setUnitTooltip(
       newUnit === 'mm'
         ? 'Enter Millimeter'
@@ -268,10 +266,6 @@ setHelperBoard(widthBoardSizeHelper)
 
       const length_board_size_cm2 = convertValue(prev.length_board_size_cm2)
       const width_board_size_cm2 = convertValue(prev.width_board_size_cm2)
-
-      console.log('convert value', parseInt(convertValue(prev.length)))
-      console.log('convert value', parseInt(convertValue(prev.width)))
-      console.log('convert value', parseInt(convertValue(prev.height)))
 
       return {
         ...prev,
@@ -541,9 +535,6 @@ setHelperBoard(widthBoardSizeHelper)
   //  }
   //}, [addNewSkuData.length, addNewSkuData.width, addNewSkuData.height])
 
-  console.log('length height', addNewSkuData.length)
-  console.log('length height', addNewSkuData.height)
-  console.log('ups', addNewSkuData.ups)
   useEffect(() => {
     let { length, height, ups } = addNewSkuData
 
@@ -566,7 +557,6 @@ setHelperBoard(widthBoardSizeHelper)
       }))
     }
   }, [deckleSize])
-  console.log('deckle size', deckleSize)
   useEffect(() => {
     if (
       addNewSkuData.inner_outer_dimension === null ||
@@ -632,64 +622,59 @@ setHelperBoard(widthBoardSizeHelper)
   }
 
   //document edit
- useEffect(() => {
-  let parsedDocuments = []
+  useEffect(() => {
+    let parsedDocuments = []
 
-  try {
-    parsedDocuments = Array.isArray(addNewSkuData.documents)
-      ? addNewSkuData.documents
-      : JSON.parse(addNewSkuData.documents || '[]')
-  } catch (err) {
-    console.error('Invalid documents format', err)
-    parsedDocuments = []
-  }
-
-  // Clear files if print_type is 'None'
-  if (addNewSkuData.print_type === 'None') {
-    if (uploadedFiles.length > 0 || parsedDocuments.length > 0) {
-      setUploadedFiles([])
-      setFileNames([])
-
-      if (parsedDocuments.length > 0) {
-        setAddNewSkuData((prev) => ({
-          ...prev,
-          documents: [],
-        }))
-      }
+    try {
+      parsedDocuments = Array.isArray(addNewSkuData.documents)
+        ? addNewSkuData.documents
+        : JSON.parse(addNewSkuData.documents || '[]')
+    } catch (err) {
+      console.error('Invalid documents format', err)
+      parsedDocuments = []
     }
-    return
-  }
 
-  // Load files if editing
-  if (editTag && parsedDocuments.length > 0 && uploadedFiles.length === 0) {
-    setUploadedFiles([...parsedDocuments])
-    setFileNames(
-      parsedDocuments.map((file) =>
-        typeof file === 'string' ? file.split('/').pop() : file.name,
-      ),
-    )
-  }
-}, [editTag, addNewSkuData?.print_type])
+    // Clear files if print_type is 'None'
+    if (addNewSkuData.print_type === 'None') {
+      if (uploadedFiles.length > 0 || parsedDocuments.length > 0) {
+        setUploadedFiles([])
+        setFileNames([])
 
+        if (parsedDocuments.length > 0) {
+          setAddNewSkuData((prev) => ({
+            ...prev,
+            documents: [],
+          }))
+        }
+      }
+      return
+    }
 
+    // Load files if editing
+    if (editTag && parsedDocuments.length > 0 && uploadedFiles.length === 0) {
+      setUploadedFiles([...parsedDocuments])
+      setFileNames(
+        parsedDocuments.map((file) =>
+          typeof file === 'string' ? file.split('/').pop() : file.name,
+        ),
+      )
+    }
+  }, [editTag, addNewSkuData?.print_type])
 
   useEffect(() => {
-  if (addNewSkuData.sku_name && addNewSkuData.customer_reference) {
-    setAddNewSkuData((prev) => ({
-      ...prev,
-      reference_number: `${prev.sku_name}/${prev.customer_reference}`,
-    }));
-  } else {
-    setAddNewSkuData((prev) => ({
-      ...prev,
-      reference_number: '',
-    }));
-  }
-}, [addNewSkuData.sku_name, addNewSkuData.customer_reference]);
+    if (addNewSkuData.sku_name && addNewSkuData.customer_reference) {
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        reference_number: `${prev.sku_name}/${prev.customer_reference}`,
+      }))
+    } else {
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        reference_number: '',
+      }))
+    }
+  }, [addNewSkuData.sku_name, addNewSkuData.customer_reference])
 
-
-console.log("unit///",rscUnits)
-console.log("rsccc",addNewSkuData)
   return (
     <div className="rounded-lg ">
       <CustomAlert alerts={alerts} handleClose={handleClose} />
@@ -784,25 +769,23 @@ console.log("rsccc",addNewSkuData)
                       paddingY: 0,
                     },
                   }}
-                renderValue={(selected) => {
-    // Show placeholder if none selected
-    if (!selected) return <em>Select</em>;
+                  renderValue={(selected) => {
+                    // Show placeholder if none selected
+                    if (!selected) return <em>Select</em>
 
-    // Show display_name of matched client_id
-    const selectedClient = client.find(
-      (item) => item.client_id === selected
-    );
-    return selectedClient ? selectedClient?.display_name : 'Unknown';
-  }}
->
-  <MenuItem value="" disabled>
-    <em>Select</em>
-  </MenuItem>
-  {client?.map((item) => (
-    <MenuItem key={item?.client_id} value={item?.client_id}>
-      {item?.display_name}
-    </MenuItem>
-  ))}
+                    // Show display_name of matched client_id
+                    const selectedClient = client.find((item) => item.client_id === selected)
+                    return selectedClient ? selectedClient?.display_name : 'Unknown'
+                  }}
+                >
+                  <MenuItem value="" disabled>
+                    <em>Select</em>
+                  </MenuItem>
+                  {client?.map((item) => (
+                    <MenuItem key={item?.client_id} value={item?.client_id}>
+                      {item?.display_name}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
 
@@ -845,7 +828,7 @@ console.log("rsccc",addNewSkuData)
             id="reference_number"
             name="reference_number"
             //value={Number(addNewSkuData.reference_number) || null}
-                value={addNewSkuData.reference_number || ''}
+            value={addNewSkuData.reference_number || ''}
             onChange={handleChange}
             className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             readOnly
@@ -859,10 +842,11 @@ console.log("rsccc",addNewSkuData)
             <select
               value={addNewSkuData.unit || rscUnits}
               onChange={handleUnitChange}
-               disabled={editTag}
-  className={`w-full appearance-none bg-gray-700 text-white py-1.5 px-2 pr-7 rounded-md text-sm transition-colors focus:outline-none ${
-    editTag ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-400'
-  }`}            >
+              disabled={editTag}
+              className={`w-full appearance-none bg-gray-700 text-white py-1.5 px-2 pr-7 rounded-md text-sm transition-colors focus:outline-none ${
+                editTag ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-400'
+              }`}
+            >
               <option value="mm" className="bg-white text-gray-800">
                 mm
               </option>
@@ -890,27 +874,27 @@ console.log("rsccc",addNewSkuData)
           />
         </div>
 
-        <Tooltip title={unitTooltip}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Dimensions <span className="text-gray-500 text-xs">(L × W × H)</span>
-              <span className="text-red-500 ml-1">*</span>
-              {/*{errors.width === 'Required' &&
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Dimensions <span className="text-gray-500 text-xs">(L × W × H)</span>
+            <span className="text-red-500 ml-1">*</span>
+            {/*{errors.width === 'Required' &&
                 errors.length === 'Required' &&
                 errors.height === 'Required' && (
                   <span className="text-red-500 text-xs ml-2 align-middle">Required</span>
                 )}*/}
-            </label>
+          </label>
 
-            <div
-              className={`h-8 w-[200px] rounded-md flex items-center bg-white ${
-                errors.width === 'Required' ||
-                errors.length === 'Required' ||
-                errors.height === 'Required'
-                  ? 'border-2 border-red-500'
-                  : 'border border-gray-300'
-              }`}
-            >
+          <div
+            className={`h-8 w-[200px] rounded-md flex items-center bg-white ${
+              errors.width === 'Required' ||
+              errors.length === 'Required' ||
+              errors.height === 'Required'
+                ? 'border-2 border-red-500'
+                : 'border border-gray-300'
+            }`}
+          >
+            <Tooltip title={unitTooltip} placement="top">
               <input
                 min="0"
                 id="length"
@@ -919,7 +903,7 @@ console.log("rsccc",addNewSkuData)
                 value={Math.round(Number(addNewSkuData.length) * 100) / 100 || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
-                    inputMode="numeric"
+                inputMode="numeric"
                 onKeyPress={(e) => {
                   // Only allow numbers 0-9
                   if (!/[0-9]/.test(e.key)) {
@@ -928,7 +912,9 @@ console.log("rsccc",addNewSkuData)
                 }}
                 className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-l-md"
               />
-              <span className="text-gray-500 px-1">x</span>
+            </Tooltip>
+            <span className="text-gray-500 px-1">x</span>
+            <Tooltip title={unitTooltip} placement="top">
               <input
                 id="width"
                 name="width"
@@ -937,7 +923,7 @@ console.log("rsccc",addNewSkuData)
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
                 min="0"
-                    inputMode="numeric"
+                inputMode="numeric"
                 onKeyPress={(e) => {
                   // Only allow numbers 0-9
                   if (!/[0-9]/.test(e.key)) {
@@ -946,7 +932,9 @@ console.log("rsccc",addNewSkuData)
                 }}
                 className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-              <span className="text-gray-500 px-1">x</span>
+            </Tooltip>
+            <span className="text-gray-500 px-1">x</span>
+            <Tooltip title={unitTooltip} placement="top">
               <input
                 id="height"
                 name="height"
@@ -954,7 +942,7 @@ console.log("rsccc",addNewSkuData)
                 value={Math.round(Number(addNewSkuData.height) * 100) / 100 || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
-                    inputMode="numeric"
+                inputMode="numeric"
                 onKeyPress={(e) => {
                   // Only allow numbers 0-9
                   if (!/[0-9]/.test(e.key)) {
@@ -963,20 +951,20 @@ console.log("rsccc",addNewSkuData)
                 }}
                 className="w-[55px] p-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-            </div>
+            </Tooltip>
           </div>
-        </Tooltip>
+        </div>
 
-        <Tooltip title={unitTooltip}>
-          <div className="flex gap-3">
-            <div className="w-1/2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Joints
-                <span className="text-red-500 ml-1">*</span>
-                {/*{errors.joints && (
+        <div className="flex gap-3">
+          <div className="w-1/2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Joints
+              <span className="text-red-500 ml-1">*</span>
+              {/*{errors.joints && (
                   <span className="text-red-500 text-xs ml-2 align-middle">{errors.joints}</span>
                 )}*/}
-              </label>
+            </label>
+            <Tooltip title={unitTooltip} placement="top">
               <input
                 id="joints"
                 name="joints"
@@ -995,20 +983,22 @@ console.log("rsccc",addNewSkuData)
                   errors.joints ? 'border-2 border-red-500' : 'border border-gray-300'
                 }`}
               />
-            </div>
+            </Tooltip>
+          </div>
 
-            <div className="w-1/2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Deckle Size
-                <span className="text-red-500 ml-1">*</span>
-              </label>
+          <div className="w-1/2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Deckle Size
+              <span className="text-red-500 ml-1">*</span>
+            </label>
+            <Tooltip title={unitTooltip} placement="top">
               <input
                 id="deckle_size"
                 name="deckle_size"
                 value={Number(toThreeDecimalFixed(addNewSkuData.deckle_size)) || ''}
                 onChange={modifiedHandleChange}
                 readOnly={editTag}
-                    inputMode="numeric"
+                inputMode="numeric"
                 onKeyPress={(e) => {
                   // Only allow numbers 0-9
                   if (!/[0-9]/.test(e.key)) {
@@ -1020,13 +1010,13 @@ console.log("rsccc",addNewSkuData)
                   errors.deckle_size ? 'border-2 border-red-500' : 'border border-gray-300'
                 }`}
               />
-              <p className="text-[10px] text-gray-500 mt-1">
-                {/*Deckle should be greater than (({Math.round(Number(addNewSkuData?.length) * 100) / 100 || ''} + {Math.round(Number(addNewSkuData?.height) * 100) / 100 || ''}) × {Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}) + 20*/}
-                Deckle should be greater than {deckleSize}
-              </p>
-            </div>
+            </Tooltip>
+            <p className="text-[10px] text-gray-500 mt-1">
+              {/*Deckle should be greater than (({Math.round(Number(addNewSkuData?.length) * 100) / 100 || ''} + {Math.round(Number(addNewSkuData?.height) * 100) / 100 || ''}) × {Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}) + 20*/}
+              Deckle should be greater than {deckleSize}
+            </p>
           </div>
-        </Tooltip>
+        </div>
 
         <div className="w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1067,34 +1057,34 @@ console.log("rsccc",addNewSkuData)
           </div>
         </div>
 
-        <Tooltip title={unitTooltip}>
-          <div className="w-[200px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Flap Width
-              <span className="text-red-500 ml-1">*</span>
-              {/*{errors.flap_width && (
+        <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Flap Width
+            <span className="text-red-500 ml-1">*</span>
+            {/*{errors.flap_width && (
                 <span className="text-red-500 text-sm ml-2 align-middle">{errors.flap_width}</span>
               )}*/}
-            </label>
+          </label>
+          <Tooltip title={unitTooltip} placement="top">
             <input
               id="flap_width"
               name="flap_width"
-              value={Number(addNewSkuData.flap_width) || ""}
+              value={Number(addNewSkuData.flap_width) || ''}
               onChange={modifiedHandleChange}
               readOnly={editTag}
               className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                 errors.flap_width ? 'border-2 border-red-500' : 'border border-gray-300'
               }`}
-                  inputMode="numeric"
-                onKeyPress={(e) => {
-                  // Only allow numbers 0-9
-                  if (!/[0-9]/.test(e.key)) {
-                    e.preventDefault()
-                  }
-                }}
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
             />
-          </div>
-        </Tooltip>
+          </Tooltip>
+        </div>
 
         {/* <div className="w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1113,24 +1103,24 @@ console.log("rsccc",addNewSkuData)
           />
         </div> */}
 
-        <Tooltip title={unitTooltip}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Board Size <span className="text-gray-500 text-xs">(W × L)</span>
-              <span className="text-red-500 ml-1">*</span>
-              {/*{errors.width_board_size_cm2 && errors.length_board_size_cm2 && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Board Size <span className="text-gray-500 text-xs">(W × L)</span>
+            <span className="text-red-500 ml-1">*</span>
+            {/*{errors.width_board_size_cm2 && errors.length_board_size_cm2 && (
                 <span className="text-red-500 text-xs ml-2 align-middle">
                   {errors.width_board_size_cm2}
                 </span>
               )}*/}
-            </label>
-            <div
-              className={`h-8 w-[200px] rounded-md flex items-center bg-white ${
-                errors.width_board_size_cm2 || errors.length_board_size_cm2
-                  ? 'border-2 border-red-500'
-                  : 'border border-gray-300'
-              }`}
-            >
+          </label>
+          <div
+            className={`h-8 w-[200px] rounded-md flex items-center bg-white ${
+              errors.width_board_size_cm2 || errors.length_board_size_cm2
+                ? 'border-2 border-red-500'
+                : 'border border-gray-300'
+            }`}
+          >
+            <Tooltip title={unitTooltip} placement="top">
               <input
                 id="width_board_size_cm2"
                 name="width_board_size_cm2"
@@ -1140,7 +1130,9 @@ console.log("rsccc",addNewSkuData)
                 title={unitTooltip}
                 readOnly
               />
-              <span className="flex items-center justify-center text-gray-500 text-sm">x</span>
+            </Tooltip>
+            <span className="flex items-center justify-center text-gray-500 text-sm">x</span>
+            <Tooltip title={unitTooltip} placement="top">
               <input
                 id="length_board_size_cm2"
                 name="length_board_size_cm2"
@@ -1150,14 +1142,14 @@ console.log("rsccc",addNewSkuData)
                 title={unitTooltip}
                 readOnly
               />
-            </div>
-              <p className="text-[10px] text-gray-500 mt-1">
-                {/*Deckle should be greater than (({Math.round(Number(addNewSkuData?.length) * 100) / 100 || ''} + {Math.round(Number(addNewSkuData?.height) * 100) / 100 || ''}) × {Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}) + 20*/}
-                {/*Board width per UPS {Math.round((addNewSkuData.width_board_size_cm2)/(((addNewSkuData?.ups) * 100)/100))}*/}
-                Board width per UPS {helperBoard}
-              </p>
+            </Tooltip>
           </div>
-        </Tooltip>
+          <p className="text-[10px] text-gray-500 mt-1">
+            {/*Deckle should be greater than (({Math.round(Number(addNewSkuData?.length) * 100) / 100 || ''} + {Math.round(Number(addNewSkuData?.height) * 100) / 100 || ''}) × {Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}) + 20*/}
+            {/*Board width per UPS {Math.round((addNewSkuData.width_board_size_cm2)/(((addNewSkuData?.ups) * 100)/100))}*/}
+            Board width per UPS {helperBoard}
+          </p>
+        </div>
 
         <div className="w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1167,36 +1159,38 @@ console.log("rsccc",addNewSkuData)
               <span className="text-red-500 text-sm ml-2 align-middle">{errors.ups}</span>
             )}*/}
           </label>
-          <input
-            id="ups"
-            name="ups"
-            value={Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}
-            onChange={modifiedHandleChange}
-            readOnly={editTag}
-            className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-              errors.ups ? 'border-2 border-red-500' : 'border border-gray-300'
-            }`}
-                inputMode="numeric"
-                onKeyPress={(e) => {
-                  // Only allow numbers 0-9
-                  if (!/[0-9]/.test(e.key)) {
-                    e.preventDefault()
-                  }
-                }}
-          />
+          <Tooltip title={unitTooltip} placement="top">
+            <input
+              id="ups"
+              name="ups"
+              value={Math.round(Number(addNewSkuData?.ups) * 100) / 100 || ''}
+              onChange={modifiedHandleChange}
+              readOnly={editTag}
+              className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.ups ? 'border-2 border-red-500' : 'border border-gray-300'
+              }`}
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
+            />
+          </Tooltip>
         </div>
 
-        <Tooltip title={unitTooltip}>
-          <div className="w-[200px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Length Trimming Tolereance
-              <span className="text-red-500 ml-1">*</span>
-              {/*{errors.length_trimming_tolerance && (
+        <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Length Trimming Tolereance
+            <span className="text-red-500 ml-1">*</span>
+            {/*{errors.length_trimming_tolerance && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.length_trimming_tolerance}
                 </span>
               )}*/}
-            </label>
+          </label>
+          <Tooltip title={unitTooltip} placement="top">
             <input
               id="length_trimming_tolerance"
               name="length_trimming_tolerance"
@@ -1210,28 +1204,28 @@ console.log("rsccc",addNewSkuData)
                   ? 'border-2 border-red-500'
                   : 'border border-gray-300'
               }`}
-                  inputMode="numeric"
-                onKeyPress={(e) => {
-                  // Only allow numbers 0-9
-                  if (!/[0-9]/.test(e.key)) {
-                    e.preventDefault()
-                  }
-                }}
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
             />
-          </div>
-        </Tooltip>
+          </Tooltip>
+        </div>
 
-        <Tooltip title={unitTooltip}>
-          <div className="w-[200px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Width Trimming Tolereance
-              <span className="text-red-500 ml-1">*</span>
-              {/*{errors.width_trimming_tolerance && (
+        <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Width Trimming Tolereance
+            <span className="text-red-500 ml-1">*</span>
+            {/*{errors.width_trimming_tolerance && (
                 <span className="text-red-500 text-sm ml-2 align-middle">
                   {errors.width_trimming_tolerance}
                 </span>
               )}*/}
-            </label>
+          </label>
+          <Tooltip title={unitTooltip} placement="top">
             <input
               id="width_trimming_tolerance"
               name="width_trimming_tolerance"
@@ -1243,16 +1237,16 @@ console.log("rsccc",addNewSkuData)
                   ? 'border-2 border-red-500'
                   : 'border border-gray-300'
               }`}
-                  inputMode="numeric"
-                onKeyPress={(e) => {
-                  // Only allow numbers 0-9
-                  if (!/[0-9]/.test(e.key)) {
-                    e.preventDefault()
-                  }
-                }}
+              inputMode="numeric"
+              onKeyPress={(e) => {
+                // Only allow numbers 0-9
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
             />
-          </div>
-        </Tooltip>
+          </Tooltip>
+        </div>
 
         <div className="w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1269,18 +1263,18 @@ console.log("rsccc",addNewSkuData)
             name="minimum_order_level"
             type="number"
             min="0"
-            value={Number(addNewSkuData.minimum_order_level) || ""}
+            value={Number(addNewSkuData.minimum_order_level) || ''}
             onChange={handleChange}
             className={`w-full p-1 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
               errors.minimum_order_level ? 'border-2 border-red-500' : 'border border-gray-300'
             }`}
-                inputMode="numeric"
-                onKeyPress={(e) => {
-                  // Only allow numbers 0-9
-                  if (!/[0-9]/.test(e.key)) {
-                    e.preventDefault()
-                  }
-                }}
+            inputMode="numeric"
+            onKeyPress={(e) => {
+              // Only allow numbers 0-9
+              if (!/[0-9]/.test(e.key)) {
+                e.preventDefault()
+              }
+            }}
           />
         </div>
         <ChipSelectorWithBrowse
@@ -1293,26 +1287,25 @@ console.log("rsccc",addNewSkuData)
           errors={errors}
         />
 
-      <div className="w-[200px]">
-  <label className="block text-sm font-medium text-gray-700 mb-2">Tax Master</label>
-  <select
-    id="gst_percentage"
-    name="gst_percentage"
-    value={addNewSkuData?.gst_percentage || ''}
-    onChange={handleChange}
-    className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-  >
-    <option value="">Select Tax</option>
-    {taxMaster
-      //?.filter((tax) => tax.deleted_at === null)
-      .map((tax) => (
-        <option key={tax.id} value={tax.rate_percent}>
-          {tax.rate_percent}%
-        </option>
-      ))}
-  </select>
-</div>
-
+        <div className="w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Tax Master</label>
+          <select
+            id="gst_percentage"
+            name="gst_percentage"
+            value={addNewSkuData?.gst_percentage || ''}
+            onChange={handleChange}
+            className="w-full p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          >
+            <option value="">Select Tax</option>
+            {taxMaster
+              //?.filter((tax) => tax.deleted_at === null)
+              .map((tax) => (
+                <option key={tax.id} value={tax.rate_percent}>
+                  {tax.rate_percent}%
+                </option>
+              ))}
+          </select>
+        </div>
 
         <div className="w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">Print Type</label>
@@ -1372,7 +1365,7 @@ console.log("rsccc",addNewSkuData)
                         </div>
                         <button
                           type="button"
-                        disabled={editTag}
+                          disabled={editTag}
                           onClick={() => removeFile(index)}
                           className="ml-1 text-red-500 hover:text-red-700 text-sm"
                         >

@@ -25,6 +25,7 @@ import { machineApi } from '../../../api/machine'
 import { useNavigate, useParams } from 'react-router-dom'
 import CustomAlert from '../../../components/New/CustomAlert'
 import { companyApi } from '../../../api/company'
+import { CTooltip } from '@coreui/react'
 
 const REPORTING_OPTIONS = [
   { id: 1, name: 'Jane Smith' },
@@ -56,6 +57,11 @@ const defaultFormState = {
   image: '',
   country_phonecode: 91,
   country_id: null,
+}
+
+function isValidMobile(mobile) {
+  // Checks for 10 digits, no spaces, no letters
+  return /^[0-9]{10}$/.test(mobile)
 }
 
 function EmployeeForm() {
@@ -325,6 +331,9 @@ function EmployeeForm() {
         errors[field] = 'Required'
       }
     })
+    if (formData.mobile && !isValidMobile(formData.mobile)) {
+      errors.mobile = 'Enter a valid 10-digit mobile number'
+    }
     setValidationErrors(errors)
     if (Object.keys(errors).length > 0) return
 
@@ -970,9 +979,7 @@ function EmployeeForm() {
 
             {/* Password */}
             <div>
-              <h6 className="mb-2">
-                Password <span className="text-red-600">*</span>
-              </h6>
+              <h6 className="mb-2">Password</h6>
               <div className="flex items-center border border-stone-200 rounded-md">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -1419,80 +1426,84 @@ function EmployeeForm() {
                   </div>
                 ))}
               </div>
-              <div className="relative" ref={machineDropdownRef}>
-                <div
-                  className={`flex items-center justify-between border border-stone-200 rounded-md p-1 ${machineList && machineList.length > 0 ? 'cursor-pointer' : 'cursor-not-allowed bg-gray-100'}`}
-                  onClick={() => {
-                    if (machineList && machineList.length > 0) {
-                      setMachineDropdownOpen(!machineDropdownOpen)
-                    }
-                  }}
-                >
-                  <span className="text-zinc-500">
-                    {machineList && machineList.length > 0
-                      ? 'Select Machine as Skill'
-                      : 'No machines available'}
-                  </span>
-                  <span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      height="10"
-                      fill="currentColor"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
-                    </svg>
-                  </span>
-                </div>
-
-                {machineDropdownOpen && (
-                  <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg">
-                    <div className="p-2 border-b">
-                      <input
-                        type="text"
-                        placeholder="Search machines"
-                        className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        value={machineSearchQuery}
-                        onChange={(e) => setMachineSearchQuery(e.target.value)}
-                      />
-                    </div>
-                    <div className="max-h-60 overflow-y-auto">
-                      {machineList && machineList.length > 0 ? (
-                        machineList
-                          .filter((machine) => !skills.includes(machine.machine_name))
-                          .filter((machine) =>
-                            machine.machine_name
-                              .toLowerCase()
-                              .includes(machineSearchQuery.toLowerCase()),
-                          )
-                          .map((machine) => (
-                            <div
-                              key={machine.id}
-                              className="flex items-center px-3 py-1 hover:bg-gray-100 cursor-pointer"
-                              onClick={() => handleAddMachineSkill(machine)}
-                            >
-                              <span>{machine.machine_name}</span>
-                            </div>
-                          ))
-                      ) : (
-                        <div className="px-3 py-1 text-gray-500">No machines available</div>
-                      )}
-                      {machineList &&
-                        machineList.length > 0 &&
-                        machineList.filter(
-                          (machine) =>
-                            !skills.includes(machine.machine_name) &&
-                            machine.machine_name
-                              .toLowerCase()
-                              .includes(machineSearchQuery.toLowerCase()),
-                        ).length === 0 && (
-                          <div className="px-3 py-1 text-gray-500">No matching machines found</div>
-                        )}
-                    </div>
+              <CTooltip content="Select a machine to add as a skill" placement="top">
+                <div className="relative" ref={machineDropdownRef}>
+                  <div
+                    className={`flex items-center justify-between border border-stone-200 rounded-md p-1 ${machineList && machineList.length > 0 ? 'cursor-pointer' : 'cursor-not-allowed bg-gray-100'}`}
+                    onClick={() => {
+                      if (machineList && machineList.length > 0) {
+                        setMachineDropdownOpen(!machineDropdownOpen)
+                      }
+                    }}
+                  >
+                    <span className="text-zinc-500">
+                      {machineList && machineList.length > 0
+                        ? 'Select Machine as Skill'
+                        : 'No machines available'}
+                    </span>
+                    <span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="10"
+                        height="10"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+                      </svg>
+                    </span>
                   </div>
-                )}
-              </div>
+
+                  {machineDropdownOpen && (
+                    <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg">
+                      <div className="p-2 border-b">
+                        <input
+                          type="text"
+                          placeholder="Search machines"
+                          className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          value={machineSearchQuery}
+                          onChange={(e) => setMachineSearchQuery(e.target.value)}
+                        />
+                      </div>
+                      <div className="max-h-60 overflow-y-auto">
+                        {machineList && machineList.length > 0 ? (
+                          machineList
+                            .filter((machine) => !skills.includes(machine.machine_name))
+                            .filter((machine) =>
+                              machine.machine_name
+                                .toLowerCase()
+                                .includes(machineSearchQuery.toLowerCase()),
+                            )
+                            .map((machine) => (
+                              <div
+                                key={machine.id}
+                                className="flex items-center px-3 py-1 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => handleAddMachineSkill(machine)}
+                              >
+                                <span>{machine.machine_name}</span>
+                              </div>
+                            ))
+                        ) : (
+                          <div className="px-3 py-1 text-gray-500">No machines available</div>
+                        )}
+                        {machineList &&
+                          machineList.length > 0 &&
+                          machineList.filter(
+                            (machine) =>
+                              !skills.includes(machine.machine_name) &&
+                              machine.machine_name
+                                .toLowerCase()
+                                .includes(machineSearchQuery.toLowerCase()),
+                          ).length === 0 && (
+                            <div className="px-3 py-1 text-gray-500">
+                              No matching machines found
+                            </div>
+                          )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CTooltip>
               {validationErrors.skills && (
                 <div className="text-red-500 text-xs mt-1 flex items-center">
                   <svg

@@ -13,7 +13,7 @@ import { AuthContext } from '../../Context/AuthContext'
 import { useSearch } from '../../components/New/SearchContext'
 import CustomAlert from '../../components/New/CustomAlert'
 import createInitialSkuData from './CreateInitialSkuData'
-import { useNavigate,Outlet } from 'react-router-dom'
+import { useNavigate, Outlet } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import ContentHeader from '../../components/New/ContentHeader'
 import { FiDownload, FiUpload } from 'react-icons/fi'
@@ -25,8 +25,6 @@ import { setSkuPartValue } from '../../action'
 import { clientApi } from '../../api/client'
 import { skuApi } from '../../api/sku'
 //import { saveSkuFormState } from '../../action'
-
-
 
 function SkuList() {
   const [skuType, setSkuType] = useState([])
@@ -58,78 +56,20 @@ function SkuList() {
   const dispatch = useDispatch()
   const [errors, setErrors] = useState({})
   const [isMinimized, setIsMinimized] = useState(false)
-  const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
+  const [uploadedFiles, setUploadedFiles] = useState([]) // file URLs
   const [validationErrors, setValidationErrors] = useState({})
-    const [loading, setLoading] = useState(false)
-      const [totalRecords, setTotalRecords] = useState(0)
-  const prevLocationRef = useRef(null);
-const [hasMinimized, setHasMinimized] = useState(false);
- const successMessage = location.state?.successMessage;
-   useEffect(() => {
+  const [loading, setLoading] = useState(false)
+  const [totalRecords, setTotalRecords] = useState(0)
+  const prevLocationRef = useRef(null)
+  const [hasMinimized, setHasMinimized] = useState(false)
+  const successMessage = location.state?.successMessage
+  useEffect(() => {
     if (successMessage) {
-      setAlerts([{ severity: 'success', message: successMessage }]);
+      setAlerts([{ severity: 'success', message: successMessage }])
     }
-  }, [successMessage]);
-const navigate=useNavigate()
-  //const [addNewSkuData, setAddNewSkuData] = useState({
-  //  sku_name: null,
-  //  client_id: null,
-  //  client: null,
-  //  ply: null,
-  //  length: null,
-  //  width: null,
-  //  height: null,
-  //  lwh: null,
-  //  unit: 'mm',
-  //  joints: null,
-  //  ups: null,
-  //  select_dies: null,
-  //  no_of_parts: null,
-  //  composite_type: null,
-  //  inner_outer_dimension: 'Inner',
-  //  flap_width: null,
-  //  flap_tolerance: null,
-  //  length_trimming_tolerance: 20,
-  //  width_board_size_cm2: null,
-  //  length_board_size_cm2: null,
-  //  width_trimming_tolerance: 20,
-  //  strict_adherence: strictAdherence,
-  //  customer_reference: null,
-  //  reference_number: null,
-  //  // internal_id: null,
-  //  board_size_cm2: null,
-  //  deckle_size: null,
-  //  minimum_order_level: null,
-  //  sku_type: 'RSC box',
-  //  part_value: [],
-  //  route: [],
-  //  part_count: null,
-  //  estimate_composite_item: null,
-  //  description: null,
-  //  default_sku_details: null,
-  //  documents:[],
-  //  print_type:null,
-  //  tags: {},
-  //  gst_percentage: null,
-  //  total_weight:null,
-  //  total_bursting_strength:null,
-  //  sku_values: [
-  //    {
-  //      layer_id:null,
-  //      layer: null,
-  //      gsm: null,
-  //      bf: null,
-  //      material: null,
-  //      color: null,
-  //      flute_type: null,
-  //      weight: null,
-  //      bursting_strength: null,
-  //      flute_ratio: null,
-  //      layer_status:"ungrouped",
-  //      production_status:" pending"
-  //    },
-  //  ],
-  //})
+  }, [successMessage])
+  const navigate = useNavigate()
+
   const [selectedSku, setSelectedSku] = useState(null)
   useEffect(() => {
     if (location.state?.initialRender) {
@@ -152,30 +92,28 @@ const navigate=useNavigate()
     }
   }, [location.state])
 
-const fetchClient = async () => {
-  if (!skuIdVal) return; // Run only if skuIdVal exists
+  const fetchClient = async () => {
+    if (!skuIdVal) return // Run only if skuIdVal exists
 
-  try {
-    const data = await skuApi.singlesku(skuIdVal);
-    setSelectedSku(data);
-    console.log("sku single data", data);
-  } catch (error) {
-    console.error('Error fetching client:', error);
+    try {
+      const data = await skuApi.singlesku(skuIdVal)
+      setSelectedSku(data)
+    } catch (error) {
+      console.error('Error fetching client:', error)
+    }
   }
-};
 
-const fromWorkOrderView = location.state?.fromWorkOrderView;
-const skuIdVal = location.state?.skuId;
+  const fromWorkOrderView = location.state?.fromWorkOrderView
+  const skuIdVal = location.state?.skuId
 
-useEffect(() => {
-  console.log("fromWorkOrderView:", fromWorkOrderView);
-  console.log("skuIdVal:", skuIdVal);
+  useEffect(() => {
 
-  if (fromWorkOrderView) {
-    setIsMinimized(true);
-    fetchClient();
-  }
-}, [fromWorkOrderView, skuIdVal]);
+
+    if (fromWorkOrderView) {
+      setIsMinimized(true)
+      fetchClient()
+    }
+  }, [fromWorkOrderView, skuIdVal])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -188,482 +126,6 @@ useEffect(() => {
     }
     fetchData()
   }, [])
-
-  //const handleChange = (event) => {
-  //  const { name, value } = event.target
-
-  //if (name === 'client' && value === 'add_client') {
-  //  setPopupOpen(true);
-  //  setAddNewSkuData((prev) => ({
-  //    ...prev,
-  //    client: null,
-  //    client_id: null,
-  //  }));
-  //  return;
-  //}
-  //  if (name === 'gst_percentage') {
-  //    setAddNewSkuData((prev) => ({
-  //      ...prev,
-  //      gst_percentage: value,
-  //    }))
-  //    return
-  //  }
-
-  //  setAddNewSkuData((prev) => ({
-  //    ...prev,
-  //    [name]: value,
-  //  }))
-
-  //  // Find the selected client based on the client_id
-  // if (name === 'client') {
-  //  const selectedClient = client?.find(
-  //    (item) => item?.client_id === parseInt(value)
-  //  );
-
-  //  if (selectedClient) {
-  //    setAddNewSkuData((prev) => ({
-  //      ...prev,
-  //      client_id: selectedClient.client_id,
-  //      client: selectedClient.company_name,
-  //    }));
-
-  //    // Clear validation error
-  //    if (selectedClient.client_id?.toString().trim()) {
-  //      setErrors((prev) => {
-  //        const newErrors = { ...prev };
-  //        delete newErrors.client_id;
-  //        return newErrors;
-  //      });
-  //    }
-  //  }
-  //  return; // Prevent further updates for 'client'
-  //}
-  //  if (value?.trim()) {
-  //    setErrors((prev) => {
-  //      const newErrors = { ...prev }
-  //      delete newErrors[name]
-  //      return newErrors
-  //    })
-  //  }
-
-  //}
-
-  //const handleStrictAdherenceToggle = () => {
-  //  const newStrictAdherence = !strictAdherence
-  //  setStrictAdherence(newStrictAdherence)
-
-  //  setAddNewSkuData((prevData) => ({
-  //    ...prevData,
-  //    strict_adherence: newStrictAdherence,
-  //  }))
-  //}
-
-//  const deckleError = useSelector((state) => state.boardCalculations.deckleError)
-//  const dieError = useSelector((state) => state.diecutCalculations.deckleError)
-
-//  const handleAddSkuSubmit = async () => {
-//    let newErrors = {}
-//    if (addNewSkuData.sku_type === 'Custom Item') {
-//      // Validate only for Custom Item
-//      if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
-//      if (!addNewSkuData.client_id) newErrors.client_id = 'Required'
-//      if (!addNewSkuData.estimate_composite_item) newErrors.estimate_composite_item = 'Required'
-//      if (!addNewSkuData.default_sku_details) newErrors.default_sku_details = 'Required'
-//      if (!addNewSkuData.description) newErrors.description = 'Required'
-//    } else if (addNewSkuData.sku_type === 'Composite') {
-//      // Validate only for Composite
-//      if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
-//      if (!addNewSkuData.client_id) newErrors.client_id = 'Required'
-//      if (!addNewSkuData.composite_type) newErrors.composite_type = 'Required'
-//      if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
-//      if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
-//        newErrors.route = 'Required'
-//      }
-// const partValueErrors = addNewSkuData.part_value.map((part) => {
-//  const errors = {}
-//  if (!part.sku_id || !part.sku_name) errors.sku = 'SKU is required'
-//  if (!part.ratio) errors.ratio = 'Ratio is required'
-//  return Object.keys(errors).length > 0 ? errors : undefined
-//})
-
-//// Only assign part_value errors if there are any non-undefined entries
-//if (partValueErrors.some((entry) => entry !== undefined)) {
-//  newErrors.part_value = partValueErrors
-//}
-
-//    } else if (addNewSkuData.sku_type === 'Die Cut box') {
-//      // Validate only for Composite
-//      if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
-//      if (!addNewSkuData.client_id) newErrors.client_id = 'Required'
-//      if (!addNewSkuData.ply) newErrors.ply = 'Required'
-//      if (!addNewSkuData.ups) newErrors.ups = 'Required'
-//      if (!addNewSkuData.select_dies) newErrors.select_dies = 'Required'
-//      // if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
-//      // if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
-//      if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
-//      // if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
-//      if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
-//      if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
-//      if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
-//      if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
-//      if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
-//        newErrors.route = 'Required'
-//      }
-//            if (Array.isArray(addNewSkuData.sku_values)) {
-//    addNewSkuData.sku_values.forEach((layer, index) => {
-//      const layerErrors = {}
-
-//      if (!layer.gsm) layerErrors.gsm = 'GSM is required'
-//      if (!layer.bf) layerErrors.bf = 'BF is required'
-//      if (!layer.color) layerErrors.color = 'Color is required'
-//      if (
-//        layer?.layer?.toLowerCase()?.includes('corrugated') &&
-//        !layer.flute_type
-//      ) {
-//        layerErrors.flute_type = 'Flute Type is required'
-//      }
-
-//      if (Object.keys(layerErrors).length > 0) {
-//        if (!newErrors.sku_values) newErrors.sku_values = {}
-//        newErrors.sku_values[index] = layerErrors
-//      }
-//    })
-//  }
-//    } else if (addNewSkuData.sku_type === 'Board') {
-//      // Validate only for Composite
-//      if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
-//      if (!addNewSkuData.client_id) newErrors.client_id = 'Required'
-//      if (!addNewSkuData.ply) newErrors.ply = 'Required'
-//      if (!addNewSkuData.joints) newErrors.joints = 'Required'
-//      if (!addNewSkuData.ups) newErrors.ups = 'Required'
-//      if (!addNewSkuData.flap_width) newErrors.flap_width = 'Required'
-//      if (!addNewSkuData.flap_tolerance) newErrors.flap_tolerance = 'Required'
-//      if (!addNewSkuData.length_trimming_tolerance) newErrors.length_trimming_tolerance = 'Required'
-//      // if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
-//      // if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
-//      // if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
-//      if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
-//      if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
-//      if (!addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
-//      if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
-//      if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
-//      if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
-//        newErrors.route = 'Required'
-//      }
-//            if (Array.isArray(addNewSkuData.sku_values)) {
-//    addNewSkuData.sku_values.forEach((layer, index) => {
-//      const layerErrors = {}
-
-//      if (!layer.gsm) layerErrors.gsm = 'GSM is required'
-//      if (!layer.bf) layerErrors.bf = 'BF is required'
-//      if (!layer.color) layerErrors.color = 'Color is required'
-//      if (
-//        layer?.layer?.toLowerCase()?.includes('corrugated') &&
-//        !layer.flute_type
-//      ) {
-//        layerErrors.flute_type = 'Flute Type is required'
-//      }
-
-//      if (Object.keys(layerErrors).length > 0) {
-//        if (!newErrors.sku_values) newErrors.sku_values = {}
-//        newErrors.sku_values[index] = layerErrors
-//      }
-//    })
-//  }
-//    }
-//    //if (!addNewSkuData.gst_percentage) newErrors.gst_percentage = 'Required'
-//    else if (addNewSkuData.sku_type === 'RSC box') {
-//      // Validate only for Composite
-//      if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
-//      if (!addNewSkuData.client_id) newErrors.client_id = 'Required'
-//      if (!addNewSkuData.ply) newErrors.ply = 'Required'
-
-//      if (!addNewSkuData.joints) newErrors.joints = 'Required'
-//      if (!addNewSkuData.ups) newErrors.ups = 'Required'
-//      if (!addNewSkuData.length) newErrors.length = 'Required'
-//      if (!addNewSkuData.width) newErrors.width = 'Required'
-//      if (!addNewSkuData.height) newErrors.height = 'Required'
-//      if (!addNewSkuData.joints) newErrors.joints = 'Required'
-//      //if (!addNewSkuData.deckle_size &&  deckleSize>addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
-//      if (!addNewSkuData.deckle_size) {
-//  newErrors.deckle_size = 'Deckle size is required';
-//} else if (Number(addNewSkuData.deckle_size) < deckleSize) {
-//  newErrors.deckle_size = `Deckle size must be greater than ${deckleSize.toFixed(3)}`;
-//}
-
-//      //if (!addNewSkuData.inner_outer_dimension) newErrors.inner_outer_dimension = 'Required'
-//      if (!addNewSkuData.flap_width) newErrors.flap_width = 'Required'
-//      if (!addNewSkuData.length_trimming_tolerance) newErrors.length_trimming_tolerance = 'Required'
-//      if (!addNewSkuData.width_trimming_tolerance) newErrors.width_trimming_tolerance = 'Required'
-//      // if (!addNewSkuData.customer_reference) newErrors.customer_reference = 'Required'
-//      // if (!addNewSkuData.reference_number) newErrors.reference_number = 'Required'
-//      // if (!addNewSkuData.internal_id) newErrors.internal_id = 'Required'
-//      if (!addNewSkuData.width_board_size_cm2) newErrors.width_board_size_cm2 = 'Required'
-//      if (!addNewSkuData.length_board_size_cm2) newErrors.length_board_size_cm2 = 'Required'
-//      if (!addNewSkuData.ups) newErrors.ups = 'Required'
-//      if (!addNewSkuData.minimum_order_level) newErrors.minimum_order_level = 'Required'
-//      if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
-//        newErrors.route = 'Required'
-//      }
-//      if (Array.isArray(addNewSkuData.sku_values)) {
-//    addNewSkuData.sku_values.forEach((layer, index) => {
-//      const layerErrors = {}
-
-//      if (!layer.gsm) layerErrors.gsm = 'GSM is required'
-//      if (!layer.bf) layerErrors.bf = 'BF is required'
-//      if (!layer.color) layerErrors.color = 'Color is required'
-//      if (
-//        layer?.layer?.toLowerCase()?.includes('corrugated') &&
-//        !layer?.flute_type
-//      ) {
-//        layerErrors.flute_type = 'Flute Type is required'
-//      }
-
-//      if (Object.keys(layerErrors).length > 0) {
-//        if (!newErrors.sku_values) newErrors.sku_values = {}
-//        newErrors.sku_values[index] = layerErrors
-//      }
-//    })
-//  }
-//    } else {
-//      newErrors = {}
-//    }
-//    setErrors(newErrors)
-
-//    if (Object.keys(newErrors).length === 0) {
-//      if (dieError) {
-//        setAlerts([{ severity: 'error', message: dieError || '1' }])
-//        return null
-//      }
-//      if (deckleError) {
-//        setAlerts([{ severity: 'error', message: deckleError || '3' }])
-//        return null
-//      }
-//      if (boardSizeError) {
-//        console.warn('Blocked submission due to board size error:', boardSizeError)
-//        setAlerts([{ severity: 'error', message: boardSizeError || '4' }])
-//        return null
-//      }
-
-//      const numberSkuData = {
-//        ...addNewSkuData,
-//         unit: addNewSkuData.unit?.trim() ? addNewSkuData.unit : "mm",
-//        width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
-//        length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
-//        deckle_size: Number(addNewSkuData.deckle_size),
-//        gst_percentage: Number(addNewSkuData.gst_percentage),
-//            length: Number(addNewSkuData.length),
-//             width: Number(addNewSkuData.width),
-//             height: Number(addNewSkuData.height)
-//      }
-//      //console.log("numberSkuData",JSON.stringify(numberSkuData))
-// const numberSkuDataFixed = {
-//  ...numberSkuData,
-//  sku_values: numberSkuData.sku_values.map(({ selected_flute, flute_type, ...rest }) => ({
-//    ...rest,
-//    flute_type: flute_type === "--" ? null : flute_type,
-//  })),
-//};
-
-//console.log("numberSkuDataFixed", JSON.stringify(numberSkuDataFixed, null, 2));
-
-//      try {
-//        let response
-
-//        if (editTag) {
-//          response = await skuApi.updateSku(numberSkuDataFixed)
-//        } else {
-//          response = await skuApi.addSku(numberSkuDataFixed)
-//        }
-
-//        if (response?.data?.message) {
-//          setAlerts([{ severity: 'success', message: response.data.message }])
-//          setRefresh((prev) => !prev)
-//          if (isSingleViewPopupForType) {
-//            setisSingleViewPopupForType(false)
-//          } else {
-//            setDrawerOpen(false)
-//          }
-//          setEditTag(false)
-//          if(addNewSkuData.sku_type==="Composite"){
-//           dispatch(setSkuPartValue([]))
-//          }
-//        }
-//      } catch (error) {
-//        console.error('Error adding SKU:', error)
-//        if (error?.response?.data?.error) {
-//          setAlerts([{ severity: 'error', message: error?.response?.data?.error }])
-//        } else {
-//          setAlerts([{ severity: 'error', message: error?.response?.data?.message }])
-//        }
-//      } finally {
-//        setTimeout(() => {
-//          setAlerts([])
-//        }, 3000)
-//      }
-//    }
-//  }
-
-//  const handleSkuEdit = (id) => {
-//    console.log("editing id",id)
-//    //const selectedSku = skudata.find((sku) => sku.id === id)
-//      if (!id) return;
-//    try {
-//      const data = await skuApi.singleSku(id);
-//      setSelectedSku(data);
-//      console.log("sku singke darta",data)
-//      // navigate(`/sku/${selectedSkuData.id}`);
-//    } catch (error) {
-//      console.error('Error fetching client:', error);
-//    }
-//    setEditTag(true)
-//    setClientDisable(true)
-//    setEditedSkuData(selectedSku)
-//    setAddNewSkuData({
-//      id: selectedSku.id || null,
-//      sku_name: selectedSku.sku_name || null,
-//      client_id: selectedSku?.client_id || null,
-//      client: selectedSku?.company_name || null,
-//      ply: selectedSku.ply || null,
-//      length: selectedSku.length || null,
-//      width: selectedSku.width || null,
-//      height: selectedSku.height || null,
-//      lwh: selectedSku.lwh || null,
-//      unit: selectedSku.unit || null,
-//      joints: selectedSku.joints || null,
-//      ups: selectedSku.ups || null,
-//      select_dies: selectedSku.select_dies || null,
-//      no_of_parts: selectedSku?.no_of_parts || null,
-//      composite_type: selectedSku?.composite_type || null,
-//      inner_outer_dimension: selectedSku.inner_outer_dimension || null,
-//      flap_width: selectedSku.flap_width ?? null,
-//      flap_tolerance: selectedSku.flap_tolerance || null,
-//      length_trimming_tolerance: selectedSku.length_trimming_tolerance || null,
-//      width_trimming_tolerance: selectedSku.width_trimming_tolerance || null,
-//      strict_adherence: selectedSku.strict_adherence || false,
-//      customer_reference: selectedSku.customer_reference || null,
-//      reference_number: selectedSku.reference_number || null,
-//      // internal_id: selectedSku.internal_id || null,
-//      board_size_cm2: selectedSku.board_size_cm2 || null,
-//      deckle_size: selectedSku.deckle_size || null,
-//      minimum_order_level: selectedSku.minimum_order_level ?? null,
-//      sku_type: selectedSku.sku_type || null,
-//      part_value: selectedSku.part_value || [],
-//      route: selectedSku.route || [],
-//      part_count: selectedSku.part_count,
-//      width_board_size_cm2: selectedSku.width_board_size_cm2 || null,
-//      length_board_size_cm2: selectedSku.length_board_size_cm2 || null,
-//      estimate_composite_item: selectedSku.estimate_composite_item || null,
-//      description: selectedSku.description || null,
-//      default_sku_details: selectedSku.default_sku_details || null,
-//          documents: selectedSku.documents || [],
-//    print_type:selectedSku.print_type || null,
-//      tags: selectedSku.tags || {},
-//      gst_percentage: selectedSku.gst_percentage || null,
-//      total_weight:selectedSku.total_weight || null,
-//total_bursting_strength:selectedSku.total_bursting_strength ||null,
-//      sku_values: selectedSku.sku_values || [
-//        {
-//          layer_id:null,
-//          layer: null,
-//          gsm: null,
-//          bf: null,
-//          material: null,
-//          color: null,
-//          flute_type: null,
-//          weight: null,
-//          bursting_strength: null,
-//          flute_ratio: null,
-//          layer_status: null,
-//          production_status: "pending",
-//        },
-//      ],
-//    })
-
-//    setStrictAdherence(selectedSku.strict_adherence || false)
-//    navigate('/skuForm')
-//  }
-//const handleSkuEdit = async (id) => {
-//  if (!id) return;
-
-//  try {
-//    console.log("editing id", id);
-//    const data = await skuApi.singleSku(id); // Make sure skuApi.singleSku returns a promise
-//    console.log("sku single data", data);
-
-//    setSelectedSku(data);
-//    setEditTag(true);
-//    setClientDisable(true);
-//    setEditedSkuData(data); // Use `data`, not `selectedSku`
-
-//    setAddNewSkuData({
-//      id: data.id ?? null,
-//      sku_name: data.sku_name ?? null,
-//      client_id: data.client_id ?? null,
-//      client: data.company_name ?? null,
-//      ply: data.ply ?? null,
-//      length: data.length ?? null,
-//      width: data.width ?? null,
-//      height: data.height ?? null,
-//      lwh: data.lwh ?? null,
-//      unit: data.unit ?? null,
-//      joints: data.joints ?? null,
-//      ups: data.ups ?? null,
-//      select_dies: data.select_dies ?? null,
-//      no_of_parts: data.no_of_parts ?? null,
-//      composite_type: data.composite_type ?? null,
-//      inner_outer_dimension: data.inner_outer_dimension ?? null,
-//      flap_width: data.flap_width ?? null,
-//      flap_tolerance: data.flap_tolerance ?? null,
-//      length_trimming_tolerance: data.length_trimming_tolerance ?? null,
-//      width_trimming_tolerance: data.width_trimming_tolerance ?? null,
-//      strict_adherence: data.strict_adherence ?? false,
-//      customer_reference: data.customer_reference ?? null,
-//      reference_number: data.reference_number ?? null,
-//      board_size_cm2: data.board_size_cm2 ?? null,
-//      deckle_size: data.deckle_size ?? null,
-//      minimum_order_level: data.minimum_order_level ?? null,
-//      sku_type: data.sku_type ?? null,
-//      part_value: data.part_value ?? [],
-//      route: data.route ?? [],
-//      part_count: data.part_count ?? null,
-//      width_board_size_cm2: data.width_board_size_cm2 ?? null,
-//      length_board_size_cm2: data.length_board_size_cm2 ?? null,
-//      estimate_composite_item: data.estimate_composite_item ?? null,
-//      description: data.description ?? null,
-//      default_sku_details: data.default_sku_details ?? null,
-//      documents: data.documents ?? [],
-//      print_type: data.print_type ?? null,
-//      tags: data.tags ?? {},
-//      gst_percentage: data.gst_percentage ?? null,
-//      total_weight: data.total_weight ?? null,
-//      total_bursting_strength: data.total_bursting_strength ?? null,
-//      sku_values: data.sku_values ?? [
-//        {
-//          layer_id: null,
-//          layer: null,
-//          gsm: null,
-//          bf: null,
-//          material: null,
-//          color: null,
-//          flute_type: null,
-//          weight: null,
-//          bursting_strength: null,
-//          flute_ratio: null,
-//          layer_status: null,
-//          production_status: "pending",
-//        },
-//      ],
-//    });
-
-//    setStrictAdherence(data.strict_adherence ?? false);
-    
-//    navigate('/skuForm');
-
-//  } catch (error) {
-//    console.error('Error fetching SKU:', error);
-//  }
-//};
 
   const fetchData = async () => {
     setLoading(true)
@@ -679,19 +141,18 @@ useEffect(() => {
         page: pagination?.currentPage || 1,
         limit: message ? 10000 : limit,
       })
-const clientResponse = await clientApi.getSkuClients({ limit: 10000 }) 
+      const clientResponse = await clientApi.getSkuClients({ limit: 10000 })
 
       setSkuData(response.data)
       setClient(clientResponse.data)
       setPagination(response.pagination)
       setTotalRecords(response?.pagination?.totalCount)
       setDashboard(response.dashboard)
-      console.log("jsonres",response?.pagination?.totalCount)
     } catch (error) {
       console.error('Error fetching data:', error)
-    }finally {
-    setLoading(false); // Always called, even if error occurs or early return
-  }
+    } finally {
+      setLoading(false) // Always called, even if error occurs or early return
+    }
   }
   useEffect(() => {
     fetchData()
@@ -733,40 +194,34 @@ const clientResponse = await clientApi.getSkuClients({ limit: 10000 })
     setAlerts([])
   }
   const handleNewSku = () => {
-  navigate('/skuForm')
+    navigate('/skuForm')
   }
 
-  //console.log("edittag",editTag)
-console.log("pagination",pagination)
-//console.log("sku type",addNewSkuData?.sku_type)
-console.log("Minimised",isMinimized)
 
-const { id } = useParams();
- useEffect(() => {
+  const { id } = useParams()
+  useEffect(() => {
     if (id) {
-      setIsMinimized(true);
+      setIsMinimized(true)
     } else {
-      setIsMinimized(false); // Reset to false if ID is not '10'
+      setIsMinimized(false) // Reset to false if ID is not '10'
     }
-  }, [id]);
+  }, [id])
 
-useEffect(() => {
-  const { fromClientForm, sku_type_for_navigate_from_client } = location.state || {};
+  useEffect(() => {
+    const { fromClientForm, sku_type_for_navigate_from_client } = location.state || {}
 
-  if (fromClientForm) {
-    console.log("sku type", sku_type_for_navigate_from_client);
+    if (fromClientForm) {
 
-    setDrawerOpen(true);
-   setAddNewSkuData((prev) => ({
-      ...prev,
-      sku_type: sku_type_for_navigate_from_client || prev.sku_type,
-    }));
-    // Optional: clear state from history to prevent retrigger
-    navigate(location.pathname, { replace: true, state: {} });
-  }
-}, [location.pathname, location.state]);
+      setDrawerOpen(true)
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        sku_type: sku_type_for_navigate_from_client || prev.sku_type,
+      }))
+      // Optional: clear state from history to prevent retrigger
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.pathname, location.state])
 
-//console.log("before editing",addNewSkuData)
 
   return (
     <div className="flex">
@@ -777,11 +232,11 @@ useEffect(() => {
           onAddClick={handleNewSku}
           isMinimized={isMinimized}
           menuOptions={[
-            {
-              icon: <FiDownload className="mr-2 text-blue-500" />,
-              label: 'Bulk Upload',
-              onClick: () => setVisible(true),
-            },
+            // {
+            //   icon: <FiDownload className="mr-2 text-blue-500" />,
+            //   label: 'Bulk Upload',
+            //   onClick: () => setVisible(true),
+            // },
             {
               icon: <FiUpload className="mr-2 text-blue-500" />,
               label: 'Export to Excel',
@@ -854,16 +309,15 @@ useEffect(() => {
         {!isMinimized && (
           <div className="flex items-center justify-between flex-wrap gap-2 my-4 p-2 w-full bg-white border border-gray-200 border-b-transparent">
             {/* <SearchBar text="SKU" data={skudata} ref={searchBarRef} /> */}
-          <div className="w-full sm:w-[150px] flex items-center justify-between bg-white border border-gray-300 rounded-lg px-3 py-2">
-  <div className="flex items-center gap-2 whitespace-nowrap">
-    <AiFillCarryOut className="text-blue-600 text-xl" />
-    <span className="text-sm font-semibold text-gray-800 pr-1">Total Count: </span>
-  </div>
-  <div className="h-7 w-7 flex items-center justify-center text-gray-800 font-bold text-sm">
-    {pagination?.totalCount ?? 0}
-  </div>
-</div>
-
+            <div className="w-full sm:w-[150px] flex items-center justify-between bg-white border border-gray-300 rounded-lg px-3 py-2">
+              <div className="flex items-center gap-2 whitespace-nowrap">
+                <AiFillCarryOut className="text-blue-600 text-xl" />
+                <span className="text-sm font-semibold text-gray-800 pr-1">Total Count: </span>
+              </div>
+              <div className="h-7 w-7 flex items-center justify-center text-gray-800 font-bold text-sm">
+                {pagination?.totalCount ?? 0}
+              </div>
+            </div>
 
             <div className="flex justify-between gap-2 w-full sm:w-auto text-xs">
               <select
@@ -911,7 +365,7 @@ useEffect(() => {
             </div>
           </div>
         )}
-            <Loader isLoading={loading} />
+        <Loader isLoading={loading} />
         <div className={`${isMinimized ? 'mt-1' : '-my-6'}`}>
           <div className="flex overflow-x-auto overflow-y-auto whitespace-nowrap ">
             <SkuTable
@@ -931,100 +385,43 @@ useEffect(() => {
         </div>
 
         {/* Pagination Section */}
-        <div className={`flex justify-end items-center gap-4 pl-4 pr-4 ${isMinimized ? 'mt-[20px]' : 'mt-[40px]'}`}>
-          <p className='w-40 text-sm'>Total Count :<span className='font-semibold'> {totalRecords}</span> </p>
-            <CompactPagination
-                        totalRecords={totalRecords}
-                    count={pagination?.totalPages || 1}
-                    page={pagination?.currentPage || 1}
-                    onPageChange={(event, value) => {
-            setPagination((prev) => ({
-              ...prev,
-              currentPage: value,
-            }))
-            setRefresh((prev) => !prev)
-          }}
-                    entriesPerPage={limit}
-                    onEntriesChange={(newLimit) => {
-            setLimit(newLimit)
-            // Reset to first page when changing limit
-            setPagination((prev) => ({
-              ...prev,
-              currentPage: 1,
-            }))
-            setRefresh((prev) => !prev)
-          }}
-                    isMinimized={isMinimized}
-                  />
-      </div>
+        <div
+          className={`flex justify-end items-center gap-4 pl-4 pr-4 ${isMinimized ? 'mt-[20px]' : 'mt-[40px]'}`}
+        >
+          <p className="w-40 text-sm">
+            Total Count :<span className="font-semibold"> {totalRecords}</span>{' '}
+          </p>
+          <CompactPagination
+            totalRecords={totalRecords}
+            count={pagination?.totalPages || 1}
+            page={pagination?.currentPage || 1}
+            onPageChange={(event, value) => {
+              setPagination((prev) => ({
+                ...prev,
+                currentPage: value,
+              }))
+              setRefresh((prev) => !prev)
+            }}
+            entriesPerPage={limit}
+            onEntriesChange={(newLimit) => {
+              setLimit(newLimit)
+              // Reset to first page when changing limit
+              setPagination((prev) => ({
+                ...prev,
+                currentPage: 1,
+              }))
+              setRefresh((prev) => !prev)
+            }}
+            isMinimized={isMinimized}
+          />
+        </div>
         <div>
           <SkuPopup visible={visible} setVisible={setVisible} />
         </div>
-        {/*{isDrawerOpen || editTag && (*/}
-        {/*<Drawer
-          maxWidth="1340px"
-          isOpen={isDrawerOpen
-            // || editTag
-            }
-          //title={editTag ? 'Edit SKU Details' : 'Add SKU Details'}
-          onClose={() => {
-            setDrawerOpen(false)
-            setEditTag(false)
-            setClientDisable(false)
-            setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
-             dispatch(setSkuPartValue([]))
-            //navigate('/SKU')
-          }}
-        >
-          <SkuAddEdit
-          validationErrors={validationErrors.part_value || []}
-          uploadedFiles={uploadedFiles}
-          setUploadedFiles={setUploadedFiles}
-            //isopenval={isDrawerOpen || editTag}
-            //handleChange={handleChange}
-            //strictAdherence={strictAdherence}
-            //handleStrictAdherenceToggle={handleStrictAdherenceToggle}
-            //handleAddSkuSubmit={handleAddSkuSubmit}
-            //editTag={editTag}
-            //addNewSkuData={addNewSkuData}
-            //setAddNewSkuData={setAddNewSkuData}
-            client={client}
-            setClient={setClient}
-            clientDiasble={clientDiasble}
-            skuType={skuType}
-            setSkuType={setSkuType}
-            locationvalue={location?.state?.client_id}
-            closedrawer={setDrawerOpen}
-            //setBoardSizeError={setBoardSizeError}
-            //onUnitChange={handleUnitChange}
-            editedSkudata={editedSkudata}
-            handleClose={() => {
-              setDrawerOpen(false)
-              setEditTag(false)
-              setClientDisable(false)
-              setAddNewSkuData(() => createInitialSkuData(user.id, strictAdherence))
-              //navigate('/SKU')
-            }}
-            setisSingleViewPopupForType={setisSingleViewPopupForType}
-            isSingleViewPopupForType={isSingleViewPopupForType}
-            isPopupOpen={isPopupOpen}
-            setPopupOpen={setPopupOpen}
-            message={message}
-            setMessage={setMessage}
-            errors={errors}
-            setErrors={setErrors}
-            //setSkuVariant={setSkuVariant}
-          />
-        </Drawer>*/}
       </div>
       {isMinimized && (
         <div className="flex w-[75%] transition-all duration-300 ">
-          <SkuView
-            selectedSkuData={selectedSku}
-            setIsMinimized={setIsMinimized}
-            //handleSkuEdit={handleSkuEdit}
-          />
-          {/*<Outlet/>*/}
+          <SkuView selectedSkuData={selectedSku} setIsMinimized={setIsMinimized} />
         </div>
       )}
     </div>

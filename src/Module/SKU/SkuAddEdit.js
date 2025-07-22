@@ -12,14 +12,14 @@ import CustomItem from './CustomItem'
 import { useDispatch, useSelector } from 'react-redux'
 import updown from '../../assets/images/updown.png'
 import { version } from 'core-js'
-import { setRscDeckleSize } from '../../action';
+import { setRscDeckleSize } from '../../action'
 import { setSkuPartValue } from '../../action'
 import { skuApi } from '../../api/sku'
 import { commonApi } from '../../api/common'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 //import { saveSkuFormState } from '../../action'
 import { clientApi } from '../../api/client'
-
+import CustomAlert from '../../components/New/CustomAlert'
 
 function SkuAddEdit({
   isopenval,
@@ -48,15 +48,15 @@ function SkuAddEdit({
   //errors,
   //setErrors,
   //setSkuVariant,
-    // uploadedFiles,
-          //setUploadedFiles,
-          //validationErrors
+  // uploadedFiles,
+  //setUploadedFiles,
+  //validationErrors
 }) {
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-    // const skuFormData = useSelector((state) => state.skuForm)
-             const deckleSize = useSelector((state) => state.deckleSize)
-     
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  // const skuFormData = useSelector((state) => state.skuForm)
+  const deckleSize = useSelector((state) => state.deckleSize)
+
   //    const [isSingleViewPopupForType, setisSingleViewPopupForType] = useState(skuFormData.isSingleViewPopupForType || {})
   //      const [client, setClient] = useState(skuFormData.client || null)
   //const [uploadedFiles, setUploadedFiles] = useState(skuFormData.uploadedFiles || [])
@@ -66,48 +66,47 @@ function SkuAddEdit({
   //const [message, setMessage] = useState(skuFormData.message || '')
   //const [errors, setErrors] = useState(skuFormData.errors || {})
   const [isOpen, setIsOpen] = useState(false)
-    const [alerts, setAlerts] = useState([])
-      const [validationErrors, setValidationErrors] = useState({})
-  
-      const [editTag, setEditTag] = useState(false)
-    
-  
-    const [skuVariant, setSkuVariant] = useState('RSC Box')
-  
+  const [alerts, setAlerts] = useState([])
+  const [validationErrors, setValidationErrors] = useState({})
+
+  const [editTag, setEditTag] = useState(false)
+
+  const [skuVariant, setSkuVariant] = useState('RSC Box')
+
   const dropdownRef = useRef(null)
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
   const [meterSquareData, setMeterSquareData] = useState(null)
   const [compositeSelect, setCompositeSelect] = useState(null)
   const [isactivateRender, setIsActivateRender] = useState(false)
   const [boardSizeError, setBoardSizeError] = useState('')
-  const [uploadedFiles, setUploadedFiles] = useState([]); // file URLs
+  const [uploadedFiles, setUploadedFiles] = useState([]) // file URLs
   const [strictAdherence, setStrictAdherence] = useState(false)
   const [client, setClient] = useState([])
   const [clientDiasble, setClientDisable] = useState(false)
   const [skuType, setSkuType] = useState([])
-    const [taxMaster, setTaxmaster] = useState([])
+  const [taxMaster, setTaxmaster] = useState([])
   const location = useLocation()
   const [editedSkudata, setEditedSkuData] = useState(null)
   const [isSingleViewPopupForType, setisSingleViewPopupForType] = useState(false)
   const [isPopupOpen, setPopupOpen] = useState(false)
   const [message, setMessage] = useState('')
   const [errors, setErrors] = useState({})
-const prevValueRef = useRef(isSingleViewPopupForType);
+  const prevValueRef = useRef(isSingleViewPopupForType)
 
   const prevIsSingleViewRef = useRef(isSingleViewPopupForType)
   const [version, setVersion] = useState([])
   const [selectedVersion, setSelectedVersion] = useState(null)
   const [defaultSkuValues, setDefaultSkuValues] = useState([])
-  const [color,setColor]=useState([])
-  const [fluteDropdown,setFluteDropdown]=useState([])
-  const [rscUnits,setRscUnits] = useState("mm")
-const [selectedFluteIndex, setSelectedFluteIndex] = useState(null);
-const [isCompositePopupCreate,setIsCompositePopupCreate]=useState(false)
-  const skuTypeFromClient = location?.state?.sku_type_for_navigate_from_client;
-const [compositeSkuMessage,setCompositeSkuMessage]=useState("")
-const [branchList, setBranchList] = useState([]);
+  const [color, setColor] = useState([])
+  const [fluteDropdown, setFluteDropdown] = useState([])
+  const [rscUnits, setRscUnits] = useState('mm')
+  const [selectedFluteIndex, setSelectedFluteIndex] = useState(null)
+  const [isCompositePopupCreate, setIsCompositePopupCreate] = useState(false)
+  const skuTypeFromClient = location?.state?.sku_type_for_navigate_from_client
+  const [compositeSkuMessage, setCompositeSkuMessage] = useState('')
+  const [branchList, setBranchList] = useState([])
 
-const [addNewSkuData, setAddNewSkuData] = useState({
+  const [addNewSkuData, setAddNewSkuData] = useState({
     sku_name: null,
     client_id: null,
     client: null,
@@ -136,22 +135,22 @@ const [addNewSkuData, setAddNewSkuData] = useState({
     board_size_cm2: null,
     deckle_size: null,
     minimum_order_level: null,
-    sku_type:location?.state?.sku_type_for_navigate_from_client || 'RSC box',
+    sku_type: location?.state?.sku_type_for_navigate_from_client || 'RSC box',
     part_value: [],
     route: [],
     part_count: null,
     estimate_composite_item: null,
     description: null,
     default_sku_details: null,
-    documents:[],
-    print_type:"None",
+    documents: [],
+    print_type: 'None',
     tags: {},
     gst_percentage: null,
-    total_weight:null,
-    total_bursting_strength:null,
+    total_weight: null,
+    total_bursting_strength: null,
     sku_values: [
       {
-        layer_id:null,
+        layer_id: null,
         layer: null,
         gsm: null,
         bf: null,
@@ -161,8 +160,8 @@ const [addNewSkuData, setAddNewSkuData] = useState({
         weight: null,
         bursting_strength: null,
         flute_ratio: null,
-        layer_status:"ungrouped",
-        production_status:" pending"
+        layer_status: 'ungrouped',
+        production_status: ' pending',
       },
     ],
   })
@@ -178,7 +177,7 @@ const [addNewSkuData, setAddNewSkuData] = useState({
     fetchData()
   }, [])
 
-    useEffect(() => {
+  useEffect(() => {
     const taxData = async () => {
       try {
         const response = await skuApi.getTaxMaster()
@@ -190,33 +189,31 @@ const [addNewSkuData, setAddNewSkuData] = useState({
     taxData()
   }, [])
 
-console.log("taxxx",taxMaster)
   useEffect(() => {
-console.log("old data",skuTypeFromClient)
-  if (skuTypeFromClient) {
-    setAddNewSkuData((prev) => ({
-      ...prev,
-      sku_type: skuTypeFromClient,
-    }));
-  }
-}, [location?.state?.sku_type_for_navigate_from_client]);
-   const fetchData = async () => {
+    if (skuTypeFromClient) {
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        sku_type: skuTypeFromClient,
+      }))
+    }
+  }, [location?.state?.sku_type_for_navigate_from_client])
+  const fetchData = async () => {
+    try {
+      const clientResponse = await clientApi.getSkuClients({ limit: 10000 })
 
-      try {
-  const clientResponse = await clientApi.getSkuClients({ limit: 10000 }) 
-  
-        //setSkuData(response.data)
-        setClient(clientResponse.data)
-console.log("client res",clientResponse)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }finally {
+      //setSkuData(response.data)
+      setClient(clientResponse.data)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    } finally {
       //setLoading(false); // Always called, even if error occurs or early return
     }
-    }
-    useEffect(() => {
+  }
+  useEffect(
+    () => {
       fetchData()
-    }, [
+    },
+    [
       //refresh,
       //selectedClient,
       //selectedDisplayName,
@@ -227,25 +224,26 @@ console.log("client res",clientResponse)
       //limit,
       //+location.state?.skipInitialFetch,
       //message,
-    ])
-const { id } = useParams();
-   useEffect(() => {
+    ],
+  )
+  const { id } = useParams()
+  useEffect(() => {
     if (id) {
-      handleSkuEdit(id);
+      handleSkuEdit(id)
     }
-  }, [id]);
- const handleChange = (event) => {
+  }, [id])
+  const handleChange = (event) => {
     const { name, value } = event.target
 
-  if (name === 'client' && value === 'add_client') {
-    setPopupOpen(true);
-    setAddNewSkuData((prev) => ({
-      ...prev,
-      client: null,
-      client_id: null,
-    }));
-    return;
-  }
+    if (name === 'client' && value === 'add_client') {
+      setPopupOpen(true)
+      setAddNewSkuData((prev) => ({
+        ...prev,
+        client: null,
+        client_id: null,
+      }))
+      return
+    }
     if (name === 'gst_percentage') {
       setAddNewSkuData((prev) => ({
         ...prev,
@@ -260,29 +258,27 @@ const { id } = useParams();
     }))
 
     // Find the selected client based on the client_id
-   if (name === 'client') {
-    const selectedClient = client?.find(
-      (item) => item?.client_id === parseInt(value)
-    );
+    if (name === 'client') {
+      const selectedClient = client?.find((item) => item?.client_id === parseInt(value))
 
-    if (selectedClient) {
-      setAddNewSkuData((prev) => ({
-        ...prev,
-        client_id: selectedClient.client_id,
-        client: selectedClient.company_name,
-      }));
+      if (selectedClient) {
+        setAddNewSkuData((prev) => ({
+          ...prev,
+          client_id: selectedClient.client_id,
+          client: selectedClient.company_name,
+        }))
 
-      // Clear validation error
-      if (selectedClient.client_id?.toString().trim()) {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.client_id;
-          return newErrors;
-        });
+        // Clear validation error
+        if (selectedClient.client_id?.toString().trim()) {
+          setErrors((prev) => {
+            const newErrors = { ...prev }
+            delete newErrors.client_id
+            return newErrors
+          })
+        }
       }
+      return // Prevent further updates for 'client'
     }
-    return; // Prevent further updates for 'client'
-  }
     if (value?.trim()) {
       setErrors((prev) => {
         const newErrors = { ...prev }
@@ -290,17 +286,14 @@ const { id } = useParams();
         return newErrors
       })
     }
-
   }
 
-
-console.log("data",rscUnits)
   const createInitialSkuData = () => ({
     client_id: null,
     sku_name: null,
     composite_type: null,
     ply: null,
-    client: "",
+    client: '',
     length: null,
     width: null,
     height: null,
@@ -321,22 +314,22 @@ console.log("data",rscUnits)
     board_size_cm2: null,
     deckle_size: null,
     minimum_order_level: null,
-    sku_type:location?.state?.sku_type_for_navigate_from_client || 'RSC box',
+    sku_type: location?.state?.sku_type_for_navigate_from_client || 'RSC box',
     part_value: [],
     route: [],
     part_count: null,
     estimate_composite_item: null,
     description: null,
     default_sku_details: null,
-    documents:[],
-    print_type:"None",
+    documents: [],
+    print_type: 'None',
     tags: {},
     gst_percentage: null,
-        total_weight:null,
-total_bursting_strength:null,
+    total_weight: null,
+    total_bursting_strength: null,
     sku_values: [
       {
-        layer_id:null,
+        layer_id: null,
         layer: null,
         gsm: null,
         bf: null,
@@ -345,14 +338,13 @@ total_bursting_strength:null,
         flute_type: null,
         weight: null,
         bursting_strength: null,
-        layer_status:"ungrouped",
-        production_status:"pending"
+        layer_status: 'ungrouped',
+        production_status: 'pending',
         //flute_ratio: null,
       },
     ],
   })
-// const skuFormData = useSelector((state) => state.skuForm)
-
+  // const skuFormData = useSelector((state) => state.skuForm)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -389,9 +381,8 @@ total_bursting_strength:null,
   //  }
   //}, [editTag, refresh])
 
-
   const handleSelect = (option) => {
-dispatch(setRscDeckleSize({ length: null, height: null, ups: null }));
+    dispatch(setRscDeckleSize({ length: null, height: null, ups: null }))
 
     dispatch({
       type: 'SET_SELECTED_ROUTE_IDS',
@@ -405,7 +396,7 @@ dispatch(setRscDeckleSize({ length: null, height: null, ups: null }));
       },
     })
     dispatch({ type: 'RESET_DIECUT_CALCULATIONS' })
- 
+
     setErrors({})
     if (option.value === 'addMore') {
       // Handle add more procedure logic if needed
@@ -422,128 +413,120 @@ dispatch(setRscDeckleSize({ length: null, height: null, ups: null }));
     setSkuVariant(option?.sku_type || option?.value)
     setAddNewSkuData(baseSkuData)
   }
-const calculateWeight = ({ gsm, isCorrugated, selectedFlute, areaInSquareMeters }) => {
-  const numberOfFlutes = isCorrugated
-    ? selectedFlute?.take_up_factor || 0
-    : 1;
+  const calculateWeight = ({ gsm, isCorrugated, selectedFlute, areaInSquareMeters }) => {
+    const numberOfFlutes = isCorrugated ? selectedFlute?.take_up_factor || 0 : 1
 
-  if (!gsm || !areaInSquareMeters) return null;
-console.log("values///",((gsm * areaInSquareMeters) * 0.001) * numberOfFlutes)
-  return ((gsm * areaInSquareMeters) * 0.001) * numberOfFlutes;
-};
-const handleSkuValuesChange = (index, field, value) => {
-  setAddNewSkuData((prevData) => {
-    const updatedSkuValues = [...prevData.sku_values];
-    const updatedItem = { ...updatedSkuValues[index], [field]: value };
+    if (!gsm || !areaInSquareMeters) return null
+    return gsm * areaInSquareMeters * 0.001 * numberOfFlutes
+  }
+  const handleSkuValuesChange = (index, field, value) => {
+    setAddNewSkuData((prevData) => {
+      const updatedSkuValues = [...prevData.sku_values]
+      const updatedItem = { ...updatedSkuValues[index], [field]: value }
 
-    // Determine if layer is corrugated
-    const isCorrugated = updatedItem.layer?.toLowerCase().includes('corrugated');
+      // Determine if layer is corrugated
+      const isCorrugated = updatedItem.layer?.toLowerCase().includes('corrugated')
 
+      if (field === 'flute_type') {
+        updatedItem.flute_type = value
 
-        if (field === 'flute_type') {
-      updatedItem.flute_type = value;
-
-      // Match the flute object by name
-      const matchedFlute = fluteDropdown.find((flute) => flute.name === value);
-      if (matchedFlute) {
-        updatedItem.selected_flute = matchedFlute;
+        // Match the flute object by name
+        const matchedFlute = fluteDropdown.find((flute) => flute.name === value)
+        if (matchedFlute) {
+          updatedItem.selected_flute = matchedFlute
+        }
       }
-    }
 
-    // Store selectedFlute (or update if field was 'selected_flute')
-    if (field === 'selected_flute') {
-      updatedItem.selected_flute = value;
-    }
-    const selectedFlute = updatedItem.selected_flute;
+      // Store selectedFlute (or update if field was 'selected_flute')
+      if (field === 'selected_flute') {
+        updatedItem.selected_flute = value
+      }
+      const selectedFlute = updatedItem.selected_flute
 
-    // Set default flute info if non-corrugated
-    if (field === 'layer' && !isCorrugated) {
-      updatedItem.flute_type = '--';
-      updatedItem.selected_flute = { take_up_factor: 1 };
-    }
+      // Set default flute info if non-corrugated
+      if (field === 'layer' && !isCorrugated) {
+        updatedItem.flute_type = '--'
+        updatedItem.selected_flute = { take_up_factor: 1 }
+      }
 
-    // Calculate area in square meters
-    let areaInSquareMeters = 0;
-    if (rscUnits === 'mm') areaInSquareMeters = meterSquareData * 1e-6;
-    else if (rscUnits === 'cm') areaInSquareMeters = meterSquareData * 1e-4;
-    else if (rscUnits === 'in') areaInSquareMeters = meterSquareData * 0.00064516;
+      // Calculate area in square meters
+      let areaInSquareMeters = 0
+      if (rscUnits === 'mm') areaInSquareMeters = meterSquareData * 1e-6
+      else if (rscUnits === 'cm') areaInSquareMeters = meterSquareData * 1e-4
+      else if (rscUnits === 'in') areaInSquareMeters = meterSquareData * 0.00064516
 
-    // Trigger weight recalculation
-    if (['gsm', 'layer', 'selected_flute'].includes(field)) {
-      updatedItem.weight = calculateWeight({
-        gsm: field === 'gsm' ? value : updatedItem.gsm,
-        isCorrugated,
-        selectedFlute,
-        areaInSquareMeters,
-      });
-    }
-
-    
-    updatedSkuValues[index] = updatedItem;
-    return { ...prevData, sku_values: updatedSkuValues };
-  });
-};
-useEffect(() => {
-  // 1. First reset weights to ensure recalculation doesn't use stale data
-  const resetWeights = addNewSkuData?.sku_values?.map((item) => ({
-    ...item,
-    weight: null,
-  }));
-
-  setAddNewSkuData((prevData) => ({
-    ...prevData,
-    sku_values: resetWeights,
-  }));
-
-  // 2. Now recalculate weights after a short delay to ensure reset completes
-  // This avoids race condition with batched updates
-  setTimeout(() => {
-    let areaInSquareMeters = 0;
-    if (rscUnits === 'mm') areaInSquareMeters = meterSquareData * 1e-6;
-    else if (rscUnits === 'cm') areaInSquareMeters = meterSquareData * 1e-4;
-    else if (rscUnits === 'in') areaInSquareMeters = meterSquareData * 0.00064516;
-
-    const updatedSkuValues = addNewSkuData?.sku_values?.map((item) => {
-      const isCorrugated = item.layer?.toLowerCase().includes('corrugated');
-      const selectedFlute = item.selected_flute;
-
-      return {
-        ...item,
-        weight: calculateWeight({
-          gsm: item.gsm,
+      // Trigger weight recalculation
+      if (['gsm', 'layer', 'selected_flute'].includes(field)) {
+        updatedItem.weight = calculateWeight({
+          gsm: field === 'gsm' ? value : updatedItem.gsm,
           isCorrugated,
           selectedFlute,
           areaInSquareMeters,
-        }),
-        ...(isCorrugated
-          ? {}
-          : {
-              flute_type: "--",
-              selected_flute: { take_up_factor: 1 },
-            }),
-      };
-    });
+        })
+      }
+
+      updatedSkuValues[index] = updatedItem
+      return { ...prevData, sku_values: updatedSkuValues }
+    })
+  }
+  useEffect(() => {
+    // 1. First reset weights to ensure recalculation doesn't use stale data
+    const resetWeights = addNewSkuData?.sku_values?.map((item) => ({
+      ...item,
+      weight: null,
+    }))
 
     setAddNewSkuData((prevData) => ({
       ...prevData,
-      sku_values: updatedSkuValues,
-    }));
-  }, 0); // Runs after reset
-}, [
-  addNewSkuData?.length,
-  addNewSkuData?.width,
-  addNewSkuData?.height,
-  rscUnits,
-  addNewSkuData?.width_board_size_cm2,
-  addNewSkuData?.length_board_size_cm2,
-  meterSquareData,
-  JSON.stringify(
-    addNewSkuData?.sku_values?.map(
-      (item) => item.selected_flute?.take_up_factor || 0
-    )
-  ),
-]);
+      sku_values: resetWeights,
+    }))
 
+    // 2. Now recalculate weights after a short delay to ensure reset completes
+    // This avoids race condition with batched updates
+    setTimeout(() => {
+      let areaInSquareMeters = 0
+      if (rscUnits === 'mm') areaInSquareMeters = meterSquareData * 1e-6
+      else if (rscUnits === 'cm') areaInSquareMeters = meterSquareData * 1e-4
+      else if (rscUnits === 'in') areaInSquareMeters = meterSquareData * 0.00064516
+
+      const updatedSkuValues = addNewSkuData?.sku_values?.map((item) => {
+        const isCorrugated = item.layer?.toLowerCase().includes('corrugated')
+        const selectedFlute = item.selected_flute
+
+        return {
+          ...item,
+          weight: calculateWeight({
+            gsm: item.gsm,
+            isCorrugated,
+            selectedFlute,
+            areaInSquareMeters,
+          }),
+          ...(isCorrugated
+            ? {}
+            : {
+                flute_type: '--',
+                selected_flute: { take_up_factor: 1 },
+              }),
+        }
+      })
+
+      setAddNewSkuData((prevData) => ({
+        ...prevData,
+        sku_values: updatedSkuValues,
+      }))
+    }, 0) // Runs after reset
+  }, [
+    addNewSkuData?.length,
+    addNewSkuData?.width,
+    addNewSkuData?.height,
+    rscUnits,
+    addNewSkuData?.width_board_size_cm2,
+    addNewSkuData?.length_board_size_cm2,
+    meterSquareData,
+    JSON.stringify(
+      addNewSkuData?.sku_values?.map((item) => item.selected_flute?.take_up_factor || 0),
+    ),
+  ])
 
   //for updating the gsm calculations when dimension changes
   useEffect(() => {
@@ -563,40 +546,196 @@ useEffect(() => {
 
   const plyLayerConfigurations = {
     2: [
-      { layer_id:1,layer: 'Top Layer', type: 'Top Layer',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:2,layer: 'Corrugated Layer', type: 'Corrugated Layer',layer_status:"ungrouped", production_status: "pending" },
+      {
+        layer_id: 1,
+        layer: 'Top Layer',
+        type: 'Top Layer',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 2,
+        layer: 'Corrugated Layer',
+        type: 'Corrugated Layer',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
     ],
     3: [
-      { layer_id:1,layer: 'Top Layer', type: 'Top Layer',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1',layer_status:"ungrouped", production_status: "pending" },
+      {
+        layer_id: 1,
+        layer: 'Top Layer',
+        type: 'Top Layer',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 2,
+        layer: 'Corrugated Layer 1',
+        type: 'Corrugated Layer 1',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 3,
+        layer: 'Liner Layer 1',
+        type: 'Liner Layer 1',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
     ],
     5: [
-      { layer_id:1,layer: 'Top Layer', type: 'Top Layer',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:4,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:5,layer: 'Liner Layer 2', type: 'Liner Layer 2',layer_status:"ungrouped", production_status: "pending" },
+      {
+        layer_id: 1,
+        layer: 'Top Layer',
+        type: 'Top Layer',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 2,
+        layer: 'Corrugated Layer 1',
+        type: 'Corrugated Layer 1',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 3,
+        layer: 'Liner Layer 1',
+        type: 'Liner Layer 1',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 4,
+        layer: 'Corrugated Layer 2',
+        type: 'Corrugated Layer 2',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 5,
+        layer: 'Liner Layer 2',
+        type: 'Liner Layer 2',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
     ],
     7: [
-      { layer_id:1,layer: 'Top Layer', type: 'Top Layer',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:4,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:5,layer: 'Liner Layer 2', type: 'Liner Layer 2',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:6,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:7,layer: 'Liner Layer 3', type: 'Liner Layer 3',layer_status:"ungrouped", production_status: "pending" },
+      {
+        layer_id: 1,
+        layer: 'Top Layer',
+        type: 'Top Layer',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 2,
+        layer: 'Corrugated Layer 1',
+        type: 'Corrugated Layer 1',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 3,
+        layer: 'Liner Layer 1',
+        type: 'Liner Layer 1',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 4,
+        layer: 'Corrugated Layer 2',
+        type: 'Corrugated Layer 2',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 5,
+        layer: 'Liner Layer 2',
+        type: 'Liner Layer 2',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 6,
+        layer: 'Corrugated Layer 3',
+        type: 'Corrugated Layer 3',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 7,
+        layer: 'Liner Layer 3',
+        type: 'Liner Layer 3',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
     ],
     9: [
-      { layer_id:1,layer: 'Top Layer', type: 'Top Layer',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:2,layer: 'Corrugated Layer 1', type: 'Corrugated Layer 1',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:3,layer: 'Liner Layer 1', type: 'Liner Layer 1',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:4,layer: 'Corrugated Layer 2', type: 'Corrugated Layer 2',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:5,layer: 'Liner Layer 2', type: 'Liner Layer 2',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:6,layer: 'Corrugated Layer 3', type: 'Corrugated Layer 3',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:7,layer: 'Liner Layer 3', type: 'Liner Layer 3',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:8,layer: 'Corrugated Layer 4', type: 'Corrugated Layer 4',layer_status:"ungrouped", production_status: "pending" },
-      { layer_id:9,layer: 'Liner Layer 4', type: 'Liner Layer 4',layer_status:"ungrouped", production_status: "pending" },
+      {
+        layer_id: 1,
+        layer: 'Top Layer',
+        type: 'Top Layer',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 2,
+        layer: 'Corrugated Layer 1',
+        type: 'Corrugated Layer 1',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 3,
+        layer: 'Liner Layer 1',
+        type: 'Liner Layer 1',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 4,
+        layer: 'Corrugated Layer 2',
+        type: 'Corrugated Layer 2',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 5,
+        layer: 'Liner Layer 2',
+        type: 'Liner Layer 2',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 6,
+        layer: 'Corrugated Layer 3',
+        type: 'Corrugated Layer 3',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 7,
+        layer: 'Liner Layer 3',
+        type: 'Liner Layer 3',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 8,
+        layer: 'Corrugated Layer 4',
+        type: 'Corrugated Layer 4',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
+      {
+        layer_id: 9,
+        layer: 'Liner Layer 4',
+        type: 'Liner Layer 4',
+        layer_status: 'ungrouped',
+        production_status: 'pending',
+      },
     ],
   }
 
@@ -604,7 +743,7 @@ useEffect(() => {
     const layerConfig = plyLayerConfigurations[plyCount] || []
 
     const newSkuValues = layerConfig.map((layer) => ({
-      layer_id:layer.layer_id,
+      layer_id: layer.layer_id,
       layer: layer.layer,
       gsm: '',
       bf: '',
@@ -614,8 +753,8 @@ useEffect(() => {
       weight: '',
       bursting_strength: '',
       //flute_ratio: '',
-      layer_status:layer.layer_status,
-      production_status:layer.production_status
+      layer_status: layer.layer_status,
+      production_status: layer.production_status,
     }))
 
     setAddNewSkuData((prevData) => ({
@@ -643,10 +782,10 @@ useEffect(() => {
   const skuComponents = {
     'RSC box': (
       <RSCBox
-         uploadedFiles={uploadedFiles}
-          setUploadedFiles={setUploadedFiles}
-          rscUnits={rscUnits}
-      setRscUnits={setRscUnits}
+        uploadedFiles={uploadedFiles}
+        setUploadedFiles={setUploadedFiles}
+        rscUnits={rscUnits}
+        setRscUnits={setRscUnits}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -680,9 +819,9 @@ useEffect(() => {
     Board: (
       <CorrugatedSheet
         onMeterDataChange={handleMeterDataChange}
-            setRscUnits={setRscUnits}
+        setRscUnits={setRscUnits}
         uploadedFiles={uploadedFiles}
-          setUploadedFiles={setUploadedFiles}
+        setUploadedFiles={setUploadedFiles}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -704,16 +843,15 @@ useEffect(() => {
         setMessage={setMessage}
         errors={errors}
         setErrors={setErrors}
-                taxMaster={taxMaster}
-
+        taxMaster={taxMaster}
       />
     ),
     'Die Cut box': (
       <DieCutBox
-             onMeterDataChange={handleMeterDataChange}
+        onMeterDataChange={handleMeterDataChange}
         setRscUnits={setRscUnits}
-              uploadedFiles={uploadedFiles}
-          setUploadedFiles={setUploadedFiles}
+        uploadedFiles={uploadedFiles}
+        setUploadedFiles={setUploadedFiles}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -735,13 +873,12 @@ useEffect(() => {
         setMessage={setMessage}
         errors={errors}
         setErrors={setErrors}
-                taxMaster={taxMaster}
-
+        taxMaster={taxMaster}
       />
     ),
     Composite: (
       <Composite
-      validationErrors={validationErrors}
+        validationErrors={validationErrors}
         isopenval={isopenval}
         dropdownRef={dropdownRef}
         addNewSkuData={addNewSkuData}
@@ -767,8 +904,7 @@ useEffect(() => {
         errors={errors}
         setErrors={setErrors}
         compositeSkuMessage={compositeSkuMessage}
-                taxMaster={taxMaster}
-
+        taxMaster={taxMaster}
       />
     ),
     'Custom Item': (
@@ -794,8 +930,7 @@ useEffect(() => {
         message={message}
         setMessage={setMessage}
         errors={errors}
-                taxMaster={taxMaster}
-
+        taxMaster={taxMaster}
       />
     ),
   }
@@ -807,9 +942,8 @@ useEffect(() => {
     setisSingleViewPopup(false)
   }
 
-
   const handleCancel = () => {
-  dispatch(setSkuPartValue([]))
+    dispatch(setSkuPartValue([]))
     setAddNewSkuData(createInitialSkuData())
     //handleClose()
     // dispatch(saveSkuFormState({}))
@@ -822,7 +956,6 @@ useEffect(() => {
   }
   useEffect(() => {
     if (compositeSelect) {
-
       setisSingleViewPopupForType(true)
 
       //setIsCompositePopupCreate(true)
@@ -832,8 +965,6 @@ useEffect(() => {
       setCompositeSelect(null)
     }
   }, [compositeSelect])
-
-
 
   useEffect(() => {
     if (!isSingleViewPopupForType) {
@@ -866,28 +997,28 @@ useEffect(() => {
   }, [isSingleViewPopupForType])
 
   useEffect(() => {
-      const updatedSkuValues = addNewSkuData?.sku_values?.map((item) => {
-    const { gsm, bf, selected_flute, layer } = item;
+    const updatedSkuValues = addNewSkuData?.sku_values?.map((item) => {
+      const { gsm, bf, selected_flute, layer } = item
 
-    if (gsm && bf) {
-      const isCorrugated = layer?.toLowerCase().includes('corrugated');
+      if (gsm && bf) {
+        const isCorrugated = layer?.toLowerCase().includes('corrugated')
 
-      // Choose divisor based on corrugated status
-      const divisor = isCorrugated ? 2000 : 1000;
+        // Choose divisor based on corrugated status
+        const divisor = isCorrugated ? 2000 : 1000
 
-      const calculatedBS = Number(((gsm * bf) / divisor).toFixed(3));
-      console.log("calculated bursting strength:", calculatedBS);
+        const calculatedBS = Number(((gsm * bf) / divisor).toFixed(3))
 
-      // Only update if the calculated bursting strength is different
-      if (item.bursting_strength !== calculatedBS) {
-        return { ...item, bursting_strength: calculatedBS };
+        // Only update if the calculated bursting strength is different
+        if (item.bursting_strength !== calculatedBS) {
+          return { ...item, bursting_strength: calculatedBS }
+        }
       }
-    }
 
-    return item;
-  });
+      return item
+    })
     const hasChanged = updatedSkuValues?.some(
-      (item, index) => item.bursting_strength !== addNewSkuData?.sku_values[index].bursting_strength,
+      (item, index) =>
+        item.bursting_strength !== addNewSkuData?.sku_values[index].bursting_strength,
     )
 
     if (hasChanged) {
@@ -970,47 +1101,42 @@ useEffect(() => {
     }
   }
 
-useEffect(() => {
-  const colorData = async () => {
-    try {
-      const response = await commonApi.getColors();
-      setColor(response.data.data); // ✅ use response.data.data
-      console.log("color data", response.data.data);
-    } catch (error) {
-      console.error(error);
+  useEffect(() => {
+    const colorData = async () => {
+      try {
+        const response = await commonApi.getColors()
+        setColor(response.data.data) // ✅ use response.data.data
+      } catch (error) {
+        console.error(error)
+      }
     }
-  };
-  colorData();
-}, []);
+    colorData()
+  }, [])
 
-console.log("shared unitr form rsc",rscUnits)
-console.log("composite",compositeSelect)
-console.log("sku values...",JSON.stringify(addNewSkuData?.sku_values))
-useEffect(() => {
-  const totalWeight = addNewSkuData?.sku_values?.reduce(
-    (acc, item) => acc + (Number(item.weight) || 0),
-    0
-  )
+  useEffect(() => {
+    const totalWeight = addNewSkuData?.sku_values?.reduce(
+      (acc, item) => acc + (Number(item.weight) || 0),
+      0,
+    )
 
-const totalBurstingStrength = addNewSkuData?.sku_values?.reduce((acc, item) => {
-  const gsm = Number(item.gsm);
-  const bf = Number(item.bf);
-  const isCorrugated = item.layer?.toLowerCase().includes('corrugated');
+    const totalBurstingStrength = addNewSkuData?.sku_values?.reduce((acc, item) => {
+      const gsm = Number(item.gsm)
+      const bf = Number(item.bf)
+      const isCorrugated = item.layer?.toLowerCase().includes('corrugated')
 
-  if (gsm && bf) {
-    const divisor = isCorrugated ? 2000 : 1000;
-    return acc + (gsm * bf) / divisor;
-  }
-  return acc;
-}, 0);
+      if (gsm && bf) {
+        const divisor = isCorrugated ? 2000 : 1000
+        return acc + (gsm * bf) / divisor
+      }
+      return acc
+    }, 0)
 
-
-  setAddNewSkuData((prevData) => ({
-    ...prevData,
-    total_weight: Math.round(totalWeight * 1000) / 1000,
-    total_bursting_strength: Math.round(totalBurstingStrength * 1000) / 1000,
-  }))
-}, [addNewSkuData?.sku_values])
+    setAddNewSkuData((prevData) => ({
+      ...prevData,
+      total_weight: Math.round(totalWeight * 1000) / 1000,
+      total_bursting_strength: Math.round(totalBurstingStrength * 1000) / 1000,
+    }))
+  }, [addNewSkuData?.sku_values])
 
   useEffect(() => {
     fetchFluteList()
@@ -1020,27 +1146,22 @@ const totalBurstingStrength = addNewSkuData?.sku_values?.reduce((acc, item) => {
     try {
       const response = await skuApi.getFluteType()
       setFluteDropdown(response.data.data)
-      console.log("flute",response.data.data)
-      console.log("flute type",JSON.stringify(response.data.data))
+
     } catch (error) {
       console.error(error)
     }
   }
 
-
-const handleFluteSelection = (selectedFlute, fluteIndex) => {
-  console.log("selected flute",selectedFlute)
-  if (fluteIndex !== null) {
-    handleSkuValuesChange(fluteIndex, 'flute_type', selectedFlute.name);
-    handleSkuValuesChange(fluteIndex, 'selected_flute', selectedFlute);
-    setSelectedFluteIndex(null);
-    setisSingleViewPopup(false);
+  const handleFluteSelection = (selectedFlute, fluteIndex) => {
+    if (fluteIndex !== null) {
+      handleSkuValuesChange(fluteIndex, 'flute_type', selectedFlute.name)
+      handleSkuValuesChange(fluteIndex, 'selected_flute', selectedFlute)
+      setSelectedFluteIndex(null)
+      setisSingleViewPopup(false)
+    }
   }
-};
 
-console.log("addnedwskudata unit",rscUnits)
-console.log("add sku data",addNewSkuData?.client)
-console.log("add sku data",addNewSkuData?.client_id)
+
 
   const deckleError = useSelector((state) => state.boardCalculations.deckleError)
   const dieError = useSelector((state) => state.diecutCalculations.deckleError)
@@ -1063,18 +1184,17 @@ console.log("add sku data",addNewSkuData?.client_id)
       if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
         newErrors.route = 'Required'
       }
- const partValueErrors = addNewSkuData.part_value.map((part) => {
-  const errors = {}
-  if (!part.sku_id || !part.sku_name) errors.sku = 'SKU is required'
-  if (!part.ratio) errors.ratio = 'Ratio is required'
-  return Object.keys(errors).length > 0 ? errors : undefined
-})
+      const partValueErrors = addNewSkuData.part_value.map((part) => {
+        const errors = {}
+        if (!part.sku_id || !part.sku_name) errors.sku = 'SKU is required'
+        if (!part.ratio) errors.ratio = 'Ratio is required'
+        return Object.keys(errors).length > 0 ? errors : undefined
+      })
 
-// Only assign part_value errors if there are any non-undefined entries
-if (partValueErrors.some((entry) => entry !== undefined)) {
-  newErrors.part_value = partValueErrors
-}
-
+      // Only assign part_value errors if there are any non-undefined entries
+      if (partValueErrors.some((entry) => entry !== undefined)) {
+        newErrors.part_value = partValueErrors
+      }
     } else if (addNewSkuData.sku_type === 'Die Cut box') {
       // Validate only for Composite
       if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
@@ -1093,32 +1213,29 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
         newErrors.route = 'Required'
       }
-   if (
-  addNewSkuData?.print_type !== 'None' &&
-  (!addNewSkuData.documents || addNewSkuData.documents.length === 0)
-) {
-  newErrors.documents = 'Required';
-}
-            if (Array.isArray(addNewSkuData.sku_values)) {
-    addNewSkuData.sku_values.forEach((layer, index) => {
-      const layerErrors = {}
-
-      if (!layer.gsm) layerErrors.gsm = 'GSM is required'
-      if (!layer.bf) layerErrors.bf = 'BF is required'
-      if (!layer.color) layerErrors.color = 'Color is required'
       if (
-        layer?.layer?.toLowerCase()?.includes('corrugated') &&
-        !layer.flute_type
+        addNewSkuData?.print_type !== 'None' &&
+        (!addNewSkuData.documents || addNewSkuData.documents.length === 0)
       ) {
-        layerErrors.flute_type = 'Flute Type is required'
+        newErrors.documents = 'Required'
       }
+      if (Array.isArray(addNewSkuData.sku_values)) {
+        addNewSkuData.sku_values.forEach((layer, index) => {
+          const layerErrors = {}
 
-      if (Object.keys(layerErrors).length > 0) {
-        if (!newErrors.sku_values) newErrors.sku_values = {}
-        newErrors.sku_values[index] = layerErrors
+          if (!layer.gsm) layerErrors.gsm = 'GSM is required'
+          if (!layer.bf) layerErrors.bf = 'BF is required'
+          if (!layer.color) layerErrors.color = 'Color is required'
+          if (layer?.layer?.toLowerCase()?.includes('corrugated') && !layer.flute_type) {
+            layerErrors.flute_type = 'Flute Type is required'
+          }
+
+          if (Object.keys(layerErrors).length > 0) {
+            if (!newErrors.sku_values) newErrors.sku_values = {}
+            newErrors.sku_values[index] = layerErrors
+          }
+        })
       }
-    })
-  }
     } else if (addNewSkuData.sku_type === 'Board') {
       // Validate only for Composite
       if (!addNewSkuData.sku_name) newErrors.sku_name = 'Required'
@@ -1140,32 +1257,29 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
         newErrors.route = 'Required'
       }
-       if (
-  addNewSkuData?.print_type !== 'None' &&
-  (!addNewSkuData.documents || addNewSkuData.documents.length === 0)
-) {
-  newErrors.documents = 'Required';
-}
-            if (Array.isArray(addNewSkuData.sku_values)) {
-    addNewSkuData.sku_values.forEach((layer, index) => {
-      const layerErrors = {}
-
-      if (!layer.gsm) layerErrors.gsm = 'GSM is required'
-      if (!layer.bf) layerErrors.bf = 'BF is required'
-      if (!layer.color) layerErrors.color = 'Color is required'
       if (
-        layer?.layer?.toLowerCase()?.includes('corrugated') &&
-        !layer.flute_type
+        addNewSkuData?.print_type !== 'None' &&
+        (!addNewSkuData.documents || addNewSkuData.documents.length === 0)
       ) {
-        layerErrors.flute_type = 'Flute Type is required'
+        newErrors.documents = 'Required'
       }
+      if (Array.isArray(addNewSkuData.sku_values)) {
+        addNewSkuData.sku_values.forEach((layer, index) => {
+          const layerErrors = {}
 
-      if (Object.keys(layerErrors).length > 0) {
-        if (!newErrors.sku_values) newErrors.sku_values = {}
-        newErrors.sku_values[index] = layerErrors
+          if (!layer.gsm) layerErrors.gsm = 'GSM is required'
+          if (!layer.bf) layerErrors.bf = 'BF is required'
+          if (!layer.color) layerErrors.color = 'Color is required'
+          if (layer?.layer?.toLowerCase()?.includes('corrugated') && !layer.flute_type) {
+            layerErrors.flute_type = 'Flute Type is required'
+          }
+
+          if (Object.keys(layerErrors).length > 0) {
+            if (!newErrors.sku_values) newErrors.sku_values = {}
+            newErrors.sku_values[index] = layerErrors
+          }
+        })
       }
-    })
-  }
     }
     //if (!addNewSkuData.gst_percentage) newErrors.gst_percentage = 'Required'
     else if (addNewSkuData.sku_type === 'RSC box') {
@@ -1182,10 +1296,10 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!addNewSkuData.joints) newErrors.joints = 'Required'
       //if (!addNewSkuData.deckle_size &&  deckleSize>addNewSkuData.deckle_size) newErrors.deckle_size = 'Required'
       if (!addNewSkuData.deckle_size) {
-  newErrors.deckle_size = 'Deckle size is required';
-} else if (Number(addNewSkuData.deckle_size) < deckleSize) {
-  newErrors.deckle_size = `Deckle size must be greater than ${deckleSize.toFixed(3)}`;
-}
+        newErrors.deckle_size = 'Deckle size is required'
+      } else if (Number(addNewSkuData.deckle_size) < deckleSize) {
+        newErrors.deckle_size = `Deckle size must be greater than ${deckleSize.toFixed(3)}`
+      }
 
       //if (!addNewSkuData.inner_outer_dimension) newErrors.inner_outer_dimension = 'Required'
       if (!addNewSkuData.flap_width) newErrors.flap_width = 'Required'
@@ -1201,35 +1315,30 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
       if (!Array.isArray(addNewSkuData.route) || addNewSkuData.route.length === 0) {
         newErrors.route = 'Required'
       }
-   if (
-  addNewSkuData?.print_type !== 'None' &&
-  (!addNewSkuData.documents || addNewSkuData.documents.length === 0)
-) {
-  newErrors.documents = 'Required';
-}
-
+      if (
+        addNewSkuData?.print_type !== 'None' &&
+        (!addNewSkuData.documents || addNewSkuData.documents.length === 0)
+      ) {
+        newErrors.documents = 'Required'
+      }
 
       if (Array.isArray(addNewSkuData.sku_values)) {
-    addNewSkuData.sku_values.forEach((layer, index) => {
-      const layerErrors = {}
+        addNewSkuData.sku_values.forEach((layer, index) => {
+          const layerErrors = {}
 
-      if (!layer.gsm) layerErrors.gsm = 'GSM is required'
-      if (!layer.bf) layerErrors.bf = 'BF is required'
-      if (!layer.color) layerErrors.color = 'Color is required'
-      if (
-        layer?.layer?.toLowerCase()?.includes('corrugated') &&
-        !layer?.flute_type
-      ) {
-        layerErrors.flute_type = 'Flute Type is required'
+          if (!layer.gsm) layerErrors.gsm = 'GSM is required'
+          if (!layer.bf) layerErrors.bf = 'BF is required'
+          if (!layer.color) layerErrors.color = 'Color is required'
+          if (layer?.layer?.toLowerCase()?.includes('corrugated') && !layer?.flute_type) {
+            layerErrors.flute_type = 'Flute Type is required'
+          }
+
+          if (Object.keys(layerErrors).length > 0) {
+            if (!newErrors.sku_values) newErrors.sku_values = {}
+            newErrors.sku_values[index] = layerErrors
+          }
+        })
       }
-
-      if (Object.keys(layerErrors).length > 0) {
-        if (!newErrors.sku_values) newErrors.sku_values = {}
-        newErrors.sku_values[index] = layerErrors
-      }
-
-    })
-  }
     } else {
       newErrors = {}
     }
@@ -1252,25 +1361,23 @@ if (partValueErrors.some((entry) => entry !== undefined)) {
 
       const numberSkuData = {
         ...addNewSkuData,
-         unit: addNewSkuData.unit?.trim() ? addNewSkuData.unit : "mm",
+        unit: addNewSkuData.unit?.trim() ? addNewSkuData.unit : 'mm',
         width_board_size_cm2: Number(addNewSkuData.width_board_size_cm2),
         length_board_size_cm2: Number(addNewSkuData.length_board_size_cm2),
         deckle_size: Number(addNewSkuData.deckle_size),
         gst_percentage: Number(addNewSkuData.gst_percentage),
-            length: Number(addNewSkuData.length),
-             width: Number(addNewSkuData.width),
-             height: Number(addNewSkuData.height)
+        length: Number(addNewSkuData.length),
+        width: Number(addNewSkuData.width),
+        height: Number(addNewSkuData.height),
       }
-      //console.log("numberSkuData",JSON.stringify(numberSkuData))
- const numberSkuDataFixed = {
-  ...numberSkuData,
-  sku_values: numberSkuData.sku_values.map(({ selected_flute, flute_type, ...rest }) => ({
-    ...rest,
-    flute_type: flute_type === "--" ? null : flute_type,
-  })),
-};
+      const numberSkuDataFixed = {
+        ...numberSkuData,
+        sku_values: numberSkuData.sku_values.map(({ selected_flute, flute_type, ...rest }) => ({
+          ...rest,
+          flute_type: flute_type === '--' ? null : flute_type,
+        })),
+      }
 
-console.log("numberSkuDataFixed", JSON.stringify(numberSkuDataFixed, null, 2));
 
       try {
         let response
@@ -1285,29 +1392,30 @@ console.log("numberSkuDataFixed", JSON.stringify(numberSkuDataFixed, null, 2));
           //setRefresh((prev) => !prev)
           if (isSingleViewPopupForType) {
             setisSingleViewPopupForType(false)
-                      setAlerts([{ severity: 'success', message: response.data.message }])
-                      setCompositeSkuMessage(response.data.message)
+            setAlerts([{ severity: 'success', message: response.data.message }])
+            setCompositeSkuMessage(response.data.message)
           } else {
             //setDrawerOpen(false)
-                        navigate('/SKU', {
-  state: {
-    successMessage: response.data.message
-  }
-});
-
+            navigate('/SKU', {
+              state: {
+                successMessage: response.data.message,
+              },
+            })
           }
           setEditTag(false)
-          if(addNewSkuData.sku_type==="Composite"){
-           dispatch(setSkuPartValue([]))
+          if (addNewSkuData.sku_type === 'Composite') {
+            dispatch(setSkuPartValue([]))
           }
-
         }
       } catch (error) {
         console.error('Error adding SKU:', error)
+        if (error?.response?.data?.field) {
+          setErrors((prev) => ({ ...prev, [error.response.data.field]: error.response.data.error }))
+        }
         if (error?.response?.data?.error) {
-          setAlerts([{ severity: 'error', message: error?.response?.data?.error }])
-        } else {
-          setAlerts([{ severity: 'error', message: error?.response?.data?.message }])
+          setAlerts([{ severity: 'error', message: error.response.data.error }])
+        } else if (error?.response?.data?.message) {
+          setAlerts([{ severity: 'error', message: error.response.data.message }])
         }
       } finally {
         setTimeout(() => {
@@ -1316,7 +1424,6 @@ console.log("numberSkuDataFixed", JSON.stringify(numberSkuDataFixed, null, 2));
       }
     }
   }
-
 
   const handleStrictAdherenceToggle = () => {
     const newStrictAdherence = !strictAdherence
@@ -1329,128 +1436,118 @@ console.log("numberSkuDataFixed", JSON.stringify(numberSkuDataFixed, null, 2));
   }
 
 
-  console.log("sku tyoe000000",skuType)
-  console.log("edit datas",addNewSkuData)
 
   const handleSkuEdit = async (id) => {
-  if (!id) return;
+    if (!id) return
 
-  try {
-    console.log("editing id", id);
-    const selectedSku  = await skuApi.singleSku(id); // Make sure skuApi.singleSku returns a promise
-    console.log("sku single data", selectedSku);
+    try {
+      const selectedSku = await skuApi.singleSku(id) // Make sure skuApi.singleSku returns a promise
 
-    //setSelectedSku(data);
-    setEditTag(true);
-    setClientDisable(true);
-    setEditedSkuData(selectedSku); // Use `data`, not `selectedSku`
+      //setSelectedSku(data);
+      setEditTag(true)
+      setClientDisable(true)
+      setEditedSkuData(selectedSku) // Use `data`, not `selectedSku`
 
-     setAddNewSkuData({
-      id: selectedSku.id || null,
-      sku_name: selectedSku.sku_name || null,
-      client_id: selectedSku?.client_id || null,
-      client: selectedSku?.company_name || null,
-      ply: selectedSku.ply || null,
-      length: selectedSku.length || null,
-      width: selectedSku.width || null,
-      height: selectedSku.height || null,
-      lwh: selectedSku.lwh || null,
-      unit: selectedSku.unit || null,
-      joints: selectedSku.joints || null,
-      ups: selectedSku.ups || null,
-      select_dies: selectedSku.select_dies || null,
-      no_of_parts: selectedSku?.no_of_parts || null,
-      composite_type: selectedSku?.composite_type || null,
-      inner_outer_dimension: selectedSku.inner_outer_dimension || null,
-      flap_width: selectedSku.flap_width ?? null,
-      flap_tolerance: selectedSku.flap_tolerance || null,
-      length_trimming_tolerance: selectedSku.length_trimming_tolerance || null,
-      width_trimming_tolerance: selectedSku.width_trimming_tolerance || null,
-      strict_adherence: selectedSku.strict_adherence || false,
-      customer_reference: selectedSku.customer_reference || null,
-      reference_number: selectedSku.reference_number || null,
-      // internal_id: selectedSku.internal_id || null,
-      board_size_cm2: selectedSku.board_size_cm2 || null,
-      deckle_size: selectedSku.deckle_size || null,
-      minimum_order_level: selectedSku.minimum_order_level ?? null,
-      sku_type: selectedSku.sku_type || null,
-      part_value: selectedSku.part_value || [],
-      route: selectedSku.route || [],
-      part_count: selectedSku.part_count,
-      width_board_size_cm2: selectedSku.width_board_size_cm2 || null,
-      length_board_size_cm2: selectedSku.length_board_size_cm2 || null,
-      estimate_composite_item: selectedSku.estimate_composite_item || null,
-      description: selectedSku.description || null,
-      default_sku_details: selectedSku.default_sku_details || null,
-          documents: selectedSku.documents || [],
-    print_type:selectedSku.print_type || null,
-      tags: selectedSku.tags || {},
-      gst_percentage: selectedSku.gst_percentage || null,
-      total_weight:selectedSku.total_weight || null,
-total_bursting_strength:selectedSku.total_bursting_strength ||null,
-      sku_values: selectedSku.sku_values || [
-        {
-          layer_id:null,
-          layer: null,
-          gsm: null,
-          bf: null,
-          material: null,
-          color: null,
-          flute_type: null,
-          weight: null,
-          bursting_strength: null,
-          flute_ratio: null,
-          layer_status: null,
-          production_status: "pending",
-        },
-      ],
-    })
+      setAddNewSkuData({
+        id: selectedSku.id || null,
+        sku_name: selectedSku.sku_name || null,
+        client_id: selectedSku?.client_id || null,
+        client: selectedSku?.company_name || null,
+        ply: selectedSku.ply || null,
+        length: selectedSku.length || null,
+        width: selectedSku.width || null,
+        height: selectedSku.height || null,
+        lwh: selectedSku.lwh || null,
+        unit: selectedSku.unit || null,
+        joints: selectedSku.joints || null,
+        ups: selectedSku.ups || null,
+        select_dies: selectedSku.select_dies || null,
+        no_of_parts: selectedSku?.no_of_parts || null,
+        composite_type: selectedSku?.composite_type || null,
+        inner_outer_dimension: selectedSku.inner_outer_dimension || null,
+        flap_width: selectedSku.flap_width ?? null,
+        flap_tolerance: selectedSku.flap_tolerance || null,
+        length_trimming_tolerance: selectedSku.length_trimming_tolerance || null,
+        width_trimming_tolerance: selectedSku.width_trimming_tolerance || null,
+        strict_adherence: selectedSku.strict_adherence || false,
+        customer_reference: selectedSku.customer_reference || null,
+        reference_number: selectedSku.reference_number || null,
+        // internal_id: selectedSku.internal_id || null,
+        board_size_cm2: selectedSku.board_size_cm2 || null,
+        deckle_size: selectedSku.deckle_size || null,
+        minimum_order_level: selectedSku.minimum_order_level ?? null,
+        sku_type: selectedSku.sku_type || null,
+        part_value: selectedSku.part_value || [],
+        route: selectedSku.route || [],
+        part_count: selectedSku.part_count,
+        width_board_size_cm2: selectedSku.width_board_size_cm2 || null,
+        length_board_size_cm2: selectedSku.length_board_size_cm2 || null,
+        estimate_composite_item: selectedSku.estimate_composite_item || null,
+        description: selectedSku.description || null,
+        default_sku_details: selectedSku.default_sku_details || null,
+        documents: selectedSku.documents || [],
+        print_type: selectedSku.print_type || null,
+        tags: selectedSku.tags || {},
+        gst_percentage: selectedSku.gst_percentage || null,
+        total_weight: selectedSku.total_weight || null,
+        total_bursting_strength: selectedSku.total_bursting_strength || null,
+        sku_values: selectedSku.sku_values || [
+          {
+            layer_id: null,
+            layer: null,
+            gsm: null,
+            bf: null,
+            material: null,
+            color: null,
+            flute_type: null,
+            weight: null,
+            bursting_strength: null,
+            flute_ratio: null,
+            layer_status: null,
+            production_status: 'pending',
+          },
+        ],
+      })
 
-
-    setStrictAdherence(data.strict_adherence ?? false);
-    
-
-  } catch (error) {
-    console.error('Error fetching SKU:', error);
+      setStrictAdherence(data.strict_adherence ?? false)
+    } catch (error) {
+      console.error('Error fetching SKU:', error)
+    }
   }
-};
 
-console.log("editinggg data",addNewSkuData)
- useEffect(() => {
+  useEffect(() => {
     const handleBeforeUnload = (e) => {
-      e.preventDefault();
-      e.returnValue = ''; // required for Chrome to show the confirmation dialog
-    };
+      e.preventDefault()
+      e.returnValue = '' // required for Chrome to show the confirmation dialog
+    }
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('beforeunload', handleBeforeUnload)
 
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
-
-useEffect(() => {
-  const fetchBranches = async () => {
-    try {
-      const response = await commonApi.getCompanyBranchDropdown();
-      console.log('Branch dropdown response:', response.data);
-      setBranchList(response.data);
-    } catch (error) {
-      console.error('Error fetching branches:', error);
+      window.removeEventListener('beforeunload', handleBeforeUnload)
     }
-  };
+  }, [])
 
-  fetchBranches();
-}, []);
-// Compute toggle state based on addNewSkuData.strict_adherence
-const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherence;
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const response = await commonApi.getCompanyBranchDropdown()
+        setBranchList(response.data)
+      } catch (error) {
+        console.error('Error fetching branches:', error)
+      }
+    }
+
+    fetchBranches()
+  }, [])
+  // Compute toggle state based on addNewSkuData.strict_adherence
+  const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherence
 
   return (
     <div className="p-6 bg-white rounded-lg">
+      <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
       {/* conditional rendring according to sku_type */}
-      <h4 className="text-lg font-semibold mb-4">
-  {editTag ? 'Edit' : 'Add'} Sku Details
-</h4>
+      <h4 className="text-lg font-semibold mb-4">{editTag ? 'Edit' : 'Add'} Sku Details</h4>
 
       {skuComponents[addNewSkuData?.sku_type] || null}
 
@@ -1461,7 +1558,7 @@ const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherenc
             <button
               className={`w-11 h-[23px] flex items-center border border-blue-600 rounded-full p-1 cursor-pointer 
   ${isStrictActive ? 'bg-blue-600' : 'bg-gray-300'}`}
-             onClick={!editTag ? handleStrictAdherenceToggle : undefined} 
+              onClick={!editTag ? handleStrictAdherenceToggle : undefined}
             >
               <div
                 className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out 
@@ -1528,7 +1625,6 @@ const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherenc
                           value={item.layer}
                           onChange={(e) => handleSkuValuesChange(index, 'layer', e.target.value)}
                           readOnly="true"
- 
                         />
                         <img
                           src={updown}
@@ -1545,30 +1641,29 @@ const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherenc
                     </td>
 
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                    <input
-  type="number"
-  className={`p-1 rounded text-center w-full transition-colors ${
-    errors.sku_values?.[index]?.gsm
-      ? 'border-2 border-red-500'
-      : 'border border-gray-300'
-  }`}
-  value={item.gsm || ''}
-  placeholder="gsm"
-  onChange={(e) =>
-    handleSkuValuesChange(index, 'gsm', Number(e.target.value))
-  }
-  readOnly={editTag}
-/>
-
+                      <input
+                        type="number"
+                        className={`p-1 rounded text-center w-full transition-colors ${
+                          errors.sku_values?.[index]?.gsm
+                            ? 'border-2 border-red-500'
+                            : 'border border-gray-300'
+                        }`}
+                        value={item.gsm || ''}
+                        placeholder="gsm"
+                        onChange={(e) =>
+                          handleSkuValuesChange(index, 'gsm', Number(e.target.value))
+                        }
+                        readOnly={editTag}
+                      />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
                       <input
                         type="number"
-                      className={`p-1 rounded text-center w-full transition-colors ${
-    errors.sku_values?.[index]?.bf
-      ? 'border-2 border-red-500'
-      : 'border border-gray-300'
-  }`}
+                        className={`p-1 rounded text-center w-full transition-colors ${
+                          errors.sku_values?.[index]?.bf
+                            ? 'border-2 border-red-500'
+                            : 'border border-gray-300'
+                        }`}
                         value={item.bf || ''}
                         placeholder="bf"
                         onChange={(e) => handleSkuValuesChange(index, 'bf', Number(e.target.value))}
@@ -1576,34 +1671,33 @@ const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherenc
                       />
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-<select
-     className={`p-1 rounded w-full transition-colors ${
-      errors.sku_values?.[index]?.color
-        ? 'border-2 border-red-500'
-        : 'border border-gray-300'
-    }`}
-  value={item.color}
-  onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
-  disabled={editTag} // use disabled for select instead of readOnly
->
-  <option value="">Select Color</option>
-  {color.map((c) => (
-    <option key={c.id} value={c.color_name}>
-      {c.color_name}
-    </option>
-  ))}
-</select>
-
+                      <select
+                        className={`p-1 rounded w-full transition-colors ${
+                          errors.sku_values?.[index]?.color
+                            ? 'border-2 border-red-500'
+                            : 'border border-gray-300'
+                        }`}
+                        value={item.color}
+                        onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
+                        disabled={editTag} // use disabled for select instead of readOnly
+                      >
+                        <option value="">Select Color</option>
+                        {color.map((c) => (
+                          <option key={c.id} value={c.color_name}>
+                            {c.color_name}
+                          </option>
+                        ))}
+                      </select>
                     </td>
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
                       {item?.layer?.toLowerCase().includes('corrugated') ? (
                         <div className="relative w-full flex items-center">
                           <select
-                              className={`p-1 rounded w-full pr-8 appearance-none transition-colors ${
-          errors.sku_values?.[index]?.flute_type
-            ? 'border-2 border-red-500'
-            : 'border border-gray-300'
-        }`}
+                            className={`p-1 rounded w-full pr-8 appearance-none transition-colors ${
+                              errors.sku_values?.[index]?.flute_type
+                                ? 'border-2 border-red-500'
+                                : 'border border-gray-300'
+                            }`}
                             value={item.flute_type}
                             onChange={(e) =>
                               handleSkuValuesChange(index, 'flute_type', e.target.value)
@@ -1611,25 +1705,23 @@ const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherenc
                             disabled={editTag}
                           >
                             <option hidden>Select</option>
-  {fluteDropdown.map((flute) => (
-    <option key={flute.id} value={flute.name}>
-      {flute.name}
-    </option>
-  ))}
+                            {fluteDropdown.map((flute) => (
+                              <option key={flute.id} value={flute.name}>
+                                {flute.name}
+                              </option>
+                            ))}
                           </select>
                           <FaEye
                             className="absolute right-2 text-gray-500 cursor-pointer"
-                           onClick={() => {
-    setSelectedFluteIndex(index);
-    setisSingleViewPopup(true);
-  }}
+                            onClick={() => {
+                              setSelectedFluteIndex(index)
+                              setisSingleViewPopup(true)
+                            }}
                           />
                         </div>
                       ) : (
                         <p className="text-gray-500">--</p>
                       )}
-
-
                     </td>
 
                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
@@ -1652,23 +1744,19 @@ const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherenc
                 ))}
               </tbody>
             </table>
-
           </div>
         </div>
       )}
-{addNewSkuData?.ply && addNewSkuData?.sku_type !== 'Custom Item' && (
-  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-4 mt-4 mb-6">
-    <p className="text-sm font-medium text-gray-700 mb-10">
-      Total Weight:{' '}
- {addNewSkuData?.total_weight}
-    </p>
-    <p className="text-sm font-medium text-gray-700 mb-10">
-      Total Bursting Strength:{' '}
-{addNewSkuData?.total_bursting_strength}
-    </p>
-  </div>
-)}
-
+      {addNewSkuData?.ply && addNewSkuData?.sku_type !== 'Custom Item' && (
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-4 mt-4 mb-6">
+          <p className="text-sm font-medium text-gray-700 mb-10">
+            Total Weight: {addNewSkuData?.total_weight}
+          </p>
+          <p className="text-sm font-medium text-gray-700 mb-10">
+            Total Bursting Strength: {addNewSkuData?.total_bursting_strength}
+          </p>
+        </div>
+      )}
 
       {/*{addNewSkuData.ply && addNewSkuData.sku_type !== 'Custom Item' && (
         <tr className="bg-gray-100 font-semibold text-center">
@@ -1684,7 +1772,7 @@ const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherenc
         </tr>
       )}*/}
 
-    {/*<div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 pb-6 px-4 flex justify-end space-x-4 z-20">
+      {/*<div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 pb-6 px-4 flex justify-end space-x-4 z-20">
         <button
             className="p-1.5 border border-gray-300 rounded w-20 text-sm"
             onClick={handleCancel}
@@ -1700,23 +1788,15 @@ const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherenc
 
   
 </div>*/}
-  <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-2 z-10">
-          <div className="pr-3 mx-auto flex justify-end">
-            <div className='flex gap-2'>
-              <ActionButton
-                onClick={handleCancel}
-                variant="cancel"
-                label={"cancel"}
-              />
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-2 z-10">
+        <div className="pr-3 mx-auto flex justify-end">
+          <div className="flex gap-2">
+            <ActionButton onClick={handleCancel} variant="cancel" label={'cancel'} />
 
-              <ActionButton
-                label={"Submit"}
-                variant=''
-               onClick={handleAddSkuSubmit}
-              />
-            </div>
+            <ActionButton label={'Submit'} variant="" onClick={handleAddSkuSubmit} />
           </div>
         </div>
+      </div>
 
       <PopUp
         visible={isSingleViewPopup}
@@ -1725,11 +1805,9 @@ const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherenc
         width={'50vw'}
         header={'Add Flute'}
       >
- <FluteTypeView
-    onSelect={(selectedFlute) =>
-      handleFluteSelection(selectedFlute, selectedFluteIndex)
-    }
-  />
+        <FluteTypeView
+          onSelect={(selectedFlute) => handleFluteSelection(selectedFlute, selectedFluteIndex)}
+        />
       </PopUp>
 
       <PopUp
@@ -1798,93 +1876,91 @@ const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherenc
                           />
                         </td>
                         <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                    <input
-  type="number"
-  className={`p-1 rounded text-center w-full transition-colors ${
-    errors.sku_values?.[index]?.gsm
-      ? 'border-2 border-red-500'
-      : 'border border-gray-300'
-  }`}
-  value={item.gsm || ''}
-  placeholder="gsm"
-  onChange={(e) =>
-    handleSkuValuesChange(index, 'gsm', Number(e.target.value))
-  }
-  readOnly={editTag}
-/>
-
-                    </td>
-                    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <input
-                        type="number"
-                      className={`p-1 rounded text-center w-full transition-colors ${
-    errors.sku_values?.[index]?.bf
-      ? 'border-2 border-red-500'
-      : 'border border-gray-300'
-  }`}
-                        value={item.bf || ''}
-                        placeholder="bf"
-                        onChange={(e) => handleSkuValuesChange(index, 'bf', Number(e.target.value))}
-                        readOnly={editTag}
-                      />
-                    </td>
-        
-                     <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-<select
-     className={`p-1 rounded w-full transition-colors ${
-      errors.sku_values?.[index]?.color
-        ? 'border-2 border-red-500'
-        : 'border border-gray-300'
-    }`}
-  value={item.color}
-  onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
-  disabled={editTag} // use disabled for select instead of readOnly
->
-  <option value="">Select Color</option>
-  {color.map((c) => (
-    <option key={c.id} value={c.color_name}>
-      {c.color_name}
-    </option>
-  ))}
-</select>
-
-                    </td>
-                        <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
-                      {item?.layer?.toLowerCase().includes('corrugated') ? (
-                        <div className="relative w-full flex items-center">
-                          <select
-                              className={`p-1 rounded w-full pr-8 appearance-none transition-colors ${
-          errors.sku_values?.[index]?.flute_type
-            ? 'border-2 border-red-500'
-            : 'border border-gray-300'
-        }`}
-                            value={item.flute_type}
+                          <input
+                            type="number"
+                            className={`p-1 rounded text-center w-full transition-colors ${
+                              errors.sku_values?.[index]?.gsm
+                                ? 'border-2 border-red-500'
+                                : 'border border-gray-300'
+                            }`}
+                            value={item.gsm || ''}
+                            placeholder="gsm"
                             onChange={(e) =>
-                              handleSkuValuesChange(index, 'flute_type', e.target.value)
+                              handleSkuValuesChange(index, 'gsm', Number(e.target.value))
                             }
-                            disabled={editTag}
-                          >
-                            <option hidden>Select</option>
-  {fluteDropdown.map((flute) => (
-    <option key={flute.id} value={flute.name}>
-      {flute.name}
-    </option>
-  ))}
-                          </select>
-                          <FaEye
-                            className="absolute right-2 text-gray-500 cursor-pointer"
-                           onClick={() => {
-    setSelectedFluteIndex(index);
-    setisSingleViewPopup(true);
-  }}
+                            readOnly={editTag}
                           />
-                        </div>
-                      ) : (
-                        <p className="text-gray-500">--</p>
-                      )}
+                        </td>
+                        <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                          <input
+                            type="number"
+                            className={`p-1 rounded text-center w-full transition-colors ${
+                              errors.sku_values?.[index]?.bf
+                                ? 'border-2 border-red-500'
+                                : 'border border-gray-300'
+                            }`}
+                            value={item.bf || ''}
+                            placeholder="bf"
+                            onChange={(e) =>
+                              handleSkuValuesChange(index, 'bf', Number(e.target.value))
+                            }
+                            readOnly={editTag}
+                          />
+                        </td>
 
-
-                    </td>
+                        <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                          <select
+                            className={`p-1 rounded w-full transition-colors ${
+                              errors.sku_values?.[index]?.color
+                                ? 'border-2 border-red-500'
+                                : 'border border-gray-300'
+                            }`}
+                            value={item.color}
+                            onChange={(e) => handleSkuValuesChange(index, 'color', e.target.value)}
+                            disabled={editTag} // use disabled for select instead of readOnly
+                          >
+                            <option value="">Select Color</option>
+                            {color.map((c) => (
+                              <option key={c.id} value={c.color_name}>
+                                {c.color_name}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12 relative">
+                          {item?.layer?.toLowerCase().includes('corrugated') ? (
+                            <div className="relative w-full flex items-center">
+                              <select
+                                className={`p-1 rounded w-full pr-8 appearance-none transition-colors ${
+                                  errors.sku_values?.[index]?.flute_type
+                                    ? 'border-2 border-red-500'
+                                    : 'border border-gray-300'
+                                }`}
+                                value={item.flute_type}
+                                onChange={(e) =>
+                                  handleSkuValuesChange(index, 'flute_type', e.target.value)
+                                }
+                                disabled={editTag}
+                              >
+                                <option hidden>Select</option>
+                                {fluteDropdown.map((flute) => (
+                                  <option key={flute.id} value={flute.name}>
+                                    {flute.name}
+                                  </option>
+                                ))}
+                              </select>
+                              <FaEye
+                                className="absolute right-2 text-gray-500 cursor-pointer"
+                                onClick={() => {
+                                  setSelectedFluteIndex(index)
+                                  setisSingleViewPopup(true)
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <p className="text-gray-500">--</p>
+                          )}
+                        </td>
                         <td className="p-2 text-center w-full sm:w-1/12">
                           <input
                             type="text"
@@ -1896,12 +1972,12 @@ const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherenc
                             }
                           />
                         </td>
- <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <p>{toThreeDecimalFixed(item.weight) || 'N/A'}</p>
-                    </td>
-                    <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
-                      <p>{Math.round(item.bursting_strength)}</p>
-                    </td>
+                        <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                          <p>{toThreeDecimalFixed(item.weight) || 'N/A'}</p>
+                        </td>
+                        <td className="p-2 text-center w-full sm:w-1/12 md:w-1/12 lg:w-1/12">
+                          <p>{Math.round(item.bursting_strength)}</p>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -1910,38 +1986,29 @@ const isStrictActive = editTag ? addNewSkuData.strict_adherence : strictAdherenc
             </div>
           )}
           {addNewSkuData?.ply && addNewSkuData?.sku_type !== 'Custom Item' && (
-  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-4 mt-4 mb-6">
-    <p className="text-sm font-medium text-gray-700 mb-10">
-      Total Weight:{' '}
- {addNewSkuData?.total_weight}
-    </p>
-    <p className="text-sm font-medium text-gray-700 mb-10">
-      Total Bursting Strength:{' '}
-{addNewSkuData?.total_bursting_strength}
-    </p>
-  </div>
-)}
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-4 mt-4 mb-6">
+              <p className="text-sm font-medium text-gray-700 mb-10">
+                Total Weight: {addNewSkuData?.total_weight}
+              </p>
+              <p className="text-sm font-medium text-gray-700 mb-10">
+                Total Bursting Strength: {addNewSkuData?.total_bursting_strength}
+              </p>
+            </div>
+          )}
 
           <div className="flex justify-end space-x-4 mt-6">
-           <ActionButton
-                 onClick={() => {
-
+            <ActionButton
+              onClick={() => {
                 setisSingleViewPopupForType(false)
                 // setIsCompositePopupCreate(false)
                 //setCompositeSelect('Composite')
                 setAddNewSkuData(createInitialSkuData())
-
               }}
-                variant="cancel"
-                label={"cancel"}
-              />
-          <ActionButton
-                label={"Submit"}
-                variant=''
-               onClick={handleAddSkuSubmit}
-              />
+              variant="cancel"
+              label={'cancel'}
+            />
+            <ActionButton label={'Submit'} variant="" onClick={handleAddSkuSubmit} />
           </div>
-         
         </div>
       </PopUp>
     </div>

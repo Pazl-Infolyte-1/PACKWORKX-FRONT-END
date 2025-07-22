@@ -57,9 +57,9 @@ function SalesOrderTable({
       { key: 'sales_generate_id', header: 'Sales ID', field: 'sales_generate_id', searchIcon: true  },  
       { key: 'sales_ui_id', header: 'SO-Reference', field: 'sales_ui_id', searchIcon: true  },  
       { key: 'client', header: 'Client', field: 'client', searchIcon: true  },
-      { key: 'skuCount', header: 'Work Orders', field: 'workOrders', searchIcon: true  },
-      { key: 'estimated', header: 'Expected Delivery Date', type:"date", field: 'estimated'  },
-      { key: 'created_at', header: 'Created Date', field: 'created_at',type:"date" },
+      { key: 'skuCount', header: 'Work Orders', field: 'workOrders'},
+      { key: 'estimated', header: 'Expected Delivery Date', field: 'estimated'  },
+      { key: 'created_at', header: 'Created Date', field: 'created_at' },
       {
         key: 'sales_status',
         header: 'Sales Status',

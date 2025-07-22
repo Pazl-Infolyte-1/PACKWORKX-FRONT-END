@@ -4,6 +4,9 @@ import ActionButton from '../../components/New/ActionButton'
 import { purchaseOrderApi } from '../../api/purchaseOrder'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { grnApi } from '../../api/grn'
+import CustomAlert from '../../components/New/CustomAlert'
+import { set } from 'lodash'
+import { formatDateForPayload } from '../../utils/dateFormat'
 
 const GrnForm = () => {
   const location = useLocation()
@@ -29,6 +32,7 @@ const GrnForm = () => {
     received_by: '',
     notes: '',
     items: [],
+    validateItems: null, // Add this to store validation function
   })
 
   useEffect(() => {
@@ -57,7 +61,8 @@ const GrnForm = () => {
 
     setIsSubmitted(true)
     let newErrors = {}
-    // if (!grnFormData.bill) newErrors.bill = 'Required'
+
+    // Basic form validation
     if (!grnFormData.po_id) newErrors.po_id = 'Required'
     if (!grnFormData.grn_date) newErrors.grn_date = 'Required'
     if (!grnFormData.delivery_note_no) newErrors.delivery_note_no = 'Required'
@@ -66,52 +71,91 @@ const GrnForm = () => {
     if (!grnFormData.received_by) newErrors.received_by = 'Required'
     if (!grnFormData.notes) newErrors.notes = 'Required'
 
-    if (Object.keys(newErrors).length > 0) {
+    // Validate items using the validation function from GrnItemsFrom
+    let itemValidationErrors = []
+    if (grnFormData.validateItems) {
+      itemValidationErrors = grnFormData.validateItems()
+    }
+
+    // Check if there are any validation errors in the items component
+    const hasItemValidationErrors = grnFormData.hasValidationErrors
+      ? grnFormData.hasValidationErrors()
+      : false
+
+    if (
+      Object.keys(newErrors).length > 0 ||
+      itemValidationErrors.length > 0 ||
+      hasItemValidationErrors
+    ) {
       setErrors(newErrors)
-      setAlerts((prev) => [
-        ...prev,
-        { severity: 'error', message: 'Please fill all the required fields' },
-      ])
+
+      // Combine all error messages
+      const errorMessages = []
+
+      if (Object.keys(newErrors).length > 0) {
+        errorMessages.push({ severity: 'error', message: 'Please fill all the required fields' })
+      }
+
+      if (itemValidationErrors.length > 0) {
+        itemValidationErrors.forEach((error) => {
+          errorMessages.push({ severity: 'error', message: error.message })
+        })
+      }
+
+      if (hasItemValidationErrors && itemValidationErrors.length === 0) {
+        errorMessages.push({
+          severity: 'error',
+          message:
+            'Please fix validation errors in the items table. Accepted quantity cannot be greater than received quantity.',
+        })
+      }
+
+      setAlerts(errorMessages)
+
+      // Scroll to top to show alerts
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+
+      return // Stop execution here - PREVENT SAVE
     } else {
-      console.log('Submited form Data', grnFormData)
+      // Format created_at and updated_at in items to only pass date
+      const formattedItems = grnFormData.items.map((item) => ({
+        ...item,
+        created_at: formatDateForPayload(item.created_at?.split(' ')[0]),
+        updated_at: formatDateForPayload(item.updated_at?.split(' ')[0]),
+      }))
+
+      const payload = {
+        ...grnFormData,
+        items: formattedItems,
+        // Remove the validation functions from payload
+        validateItems: undefined,
+        hasValidationErrors: undefined,
+      }
+      delete payload.validateItems
+      delete payload.hasValidationErrors
+
       setAlerts([])
+
       try {
         if (isEdit) {
-          const response = await grnApi.editGrn(grnFormData)
+          const response = await grnApi.editGrn(payload)
           setAlerts((prev) => [
             ...prev,
             {
               severity: 'success',
-              message: response?.data?.message || 'GRN Uopdated Successfully',
+              message: response?.data?.message || 'GRN Updated Successfully',
             },
           ])
         } else {
-          const response = await grnApi.postGrn(grnFormData)
+          const response = await grnApi.postGrn(payload)
           setAlerts((prev) => [
             ...prev,
             { severity: 'success', message: response?.data?.message || 'GRN Added Successfully' },
           ])
         }
-        setGrnFormData({
-          po_bill_id: null,
-          po_id: null,
-          grn_date: '',
-          delivery_note_no: '',
-          invoice_no: '',
-          invoice_date: '',
-          amount: 0,
-          cgst_amount: 0,
-          sgst_amount: 0,
-          tax_amount: 0,
-          total_amount: 0,
-          total_qty: 0,
-          received_by: '',
-          notes: '',
-          items: [],
-        })
-        setErrors({})
-        console.log('Before Navigation')
-        navigate('/grn')
+        setTimeout(() => {
+          navigate('/grn')
+        }, 800)
       } catch (error) {
         console.error(error)
         setAlerts([
@@ -143,7 +187,6 @@ const GrnForm = () => {
     try {
       const response = await purchaseOrderApi.getPurchaseOrderById(id)
       const poData = response.data
-      console.log('PO Data:', poData?.items)
 
       // Update the main form data with PO information
       setGrnFormData((prevData) => ({
@@ -206,9 +249,7 @@ const GrnForm = () => {
 
   const handleBillChange = (bill_id) => {
     const selectedBill = billings.find((item) => item.id == bill_id)
-    console.log('Selected Bill ID:', selectedBill)
     if (selectedBill) {
-      console.log('Selected Bill:', selectedBill.purchaseOrder)
       // Ensure purchaseOrderData is always an array
       setPurchaseOrderData(
         Array.isArray(selectedBill.purchaseOrder)
@@ -219,7 +260,6 @@ const GrnForm = () => {
         ...prevData,
         po_bill_id: bill_id,
       }))
-      console.log('Updated purchaseOrderData:', purchaseOrderData)
     } else {
       console.warn('No matching bill found')
       setPurchaseOrderData([])
@@ -262,10 +302,10 @@ const GrnForm = () => {
       id: item.id,
       po_bill_id: item.po_bill_id,
       po_id: item.po_id,
-      grn_date: item.grn_date,
+      grn_date: formatDateForPayload(item.grn_date),
       delivery_note_no: item.delivery_note_no,
       invoice_no: item.invoice_no,
-      invoice_date: item.invoice_date,
+      invoice_date: formatDateForPayload(item.invoice_date),
       amount: item.amount,
       cgst_amount: item.cgst_amount,
       sgst_amount: item.sgst_amount,
@@ -290,6 +330,7 @@ const GrnForm = () => {
   return (
     <>
       <form onSubmit={handleSubmit}>
+        <CustomAlert alerts={alerts} handleClose={() => setAlerts([])} />
         <div className="relative max-h-[100vh] overflow-y-scroll">
           <div className="w-full  ">
             {/* Form Content */}
@@ -433,7 +474,9 @@ const GrnForm = () => {
 
                   {/* Delivery Note No */}
                   <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">Delivery Note No. <span className="text-red-500">*</span></label>
+                    <label className="text-xs text-black-600 w-40">
+                      Delivery Note No. <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       name="delivery_note_no"
@@ -446,7 +489,9 @@ const GrnForm = () => {
 
                   {/* Invoice No */}
                   <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">Invoice No. <span className="text-red-500">*</span></label>
+                    <label className="text-xs text-black-600 w-40">
+                      Invoice No. <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       name="invoice_no"
@@ -459,7 +504,9 @@ const GrnForm = () => {
 
                   {/* Invoice Date */}
                   <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">Invoice Date <span className="text-red-500">*</span></label>
+                    <label className="text-xs text-black-600 w-40">
+                      Invoice Date <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="date"
                       name="invoice_date"
@@ -472,7 +519,9 @@ const GrnForm = () => {
 
                   {/* Received By */}
                   <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">Received By <span className="text-red-500">*</span></label>
+                    <label className="text-xs text-black-600 w-40">
+                      Received By <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       name="received_by"
@@ -485,7 +534,9 @@ const GrnForm = () => {
 
                   {/* Notes */}
                   <div className="flex items-center gap-4">
-                    <label className="text-xs text-black-600 w-40">Notes <span className="text-red-500">*</span></label>
+                    <label className="text-xs text-black-600 w-40">
+                      Notes <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       name="notes"
@@ -508,6 +559,7 @@ const GrnForm = () => {
               setGrnFormData={setGrnFormData}
               purchaseOrderData={purchaseOrderData}
               isEdit={isEdit}
+              setAlerts={setAlerts}
             />
           </div>
 

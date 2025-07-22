@@ -69,7 +69,6 @@ const WorkOrders = () => {
       })
 
       setData(response.data?.workOrders || [])
-      console.log("jjjjj",response.data.pagination.total )
       setCount(response.data.pagination.total)
       setPagination(prev => ({
         ...prev,
@@ -208,11 +207,6 @@ const WorkOrders = () => {
               navigate('form?tab=skuDetails')
             }}
             menuOptions={[
-              {
-                icon: <FiUpload className="mr-2 text-blue-500" />,
-                label: 'Import',
-                onClick: () => console.log('Import clicked'),
-              },
               {
                 icon: <FiDownload className="mr-2 text-blue-500" />,
                 label: 'Export',

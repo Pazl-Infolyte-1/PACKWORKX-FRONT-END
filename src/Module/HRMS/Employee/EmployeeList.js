@@ -229,12 +229,11 @@ function EmployeeList() {
 
   const handleView = async (id) => {
     try {
-      console.log('Requesting for data for employee')
       const response = await employeeApi.getEmployeeData(id)
       setViewEmployeeData(response.data.data)
       setShowEmployeeData(true)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 
@@ -277,11 +276,6 @@ function EmployeeList() {
           heading={'Employee'}
           onAddClick={() => navigate('/employeelist/form')}
           menuOptions={[
-            {
-              icon: <FiUpload className="mr-2 text-blue-500" />,
-              label: 'Import',
-              onClick: () => console.log('Import clicked'),
-            },
             {
               icon: <FiDownload className="mr-2 text-blue-500" />,
               label: 'Export',

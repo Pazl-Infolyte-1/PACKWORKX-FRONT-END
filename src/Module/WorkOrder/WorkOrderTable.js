@@ -47,7 +47,6 @@ const WorkOrderTable = ({
         const data = response?.data?.data || []
         const options = data.map((item) => item.work_order_status)
         setProgressOptions(options)
-        console.log(options)
       } catch (error) {
         console.error('Error fetching work order progress options:', error)
       }
@@ -61,7 +60,7 @@ const WorkOrderTable = ({
       setIsLayerProductionOpen(true)
       setSelectedWorkorder(row)
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
@@ -98,7 +97,6 @@ const WorkOrderTable = ({
     if (newValue == 'Completed') {
       const item = cellData.find((a) => a.id == id)
       if (!item) {
-        console.log(`Item with id ${id} not found`)
         return
       }
       const newEntry = { id, qty: item.qty, progress: newValue }
@@ -141,8 +139,8 @@ const WorkOrderTable = ({
     //   type: 'checkbox',
     // },
     { key: 'work_generate_id', header: 'Number', field: 'work_generate_id', cellClass: '', searchIcon: true },
-    { key: 'sales_generate_id', header: 'SALES-ID', field: 'salesOrder.sales_generate_id', cellClass: '', searchIcon: true },
-    { key: 'sales_ui_id', header: 'SO-Reference', field: 'salesOrder.sales_ui_id', cellClass: '', searchIcon: true },
+    { key: 'sales_generate_id', header: 'SALES-ID', field: 'salesOrder.sales_generate_id', cellClass: ''},
+    { key: 'sales_ui_id', header: 'SO-Reference', field: 'salesOrder.sales_ui_id', cellClass: ''},
     { key: 'sku_name', header: 'SKU Name', field: 'sku_name', searchIcon: true },
     // { key: 'manufacture', header: 'Manufacture', field: 'manufacture', searchIcon: true  },
     {
@@ -189,7 +187,7 @@ const WorkOrderTable = ({
         </button>
       ),
     },
-    { key: 'created_at', header: 'Created Date', field: 'created_at', type: 'date' },
+    { key: 'created_at', header: 'Created Date', field: 'created_at' },
     { key: 'qty', header: 'Qty', type: 'number', field: 'qty' },
     {
       key: 'priority',

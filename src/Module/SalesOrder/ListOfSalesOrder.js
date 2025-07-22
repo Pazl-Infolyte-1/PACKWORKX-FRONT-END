@@ -257,11 +257,6 @@ function ListOfSalesOrder() {
             }}
             menuOptions={[
               {
-                icon: <FiUpload className="mr-2 text-blue-500" />,
-                label: 'Import',
-                onClick: () => console.log('Import clicked'),
-              },
-              {
                 icon: <FiDownload className="mr-2 text-blue-500" />,
                 label: 'Export',
                 onClick: downloadSalesOrderExcelSheet,

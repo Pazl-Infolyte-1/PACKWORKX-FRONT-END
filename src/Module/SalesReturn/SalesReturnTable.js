@@ -33,7 +33,6 @@ const SalesReturnTable = ({ isMinimized, handleEdit, salesReturnData }) => {
       key: 'return_date',
       header: 'Return Date',
       field: 'return_date',
-      type: 'date',
     },
 
     {

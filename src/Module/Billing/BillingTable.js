@@ -58,21 +58,21 @@ const BillingTable = ({ billingdata, refreshBilling, isMinimized, setSingleStatu
                     PO ID<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell> */}
                   <CTableHeaderCell className="w-40 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                    Supplier<span className="text-gray-500 ml-1">⌕</span>
+                    Supplier
                   </CTableHeaderCell>
 
                   <CTableHeaderCell className="w-32 px-4 x-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                    Reference Number<span className="text-gray-500 ml-1">⌕</span>
+                    Reference Number
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-40 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                    Bill Date<span className="text-gray-500 ml-1">⌕</span>
+                    Bill Date
                   </CTableHeaderCell>
 
                   <CTableHeaderCell className="w-52 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
                     Remarks<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-36 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                    Status<span className="text-gray-500 ml-1">⌕</span>
+                    Status
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-24 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
                     Actions
@@ -157,7 +157,6 @@ const BillingTable = ({ billingdata, refreshBilling, isMinimized, setSingleStatu
                                   label: 'Edit',
                                   icon: cilPencil,
                                   onClick: () => {
-                                    console.log('Edit', bill)
                                     navigate('/billingmain/billingmainForm', { state: { bill } })
                                   },
                                 },

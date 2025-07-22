@@ -14,7 +14,14 @@ import ClientForm from './ClientForm'
 import Drawer from '../../components/Drawer/Drawer'
 import ClientSingleViewCard from './ClientSingleViewCard'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import { cilBan, cilCheckCircle, cilHandPointRight, cilPencil, cilPowerStandby, cilTrash } from '@coreui/icons'
+import {
+  cilBan,
+  cilCheckCircle,
+  cilHandPointRight,
+  cilPencil,
+  cilPowerStandby,
+  cilTrash,
+} from '@coreui/icons'
 import CustomAlert from '../../components/New/CustomAlert'
 import { useNavigate } from 'react-router-dom'
 import ConfirmationModale from '../../components/New/ConfirmationModale'
@@ -22,7 +29,7 @@ import PopUp from '../../components/New/PopUp'
 import { TiFlowSwitch } from 'react-icons/ti'
 import { clientApi } from '../../api/client'
 
-function ClientTable({ clientdata, refreshClients, isMinimized,setSingleStatusUpdate }) {
+function ClientTable({ clientdata, refreshClients, isMinimized, setSingleStatusUpdate }) {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [selectedClientId, setSelectedClientId] = useState(null)
   const [isSingleViewPopup, setisSingleViewPopup] = useState(false)
@@ -37,7 +44,6 @@ function ClientTable({ clientdata, refreshClients, isMinimized,setSingleStatusUp
 
   const openViewCard = (data) => {
     //setisSingleViewPopup(true)
-    console.log(JSON.stringify(data))
     setSingleData(data)
   }
 
@@ -91,18 +97,16 @@ function ClientTable({ clientdata, refreshClients, isMinimized,setSingleStatusUp
     }
   }
 
-const handleStatusChange = async (clientId, newStatus) => {
-  try {
-const response = await clientApi.clientStatusSwitch(newStatus, clientId)
-    console.log('✅ Status update response:', response.data.message)
-          setAlerts([{ severity: 'success', message: response.data.message }])
-    // Optionally refetch or update local state here
-    setSingleStatusUpdate(response.data.status)
-  } catch (error) {
-    console.error('Status update failed:', error)
+  const handleStatusChange = async (clientId, newStatus) => {
+    try {
+      const response = await clientApi.clientStatusSwitch(newStatus, clientId)
+      setAlerts([{ severity: 'success', message: response.data.message }])
+      // Optionally refetch or update local state here
+      setSingleStatusUpdate(response.data.status)
+    } catch (error) {
+      console.error('Status update failed:', error)
+    }
   }
-}
-
 
   return (
     <>
@@ -125,23 +129,23 @@ const response = await clientApi.clientStatusSwitch(newStatus, clientId)
                       className="form-checkbox h-3 w-3 text-blue-600 rounded"
                     />
                   </CTableHeaderCell> */}
-                  <CTableHeaderCell className="w-48 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  <CTableHeaderCell className="w-48 px-4 text-xs font-bold !text-gray-500 uppercase tracking-wider">
                     Name<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-32 px-4 x-2 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                  Id<span className="text-gray-500 ml-1">⌕</span>
+                    Id<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-40 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                Reference Id<span className="text-gray-500 ml-1">⌕</span>
+                    Reference Id<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-52 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                  Email<span className="text-gray-500 ml-1">⌕</span>
+                    Email<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-36 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                  Phone<span className="text-gray-500 ml-1">⌕</span>
+                    Phone<span className="text-gray-500 ml-1">⌕</span>
                   </CTableHeaderCell>
-                      <CTableHeaderCell className="w-36 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
-                Status
+                  <CTableHeaderCell className="w-36 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
+                    Status
                   </CTableHeaderCell>
                   <CTableHeaderCell className="w-24 px-4 text-xs !font-bold !text-gray-500 uppercase tracking-wider">
                     Actions
@@ -209,7 +213,7 @@ const response = await clientApi.clientStatusSwitch(newStatus, clientId)
                             //e.stopPropagation();
                             openViewCard(client)
                           }}
-                          className="px-4 py-3 text-sm !text-blue-600 font-semibold  whitespace-nowrap"
+                          className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap"
                         >
                           {client.display_name || 'N/A'}
                         </CTableDataCell>
@@ -225,8 +229,8 @@ const response = await clientApi.clientStatusSwitch(newStatus, clientId)
                         <CTableDataCell className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
                           {client.mobile || 'N/A'}
                         </CTableDataCell>
-        <CTableDataCell className="px-4 py-3 text-sm">
-          {/*<select
+                        <CTableDataCell className="px-4 py-3 text-sm">
+                          {/*<select
   value={client.status === 'active' || client.status === 'inactive' ? client.status : ''}
   onClick={(e) => e.stopPropagation()}
   onChange={(e) => handleStatusChange(client.client_id, e.target.value)}
@@ -237,20 +241,18 @@ const response = await clientApi.clientStatusSwitch(newStatus, clientId)
   <option value="active">active</option>
   <option value="inactive">In active</option>
 </select>*/}
-  <span
-    className={`inline-block text-center px-2 py-1 rounded-full text-xs font-semibold w-[70px] ${
-      client.status === 'active'
-        ? 'bg-green-100 text-green-800'
-        : client.status === 'inactive'
-        ? 'bg-red-100 text-red-800'
-        : 'bg-gray-100 text-gray-800'
-    }`}
-  >
-    {client.status}
-  </span>
-</CTableDataCell>
-
-
+                          <span
+                            className={`inline-block text-center px-2 py-1 rounded-full text-xs font-semibold w-[70px] ${
+                              client.status === 'active'
+                                ? 'bg-green-100 text-green-800'
+                                : client.status === 'inactive'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {client.status}
+                          </span>
+                        </CTableDataCell>
 
                         <CTableDataCell className="px-4 py-3">
                           <div onClick={(e) => e.stopPropagation()}>
@@ -260,26 +262,27 @@ const response = await clientApi.clientStatusSwitch(newStatus, clientId)
                                   label: 'Edit',
                                   icon: cilPencil,
                                   onClick: () => {
-                                    console.log('Edit', client)
                                     navigate('/clients/clientForm', { state: { client } })
                                   },
                                 },
                                 {
                                   label: 'Delete',
                                   icon: cilTrash,
-                                  onClick: () => setIsDeleteModalOpen({
-                                    open: true,
-                                    id: client.client_id,
-                                  }),
+                                  onClick: () =>
+                                    setIsDeleteModalOpen({
+                                      open: true,
+                                      id: client.client_id,
+                                    }),
                                 },
-                            {
-      label: client.status === 'active' ? 'Set Inactive' : 'Set Active',
-      icon: client.status === 'active' ? cilBan : cilCheckCircle,
-      onClick: () => handleStatusChange(
-        client.client_id,
-        client.status === 'active' ? 'inactive' : 'active'
-      ),
-    },
+                                {
+                                  label: client.status === 'active' ? 'Set Inactive' : 'Set Active',
+                                  icon: client.status === 'active' ? cilBan : cilCheckCircle,
+                                  onClick: () =>
+                                    handleStatusChange(
+                                      client.client_id,
+                                      client.status === 'active' ? 'inactive' : 'active',
+                                    ),
+                                },
                               ]}
                             />
                           </div>
@@ -290,7 +293,10 @@ const response = await clientApi.clientStatusSwitch(newStatus, clientId)
                 ))
               ) : (
                 <CTableRow>
-                  <CTableDataCell colSpan={isMinimized ? 2 : 8} className="text-center text-sm !text-red-600  py-3">
+                  <CTableDataCell
+                    colSpan={isMinimized ? 2 : 8}
+                    className="text-center text-sm !text-red-600  py-3"
+                  >
                     No Data Found
                   </CTableDataCell>
                 </CTableRow>
@@ -318,10 +324,7 @@ const response = await clientApi.clientStatusSwitch(newStatus, clientId)
           showCloseButton={true}
           width={'70vw'}
         >
-          <ClientSingleViewCard
-            clientData={singleData}
-            handleEdit={handleEdit}
-          />
+          <ClientSingleViewCard clientData={singleData} handleEdit={handleEdit} />
         </PopUp>
 
         <ConfirmationModale

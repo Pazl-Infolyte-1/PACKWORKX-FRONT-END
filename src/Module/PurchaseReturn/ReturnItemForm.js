@@ -269,8 +269,8 @@ const ReturnItemForm = ({
                     <td className="p-1 text-right">
                       <input
                         type="number"
-                        step="0.01"
                         {...register(`items.${index}.return_qty`)}
+                        onWheel={(e) => e.target.blur()}
                         className="w-full h-[35px] bg-white border rounded-md px-2  focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
                     </td>

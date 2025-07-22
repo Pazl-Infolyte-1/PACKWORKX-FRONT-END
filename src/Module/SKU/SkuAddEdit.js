@@ -1559,14 +1559,14 @@ function SkuAddEdit({
               className={`w-11 h-[23px] flex items-center border border-blue-600 rounded-full p-1 cursor-pointer 
   ${isStrictActive ? 'bg-blue-600' : 'bg-gray-300'}`}
               onClick={!editTag ? handleStrictAdherenceToggle : undefined}
-            >
+             >
               <div
                 className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ease-in-out 
                 ${strictAdherence ? 'translate-x-5' : '-translate-x-[2px]'}`}
               ></div>
             </button>
           </div>
-          {!isStrictActive && (
+          {isStrictActive || editTag &&  (
             <select
               onChange={handleVersionSelect}
               value={selectedVersion?.sku_version || ''}

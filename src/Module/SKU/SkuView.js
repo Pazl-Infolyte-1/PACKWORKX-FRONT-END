@@ -167,7 +167,7 @@ useEffect(() => {
       {/* Content area with dynamic height */}
       <div className="flex overflow-y-auto" style={{ height: contentHeight }}>
         {/* Left Column */}
-        <div className="w-1/3 border-r h-[2000px] border-gray-200 p-4">
+        <div className="w-1/3 border-r h-[800px] border-gray-200 p-4">
           <div className="pb-4 border-b border-gray-200">
             <h2 className="font-normal text-gray-700 mb-4 text-sm border-b border-gray-200">
               {selectedSku.client}
@@ -181,7 +181,6 @@ useEffect(() => {
               <div>
                 <p className="text-sm font-semibold my-0">{selectedSku.sku_name}</p>
                 <p className="text-sm my-0">{selectedSku.sku_ui_id}</p>
-
               </div>
             </div>
           </div>
@@ -196,7 +195,6 @@ useEffect(() => {
               className="flex justify-between items-center cursor-pointer"
               onClick={() => setAddressExpanded(!addressExpanded)}
             >
-              
               <h3 className="font-medium text-sm text-gray-800">MEASUREMENTS</h3>
               {addressExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </div>

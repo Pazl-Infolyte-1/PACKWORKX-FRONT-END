@@ -15,7 +15,6 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import { inventoryApi } from '../../api/inventory'
 
 const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized, refreshClients }) => {
-  console.log('stock data in table', stockAdjustmentData)
   const [selectedRows, setSelectedRows] = useState([])
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState({ open: false, id: null })
   const navigate = useNavigate()
@@ -48,7 +47,6 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized, refreshClients
       if (!response?.status) {
         throw new Error(response?.message || 'Failed to delete client')
       }
-      console.log('response del', response)
       setAlerts([{ severity: 'success', message: response?.data?.message }])
     } catch (error) {
       console.error('Error deleting client:', error)
@@ -197,9 +195,9 @@ const StockAdjustmentTable = ({ stockAdjustmentData, isMinimized, refreshClients
                 <CTableRow>
                   <CTableDataCell
                     colSpan={isMinimized ? 2 : 8}
-                    className="text-center text-sm !text-red-600  py-3"
+                    className="text-center text-sm  py-3"
                   >
-                    No Data Found
+                    No data available
                   </CTableDataCell>
                 </CTableRow>
               )}

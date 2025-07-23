@@ -12,8 +12,7 @@ import ConfirmationModale from '../../components/New/ConfirmationModale'
 import CIcon from '@coreui/icons-react'
 import ReusableTable from '../SalesOrder/ReusableTable'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
-import {routeApi} from "../../api/route"
-
+import { routeApi } from '../../api/route'
 
 const RouteProcessTable = ({
   routeProcessData,
@@ -72,15 +71,13 @@ const RouteProcessTable = ({
     },
     {
       key: 'created_at',
-      header:'Created at',
+      header: 'Created at',
       field: 'created_at',
-      type: 'date',
     },
     {
       key: 'updated_at',
       header: 'Updated',
       field: 'updated_at',
-      type: 'date',
     },
     {
       key: 'actions',
@@ -120,73 +117,6 @@ const RouteProcessTable = ({
         minHeight="vh65"
         handleRowClick={RowClick}
       />
-      {/* <div className="h-[340px] overflow-y-auto border border-gray-200 custom-scrollbar rounded-lg p-2">
-        <CTable striped hover className="w-full m-0 table-fixed">
-          <CTableHead className="bg-gray-100 sticky -top-2 z-10">
-            <CTableRow className="text-center">
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium text-start">
-                Id
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Route Name
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Created Date
-              </CTableHeaderCell>
-              <CTableHeaderCell className="py-3 px-2 text-gray-600 font-medium">
-                Action
-              </CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {routeProcessData && routeProcessData.length > 0 ? (
-              routeProcessData.map((item) => (
-                <CTableRow key={item.id} className="border-b text-center">
-                  <CTableDataCell
-                    onClick={() => setOpenRouteModal({ open: true, id: item.id })}
-                    className="py-3 px-2 !text-blue-600 font-semibold cursor-pointer underline text-start"
-                  >
-                    {item.route_generate_id}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2  font-semibold">
-                    {item.route_name}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2  font-semibold">
-                    {new Date(item.created_at).toLocaleString()}
-                  </CTableDataCell>
-                  <CTableDataCell className="py-3 px-2">
-                    <div className="flex justify-center items-center space-x-4">
-                      <CIcon
-                        icon={cilPencil}
-                        className="cursor-pointer"
-                        style={{ color: '#2563EB' }}
-                        onClick={() => handleEdit(item)}
-                      />
-                      <CIcon
-                        icon={cilTrash}
-                        className="cursor-pointer"
-                        style={{ color: '#DC2626' }}
-                        onClick={() => openDeleteModal(item.id)}
-                      />
-                    </div>
-                  </CTableDataCell>
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow>
-                <CTableDataCell colSpan={4} className="py-3 px-2 text-center !text-red-500 ">
-                  No Records Found
-                </CTableDataCell>
-              </CTableRow>
-            )}
-          </CTableBody>
-        </CTable>
-        <ConfirmationModale
-          isOpen={confirmModal}
-          onClose={closeDeleteModal}
-          onConfirm={handleDelete}
-        />
-      </div> */}
     </>
   )
 }

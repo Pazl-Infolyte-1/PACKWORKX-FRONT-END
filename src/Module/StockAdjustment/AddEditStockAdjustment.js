@@ -102,12 +102,10 @@ const AddEditStockAdjustment = () => {
         const items = await Promise.all(
           data?.StockAdjustmentItems?.map(async (item, index) => {
             await getInventoryByItemId(item.item_id, index)
-            console.log('Inventory Items:', InventoryItems)
 
             const AvailableQuantity = InventoryItems?.[index]?.find(
               (inv) => inv.id === item.inventory_id,
             )?.quantity_available
-            console.log('Available Quantity:', AvailableQuantity)
 
             return {
               item_id: item.item_id || null,
@@ -147,7 +145,6 @@ const AddEditStockAdjustment = () => {
                 ],
         })
 
-        console.log('edit form data', data)
       } catch (error) {
         console.error('Error fetching stock:', error)
       }
@@ -200,9 +197,7 @@ const AddEditStockAdjustment = () => {
   const handleThrowAlert = async (id) => {
     try {
       const response = await commonApi.throwAlert(id)
-      console.log('product data', response.data.data)
       const all_notofications = await commonApi.getNotifications()
-      console.log('All Notifications:', all_notofications.data.data)
       dispatch(setAllNotifications(all_notofications?.data?.data || []))
     } catch (error) {
       console.error('Error in handleThrowAlert:', error)
@@ -210,7 +205,6 @@ const AddEditStockAdjustment = () => {
   }
 
   const onSubmit = async (data) => {
-    console.log('Form Data:', data)
 
     const parsedData = {
       ...data,
@@ -229,16 +223,13 @@ const AddEditStockAdjustment = () => {
       })),
     }
 
-    console.log('Submitted Adjustment Data:', parsedData)
 
     const invalidItem = parsedData.items.find(
       (item) => item.type === 'decrease' && item.adjustment_quantity > item.quantity_available,
     )
-    console.log('Invalid Item:', invalidItem)
 
     if (invalidItem) {
       const MatchedProduct = product.find((prod) => prod.id === parseInt(invalidItem.item_id))
-      console.log('Matched Product:', MatchedProduct)
 
       const itemName = MatchedProduct?.item_generate_id || `Item ${invalidItem.item_id}`
 
@@ -251,13 +242,11 @@ const AddEditStockAdjustment = () => {
       return
     }
 
-    console.log('Submitting stock adjustment with data:', parsedData)
 
     try {
       if (singleData?.id) {
         // ✅ Update existing stock adjustment
         const response = await stockAdjustmentApi.updateStockAdjustment(singleData.id, parsedData)
-        console.log('Stock adjustment updated successfully:', response.data)
         dispatch(setProductArray([]))
 
         const decreaseItems = parsedData.items.filter((item) => item.type === 'decrease')
@@ -267,7 +256,6 @@ const AddEditStockAdjustment = () => {
       } else {
         // ✅ Create new stock adjustment
         const response = await stockAdjustmentApi.postStockAdjustment(parsedData)
-        console.log('Stock adjustment created successfully:', response.data)
         dispatch(setProductArray([]))
         setAlerts([{ severity: 'success', message: response.data?.message }])
 
@@ -314,7 +302,6 @@ const AddEditStockAdjustment = () => {
     if (!productIds.includes(selectedProductId)) {
       const updatedArray = [...productIds, selectedProductId]
       dispatch(setProductArray(updatedArray))
-      console.log('Updated Product Array:', updatedArray)
     }
 
     // getPurchaseOrderItem(selectedProductId, rowIndex)
@@ -328,7 +315,6 @@ const AddEditStockAdjustment = () => {
   const getInventoryByItemId = async (selectedProductId, rowIndex) => {
     try {
       const response = await grnApi.getInventoryByItemId(selectedProductId)
-      console.log('Inventory     Data:', response?.data?.data)
       setInventoryItems((prev) => ({
         ...prev,
         [rowIndex]: response?.data?.data || [],
@@ -370,7 +356,6 @@ const AddEditStockAdjustment = () => {
     try {
       const response = await grnApi.getGRNByPOId(selectedPOId)
       const data = response?.data.data.grns || []
-      console.log('GRN Items Response:', data)
       setGRNItems((prev) => ({
         ...prev,
         [rowIndex]: data,
@@ -381,15 +366,13 @@ const AddEditStockAdjustment = () => {
   }
 
   const handleGRNSelect = (selectedGRNId, rowIndex) => {
-    console.log('Selected GRN ID:', selectedGRNId)
-    // console.log('Selected GRN IDs:', selectedGRNIds)
+
     // if (!selectedGRNId) return
     // // Ensure selectedGRNIds is an array
     // const grnIds = selectedGRNIds || []
     // if (!grnIds.includes(selectedGRNId)) {
     //   const updatedArray = [...grnIds, selectedGRNId]
     //   dispatch(setStockAdjustmentGRNArray(updatedArray))
-    //   console.log('Updated GRN Array:', updatedArray)
     // }
   }
 
@@ -532,7 +515,7 @@ const AddEditStockAdjustment = () => {
                     <option value="">Select Inventory</option>
                     {(InventoryItems?.[index] || []).map((inv) => (
                       <option key={inv?.id} value={inv.id}>
-                        {inv?.inventory_generate_id}
+                        {inv?.inventory_generate_id || '--'}
                       </option>
                     ))}
                   </select>

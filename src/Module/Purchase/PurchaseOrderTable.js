@@ -20,6 +20,7 @@ import {
   PurchaseOrderPaymentHistoryModal,
   PurchaseOrderPaymentModal,
 } from './PurchaseOrderPaymentModal'
+import { formatDateForPayload } from '../../utils/dateFormat'
 
 function PurchaseOrderTable({
   data = [],
@@ -73,9 +74,17 @@ function PurchaseOrderTable({
 
   const handleStatusChange = async (id, newStatus) => {
     const currentPo = data.find((po) => po.id === id)
+    // Format date fields in items
+    const formattedItems = (currentPo.items || []).map((item) => ({
+      ...item,
+      created_at: formatDateForPayload(item.created_at),
+      updated_at: formatDateForPayload(item.updated_at),
+      // Add other date fields if present
+    }))
+
     const payload = {
       decision: newStatus,
-      items: currentPo.items || [],
+      items: formattedItems,
     }
 
     try {
@@ -133,13 +142,11 @@ function PurchaseOrderTable({
       key: 'po_date',
       header: 'PO Date',
       field: 'po_date',
-      type: 'date',
     },
     {
       key: 'valid_till',
       header: 'Valid Till',
       field: 'valid_till',
-      type: 'date',
     },
     {
       key: 'status',
@@ -178,7 +185,7 @@ function PurchaseOrderTable({
             sm:min-w-[80px] sm:max-w-[110px]
             md:min-w-[90px] md:max-w-[120px]
             ${row.payment_status === 'partial' ? 'bg-blue-100 text-blue-800' : ''}
-            ${row.payment_status === 'pending' ? 'bg-red-100 text-red-800' : ''}
+            ${row.payment_status === 'pending' ? 'bg-orange-100 text-red-800' : ''}
             ${row.payment_status === 'completed' ? 'bg-teal-500 text-white' : ''}
             ${row.payment_status === 'paid' ? 'bg-green-100 text-green-800' : ''}
             `}
@@ -201,7 +208,7 @@ function PurchaseOrderTable({
               min-w-[80px] max-w-[120px] w-full
               sm:min-w-[90px] sm:max-w-[130px]
               md:min-w-[100px] md:max-w-[140px]
-              bg-sky-200 text-black border-green-300`}
+              ${row.decision === 'approve' ? 'bg-green-100 text-black border-green-300' : 'bg-red-100 text-black border-red-200'}`}
               value={row.decision}
               onChange={(e) => handleStatusChange(row.id, e.target.value)}
             >
@@ -214,7 +221,7 @@ function PurchaseOrderTable({
               min-w-[80px] max-w-[120px] w-full
               sm:min-w-[90px] sm:max-w-[130px]
               md:min-w-[100px] md:max-w-[140px]
-              bg-red-100 text-red-800 border-red-300`}
+              bg-green-100 text-black border-red-300`}
             >
               {row.decision.charAt(0).toUpperCase() + row.decision.slice(1)}
             </div>

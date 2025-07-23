@@ -66,7 +66,6 @@ const DebitNoteTable = ({ debitNoteData, setAlerts, isMinimiseTable, setIsMinimi
       key: 'debit_note_date',
       header: 'Debit Note Date',
       field: 'debit_note_date',
-      type: 'date',
     },
     {
       key: 'amount',

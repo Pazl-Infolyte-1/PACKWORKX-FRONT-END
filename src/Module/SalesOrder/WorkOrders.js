@@ -46,7 +46,6 @@ const WorkOrders = ({
   skuValuesMap,
   setSkuValuesMap
 }) => {
-  console.log("sku details",skuDetailsForm)
   const [openCreateAccordion, setCreateOpenAccordion] = useState([1])
   const [openCreateAccordion1, setCreateOpenAccordion1] = useState([])
   const [isVersionDrawerOpen, setVersionDrawerOpen] = useState(false)
@@ -69,13 +68,11 @@ const [wholeSkuObject, setWholeSkuObject] = useState(null);
 
 
 const handleWholeSkuObject = (data) => {
-  console.log("Received in parent:", data);
   setWholeSkuObject(data);
 };
 
   const { id: salesOrderId, fromsalesorder } = location.state || {};
 
-  console.log("work orders///",workOrders)
   useEffect(() => {
     if (fromsalesorder && salesOrderId && salesOrder?.length > 0) {
       const selectedSalesOrderId = salesOrderId.toString();
@@ -98,16 +95,11 @@ const handleCancel = () => {
 };
 
 
-  useEffect(() => {
-    console.log(skuDetailsForm, 'skudetailsform in workorderform')
-  }, [skuDetailsForm])
-
 
   useEffect(() => {
     const fetchSalesOrders = async () => {
       try {
         const response = await salesOrderApi.getSalesOrderList();
-        // console.log(response,'looooooooooooooooooooooooooooooooooooooooooooooooooooooooooo')
         setSalesOrder(response.data.data);
       } catch (error) {
         console.error("Error fetching sales order list:", error);
@@ -204,10 +196,7 @@ const handleCancel = () => {
 
     e.preventDefault() // Prevent default form submission
 
-    console.log("worl order data",workOrdersData.length)
-console.log("work oders length",workOrders.length)
 if(workOrdersData.length+workOrders.length !== workOrdersData.length && !isWorkOrderList){
-  console.log("error")
      setAlerts([
           {
             severity: "error",
@@ -219,9 +208,7 @@ if(workOrdersData.length+workOrders.length !== workOrdersData.length && !isWorkO
     if (isWorkOrderList) {
       const isValid = validateForm(workOrders[0]); // Validate first order only
       if (isValid) {
-        console.log(workOrders[0])
         workOrderListSubmit(workOrders[0]);
-        console.log("worl order",workOrders[0])
       }
     } else {
       const filledWorkOrders = workOrders.filter(order =>
@@ -252,8 +239,7 @@ if(workOrdersData.length+workOrders.length !== workOrdersData.length && !isWorkO
     // Show confirmation to user
     // alert("Work order saved successfully!")
 
-    // console.log("Updated work order:", workOrderToUpdate)
-    // console.log("Updated work orders data:", updatedWorkOrdersData)
+
   }
 
   // Handle start date change with validation
@@ -268,7 +254,6 @@ if(workOrdersData.length+workOrders.length !== workOrdersData.length && !isWorkO
     handleWorkOrderChange(orderId, 'planned_end_date', value)
   }
 
-console.log("work oders length",workOrders.length)
   const handleSubmitWorkOrderForm = (id) => {
     // Find the work order with the matching id
     const selectedWorkOrder = workOrders.find(order => order.id === id);
@@ -288,14 +273,6 @@ console.log("work oders length",workOrders.length)
         select_plant,
       } = selectedWorkOrder;
 
-        console.log("sku_name:", sku_name);
-    console.log("sku_version:", sku_version);
-    console.log("qty:", qty);
-    console.log("edd:", edd);
-    console.log("description:", description);
-    console.log("planned_start_date:", planned_start_date);
-    console.log("acceptable_excess_units:", acceptable_excess_units);
-    console.log("planned_end_date:", planned_end_date);
       // Check if any of the fields are empty
       if (
         !sku_name ||
@@ -378,7 +355,6 @@ console.log("work oders length",workOrders.length)
 
     const response = await getskuversions(selectedId)
 
-    // console.log(response.data.data)
 
     // setSelectedWorkOrderForVersions(orderId)
     setSkuVersionsMap(prev => ({
@@ -404,7 +380,6 @@ console.log("work oders length",workOrders.length)
     SetselectedSkuID(selectedId)
 
     const response = await getskuversions(selectedId)
-    // console.log(response.data.data)
 
 
     setSkuVersionsMap(prev => ({
@@ -447,7 +422,6 @@ console.log("work oders length",workOrders.length)
   // }
 
   const handleSalesOrderChange = async (orderId, value, clientID) => {
-    console.log(orderId)
     handleWorkOrderChange(orderId, 'sales_order_id', value);
     handleWorkOrderChange(orderId, 'client_id', clientID);
 
@@ -490,7 +464,6 @@ console.log("work oders length",workOrders.length)
       },
     ])
 
-    console.log("add length",workOrders)
   }
 
   // Function to delete a work order
@@ -505,7 +478,6 @@ console.log("work oders length",workOrders.length)
 
     SetselectedSkuID(skuId)
     const response = await getskuversions(skuId)
-    // console.log(response.data.data)
 
 
     setSkuVersionsMap(prev => ({
@@ -523,7 +495,6 @@ console.log("work oders length",workOrders.length)
   const handleDeleteVersion = async (versionId,skuid) => {
     try {
       const response = await skuApi.deleteSkuVersion(versionId)
-      // console.log("Version deleted successfully:", response)
       setVersionAlerts([{ severity: "success", message: "Version deleted successfully" }]);
 
       // Show success alert (optional)
@@ -561,7 +532,6 @@ console.log("work oders length",workOrders.length)
     setVersionDrawerOpen(true)
   }
 
-console.log("whole sku",wholeSkuObject)
   return (
     <div className="relative min-h-screen pb-20"> {/* Add padding bottom to account for fixed buttons */}
       <div className='w-full mt-2'>

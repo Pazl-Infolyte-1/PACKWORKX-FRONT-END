@@ -5,18 +5,41 @@ import ItemForm from './ItemForm'
 import 'core-js/stable'
 import { clientApi } from '../../api/client'
 import { useNavigate } from 'react-router-dom'
+import { formatDateForPayload } from '../../utils/dateFormat'
 
-const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id,setUseDebitBalance,useDebitBalance,setBalanceAmount,balanceAmount,
-  debitBalanceAmount,setDebitBalanceAmount,debitUsedAmount,setDebitUsedAmount
- }) => {
+function parseCustomDateString(dateStr) {
+  if (!dateStr) return ''
+  // Match DD-MM-YYYY at the start
+  const match = dateStr.match(/^(\d{2})-(\d{2})-(\d{4})/)
+  if (!match) return ''
+  const [, dd, mm, yyyy] = match
+  return `${yyyy}-${mm}-${dd}`
+}
+
+const OrderForm = ({
+  orderData,
+  itemsData,
+  onSubmit,
+  isEdit,
+  isSubmitting,
+  id,
+  setUseDebitBalance,
+  useDebitBalance,
+  setBalanceAmount,
+  balanceAmount,
+  debitBalanceAmount,
+  setDebitBalanceAmount,
+  debitUsedAmount,
+  setDebitUsedAmount,
+}) => {
   const [items, setItems] = useState(itemsData || [])
   const [supplierAddresses, setSupplierAddresses] = useState([])
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0)
   const [showAddressModal, setShowAddressModal] = useState(false)
   const [vendor, setVendor] = useState([])
   const [isSubmitted, setIsSubmitted] = useState(false)
-      const [debitBalanceObject, setDebitBalanceObject] = useState(null)
-  const [fixedDebitBalance, setFixedDebitBalance] = useState(0);
+  const [debitBalanceObject, setDebitBalanceObject] = useState(null)
+  const [fixedDebitBalance, setFixedDebitBalance] = useState(0)
 
   const navigate = useNavigate()
   const [poTotals, setPoTotals] = useState({
@@ -60,10 +83,19 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id,se
   useEffect(() => {
     if (orderData) {
       clearErrors()
-      reset(orderData)
-      Object.keys(orderData).forEach((key) => {
-        setValue(key, orderData[key])
+
+      // Format dates to YYYY-MM-DD
+      const formattedOrderData = {
+        ...orderData,
+        po_date: parseCustomDateString(orderData.po_date),
+        valid_till: parseCustomDateString(orderData.valid_till),
+      }
+
+      reset(formattedOrderData)
+      Object.keys(formattedOrderData).forEach((key) => {
+        setValue(key, formattedOrderData[key])
       })
+
       if (orderData.supplier_addresses) {
         setSupplierAddresses(orderData.supplier_addresses)
       }
@@ -153,7 +185,7 @@ const OrderForm = ({ orderData, itemsData, onSubmit, isEdit, isSubmitting, id,se
     const selectedClient = vendor.find(
       (client) => client.client_id === parseInt(selectedId) || client.client_id === selectedId,
     )
-setDebitBalanceObject(selectedClient)
+    setDebitBalanceObject(selectedClient)
 
     if (selectedClient) {
       setValue('supplier_name', selectedClient.display_name || '')
@@ -231,6 +263,8 @@ setDebitBalanceObject(selectedClient)
     const formData = {
       orderData: {
         ...data,
+        created_at: formatDateForPayload(data.created_at),
+        updated_at: formatDateForPayload(data.updated_at),
         amount: poTotals.amount || 0,
         total_qty: poTotals.total_qty || 0,
         cgst_amount: poTotals.cgst_amount || 0,
@@ -306,25 +340,21 @@ setDebitBalanceObject(selectedClient)
     setShowAddressModal(false)
   }
 
-  console.log("chkck box val",fixedDebitBalance)
+  useEffect(() => {
+    if (isEdit) {
+      const debitbalanceAmount = Number(orderData.debit_balance_amount)
+      const usedAmount = Number(orderData.debit_used_amount)
+      if (!isNaN(debitbalanceAmount) && debitbalanceAmount > 0) {
+        setDebitBalanceObject(debitbalanceAmount)
+      }
 
-  console.log("is edit",isEdit)
-  console.log("order data",orderData)
-useEffect(() => {
-  if (isEdit) {
-    const debitbalanceAmount = Number(orderData.debit_balance_amount);
-const usedAmount = Number(orderData.debit_used_amount)
-    if (!isNaN(debitbalanceAmount) && debitbalanceAmount > 0) {
-      setDebitBalanceObject(debitbalanceAmount);
+      if (orderData.use_this) {
+        setUseDebitBalance(orderData.use_this)
+        setFixedDebitBalance(!isNaN(debitbalanceAmount) ? debitbalanceAmount : 0)
+        setFixedDebitBalance(debitbalanceAmount + usedAmount)
+      }
     }
-
-    if (orderData.use_this) {
-      setUseDebitBalance(orderData.use_this);
-      setFixedDebitBalance(!isNaN(debitbalanceAmount) ? debitbalanceAmount : 0);
-      setFixedDebitBalance(debitbalanceAmount+usedAmount);
-    }
-  }
-}, [isEdit]);
+  }, [isEdit])
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -370,49 +400,50 @@ const usedAmount = Number(orderData.debit_used_amount)
                   </svg>
                 </button>
               </div>
-  {debitBalanceObject && (
-  <div className="mt-2 flex items-center space-x-4 text-sm text-gray-700">
-    <p className="flex items-center space-x-2">
-      <span>
-        <strong>Debit Balance:</strong>{' '}
-        ₹{debitBalanceObject.debit_balance !== null ? debitBalanceObject.debit_balance : '0.00'}
-      </span>
-      {Number(debitBalanceObject.debit_balance) > 0 && (
-        <label className="flex items-center space-x-1">
-          <input
-            type="checkbox"
-            checked={useDebitBalance}
-            onChange={(e) => {
-              const isChecked = e.target.checked;
-              setUseDebitBalance(isChecked);
-              const fixedValue =
-                isChecked && debitBalanceObject.debit_balance !== null
-                  ? Number(debitBalanceObject.debit_balance)
-                  : 0;
-              setFixedDebitBalance(fixedValue);
-              console.log('Using debit balance:', fixedValue);
-            }}
-            className="h-4 w-4"
-          />
-          <span>Use</span>
-        </label>
-      )}
-    </p>
-    
-    {/* Helper text with info icon - Balance Amount From Debit */}
-    {useDebitBalance && (
-      <div className="flex items-center space-x-1 text-xs text-gray-500 italic mt-1">
-        <span className="inline-flex items-center justify-center w-3 h-3 bg-gray-400 text-white rounded-full text-[10px] font-bold">
-          i
-        </span>
-        <span>
-          <strong>Balance Amount From Debit:</strong>{' '}
-          ₹{Math.abs(balanceAmount).toFixed(2)}
-        </span>
-      </div>
-    )}
-  </div>
-)}
+              {debitBalanceObject && (
+                <div className="mt-2 flex items-center space-x-4 text-sm text-gray-700">
+                  <p className="flex items-center space-x-2">
+                    <span>
+                      <strong>Debit Balance:</strong> ₹
+                      {debitBalanceObject.debit_balance !== null
+                        ? debitBalanceObject.debit_balance
+                        : '0.00'}
+                    </span>
+                    {Number(debitBalanceObject.debit_balance) > 0 && (
+                      <label className="flex items-center space-x-1">
+                        <input
+                          type="checkbox"
+                          checked={useDebitBalance}
+                          onChange={(e) => {
+                            const isChecked = e.target.checked
+                            setUseDebitBalance(isChecked)
+                            const fixedValue =
+                              isChecked && debitBalanceObject.debit_balance !== null
+                                ? Number(debitBalanceObject.debit_balance)
+                                : 0
+                            setFixedDebitBalance(fixedValue)
+                          }}
+                          className="h-4 w-4"
+                        />
+                        <span>Use</span>
+                      </label>
+                    )}
+                  </p>
+
+                  {/* Helper text with info icon - Balance Amount From Debit */}
+                  {useDebitBalance && (
+                    <div className="flex items-center space-x-1 text-xs text-gray-500 italic mt-1">
+                      <span className="inline-flex items-center justify-center w-3 h-3 bg-gray-400 text-white rounded-full text-[10px] font-bold">
+                        i
+                      </span>
+                      <span>
+                        <strong>Balance Amount From Debit:</strong> ₹
+                        {Math.abs(balanceAmount).toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Supplier Name */}
               <div className="flex items-center mt-1">

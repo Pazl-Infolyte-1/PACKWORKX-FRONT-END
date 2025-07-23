@@ -99,10 +99,6 @@ const OverviewComponent = ({ tableData }) => {
         </div>
       </div>
     )}
-
-    <div className="py-1 text-sm text-gray-700 relative">
-      <p className="text-xs m-0 text-[#3e8efd]">Add Additional Address</p>
-    </div>
   </div>
 )}
 

@@ -25,6 +25,7 @@ import ProgressCompletedModal from "./ProgressCompletedModale";
 import { workOrderApi } from "../../api/workOrder";
 import { invoiceApi } from "../../api/Invoice";
 import { orderBy } from "lodash";
+import { Close } from "@mui/icons-material";
 
 // Format dates
 const formatDate = (dateString) => {
@@ -335,7 +336,6 @@ const ViewWorkOrder = () => {
     try {
       const response = await workOrderApi.createInvoiceWorkOrder(invoiceData);
       
-      console.log('Invoice created successfully:', response);
 
       setAlerts([{ severity: "success", message: "Invoice Created Successfully" }]);
 
@@ -544,7 +544,6 @@ const ViewWorkOrder = () => {
     try {
       // Get the QR code URL
       const qrCodeUrl = `https://dev-packwork.pazl.info/api/file/download-qr?url=${url}`;
-      console.log(qrCodeUrl)
 
       // file/download-qr?url=https://buzzdatabasebackup.s3.us-east-1.amazonaws.com/packworkz/uploads/1749793375012-wo__WO_00011_1749793374890.png
       
@@ -611,20 +610,20 @@ const ViewWorkOrder = () => {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 ">
         <div className="px-4 py-2 mx-auto sm:px-6 lg:px-8 max-w-7xl">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-end">
             <div className="flex items-center  space-x-3">
               <button className="p-1 text-gray-500 rounded hover:bg-gray-100" onClick={() => {
                  navigate('/workorderlist')
                   }}>
-                <ChevronLeft size={20} />
+                <Close size={20} />
               </button>
               {/* <h1 className="text-sm   font-medium text-gray-900">Work Order Details</h1> */}
             </div>
             <div className="flex items-center space-x-2 ">
-              <button className="flex items-center px-2 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+              {/* <button className="flex items-center px-2 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
                 <Printer size={14} className="mr-1" />
                 Print
-              </button>
+              </button> */}
               {/* <button className="flex items-center px-2 py-1 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
                 <Download size={14} className="mr-1" />
                 Export
@@ -889,7 +888,7 @@ const ViewWorkOrder = () => {
             </div>
 
             {/* Production Planned Section */}
-            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div className="mt-12 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="p-3 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">Production Planned</h3>
               </div>
@@ -917,7 +916,7 @@ const ViewWorkOrder = () => {
             </div>
 
             {/* Raw Material Allocation Section */}
-            <div className="mt-4 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div className="mt-12 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="p-3 border-b border-gray-200">
                 <h3 className="text-sm font-medium text-gray-700">Raw Material Allocation</h3>
               </div>
@@ -1010,10 +1009,10 @@ const ViewWorkOrder = () => {
       </div>
 
       {/* Raw Material Allocation Modal */}
-      <div className={`fixed inset-0 z-50 flex items-start justify-center pt-4 px-4 ${isRawMaterialModalOpen ? '' : 'hidden'}`}>
+      <div className={`fixed inset-0 z-50 flex items-start justify-center pt-14 px-4 ${isRawMaterialModalOpen ? '' : 'hidden'}`}>
         <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setIsRawMaterialModalOpen(false)}></div>
         <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl">
-          <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center justify-between p-3 border-b">
             <h3 className="text-lg font-medium">Allocate Raw Materials</h3>
             <button onClick={() => setIsRawMaterialModalOpen(false)} className="text-gray-400 hover:text-gray-500">
               <X size={20} />
@@ -1023,7 +1022,7 @@ const ViewWorkOrder = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Material Type</label>
-                <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <select className="mt-1 p-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                   <option>Select Material</option>
                   <option>Paper</option>
                   <option>Ink</option>
@@ -1034,7 +1033,7 @@ const ViewWorkOrder = () => {
                 <label className="block text-sm font-medium text-gray-700">Quantity</label>
                 <input
                   type="number"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 p-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   placeholder="Enter quantity"
                 />
               </div>
@@ -1066,10 +1065,10 @@ const ViewWorkOrder = () => {
       </div>
 
       {/* Production Planned Modal */}
-      <div className={`fixed inset-0 z-50 flex items-start justify-center pt-4 px-4 ${isProductionPlannedModalOpen ? '' : 'hidden'}`}>
+      <div className={`fixed inset-0 z-50 flex items-start justify-center pt-14 px-4 ${isProductionPlannedModalOpen ? '' : 'hidden'}`}>
         <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setIsProductionPlannedModalOpen(false)}></div>
         <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl">
-          <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center justify-between p-3 border-b">
             <h3 className="text-lg font-medium">Plan Production</h3>
             <button onClick={() => setIsProductionPlannedModalOpen(false)} className="text-gray-400 hover:text-gray-500">
               <X size={20} />
@@ -1081,19 +1080,19 @@ const ViewWorkOrder = () => {
                 <label className="block text-sm font-medium text-gray-700">Start Date</label>
                 <input
                   type="date"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 p-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">End Date</label>
                 <input
                   type="date"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 p-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Production Line</label>
-                <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <select className="mt-1 p-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                   <option>Select Production Line</option>
                   <option>Line 1</option>
                   <option>Line 2</option>

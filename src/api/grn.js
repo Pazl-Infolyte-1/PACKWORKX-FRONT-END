@@ -10,19 +10,11 @@ export const grnApi = {
   },
 
   postGrn: async (payload) => {
-    try {
-      return await apiClient.post('/grn', payload)
-    } catch (error) {
-      console.error(error)
-    }
+    return await apiClient.post('/grn', payload)
   },
 
   editGrn: async (payload) => {
-    try {
-      return await apiClient.put(`/grn/${payload.id}`, payload)
-    } catch (error) {
-      console.error(error)
-    }
+    return await apiClient.put(`/grn/${payload.id}`, payload)
   },
 
   deleteGrn: async (id) => {
@@ -61,6 +53,6 @@ export const grnApi = {
     }
   },
   getInventoryByItemId: async (itemId) => {
-      return await apiClient.get(`/stock-adjustments/items/${itemId}`)
+    return await apiClient.get(`/stock-adjustments/items/${itemId}`)
   },
 }

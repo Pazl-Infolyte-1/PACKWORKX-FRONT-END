@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { CloseButton } from 'react-bootstrap'
 import { capitalize } from 'lodash'
 import ItemDetails from './ItemDetails'
+import { Print } from '@mui/icons-material'
 
 function PurchaseOrderDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -117,9 +118,12 @@ function PurchaseOrderDetails() {
           <div className="flex items-center gap-3">
             <button
               onClick={handlePDFDownload}
-              className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded  bg-red-500 text-white"
+              className="flex items-center gap-2 px-4 py-1 text-sm border border-gray-300 rounded"
             >
-              <span>📄</span> Download PDF
+              <span>
+                <Print />
+              </span>{' '}
+              Print
             </button>
             <CloseButton
               onClick={() => navigate('/purchaseorder')}
@@ -268,7 +272,18 @@ function PurchaseOrderDetails() {
                                 className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50"
                                 title="View Item Details"
                               >
-                                ℹ️
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-5 w-5"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
                               </button>
                             </div>
                           </td>
@@ -429,7 +444,8 @@ function PurchaseOrderDetails() {
                     <span className="text-base font-medium text-gray-900">Total</span>
                     <span className="text-base font-semibold text-gray-900">
                       {(
-                        parseFloat(purchaseOrder.amount || 0 ) + parseFloat(purchaseOrder.tax_amount || 0)
+                        parseFloat(purchaseOrder.amount || 0) +
+                        parseFloat(purchaseOrder.tax_amount || 0)
                       ).toFixed(2)}
                     </span>
                   </div>

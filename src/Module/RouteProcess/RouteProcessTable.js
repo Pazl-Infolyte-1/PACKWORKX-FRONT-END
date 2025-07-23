@@ -117,6 +117,13 @@ const RouteProcessTable = ({
         minHeight="vh65"
         handleRowClick={RowClick}
       />
+      <ConfirmationModale
+        isOpen={confirmModal}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        title="Delete Route"
+        message="Are you sure you want to delete this route?"
+      />
     </>
   )
 }

@@ -115,9 +115,9 @@ const reorderedHeaders = [
             <CTableRow>
               <CTableDataCell
                 colSpan={headers.length}
-                className="text-center text-sm !text-red-600 py-3"
+                className="text-center text-sm  py-3"
               >
-                No Data Found
+                No Data Available
               </CTableDataCell>
             </CTableRow>
           )}

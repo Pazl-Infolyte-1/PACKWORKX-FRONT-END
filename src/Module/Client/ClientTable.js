@@ -295,9 +295,9 @@ function ClientTable({ clientdata, refreshClients, isMinimized, setSingleStatusU
                 <CTableRow>
                   <CTableDataCell
                     colSpan={isMinimized ? 2 : 8}
-                    className="text-center text-sm !text-red-600  py-3"
+                    className="text-center text-sm  py-3"
                   >
-                    No Data Found
+                    No Data Availble
                   </CTableDataCell>
                 </CTableRow>
               )}

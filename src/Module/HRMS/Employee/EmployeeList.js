@@ -181,15 +181,6 @@ function EmployeeList() {
     }
     setFilters(newFilters)
 
-    // Clear other dropdowns (optional - remove if you want multiple filters)
-    if (filterType !== 'status') {
-      // Keep status separate as it has its own handler
-      document.querySelectorAll('.filter-dropdown').forEach((dropdown) => {
-        if (dropdown.id !== selectedDropdownId) {
-          dropdown.value = ''
-        }
-      })
-    }
 
     // Reset pagination to first page when filtering
     setPaginationParams((prev) => ({
@@ -197,11 +188,12 @@ function EmployeeList() {
       currentPage: 1,
     }))
   }
+
   const fetchEmployeeData = async () => {
     setLoading(true)
     try {
       const response = await employeeApi.GetEmployeelist({
-        search: searchQuery || filters.department || filters.role,
+        search: searchQuery,
         page: paginationParams.currentPage,
         limit: paginationParams.pageSize,
         status: status,
@@ -316,7 +308,7 @@ function EmployeeList() {
                   <select
                     id="department-filter"
                     className="bg-white border border-[#e7e5e4] p-[6px] h-[35px] rounded-md filter-dropdown"
-                    defaultValue=""
+                    value={filters.department}
                     onChange={HandleFilter}
                   >
                     <option value="" disabled>
@@ -332,7 +324,7 @@ function EmployeeList() {
                   <select
                     id="role-filter"
                     className="border border-[#e7e5e4] p-[6px] h-[35px] rounded-md filter-dropdown"
-                    defaultValue=""
+                    value={filters.role}
                     onChange={HandleFilter}
                   >
                     <option value="" disabled>

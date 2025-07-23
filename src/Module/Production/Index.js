@@ -193,8 +193,11 @@ const IndexContent = () => {
             const isActive = activeTabIndex === index;
             const isCompleted = activeTabIndex > index;
 
-            // Only allow going back to the immediate previous step
-            if (index < activeTabIndex - 1) {
+            // Disable all forward steps (cannot go forward by clicking number)
+            if (index > activeTabIndex) {
+              isDisabled = true;
+            } else if (index < activeTabIndex - 1) {
+              // Only allow going back to the immediate previous step
               isDisabled = true;
             } else if (locked && index < activeTabIndex) {
               // If locked, keep previous steps disabled as per original logic

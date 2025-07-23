@@ -101,6 +101,11 @@ function EmployeeForm() {
     ],
   })
 
+  const getErrorStyle = (field) =>
+    validationErrors[field]
+      ? { border: '1px solid #ef4444', borderRadius: '4px' } 
+      : {}
+
   // This effect monitors drawer close events
   useEffect(() => {
     // When drawer closes, reset the form
@@ -271,23 +276,43 @@ function EmployeeForm() {
   const handleInputChange = (e) => {
     setIsTouched(true)
     const { name, value } = e.target
+
+    if (name === 'mobile') {
+      // Remove non-digits and limit to 10 digits
+      let cleaned = value.replace(/\D/g, '').slice(0, 10)
+
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: cleaned,
+      }))
+
+      // Live validation for mobile
+      let error = ''
+      if (cleaned.length !== 10) {
+        error = 'Enter a valid 10-digit mobile number'
+      }
+      setValidationErrors((prev) => ({
+        ...prev,
+        [name]: error,
+      }))
+      return
+    }
+
     setFormData((prevState) => ({
       ...prevState,
-      [name]:
-        // Convert to number for specific fields, keep as is for others
-        [
-          'department_id',
-          'designation_id',
-          'reporting_to',
-          'company_address_id',
-          'role_id',
-          'country_phonecode',
-          'country_id',
-        ].includes(name)
-          ? value === ''
-            ? null
-            : Number(value)
-          : value,
+      [name]: [
+        'department_id',
+        'designation_id',
+        'reporting_to',
+        'company_address_id',
+        'role_id',
+        'country_phonecode',
+        'country_id',
+      ].includes(name)
+        ? value === ''
+          ? null
+          : Number(value)
+        : value,
     }))
 
     if (validationErrors[name]) {
@@ -328,7 +353,11 @@ function EmployeeForm() {
     const errors = {}
     requiredFields.forEach((field) => {
       if (!formData[field]) {
-        errors[field] = 'Required'
+        if (field === 'mobile') {
+          errors.mobile = true
+        } else {
+          errors[field] = true
+        }
       }
     })
     if (formData.mobile && !isValidMobile(formData.mobile)) {
@@ -651,53 +680,29 @@ function EmployeeForm() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 ">
             {/* Name */}
             <div>
               <h6 className="mb-2">
                 Name <span className="text-red-600">*</span>
               </h6>
-              <div className="flex items-center border border-stone-200 rounded-md">
+              <div className="flex items-center rounded-md overflow-hidden" style={{border:'1px solid #e7e5e4',...getErrorStyle('name')}}>
                 <input
                   type="text"
                   name="name"
                   className="w-full outline-none text-zinc-500 px-3 py-1"
-                  // placeholder="Enter Your Name"
                   value={formData.name}
                   onChange={handleInputChange}
                 />
                 <RiUserLine className="pr-2h-8 w-8" />
               </div>
-
-              {validationErrors.name && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.name}
-                </div>
-              )}
             </div>
-
             {/* Email */}
             <div>
               <h6 className="mb-2">
                 Email <span className="text-red-600">*</span>
               </h6>
-              <div className="flex items-center border border-stone-200 rounded-md">
+              <div className="flex items-center rounded-md overflow-hidden" style={{border:'1px solid #e7e5e4' ,...getErrorStyle('email')}}>
                 <input
                   type="email"
                   name="email"
@@ -708,29 +713,7 @@ function EmployeeForm() {
                 />
                 <IoIosAt className="pr-2h-8 w-8" />
               </div>
-              {validationErrors.email && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.email}
-                </div>
-              )}
             </div>
-
             {/* Date of Birth */}
             <div>
               <h6 className="mb-2">
@@ -741,49 +724,36 @@ function EmployeeForm() {
                   type="date"
                   name="date_of_birth"
                   className="h-8  w-full outline-none text-zinc-500 px-3"
+                  style={getErrorStyle('date_of_birth')}
                   value={formData.date_of_birth}
                   onChange={handleInputChange}
                 />
               </div>
-              {validationErrors.date_of_birth && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.date_of_birth}
-                </div>
-              )}
             </div>
-
             {/* Mobile */}
             <div>
               <h6 className="mb-2">
                 Mobile Number <span className="text-red-600">*</span>
               </h6>
-              <div className="flex border border-stone-200 rounded-md">
+              <div
+                className="flex border-1 rounded-md overflow-hidden"
+                style={{
+                  borderColor: validationErrors.mobile ? '#ef4444' : '#e5e7eb',
+                  borderRadius: '4px',
+                  ...getErrorStyle('mobile'),
+                }}
+              >
                 {/* Custom country code dropdown */}
                 <div className="relative" ref={dropdownRef}>
                   <button
                     type="button"
-                    className="flex items-center justify-between border-0 rounded-0 border-r border-stone-200 h-8  px-3 bg-white"
-                    onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
+                    className="flex items-center justify-between border-0 rounded-0 h-8 px-3 bg-white"
                     style={{
                       paddingRight: '30px',
                       position: 'relative',
+                      borderRight: `1px solid ${validationErrors.mobile ? '#ef4444' : '#e5e7eb'}`, // Add red border when error
                     }}
+                    onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
                   >
                     {formData.country_id ? (
                       <div className="flex items-center pr-4">
@@ -791,7 +761,6 @@ function EmployeeForm() {
                           const selectedCountry = dropdownOptions.countries.find(
                             (country) => country.id === formData.country_id,
                           )
-
                           return selectedCountry ? (
                             <>
                               <img
@@ -879,35 +848,15 @@ function EmployeeForm() {
                 <input
                   type="tel"
                   name="mobile"
-                  // placeholder="Enter Mobile Number"
+                  className="flex-grow h-8 px-3 outline-none"
                   value={formData.mobile || ''}
                   onChange={handleInputChange}
-                  className="flex-grow border-0 h-8  px-3 outline-none"
                 />
               </div>
-              {validationErrors.mobile && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.mobile}
-                </div>
+              {typeof validationErrors.mobile === 'string' && (
+                <p className="text-red-500 text-xs m-0">{validationErrors.mobile}</p>
               )}
             </div>
-
             {/* Address */}
             <div>
               <h6 className="mb-2">Address </h6>
@@ -923,7 +872,6 @@ function EmployeeForm() {
                 <RiHome2Line className="pr-2h-8 w-8" />
               </div>
             </div>
-
             {/* About Me */}
             <div>
               <h6 className="mb-2">About Me</h6>
@@ -938,7 +886,6 @@ function EmployeeForm() {
                 />
               </div>
             </div>
-
             {/* Employee ID */}
             <div>
               <h6 className="mb-2">
@@ -949,34 +896,13 @@ function EmployeeForm() {
                   type="text"
                   name="employee_id"
                   className="w-full outline-none text-zinc-500 px-3 py-1"
+                  style={getErrorStyle('employee_id')}
                   // placeholder="Enter Employee ID"
                   value={formData.employee_id}
                   onChange={handleInputChange}
                 />
               </div>
-              {validationErrors.employee_id && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.employee_id}
-                </div>
-              )}
             </div>
-
             {/* Password */}
             <div>
               <h6 className="mb-2">Password</h6>
@@ -985,7 +911,6 @@ function EmployeeForm() {
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   className="w-full outline-none text-zinc-500 px-3 py-1"
-                  // placeholder="Enter Password"
                   value={formData.password}
                   onChange={handleInputChange}
                 />
@@ -1001,29 +926,7 @@ function EmployeeForm() {
                   )}
                 </button>
               </div>
-              {validationErrors.password && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.password}
-                </div>
-              )}
             </div>
-
             {/* Company Address */}
             <div>
               <h6 className="mb-2">
@@ -1033,6 +936,7 @@ function EmployeeForm() {
                 <select
                   name="company_address_id"
                   className="h-8  w-full outline-none text-zinc-500 px-3"
+                  style={getErrorStyle('company_address_id')}
                   value={formData.company_address_id || ''}
                   onChange={handleInputChange}
                 >
@@ -1046,29 +950,7 @@ function EmployeeForm() {
                   ))}
                 </select>
               </div>
-              {validationErrors.company_address_id && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.company_address_id}
-                </div>
-              )}
             </div>
-
             {/* Department */}
             <div>
               <h6 className="mb-2">
@@ -1079,6 +961,7 @@ function EmployeeForm() {
                   <select
                     name="department_id"
                     className="h-8  w-full outline-none text-zinc-500 px-3"
+                    style={getErrorStyle('department_id')}
                     value={formData.department_id || ''}
                     onChange={handleInputChange}
                   >
@@ -1106,29 +989,7 @@ function EmployeeForm() {
                     Add Department
                   </button> */}
               </div>
-              {validationErrors.department_id && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.department_id}
-                </div>
-              )}
             </div>
-
             {/* Designation */}
             <div>
               <h6 className="mb-2">
@@ -1139,6 +1000,7 @@ function EmployeeForm() {
                   <select
                     name="designation_id"
                     className="h-8  w-full outline-none text-zinc-500 px-3"
+                    style={getErrorStyle('designation_id')}
                     value={formData.designation_id || ''}
                     onChange={handleInputChange}
                   >
@@ -1160,29 +1022,7 @@ function EmployeeForm() {
                   onClick={() => openModal('designation')}
                 />
               </div>
-              {validationErrors.designation_id && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.designation_id}
-                </div>
-              )}
             </div>
-
             {/* Role */}
             <div>
               <h6 className="mb-2">
@@ -1193,6 +1033,7 @@ function EmployeeForm() {
                   <select
                     name="role_id"
                     className="h-8  w-full outline-none text-zinc-500 px-3"
+                    style={getErrorStyle('role_id')}
                     value={formData.role_id || ''}
                     onChange={handleInputChange}
                   >
@@ -1216,29 +1057,7 @@ function EmployeeForm() {
                   />
                 </div>
               </div>
-              {validationErrors.role_id && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.role_id}
-                </div>
-              )}
             </div>
-
             {/* Joining Date */}
             <div>
               <h6 className="mb-2">
@@ -1249,33 +1068,12 @@ function EmployeeForm() {
                   type="date"
                   name="joining_date"
                   className="h-8  w-full outline-none text-zinc-500 px-3"
+                  style={getErrorStyle('joining_date')}
                   value={formData.joining_date}
                   onChange={handleInputChange}
                 />
               </div>
-              {validationErrors.joining_date && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.joining_date}
-                </div>
-              )}
             </div>
-
             {/* Reporting To */}
             <div>
               <h6 className="mb-2">
@@ -1285,6 +1083,7 @@ function EmployeeForm() {
                 <select
                   name="reporting_to"
                   className="h-8  w-full outline-none text-zinc-500 px-3"
+                  style={getErrorStyle('reporting_to')}
                   value={formData.reporting_to || ''}
                   onChange={handleInputChange}
                 >
@@ -1299,29 +1098,7 @@ function EmployeeForm() {
                   ))}
                 </select>
               </div>
-              {validationErrors.reporting_to && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.reporting_to}
-                </div>
-              )}
             </div>
-
             {/* Employment Type */}
             <div>
               <h6 className="mb-2">
@@ -1331,6 +1108,7 @@ function EmployeeForm() {
                 <select
                   name="employment_type"
                   className="h-8  w-full outline-none text-zinc-500 px-3"
+                  style={getErrorStyle('employment_type')}
                   value={formData.employment_type || ''}
                   onChange={handleInputChange}
                 >
@@ -1345,29 +1123,7 @@ function EmployeeForm() {
                   ))}
                 </select>
               </div>
-              {validationErrors.employment_type && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.employment_type}
-                </div>
-              )}
             </div>
-
             {/* Contract End Date */}
             {formData.employment_type === 'Contract' && (
               <div>
@@ -1379,34 +1135,13 @@ function EmployeeForm() {
                     type="date"
                     name="contract_end_date"
                     className="h-8  w-full outline-none text-zinc-500 px-3"
+                    style={getErrorStyle('contract_end_date')}
                     value={formData.contract_end_date}
                     onChange={handleInputChange}
                   />
                 </div>
-                {validationErrors.contract_end_date && (
-                  <div className="text-red-500 text-xs mt-1 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {validationErrors.contract_end_date}
-                  </div>
-                )}
               </div>
             )}
-
             {/* Skills */}
             <div>
               <h6 className="mb-2">
@@ -1429,7 +1164,11 @@ function EmployeeForm() {
               <CTooltip content="Select a machine to add as a skill" placement="top">
                 <div className="relative" ref={machineDropdownRef}>
                   <div
-                    className={`flex items-center justify-between border border-stone-200 rounded-md p-1 ${machineList && machineList.length > 0 ? 'cursor-pointer' : 'cursor-not-allowed bg-gray-100'}`}
+                    className={`flex items-center justify-between rounded-md p-1 ${machineList && machineList.length > 0 ? 'cursor-pointer' : 'cursor-not-allowed bg-gray-100'}`}
+                    style={{
+                      border: `1px solid ${validationErrors.skills ? '#ef4444' : '#e5e7eb'}`,
+                      borderRadius: '4px',
+                    }}
                     onClick={() => {
                       if (machineList && machineList.length > 0) {
                         setMachineDropdownOpen(!machineDropdownOpen)
@@ -1505,25 +1244,7 @@ function EmployeeForm() {
                 </div>
               </CTooltip>
               {validationErrors.skills && (
-                <div className="text-red-500 text-xs mt-1 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-1"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  {validationErrors.skills}
-                </div>
+                <p className="text-red-500 text-xs mt-1">{validationErrors.skills}</p>
               )}
             </div>
           </div>

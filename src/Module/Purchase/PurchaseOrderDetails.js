@@ -6,6 +6,8 @@ import { CloseButton } from 'react-bootstrap'
 import { capitalize } from 'lodash'
 import ItemDetails from './ItemDetails'
 import { Print } from '@mui/icons-material'
+import { cilPrint } from '@coreui/icons'
+import CIcon from '@coreui/icons-react'
 
 function PurchaseOrderDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -106,9 +108,9 @@ function PurchaseOrderDetails() {
   }
 
   return (
-    <div className="h-[calc(100vh-100px)] overflow-y-auto p-2">
+    <div className="h-[calc(100vh-100px)] overflow-y-auto p-1">
       {/* Header */}
-      <div className="mb-3 border-b-2">
+      <div className="mb-1 border-b-2">
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 m-0 ">
@@ -116,7 +118,7 @@ function PurchaseOrderDetails() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            <button
+            {/* <button
               onClick={handlePDFDownload}
               className="flex items-center gap-2 px-4 py-1 text-sm border border-gray-300 rounded"
             >
@@ -124,6 +126,13 @@ function PurchaseOrderDetails() {
                 <Print />
               </span>{' '}
               Print
+            </button> */}
+            <button
+              onClick={handlePDFDownload}
+              className="flex items-center gap-1 px-3 py-1 text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-b-2 border-transparent hover:border-blue-600"
+            >
+              <CIcon icon={cilPrint} className="h-3 w-3" />
+              <span>Print</span>
             </button>
             <CloseButton
               onClick={() => navigate('/purchaseorder')}
@@ -170,9 +179,9 @@ function PurchaseOrderDetails() {
           {/* Order Details - Half Width */}
           <div className="w-1/2">
             <div className="bg-white rounded-lg border border-gray-200">
-              <div className="p-6">
+              <div className="px-6 py-3">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">ORDER DATE</h2>
-                <div className="space-y-4">
+                <div className="space-y-1">
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">ORDER DATE</span>
                     <span className="text-sm text-gray-900">{purchaseOrder.po_date}</span>

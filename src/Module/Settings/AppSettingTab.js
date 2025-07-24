@@ -8,7 +8,7 @@ import CustomAlert from '../../components/New/CustomAlert'
 function AppSettingTab() {
   const [alerts, setAlerts] = useState([])
   const [formData, setFormData] = useState({
-    date_format: 'DD-MM-YYYY',
+    date_format: 'MMM d, yyyy',
     time_format: '12-hour',
     timezone: 'Asia/Kolkata',
     currency_id: '₹ (INR)',
@@ -34,14 +34,9 @@ function AppSettingTab() {
     e.preventDefault()
 
     const payload = {
-      date_format:
-        formData.date_format === 'DD-MM-YYYY'
-          ? 'd-m-Y'
-          : formData.date_format === 'YYYY-MM-DD'
-            ? 'Y-m-d'
-            : 'm/d/Y',
+      date_format: formData.date_format,
 
-      time_format: formData.time_format === '12-hour' ? 'h:i a' : 'H:i',
+      time_format: formData.time_format === '12-hour' ? 'hh:mm A' : 'HH:mm',
 
       timezone: formData.timezone,
 
@@ -55,15 +50,19 @@ function AppSettingTab() {
 
     const response = await SettingsApi.appSettings(payload)
     if (response.status === 200) {
-      setAlerts([{ severity: 'success', message: response.data.message || 'Settings saved successfully' }])
+      setAlerts([
+        { severity: 'success', message: response.data.message || 'Settings saved successfully' },
+      ])
     } else {
       console.error('Error saving settings:', response.data)
-      setAlerts([{ severity: 'error', message: response.data.message || 'Failed to save settings' }])
+      setAlerts([
+        { severity: 'error', message: response.data.message || 'Failed to save settings' },
+      ])
     }
   }
 
   // Options for dropdowns
-  const date_formatOptions = ['DD-MM-YYYY', 'YYYY-MM-DD', 'MM/DD/YYYY']
+  const date_formatOptions = ['MMM d, yyyy', 'YYYY/MM/DD', 'YYYY-MM-DD']
 
   const time_formatOptions = ['12-hour', '24-hour']
 

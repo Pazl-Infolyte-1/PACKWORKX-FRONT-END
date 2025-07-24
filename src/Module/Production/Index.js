@@ -1,5 +1,3 @@
-// Split your Index component into two parts:
-
 import React, { useEffect, useRef, useState } from "react"
 import { RawMaterialProvider, useRawMaterialContext } from "../../Context/AlocateRawMeterialContext"
 import { GroupLayersProvider, useGroupLayers } from "../../Context/GroupLayersContext"
@@ -19,7 +17,7 @@ const Index = () => {
     <NextHandlerProvider>
       <GroupLayersProvider>
         <RawMaterialProvider>
-          <IndexContent />  {/* Move all the logic here */}
+          <IndexContent />
         </RawMaterialProvider>
       </GroupLayersProvider>
     </NextHandlerProvider>
@@ -28,7 +26,6 @@ const Index = () => {
 
 // 2. IndexContent component that uses the contexts
 const IndexContent = () => {
-  // const [workOrders, setWorkOrders] = useState([])
   const [autoSyncOrders, setAutoSyncOrders] = useState({})
   const [selectedType, setSelectedType] = useState('')
   const [visibleSplit, setVisibleSplit] = useState(false)
@@ -39,7 +36,10 @@ const IndexContent = () => {
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingTab, setPendingTab] = useState(null);
-  const locked = location.state?.lockedSteps === true;
+  
+  // Persist locked state in component state instead of relying on route state
+  const [isLocked, setIsLocked] = useState(false);
+  
   const { groupOrders: rawMaterialGroupOrders } = useRawMaterialContext();
   const [showPendingAllocAlert, setShowPendingAllocAlert] = useState(false);
   const [pendingAllocTab, setPendingAllocTab] = useState(null);
@@ -56,28 +56,23 @@ const IndexContent = () => {
     { label: 'Work Orders', path: 'WorkOrders' },
     { label: 'Group Layers', path: 'GroupLayers' },
     { label: 'Allocate RM', path: 'AllocateRM' },
-    // { label: 'Returnables', path: 'Returnables' },
     { label: 'Outsource & Preview', path: 'OutsourceAndPreview' },
   ];
 
+  // Initialize locked state from route state on first load
+  useEffect(() => {
+    if (location.state?.lockedSteps === true) {
+      setIsLocked(true);
+    }
+  }, []); // Only run on component mount
+
   useEffect(() => {
     if (!currentPath || currentPath === 'form') {
-      navigate('WorkOrders');   
+      navigate('WorkOrders', {
+        state: { lockedSteps: isLocked }
+      });   
     }
   }, [currentPath, navigate]);
-
-  // useEffect(() => {
-  //   async function getWorkOrders() {
-  //     try {
-  //       const response = await workOrderApi.getWorkOrders()
-  //       setWorkOrders(response?.data?.workOrders)
-  //     } catch (error) {
-  //       console.error('Error fetching work orders:', error)
-  //     }
-  //   }
-
-  //   getWorkOrders()
-  // }, [])
 
   useEffect(() => {
     const currentTab = tabs.find(tab => tab.path === currentPath);
@@ -91,6 +86,7 @@ const IndexContent = () => {
   const handleTabChange = (tabPath) => {
     const targetTabIndex = tabs.findIndex(tab => tab.path === tabPath);
     const isLeavingAllocateRM = currentPath === 'AllocateRM' && (tabPath === 'Returnables' || tabPath === 'OutsourceAndPreview');
+    
     if (isLeavingAllocateRM) {
       const pendingGroups = Array.isArray(rawMaterialGroupOrders)
         ? rawMaterialGroupOrders.filter(g => (g.allocated_qty || 0) < (g.group_Qty || 0) && (g.allocated_qty || 0) > 0)
@@ -109,16 +105,33 @@ const IndexContent = () => {
         return;
       } else {
         // No pending allocations, proceed to navigate directly
-        navigate(`/production/form/${tabPath}`);
+        navigate(`/production/form/${tabPath}`, {
+          state: { lockedSteps: isLocked }
+        });
         return;
       }
     }
+    
     if (tabPath !== currentPath) {
+      // Check if moving from step 4 to step 3 (OutsourceAndPreview to AllocateRM)
+      const isMovingFrom4To3 = currentPath === 'OutsourceAndPreview' && tabPath === 'AllocateRM';
+      
       if (targetTabIndex < activeTabIndex) {
-        setPendingTab(tabPath);
-        setShowConfirm(true);
+        if (isMovingFrom4To3) {
+          // Skip confirmation and navigate directly from step 4 to step 3
+          navigate(`/production/form/${tabPath}`, {
+            state: { lockedSteps: isLocked }
+          });
+        } else {
+          // Show confirmation for other backward movements
+          setPendingTab(tabPath);
+          setShowConfirm(true);
+        }
       } else {
-        navigate(`/production/form/${tabPath}`);
+        // Pass along the locked state when navigating forward
+        navigate(`/production/form/${tabPath}`, {
+          state: { lockedSteps: isLocked }
+        });
       }
     }
   };
@@ -126,8 +139,11 @@ const IndexContent = () => {
   const handleConfirmTabChange = async() => {
     setShowConfirm(false);
     if (pendingTab) {
-      await triggerNext()   // ✅ This will now work
-      navigate(`/production/form/${pendingTab}`);
+      await triggerNext();
+      // Pass along the locked state when navigating
+      navigate(`/production/form/${pendingTab}`, {
+        state: { lockedSteps: isLocked }
+      });
       setPendingTab(null);
     }
   };
@@ -155,7 +171,10 @@ const IndexContent = () => {
     if (pendingAllocTab.length !== 0) {
       try {
         await productionApi.AllocateInventoryForPendingQuantityGroups(body);
-        navigate(`/production/form/${pendingAllocTab}`);
+        // Pass along the locked state when navigating
+        navigate(`/production/form/${pendingAllocTab}`, {
+          state: { lockedSteps: isLocked }
+        });
         setPendingAllocTab(null);
       } catch (error) {
         setPendingAllocError('Failed to allocate pending quantity. Please try again.');
@@ -179,7 +198,7 @@ const IndexContent = () => {
       {/* Fixed Header Section */}
       <div className="sticky top-0 bg-white z-[900] flex-shrink-0" style={{paddingTop: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.03)'}}>
 
-        {/* Step Indicator - Exact HTML Pattern */}
+        {/* Step Indicator - Fixed Logic */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -193,18 +212,24 @@ const IndexContent = () => {
             const isActive = activeTabIndex === index;
             const isCompleted = activeTabIndex > index;
 
-            // Disable all forward steps (cannot go forward by clicking number)
-            if (index > activeTabIndex) {
-              isDisabled = true;
-            } else if (index < activeTabIndex - 1) {
-              // Only allow going back to the immediate previous step
-              isDisabled = true;
-            } else if (locked && index < activeTabIndex) {
-              // If locked, keep previous steps disabled as per original logic
-              isDisabled = true;
+            // Fixed step enabling/disabling logic
+            if (isLocked) {
+              // When locked, disable step 2 and below (indices 1 and below)
+              isDisabled = index <= 1;
+            } else {
+              // When not locked, allow normal navigation rules:
+              // - Can click current step (though it does nothing)
+              // - Can go back to immediate previous step only
+              // - Cannot go forward by clicking
+              if (index > activeTabIndex) {
+                // Cannot go forward by clicking step numbers
+                isDisabled = true;
+              } else if (index < activeTabIndex - 1) {
+                // Can only go back to immediate previous step
+                isDisabled = true;
+              }
+              // index === activeTabIndex (current) or index === activeTabIndex - 1 (previous) remain enabled
             }
-            // All other steps (current, next, and immediate previous) follow normal logic
-          
             
             return (
               <React.Fragment key={tab.path}>
@@ -263,7 +288,6 @@ const IndexContent = () => {
                       border: 'none',
                       cursor: isDisabled ? 'not-allowed' : 'pointer',
                       fontSize: '13px',
-                      // opacity: isDisabled ? 0.6 : 1,
                       transition: 'background 0.2s, color 0.2s',
                       boxShadow: isActive ? '0 2px 8px rgba(102,126,234,0.08)' : 'none',
                     }}
@@ -285,7 +309,6 @@ const IndexContent = () => {
                     {tab.label === 'Work Orders' ? 'Select Work Orders' : 
                      tab.label === 'Group Layers' ? 'Group Layers' : 
                      tab.label === 'Allocate RM' ? 'allocate rawmeterials' : 
-                    //  tab.label === 'Returnables' ? 'Allocate Inventory' : 
                      'Preview Allocation'}
                   </div>
                 </div>

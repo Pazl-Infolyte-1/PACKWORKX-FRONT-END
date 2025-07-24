@@ -324,10 +324,11 @@ function ReviewPlan() {
 
         {/* Action Buttons */}
         <div className="flex justify-between items-center pt-3 border-t bg-slate-50 mt-4">
-          <button
+          {/* <button
            className="px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">
             Back to Allocation
-          </button>
+          </button> */}
+          <div></div>
           <div className="flex gap-2">
             {/* <button className="px-4 py-2 text-sm border border-purple-300 text-purple-700 rounded hover:bg-purple-50 transition-colors">
               Save Draft

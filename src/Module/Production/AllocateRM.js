@@ -29,7 +29,7 @@ import GroupData from './RawmeterialComponents/GroupData'
 import { ConstructionOutlined } from '@mui/icons-material'
 import CustomAlert from '../../components/New/CustomAlert'
 import { useNextHandler } from '../../Context/ProductionNextHandlerContext'
-import { useParams, useLocation } from 'react-router-dom'
+import { useParams, useLocation, useNavigate } from 'react-router-dom'
 
 const ItemType = 'RawMeterial'
 
@@ -124,7 +124,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
               minWidth: '40px',
             }}
           >
-            <ThreeDotMenu
+            {/* <ThreeDotMenu
               value={[
                 {
                   label: 'View Work Order',
@@ -155,7 +155,7 @@ function SFGDragableCard({ sfg, openSFG, setOpenSFG }) {
                 //   },
                 // },
               ]}
-            />
+            /> */}
           </span>
         </div>
 
@@ -280,7 +280,7 @@ function GroupDropZone({
               {i?.layer_detail?.weight?.toString().substring(0, 5)} KG
             </span>
 
-            <Dropdown>
+            {/* <Dropdown>
               <Dropdown.Toggle as={CustomToggle} />
               <Dropdown.Menu>
                 <Dropdown.Item onClick={() => console.log('View Work Order')}>
@@ -316,7 +316,8 @@ function GroupDropZone({
                   Split Work Order
                 </Dropdown.Item>
               </Dropdown.Menu>
-            </Dropdown>
+            </Dropdown> */}
+            
           </div>
         </div>
 
@@ -687,6 +688,7 @@ const AllocateRM = ({}) => {
   const {groupOrders,refreshData, sfgData ,handleFilterChange,selectedFilters,alerts,setAlertsApp,handleClose,setRouteId,routeId,fetchWorkOrders} = useRawMaterialContext()
   const {registerNextHandler} = useNextHandler()
   const location = useLocation();
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -788,221 +790,237 @@ const AllocateRM = ({}) => {
 
 
   return (
-    <div className="flex flex-col">
+    <div className="h-[calc(98vh-150px)] relative overflow-hidden flex flex-col bg-gray-50">
+      <div className="flex-1 flex flex-col h-full min-h-0">
         <CustomAlert
-        alerts={alerts}
-        handleClose={handleClose}
+          alerts={alerts}
+          handleClose={handleClose}
         />
-        
-                  {/* Screen Header */}
-                  <div
+        {/* Screen Header */}
+        <div
           style={{
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             color: 'white',
             borderBottom: '3px solid #5a67d8'
           }}
-           className=" rounded-t-lg text-white !px-8 py-2.5 border-b-[3px] border-indigo-600">
-            <div className="text-base font-semibold mb-1">
-              Step 3: Allocate Raw Material
-            </div>
-            <div className="text-xs opacity-90">
-              Assign available raw materials to production groups to ensure efficient and accurate manufacturing.
-            </div>
+          className="rounded-t-lg text-white !px-8 py-2.5 border-b-[3px] border-indigo-600"
+        >
+          <div className="text-base font-semibold mb-1">
+            Step 3: Allocate Raw Material
           </div>
-      {/* Groups Column */}
-      <div
-      className='flex gap-2'
-      >
-        
-      <CCol xs={6}>
-        <div className="bg-slate-50 p-3 custom-srollbar" style={{ height: 'calc(95vh - 200px)', overflowY: 'auto' }}>
-          <div className="text-[15px] font-semibold mb-4 text-gray-700">
-            Available Groups
+          <div className="text-xs opacity-90">
+            Assign available raw materials to production groups to ensure efficient and accurate manufacturing.
           </div>
-          {groupOrders?.length === 0 ? (
+        </div>
+        {/* Main Content */}
+        <div className='flex gap-2 flex-1 min-h-0'>
+          {/* Groups Column */}
+          <CCol xs={6} className="h-full">
+            <div className="bg-slate-50 p-3 custom-srollbar h-full rounded-lg" style={{ overflowY: 'auto', height: '100%' }}>
+              <div className="text-[15px] font-semibold mb-4 text-gray-700">
+                Available Groups
+              </div>
+              {groupOrders?.length === 0 ? (
+                <CCard
+                  className="mb-2 "
+                  style={{
+                    borderRadius: '8px',
+                    padding: '20px',
+                    textAlign: 'center',
+                    margin: '20px'
+                  }}
+                >
+                  <CCardBody>
+                    <div className="flex flex-col items-center justify-center">
+                      <CIcon
+                        icon={cilBriefcase}
+                        style={{ fontSize: '2rem', color: '#8167e5', marginBottom: '10px' }}
+                      />
+                      <span className="text-gray-600 font-medium">No Groups Available</span>
+                      <span className="text-gray-500 text-sm mt-1">Create groups to begin allocation</span>
+                    </div>
+                  </CCardBody>
+                </CCard>
+              ) : (
+                groupOrders?.map((group, groupIndex) => (
+                  <GroupRawMeterialDropZone
+                    key={groupIndex}
+                    group={group}
+                    groupIndex={groupIndex}
+                    visibleGroupIndex={visibleGroupIndex}
+                    toggleGroupCollapse={toggleGroupCollapse}
+                  />
+                ))
+              )}
+            </div>
+          </CCol>
+
+          {/* Raw Material Column */}
+          <CCol xs={6} className="h-full">
             <CCard
-              className="mb-2 "
+              className="mb-2 !bg-slate-50 h-full"
               style={{
-                borderRadius: '8px',
-                padding: '20px',
-                textAlign: 'center',
-                margin: '20px'
+                borderRadius: '10px',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                border: 'none'
               }}
             >
-              <CCardBody>
-                <div className="flex flex-col items-center justify-center">
-                  <CIcon
-                    icon={cilBriefcase}
-                    style={{ fontSize: '2rem', color: '#8167e5', marginBottom: '10px' }}
-                  />
-                  <span className="text-gray-600 font-medium">No Groups Available</span>
-                  <span className="text-gray-500 text-sm mt-1">Create groups to begin allocation</span>
+              <CCardBody style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div className="d-flex fw-bold justify-content-center align-items-center" style={{ fontSize: '14px' }}>
+                  Raw Material
+                </div>
+                <div
+                  style={{
+                    height: '4px',
+                    marginTop: '8px',
+                    backgroundColor: '#e5e7eb',
+                    borderRadius: '2px',
+                  }}
+                ></div>
+
+                <CRow className="align-items-center mt-3">
+                  <CCol md="2">
+                    <label style={{ fontSize: '12px' }}>Raw Meterial</label>
+                    <CFormSelect 
+                      style={selectStyles}
+                    >
+                      <option value="Reel">Reel</option>
+                    </CFormSelect>
+                  </CCol>
+                  <CCol md="2">
+                    <label style={{ fontSize: '12px' }}>GSM</label>
+                    <CFormSelect 
+                      style={selectStyles}
+                      value={selectedFilters?.gsm}
+                      onChange={(e) => handleFilterChange('gsm', e.target.value)}
+                    >
+                      <option value="">GSM</option>
+                      {gsmOptions?.map((option, index) => (
+                        <option key={index} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
+                  <CCol md="2">
+                    <label style={{ fontSize: '12px' }}>BF</label>
+                    <CFormSelect 
+                      style={selectStyles}
+                      value={selectedFilters?.bf}
+                      onChange={(e) => handleFilterChange('bf', e.target.value)}
+                    >
+                      <option value="">BF</option>
+                      {bfOptions?.map((option, index) => (
+                        <option key={index} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
+                  <CCol md="2">
+                    <label style={{ fontSize: '12px' }}>Color</label>
+                    <CFormSelect 
+                      style={selectStyles}
+                      value={selectedFilters?.color}
+                      onChange={(e) => handleFilterChange('color', e.target.value)}
+                    >
+                      <option value="">Color</option>
+                      {colorOptions?.map((option, index) => (
+                        <option key={index} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
+                  <CCol md="2">
+                    <label style={{ fontSize: '12px' }}>Deckle</label>
+                    <CFormSelect 
+                      style={selectStyles}
+                      value={selectedFilters?.deckle}
+                      onChange={(e) => handleFilterChange('deckle', e.target.value)}
+                    >
+                      <option value="">Deckle</option>
+                      {deckleOptions?.map((option, index) => (
+                        <option key={index} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
+                </CRow>
+                <CRow className="align-items-center mt-2">
+                  <CCol md="2">
+                    <label style={{ fontSize: '12px' }}>Die</label>
+                    <CFormSelect style={selectStyles}>
+                      <option>180</option>
+                    </CFormSelect>
+                  </CCol>
+                  <CCol md="2">
+                    <label style={{ fontSize: '12px' }}>Ink</label>
+                    <CFormSelect style={selectStyles}>
+                      <option>25</option>
+                    </CFormSelect>
+                  </CCol>
+                  <CCol md="2">
+                    <label style={{ fontSize: '12px' }}>Stero</label>
+                    <CFormSelect style={selectStyles}>
+                      <option>90</option>
+                    </CFormSelect>
+                  </CCol>
+                  <CCol md="2">
+                    <label style={{ fontSize: '12px' }}>Glue</label>
+                    <CFormSelect style={selectStyles}>
+                      <option>25</option>
+                    </CFormSelect>
+                  </CCol>
+                  <CCol md="4">
+                    <label style={{ fontSize: '12px' }}>Stiching Wires</label>
+                    <CFormSelect className="w-50" style={selectStyles}>
+                      <option>25</option>
+                    </CFormSelect>
+                  </CCol>
+                </CRow>
+
+                <div
+                  style={{
+                    height: '4px',
+                    marginTop: '8px',
+                    backgroundColor: '#e5e7eb',
+                    borderRadius: '2px',
+                  }}
+                ></div>
+                <div style={{ flex: 1, overflowY: 'auto', marginTop: '8px' }} className="custom-scrollbar">
+                  {sfgData?.map((sfg, index) => (
+                    <SFGDragableCard
+                      sfg={sfg}
+                      key={index}
+                      openSFG={openSFG}
+                      setOpenSFG={setOpenSFG}
+                    />
+                  ))}
                 </div>
               </CCardBody>
             </CCard>
-          ) : (
-            groupOrders?.map((group, groupIndex) => (
-              <GroupRawMeterialDropZone
-                key={groupIndex}
-                group={group}
-                groupIndex={groupIndex}
-                visibleGroupIndex={visibleGroupIndex}
-                toggleGroupCollapse={toggleGroupCollapse}
-              />
-            ))
-          )}
+          </CCol>
         </div>
-      </CCol>
-
-      {/* Raw Material Column */}
-      <CCol xs={6}>
-        <CCard
-          className="mb-2 !bg-slate-50"
-          style={{
-            borderRadius: '10px',
-            height: 'calc(95vh - 200px)',
-            display: 'flex',
-            flexDirection: 'column',
-            border: 'none'
-          }}
-        >
-          <CCardBody style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div className="d-flex fw-bold justify-content-center align-items-center" style={{ fontSize: '14px' }}>
-              Raw Material
-            </div>
-            <div
-              style={{
-                height: '4px',
-                marginTop: '8px',
-                backgroundColor: '#e5e7eb',
-                borderRadius: '2px',
-              }}
-            ></div>
-
-            <CRow className="align-items-center mt-3">
-              <CCol md="2">
-                <label style={{ fontSize: '12px' }}>Raw Meterial</label>
-                <CFormSelect 
-                  style={selectStyles}
-                >
-                  <option value="Reel">Reel</option>
-                </CFormSelect>
-              </CCol>
-              <CCol md="2">
-                <label style={{ fontSize: '12px' }}>GSM</label>
-                <CFormSelect 
-                  style={selectStyles}
-                  value={selectedFilters?.gsm}
-                  onChange={(e) => handleFilterChange('gsm', e.target.value)}
-                >
-                  <option value="">GSM</option>
-                  {gsmOptions?.map((option, index) => (
-                    <option key={index} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-              <CCol md="2">
-                <label style={{ fontSize: '12px' }}>BF</label>
-                <CFormSelect 
-                  style={selectStyles}
-                  value={selectedFilters?.bf}
-                  onChange={(e) => handleFilterChange('bf', e.target.value)}
-                >
-                  <option value="">BF</option>
-                  {bfOptions?.map((option, index) => (
-                    <option key={index} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-              <CCol md="2">
-                <label style={{ fontSize: '12px' }}>Color</label>
-                <CFormSelect 
-                  style={selectStyles}
-                  value={selectedFilters?.color}
-                  onChange={(e) => handleFilterChange('color', e.target.value)}
-                >
-                  <option value="">Color</option>
-                  {colorOptions?.map((option, index) => (
-                    <option key={index} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-              <CCol md="2">
-                <label style={{ fontSize: '12px' }}>Deckle</label>
-                <CFormSelect 
-                  style={selectStyles}
-                  value={selectedFilters?.deckle}
-                  onChange={(e) => handleFilterChange('deckle', e.target.value)}
-                >
-                  <option value="">Deckle</option>
-                  {deckleOptions?.map((option, index) => (
-                    <option key={index} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-            </CRow>
-            <CRow className="align-items-center mt-2">
-              <CCol md="2">
-                <label style={{ fontSize: '12px' }}>Die</label>
-                <CFormSelect style={selectStyles}>
-                  <option>180</option>
-                </CFormSelect>
-              </CCol>
-              <CCol md="2">
-                <label style={{ fontSize: '12px' }}>Ink</label>
-                <CFormSelect style={selectStyles}>
-                  <option>25</option>
-                </CFormSelect>
-              </CCol>
-              <CCol md="2">
-                <label style={{ fontSize: '12px' }}>Stero</label>
-                <CFormSelect style={selectStyles}>
-                  <option>90</option>
-                </CFormSelect>
-              </CCol>
-              <CCol md="2">
-                <label style={{ fontSize: '12px' }}>Glue</label>
-                <CFormSelect style={selectStyles}>
-                  <option>25</option>
-                </CFormSelect>
-              </CCol>
-              <CCol md="4">
-                <label style={{ fontSize: '12px' }}>Stiching Wires</label>
-                <CFormSelect className="w-50" style={selectStyles}>
-                  <option>25</option>
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            <div
-              style={{
-                height: '4px',
-                marginTop: '8px',
-                backgroundColor: '#e5e7eb',
-                borderRadius: '2px',
-              }}
-            ></div>
-            <div style={{ flex: 1, overflowY: 'auto', marginTop: '8px' }} className="custom-scrollbar">
-              {sfgData?.map((sfg, index) => (
-                <SFGDragableCard
-                  sfg={sfg}
-                  key={index}
-                  openSFG={openSFG}
-                  setOpenSFG={setOpenSFG}
-                />
-              ))}
-            </div>
-          </CCardBody>
-        </CCard>
-      </CCol>
+        {/* Action Button: Type of allocate raw meterial */}
+        <div className="flex gap-2 justify-center items-end mt-3">
+          <button
+            onClick={() => navigate('/production/form/OutsourceAndPreview')}
+            className={`
+              px-4 py-2 rounded-md border-none font-semibold text-white text-sm
+              transition-all duration-200 ease-in-out
+              bg-indigo-500
+              hover:bg-indigo-600 hover:-translate-y-px
+              disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed
+              shadow-sm
+            `}
+          >
+            type of allocate raw meterial
+          </button>
+        </div>
       </div>
     </div>
   )

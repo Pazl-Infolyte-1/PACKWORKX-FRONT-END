@@ -58,11 +58,11 @@ const ProductionPlanning = () => {
       setEmployeesData(employeeData?.data?.data)
       const machines = await machineApi.getMachine({})
       setMachinesData(machines?.data?.data)
-      const groups = await productionApi.getProductionGroups({})
+      const groups = await productionApi.getProductionPlanningGroups({})
       const productionGroups = groups?.data?.data.filter(
         (group) => group.group_status === 'allocation_completed',
       )
-      setGroupsData(productionGroups)
+      setGroupsData(groups?.data?.data)
     }
     fetchData()
 

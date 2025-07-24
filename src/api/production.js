@@ -26,6 +26,9 @@ export const productionApi = {
   getProductionGroups:async()=>{
     return await apiClient.get('/production/production-group?include_work_orders=true&temporary_status=1')
   },
+  getProductionPlanningGroups:async()=>{
+    return await apiClient.get('/production/production-group?include_work_orders=true&temporary_status=0')
+  },
    getProductionGroupTable:async(params)=>{
     return await apiClient.get('/production/production-group?include_work_orders=true&temporary_status=0',{params})
   },

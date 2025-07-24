@@ -7,7 +7,7 @@ import {
   CTableDataCell,
   CTableHead,
 } from '@coreui/react'
-import { cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
+import { cilDescription, cilHandPointRight, cilPencil, cilTrash } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import ThreeDotMenu from '../../components/ThreeDotMenu'
 import WorkOrderDetails from './WorkOrderDetails'
@@ -18,6 +18,7 @@ import ProgressCompletedModal from './ProgressCompletedModale'
 import { workOrderApi } from '../../api/workOrder'
 import LayerProduction from './LayerProduction'
 import CustomPopup from '../../components/New/CustomPopupModal/CustomPopup'
+import { vi } from 'date-fns/locale'
 
 const WorkOrderTable = ({
   cellData,
@@ -303,7 +304,7 @@ const WorkOrderTable = ({
           },
           {
             label: 'view Production Status',
-            icon: cilTrash,
+            icon: cilDescription,
             onClick: () => {
               hanleViewProductionClick(row)
             },

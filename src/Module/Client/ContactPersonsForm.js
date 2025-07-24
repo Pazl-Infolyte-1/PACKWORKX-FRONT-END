@@ -15,7 +15,7 @@ const ContactPersonsForm =() =>{
 		])
 	  }
 	return (
-        <div className="p-4 bg-white shadow-md rounded-lg  p-6 w-[200%] ml-5">
+        <div className="p-4 bg-white shadow-md rounded-lg w-[200%] ml-5">
           <table className="w-full border-collapse mt-2 ">
             <thead>
               <tr className="bg-white">
